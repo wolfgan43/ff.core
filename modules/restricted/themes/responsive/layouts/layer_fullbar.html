@@ -1,0 +1,40 @@
+<div class="container-fluid">
+  <div class="row maincontent -fixedtop -leftview">
+    <nav id="mainmenu" class="hidden-xs col-sm-1 col-md-3 col-lg-2 sidemenu -inverse">
+      <div class="sidemenu__head">
+        <div class="text-center"> {brand} </div>
+        <div class="adminmenu"> {admin} </div>
+        {account}
+        {search}
+      </div>
+      {topbar} </nav>
+    <section class="col-sm-offset-1 col-md-offset-3 col-lg-offset-2 col-sm-10 col-md-9 col-lg-10">
+      <header class="header {fullbar_class}">
+        <div class="row header__top">
+          <div class="col-xs-5 col-sm-7 header__left">
+              <a href="javascript:void(0);" class="header__menutoggler" onclick="jQuery('.maincontent').toggleClass('-leftview');">
+                  <i class="fa fa-bars"></i>
+              </a>
+              <h1>{page-title}</h1>
+          </div>
+          <div class="col-xs-7 col-sm-5 header__right"> {favorite} {lang}
+            {accountpanel} <a class="header__menutoggler" href="javascript:void(0);" onclick="jQuery('.maincontent').toggleClass('-rightview');"><i class="fa-bars fa"></i></a>
+          </div>
+        </div>
+        <div class="row header__bar">
+          <div class="col-sm-6"> {tab-header} </div>
+          <div class="col-sm-6">{breadcrumb}</div>
+        </div>
+      </header>
+      <section class="pagecontent"> {[notifier|box]}{content} </section>
+      <!--BeginSectFooter-->
+      <footer class="row footer">
+        <div class="footer__copy">
+          <p>{_developer_label} <a href="{_developer_url}">{_developer_name}</a></p>
+        </div>
+      </footer>
+      <!--EndSectFooter-->
+    </section>
+    <div class="cmppanel -inverse col-sm-3 col-lg-2 "> {rightcol} </div>
+  </div>
+</div>
