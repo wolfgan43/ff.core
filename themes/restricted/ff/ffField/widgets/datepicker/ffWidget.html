@@ -1,0 +1,67 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginLoad("jquery.datepicker.regional.{lang}", "/themes/library/jquery.ui/i18n/jquery.ui.datepicker-{lang}.js");
+    
+    <!--BeginSectDateTimeHeader-->
+    ff.injectCSS("jqueryuitimepicker", "/themes/restricted/ff/ffField/widgets/datepicker/timepicker-addon.css", function() {
+        //ff.injectCSS("jqueryuislider", "{jqueryuislider}");
+    });
+    <!--EndSectDateTimeHeader-->
+
+	/* Remove jquery ui css
+	ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
+		ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
+			ff.injectCSS("jqueryuidatepicker", "{jqueryuidatepicker}", function() {
+				ff.pluginLoad("jquery.datepicker.regional.{lang}", "/themes/library/jquery.ui/i18n/jquery.ui.datepicker-{lang}.js");
+                
+                <!--BeginSectDateTimeHeader-->
+                ff.injectCSS("jqueryuitimepicker", "/themes/restricted/ff/ffField/widgets/datepicker/timepicker-addon.css", function() {
+                    ff.injectCSS("jqueryuislider", "{jqueryuislider}");
+                });
+                <!--EndSectDateTimeHeader-->
+			});
+		});
+	});*/
+	<!--BeginSectBinding-->
+	jQuery(function() {
+        <!--BeginSectDate-->
+        jQuery(document.getElementById("{container}{id}")).datepicker({
+            changeMonth: true
+            , changeYear: true
+            , yearRange: "-{min_year}:+{max_year}"
+        });
+        <!--EndSectDate-->
+        <!--BeginSectDateTime-->
+        ff.pluginLoad("jquery.ui.timepicker", "/themes/restricted/ff/ffField/widgets/datepicker/timepicker-addon.js", function() {
+            jQuery(document.getElementById("{container}{id}")).datetimepicker({
+                changeMonth: true
+                , changeYear: true
+                , yearRange: "-{min_year}:+{max_year}"
+                , timeFormat: 'HH:mm:ss'
+                , timeOnlyTitle: '{_datepicker_choose}'
+                , timeText: '{_datepicker_time}'
+                , hourText: '{_datepicker_hour}'
+                , minuteText: '{_datepicker_minute}'
+                , secondText: '{_datepicker_second}'
+                , currentText: '{_datepicker_current}'
+                , closeText: '{_datepicker_close}'
+                , showButtonPanel: false
+            });
+        });
+        <!--EndSectDateTime-->
+		/*ff.doEvent({
+			"event_name" : "initIFElement"
+			, "event_params" : ["{container}{id}", "datepicker"]
+		});*/
+	});
+	<!--EndSectBinding-->
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<input type="text" id="{container}{id}" name="{container}{id}" value="{value}" class="{class}_text" style="{style}" {properties} />
+<a href="javascript:void(0);" onclick="$('#{container}{id}').datepicker('show');" class="{datepicker_class}"></a>
+<!--EndSectControl-->

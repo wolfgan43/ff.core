@@ -1,0 +1,33 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	"{site_path}/themes/library/ff/ffField.js",	function() {
+	ff.pluginLoad("swfobject", "{site_path}/themes/library/swfobject/swfobject.js", function () {
+		ff.injectCSS("uploadify", "{site_path}/themes/library/plugins/jquery.uploadify/uploadify.css", function() {
+			ff.pluginLoad("jquery.fn.uploadify", "{site_path}/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function () {
+				ff.pluginLoad("ff.ffField.uploadify", "{site_path}/themes/default/ff/ffField/widgets/uploadify/uploadify.js");
+			}, false);
+		});
+	}, false);
+});
+</script>
+<!--EndSectHeaders-->
+
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+	ff.pluginAddInit("ff.ffField.uploadify", function () {
+		ff.ffField.uploadify.init({
+			component 		: "{container}{id}",
+			suffix 			: "{suffix_file}",
+			basePath		: "{site_path}/themes/library/plugins/jquery.uploadify",
+			baseUrl			: "{base_url}", 
+			previewJs		: {preview_js},
+			sizeLimit		: {size_limit}
+		});
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+{control}
+<!--EndSectControl-->

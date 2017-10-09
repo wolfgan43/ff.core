@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<menu>
+		<!--<ds path="/ds" label="Data Storage" location="admin" acl="3" />-->
+		<admin path="/admin" label="Admin" redir="/admin/layout">
+			<layout path="/admin/layout" label="Layout" />
+			<h label="Showfiles" />
+			<showfiles path="/admin/showfiles" label="Items" />
+			<showfiles-modes path="/admin/showfiles-modes" label="Modes" />
+			<h label="Others" />
+		</admin>
+	</menu>
+	<!--<layout>
+		<layer path="/ds" name="twocols" />
+	</layout>-->
+</configdata>

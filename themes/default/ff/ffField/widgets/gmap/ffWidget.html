@@ -1,0 +1,34 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript" >
+ff.pluginLoad("ff.ffField",	ff.site_path + "/themes/library/ff/ffField.js",	function() {
+	ff.pluginLoad("ff.lib.gmap", "http://maps.google.com/maps?file=api&v=2&key={key}", function () {
+		ff.pluginLoad("ff.ffField.gmap", "{site_path}/themes/default/ff/ffField/widgets/gmap/gmap.js");
+	});
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript" defer="defer">
+	ff.pluginAddInit("ff.ffField.gmap", function () {
+		ff.ffField.gmap.init();
+		<!--BeginSectBinding-->
+		ff.ffField.gmap.addData({
+			"id"			: "{container}{id}",
+			"draggable"		: {draggable},
+			"startLat"		: {start_lat},
+			"startLng"		: {start_lng},
+			"startZoom"		: {start_zoom},
+			"title"			: "{title}",
+			"setMarker"		: {set_marker},
+			"forceSearch"	: {force_search}
+		});
+		<!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<input class="FormsControl_text" type="text" id="{container}{id}[search]" name="{container}{id}[search]" value="{title}" onkeypress="return ff.ffField.gmap.searchViaEnter(event, '{container}{id}', document.getElementById('{container}{id}[search]').value)" />&nbsp;<input id="{container}{id}[search_bt]" name="{container}{id}[search_bt]" type="button" onclick="javascript:ff.ffField.gmap.searchAddress('{container}{id}', document.getElementById('{container}{id}[search]').value)" value="Cerca" class="button noactivebuttons" style="width: auto;" />
+<div id="{container}{id}[map]" {properties} ></div>
+<!--EndSectControl-->

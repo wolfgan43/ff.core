@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<menu>
+		<!--
+				"default Serve per dare accesso al file /index normalmente contenuto alla radice di ogni sito,
+				senza però visualizzare navigazione
+		-->
+		<default path="/" hide="true" />
+		<admin path="/admin" label="Admin">
+			<settings path="/admin/settings" label="Settings" />
+		</admin>
+	</menu>
+	<sections>
+		<top>
+			<topbar default="true" />
+			<admin />
+			<account />
+		</top>
+		<nav>
+			<navbar default="true" />
+			<rightcol />
+		</nav>
+	</sections>
+	<!--<settings>
+		<nomegruppo label="NOME GRUPPO">
+			<NOMECAMPO label="nome campo" parametri del field />
+		</nomegruppo>
+		<packages label="Alterazione Package">
+			<nomecampo label="NOME CAMPO" allow_undefined="true" undefined_label="illimitati" />
+		</packages>
+	</settings>-->
+</configdata>

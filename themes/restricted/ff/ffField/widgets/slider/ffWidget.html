@@ -1,0 +1,64 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	/* Remove jquery ui css
+	ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
+		ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
+			ff.injectCSS("jqueryuislider", "{jqueryuislider}", function() {
+			});
+		});
+	});
+	*/
+	<!--BeginSectBinding-->
+	jQuery(function() {
+		var description = [<!--BeginSectElement-->'{element}',<!--EndSectElement-->];
+		jQuery("#{container}{id}_slider").slider({
+			animate: true
+			,min: {min}
+			,max: {max}
+			,step: {step}
+			,value: {value}			
+			,slide: function(event, ui) {
+				jQuery("#{container}{id}").val(ui.value);
+				jQuery("#{container}{id}_amount").val(ui.value);
+				<!--BeginSectDesc-->
+					var label = description[jQuery("#{container}{id}_amount").get(0).value];
+					jQuery("#{container}{id}_label").val(label);
+				<!--EndSectDesc-->
+			}
+		});
+		$("#{container}{id}_amount").keyup(function(event) {
+			if (/\D/g.test(this.value))
+			{
+			    this.value = this.value.replace(/\D/g, '');
+			}
+			else
+			{
+				jQuery("#{container}{id}_slider").slider( "value", jQuery(this).val());
+				jQuery("#{container}{id}").val(jQuery(this).val());
+			}
+	    });
+
+		$("#{container}{id}_amount").val($("#{container}{id}_slider").slider("value"));
+		<!--BeginSectDefault-->
+			jQuery("#{container}{id}_label").val(description[0]);
+		<!--EndSectDefault-->
+	});
+	<!--EndSectBinding-->
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<div class="slider-box">
+	{fixed_pre_content}
+	<input type="text" class="slider {class}" id="{container}{id}_amount" {properties} />
+	<!--BeginSectText-->
+		<input type="text" class="slider-label" id="{container}{id}_label" {properties} readonly="readonly" />
+	<!--EndSectText-->
+	<input type="hidden" id="{container}{id}" name="{container}{id}" value="{value_format}" />
+	{fixed_post_content}
+	<div id="{container}{id}_slider"></div>
+</div>
+<!--EndSectControl-->

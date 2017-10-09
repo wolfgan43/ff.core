@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<rule id="mention">
+		<priority>NORMAL</priority>
+		<source>^/restricted/mention(.*)</source>
+		<destination>
+			<module>mention</module>
+			<url>/restricted/mention$1</url>
+		</destination>
+        <reverse>/restricted/mention</reverse> 
+		<accept_path_info />
+	</rule>
+    <rule id="mention_services">
+        <priority>NORMAL</priority>
+        <source>^/services(.*)</source>
+        <destination>
+            <module>mention</module>
+            <url>/services$1</url>
+        </destination>
+        <reverse>/services</reverse>
+        <accept_path_info />
+    </rule>
+    <rule>
+        <priority>NORMAL</priority>
+        <source>^/restricted/mention/settings(.*)</source>
+        <destination>
+            <module>restricted</module>
+            <url>/settings/mention$1</url>
+        </destination>
+        <accept_path_info />
+    </rule>
+</configdata>
+

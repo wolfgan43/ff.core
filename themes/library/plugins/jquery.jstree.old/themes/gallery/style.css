@@ -1,0 +1,30 @@
+/* LOCKED */
+.tree-gallery .locked li a { color:gray; }
+/* DOTS */
+.tree-gallery ul { background-position:6px 1px; background-repeat:repeat-y; background-image:url(data:image/gif;base64,R0lGODlhAgACAIAAAB4dGf///yH5BAEAAAEALAAAAAACAAIAAAICRF4AOw==); _background-image:url("dot_for_ie.gif"); background-image:url("dot_for_ie.gif"); }
+.tree-gallery li { background-position:-64px -16px; background-repeat:no-repeat; background-image:url("icons.png"); }
+/* NO DOTS */
+.tree-gallery .no_dots, .tree-gallery .no_dots ul { background:transparent; }
+.tree-gallery .no_dots li.leaf { background-image:none; background-color:transparent; }
+/* OPEN or CLOSED */
+.tree-gallery li.open { background:url("icons.png") -32px -48px no-repeat; }
+.tree-gallery li.closed, #jstree-dragged.tree-gallery li li.open { background:url("icons.png") -48px -32px no-repeat; }
+#jstree-marker { background-image:url("icons.png"); }
+/* gallery, HOVER, CLICKED, LOADING STATES */
+.tree-gallery li a, .tree-gallery li span { border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
+.tree-gallery li a:hover, .tree-gallery li a.hover, .tree-gallery li span { background: #e7f4f9; border:1px solid #d8f0fa; padding:0px 3px 0px 3px; }
+.tree-gallery li a.clicked, .tree-gallery li a.clicked:hover, .tree-gallery li span.clicked { background: #beebff; border:1px solid #99defd; padding:0px 3px 0px 3px; }
+/* ICONS */
+.tree-gallery ins { background-image:url("icons.png"); background-position:0 0; background-repeat:no-repeat; }
+.tree-gallery ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important; } /* UL is added to make selector stronger */
+.tree-gallery li a ins.forbidden { background-position:-16px -16px; }
+.tree-gallery .locked li a ins { background-position:0 -48px; }
+.tree-gallery li span ins { background-position:-16px 0; }
+#jstree-dragged.tree-gallery ins { background:url("icons.png") -16px -32px no-repeat; }
+#jstree-dragged.tree-gallery ins.forbidden { background:url("icons.png") -16px -16px no-repeat; }
+
+/* CONTEXT MENU */
+.tree-gallery-context a ins { background-image:url("icons.png"); background-repeat:no-repeat; background-position:-64px -64px; }
+.tree-gallery-context a ins.create { background-position:0 -16px; }
+.tree-gallery-context a ins.rename { background-position:-16px 0px; }
+.tree-gallery-context a ins.remove { background-position:0 -32px; }

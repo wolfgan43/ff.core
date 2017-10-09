@@ -1,0 +1,59 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
+	ff.pluginLoad("jquery.ui", "/themes/library/jquery.ui/jquery.ui.js", function() {
+		ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js");
+	});
+/* Remove jquery ui css
+	ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
+		ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
+			ff.injectCSS("jqueryuidialog", "{jqueryuidialog}", function() {
+				<!--BeginSectResizeCss-->
+				ff.injectCSS("jqueryuiresizable", "{jqueryuiresizable}");
+				<!--EndSectResizeCss-->
+			});
+		});
+	});
+*/
+});
+</script>
+<!--EndSectHeaders-->
+<!--BeginSectControl-->
+<a href="{addjs}javascript:ff.ffPage.dialog.doOpen('{id}');" class="{class}">{name}</a>
+<!--EndSectControl-->
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("ff.ffPage.dialog", function () {
+		<!--BeginSectIstance-->
+		ff.ffPage.dialog.addDialog({
+			"id" : "{id}",
+			"callback" : "{callback}",
+			"url" : "{url}",
+			"resizable" : {resizable},
+			"position" : {position},
+			"draggable" : {draggable},
+			<!--BeginSectParams-->
+			"params" : {
+				<!--BeginSectParam-->
+				"{param_name}" : "{param_value}" {param_colon}
+				<!--EndSectParam-->
+			},
+			<!--EndSectParams-->
+			"title" : "{title}"
+			<!--BeginSectClass-->
+			, "dialogClass" : "{dialog_class}"
+			<!--EndSectClass-->
+			<!--BeginSectHeight-->
+			, "height" : {height}
+			<!--EndSectHeight-->
+			<!--BeginSectWidth-->
+			, "width" : {width}
+			<!--EndSectWidth-->
+			, "doredirects" : {doredirects}
+			, "responsive" : {responsive}
+			, "unique" : {unique}
+		});
+		<!--EndSectIstance-->
+	});
+</script>
+<!--EndSectFooters-->

@@ -1,0 +1,47 @@
+<div id="{component}hidden" class="hidden">
+	<input type="hidden" id="{component}rows" name="{component}rows" value="{rows}" />
+	<input type="hidden" id="{component}delete_row" name="{component}delete_row" value="" />
+	<!--BeginSectHidden-->
+	<input type="hidden" name="{component}{hidden_name}" value="{hidden_value}" />
+	<!--EndSectHidden-->
+</div>
+
+<!--BeginSectNew-->
+<div class="detail">
+	<input type="submit" value="Aggiungi" onclick="document.getElementById('{main_record_component}detailaction').value='{componentid}'; document.getElementById('frmAction').value = '{main_record_component}detail_addrows';" class="detailSubmit" />
+	<input id="{component}rowstoadd" name="{component}rowstoadd" type="text" value="1" class="addRow"/>
+</div>
+<!--EndSectNew-->
+<h3>{title}</h3>
+<!--BeginSectError-->
+<div class="warning">{strError}</div>
+<!--EndSectError-->
+<table border="0" cellpadding="0" cellspacing="0" class="">
+	<thead>
+		<tr class="head_details">
+			<!--BeginSectLabel-->
+				<!--BeginSectDetailButtonLabel-->
+				<th class="" width="{width}"><div class="toplabel_details">{DetailButtonLabel}</div></th>
+				<!--EndSectDetailButtonLabel-->
+				<!--BeginSectFormFieldLabel-->
+				<th class="" width="{width}"><div class="toplabel_details">{FormFieldLabel}</div></th>
+				<!--EndSectFormFieldLabel-->
+			<!--EndSectLabel-->
+		</tr>
+	</thead>
+	<tbody>
+		<!--BeginSectFormRow-->
+		<tr class="">
+		<!--BeginSectCol-->
+			<!--BeginSectDetailButton-->
+			<td class="button_cont_details ffButton">{DetailButton}</td>
+			<!--EndSectDetailButton-->
+			<!--BeginSectFormField-->
+			<td class="" width="{width}">{control}</td>
+			<!--EndSectFormField-->
+		<!--EndSectCol-->
+		</tr>
+		<!--EndSectFormRow-->
+	</tbody>
+
+</table>

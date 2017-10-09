@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<rule id="clienti">
+		<priority>NORMAL</priority>
+		<source>^/clienti/clienti(.*)</source>
+		<destination>
+			<module>clienti</module>
+			<url>/restricted/clienti$1</url>
+		</destination>
+		<reverse>/clienti/clienti</reverse>
+	</rule>
+    <rule id="geo">
+        <priority>NORMAL</priority>
+        <source>^/clienti/geo(.*)</source>
+        <destination>
+            <module>clienti</module>
+            <url>/restricted/geo$1</url>
+        </destination>
+        <reverse>/clienti/clienti</reverse>
+    </rule>
+	<rule id="contatti">
+		<priority>NORMAL</priority>
+		<source>^/clienti/contatti(.*)</source>
+		<destination>
+			<module>clienti</module>
+			<url>/restricted/contatti$1</url>
+		</destination>
+		<reverse>/clienti/contatti</reverse>
+	</rule>
+    <rule>
+        <priority>HIGH</priority>
+        <source>^/services(.*)</source>
+        <destination>
+            <module>clienti</module>
+            <url>/services$1</url>
+        </destination>
+        <accept_path_info /> 
+        <process_next />
+    </rule>    
+</configdata>
+

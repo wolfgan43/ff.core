@@ -1,0 +1,17 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffGrid", "/themes/library/ff/ffGrid.js", function() {
+	ff.pluginLoad("jquery.fn.jTableFullClick", "/themes/restricted/ff/ffGrid/widgets/fullclick/fullclick.js");
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("jquery.fn.jTableFullClick", function () {
+		<!--BeginSectIstance-->
+		jQuery("#{component}").jTableFullClick();
+		<!--EndSectIstance-->
+	});
+</script>
+<!--EndSectFooters-->

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<rule>
+		<priority>NORMAL</priority>
+		<source>^/restricted/article(.*)</source>
+		<destination>
+			<module>article</module>
+			<url>/restricted/article$1</url>
+		</destination>
+	</rule>
+	<rule id="articles">
+		<priority>NORMAL</priority>
+		<source>^/articles(.*)</source>
+		<destination>
+			<module>article</module>
+			<url>/article$1</url>
+		</destination>
+		<reverse>/articles</reverse>
+		<options>
+		</options>
+	</rule>
+    <rule id="articoli">
+        <priority>NORMAL</priority>
+        <source>^/articoli(.*)</source>
+        <destination>
+            <module>article</module>
+            <url>/article$1</url>
+        </destination>
+        <reverse>/articoli</reverse>
+        <options>
+        </options>
+    </rule>
+</configdata>

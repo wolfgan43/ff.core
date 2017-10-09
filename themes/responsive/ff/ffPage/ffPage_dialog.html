@@ -1,0 +1,43 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+	<!--BeginSectFFObject-->
+	ff.struct.set("{objid}", {
+		"type"			: "{type}"
+		, "resources"	: [<!--BeginSectResource-->{resource}<!--EndSectResource-->]
+		, "fields"		: ff.hash()
+		, "dialog"		: "{dialog_id}"
+		<!--BeginSectProperty-->
+		, "{prop_name}"	: {prop_value}
+		<!--EndSectProperty-->
+	});
+	<!--EndSectFFObject-->
+	<!--BeginSectField-->
+	ff.struct.{getobj}fields.set("{fieldid}", {
+		"widget"		: "{widget}"
+		, "resources"	: [<!--BeginSectFieldResource-->{resource}<!--EndSectFieldResource-->]
+		, "dialog"		: "{dialog_id}"
+	});
+	<!--EndSectField-->
+	<!--BeginSectAsyncCssPlugin-->
+	ff.injectCSS("{css_file}", "{css_path}{css_file}");
+	<!--EndSectAsyncCssPlugin-->
+
+</script>
+<!--BeginSectWidgetsHeaders-->
+{WidgetsContent}
+<!--EndSectWidgetsHeaders-->
+<!--EndSectHeaders-->
+{[notifier|box:name=dialog]}{content}
+<!--BeginSectFooters-->
+<!--BeginSectWidgetsFooters-->
+{WidgetsContent}
+<!--EndSectWidgetsFooters-->
+<script type="text/javascript">
+	<!--BeginSectJs-->
+	{js_embed}
+	<!--EndSectJs-->
+	<!--BeginSectAsyncJsPlugin-->
+	ff.pluginLoad("{js_tag}", "{js_path}{js_file}", undefined, false);
+	<!--EndSectAsyncJsPlugin-->
+</script>
+<!--EndSectFooters-->

@@ -1,0 +1,62 @@
+body { background:white; padding:10px; text-align:left; font-size:12px; font-family:verdana; color:black; line-height:20px; }
+
+h2 { font-size:20px; margin-bottom:10px; }
+
+.red { color:red; }
+
+ul.menu { margin-top:40px; list-style-type:none; border-bottom:1px solid black; height:41px; }
+ul.menu li { display: block; float:left; width:100px; height:20px; border:1px solid black; margin-right:10px; padding:10px; text-align:center; text-decoration:underline; cursor:pointer; }
+ul.menu li.active { height:24px; position:relative; margin-top:-3px; background:white; border-bottom:none; }
+
+.b { font-weight:bold; }
+
+u { text-decoration:none; color:green; font-weight:bold; }
+
+i { color:gray; }
+
+textarea { width:100%; height:200px; margin-top:20px; display:none; }
+
+.mt { margin-top:50px; }
+
+a { color:green; }
+tr.menu td { cursor: pointer}
+.h3 { font-size:18px; font-weight:bold; color:green;}
+.cb { clear:both; }
+
+/* jjmenu styles */
+.ItemRed { color: red; }
+.ItemBlue { color:blue; }
+div.jjmenu {
+	
+	position:absolute;
+	background:#fffef0;
+	border-bottom:2px solid gray;
+	border-right:1px solid gray;
+	padding:0px;
+}
+
+div.jj_menu_item {
+	color:black;
+	border:1px solid gray;
+	border-bottom:none;
+	background:url(menuitem.gif) no-repeat black;
+	cursor:pointer;
+}
+
+div.jj_menu_item span {
+	display:block;
+	padding:4px;
+}
+
+div.jj_menu_item_more span {
+	background:url(more.gif)  right no-repeat;	
+}
+div.jj_menu_item_more span {
+	padding-right:20px;
+}
+
+div.jj_menu_item_hover {
+	background:#e4e4e4;
+	
+}
+

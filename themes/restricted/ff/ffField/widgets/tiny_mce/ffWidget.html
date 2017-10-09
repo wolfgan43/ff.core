@@ -1,0 +1,25 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+var TINYMCE_BASEPATH = 'http://' + window.location.hostname + ff.site_path + '/themes/library/tiny_mce/';
+ff.pluginLoad("ff.ffField", "/themes/library/ff/ffField.js", function() {
+    ff.pluginLoad("tinymce", "/themes/library/tiny_mce/tiny_mce.js", function () {
+        ff.pluginLoad("ff.ffField.tinymce", "{widget_path}/tinymce.js", function() {
+        });
+    });
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+        ff.pluginAddInit("ff.ffField.tinymce", function () {
+        ff.ffField.tinymce.init("{widget_class}", "{widget_lang}", "{plugins}", "{buttons1}", "{buttons2}", "{buttons3}", "{buttons4}", "{buttons5}", "{buttons6}");
+    });
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+{fixed_pre_content}
+<textarea name="{container}{id}" id="{container}{id}" class="{class}" style="{style}" {properties} >{value}</textarea>
+{fixed_post_content}
+<!--EndSectControl-->

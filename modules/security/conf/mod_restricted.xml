@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<menu>
+		<admin>
+			<!--<domains label="Domains" />-->
+			<!--<packages label="Packages" />-->
+			<!--<profile label="Profilo" path="/profile" location="account" />-->
+			<users label="Utenti" />
+			<!--<profiling label="Profili" />-->
+			<!--<crypt_init label="Inizalizza Crittografia" path="/admin/crypt/init" location="admin" acl="3" />-->
+			<!--<crypt_view label="Visualizza Chiavi Crittografia" path="/admin/crypt/view" location="admin" acl="3" />-->
+			<!--<oauth2 hide="true" profiling_skip="true" />
+			<apiserver path="/apiserver" label="API Server" location="admin" acl="3" redir="/apiserver/apps">
+				<apps path="/apiserver/apps" label="Applications" />
+				<scopes path="/apiserver/scopes" label="Scopes" />
+			</apiserver>-->			
+		</admin>
+		<logout label="Esci" path="/login" params="&amp;ret_url=[ENCODED_THIS_URL]" />
+	</menu>
+	<layout>
+		<nolayout path="/login" />
+		<nolayout path="/recover" />
+		<nolayout path="/change_password" />
+	</layout>
+</configdata>

@@ -1,0 +1,58 @@
+@charset "utf-8";
+/* CSS Document */
+
+.sortable {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	margin: 10px 0;
+	border: 1px solid #999999;
+	background-color:#ededed; 
+}
+	
+.draggable.article {
+	margin: 6px;
+	padding: 12px;
+	font-size: 1.2em;
+	width: auto;
+	border: 1px solid #999999;
+	background: url(../../images/bg/draggable.gif) left repeat-y white;
+	position:relative;
+}
+
+.draggable.article label{
+	width:20%;
+}
+
+.draggable.article input, .draggable.article textarea, .draggable.article select{
+	width:75%;
+}
+
+.draggable.article textarea{
+	height:240px;
+}
+
+li.draggable.article:hover {
+	margin: 6px;
+	padding: 12px;
+	font-size: 1.2em;
+	width: auto;
+	border: 1px solid #e41c59;
+	background: url(../../images/bg/draggable.gif) left repeat-y white;
+	position:relative;
+}
+
+.draggable a.FormsButton_link{
+	position:absolute;
+	top:6px;
+	right:6px;
+}
+	
+.not-draggable {
+	margin: 0 5px 5px 5px;
+	padding: 5px;
+	font-size: 1.2em;
+	font-weight: bold;
+	color: white;
+	width: 120px; 
+}

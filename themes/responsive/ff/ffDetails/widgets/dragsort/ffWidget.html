@@ -1,0 +1,30 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffDetails", "/themes/library/ff/ffDetails.js", function() {   
+	ff.pluginLoad("jquery.fn.jTableOrder", "/themes/responsive/ff/ffDetails/widgets/dragsort/jTableOrder.js", function() {
+        ff.pluginLoad("ff.ffDetails", "/themes/library/ff/ffDetails.js", function() { 
+		    ff.pluginLoad("ff.ffDetails.dragsort", "/themes/responsive/ff/ffDetails/widgets/dragsort/dragsort.js");
+        });
+	});
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("ff.ffDetails.dragsort", function () {
+		ff.ffDetails.dragsort.init({
+			"id"				: "{component_id}"
+			, "data" : [
+				<!--BeginSectData-->
+				"{key_value}",
+				<!--EndSectData-->
+			]
+			, "resource_id"		: "{resource_id}"
+			, "service_path"	: "{service_path}"
+		});
+		<!--BeginSectIstance-->
+		<!--EndSectIstance-->
+	});
+</script>
+<!--EndSectFooters-->

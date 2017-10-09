@@ -1,0 +1,23 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
+    ff.injectCSS("image-picker.css", "/themes/library/plugins/jquery.image-picker/jquery.image-picker.css", function() {
+            ff.pluginLoad("image-picker","/themes/library/plugins/jquery.image-picker/jquery.image-picker.min.js", function() {
+ff.pluginLoad("ff.ffField.imagepicker", "{widget_path}/imagepicker.js");
+});
+});
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("ff.ffField.imagepicker", function () {
+		<!--BeginSectBinding-->
+		ff.ffField.imagepicker(); 
+		<!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl--><!--EndSectControl-->

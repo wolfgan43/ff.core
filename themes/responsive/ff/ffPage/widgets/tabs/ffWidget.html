@@ -1,0 +1,58 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+	//ff.pluginLoad("ff.history", "/themes/library/ff/history.js", function () {
+		ff.pluginLoad("ff.ffPage.tabs", "/themes/responsive/ff/ffPage/widgets/tabs/tabs.js"); 
+	//});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	<!--BeginSectBinding-->
+	ff.pluginAddInit("ff.ffPage.tabs", function () {
+		ff.ffPage.tabs.addTab("{component_id}", "{framework_css_name}");
+	});
+	<!--EndSectBinding-->
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectIstance-->
+<div id="tab-{component_id}">
+	<!--BeginSectHeaderTab-->
+	{tab_menu_wrap_start}
+	<ul {tab_menu_properties}>
+		<!--BeginSectHeaderRow-->
+		<li {tab_menu_item_properties}>
+	        <a href="#{component_id}_{rrow}" {tab_menu_link_properties}>{tab_label}{tab_buttons}</a>
+		</li>
+		<!--EndSectHeaderRow-->
+	</ul>
+	{tab_menu_wrap_end}
+	<!--EndSectHeaderTab-->
+
+	{tab_pane_wrap_start}
+	<div {tab_pane_properties}>
+	<!--BeginSectBodyRow-->
+	<div id="{component_id}_{rrow}" {tab_pane_item_properties}>
+		{content}
+	</div>
+	<!--EndSectBodyRow-->
+	</div>
+	{tab_pane_wrap_end}
+	<!--BeginSectHeaderTabBottom-->
+	{tab_menu_wrap_start}
+	<ul {tab_menu_properties}>
+		<!--BeginSectHeaderRowBottom-->
+		<li {tab_menu_item_properties}>
+	        <a href="#{component_id}_{rrow}" {tab_menu_link_properties}>{tab_label}{tab_buttons}</a>
+		</li>
+		<!--EndSectHeaderRowBottom-->
+	</ul>
+	{tab_menu_wrap_end}
+	<!--EndSectHeaderTabBottom-->
+	
+	
+	
+
+</div>
+<!--EndSectIstance-->

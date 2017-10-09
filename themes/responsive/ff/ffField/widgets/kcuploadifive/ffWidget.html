@@ -1,0 +1,70 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
+	ff.injectCSS("uploadifive", "{uploadifive}", function() {
+		ff.pluginLoad("jquery.fn.uploadifive", "/themes/library/plugins/jquery.uploadifive/jquery.uploadifive.js", function () {
+			<!--BeginSectPluginCss-->
+			ff.injectCSS("{uploadifive_plugin_name}", "{uploadifive_plugin_css}");
+			<!--EndSectPluginCss-->
+			<!--BeginSectPluginJs-->
+			ff.pluginLoad("{uploadifive_plugin_name}", "{uploadifive_plugin_js}", function() {
+				ff.pluginLoad("ff.ffField.kcuploadifive", "{widget_path}/kcuploadifive.js");
+			});
+			<!--EndSectPluginJs-->
+			<!--BeginSectNoPlugin-->
+			ff.pluginLoad("ff.ffField.kcuploadifive", "{widget_path}/kcuploadifive.js");
+			<!--EndSectNoPlugin-->
+			
+		}, false);
+	});
+});
+</script>
+<!--EndSectHeaders-->
+
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+	ff.pluginAddInit("ff.ffField.kcuploadifive", function () {
+        <!--BeginSectBinding-->
+		ff.ffField.kcuploadifive.init({
+			component 		: "{container}{id}",
+            start           : "{suffix_start}",
+            target          : "{suffix_target}",
+            tmpname         : "{suffix_tmpname}",
+            sufdel	        : "{suffix_delete}",
+			baseUrlKC		: "{site_base_url}", 
+			previewJs		: {preview_js},
+            writable        : {writable},
+			sizeLimit		: {size_limit},
+			fileExt			: {file_ext},
+			fileNormalize	: {file_normalize},
+			multi			: {multi},
+			modelThumb		: '{thumb_model}',
+			showFile		: {show_file},
+			showFilePath	: {showfile_path},
+			showFileDialog	: {showfile_dialog},
+			showFilePlugin	: {showfile_plugin},
+			showFileSort	: {showfile_sort},
+            fullPath        : {full_path},
+            dataSrc			: "{data_src}", 
+            folder			: "{folder}", 
+            height			: "{height}", 
+            width			: "{width}",
+            aviary			: {aviary},
+            icons           : {
+                                "cancel" : '{cancel_class}',
+                                "aviary" : "{aviary_class}",
+                                "upload" : "{upload_class}"
+                                
+                            }
+        });
+        <!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+<!--BeginSectControl-->
+{fixed_pre_content}
+<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{browse_class}" onclick="ff.ffField.kcuploadifive.openKCFinder('{container}{id}', '/{resource_type}{base_url_kc}' );"></a> 
+{control}
+{fixed_post_content}
+<!--EndSectControl-->

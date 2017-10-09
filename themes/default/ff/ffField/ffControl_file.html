@@ -1,0 +1,18 @@
+<input type="file" id="{container}{id}{suffix_file}" name="{container}{id}{suffix_file}" class="{class}" {properties} />
+	<input type="hidden" id="{container}{id}{suffix_name}" 		name="{container}{id}{suffix_name}" 	value="{filename}" />
+	<input type="hidden" id="{container}{id}{suffix_tmpname}" 	name="{container}{id}{suffix_tmpname}" 	value="{tmpname}" />
+	<input type="hidden" id="{container}{id}{suffix_delete}" 	name="{container}{id}{suffix_delete}" 	value="" />
+<!--BeginShowFile-->
+	<br /><br />
+	<!--BeginShowPreview-->
+	<a href="{view_url}{view_query_string}" target="_blank">
+		<img src="{preview_url}{preview_query_string}" />
+	</a>
+	<!--EndShowPreview-->
+	<!--BeginShowFilename-->
+	<a href="{view_url}{view_query_string}" target="_blank">{filename}</a>
+	<!--EndShowFilename-->
+<!--EndShowFile-->
+<!--BeginShowDelete-->
+	&nbsp;&nbsp;<a href="#" class="FormsControl_file_delfile" onclick="document.getElementById('{container}{id}{suffix_delete}').value = 'delete'; document.getElementById('frmAction').value = '{container}deletefile'; document.getElementById('frmMain').submit();">Delete</a>
+<!--EndShowDelete-->

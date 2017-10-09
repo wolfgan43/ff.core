@@ -1,0 +1,25 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffGrid", "/themes/library/ff/ffGrid.js", function() {
+	ff.pluginLoad("jquery.fn.jTableOrder", "/themes/restricted/ff/ffGrid/widgets/dragsort/jTableOrder.js", function () {
+		ff.pluginLoad("ff.ffGrid.dragsort", "/themes/restricted/ff/ffGrid/widgets/dragsort/dragsort.js", function () {
+			ff.pluginLoad("jquery.fn.jTableSort","/themes/restricted/ff/ffGrid/widgets/labelsort/labelsort.js");
+		});
+	});
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("jquery.fn.jTableSort", function () {
+		<!--BeginSectIstance-->
+		$("#{component}").jTableSort({
+			"resource_id"		: "{resource_id}",
+			"service_path"		: "{service_path}",
+			"onHeadGetOrdered"	: ff.ffGrid.labelsort
+		});
+		<!--EndSectIstance-->
+	});
+</script>
+<!--EndSectFooters-->

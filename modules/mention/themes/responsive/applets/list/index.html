@@ -1,0 +1,23 @@
+<div class="mention-container">
+	<!--BeginSectMention-->
+	<div class="mention">
+		<!--BeginSectMentionTitleUrl-->
+		<h3 class="title"><a href="{smart_url}">{title}</a></h3>
+		<!--EndSectMentionTitleUrl-->
+		<!--BeginSectMentionTitleNoUrl-->
+		<h3 class="title">{title}</h3>
+		<!--EndSectMentionTitleNoUrl-->
+		<p class="description">{description}</p> 
+		<!--BeginSectMentionUrl-->
+		<a {url_class} href="{url}" rel="nofollow" target="_blank">{_mention_source_url}</a>
+		<!--EndSectMentionUrl-->
+		<span class="published">{published_at}</span>
+		<!--BeginSectMentionSourceUrl-->
+		<a {source_class} rel="nofollow" href="{source_url}" target="_blank">{source_type}: {source_name}</a>
+		<!--EndSectMentionSourceUrl-->
+		<!--BeginSectMentionSourceNoUrl-->
+		<span class="source">{source_type}: {source_name}</span>
+		<!--EndSectMentionSourceNoUrl-->
+	</div>
+	<!--EndSectMention-->
+</div>

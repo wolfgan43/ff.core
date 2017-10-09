@@ -1,0 +1,23 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
+	ff.pluginLoad("ff.lib.editarea", "/themes/library/editarea/edit_area_loader.js", function () {
+		ff.pluginLoad("ff.ffField.editarea", "{widget_path}/editarea.js");
+	}, false);
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+	ff.pluginAddInit("ff.ffField.editarea", function () {
+		<!--BeginSectBinding-->
+		ff.ffField.editarea.init("{container}{id}", "{widget_syntax}", "{widget_lang}", {widget_writable});
+		<!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<textarea name="{container}{id}" id="{container}{id}" class="{class}" style="{style}" {properties} >{value}</textarea>
+<!--EndSectControl-->

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"<!--BeginSectHtmlAttr--> {attr_type}="{attr_content}"<!--EndSectHtmlAttr-->>
+<head>
+<title>{title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<!--BeginSectMeta-->
+	<meta {meta_type}="{meta_name}" content="{meta_content}" />
+<!--EndSectMeta-->
+<!--BeginSectCss-->
+<link href="{css_path}{css_file}" {link_properties}/>
+<!--EndSectCss-->
+<!--BeginSectJs-->
+<script<!--BeginSectJsSrc--> src="{js_path}{js_file}"<!--EndSectJsSrc-->>{js_embed}</script>
+<!--EndSectJs-->
+<!--BeginSectFFJS-->
+<script type="text/javascript">
+	var libs = ff.hash();
+	var struct = ff.hash();
+	struct.fields = ff.hash();
+	<!--BeginSectFFObject-->
+	struct.set("{objid}", {
+		"type"			: "{type}"
+		, "resources"	: [<!--BeginSectResource-->{resource}<!--EndSectResource-->]
+		, "fields"		: ff.hash()
+		<!--BeginSectProperty-->
+		, "{prop_name}"	: {prop_value}
+		<!--EndSectProperty-->
+	});
+	<!--EndSectFFObject-->
+	<!--BeginSectField-->
+	struct.{getobj}fields.set("{fieldid}", {
+		"widget"		: "{widget}"
+		, "resources"	: [<!--BeginSectFieldResource-->{resource}<!--EndSectFieldResource-->]
+	});
+	<!--EndSectField-->
+
+	ff.initFF({
+		"site_path"		: "{site_path}", 
+		"theme"			: "{theme}", 
+		"theme_ui"		: "{theme_ui}", 
+		"language"		: "{language}", 
+		"locale"		: "{locale}", 
+		"layer"			: "{layer}",
+        <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->    
+		"struct"		: struct,
+		"libs"			: libs
+	});
+
+	<!--BeginSectAsyncCssPlugin-->
+	ff.injectCSS("{css_file}", "{css_path}{css_file}");
+	<!--EndSectAsyncCssPlugin-->
+	<!--BeginSectAsyncJsPlugin-->
+	ff.pluginLoad("{js_tag}", "{js_path}{js_file}", undefined, false);
+	<!--EndSectAsyncJsPlugin-->
+</script>
+<!--EndSectFFJS-->
+<!--BeginSectWidgetsHeaders-->
+{WidgetsContent}
+<!--EndSectWidgetsHeaders-->
+<!--BeginSectCssEmbed-->
+<style type="{css_type}">{css_embed}</style>
+<!--EndSectCssEmbed-->
+</head>
+<body{class_body}>
+<!--BeginSectFormHeader-->
+	<form id="{form_id}" name="{form_name}" method="{form_method}"{form_action}{form_enctype}>
+	<!--BeginSectFormWorkaround-->
+	<input disabled="disabled" type="text" value="" style="position:fixed; bottom:0px; right: 0px; width:1px; height:1px; margin:0px; padding: 0px; background-color: transparent; border: 0px;" />
+	<!--EndSectFormWorkaround-->
+    <div id="frmMain_hidden" class="hidden">
+        <!--BeginSectFormHidden-->
+            <input type="hidden" id="{varname}" name="{varname}" value="{varvalue}" />
+        <!--EndSectFormHidden-->
+    </div>
+<!--EndSectFormHeader-->
+	{content}
+<!--BeginSectWidgetsFooters-->
+{WidgetsContent}
+<!--EndSectWidgetsFooters-->
+<!--BeginSectFormFooter-->
+	</form>
+<!--EndSectFormFooter-->
+<!--BeginSectJSDefer-->
+<script type="text/javascript" defer="defer" async="async">
+	function downloadJSAtOnload() {
+		var scripts = {defer_js};
+
+		for(var i = 0; i< scripts.length; i++) {
+			var elem = document.createElement("script");
+			elem.type = "text/javascript"; 
+			elem.src = scripts[i];
+			document.head.appendChild(elem);
+		}
+	}
+
+	if (window.addEventListener)
+		window.addEventListener("load", downloadJSAtOnload, false);
+	else if (window.attachEvent)
+		window.attachEvent("onload", downloadJSAtOnload);
+	else 
+		window.onload = downloadJSAtOnload;
+</script>
+<!--EndSectJSDefer-->
+</body>
+</html>
+<!--BeginSectCSSDefer-->{defer_css}<!--EndSectCSSDefer-->

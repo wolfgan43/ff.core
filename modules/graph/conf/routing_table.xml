@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<rule>
+		<priority>NORMAL</priority>
+		<source>^/restricted/graph(.*)</source>
+		<destination>
+			<module>graph</module>
+			<url>/restricted/graph$1</url>
+		</destination>
+	</rule>
+	<rule id="parsegraph">
+		<priority>HIGH</priority>
+		<index>999</index>
+		<source>^/services/parsegraph(.*)</source>
+		<destination>
+			<module>graph</module>
+			<url>/services/parsegraph$1</url>
+		</destination>
+		<reverse>/services/parsegraph</reverse>
+	</rule>
+	<rule id="graph">
+		<priority>NORMAL</priority>
+		<source>^/graph(.*)</source>
+		<destination>
+			<module>graph</module>
+			<url>/graph$1</url>
+		</destination>
+		<reverse>/graph</reverse>
+		<options>
+		</options>
+	</rule>
+</configdata>
+

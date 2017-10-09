@@ -1,0 +1,161 @@
+
+/*
+Uploadify v2.1.4
+Release Date: November 8, 2010
+
+Copyright (c) 2010 Ronnie Garcia, Travis Nickels
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+#PhotoModifyDetail_discl_sect TABLE TD {
+	vertical-align:middle;
+}
+
+#PhotoModifyDetail_discl_sect TABLE TD.button_cont_details {
+	padding:0 10px;
+}
+
+div[class^="ff"] .uploadify .uploadify {
+    border:1px solid #c6c6c6;
+    padding:0.5em;
+}
+
+div[class^="ff"] .uploadify.line { border:0; padding:0; }
+
+.uploadify A,
+.uploadify .preview .cancel A {
+    display:inline-block;
+    padding:1em !important; 
+    font-size:1em !important;
+}
+
+.uploadify .top>A,
+.uploadify .preview A { padding:0 !important; }
+
+.uploadify .preview IMG { margin-right:0.5em; }
+
+
+.uploadify.default { overflow:hidden; clear:right; }
+
+.uploadifyQueueItem {
+    background:#f1f1f1 !important;
+    padding:1em !important;
+    margin-top:0.5em !important;
+    clear:both;
+    position:relative;
+}
+
+.uploadify.default OBJECT { float:right; height:3em; }
+
+
+.uploadifyError {
+	background-color: #FDE5DD !important;
+	border: 2px solid #FBCBBC !important;
+}
+.uploadifyQueueItem .cancel {
+	position:absolute;
+	top:0;
+	right:0;
+}
+.uploadifyQueue .completed {
+	background-color: #E5E5E5;
+}
+.uploadifyProgress {
+	background-color: #E5E5E5;
+	margin-top: 10px;
+	width: 100%;
+}
+.uploadifyProgressBar {
+	background-color: #0099FF;
+	height: 3px;
+	width: 1px;
+}
+
+
+.uploadify.horizzontal .cancel A:hover { background-position: -26px 0; }
+
+.uploadify.horizzontal { width:110px; overflow:hidden; }
+
+.uploadify.horizzontal OBJECT {
+	display:block;
+	position:absolute;
+	top:38px;
+	right:0;
+	width:20px;
+	height:20px;
+	background:url(sprite-uploadify.png) 0 -24px no-repeat;
+} 
+
+.uploadify.horizzontal OBJECT:hover { background-position: -26px -24px; }
+
+
+/*.uploadify.horizzontal .cancel A.del-file,
+.uploadify.horizzontal OBJECT {
+	display:none;
+}
+
+.uploadify.horizzontal:hover .cancel A.del-file,
+.uploadify.horizzontal:hover OBJECT {
+	display:block;
+}*/
+
+/* vertical */
+.uploadify.vertical {
+	position:relative;
+}
+.uploadify.vertical,
+.uploadifyQueueItem.vertical {
+	width:200px;
+	height:284px;
+	background: #ddd;
+}
+.vertical .uploadifyQueue {
+	width:200px;
+	border:0;
+}
+.uploadifyProgressBar {
+	width:190px;
+}
+.uploadifyQueueItem.vertical {
+	padding:0;
+	position:relative;
+	border:1px solid #F5F5F5;
+}
+.uploadify.vertical .image {
+	width:200px;
+	height:250px;
+}
+.uploadify.vertical .cancel A {
+	width:20px;
+	height:20px;
+	position:absolute;
+	z-index:150;
+	top:2px;
+	right:2px;
+	background:url(sprite-uploadify.png) 0 0 no-repeat;
+}
+
+.uploadify.vertical .cancel A:hover {background-position: -26px 0 no-repeat;}
+
+.uploadify.vertical OBJECT {
+	position:absolute;
+	bottom:2px;
+	left:40px;
+}

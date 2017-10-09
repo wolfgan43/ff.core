@@ -1,0 +1,1 @@
+[{"title":"ajax item 1"},{"title":"ajax item 2"}, {title:"Dynamic recurrence ;) Sub", type:"sub", src:[{get:"dynamic.txt"}]}]

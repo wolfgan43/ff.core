@@ -1,0 +1,39 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+	ff.pluginLoad("ff.history", "/themes/library/ff/history.js", function () {
+		ff.pluginLoad("ff.ffPage.tabs", "/themes/restricted/ff/ffPage/widgets/tabs/tabs.js");
+		/* Remove jquery ui css
+		ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
+			ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
+				ff.injectCSS("jqueryuitabs", "{jqueryuitabs}", function() {
+					ff.pluginLoad("ff.ffPage.tabs", "/themes/restricted/ff/ffPage/widgets/tabs/tabs.js");
+				});
+			});
+		});
+		*/
+	});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	<!--BeginSectBinding-->
+	ff.pluginAddInit("ff.ffPage.tabs", function () {
+		ff.ffPage.tabs.addTab("{id}");
+	});
+	<!--EndSectBinding-->
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectIstance-->
+<div id="tabs_{id}">
+	<ul id="tabs_{id}-nav">
+		<!--BeginSectElementHead-->
+		<li><a class="tab-bt" href="#tabs_{id}_{element_count}">{element_title}</a></li>
+		<!--EndSectElementHead-->
+	</ul>
+	<!--BeginSectElementBody-->
+	<div id="tabs_{id}_{element_count}">{element_content}</div>
+	<!--EndSectElementBody-->
+</div>
+<!--EndSectIstance-->

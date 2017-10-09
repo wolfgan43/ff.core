@@ -1,0 +1,344 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="styl.css" type="text/css">
+  <title>jjmenu - context menu jquery plugin</title>
+  <script src="jquery.js" type="text/javascript"></script>
+  <script src="jjmenu.js" type="text/javascript"></script>
+  <script src="site.js" type="text/javascript"></script>
+  </head>
+  <body>
+  
+  <h2>Context menu jquery plugin: jjmenu.</h2>
+  <p>Current version: <b class="red"> 1.1.1 (2010-08-28)</b></p>
+  
+  <ul class="menu">
+    <li class="active"> <a href="#overview">Overview</a> </li>
+    <li> <a href="#demos">Demos</a> </li>
+    <li> <a href="#documentation">Documentation</a> </li>
+    <li> <a href="#tips">Tips</a> </li>
+    <li> <a href="#download" class="b red">Download</a> </li>
+  </ul>
+  
+  <br class="cb">
+  
+  <div>
+  <a name="overview" class="h3">Overview</a>
+    <ul>
+      <li>Supports both left- and right- click event <i>(warining: right click event is not supported by Opera)</i></li>
+      <li>Static and AJAX menu items</li>
+      <li>Static and AJAX <b>submenus</b></li>
+      <li>Flexible event model, supports ajax and custom user actions</li>
+      <li>Easy to customize with CSS selectors</li>
+      <li>Dynamic variables in in-menu URLs, such as ID (for example /get.php?id=#id#)</li> 
+    </ul>       
+    <h3 class="h3">Changelog</h3>
+    <b>1.1.2 (2010-08-28)</b>:
+    <ul>
+        <li>Bugfix: eval for callback didn't work under IE (thanks for sending me info)</li>
+    </ul>
+    <b>1.1.1 (2010-01-04)</b>:
+    <ul>
+        <li>Bugfix: fixed some menu positioning</li>
+        <li>Added: xposition, yposition - "mouse" (position menu directly under mouse cursor)</li>
+        <li>Added: customClass attribute to add some more customization to menu items</li>
+    </ul>
+
+  </div>
+  <div>
+    <a name="demos" class="h3">Demos</a>
+
+  <a href="#" id="show_sources" style="color:red;"><b>Show sources</b></a>
+    
+    <p class="mt">
+    1. Simple, static menu:
+    
+    <a href="#" id="staticMenuL">[Click Me With LeftMouseButton]</a>
+    
+    <textarea>
+      var options1 = [
+    	{title:"Menu Item 1 - Go TO www.google.com", action:{type:"gourl",url:"http://www.google.com/"}},
+    	{title:"Menu Item 2 - do <b style='color:red;'>nothing</b>"},
+    	{title:"Menu Item 3 - submenu", type:"sub", src:[{title:"Submenu 1"},{title:"Submenu 2"},{title:"Submenu 3"}, {title:"Submenu 4 - submenu", type:"sub", src:[{title:"SubSubmenu 1"},{title:"SubSubmenu 2"}]}]},
+    	{title:"Menu Item 4 - Js function", action:{type:"fn",callback:"(function(){ alert('THIS IS THE TEST'); })"}}
+      ];
+      
+      jQuery("a#staticMenuL").jjmenu("click", options1);    
+    </textarea>
+    <script type="text/javascript">
+    var options1 = [
+  	{title:"Menu Item 1 - Go TO www.google.com", action:{type:"gourl",url:"http://www.google.com/"}},
+  	{title:"Menu Item 2 - do <b style='color:red;'>nothing</b>"},
+  	{title:"Menu Item 3 - submenu", type:"sub", src:[{title:"Submenu 1"},{title:"Submenu 2"},{title:"Submenu 3"}, {title:"Submenu 4 - submenu", type:"sub", src:[{title:"SubSubmenu 1"},{title:"SubSubmenu 2"}]}]},
+  	{title:"Menu Item 4 - Js function", action:{type:"fn",callback:"(function(){ alert('THIS IS THE TEST'); })"}}
+    ];
+    
+    jQuery("a#staticMenuL").jjmenu("click", options1);
+    
+    </script>
+    </p>
+    
+    <p class="mt">
+    2. Pass dynamic parameters ( type here: <input type="text" name="test" id="test" value="Blah blah" /> )  <a href="#" id="staticMenuR" class="SomeClass">[Click Me With RightMouseButton]</a>
+    
+    <textarea>
+    var options2 = [
+      {title:"Show myid", action:{type:"fn",callback:"(function(data) { alert(data.myid); })"}},
+      {title:"Show input value", action:{type:"fn",callback:"(function(data) { alert('Input name = '+data.inputValue()); })"}},
+      {title:"Show clicked element className", action:{type:"fn",callback:"(function(data) { alert('Clicke item class name = '+triggerElement.className); })"}},
+      {title:"Search for <b style='color:yellow'>#inputValue#</b> in new window", action:{type:"gourl",url:"http://www.google.com/search?q=#inputValue#", target:"_blank"}},
+    ];
+    
+    jQuery("a#staticMenuR").jjmenu("rightClick", options2, {inputValue: function() { return jQuery("#test").val() }, myid:5});    
+    </textarea>
+    
+    <script type="text/javascript">
+    var options2 = [
+      {title:"Show myid", action:{type:"fn",callback:"(function(data) { alert(data.myid); })"}},
+      {title:"Show input value", action:{type:"fn",callback:"(function(data) { alert('Input name = '+data.inputValue()); })"}},
+      {title:"Show clicked element className", action:{type:"fn",callback:"(function(data) { alert('Clicke item class name = '+triggerElement.className); })"}},
+      {title:"Search for <b style='color:yellow'>#inputValue#</b> in new window", action:{type:"gourl",url:"http://www.google.com/search?q=#inputValue#", target:"_blank"}},
+    ];
+    
+    jQuery("a#staticMenuR").jjmenu("rightClick", options2, {inputValue: function() { return jQuery("#test").val() }, myid:5});
+    </script>
+    </p>
+    
+  <p class="mt">
+    
+    3. AJAX items <a href="#" id="MenuB">[Click Me With Left or Right MouseButton]</a>
+    
+    <textarea>
+    var options3 = [
+      {title:"Some static item 1"},
+      {title:"Some static item 2"},
+      {title:"AJAX action with callback", action:{type:"ajax","url":"ajax.php?myid=#myid#",callback:"(function(data){alert(data.returnValue);})"}},
+      {get:"dynamic.txt"}
+    ];
+    
+    jQuery("a#MenuB").jjmenu("both", options3, {inputValue: function() { return jQuery("#test").val() }, myid:5});    
+    </textarea>
+    
+    <script type="text/javascript">
+    var options3 = [
+      {title:"Some static item 1"},
+      {title:"Some static item 2"},
+      {title:"AJAX action with callback", action:{type:"ajax","url":"ajax.php?myid=#myid#",callback:"(function(data){alert(data.returnValue);})"}},
+      {get:"dynamic.txt"}
+    ];
+    
+    jQuery("a#MenuB").jjmenu("both", options3, {inputValue: function() { return jQuery("#test").val() }, myid:5});
+    </script>
+    </p>
+     
+    <p class="mt">
+    4. Menu Effects  <a href="#" id="MenuEF">[Fade In - Click Me With L or R MouseButton]</a> | 
+    <a href="#" id="MenuEF2">[Slide Down - Click Me With L or R MouseButton]</a>
+    
+    <textarea>
+    jQuery("a#MenuEF").jjmenu("both", options1, {}, {show:"fadeIn", xposition:"left", yposition:"auto", "orientation":"auto"});
+    jQuery("a#MenuEF2").jjmenu("both", options1, {}, {show:"slideDown",speed:400, yposition:"bottom", orientation:"top"});    
+    </textarea>
+    
+    <script type="text/javascript">
+    jQuery("a#MenuEF").jjmenu("both", options1, {}, {show:"fadeIn", xposition:"left", yposition:"auto", "orientation":"auto"});
+    jQuery("a#MenuEF2").jjmenu("both", options1, {}, {show:"slideDown",speed:400, yposition:"bottom", orientation:"top"});
+    </script>
+    </p>    
+
+    <p class="mt">
+    5. Other
+    <table width="100%" border="1">
+        <tr>
+            <th> ID </th>
+            <th> NAME </th>
+            <th> AGE </th>
+        </tr>
+        <tr class="menu">
+            <td>1</td>
+            <td>Thomas</td>
+            <td>28</td>
+        </tr>
+        <tr class="menu">
+            <td>2</td>
+            <td>Jack</td>
+            <td>23</td>
+        </tr>
+        <tr class="menu">
+            <td>3</td>
+            <td>Paul</td>
+            <td>33</td>
+        </tr>
+    </table>
+<textarea>
+        jQuery("tr.menu td").jjmenu("both", 
+                                    // menu items:
+                                    [ {title:"some static item", customClass:"ItemRed"},
+                                      {title:"something else", customClass:"ItemBlue"},
+                                      {getByFunction:function(myData) {
+                                            return [{title:"ID: "+myData.tbRow()[0] + ", Name: "+myData.tbRow()[1]}, {title:"Current Element: "+myData.td()}];
+                                            }
+                                      } 
+                                    ], 
+                                    // myReplaces / userData:
+                                    {   "tbRow":function(){ 
+                                            var tr = jQuery(triggerElement).parent("tr");
+                                            var td = [];
+                                            jQuery(tr).children("td").each(function() {
+                                                td[td.length] = jQuery(this).html();
+                                            });
+                                            return td;    
+                                        },
+                                        "td":function() { return $(triggerElement).html(); }  
+                                    }, 
+                                    // effects:
+                                    {show:"fadeIn", xposition:"mouse", yposition:"mouse"});
+</textarea>
+    <script type="text/javascript">
+        jQuery("tr.menu td").jjmenu("both", 
+                                    // menu items:
+                                    [ {title:"some static item", customClass:"ItemRed"},
+                                      {title:"something else", customClass:"ItemBlue"},
+                                      {getByFunction:function(myData) {
+                                            return [{title:"ID: "+myData.tbRow()[0] + ", Name: "+myData.tbRow()[1]}, {title:"Current Element: "+myData.td()}];
+                                            }
+                                      } 
+                                    ], 
+                                    // myReplaces / userData:
+                                    {   "tbRow":function(){ 
+                                            var tr = jQuery(triggerElement).parent("tr");
+                                            var td = [];
+                                            jQuery(tr).children("td").each(function() {
+                                                td[td.length] = jQuery(this).html();
+                                            });
+                                            return td;    
+                                        },
+                                        "td":function() { return $(triggerElement).html(); }  
+                                    }, 
+                                    // effects:
+                                    {show:"fadeIn", xposition:"mouse", yposition:"mouse"});
+    </script>
+
+
+    </p>
+  </div>  
+  <div>
+    <a name="documentation" class="h3">Documentation</a>
+    <br /><br /><br />
+
+   <b>Usage:</b>
+        <pre>jQuery(" <u>-trigger element-</u> ").jjmenu( <b>eventType</b>, <b>items</b>, <b>userData</b>, <b>effects</b> );</pre>
+        
+        
+        <p>
+            <b>eventType</b>: 
+            <ul>
+                <li>"<u>click</u>" - left mouse button click</li>
+                <li>"<u>rightClick</u>"  - right mouse button click </li>
+                <li>"<u>both</u>"  - LMB or RMB click on trigger element activates menu</li>
+            </ul>     
+        </p>    
+        <p>
+            <b>items</b> - array of objects : [ object1, object2, ... ] 
+        </p>            
+        <p>
+            <b>object in items array</b> (attributes): <i>Defines the menu item object</i>
+<pre>
+{ 
+    <b>title</b>:<u>"Some title</u>", <i>//title of the menu item</i>
+    <b>customClass</b>:<u>"someClassName</u>", <i>//custom ClassName of menu item (for CSS formating)</i>
+    <b>"action"</b>:<u>action object</u> {        
+      {<b>type</b>:"ajax", <b>url</b>:"<u>/url.php?id=#myvalue1#</u>", <b>callback</b>:"<u>(function(data){ <i>alert(data.value); </i> })</u>"  } <i>// for ajax action</i>
+      | {<b>type</b>:"gourl", <b>url</b>:"<u>url</u>, <b>target</b>:"<u>_blank</u>" } <i>// for simple go url action, don't define <b>target</b> for simple redirection</i> 
+      | {<b>type</b>:"fn", <b>callback</b>:"<u>(function(userData) { <i>alert(userData.attr2); alert(triggerElement.id);</i> })</u>"} <i>// for custom user function </i> 
+    }
+    <b>"type"</b>: "<u>sub</u>"|"<u>default</u>"  <i>// type of item [ "sub" - submenu, "default" - default item ]</i>
+    <b>"src"</b>: <u>array of objects : [ object1, object2, ... ] for submenu</u>
+
+}     
+</pre>  
+<b>or</b>
+<pre>
+{ 
+    <b>get</b>:<u>"URL to server side script</u>", <i>//load dynamic item using ajax, server should return the same structure as above</i>
+}     
+</pre>
+<b>or</b>
+<pre>
+{ 
+    <b>getByFunction</b>:<u>JS_FUNCTION</u>, <i>//JS users custom function that returns the same structure as above</i>
+}     
+</pre>          
+        </p>
+        <p> 
+            <b>userData</b> - object 
+            <i>Replaces content: #attr1# with value1, #attr2# with value2, etc - in URLs and menu titles. Also pass userData as parameter to user's JS callback functions</i>
+             
+<pre>
+{
+    <b>myvalue1</b>:"<u>value1</u>",
+    <b>attr2</b>:"<u>value2</u>"",
+    ...
+}
+</pre>
+        </p>
+        <p>
+            <b>effects</b> - object: 
+            <i> Determines the appearance of menu </i> 
+<pre>
+{ 
+    <b>show</b>:"<u>default</u>"|"<u>fadeIn</u>"|"<u>slideDown</u>", <i>//type of show effect</i>
+    <b>orientation</b>: "<u>top</u>"|"<u>bottom</u>"|"<u>auto</u>", <i>//type of menu orientation - to top, to bottom, auto (to bottom, if doesn't fit on screen - to top)</i>
+    <b>xposition</b>:"<u>left</u>"|"<u>right</u>", <i>// position of menu (left side or right side of trigger element)</i> 
+    <b>yposition</b>:"<u>top</u>"|"<u>bottom</u>"|"<u>auto</u>" 
+}
+</pre>     
+        </p>    
+            
+    
+    </p>
+</p>
+
+  </div>
+  <div>
+    <a name="tips" class="h3">Tips</a>
+        <p>To get clicked element properities, special variable <b style="color:red"> triggerElement </b> is available in all callback functions.</p>
+        <p>To get clicked element properities in userData object, you need to use callback function such as:
+        <pre>{"url_id":function() { return triggerElement.id;  } }</pre>
+        Now you can define for example such menu item:
+        <pre>{"title":"Go to user portfolio", action:{type:"gourl", url:"http://mywebsite.com/user.php?id=<u>#url_id#</u>"} }</pre>
+  </div>
+  <div>
+    <a name="download" class="h3">Download</a>
+
+<pre>The MIT License
+
+Copyright (c) 2010 Jacek Jursza
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+</pre>
+<a href="jjmenu.zip">download source code</a>
+
+
+  </div>      
+  
+  
+  </body>
+</html>

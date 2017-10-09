@@ -1,0 +1,146 @@
+#FBr_Album_Frame {
+	background:						url(galleries_bg.gif) repeat;
+}
+
+#FB_Album_iFrame {
+	background:						url(galleries_bg.gif) repeat;
+}
+#FB_Album_Loader {
+	background:						url(ajax-loader.gif) no-repeat bottom center;
+}
+
+.albumLink {
+	background:						url(photo-album-icon.png) no-repeat center center;
+}
+.albumLinkSimple {
+	background:						url(link.png) no-repeat center center;
+}
+a.AlbumLinkButtonText:before{
+	background: 					transparent url(link.png) no-repeat 0 0;
+}
+
+.albumWrapper .fb-album-shadow1 {
+	background:						url(shadow1.png) no-repeat bottom center;
+}
+.albumWrapper .fb-album-shadow2 {
+	background:						url(shadow2.png) no-repeat bottom center;
+}
+.albumWrapper .fb-album-shadow3 {
+	background:						url(shadow3.png) no-repeat bottom center;
+}
+.albumThumb span.PaperClipLeft {
+	background: 					url(paper-clip-left.png) no-repeat;
+}
+.albumThumb span.PaperClipRight {
+	background: 					url(paper-clip-right.png) no-repeat;
+}
+.albumThumb span.PushPin {
+	background: 					url(pin.png) no-repeat;
+}
+.photoThumb span.ClearTape,
+.albumThumb span.ClearTape {
+	background: 					url(tape.png) no-repeat;
+}
+.photoThumb span.YellowTape,
+.albumThumb span.YellowTape {
+	background: 					url(tape2.png) no-repeat;
+}
+.photoThumb span.PushPin,
+.albumThumb span.PushPin{
+	background: 					url(pin.png) no-repeat;
+}
+.albumThumb i.fb-album-overlay {
+    background-image:       		url(magnifier-plus.png);
+}
+.albumThumb i.fb-album-spinner {
+    background-image:       		url(loading-gallery.gif);
+}
+.albumThumb i.fb-album-loading,
+.albumThumb span.fb-album-loading {
+    background-image:       		url(loading-gallery.gif);
+}
+.photoThumb i.fb-photo-overlay {
+    background-image:       		url(magnifier.png);
+}
+.photoThumb i.fb-photo-spinner {
+    background-image:       		url(loading-gallery.gif);
+}
+#fb-album-header .BackButton:before,
+#fb-album-footer .BackButton:before,
+.paginationControls .BackButton:before{
+	background: 					transparent url(back_arrow.png) no-repeat 0 0;
+}
+#fb-album-footer ul.TopButton li a .Album_To_Top {
+	background:						url(Back_Top.png) center center no-repeat;
+}
+.icon-facebook,
+.icon-googleplus,
+.icon-twitter {
+	background: 					url(Social_Icons.png) no-repeat;
+}
+.icon-printer {
+	background: 					url(printer.png) no-repeat;
+}
+.icon-disk {
+	background: 					url(disk.png) no-repeat;
+}
+#FirstPage {
+	background: 					transparent url(document_page_first.png) no-repeat center center;
+}
+#PrevPage {
+	background: 					transparent url(document_page_previous.png) no-repeat center center;
+}
+#NextPage {
+	background: 					transparent url(document_page_next.png) no-repeat center center;
+}
+#LastPage {
+	background: 					transparent url(document_page_last.png) no-repeat center center;
+}
+.paginationMain .showSortingBtn:before {
+	background: 					transparent url(sort_columns.png) no-repeat 0 0;
+}
+.paginationMain .showFilterBtn:before {
+	background: 					transparent url(filter_type.png) no-repeat 0 0;
+}
+.paginationMain .showPagerBtn:before {
+	background: 					transparent url(pages.png) no-repeat 0 0;
+}
+.paginationMain .paginationControls.Floater {
+	background:						url(stripey.png) center center;
+}
+.paginationMain .Toggle_Info_Main .Toggle_Info {
+	background:						url(information.png) center center no-repeat;
+}
+.paginationMain .Scroll_To_Top .To_Top {
+	background:						url(Back_Top.png) center center no-repeat;
+}
+.paginationMain .paginationControls .paginationPagers li a.Active {
+	background: 					url(selected.png) no-repeat left center;
+}
+.paginationMain .paginationControls .paginationSorting li a.asc{
+	background:						transparent url(arrow_up_red.png) no-repeat 120px 4px;
+}
+.paginationMain .paginationControls .paginationSorting li a.dec{
+	background:						transparent url(arrow_down_red.png) no-repeat 120px 4px;
+}
+.paginationMain .paginationControls .bar .Closer{
+	background:						transparent url(closer.png) no-repeat 99% 50%;
+}
+.paginationMain .paginationControls .paginationFilters a.showing:after {
+	background:						transparent url(selected.png) no-repeat 0 0;
+}
+.paginationMain .paginationMessage:after{
+	background:						transparent url(notification.png) no-repeat 0 0;
+}
+.paginationMain .paginationEmpty:after{
+	background:						transparent url(cancel.png) no-repeat 0 0;
+}
+.paginationMain .paginationSearchGo:before {
+	background: 					transparent url(go_search.png) no-repeat 0 0;
+}
+.paginationMain .paginationControls .paginationSearch .clearSearch:before {
+	background: 					transparent url(Delete_Icon.png) no-repeat 0 0;
+}
+.paginationMain .paginationFrame.loading{
+	background:						transparent url(loading32.gif) no-repeat 50% 50%;
+}

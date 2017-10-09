@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"<!--BeginSectHtmlAttr--> {attr_type}="{attr_content}"<!--EndSectHtmlAttr-->>
+<head>
+<title>{title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<!--BeginSectMeta-->
+	<meta {meta_type}="{meta_name}" content="{meta_content}" />
+<!--EndSectMeta-->
+<!--BeginSectJSDefer--> 
+<script type="text/javascript">
+   function ffDF() {
+   		function js() {
+			var s = {defer_js};
+			for(var i = 0; i< s.length; i++) {
+				var e = document.createElement("script");
+				e.type = "text/javascript"; 
+				e.src = s[i];
+				document.head.appendChild(e);
+			}
+			setTimeout(function() {
+				if (typeof ff == "undefined")
+					window.location.href = window.location.pathname + "?" + (window.location.search ? window.location.search + "&" : "") + "__nocache__" + (window.location.hash ? "#" + window.location.hash : "");
+			}, 5000);
+		}   
+		var a = document.getElementById("above-the-fold");
+		<!--BeginSectNoCSSDefer-->
+		if(a) a.parentNode.removeChild(a);
+		js();
+		<!--EndSectNoCSSDefer-->
+		<!--BeginSectCSSDefer-->
+		var l = setTimeout(function() {
+			document.body.className = "pbar";
+	   	}, 5000);		
+		var c = {defer_css}, t, x;
+		for(var i = 0; i< c.length; i++) {
+			var e = document.createElement("link");
+			e.type = "text/css";
+			e.rel = "stylesheet"; 
+			if(c[i]["media"]) {
+				e.media = c[i]["media"];
+				e.href = c[i]["src"];
+			} else 
+				e.href = c[i];
+			var ev = document.head.appendChild(e);
+		}
+		t = setInterval( function() {
+	      try {
+	         if ( (ev.sheet && ev.sheet.cssRules.length)
+	            || (ev.styleSheet && ev.styleSheet.cssText.length)
+	          ) {
+	            document.body.className = "";
+	            clearInterval( t );
+	            clearTimeout( l );
+	            clearTimeout( x );
+	            
+				if(a) a.parentNode.removeChild(a);
+	            js();
+	         }
+	      } catch( ev ) {} finally {}
+	   }, 10 );
+	   <!--EndSectCSSDefer-->
+	}
+
+	if (window.addEventListener)
+		window.addEventListener("load", ffDF, false);
+	else if (window.attachEvent)
+		window.attachEvent("onload", ffDF);
+	else 
+		window.onload = ffDF;
+</script>
+<!--EndSectJSDefer-->
+<!--BeginSectCss-->
+<link href="{css_path}{css_file}" rel="{css_rel}" {link_properties}/>
+<!--EndSectCss-->
+<!--BeginSectJs-->
+<script<!--BeginSectJsSrc--> src="{js_path}{js_file}"<!--EndSectJsSrc-->>{js_embed}</script>
+<!--EndSectJs-->
+<!--BeginSectFFJS-->
+<script type="text/javascript">
+	var libs = ff.hash();
+	var struct = ff.hash();
+	struct.fields = ff.hash();
+	<!--BeginSectFFObject-->
+	struct.set("{objid}", {
+		"type"			: "{type}"
+		, "resources"	: [<!--BeginSectResource-->{resource}<!--EndSectResource-->]
+		, "fields"		: ff.hash()
+		<!--BeginSectProperty-->
+		, "{prop_name}"	: {prop_value}
+		<!--EndSectProperty-->
+	});
+	<!--EndSectFFObject-->
+	<!--BeginSectField-->
+	struct.{getobj}fields.set("{fieldid}", {
+		"widget"		: "{widget}"
+		, "resources"	: [<!--BeginSectFieldResource-->{resource}<!--EndSectFieldResource-->]
+	});
+	<!--EndSectField-->
+
+	ff.initFF({
+		"site_path"		: "{site_path}", 
+		"theme"			: "{theme}", 
+		"theme_ui"		: "{theme_ui}", 
+		"language"		: "{language}", 
+		"locale"		: "{locale}", 
+		"layer"			: "{layer}",
+        <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->    
+        "lazyImg"	: {lazy_img},
+		"struct"		: struct,
+		"libs"			: libs
+	});
+
+	<!--BeginSectAsyncCssPlugin-->
+	ff.injectCSS("{css_file}", "{css_path}{css_file}");
+	<!--EndSectAsyncCssPlugin-->
+	<!--BeginSectAsyncJsPlugin-->
+	ff.pluginLoad("{js_tag}", "{js_path}{js_file}", undefined, false);
+	<!--EndSectAsyncJsPlugin-->
+</script>
+<!--EndSectFFJS-->
+<!--BeginSectWidgetsHeaders-->
+{WidgetsContent}
+<!--EndSectWidgetsHeaders-->
+<!--BeginSectCssEmbed-->
+<style id="{css_key}" type="{css_type}">{css_embed}</style>
+<!--EndSectCssEmbed-->
+</head>
+<body{class_body}>
+<!--BeginSectFormHeader-->
+	<form id="{form_id}" name="{form_name}" method="{form_method}"{form_action}{form_enctype}>
+	<!--BeginSectFormWorkaround-->
+	<input disabled="disabled" type="text" value="" style="position:fixed; bottom:0px; right: 0px; width:1px; height:1px; margin:0px; padding: 0px; background-color: transparent; border: 0px;" />
+	<!--EndSectFormWorkaround-->
+    <!--BeginSectFormHidden-->
+        <input type="hidden" id="{varname}" name="{varname}" value="{varvalue}" />
+    <!--EndSectFormHidden-->
+<!--EndSectFormHeader-->
+	{content}
+<!--BeginSectWidgetsFooters-->
+{WidgetsContent}
+<!--EndSectWidgetsFooters-->
+<!--BeginSectFormFooter-->
+	</form>
+<!--EndSectFormFooter-->
+</body>
+</html>

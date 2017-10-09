@@ -1,0 +1,45 @@
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	/*<![CDATA[*/
+	google.load("visualization", "1", {"packages" : ["piechart"], callback: function () {
+		var query = new google.visualization.Query("{parsegraph}?name={graph_name}&tqx=reqId:{reqId}&{query_string}", {sendMethod : "xhr"});
+		query.send(function (response) {
+			if (response.isError()) {
+				alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+			}
+			
+			var data = response.getDataTable();
+			var chart = new google.visualization.PieChart(document.getElementById("chart_div_pie_{graph_name}"));
+			chart.draw(data, {
+				enableTooltip: {enableTooltip},
+				is3D: {is3D},
+				isStacked: {isStacked},
+				<!--BeginSectAxisColor-->axisColor: {axisColor},<!--EndSectAxisColor-->
+				<!--BeginSectAxisFontSize-->axisFontSize: {axisFontSize},<!--EndSectAxisFontSize-->
+				<!--BeginSectBackgroundColor-->backgroundColor: {backgroundColor},<!--EndSectBackgroundColor-->
+				<!--BeginSectBorderColor-->borderColor: {borderColor},<!--EndSectBorderColor-->
+				<!--BeginSectColors-->colors: {colors},<!--EndSectColors-->
+				<!--BeginSectFocusBorderColor-->focusBorderColor: {focusBorderColor},<!--EndSectFocusBorderColor-->
+				<!--BeginSectHeight-->height: {height},<!--EndSectHeight-->
+				<!--BeginSectLegend-->legend: '{legend}',<!--EndSectLegend-->
+				<!--BeginSectLegendBackgroundColor-->backgroundColor: {legendBackgroundColor},<!--EndSectLegendBackgroundColor-->
+				<!--BeginSectLegendFontSize-->legendFontSize: {legendFontSize},<!--EndSectLegendFontSize-->
+				<!--BeginSectLegendTextColor-->legendTextColor: {legendTextColor},<!--EndSectLegendTextColor-->
+				<!--BeginSectMax-->max: {max},<!--EndSectMax-->
+				<!--BeginSectMin-->min: {min},<!--EndSectMin-->
+				<!--BeginSectPieJoinAngle-->pieJoinAngle: {pieJoinAngle},<!--EndSectPieJoinAngle-->
+				<!--BeginSectPieMinimalAngle-->pieMinimalAngle: {pieMinimalAngle},<!--EndSectPieMinimalAngle-->
+				<!--BeginSectTitle-->title: '{title}',<!--EndSectTitle-->
+				<!--BeginSectTitleX-->titleX: '{titleX}',<!--EndSectTitleX-->
+				<!--BeginSectTitleY-->titleY: '{titleY}',<!--EndSectTitleY-->
+				<!--BeginSectTitleColor-->titleColor: {titleColor},<!--EndSectTitleColor-->
+				<!--BeginSectTitleFontSize-->titleFontSize: {titleFontSize},<!--EndSectTitleFontSize-->
+				<!--BeginSectTooltipFontSize-->tooltipFontSize: {tooltipFontSize},<!--EndSectTooltipFontSize-->
+				<!--BeginSectTooltipHeight-->tooltipHeight: {tooltipHeight},<!--EndSectTooltipHeight-->
+				<!--BeginSectWidth-->width: {width},<!--EndSectWidth-->
+			});
+		});
+	}});
+	/*]]>*/
+</script>
+<div id="chart_div_pie_{graph_name}"></div>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<menu>
+		<clienti label="Clienti" path="/clienti" redir="/clienti/clienti">
+			<tipo label="Tipo Cliente" path="/clienti/tipo" />
+			<clienti label="Clienti" path="/clienti/clienti" />
+            <geo label="Geo" path="/clienti/geo" />
+			<contatti label="Contatti" path="/clienti/contatti" />
+            <import label="Import CSV" path="/clienti/clienti/importcsv" />
+		</clienti>
+	</menu>
+</configdata>

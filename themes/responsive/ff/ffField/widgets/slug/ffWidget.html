@@ -1,0 +1,15 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+    <!--BeginSectBinding-->
+    jQuery("#{container}{title_field}").keyup(function() {
+        var val = jQuery(this).val();
+        jQuery("#{container}{slug_field}").val(ff.slug(val));
+    });
+    <!--EndSectBinding-->
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl--><!--EndSectControl-->

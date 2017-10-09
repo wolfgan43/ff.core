@@ -1,0 +1,19 @@
+<center id="dialog">
+  <h3 class="message">
+  	{message_icon}
+  	<span>{message}</span>
+  </h3>
+  
+  <div class="actions dialogActionsPanel">
+  	<!--BeginCancelOnly-->
+    <a href="javascript:void(0);" onClick="'{cancelurl}'" class="{cancel_class}">{_close}</a>
+  	<!--EndCancelOnly-->
+  	<!--BeginOKOnly-->
+    <a href="javascript:void(0);" onClick="{confirmurl}" class="{confirm_class}">OK</a>
+    <!--EndOKOnly-->
+    <!--BeginYesNo-->
+    <a href="javascript:void(0);" onClick="{confirmurl}" class="{confirm_class}">{_Si}</a>
+    <a href="javascript:void(0);" onClick="{cancelurl}" class="{cancel_class}">{_No}</a>
+    <!--EndYesNo-->
+  </div> 
+</center>

@@ -1,0 +1,50 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+var CODEMIRROR_BASEPATH = 'http://' + window.location.hostname + ff.site_path + '/themes/library/codemirror/';
+ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
+    ff.injectCSS("codemirror", "/themes/library/codemirror/lib/codemirror.css", function() {
+        ff.injectCSS("codemirror", "/themes/library/codemirror/lib/codemirror.css", function() {
+            ff.injectCSS("Dialog", "/themes/library/codemirror/addon/dialog/dialog.css", function() {
+                ff.pluginLoad("CodeMirror", "/themes/library/codemirror/lib/codemirror.js", function () {
+                    ff.pluginLoad("closebrackets", "/themes/library/codemirror/addon/edit/closebrackets.js", function () {
+                        ff.pluginLoad("active-line", "/themes/library/codemirror/addon/selection/active-line.js", function () {
+                            ff.pluginLoad("dialog", "/themes/library/codemirror/addon/dialog/dialog.js", function () {
+                                ff.pluginLoad("show-hint", "/themes/library/codemirror/addon/hint/show-hint.js", function () {
+                                    ff.pluginLoad("javascript-hint", "/themes/library/codemirror/addon/hint/javascript-hint.js", function () {
+                                        ff.pluginLoad("javascript", "/themes/library/codemirror/mode/javascript/javascript.js", function () {
+                                            ff.pluginLoad("search", "/themes/library/codemirror/addon/search/search.js", function () {  
+                                                ff.pluginLoad("search-cursor", "/themes/library/codemirror/addon/search/searchcursor.js", function () {
+                                                    ff.pluginLoad("ff.ffField.codemirror", "{widget_path}/codemirror.js", function() {
+                                                    });
+                                                }); 
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });	
+                    });
+                });
+            });
+        });
+    });
+});
+</script>
+
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+
+	ff.pluginAddInit("ff.ffField.codemirror", function () {
+		<!--BeginSectBinding-->
+		ff.ffField.codemirror.init("{container}{id}");
+		<!--EndSectBinding-->
+	});
+
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<textarea name="{container}{id}" id="{container}{id}" class="{class}" style="{style}" {properties} >{value}</textarea>
+<!--EndSectControl-->

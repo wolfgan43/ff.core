@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Curl.js (with IE 6/7 support)</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-language" content="en">
+	<link rel="bookmark" type="text/html" title="Curl.js" href="http://www.netzgesta.de/curl/">
+	<meta name="Author" lang="en" content="curl.netzgesta.de - Christian Effenberger">
+	<meta name="Publisher" lang="en" content="www.netzgesta.de">
+	<meta name="Copyright" lang="en" content="www.netzgesta.de - Christian Effenberger">
+	<meta name="Generator" lang="en" content="Christian Effenberger">
+	<meta name="Description" lang="en" content="Curl.js 1.3 allows you to add individual curls (inc. backside mask) to images on your webpages through unobtrusive javascript">
+	<meta name="Keywords" lang="en" content="curl.js,images,effect,turn page,flip page,page curl,unobtrusive javascript,IE,Mozilla,Firefox,Opera,Safari">
+	<meta http-equiv="imagetoolbar" content="no">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css">
+	a { color: blue; font-style:italic; text-decoration:none; }
+	tt {color: green;}
+	b {color: #993333;}
+	body { background: url(images/backgrnd.jpg) silver; color: black; font-family: Georgia,serif; line-height: 1.5; margin: 2em 2em;}
+	h2 { line-height: 1; }
+	.demo { float: left; padding: 10px; }
+	.logo { position: relative; width: 400px; height: 150px; white-space: nowrap;}
+	#guru { padding: 4px; width: 99%; height: auto; text-align: center; background-color: black; }
+	#guru div { border: solid 3px red; padding: 4px; font-family: monospace; font-size: 1.25em; width: auto; height: auto; color: red; text-align: center; text-decoration: blink; }
+	#header { margin-bottom: 0; font-weight: normal; font-style: italic; color: gray; }
+	.bookmarks { white-space: nowrap; width: 98%; margin: 0; padding-top: 10px; border-top: 1px dotted gray;}
+</style>
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<script type="text/javascript" src="cvi_curl_lib.js"></script>
+<script type="text/javascript">
+<!--
+function toggle(obj) {
+	cvi_curl.defaultSize = 50;
+	cvi_curl.defaultColor = "#ffeeaa";
+	if(obj.tagName.toUpperCase() != 'IMG') {
+		cvi_curl.remove(obj);
+	}else {
+		cvi_curl.add(obj);
+	}
+}
+
+var size = 100;
+var direct = true;
+function increase(obj) {
+	var max = 100;
+	if(obj.tagName.toUpperCase() != 'IMG') {
+		if(!direct && size>5 || size>=max) {
+			direct = false; size -= 5;
+		}else if(direct && size<=5 || size<max) {
+			direct = true; size += 5;
+		}
+		cvi_curl.modify(obj, {size: size });
+	}
+}
+
+window.onload = function () {
+	cvi_curl.add(document.getElementById("img2"), {size: 100 });
+	cvi_curl.add(document.getElementById("img3"), {size: 5 });
+	cvi_curl.add(document.getElementById("img4"), {size: 75 });
+};
+-->
+</script>
+	<script type="text/javascript" src="curl.js"></script>
+</head>
+<body><noscript><div id="guru" title="By this you can recognize the Amiga fan!"><div><strong>Guru Meditation</strong> - With deactivated JavaScript: Images stay unmodified!</div></div></noscript>
+
+<table summary="">
+<tr><td valign="top" style="padding-top: 0.5em">
+<div class="logo"><a class="nop" href="curl.zip" title="download curl.js">
+<img src="images/curl.jpg" class="curl isize75" border="0" alt="curl">
+</a></div>
+</td>
+<td style="padding: 0 0 0 15px; margin: 0; line-height: 1.5; font-style: italic;">
+<p><strong>Curl.js 1.3</strong> allows you to add individual curls (inc. backside mask) to images on your webpages. It uses unobtrusive javascript to keep your code clean.</p>
+<p>It works in all the major browsers - Mozilla Firefox 1.5+, Opera 9+, Safari and IE6+. On older browsers, it'll degrade and your visitors won't notice a thing.</p>
+<p><small><a href="http://lab.netzgesta.de/" title="showcase">CVI-lab</a>: Get a fast impression of the effects and their illustration qualities.</small></p>
+</td></tr>
+</table>
+
+<h2>Demonstration</h2>
+
+<p style="clear: left">Shows some of the things "curl.js" does.<small><br>
+<br>First Image with class = "<tt>curl invert</tt>", others with class = "<tt>curl isizeN</tt>" <em>(different sizes)</em>...</small></p>
+<div class="demo">
+<img class="curl isize100 ishadow100 icolorffffff invert" src="images/girl.jpg" width="400" height="400" border="0" title="onClick event" onClick="alert('Image dimension '+this.width+'x'+this.height);" alt="">
+</div>
+<div class="demo">
+<img class="curl isize100" src="images/girl.jpg" width="160" height="160" border="0" title="onClick event" onClick="alert('ALT=\''+this.alt+'\'');" alt="beautiful girl">
+<br><img class="curl isize75" src="images/girl.jpg" width="120" height="120" border="0" title="onClick event" onClick="alert('ID='+this.id);" alt="" id="girl_image">
+<br><img class="curl" src="images/girl.jpg" width="80" height="80" border="0" title="tooltip support" alt="">
+</div>
+<p style="clear: left;"><br></p>
+<div class="demo" onclick="toggle(document.getElementById('img1'));">
+<small><em>Click to add or remove curl</em><br></small>
+<img src="images/example.jpg" id="img1" title="Click to add/remove curl" alt="1">
+</div>
+<div class="demo" onmousemove="increase(document.getElementById('img2'));">
+<small><em>Move over to in/decrease curl</em><br></small>
+<img src="images/example.jpg" id="img2" alt="2">
+</div>
+<div class="demo" onmouseover="cvi_curl.modify(document.getElementById('img3'), {size: 50 });" onmouseout="cvi_curl.modify(document.getElementById('img3'), {size: 5 });">
+<small><em>Move over to change curl</em><br></small>
+<img src="images/example.jpg" id="img3" title="Move over to change curl" alt="3">
+</div>
+<div class="demo" onmouseup="cvi_curl.modify(document.getElementById('img4'), {color: 0 });" onmousedown="cvi_curl.modify(document.getElementById('img4'), {color: '#eeeeee' });">
+<small><em>Mouse up/down to change curl</em><br></small>
+<img src="images/example.jpg" id="img4" title="Mouse up/down to change curl" alt="4">
+</div>
+<p style="clear: left;"><br></p>
+
+<h2>Setting Up</h2>
+
+<p>Download "curl.js" and include it into your webpage.</p>
+<code>&lt;script type="text/javascript" src="<tt>curl.js</tt>"&gt;&lt;/script&gt;</code>
+
+<h2>Using It</h2>
+
+<p style="clear: left;">To get the page curl effect just add a class="<tt>curl</tt>" to the image.</p>
+
+<h2>Classes</h2><ul>
+<li>Initialisation class "<tt>curl</tt>"</li>
+<li><small><em>vary the size of the curl by adding isize followed by the desired <b>size</b> in percent:</em></small><br>
+Curl size class "<tt>isize</tt>" - min=0 max=MinImageDimension default=33</li>
+<li><small><em>vary the shadow by adding ishadow followed by the <b>opacity</b> in percent:</em></small><br>
+Curl shadow class "<tt>ishadow</tt>" - min=0 max=100 default=66</li>
+<li><small><em>vary the paperback color of the curl by adding icolor followed by the <b>color</b>:</em></small><br>
+Curl color class "<tt>icolor</tt>" - min=000000 max=ffffff default=0</li>
+<li><small><em>vary the clipping by adding invert:</em></small><br>
+Curl clipping class "<tt>invert</tt>"</li>
+</ul>
+
+<h2>Scripting Curls</h2>
+
+<p>If you want flexibility, use "cvi_curl_lib.js" instead of "curl.js". You can make your curls respond to user actions (e.g. changing the curl size when the image is hovered over).</p>
+<dl>
+	<dt><strong>Set</strong> defaults using Javascript</dt>
+	<dd>
+		<code>
+		cvi_curl.defaultSize = 33; <tt>//INT  0-100 (% curling)</tt><br>
+		cvi_curl.defaultShadow = 66; <tt>//INT  0-100 (% opacity)</tt><br>
+		cvi_curl.defaultColor = 0; <tt>//STR '#000000'-'#ffffff' or 0</tt><br>
+		cvi_curl.defaultInvert = false; <tt>//BOOLEAN</tt><br>
+		</code>
+		<strong>If</strong> <b>cvi_filter_lib.js</b> is loaded also...<br>
+		<code>
+		cvi_curl.defaultFilter = null; <tt>//OBJ  [{f='grayscale'},{f='emboss', s:1}...]</tt>
+		</code>
+  		<p></p>
+	</dd>
+	<dt><strong>Add</strong> images using Javascript</dt>
+  	<dd>
+  		<code>cvi_curl.add(<tt>image</tt>, <tt>options</tt>);</code><br><small>
+		<tt>image</tt> should be an image element: document.getElementById(<b>"myimg"</b>)<br>
+		<tt>options</tt> can contain one or more values: {<tt>size</tt>: <b>value</b>, <tt>shadow</tt>: <b>value</b>, <tt>color</tt>: <b>value</b>, <tt>invert</tt>: <b>value</b>, <tt>filter</tt>: <b>value</b>}</small>
+		<dl><dt>Examples:</dt>
+		<dd>
+			<code>
+			cvi_curl.add(document.getElementById(<b>"myimg"</b>), { <tt>shadow</tt>: <b>75</b>, <tt>size</tt>: <b>50</b> });<br>
+			&lt;img onLoad="cvi_curl.add(<b>this</b>, { <tt>shadow</tt>: <b>75</b>, <tt>size</tt>: <b>50</b> });" ...&gt;
+			</code>
+  		</dd></dl>
+  		<p></p>
+  	</dd>
+	<dt><strong>Modify</strong> images using Javascript</dt>
+  	<dd>
+  		<code>cvi_curl.modify(<tt>image</tt>, <tt>options</tt>);</code><br>
+  		<small>If the image has already an effect but a <tt>option</tt> value has changed, the effect will be changed accordingly.</small><br>
+		<dl><dt>Example:</dt>
+		<dd>
+			<code>cvi_curl.modify(document.getElementById(<b>"myimg"</b>), { <tt>size</tt>: <b>100</b> });</code>
+  		</dd></dl>
+		<p></p>
+  	</dd>
+	<dt><strong>Remove</strong> effect from an image using Javascript</dt>
+	<dd>
+		<code>cvi_curl.remove(<tt>image</tt>);</code>
+  		<p></p>
+	</dd>
+</dl>
+
+<h2>Support libs</h2>
+<p>If you are using the more flexible "<b>cvi_curl_lib.js</b>" instead of "<b>curl.js</b>", 
+you'll get access to additional features by the following support libraries <em>(part of distribution)</em>:</p>
+<ul>
+<li><b>cvi_filter_lib.js</b> supports image filtering capabilities. <small>[<i><a class="lk" title="Filter capability WYSIWYG-Editor" href="http://lab.netzgesta.de/">WYSIWYG-Editor</a></i>]</small><br />
+<small><i>Provides image filter capability for Canvas (only if getImageData/setImageData is supported)</i></small>.<br />
+<br />
+<code>filter : [{<tt>#1 filter options</tt>},{<tt>#2 filter options</tt>}...];</code>
+<dt><code><tt>options</tt> &nbsp; e.g. {<b>f</b>: '<tt>contrast</tt>', <b>s</b>: <tt>1.5</tt>, ...}</code></dt>
+<dd>
+	<code><b>f</b> == STRING <b>filter name</b> e.g. "invert" Default: <tt>null</tt> <em>(required)</em><pre>
+     "<tt>invert</tt>" Reverses all colors of the image
+     "<tt>invertalpha</tt>" Reverses the transparency of the image
+     "<tt>grayscale</tt>" Converts the image into grayscale
+     "<tt>solarize</tt>" Solarizes the image by negating the colors
+     "<tt>sepia</tt>" Applies the well-known sepia coloring to the image
+     "<tt>threshold</tt>" Converts the image to black&white (s<1 == darker and s>1 == brighter)
+     "<tt>posterize</tt>" Posterizes the image by quantizing each channel to a limited number of levels
+     "<tt>tritone</tt>" Applies 3 colors for low|mid|high range according to the brightness of the image
+     "<tt>mixrgb</tt>" Mixes the RGB channels with the other two channels
+     "<tt>exposure</tt>" Simulates changing the exposure of the image
+     "<tt>gamma</tt>" Standard gamma correction (s<1 == darker and s>1 == brighter)
+     "<tt>brightness</tt>" Change brightness (s<1 == darker and s>1 == brighter)
+     "<tt>contrast</tt>" Change contrast (s<1 == lower and s>1 == higher)
+     "<tt>adjustrgba</tt>" Adjust the red & green & blue & alpha channel of the image (s == [r,g,b,a])
+     "<tt>adjusthsba</tt>" Adjust hue & saturation & brightness & alpha channel of the image (s == [h,s,b,a])
+     "<tt>adjustyuva</tt>" Adjust luminance & blue–yellow chrominance & red–cyan chrominance & alpha channel of the image (s == [y,u,v,a])
+     "<tt>colorkey</tt>" Set alpha to 0 if pixel color values are higher than min and lower than max rgb color
+     "<tt>chromakey</tt>" Set alpha to 0 if pixel hue & saturation & brightness matches
+     "<tt>smooth</tt>" Smoothes the image (result is similar to bluring)
+     "<tt>spinblur</tt>" Blurs by rotating the centered image
+     "<tt>zoomblur</tt>" Blurs by zooming the centered image
+     "<tt>motionblur</tt>" Blurs by moving the image to a defined direction
+     "<tt>outline</tt>" Creates grayscaled outline images by different operators (e.g. sobel, prewitt...).
+     "<tt>convolve</tt>" Use your own 3x3 matrix via option m=[[n,n,n],[n,n,n],[n,n,n]]
+     "<tt>blur</tt>" Bluring the image by (in build and extendable cvi_matrix object) convolution
+     "<tt>median</tt>" Smoothes grainy images by (in build and extendable cvi_matrix object) convolution
+     "<tt>sharpen</tt>" Makes image sharper by (in build and extendable cvi_matrix object) convolution
+     "<tt>sharper</tt>" Makes image even sharper by (in build and extendable cvi_matrix object) convolution
+     "<tt>bumplt</tt>" Embosses the image by (in build and extendable cvi_matrix object) convolution
+     "<tt>bumpbr</tt>" ... </pre></code>
+	<code><b>s</b> == FLOAT/OBJECT <b>multiplier(s)</b>  e.g. 0-255 Defaults to... <em>(optional)</em> </tt><pre>
+     <tt>1        </tt> if f=="<tt>zoomblur</tt>|<tt>spinblur</tt>" Distance (px)
+     <tt>1        </tt> if f=="<tt>smooth</tt>" Radius (px 1-10)
+     <tt>1        </tt> if f=="<tt>posterize</tt>" Number of levels (1-16)
+     <tt>1        </tt> if f=="<tt>threshold</tt>" Multiplier of 127 (0-2)
+     <tt>1        </tt> if f=="<tt>brightness</tt>|<tt>contrast</tt>|<tt>gamma</tt>|<tt>exposure</tt>" Multiplier of existing value (0-255)
+     <tt>[1,0]    </tt> if f=="<tt>motionblur</tt>" Distance (px) and angle (0-360)
+     <tt>[auto,0] </tt> if f=="<tt>convolve</tt>" or m!=null. Divisor of convolution result (-1==auto), 
+               useable for normalization and bias (0-255) for brightness addition
+     <tt>[1,0,    </tt> if f=="<tt>outline</tt>" Divisor of convolution result, bias (0-255) 
+     <tt>  'name']</tt> and operator ('sobel'|'scharr'|'prewitt'|'kirsh'|'roberts') 
+     <tt>[1,1,1,1]</tt> if f=="<tt>adjustrgba</tt>" red, green, blue, alpha. Multipliers of existing values (0-255)
+     <tt>[1,1,1,1]</tt> if f=="<tt>adjusthsba</tt>" hue, saturation, brightness, alpha. Multiply existing values (0-255)
+     <tt>[1,1,1,1]</tt> if f=="<tt>adjustyuva</tt>" luminance, blue–yellow chrominance, red–cyan chrominance, alpha. Multiply existing values (0-255)
+     <tt>[0,0,0,0,0]</tt>  f=="<tt>chromakey</tt>" hue (0-360) and hue tolerance, min saturation, min brightness, max brightness (0-100)
+     <tt>[[0,0,0],</tt> if f=="<tt>colorkey</tt>" equals rgb min and rgb max triplet (0-255)
+     <tt> [0,0,0]]</tt> 
+     <tt>[[1,1,1],</tt> if f=="<tt>mixrgb</tt>" Mix into r, g, b with...
+     <tt> [1,1,1]]</tt> ...bluegreen, redblue, greenred as triplets [0-255,0-255,0-255]
+     <tt>[[0,0,0],</tt> if f=="<tt>tritone</tt>" low|mid|high range colors as...
+     <tt> [0,0,0],</tt> ...rgb triplets [0-255,0-255,0-255]
+     <tt> [0,0,0]]</tt> </pre></code>
+	<code><b>m</b> == OBJECT <b>kernel matrix</b>  e.g. [[n,n,n],[n,n,n],[n,n,n]] Default: <tt>null</tt> <em>(optional)</em> </code><br />
+</dd>
+<p><br/></p>
+</li>
+<li><b>cvi_istack_lib.js</b> supports image stack capabilities. <small>[<i><a class="overlay lWOn lk" title="istack Example-Demo" href="istack.html">Example-Demo</a></i>]</small><br />
+<small><i>Provides fading image stacks for Images and CVI Effects</i></small>.
+
+<dl>
+	<dt>Set defaults</dt>
+  	<dd>
+		<code>cvi_istack.<b>defaultImagearray</b>&nbsp;= <tt>null</tt>; //OBJ e.g.  [{source:'image.jpg'}]</code><br />
+		<code>cvi_istack.<b>defaultMainwidth</b>&nbsp; = <tt>128</tt>; //INT 80-n (px width) </code><br />
+		<code>cvi_istack.<b>defaultMainheight</b> = <tt>128</tt>; //INT 80-n (px height)</code><br />
+		<code>cvi_istack.<b>defaultPlayframes</b> = <tt>20</tt>; //INT 1-100 equals frames to fade (* 30 milliseconds)</code><br />
+		<code>cvi_istack.<b>defaultPlaydelay</b>&nbsp; = <tt>5000</tt>; //INT 1000-n equals milliseconds (1/1000)</code><br />
+		<code>cvi_istack.<b>defaultLoadtimeout</b>= <tt>3000</tt>;	//INT 1000-n equals milliseconds (1/1000)</code><br />
+		<code>cvi_istack.<b>defaultNoiefade</b> &nbsp; = <tt>false</tt>;//BOOLEAN IE's Alpha filter produces rough edges</code><br />
+		<code>cvi_istack.<b>defaultPlayscript</b> = <tt>''</tt>; //STRING e.g. 'cvi_bevel'|'cvi_corner'|'cvi_curl'|'cvi_edge'|'cvi_glossy'|<br />
+		'cvi_glossy'|'cvi_reflex'|'cvi_slide'|'cvi_sphere'|'cvi_strip'</code><br />
+  		<p></p>
+		<em><small><b>imagearray</b> supports <tt>source</tt> <em>(required)</em> and <tt>options</tt> <em>(optional)</em>.</small></em>
+  		<p></p>
+	</dd>
+	<dt>Add stack</dt>
+  	<dd>
+  		<code>cvi_istack.add(<tt>element</tt>, <tt>options</tt>);</code><br />
+		<dl><dt><code><tt>element</tt>&nbsp; == div element</code></dt></dl>
+		<dl><dt><code><tt>options</tt> &nbsp;e.g. {<b>mainwidth</b>: <tt>128</tt>, <b>mainheight</b>: <tt>128</tt>, ...}</code></dt>
+		<dd>
+			<code><b>imagearray</b>&nbsp;== OBJ Default: <tt>null</tt></code><br />
+			<code><b>mainwidth</b>&nbsp; == INT <tt>32</tt> - <tt>n</tt> Default: <tt>128</tt></code><br />
+			<code><b>mainheight</b> == INT <tt>32</tt> - <tt>n</tt> Default: <tt>128</tt></code><br />
+			<code><b>playframes</b> == INT <tt>1</tt> - <tt>100</tt> Default: <tt>20</tt></code><br />
+			<code><b>playdelay</b>&nbsp; == INT <tt>1000</tt> - <tt>n</tt> Default: <tt>5000</tt></code><br />
+			<code><b>loadtimeout</b>== INT <tt>1000</tt> - <tt>n</tt> Default: <tt>3000</tt></code><br />
+			<code><b>noiefade</b> &nbsp; == BOL <tt>true</tt> or <tt>false</tt> Default: <tt>false</tt></code><br />
+			<code><b>playscript</b> == STR Default: <tt>''</tt></code><br />
+  		</dd></dl>
+		<dl><dt><em><small><b>Advices:</b> All images should have the same aspect ratio like the stack object.<br />
+		cvi_slide and cvi_strip creates generally 1:1 objects (using the larger dimension),<br />
+		cvi_sphere creates generally 1:1 objects (using the smaller dimension) and<br />
+		cvi_reflex creates objects with additional height (for the reflection).</small></em><br />
+		<em><small><b>Hint:</b> By adding a stack to a div element, the former content of the element will be overwritten.</small></em></dt></dl>
+  		<p></p>
+  	</dd>
+	<dt>Get some informations</dt>
+	<dd>
+		<code><tt>FLOAT</tt> &nbsp;= cvi_istack.version;</code><br />
+		<code><tt>STRING</tt> = cvi_istack.released;</code>
+  		<p></p>
+	</dd>
+	<dt>Play stack</dt>
+	<dd>
+		<code>cvi_istack.play(<tt>element</tt>);</code>
+  		<p></p>
+	</dd>
+	<dt>Pause stack</dt>
+	<dd>
+		<code>cvi_istack.pause(<tt>element</tt>);</code>
+  		<p></p>
+	</dd>
+	<dt>Remove stack</dt>
+	<dd>
+		<code>cvi_istack.remove(<tt>element</tt>);</code>
+  		<p></p>
+	</dd>
+	<dt>Example</dt>
+	<dd>
+  		<pre>
+&lt;script type="text/javascript"&gt;
+&lt;!--
+	var photos = new Array();
+	photos = [
+		{source:'images/fire.jpg', options:'{tilt:"l",text:"fire"}' },
+		{source:'images/jeans.jpg', options:'{tilt:"r",text:"jeans"}' },
+		{source:'images/rose.jpg', options:'{tilt:"l",text:"rose"}' },
+		{source:'images/swirl.jpg', options:'{tilt:"r",text:"swirl"}' },
+		{source:'images/fruits.jpg', options:'{tilt:"l",text:"fruits"}' },
+		{source:'images/heart.jpg' }
+	];
+	
+	function init_ImageStack() {
+		cvi_glossy.defaultPreserve=true;
+		cvi_glossy.defaultTilt='left';
+		cvi_glossy.defaultFontattr= [100,100,100];
+		cvi_istack.add(document.getElementById('wrapper_div'),{
+			imagearray: photos,
+			mainwidth: 200,
+			mainheight: 200,
+			playdelay: 3000,
+			playscript: 'cvi_glossy',
+			noiefade: true
+		});
+	}
+	
+	if(window.attachEvent) {
+		window.attachEvent("onload", init_ImageStack);
+	}else {
+		window.addEventListener("load", init_ImageStack, false);
+	}
+--&gt;
+&lt;/script&gt;
+  		</pre>
+	</dd>
+</dl>
+</li>
+</ul>
+
+<h2>Why use Javascript Image Curls?</h2>
+
+<ul>
+<li>Fast and easy to implement. Just add class="curl" to the image and your good to go.</li>
+<li>Don't need to spend time in an image editor creating an image effect.</li>
+<li>Works really well with forum avatars. Doesn't require additional server work.</li>
+<li>It's dead easy to change the attributes of the images.</li>
+<li>Free of charge use on non-commercial and private web sites.</li>
+</ul>
+
+<p>In older browsers, the script degrades and your visitors won't notice a thing.</p>
+
+<h2>History</h2>
+
+Version 1.3<ul><li>Extended distribution. Added the support libs "<b>cvi_filter_lib.js</b>" and "<b>cvi_istack_lib.js</b>"</li></ul>
+Version 1.2<ul><li>Added invert clipping</li></ul>
+Version 1.0<ul><li>Initial Release<small><br>IE is unable to show a proper backside if the image is scaled.</small></li></ul>
+
+<h2>License</h2>
+
+<p>curl.js, and cvi_curl_lib.js are distributed under this <a href="LICENSE.txt">LICENSE</a>. License permits free of charge use on non-commercial and private web sites only under special conditions <em>(as described in the license)</em>. This license equals neither "<span style="text-decoration: line-through;">open source</span>" nor "<span style="text-decoration: line-through;">public domain</span>". There are also <a href="&#109;&#097;&#105;&#108;&#116;&#111;:&#099;&#118;&#105;&#064;&#110;&#101;&#116;&#122;&#103;&#101;&#115;&#116;&#097;&#046;&#100;&#101;">Commercial Software Licenses</a> available.</p>
+
+<h6>YOU AGREE TO ALL CONDITIONS OF THIS LICENCE AGREEMENT CONCERNING THE USE OF THE SOFTWARE BY ACCEPTING THIS LICENCE.
+<br>IF YOU DO NOT AGREE TO ALL CONDITIONS OF THIS AGREEMENT, YOU SHALL NOT INSTALL THE SOFTWARE, OR USE IT IN OTHER WAYS.</h6>
+
+<p><strong>Images used are copyrighted and are used for demonstration only.</strong></p>
+
+<p><a href="http://cvi.netzgesta.de/">cvi.netzgesta.de</a>&nbsp;&nbsp;also visit&nbsp;&nbsp;<a href="http://lab.netzgesta.de/">CVI-lab</a>, <a href="http://dev.netzgesta.de/">CVI-dev</a>, <a href="http://s5.netzgesta.de/">S5 Reloaded</a> and <a href="http://ajaxfilmdb.sourceforge.net/">AJAX-FilmDB</a></p>
+
+</body>
+</html>

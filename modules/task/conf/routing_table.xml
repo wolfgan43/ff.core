@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<rule id="task">
+		<priority>NORMAL</priority>
+		<source>^/restricted/task(.*)</source>
+		<destination>
+			<module>task</module>
+			<url>/restricted/task$1</url>
+		</destination>
+        <reverse>/restricted/task</reverse> 
+		<accept_path_info />
+	</rule>
+    <rule id="task_services">
+        <priority>NORMAL</priority>
+        <source>^/services(.*)</source>
+        <destination>
+            <module>task</module>
+            <url>/services$1</url>
+        </destination>
+        <reverse>/services</reverse>
+        <accept_path_info />    
+    </rule>
+    <rule>
+        <priority>NORMAL</priority>
+        <source>^/restricted/task/settings(.*)</source>
+        <destination>
+            <module>restricted</module>
+            <url>/settings/task$1</url>
+        </destination>
+        <accept_path_info />
+    </rule>
+</configdata>
+
