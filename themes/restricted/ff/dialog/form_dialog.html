@@ -1,0 +1,22 @@
+<html>
+<head>
+</head>
+<body>
+<div id="dialog" style="text-align:center">
+  <div class="left"><img src="{site_path}/themes/{theme}/images/FormsGrid/warning.png" alt="Warning" class="left"><h1 class="dialog right">{message}</h1></div>
+  
+  <div class="actions dialogActionsPanel"><div class="closure"></div>
+  <!--BeginCancelOnly-->
+    <input type="button" value="{_close}" onClick="window.location.href = '{cancelurl}';" class="button right" />
+  <!--EndCancelOnly-->
+  <!--BeginOKOnly-->
+    <input type="button" value="OK" onClick="{confirmurl}" class="button right" />
+    <!--EndOKOnly-->
+    <!--BeginYesNo-->
+    <input type="button" value="{_No}" onClick="{cancelurl}" class="button right" />
+    <input type="button" value="{_Si}" onClick="{confirmurl}" class="button right" />
+    <!--EndYesNo-->
+	</div> 
+</div>
+</body>
+</html>

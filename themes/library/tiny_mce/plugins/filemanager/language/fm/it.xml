@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<language-pack>
+	<header>
+		<author>Moxiecode Systems AB</author>
+		<version minor="2" major="0" releasedate="2005-10-28" />
+		<description>
+			Questo è il "language pack" in italiano per MCFileManager.
+		</description>
+	</header>
+
+	<language code="it" title="Italiano" dir="ltr">
+		<group target="error">
+			<item name="tofile_exists">File gi? esistente.</item>
+			<item name="no_from_file">File d'origine inesistente.</item>
+			<item name="demo">Azione non consentita in modalit? dimostrativa.</item>
+			<item name="invalid_filename">Nome del File non valido.</item>
+			<item name="no_read_access">No read access to this file/folder.</item>
+            <item name="no_write_access">Permesso di lettura/scrittura negato.</item>
+			<item name="copy_failed">Copia fallita.</item>
+			<item name="move_failed">Spostamento fallito.</item>
+			<item name="template_missing">Teplate non trovato.</item>
+			<item name="createdoc_failed">Creazione documento fallita.</item>
+			<item name="no_access">Non hai l'accesso per eseguire questa operazione.</item>
+			<item name="file_exists">File gi? esistente.</item>
+			<item name="upload_failed">Upload fallito, controlla i permessi di scrittura della cartella.</item>
+			<item name="error_to_large">Dimensione massima del File raggiunta.</item>
+			<item name="file_not_exists">File inesistente.</item>
+			<item name="delete_failed">Cancellazione fallita.</item>
+			<item name="folder_exists">Cartella Gi? essitente.</item>
+			<item name="no_filesystem">Filesystem non trovato.</item>
+			<item name="createdir_failed">Creazione cartella fallita.</item>
+			<item name="createzip_failed">Creazione ZIP fallita.</item>
+			<item name="rename_failed">Rinomina fallita.</item>
+            <item name="savecontent_failed">Save content failed.</item>
+		</group>
+
+		<group target="message">
+			<item name="zip_success">ZIP eseguito con successo.</item>
+			<item name="copy_success">Copia eseguita con successo.</item>
+			<item name="move_success">Sposta eseguito con successo.</item>
+			<item name="createdoc_success">Creazione documento eseguita con successo.</item>
+			<item name="delete_success">Cancellazione eseguita con successo.</item>
+			<item name="directory_ok">Cartella creata con successo.</item>
+			<item name="keepalive">Keepalive</item>
+			<item name="upload_ok">Upload eseguito con successo.</item>
+			<item name="confirm_cut">Sei sicuro di voler tagliare il File selezionato?</item>
+			<item name="confirm_copy">Sei sicuro di voler copiare il File selezionato?</item>
+			<item name="confirm_paste">Sei sicuro di voler incollare il File tagliato/copiato?</item>
+			<item name="confirm_delete">Sei sicuro di voler cancellare il File selezionato?</item>
+			<item name="insert">Inserimento File in corso, Attendere prego...</item>
+			<item name="paste_in_progress">Copia in corso, Attendere prego...</item>
+		</group>
+
+		<group target="common">
+			<item name="createdir">Creazione cartella</item>
+			<item name="createfile">Nuovo File</item>
+			<item name="help">Aiuto</item>
+			<item name="refresh">Aggiorna</item>
+			<item name="upload">Upload</item>
+			<item name="directory">Seleziona cartella</item>
+			<item name="imagemanager">Image Maneger</item>
+			<item name="title">Moxiecode File Manager</item>
+			<item name="alert_ok">Ok</item>
+			<item name="confirm_yes">Si</item>
+			<item name="confirm_no">No</item>
+		</group>
+
+		<group target="button">
+			<item name="create">Crea</item>
+			<item name="cancel">Cancella</item>
+            <item name="save">Save</item>
+		</group>
+
+		<group target="panel">
+			<item name="categories">Categorie</item>
+			<item name="preview">Anteprima</item>
+            
+            <!-- Legacy items -->            
+			<item name="favorites">Preferiti</item>
+			<item name="history">Storia</item>
+		</group>
+
+        <group target="edit">
+            <item name="title">Edit file</item>
+            <item name="description">Edit the contents of the file.</item>
+            <item name="loading_wait">Loading contents please wait.</item>
+            <item name="saving_wait">Saving contents please wait.</item>
+            <item name="file_path">File path:</item>
+        </group>
+        
+		<group target="actions">
+			<item name="insert">Inserisci</item>
+			<item name="download">Download</item>
+			<item name="rename">Rinomina</item>
+			<item name="cut">Taglia</item>
+			<item name="copy">Copia</item>
+			<item name="paste">Incolla</item>
+			<item name="deleteit">Cancella</item>
+            <item name="edit">Edit</item>
+			<item name="zip">Zip</item>
+			<item name="view">Visualizza</item>
+			<item name="select_all">Seleziona tutto</item>
+			<item name="unselect_all">De-seleziona tutto</item>
+
+            <!-- Legacy items -->
+			<item name="addfavorites">Aggiungi preferiti</item>
+			<item name="removefavorites">Rimuovi preferiti</item>
+		</group>
+
+		<group target="filelist">
+			<item name="filename">Nome File</item>
+			<item name="size">Dimensione</item>
+			<item name="type">Tipo</item>
+			<item name="modified">Data modifica</item>
+			<item name="with_selected">Con selezionato:</item>
+			<item name="info_dirs">Cartelle:</item>
+			<item name="info_files">Files:</item>
+			<item name="info_size">Dimensioni totali Files:</item>
+			<item name="info_access">Accesso:</item>
+			<item name="loading">Caricamento...</item>
+		</group>
+
+		<group target="createdir">
+			<item name="title">Crea Cartella</item>
+			<item name="description">Inserisci il nome della cartella che vuoi creare.</item>
+			<item name="template">Template:</item>
+			<item name="select_template">-- Seleziona template --</item>
+			<item name="directory_name">Nome Cartella:</item>
+			<item name="create_in">Crea in:</item>
+			<item name="progress">Creazione cartella, Attendere prego...</item>
+		</group>
+
+		<group target="createdoc">
+			<item name="title">Crea documento</item>
+			<item name="description">Compila il modulo per creare un nuovo documento da un template.</item>
+			<item name="template">Template:</item>
+			<item name="select_template">-- Seleziona template --</item>
+			<item name="name">Nome</item>
+			<item name="path">Percorso</item>
+			<item name="preview">Anteprima</item>
+            <item name="preview_title">Preview of: {file}</item>
+		</group>
+
+		<group target="upload">
+			<item name="title">Upload</item>
+			<item name="description">Usa il modulo per caricare il File.</item>
+			<item name="valid_extensions">Estensioni valide:</item>
+			<item name="max_upload_size">Massima dimensione di Upload:</item>
+			<item name="file_to_upload">File da caricare:</item>
+			<item name="as_file_name">Come nome file :</item>
+			<item name="path">Percorso: </item>
+			<item name="button_upload">Upload</item>
+			<item name="browse">Aggiungi File(s)</item>
+			<item name="progress">Upload in corso...</item>
+			<item name="upload_warn">I Files sono stati caricati, Sei sicuro di voler cancellare gli Upload?</item>
+            <item name="statusrow">You have {files} files (total {size}) eagerly waiting to be uploaded.</item>
+            <item name="progressinfo">{loaded} of {total} uploaded at {speed}/s.</item>
+            <item name="abort">Abort upload</item>
+            <item name="add_more">Add more?</item>
+            <item name="upload_to_server">Upload to server</item>
+            <item name="cancelled">Upload was cancelled</item>
+            <item name="choose_files">Choose files</item>
+            <item name="basic_upload">If you're having trouble uploading you can always use the {a}basic uploader{/a}.</item>
+            <item name="remove">Remove</item>
+            <item name="file">File</item>
+            <item name="size">Size</item>
+            <item name="status">Status</item>
+            <item name="no_valid_files">No valid files selected, please try again.</item>
+		</group>
+
+		<group target="createzip">
+			<item name="title">Crea zip</item>
+			<item name="description">Inserisci  il nome del file zip che desideri creare.</item>
+			<item name="name">Nome:</item>
+			<item name="path">Percorso</item>
+		</group>
+
+		<group target="tinymce">
+			<item name="insertfile_desc">Inserisci file</item>	
+		</group>
+
+        <group target="favorites">
+            <item name="special_folder_title">Favorites</item>
+            <item name="addfavorites">Add favorite(s)</item>
+            <item name="removefavorites">Remove favorite(s)</item>
+            <item name="confirm_remove_favorite">Are you sure you wish to remove this from your favorites list?</item>
+            <item name="remove_favorite_failed">Failed to remove the favorite from your favorites list.</item>
+        </group>
+
+        <group target="history">
+            <item name="special_folder_title">History</item>
+        </group>
+	</language>
+</language-pack>

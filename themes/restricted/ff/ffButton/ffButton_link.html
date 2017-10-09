@@ -1,0 +1,21 @@
+<a href="{url}" target="{target}" class="{class}"
+	<!--BeginSectSubmit-->
+		onclick="
+		<!--BeginSectFormAction-->
+		document.getElementById('frmAction').value = '{component_action}{frmAction}';
+		<!--EndSectFormAction-->
+		<!--BeginSectFormActionUrl-->
+			document.getElementById('frmMain').action = '{form_action_url}';
+		<!--EndSectFormActionUrl-->
+		<!--BeginSectSetVariable-->
+			document.getElementById('{varname}').value = '{varvalue}';
+		<!--EndSectSetVariable-->
+		{jsaction}
+		"
+	<!--EndSectSubmit-->
+ {properties} >
+<!--BeginSectImage-->
+<img src="{path}" alt="{image}" />
+<!--EndSectImage-->
+{label}
+</a>

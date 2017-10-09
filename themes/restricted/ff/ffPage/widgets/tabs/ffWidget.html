@@ -1,0 +1,25 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	<!--BeginSectBinding-->
+	ff.pluginAddInit("ff.ffPage.tabs", function () {
+		ff.ffPage.tabs.addTab("{id}");
+	});
+	<!--EndSectBinding-->
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectIstance-->
+<div id="tabs_{id}">
+	<ul id="tabs_{id}-nav">
+		<!--BeginSectElementHead-->
+		<li><a class="tab-bt" href="#tabs_{id}_{element_count}"><span>{element_title}</span></a></li>
+		<!--EndSectElementHead-->
+	</ul>
+	<!--BeginSectElementBody-->
+	<div id="tabs_{id}_{element_count}">{element_content}</div>
+	<!--EndSectElementBody-->
+</div>
+<!--EndSectIstance-->

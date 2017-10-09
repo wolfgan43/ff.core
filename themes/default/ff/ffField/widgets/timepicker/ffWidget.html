@@ -1,0 +1,24 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	"{site_path}/themes/library/ff/ffField.js",	function() {
+	ff.pluginLoad("ff.ffField.timepicker", "{site_path}/themes/default/ff/ffField/widgets/timepicker/timepicker.js");
+});
+</script>
+<!--EndSectHeaders-->
+
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("ff.ffField.timepicker", function () {
+		<!--BeginSectBinding-->
+		ff.ffField.timepicker.fill("{container}{id}", '{container}hour_{id}', '{container}minute_{id}', {sel_hour}, {sel_minute});
+		<!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<input type="hidden" id="{container}{id}" name="{container}{id}" value="{value}"/>
+<select id="{container}hour_{id}" name="{container}hour_{id}" class="{class}" {properties} onchange="ff.ffField.timepicker.change('{container}{id}', '{container}hour_{id}', '{container}minute_{id}')"></select> :
+<select id="{container}minute_{id}" name="{container}minute_{id}" class="{class}" {properties}  onchange="ff.ffField.timepicker.change('{container}{id}', '{container}hour_{id}', '{container}minute_{id}')"></select>
+<!--EndSectControl-->

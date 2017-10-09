@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"<!--BeginSectHtmlAttr--> {attr_type}="{attr_content}"<!--EndSectHtmlAttr-->>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--BeginSectMeta-->
+	<meta {meta_type}="{meta_name}" content="{meta_content}" />
+<!--EndSectMeta-->
+<title>{title}</title>
+<!--BeginSectCss-->
+<link href="{css_path}{css_file}" rel="{css_rel}" type="{css_type}" <!--BeginSectCssMedia-->media="{css_media}"<!--EndSectCssMedia--> />
+<!--EndSectCss-->
+<!--BeginSectJs-->
+    <script type="text/javascript" language="javascript" <!--BeginSectJsSrc-->src="{js_path}{js_file}"<!--EndSectJsSrc-->>{js_embed}</script>
+<!--EndSectJs-->
+<!--BeginSectFFJS-->
+<script type="text/javascript">
+	var libs = ff.hash();
+	var struct = ff.hash();
+	struct.fields = ff.hash();
+	<!--BeginSectFFObject--> 
+	struct.set("{objid}", {
+		"type"			: "{type}"
+		, "resources"	: [<!--BeginSectResource-->{resource}<!--EndSectResource-->]
+		, "fields"		: ff.hash()
+		<!--BeginSectProperty-->
+		, "{prop_name}"	: {prop_value}
+		<!--EndSectProperty-->
+	});
+	<!--EndSectFFObject-->
+	<!--BeginSectField-->
+	struct.{getobj}fields.set("{fieldid}", {
+		"widget"		: "{widget}"
+		, "resources"	: [<!--BeginSectFieldResource-->{resource}<!--EndSectFieldResource-->]
+	});
+	<!--EndSectField-->
+
+	ff.initFF({
+		"site_path" : "{site_path}",
+		"theme" : "{theme}",
+		"language" : "{language}",
+		"layer" : "{layer}",
+		"phpsession"	: {
+			"name"	: "{phpsession_name}"
+		},
+		"struct"		: struct
+	});
+	<!--BeginSectAsyncCssPlugin-->
+	ff.injectCSS("{css_file}", "{css_path}{css_file}");
+	<!--EndSectAsyncCssPlugin-->
+	<!--BeginSectAsyncJsPlugin-->
+	ff.pluginLoad("{js_tag}", "{js_path}{js_file}", undefined, false);
+	<!--EndSectAsyncJsPlugin-->
+</script>
+<!--EndSectFFJS-->
+<!--BeginSectWidgetsHeaders-->
+{WidgetsContent}
+<!--EndSectWidgetsHeaders-->
+</head>
+<body {class_body}>
+<!--BeginSectFormHeader-->
+	<form id="{form_id}" name="{form_name}" method="{form_method}" action="{form_action}" enctype="{form_enctype}">
+<!--EndSectFormHeader-->
+<!--BeginSectHiddenFields-->
+	<div class="hidden">
+	    <!--BeginSectFormHidden-->
+	        <input type="hidden" id="{varname}" name="{varname}" value="{varvalue}" />
+	    <!--EndSectFormHidden-->
+	</div>
+<!--EndSectHiddenFields-->
+{content}
+<!--BeginSectWidgetsFooters-->
+{WidgetsContent}
+<!--EndSectWidgetsFooters-->
+<!--BeginSectFormFooter-->
+	</form>
+<!--EndSectFormFooter-->
+</body>
+</html>

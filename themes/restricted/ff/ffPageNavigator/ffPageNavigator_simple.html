@@ -1,0 +1,160 @@
+<div class="pageNavigator">
+  <div class="perPage">
+    <!--BeginSectSelector-->
+    {_frame_per_page}
+    <!--BeginSectSelectorPage-->
+    <!--BeginSectSelectorPageLink-->
+    <a href="#" onclick="document.getElementById('{component}{page_parname}').value='{page}'; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">{records_per_page}</a>
+    <!--EndSectSelectorPageLink-->
+    <!--BeginSectSelectorPageSelected-->
+    <a href="#" class="selected">{records_per_page}</a>
+    <!--EndSectSelectorPageSelected-->
+    <!--EndSectSelectorPage-->
+    <!--BeginSectSelectorPageAll-->
+    <a href="javascript:void(0)" class="selectors selector_all" onclick="ff.ffPageNavigator.goToPage('{XHRcomponent}', null, {totelem}, false);">Tutti</a>
+    <!--EndSectSelectorPageAll-->
+    <!--EndSectSelector-->
+  </div>
+  <div class="pages">{_pages}
+    <!--BeginSectFirstButton-->
+    <a href="#" class="first {hidden}" onclick="document.getElementById('{component}{page_parname}').value='{page}'; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">&nbsp;</a>
+    <!--EndSectFirstButton-->
+    <!--BeginSectPrevFrameButton-->
+    <a href="#" rel="1" class="prev-frame {hidden}" onclick="
+    	var recFrame = {rec_per_frame};
+		var totPage = parseInt(jQuery(this).attr('rel'));
+
+		var firstPage = parseInt(jQuery(this).parent().children('.page:visible:first').attr('rel'));
+		var pageElem = jQuery(this).parent().children('.page:visible:first');
+		
+		jQuery(this).parent().children('.page').hide();
+
+		if(jQuery(this).parent().children('.next-frame').is(':hidden')) {
+			jQuery(this).parent().children('.next-frame').show();
+		}
+		if(jQuery(this).parent().children('.next').is(':hidden')) {
+			jQuery(this).parent().children('.next').show();
+		}
+		if(jQuery(this).parent().children('.last').is(':hidden')) {
+			jQuery(this).parent().children('.last').show();
+		}
+		
+		if((firstPage - recFrame) > 1) {
+			startPage = firstPage - recFrame - 1;
+		} else {
+			startPage = 0;
+			jQuery(this).parent().children('.prev-frame').hide();
+			jQuery(this).parent().children('.prev').hide();
+			jQuery(this).parent().children('.first').hide();
+		}
+		
+		endPage = startPage + recFrame;		
+
+		for (i = endPage; i > startPage; i--) {
+			if(!pageElem.prev().hasClass('page')) {
+				if(pageElem.hasClass('selected')) {
+					pageElem.next().clone(true).insertBefore(pageElem);
+				} else {
+					pageElem.clone(true).insertBefore(pageElem);
+				}
+    			pageElem.prev().text(i);
+    			pageElem.prev().attr('rel', i);
+				pageElem.prev().removeAttr('style');
+			}
+			pageElem.prev().fadeIn('slow');
+
+			pageElem = pageElem.prev();
+		}">&nbsp;</a>
+    <!--EndSectPrevFrameButton-->
+    <!--BeginSectPrevButton-->
+    <a href="#" class="prev {hidden}" onclick="document.getElementById('{component}{page_parname}').value='{page}'; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">&nbsp;</a>
+    <!--EndSectPrevButton-->
+    <!--BeginSectPage-->
+    <!--BeginSectFirstPageLink-->
+    <a href="#" class="page" rel="{page}" onclick="document.getElementById('{component}{page_parname}').value=this.rel; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">{page}</a>
+    <!--EndSectFirstPageLink-->
+    <!--BeginSectPageLink-->
+    <a href="#" class="page" rel="{page}" onclick="document.getElementById('{component}{page_parname}').value=this.rel; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">{page}</a>
+    <!--EndSectPageLink-->
+    <!--BeginSectPageSelected-->
+    <a href="#" rel="{page}" class="page selected">{page}</a>
+    <!--EndSectPageSelected-->
+    <!--EndSectPage-->
+    <!--BeginSectNoPage-->
+    <!--EndSectNoPage-->
+    <!--BeginSectNextButton-->
+    <a href="#" class="next {hidden}" onclick="document.getElementById('{component}{page_parname}').value='{page}'; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">&nbsp;</a>
+    <!--EndSectNextButton-->
+    <!--BeginSectNextFrameButton-->
+    <a href="#" rel="{tot_page}" class="next-frame {hidden}" onclick="
+    	var recFrame = {rec_per_frame};
+		var totPage = parseInt(jQuery(this).attr('rel'));
+
+		var lastPage = parseInt(jQuery(this).parent().children('.page:visible:last').attr('rel'));
+		var pageElem = jQuery(this).parent().children('.page:visible:last');		
+
+		jQuery(this).parent().children('.page').hide();
+		
+		if(jQuery(this).parent().children('.prev-frame').is(':hidden')) {
+			jQuery(this).parent().children('.prev-frame').show();
+		}
+		if(jQuery(this).parent().children('.prev').is(':hidden')) {
+			jQuery(this).parent().children('.prev').show();
+		}
+		if(jQuery(this).parent().children('.first').is(':hidden')) {
+			jQuery(this).parent().children('.first').show();
+		}
+		
+		if(totPage > (lastPage + recFrame)) {
+			startPage = lastPage + 1;
+		} else {
+			startPage = (totPage - recFrame) + 1;
+			jQuery(this).parent().children('.next-frame').hide();
+			jQuery(this).parent().children('.next').hide();
+			jQuery(this).parent().children('.last').hide();
+		}
+		
+		endPage = startPage + recFrame - 1;		
+
+		for (i = startPage; i <= endPage; i++) {
+			if(!pageElem.next().hasClass('page')) {
+				if(pageElem.hasClass('selected')) {
+					pageElem.prev().clone(true).insertAfter(pageElem);
+				} else {
+					pageElem.clone(true).insertAfter(pageElem);
+				}
+				pageElem.next().hide();
+    			pageElem.next().text(i);
+    			pageElem.next().attr('rel', i);
+				pageElem.next().removeAttr('style');
+			}
+			pageElem.next().fadeIn('slow');
+
+			pageElem = pageElem.next();
+		}">&nbsp;</a>
+    <!--EndSectNextFrameButton-->
+    <!--BeginSectLastButton-->
+    <a href="#" class="last" onclick="document.getElementById('{component}{page_parname}').value='{page}'; document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; document.getElementById('{extend_prefix}frmAction').value='nav'; document.getElementById('{extend_prefix}frmMain').submit(); return false;">&nbsp;</a>
+    <!--EndSectLastButton-->
+  </div>
+    <!--BeginSectTotElem-->
+    <div class="totelem">{_tot_element}
+        <span>{totelem}</span>
+    </div>
+    <!--EndSectTotElem-->
+  <!--BeginSectChoice-->
+  <div class="choice">{_go_to_page}
+  	<input type="text" onkeydown="
+  		if (null == event) 
+  			event = window.event; 
+  		if (event.keyCode == 13)  { 
+  			document.getElementById('{component}{page_parname}').value=this.value; 
+  			document.getElementById('{component}{records_per_page_parname}').value='{records_per_page}'; 
+  			document.getElementById('{extend_prefix}frmAction').value='nav'; 
+  			document.getElementById('{extend_prefix}frmMain').submit();
+  			
+  			return false; 
+  		}" value="{page}" size="1" />&nbsp;/&nbsp;{tot_page}
+  </div>
+  <!--EndSectChoice-->
+</div>

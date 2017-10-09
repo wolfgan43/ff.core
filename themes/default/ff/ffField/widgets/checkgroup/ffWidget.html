@@ -1,0 +1,26 @@
+<!--BeginSectHeaders-->	
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	ff.base_path + "/themes/library/ff/ffField.js",	function() {
+	ff.pluginLoad("ff.ffField.checkgroup", "{site_path}/themes/default/ff/ffField/widgets/checkgroup/checkgroup.js");
+});
+</script>
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("ff.ffField.checkgroup", function () {
+		<!--BeginSectBinding-->
+		ff.ffField.checkgroup.addValue({
+			"id"			: "{container}{id}",
+			"separator"			: "{separator}",
+			"length"			: "{length}"
+		});
+		<!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+<input type="hidden" id="{container}{id}" name="{container}{id}" value="{value}" />
+<!--BeginSectRow--><input onchange="ff.ffField.checkgroup.recalc('{container}{id}');" class="{class}" type="checkbox" id="{container}{id}_{index}" value="{element_value}" {checked} {properties} />&nbsp;{label}<br /><!--EndSectRow-->
+<!--EndSectControl-->

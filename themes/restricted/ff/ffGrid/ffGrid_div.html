@@ -1,0 +1,244 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+<div id="{component_id}" class="{class}">
+	<!--BeginSectHidden-->
+	<div class="hidden" id="{component_id}_hidden">
+		<!--BeginSectHiddenPageNavigator-->
+		<input type="hidden" id="{component}{page_parname}" name="{component}{page_parname}" value="{page}" />
+		<input type="hidden" id="{component}{records_per_page_parname}" name="{component}{records_per_page_parname}" value="{records_per_page}" />
+		<input type="hidden" id="{component}{page_per_frame_parname}" name="{component}{page_per_frame_parname}" value="{page_per_frame}" />
+		<!--EndSectHiddenPageNavigator-->
+		<!--BeginSectHiddenOrder-->
+		<input type="hidden" id="{component}order" name="{component}order" value="{actual_order}" />
+		<input type="hidden" id="{component}direction" name="{component}direction" value="{actual_direction}" />
+		<input type="hidden" id="{component}alpha" name="{component}alpha" value="{actual_alpha}" />
+		<!--EndSectHiddenOrder-->
+		<!--BeginSectHiddenField-->
+		<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
+		<!--EndSectHiddenField-->
+	</div>
+	<!--EndSectHidden-->
+	{fixed_pre_content}
+
+	<!--BeginSectFilters-->
+	<div id="filters">
+		<ul class="filters">
+			<!--BeginSectFilter-->
+			<li>
+				<h3>Filtra per <strong>{Filter_title}</strong></h3>
+				<ul>
+					<!--BeginSectFilterRow-->
+					<!--BeginSectFilterElement-->
+					<li><a href="javascript:void(0);" onclick="document.getElementById('{component}{FilterElement_id}').value='{FilterElement_value}'; document.getElementById('frmMain').submit();">{FilterElement_label}</a></li>
+					<!--EndSectFilterElement-->
+					<!--BeginSectSelFilterElement-->
+					<li class="selected">{FilterElement_label}</li>
+					<!--EndSectSelFilterElement-->
+					<!--EndSectFilterRow-->
+					<!--BeginSectNoElements-->
+					<li>Nessun Elemento</li>
+					<!--EndSectNoElements-->
+				</ul>
+			</li>
+			<!--EndSectFilter-->
+		</ul>
+	</div>
+	<!--EndSectFilters-->
+
+	<!--BeginSectAlpha-->
+	<div class="DataGrid">
+		<div class="datablocklegend">{_alphabetic_sort_by} {field}</div>
+		<table class="frame">
+			<tr class="row">
+				<td class="searchtoolsall"><a class="{alpha_selected_}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value=''; document.getElementById('frmMain').submit();">Tutti</a></td>
+				<td class="searchtools09"><a class="{alpha_selected_cipher}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='cipher'; document.getElementById('frmMain').submit();">0-9</a></td>
+				<td class="searchtools"><a class="{alpha_selected_a}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='a'; document.getElementById('frmMain').submit();">a</a></td>
+				<td class="searchtools"><a class="{alpha_selected_b}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='b'; document.getElementById('frmMain').submit();">b</a></td>
+				<td class="searchtools"><a class="{alpha_selected_c}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='c'; document.getElementById('frmMain').submit();">c</a></td>
+				<td class="searchtools"><a class="{alpha_selected_d}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='d'; document.getElementById('frmMain').submit();">d</a></td>
+				<td class="searchtools"><a class="{alpha_selected_e}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='e'; document.getElementById('frmMain').submit();">e</a></td>
+				<td class="searchtools"><a class="{alpha_selected_f}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='f'; document.getElementById('frmMain').submit();">f</a></td>
+				<td class="searchtools"><a class="{alpha_selected_g}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='g'; document.getElementById('frmMain').submit();">g</a></td>
+				<td class="searchtools"><a class="{alpha_selected_h}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='h'; document.getElementById('frmMain').submit();">h</a></td>
+				<td class="searchtools"><a class="{alpha_selected_i}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='i'; document.getElementById('frmMain').submit();">i</a></td>
+				<td class="searchtools"><a class="{alpha_selected_j}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='j'; document.getElementById('frmMain').submit();">j</a></td>
+				<td class="searchtools"><a class="{alpha_selected_k}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='k'; document.getElementById('frmMain').submit();">k</a></td>
+				<td class="searchtools"><a class="{alpha_selected_l}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='l'; document.getElementById('frmMain').submit();">l</a></td>
+				<td class="searchtools"><a class="{alpha_selected_m}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='m'; document.getElementById('frmMain').submit();">m</a></td>
+				<td class="searchtools"><a class="{alpha_selected_n}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='n'; document.getElementById('frmMain').submit();">n</a></td>
+				<td class="searchtools"><a class="{alpha_selected_o}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='o'; document.getElementById('frmMain').submit();">o</a></td>
+				<td class="searchtools"><a class="{alpha_selected_p}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='p'; document.getElementById('frmMain').submit();">p</a></td>
+				<td class="searchtools"><a class="{alpha_selected_q}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='q'; document.getElementById('frmMain').submit();">q</a></td>
+				<td class="searchtools"><a class="{alpha_selected_r}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='r'; document.getElementById('frmMain').submit();">r</a></td>
+				<td class="searchtools"><a class="{alpha_selected_s}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='s'; document.getElementById('frmMain').submit();">s</a></td>
+				<td class="searchtools"><a class="{alpha_selected_t}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='t'; document.getElementById('frmMain').submit();">t</a></td>
+				<td class="searchtools"><a class="{alpha_selected_u}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='u'; document.getElementById('frmMain').submit();">u</a></td>
+				<td class="searchtools"><a class="{alpha_selected_v}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='v'; document.getElementById('frmMain').submit();">v</a></td>
+				<td class="searchtools"><a class="{alpha_selected_w}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='w'; document.getElementById('frmMain').submit();">w</a></td>
+				<td class="searchtools"><a class="{alpha_selected_x}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='x'; document.getElementById('frmMain').submit();">x</a></td>
+				<td class="searchtools"><a class="{alpha_selected_y}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='y'; document.getElementById('frmMain').submit();">y</a></td>
+				<td class="searchtools"><a class="{alpha_selected_z}" href="javascript:void(0);" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='z'; document.getElementById('frmMain').submit();">z</a></td>
+			</tr>
+		</table>
+	</div>
+	<!--EndSectAlpha-->
+	<div class="heading">
+		<!--BeginSectTitle-->
+		<h2 class="dialogTitle">{discl_bt}{title}</h2>
+		<!--EndSectTitle-->
+		{fixed_title_content}
+		<div class="actions dialogActionsPanel top{dialog_class}">
+        <!--BeginSectActionButtonsHeader-->
+        <!--BeginSectActionHeader-->
+        {ActionButtonHeader}
+        <!--EndSectActionHeader-->
+        <!--EndSectActionButtonsHeader-->
+        <!--BeginSectAddNew-->
+		<!--BeginSectAddNewUrl-->
+		<a href="{addnew_url}" class="ico-add">{addnew_label}</a>
+		<!--EndSectAddNewUrl-->
+		<!--BeginSectAddNewBt-->
+			{addnew_bt}
+		<!--EndSectAddNewBt-->
+		<!--EndSectAddNew-->        
+		</div>
+        <!--BeginSectSearch-->
+		<div class="search">
+			<div class="ricerca-semplice">
+				<!--BeginSectSearchSimple-->
+				<div class="simple">
+					<!--BeginSectAdvSearch-->
+					<a class="search_more" href="javascript:void(0)" onclick="ff.ffGrid.advsearchToggle('{component}', '{component_id}');">{_ffGrid_advsearch}</a>
+					<!--EndSectAdvSearch-->
+				</div>
+				<!--EndSectSearchSimple-->
+
+				<!--BeginSectSearchButtons-->
+				{SearchButtons}
+				<!--EndSectSearchButtons-->
+                {SearchAll}
+			</div>
+            <!--BeginSectFields-->
+			<div class="set{advsearch_visibility}" id="{component}advsearch">
+				<!--BeginSectSearchRow-->
+
+				<!--BeginSectSearchCol-->
+				<fieldset class="row{container_class}"><label>{Label}</label>{Control}</fieldset>
+				<!--EndSectSearchCol-->
+
+				<!--EndSectSearchRow-->
+				{search_fixed_after}
+			</div>
+			<!--EndSectFields-->
+			
+		</div>
+		<!--EndSectSearch-->
+		<!--BeginSectSort-->
+        <div class="sort-block">
+        	<label>{_ffGrid_sort_label}</label>
+	        <a class="dropdown-sort" href="javascript:void(0);">{_ffGrid_dropdown_sort}<span class="arrow"></span></a>
+            <span class="dropdown-sort-dir"></span>
+			<div class="dropdown-sort-data"></div>
+		</div>
+		<!--EndSectSort-->
+	</div>
+	{fixed_heading_content}
+	<!--BeginSectGrid-->
+	<div class="grid">
+    <!--BeginSectDescription-->
+    <div class="descrizione">{description}</div>
+    <!--EndSectDescription-->
+		<div id="{component_id}_discl_sect">
+			<!--BeginSectError-->
+			<div class="warning">{strError}</div>
+			<!--EndSectError-->
+
+			<!--BeginSectPaginatorTop-->
+            <div class="FormsGridCommands cleared top">
+			{PageNavigator}
+			</div>
+            <!--EndSectPaginatorTop-->
+
+            <!--BeginSectLabels-->
+            <ul class="sort hidden">
+                <!--BeginSectLabel-->
+                <li {col_class} {col_properties}>
+                    <!--BeginSectOrder-->
+                    <!--BeginSectOrderIcons-->
+                    <a href="javascript:void(0);" onclick="ff.ffGrid.ajaxOrder('{component_id}', '{order}', 'ASC', {dialogid});" class="GridSortIcons"><i class="icon ico-asc"></i></a> <a href="javascript:void(0);" onclick="ff.ffGrid.ajaxOrder('{component_id}', '{order}', 'DESC', {dialogid});" class="GridSortIcons"><i class="icon ico-desc"></i></a>
+                    <!--EndSectOrderIcons-->
+                    <!--BeginSectOrderLabel-->
+                    <a href="javascript:void(0);" onclick="ff.ffGrid.ajaxOrder('{component_id}', '{order}', undefined, {dialogid});" class="FormsGridLabel">{Label}</a>
+                    <!--EndSectOrderLabel-->
+                    <!--EndSectOrder-->
+                    <!--BeginSectNoOrder-->
+                    {Label}
+                    <!--EndSectNoOrder-->
+                    <!--BeginSectSelectAll-->
+					<input type="checkbox" onclick="this.value = ff.ffGrid.turnToggle('{component_id}', '{order}', this.value);" value="0" />
+					<!--<a href="javascript:void(0);" onclick="javascript:ff.ffGrid.turnON('{component_id}', '{order}')">{turn_on_label}</a> / <a href="javascript:void(0);" onclick="javascript:ff.ffGrid.turnOFF('{component_id}', '{order}')">{turn_off_label}</a>-->
+                    <!--EndSectSelectAll-->
+                </li>
+                <!--EndSectLabel-->
+            </ul>
+            <!--EndSectLabels-->            
+				
+			<!--BeginSectGridData-->
+            <div class="ffGrid" id="{component_id}_GridData">
+				<!--BeginSectRecord-->
+				<div class="row<!--BeginSectRowClass--> {row_class}<!--EndSectRowClass-->">
+					<!--BeginSectField-->
+					<span id="{component}{row}_{col}" {col_class} {col_properties}<!--BeginSectDataInfo-->title="{data_info}"<!--EndSectDataInfo-->><!--BeginSectUrlBefore--><a href="{field_url}"><!--EndSectUrlBefore--><span class="data"><!--BeginSectEuro-->{euro}<!--EndSectEuro-->{Value}</span><!--BeginSectUrlAfter--></a><!--EndSectUrlAfter--></span>
+					<!--EndSectField-->
+                    <!--BeginSectGridButton-->
+					<div id="{component}{row}_{col}" {col_class}>{GridButton}</div>
+					<!--EndSectGridButton-->
+                    <!--BeginSectEditButton-->
+                    <div id="{component}{row}_{col}" {col_class}>
+                        <!--BeginSectEditButtonVisible-->
+                        <a href="{modify_url}" class="ico-edit" title="{_modify}"></a>
+                        <!--EndSectEditButtonVisible-->
+                    </div> 
+                    <!--EndSectEditButton-->
+					<!--BeginSectDeleteButton-->
+                    <div id="{component}{row}_{col}" {col_class}>
+						<!--BeginSectDeleteButtonVisible-->
+						<a href="{delete_url}" class="ico-delete" title="{_delete}"></a>
+						<!--EndSectDeleteButtonVisible-->
+                    </div> 
+					<!--EndSectDeleteButton-->
+				</div>
+				<!--EndSectRecord-->
+            </div>				
+            <!--EndSectGridData-->
+				
+			<!--BeginSectPaginatorBottom-->
+			<div class="FormsGridCommands bottom">{PageNavigator}</div>
+			<!--EndSectPaginatorBottom-->
+
+			{fixed_post_content}
+
+			<!--BeginSectActionButtons-->
+			<div class="actions">
+				<div class="closure"></div>
+				<!--BeginSectAction-->
+				{ActionButton}
+				<!--EndSectAction-->
+			</div>
+			<!--EndSectActionButtons-->
+		</div>
+	</div>
+	<!--EndSectGrid-->
+	<!--BeginSectNoRecords-->
+	<div class="norec_cont">{grid_no_record}{fixed_post_content}</div>
+	<!--EndSectNoRecords-->
+</div>
+<!--BeginSectFooters-->
+<script type="text/javascript">
+<!--BeginSectSortJS-->
+  ff.pluginAddInit("ff.ffGrid", function () {
+	ff.ffGrid.dropdownSort('{component}', '{component_id}');
+  }); 
+<!--EndSectSortJS-->
+</script>
+<!--EndSectFooters-->

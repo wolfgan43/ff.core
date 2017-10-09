@@ -1,0 +1,75 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+<div id="{component_id}">
+	{fixed_pre_content}
+	<div id="{component_id}_hidden" class="hidden">
+		<input type="hidden" id="{component_id}_rows" name="{component_id}_rows" value="{rows}" />
+		<input type="hidden" id="{component_id}_delete_row" name="{component_id}_delete_row" value="" />
+		<!--BeginSectHidden-->
+		<input type="hidden" id="{component_id}_{hidden_name}" name="{component_id}_{hidden_name}" value="{hidden_value}" />
+		<!--EndSectHidden-->
+	</div>
+
+	<!--BeginSectTitle-->
+	<div class="title">{discl_bt}
+		<h3>{title}</h3>
+        <!--BeginSectNewHeader-->
+        <div class="detailActions header">
+            <input type="button" value="{_addrow}" onclick="document.getElementById('{main_record_component}detailaction').value='{component_id}'; document.getElementById('frmAction').value = '{main_record_component}detail_addrows'; <!--BeginSectTabUrl-->tabs_form_url('tabs_{tab_id}', {tab_number});<!--EndSectTabUrl--> {submit_action}" class="button add noactivebuttons" />
+            <!--BeginSectNewHeaderQta-->
+            <input id="{component_id}_rowstoadd" name="{component_id}_rowstoadd" type="text" value="1" class="detailQTA"/>
+            <!--EndSectNewHeaderQta-->
+        </div>
+        <!--EndSectNewHeader-->
+	</div>
+	<!--EndSectTitle-->
+	<!--BeginSectError-->
+	<div class="warning">{strError}</div>
+	<!--EndSectError-->
+	<div id="{component_id}_discl_sect">
+		<div id="{component_id}_jtab">
+			<ul>
+				<!--BeginSectHeaderRow-->
+				<li>
+					<a href="#{component_id}_{rrow}"><!--BeginSectTabLabel--><div class="tabLabel">{tab_label}</div><!--EndSectTabLabel--></a>
+					<!--BeginSectDetailButton-->
+			        <span class="ffButton">{DetailButton}</span>
+					<!--EndSectDetailButton-->
+				</li>
+				<!--EndSectHeaderRow-->
+			</ul>
+
+			<!--BeginSectFormRow-->
+			<div id="{component_id}_{rrow}">
+				<table>
+					<!--BeginSectFormField-->
+					<tr class="row{container_class}">
+						<!--BeginSectFormFieldLabel-->
+						<td class="textLabel">{FormFieldLabel}<!--BeginSectRequiredSymbol-->&nbsp; <span class="required">*</span><!--EndSectRequiredSymbol--><!--BeginSectDescriptionLabel--><span class="description">{description}</span><!--EndSectDescriptionLabel--></td>
+						<!--EndSectFormFieldLabel-->
+						<td {colspan}>{control}</td>
+					</tr>
+					<!--EndSectFormField-->
+				</table>
+			</div>
+			<!--EndSectFormRow-->
+
+		</div>
+	</div>
+    <!--BeginSectNewFooter-->
+    <div class="detailActions footer">
+        <input type="button" value="{_addrow}" onclick="document.getElementById('{main_record_component}detailaction').value='{component_id}'; document.getElementById('frmAction').value = '{main_record_component}detail_addrows'; <!--BeginSectTabUrl-->tabs_form_url('tabs_{tab_id}', {tab_number});<!--EndSectTabUrl--> {submit_action}" class="button add noactivebuttons" />
+        <!--BeginSectNewFooterQta-->
+        <input id="{component_id}_rowstoadd" name="{component_id}_rowstoadd" type="text" value="1" class="detailQTA"/>
+        <!--EndSectNewFooterQta-->
+    </div>
+    <!--EndSectNewFooter-->
+	{fixed_post_content}
+</div>
+<!--BeginSectFooters-->
+<script type="text/javascript">
+    ff.load("ff.ffDetails", function() {
+        ff.ffDetails.tabInit("{component_id}");
+    });
+</script>
+<!--EndSectFooters-->

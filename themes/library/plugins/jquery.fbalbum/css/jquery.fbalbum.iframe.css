@@ -1,0 +1,239 @@
+/* Social Share Settings */
+/* --------------------- */
+.albumDetails .socialcount,
+.photoShare .socialcount,
+.fb-album-shareme .socialcount,
+.fb-photo-shareme .socialcount,
+.fancybox-title .socialcount,
+#cboxTitle .socialcount,
+.pp_details .socialcount,
+.photoBoxSocial .socialcount {
+	color: 							#fff;
+	font-size: 						10px;
+	line-height: 					14px;
+}
+.albumDetails .socialcount > li,
+.albumDetails .socialcount > li > a:focus,
+.albumDetails .socialcount .loading,
+.photoShare .socialcount > li,
+.photoShare .socialcount > li > a:focus,
+.photoShare .socialcount .loading,
+.fb-album-shareme .socialcount > li,
+.fb-album-shareme .socialcount > li > a:focus,
+.fb-album-shareme .socialcount .loading,
+.fb-photo-shareme .socialcount > li,
+.fb-photo-shareme .socialcount > li > a:focus,
+.fb-photo-shareme .socialcount .loading,
+.fancybox-title .socialcount > li,
+.fancybox-title .socialcount > li > a:focus,
+.fancybox-title .socialcount .loading,
+#cboxTitle .socialcount > li,
+#cboxTitle .socialcount > li > a:focus,
+#cboxTitle .socialcount .loading,
+.pp_details .socialcount > li,
+.pp_details .socialcount > li > a:focus,
+.pp_details .socialcount .loading,
+.photoBoxSocial .socialcount > li,
+.photoBoxSocial .socialcount > li > a:focus,
+.photoBoxSocial .socialcount .loading {
+	border-radius: 					4px !important;
+}
+.albumDetails .socialcount > li > a:focus,
+.albumDetails .socialcount > li:hover,
+.albumDetails .socialcount > li.hover,
+.photoShare .socialcount > li > a:focus,
+.photoShare .socialcount > li:hover,
+.photoShare .socialcount > li.hover,
+.fb-album-shareme .socialcount > li > a:focus,
+.fb-album-shareme .socialcount > li:hover,
+.fb-album-shareme .socialcount > li.hover,
+.fb-photo-shareme .socialcount > li > a:focus,
+.fb-photo-shareme .socialcount > li:hover,
+.fb-photo-shareme .socialcount > li.hover,
+.fancybox-title .socialcount > li > a:focus,
+.fancybox-title .socialcount > li:hover,
+.fancybox-title .socialcount > li.hover,
+#cboxTitle .socialcount > li > a:focus,
+#cboxTitle .socialcount > li:hover,
+#cboxTitle .socialcount > li.hover,
+.pp_details .socialcount > li > a:focus,
+.pp_details .socialcount > li:hover,
+.pp_details .socialcount > li.hover,
+.photoBoxSocial .socialcount > li > a:focus,
+.photoBoxSocial .socialcount > li:hover,
+.photoBoxSocial .socialcount > li.hover {
+	background-color: 				#464646 !important;
+}
+
+.albumDetails .socialcount,
+.photoShare .socialcount,
+.fb-album-shareme .socialcount,
+.fb-photo-shareme .socialcount,
+.fancybox-title .socialcount,
+#cboxTitle .socialcount,
+.pp_details .socialcount,
+.photoBoxSocial .socialcount {
+	list-style: 					none;
+	padding-left: 					0;
+	margin: 						0 0 6px 0;
+	overflow: 						hidden;
+}
+.albumDetails .socialcount :link,
+.albumDetails .socialcount :visited,
+.photoShare .socialcount :link,
+.photoShare .socialcount :visited,
+.fb-album-shareme .socialcount :link,
+.fb-album-shareme .socialcount :visited,
+.fb-photo-shareme .socialcount :link,
+.fb-photo-shareme .socialcount :visited,
+.fancybox-title .socialcount :link,
+.fancybox-title .socialcount :visited,
+#cboxTitle .socialcount :link,
+#cboxTitle .socialcount :visited,
+.pp_details .socialcount :link,
+.pp_details .socialcount :visited,
+.photoBoxSocial .socialcount :link,
+.photoBoxSocial .socialcount :visited {
+	color: 							inherit;
+}
+.albumDetails .socialcount > li,
+.photoShare .socialcount > li,
+.fb-album-shareme .socialcount > li,
+.fb-photo-shareme .socialcount > li,
+.fancybox-title .socialcount > li,
+#cboxTitle .socialcount > li,
+.pp_details .socialcount > li,
+.photoBoxSocial .socialcount > li {
+	background-color: 				#999;
+	padding:						0px;
+	display: 						inline-block;
+	*display: 						inline;
+	zoom: 							1;
+	position: 						relative;
+	vertical-align: 				top;
+	text-align: 					center;
+	white-space: 					nowrap;
+	*margin-right: 					4px;
+	float:							right;
+	margin-left:					4px;
+	margin-bottom:					2px;
+}
+.albumDetails .socialcount > li > a,
+.photoShare .socialcount > li > a,
+.fb-album-shareme .socialcount > li > a,
+.fb-photo-shareme .socialcount > li > a,
+.fancybox-title .socialcount > li > a,
+#cboxTitle .socialcount > li > a,
+.pp_details .socialcount > li > a,
+.photoBoxSocial .socialcount > li > a {
+	width: 							22px;
+	height: 						22px;
+	display: 						block;
+	padding: 						0px;
+	text-decoration: 				none;
+	color: 							inherit;
+}
+
+.albumDetails .social-icon,
+.photoShare .social-icon,
+.fb-album-shareme .social-icon,
+.fb-photo-shareme .social-icon,
+.fancybox-title .social-icon,
+#cboxTitle .social-icon,
+.pp_details .social-icon,
+.photoBoxSocial .social-icon {
+	display: 						inline-block;
+	*display: 						inline;
+	zoom: 							1;
+	vertical-align: 				middle;
+	*margin-right: 					5px;
+}
+.socialcount .icon-facebook {
+	background: 					url('Images/Share_Facebook.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width:							16px;
+}
+.socialcount .icon-googleplus {
+	background: 					url('Images/Share_Google.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-twitter {
+	background: 					url('Images/Share_Twitter.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-stumbleupon {
+	background: 					url('Images/Share_StumbleUpon.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-printer {
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	background: 					url('Images/Share_Printer.png') no-repeat;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-disk {
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	background: 					url('Images/Share_Disk.png') no-repeat;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-facebook:before,
+.socialcount .icon-google:before,
+.socialcount .icon-twitter:before,
+.socialcount .icon-stumbleupon:before,
+.socialcount .icon-printer:before,
+.socialcount .icon-disk:before {
+    content: 						"";
+}
+
+
+/* ClearFixMe Settings */
+/* ----------------- */
+.clearFixMe:before, .clearFixMe:after {
+	content: 						"";
+	display: 						table;
+}
+.clearFixMe:after {
+	clear: 							both;
+}
+.clearFixMe {
+	zoom: 							1;
+}
+
+
+/* Lightbox Settings */
+/* ----------------- */
+.fancybox-title {
+	text-align: 					justify;
+}
+#cboxLoadedContent {
+	overflow:						hidden !important;
+}
+.pp_social {
+	float:							right;
+}
+.pp_description {
+	display:						block !important;
+	float: 							left;
+	text-align: 					justify;
+	margin:							0px !important;
+}

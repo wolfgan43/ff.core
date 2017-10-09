@@ -1,0 +1,37 @@
+<!--BeginSectHeaders-->
+<script type="text/javascript">
+ff.pluginLoad("ff.ffField",	ff.base_path + "/themes/library/ff/ffField.js",	function() {
+	ff.pluginLoad("swfobject", ff.base_path + "/themes/library/swfobject/swfobject.js", function () {
+		ff.injectCSS("uploadify", ff.base_path + "/themes/library/plugins/jquery.uploadify/uploadify.css", function() {
+			ff.pluginLoad("ff.lib.ckfinder", ff.base_path + "/themes/library/ckfinder/ckfinder.js", function () {
+				ff.pluginLoad("jquery.fn.uploadify", ff.base_path + "/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function () {
+					ff.pluginLoad("ff.ffField.ckuploadify", ff.base_path + "/themes/default/ff/ffField/widgets/ckuploadify/ckuploadify.js");
+				}, false);
+			}, false);
+		});
+	}, false);
+});
+</script>
+<!--EndSectHeaders-->
+
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+	ff.pluginAddInit("ff.ffField.ckuploadify", function () {
+		ff.ffField.ckuploadify.init({
+			component 		: "{container}{id}",
+			suffix 			: "{suffix_file}",
+			basePathUF		: "{site_path}/themes/library/plugins/jquery.uploadify",
+			baseUrlUF		: "{base_url}", 
+			basePathCK		: "{site_path}/themes/library/ckfinder/",
+			baseUrlCK		: "{site_base_url}", 
+			previewJs		: {preview_js},
+			sizeLimit		: {size_limit}
+		});
+	});
+</script>
+<!--EndSectFooters-->
+<a href="#{container}{id}" id="CkFinder_{container}{id}" title="File selector" class="{class}" onclick="ff.ffField.ckfinder.browseServer('{resource_type}:{base_url}', '{container}{id}' );"><img src="{site_path}/themes/{theme}/images/widgets/ckfinder/browse.png" alt="ShowCkFinder" /></a>
+<!--BeginSectControl-->
+{control}
+<!--EndSectControl-->

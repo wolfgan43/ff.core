@@ -1,0 +1,2372 @@
+* {
+	margin:							0px;
+	padding:						0px;
+}
+
+#FB_Album_Frame {
+	padding:						10px 0px 10px 0px;
+	margin-top:						20px;
+	margin-left: 					auto;
+	margin-right: 					auto;
+	margin-bottom:					20px;
+	position: 						relative;
+	background:						url(Images/galleries_bg.gif) repeat;
+	border: 						solid 1px #CCCCCC;
+	-webkit-border-radius:			3px;
+	-moz-border-radius:				3px;
+	border-radius:					3px;
+	-webkit-box-shadow: 			0px 5px 30px #D8D8D8;
+	-moz-box-shadow: 				0px 5px 30px #D8D8D8;
+	-o-box-shadow: 					0px 5px 30px #D8D8D8;
+	box-shadow:					 	0px 5px 30px #D8D8D8;
+	z-index: 						10;
+}
+#FB_Album_Frame.NoShadowNoRadius {
+	-webkit-border-radius:			0px;
+	-moz-border-radius:				0px;
+	border-radius:					0px;
+	-webkit-box-shadow: 			none;
+	-moz-box-shadow: 				none;
+	-o-box-shadow: 					none;
+	box-shadow:					 	none;
+}
+
+#FB_Album_Frame * {
+	moz-box-sizing: 				content-box !important;
+	-webkit-box-sizing: 			content-box !important;
+	box-sizing: 					content-box !important;
+	o-box-sizing: 					content-box !important;
+	font-family:					Verdana;
+}
+
+#FB_Album_iFrame {
+	padding:						10px 0px 10px 0px;
+	margin-top:						0px;
+	margin-left: 					auto;
+	margin-right: 					auto;
+	margin-bottom:					0px;
+	position: 						relative;
+	border: 						solid 0px #CCCCCC;
+	-webkit-border-radius:			0px;
+	-moz-border-radius:				0px;
+	border-radius:					0px;
+	background:						url(Images/galleries_bg.gif) repeat;
+	z-index: 						10;
+}
+
+#FB_Album_Display {
+	padding: 						0px;
+	margin-left: 					auto;
+	margin-right: 					auto;
+	margin-top: 					0px;
+	width: 							100%;
+	z-index: 						1;
+	display:						none;
+}
+
+#FB_Album_Loader {
+	background:						url("Images/ajax-loader.gif") no-repeat bottom center;
+	width: 							128px;
+	height:							128px;
+	margin-left: 					auto;
+	margin-right:					auto;
+	margin-top:						20px;
+	margin-bottom:					20px;
+	display:						block;
+}
+
+#fb-albums-controls {
+	width: 							100%;
+}
+#fb-albums-controls-clear {
+	clear: 							both;
+}
+#fb-albums-all, #fb-album-content {
+	width: 							100%; /*set to 100% for fluid / responsive design*/
+	margin:							0px auto 0px auto;
+}
+#fb-albums-all {
+	text-align:						center;
+	width:							100%;
+}
+
+#sortByName {
+	font-size: 						10px;
+	cursor: 						pointer;
+	margin-bottom: 					20px;
+	margin-left: 					10px;
+	float: 							right;
+}
+#sortByItems {
+	font-size: 						10px;
+	cursor: 						pointer;
+	margin-bottom: 					20px;
+	margin-left: 					10px;
+	float: 							right;
+}
+#sortByCreate {
+	font-size: 						10px;
+	cursor: 						pointer;
+	margin-bottom: 					20px;
+	margin-left: 					10px;
+	float: 							right;
+}
+#sortByUpdate {
+	font-size: 						10px;
+	cursor: 						pointer;
+	margin-bottom: 					20px;
+	margin-left: 					10px;
+	float: 							right;
+}
+#sortAsc {
+	font-size: 						10px;
+	cursor: 						pointer;
+	margin-bottom: 					20px;
+	margin-left: 					10px;
+	float: 							right;
+}
+#sortDesc {
+	font-size: 						10px;
+	cursor: 						pointer;
+	margin-bottom: 					20px;
+	margin-left: 					10px;
+	float: 							right;
+}
+#no-fb-photos {
+	margin: 						15px 0px 0px 0px;
+	padding: 						0px;
+	padding-left: 					8px;
+	font-style: 					italic;
+}
+
+span.albumName {
+	font-size: 						11px;
+	line-height: 					11px;
+	font-weight: 					bold;
+	text-align:						justify;
+}
+
+.albumHead {
+	font-weight: 					bold;
+	font-size: 						12px;
+	text-align: 					left;
+	margin-left: 					0px;
+	margin-bottom:					10px;
+	display: 						block;
+	width:							100%;
+	float:							left;
+}
+.albumTitle {
+	font-weight: 					bold;
+	font-size: 						14px;
+	text-align: 					left;
+	padding-top:					10px;
+	margin-left: 					20px;
+	display: 						block;
+	width:							98%;
+	float:							left;
+}
+.albumLink {
+	position: 						absolute;
+	right: 							20px;
+	top: 							10px;
+	text-decoration: 				none;
+	width: 							100px;
+	height: 						71px;
+	background:						url(Images/photo-album-icon.png) no-repeat center center;
+}
+.albumLinkSimple {
+	/*position: 					absolute;
+	right: 							20px;
+	top: 							10px;*/
+	text-decoration: 				none;
+	width: 							16px;
+	height: 						16px;
+	background:						url(Images/link.png) no-repeat center center;
+}
+.albumCommentsSimpleIcon {
+	text-decoration: 				none;
+	width: 							16px;
+	height: 						16px;
+	background:						url(Images/facebook_comments.png) no-repeat center center;
+	float:							left;
+	margin-right:					10px;
+}
+.albumCommentsSimple {
+	float: 							left;
+	margin-right: 					15px;
+}
+.albumLikesSimpleIcon {
+	text-decoration: 				none;
+	width: 							14px;
+	height: 						16px;
+	background:						url(Images/facebook_like_thumb.png) no-repeat center center;
+	float:							left;
+	margin-right:					10px;
+}
+.albumLikesSimple {
+	float: 							left;
+}
+.albumCommentsUser:before{
+	background: 					transparent url(Images/comment-user.png) no-repeat center center;
+	content: 						"";
+	display: 						block;
+	height: 						20px;
+	left: 							0px;
+	position: 						absolute;
+	top: 							0px;
+	width: 							20px;
+	padding: 						2px;
+	border: 						1px solid #DDDDDD;
+}
+.albumCommentsUser {
+	display:						block;
+	position: 						relative;
+	font-size:						12px;
+	font-weight: 					bold;
+	text-align:						left;
+	padding-left:					30px;
+	padding-top: 					6px;
+	text-decoration:				none;
+	color:							#4C9CC5;
+	margin-top: 					15px;
+}
+.albumCommentsText {
+	display:						block;
+	position: 						relative;
+	font-size: 						10px;
+	text-align: 					justify;
+	margin-top: 					10px;
+}
+.albumCommentsFull {
+	display: 						none !important;
+}
+a.AlbumLinkButtonText {
+	display:						block;
+	position: 						relative;
+	font-size:						12px;
+	text-align:						left;
+	padding-left:					20px;
+	text-decoration:				none;
+	color:							#4C9CC5;
+
+}
+a.AlbumLinkButtonText:hover {
+	color:							#C90000;
+}
+a.AlbumLinkButtonText:before{
+	background: 					transparent url(Images/link.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							0px;
+	position: 						absolute;
+	top: 							0px;
+	width: 							16px;
+}
+.albumFacebook {
+	float: 							right;
+	margin-right: 					20px;
+	margin-top: 					5px;
+}
+.albumDesc {
+	text-align: 					justify;
+	font-size: 						10px;
+	padding-left: 					20px;
+	padding-right: 					20px;
+	margin-bottom:					15px;
+	float:							left;
+	width:							95%;
+}
+.albumLinkText {
+	text-align: 					justify;
+	font-size: 						10px;
+	padding-left: 					20px;
+	padding-right: 					20px;
+	margin-bottom:					15px;
+	float:							left;
+	width:							95%;
+}
+
+.photoThumb {
+	background: 					none repeat scroll 0 0 #FFFFFF;
+	border: 						1px solid #CCCCCC !important;
+	display: 						inline-block;
+	outline: 						medium none;
+	/*padding: 						5px;*/
+	position: 						relative;
+	float: 							left;
+	vertical-align:					bottom;
+}
+
+.albumThumb {
+	background: 					none repeat scroll 0 0 #FFFFFF;
+	border: 						1px solid #CCCCCC !important;
+	display: 						inline-block;
+	outline: 						medium none;
+	/*padding: 						5px;*/
+	position: 						relative;
+	float: 							left;
+	vertical-align:					bottom;
+	margin-bottom:					10px;
+}
+.albumThumb.ShadowCSS3 {
+	-webkit-box-shadow: 			0px 0px 0px 1px rgba(0, 0, 0, 0.05), 1px 1px 5px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 				0px 0px 0px 1px rgba(0, 0, 0, 0.05), 1px 1px 5px rgba(0, 0, 0, 0.3);
+	box-shadow: 					0px 0px 0px 1px rgba(0, 0, 0, 0.05), 1px 1px 5px rgba(0, 0, 0, 0.3);
+}
+.albumThumb:hover, .albumThumb:hover .albumThumbWrap {
+	border: 						1px solid rgba(205, 100, 65, 0.8);
+    box-shadow: 					0 0 5px rgba(205, 100, 65, 1);
+    -webkit-box-shadow: 			0 0 5px rgba(205, 100, 65, 1);
+    -moz-box-shadow: 				0 0 5px rgba(205, 100, 65, 1);
+}
+
+.albumThumb, .albumThumb i {
+	/*height: 						120px;
+	width: 							161px;*/
+}
+.photoThumb, .photoThumb i {
+	/*height: 						120px;
+	width: 							161px;*/
+}
+.albumWrapper .fb-album-shadow1 {
+	position: 						relative;
+	background:						url(Images/shadow1.png) no-repeat bottom center;
+	width: 							100%;
+	height:							16px;
+}
+.albumWrapper .fb-album-shadow2 {
+	position: 						relative;
+	background:						url(Images/shadow2.png) no-repeat bottom center;
+	width: 							100%;
+	height:							21px;
+}
+.albumWrapper .fb-album-shadow3 {
+	position: 						relative;
+	background:						url(Images/shadow3.png) no-repeat bottom center;
+	width: 							100%;
+	height:							16px;
+}
+.albumThumbWrap {
+	background: 					#FFFFFF;
+	border: 						1px solid #CCCCCC;
+	/*left: 						5px;*/
+	/*padding: 						5px;*/
+	position: 						absolute;
+	float: 							left;
+	/*top: 							5px;*/
+}
+.albumThumb i.fb-album-thumb, .photoThumb i.fb-photo-thumb {
+	background-color: 				#EEEEEE;
+	background-repeat: 				no-repeat;
+	display: 						block;
+	background-position:			center;
+}
+.albumThumb i.fb-album-thumb.noscaler, .photoThumb i.fb-photo-thumb.noscaler {
+	-webkit-background-size:		contain;
+	-moz-background-size: 			contain;
+	-o-background-size: 			contain;
+	background-size: 				contain;
+}
+
+.albumThumb span.PaperClipLeft {
+	width: 							30px;
+	height: 						60px;
+	display: 						block;
+	position: 						absolute;
+	z-index:						20;
+	top: 							-5px;
+	left: 							6px;
+	background: 					url(Images/paper-clip-left.png) no-repeat;
+}
+.albumThumb span.PaperClipRight {
+	width: 							30px;
+	height: 						60px;
+	display: 						block;
+	position: 						absolute;
+	z-index:						20;
+	top: 							-5px;
+	background: 					url(Images/paper-clip-right.png) no-repeat;
+}
+.albumThumb span.PushPin {
+	width: 							28px;
+	height: 						21px;
+	display: 						block;
+	position: 						absolute;
+	z-index:						20;
+	top: 							-4px;
+	background: 					url(Images/pin.png) no-repeat;
+}
+.photoThumb span.ClearTape,
+.albumThumb span.ClearTape {
+	width: 							77px;
+	height: 						27px;
+	display: 						block;
+	position: 						absolute;
+	top: 							-12px;
+	z-index:						20;
+	left: 							50px;
+	background: 					url(Images/tape.png) no-repeat;
+}
+.photoThumb span.YellowTape,
+.albumThumb span.YellowTape {
+	width: 							115px;
+	height: 						32px;
+	display: 						block;
+	position: 						absolute;
+	z-index:						20;
+	top: 							-13px;
+	left: 							30px;
+	background: 					url(Images/tape2.png) no-repeat;
+}
+.photoThumb span.PushPin,
+.albumThumb span.PushPin{
+	width: 							28px;
+	height: 						21px;
+	display: 						block;
+	position: 						absolute;
+	z-index:						20;
+	top: 							-8px;
+	background: 					url(Images/pin.png) no-repeat;
+}
+
+.albumThumb i.fb-album-overlay {
+	position: 						absolute;
+	/*padding: 						5px;*/
+	top: 							0px;
+	left: 							0px;
+    background-image:       		url(Images/magnifier-plus.png);
+    background-repeat:      		no-repeat;
+    background-position:    		center;
+	background-color: 				#000;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: 						alpha(opacity=0);
+	-moz-opacity: 					0;
+	-khtml-opacity: 				0;
+	opacity: 						0;
+	z-index:						50;
+}
+.albumThumb i.fb-album-shareme {
+	position: 						absolute;
+	/*padding: 						5px;*/
+	bottom: 						0px;
+	left: 							0px;
+	height:							25px;
+	background:						#DDDDDD;
+	border-top:						1px solid #CCCCCC;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: 						alpha(opacity=0);
+	-moz-opacity: 					0;
+	-khtml-opacity: 				0;
+	opacity: 						0;
+	z-index:						60;
+}
+.albumThumb i.fb-album-spinner {
+	position: 						absolute;
+	padding: 						0px;
+	top: 							4px;
+	left: 							4px;
+    background-image:       		url(Images/loading-gallery.gif);
+    background-repeat:      		no-repeat;
+    background-position:    		center;
+	background-color: 				#000000;
+	border: 						1px solid #CCCCCC;
+	z-index: 						10;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: 						alpha(opacity=30);
+	-moz-opacity: 					0.3;
+	-khtml-opacity: 				0.3;
+	opacity: 						0.3;
+}
+.albumThumb i.fb-album-loading,
+.albumThumb span.fb-album-loading {
+	position: 						absolute;
+	/*padding: 						5px;*/
+	top: 							0px;
+	left: 							0px;
+    background-image:       		url(Images/loading-gallery.gif);
+    background-repeat:      		no-repeat;
+    background-position:    		center;
+	background-color: 				#000000;
+	z-index: 						10;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: 						alpha(opacity=0);
+	-moz-opacity: 					0;
+	-khtml-opacity: 				0;
+	opacity: 						0;
+}
+/*.albumThumb i.fb-album-overlay:hover {
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	filter: 						alpha(opacity=70);
+	-moz-opacity: 					0.7;
+	-khtml-opacity: 				0.7;
+	opacity: 						0.7;
+	-o-transition-duration: 		1s;
+	-moz-transition-duration: 		1s;
+	-webkit-transition: 			-webkit-transform 1s;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+}*/
+.photoThumb i.fb-photo-overlay {
+	position: 						absolute;
+	/*padding: 						4px;*/
+	top: 							0px;
+	left: 							0px;
+    background-image:       		url(Images/magnifier.png);
+    background-repeat:      		no-repeat;
+    background-position:    		center;
+	background-color: 				#000000;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: 						alpha(opacity=0);
+	-moz-opacity: 					0;
+	-khtml-opacity: 				0;
+	opacity: 						0;
+	z-index: 						50;
+}
+.photoThumb i.fb-photo-shareme {
+	position: 						absolute;
+	/*padding: 						4px;*/
+	bottom: 						0px;
+	left: 							0px;
+	height:							25px;
+	background:						#DDDDDD;
+	border-top:						1px solid #CCCCCC;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: 						alpha(opacity=0);
+	-moz-opacity: 					0;
+	-khtml-opacity: 				0;
+	opacity: 						0;
+	z-index:						60;
+}
+.photoThumb i.fb-photo-spinner {
+	position: 						absolute;
+	/*padding: 						5px;*/
+	top: 							0px;
+	left: 							0px;
+    background-image:       		url(Images/loading-gallery.gif);
+    background-repeat:      		no-repeat;
+    background-position:    		center;
+	background-color: 				#000000;
+	z-index: 						10;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: 						alpha(opacity=30);
+	-moz-opacity: 					0.3;
+	-khtml-opacity: 				0.3;
+	opacity: 						0.3;
+}
+/*.photoThumb i.fb-photo-thumb {
+	position: 						absolute;
+	padding: 						5px;
+	top: 							0px;
+	left: 							0px;
+    background-image:       		url(Images/loading-gallery.gif);
+    background-repeat:      		no-repeat;
+    background-position:    		center;
+	background-color: 				#000000;
+	z-index: 						10;
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=0.3)";
+	filter: 						alpha(opacity=0.3);
+	-moz-opacity: 					0.3;
+	-khtml-opacity: 				0.3;
+	opacity: 						0.3;
+}*/
+/*.photoThumb i.fb-photo-overlay:hover {
+	-ms-filter: 					"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	filter: 						alpha(opacity=70);
+	-moz-opacity: 					0.7;
+	-khtml-opacity: 				0.7;
+	opacity: 						0.7;
+	-o-transition-duration: 		1s;
+	-moz-transition-duration: 		1s;
+	-webkit-transition: 			-webkit-transform 1s;
+	-webkit-box-shadow: 			0px 0px 4px #000;
+	-moz-box-shadow: 				0px 0px 4px #000;
+	box-shadow: 					0px 0px 4px #000;
+}*/
+
+.photoThumb:hover {
+    box-shadow: 					0 0 5px rgba(205, 100, 65, 1);
+    -webkit-box-shadow: 			0 0 5px rgba(205, 100, 65, 1);
+    -moz-box-shadow: 				0 0 5px rgba(205, 100, 65, 1);
+    border: 						1px solid rgba(205, 100, 65, 0.8);
+	cursor:							pointer;
+}
+.albumWrapper {
+	padding: 						0px;
+	float:							inherit;
+	margin-top:						10px !important;
+	margin-bottom:					10px !important;
+	z-index:						20;
+}
+.photoWrapper {
+	padding: 						0px;
+	float: 							left;
+}
+.album {
+	width:							100%;
+	text-align:						center;
+	margin-left:					auto;
+	margin-right:					auto;
+}
+
+.albumDetails {
+	/*width: 						186px;*/
+	float:							left;
+	padding-bottom: 				5px;
+	font-size: 						11px;
+	font-family: 					"lucida grande", tahoma, verdana, arial, sans-serif;
+}
+.albumShare {
+	margin-bottom:					6px;
+	border-bottom: 					1px solid #CCCCCC;
+}
+span.albumSocial {
+	float: 							left;
+	padding-top: 					6px;
+	color: 							#808080;
+}
+.albumText {
+	width: 							95%;
+	margin:							0px;
+}
+.albumText a {
+	color: 							#3B5998;
+	cursor: 						pointer;
+	text-decoration: 				none;
+}
+.albumText a:hover {
+	text-decoration: 				underline;
+}
+.albumCount, .albumCreate, .albumUpdate, .albumNumber, .albumShares {
+	color: 							#808080;
+	width:							85px;
+	display: 						block;
+	text-align: 					left;
+	float: 							left;
+}
+.albumInfo, .photoInfo {
+	color: 							#808080;
+	text-align: 					left;
+	float: 							left;
+}
+
+.photoDetails {
+	/*width: 						186px;*/
+	float:							left;
+	padding-bottom: 				5px;
+	font-size: 						11px;
+	font-family: 					"lucida grande", tahoma, verdana, arial, sans-serif;
+}
+.photoShare {
+	margin-top:						10px;
+	margin-bottom:					6px;
+	border-bottom: 					1px solid #CCCCCC;
+}
+span.photoSocial {
+	float: 							left;
+	padding-top: 					6px;
+	color: 							#808080;
+	font-size: 						11px;
+}
+.photoShares, .photoNumber {
+	color: 							#808080;
+	text-align: 					left;
+	font-size: 						11px;
+	width:							85px;
+	float:							left;
+}
+
+.fb-album-footer {
+	color: 							#808080;
+	font-weight:					bold;
+	font-size:						10px;
+}
+
+#fb-album-header, #fb-album-footer {
+	margin: 						0px;
+	padding: 						0px;
+}
+#fb-album-header p, #fb-album-footer p {
+	margin: 						0px;
+	padding: 						0px;
+	color: 							#333;
+	font-size: 						11px;
+}
+
+#fb-album-header .BackButton,
+#fb-album-footer .BackButton,
+.paginationControls .BackButton,
+.albumCommentsShow {
+	display: 						block;
+	height: 						25px;
+	width: 							90px;
+	line-height: 					25px;
+	text-align:						center;
+	position: 						relative;
+	padding-left:					20px;
+	/*margin-top: 					10px;*/
+	margin-left: 					20px;
+	margin-bottom: 					5px;
+	font-weight: 					bold;
+	display: 						inline-block;
+	*display: 						inline;
+	font-size: 						12px;
+	text-decoration: 				none;
+	zoom: 							1;
+	background: 					#ffffff; /* Old browsers */
+	background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* FF3.6+ */
+	background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+	background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Chrome10+,Safari5.1+ */
+	background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Opera 11.10+ */
+	background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* IE10+ */
+	background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* W3C */
+	filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+	-webkit-border-radius: 			5px;
+	-moz-border-radius: 			5px;
+	border-radius: 					5px;
+	text-shadow: 					0px 2px 0px #fff;
+	border: 						solid 1px #ccc;
+	color: 							#555;
+	float: 							left;
+}
+.albumCommentsShow {
+	width: 							150px;
+	margin-left: 					0px;
+	margin-right: 					20px;
+	margin-top: 					10px;
+}
+#fb-album-header .BackButton:hover,
+#fb-album-footer .BackButton:hover,
+.paginationControls .BackButton:hover,
+.albumCommentsShow:hover {
+	cursor: 						pointer;
+	text-decoration: 				none;
+	background-color: 				#ccc;
+	border-color: 					#aaa;
+	color: 							#D54E21;
+	background: 					#ffffff; /* Old browsers */
+	background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #EAD3D3 100%); /* FF3.6+ */
+	background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#EAD3D3)); /* Chrome,Safari4+ */
+	background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* Chrome10+,Safari5.1+ */
+	background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* Opera 11.10+ */
+	background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* IE10+ */
+	background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* W3C */
+	filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#EAD3D3',GradientType=0 ); /* IE6-9 */
+}
+#fb-album-header .BackButton:before,
+#fb-album-footer .BackButton:before,
+.paginationControls .BackButton:before {
+	background: 					transparent url(Images/back_arrow.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							15px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+.albumCommentsShow:before {
+	background: 					transparent url(Images/facebook_comments.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							15px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+
+#fb-album-footer ul.TopButton {
+	list-style: 					none outside none;
+    margin: 						0px 20px 0px 0px;
+    padding: 						0px;
+    text-decoration: 				none;
+	float: 							right;
+}
+#fb-album-footer ul.TopButton li {
+	display: 						block;
+	line-height: 					25px;
+	text-align:						center;
+	position: 						relative;
+	padding:						0px 5px;
+	/*margin-top: 					10px;*/
+	margin-left: 					20px;
+	margin-bottom: 					5px;
+	font-weight: 					bold;
+	display: 						inline-block;
+	*display: 						inline;
+	font-size: 						12px;
+	text-decoration: 				none;
+	zoom: 							1;
+	background: 					#ffffff; /* Old browsers */
+	background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* FF3.6+ */
+	background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+	background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Chrome10+,Safari5.1+ */
+	background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Opera 11.10+ */
+	background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* IE10+ */
+	background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* W3C */
+	filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+	-webkit-border-radius: 			5px;
+	-moz-border-radius: 			5px;
+	border-radius: 					5px;
+	text-shadow: 					0px 2px 0px #fff;
+	border: 						solid 1px #ccc;
+	color: 							#555;
+}
+#fb-album-footer ul.TopButton li:hover {
+	cursor: 						pointer;
+	text-decoration: 				none;
+	background-color: 				#ccc;
+	border-color: 					#aaa;
+	color: 							#D54E21;
+	background: 					#ffffff; /* Old browsers */
+	background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #EAD3D3 100%); /* FF3.6+ */
+	background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#EAD3D3)); /* Chrome,Safari4+ */
+	background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* Chrome10+,Safari5.1+ */
+	background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* Opera 11.10+ */
+	background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* IE10+ */
+	background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* W3C */
+	filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#EAD3D3',GradientType=0 ); /* IE6-9 */
+}
+#fb-album-footer ul.TopButton li a .Album_To_Top {
+	background:						url(Images/Back_Top.png) center center no-repeat;
+	width: 							24px;
+	height:							24px;
+	margin:							0px auto;
+}
+
+#fb-album-header .seperator,
+#fb-album-footer .seperator {
+	margin:							15px 0px 15px 0px;
+	border-bottom: 					1px dotted #CCCCCC;
+}
+#fb-album-header .seperator.Floater {
+	margin:							15px 0px 0px 0px;
+	border-bottom: 					1px dotted #CCCCCC;
+}
+.fbLink {
+	cursor: 						pointer;
+	text-align:						left;
+}
+
+
+/* Isotope Settings */
+/* ---------------- */
+.isotope-item {
+	z-index: 						2;
+}
+.isotope-hidden.isotope-item {
+	pointer-events: 				none;
+	z-index: 						1;
+}
+.isotope,
+.isotope .isotope-item {
+	-webkit-transition-duration:	0.8s;
+	-moz-transition-duration: 		0.8s;
+	-ms-transition-duration: 		0.8s;
+	-o-transition-duration: 		0.8s;
+	transition-duration: 			0.8s;
+}
+.isotope {
+	-webkit-transition-property: 	height, width;
+	-moz-transition-property: 		height, width;
+	-ms-transition-property: 		height, width;
+	-o-transition-property: 		height, width;
+	transition-property: 			height, width;
+}
+.isotope .isotope-item {
+	-webkit-transition-property: 	-webkit-transform, opacity;
+	-moz-transition-property:    	-moz-transform, opacity;
+	-ms-transition-property:     	-ms-transform, opacity;
+	-o-transition-property:      	-o-transform, opacity;
+	transition-property:         	transform, opacity;
+}
+.isotope.no-transition,
+.isotope.no-transition .isotope-item,
+.isotope .isotope-item.no-transition {
+	-webkit-transition-duration: 	0s;
+	-moz-transition-duration: 		0s;
+	-ms-transition-duration: 		0s;
+	-o-transition-duration: 		0s;
+	transition-duration: 			0s;
+}
+.isotope.infinite-scrolling {
+	-webkit-transition: 			none;
+	-moz-transition: 				none;
+	-ms-transition: 				none;
+	-o-transition: 					none;
+	transition: 					none;
+}
+
+
+/* Infinite Scroll Settings */
+/* ------------------------ */
+#FB_Album_Infinite_Load {
+	position: 						fixed;
+    background: 					none repeat scroll 0 0 #000000;
+    border-radius: 					10px 10px 10px 10px;
+    bottom: 						40px;
+    color: 							#FFFFFF;
+    left: 							45%;
+	-webkit-opacity: 				0.8;
+	-moz-opacity: 					0.8;
+	filter:							alpha(opacity=80);
+	opacity: 						0.8;
+    padding: 						10px;
+    text-align: 					center;
+    width: 							200px;
+    z-index: 						9999;
+}
+#FB_Album_Infinite_Load #FB_Album_Infinite_Image {
+	width:							70px;
+	height:							70px;
+	margin:							0px auto;
+	background:						url("Images/Infinite_Load.gif") no-repeat;
+}
+#FB_Album_Infinite_More {
+	margin:							0px auto;
+	height:							45px;
+	border-top:						2px solid #DDDDDD;
+	width:							100%;
+	margin-top:						10px;
+}
+#FB_Album_Infinite_More_Text {
+	margin:							0px auto;
+	text-align:						center;
+	font-weight:					bold;
+	font-size:						15px;
+	line-height:					15px;
+	padding-top:					15px;
+}
+#FB_Album_Infinite_More_Arrow_Left {
+	background:						url("Images/Arrow_Down_Green_Animated.gif") no-repeat;
+	width:							41px;
+	height:							45px;
+	float:							left;
+	margin-left:					20px;
+}
+#FB_Album_Infinite_More_Arrow_Right {
+	background:						url("Images/Arrow_Down_Green_Animated.gif") no-repeat;
+	width:							41px;
+	height:							45px;
+	float:							right;
+	margin-right:					20px;
+	margin-top: 					-30px;
+}
+
+
+/* ClearFixMe Settings */
+/* ----------------- */
+.clearFixMe:before, .clearFixMe:after {
+	content: 						"";
+	display: 						table;
+}
+.clearFixMe:after {
+	clear: 							both;
+}
+.clearFixMe {
+	zoom: 							1;
+}
+
+
+/* Lightbox Settings */
+/* ----------------- */
+.fancybox-title {
+	text-align: 					justify;
+}
+#cboxLoadedContent {
+	overflow:						hidden !important;
+}
+.pp_social {
+	float:							right;
+}
+.pp_description {
+	display:						block !important;
+	float: 							left;
+	text-align: 					justify;
+	margin:							0px !important;
+}
+
+
+/* Social Share Settings */
+/* --------------------- */
+.albumDetails .socialcount,
+.photoShare .socialcount,
+.fb-album-shareme .socialcount,
+.fb-photo-shareme .socialcount,
+.fancybox-title .socialcount,
+#cboxTitle .socialcount,
+.pp_details .socialcount,
+.photoBoxSocial .socialcount {
+	color: 							#fff;
+	font-size: 						10px;
+	line-height: 					14px;
+}
+.albumDetails .socialcount > li,
+.albumDetails .socialcount > li > a:focus,
+.albumDetails .socialcount .loading,
+.photoShare .socialcount > li,
+.photoShare .socialcount > li > a:focus,
+.photoShare .socialcount .loading,
+.fb-album-shareme .socialcount > li,
+.fb-album-shareme .socialcount > li > a:focus,
+.fb-album-shareme .socialcount .loading,
+.fb-photo-shareme .socialcount > li,
+.fb-photo-shareme .socialcount > li > a:focus,
+.fb-photo-shareme .socialcount .loading,
+.fancybox-title .socialcount > li,
+.fancybox-title .socialcount > li > a:focus,
+.fancybox-title .socialcount .loading,
+#cboxTitle .socialcount > li,
+#cboxTitle .socialcount > li > a:focus,
+#cboxTitle .socialcount .loading,
+.pp_details .socialcount > li,
+.pp_details .socialcount > li > a:focus,
+.pp_details .socialcount .loading,
+.photoBoxSocial .socialcount > li,
+.photoBoxSocial .socialcount > li > a:focus,
+.photoBoxSocial .socialcount .loading {
+	border-radius: 					4px !important;
+}
+.albumDetails .socialcount > li > a:focus,
+.albumDetails .socialcount > li:hover,
+.albumDetails .socialcount > li.hover,
+.photoShare .socialcount > li > a:focus,
+.photoShare .socialcount > li:hover,
+.photoShare .socialcount > li.hover,
+.fb-album-shareme .socialcount > li > a:focus,
+.fb-album-shareme .socialcount > li:hover,
+.fb-album-shareme .socialcount > li.hover,
+.fb-photo-shareme .socialcount > li > a:focus,
+.fb-photo-shareme .socialcount > li:hover,
+.fb-photo-shareme .socialcount > li.hover,
+.fancybox-title .socialcount > li > a:focus,
+.fancybox-title .socialcount > li:hover,
+.fancybox-title .socialcount > li.hover,
+#cboxTitle .socialcount > li > a:focus,
+#cboxTitle .socialcount > li:hover,
+#cboxTitle .socialcount > li.hover,
+.pp_details .socialcount > li > a:focus,
+.pp_details .socialcount > li:hover,
+.pp_details .socialcount > li.hover,
+.photoBoxSocial .socialcount > li > a:focus,
+.photoBoxSocial .socialcount > li:hover,
+.photoBoxSocial .socialcount > li.hover {
+	background-color: 				#464646 !important;
+}
+
+.albumDetails .socialcount,
+.photoShare .socialcount,
+.fb-album-shareme .socialcount,
+.fb-photo-shareme .socialcount,
+.fancybox-title .socialcount,
+#cboxTitle .socialcount,
+.pp_details .socialcount,
+.photoBoxSocial .socialcount {
+	list-style: 					none;
+	padding-left: 					0;
+	margin: 						0 0 6px 0;
+	overflow: 						hidden;
+}
+.albumDetails .socialcount :link,
+.albumDetails .socialcount :visited,
+.photoShare .socialcount :link,
+.photoShare .socialcount :visited,
+.fb-album-shareme .socialcount :link,
+.fb-album-shareme .socialcount :visited,
+.fb-photo-shareme .socialcount :link,
+.fb-photo-shareme .socialcount :visited,
+.fancybox-title .socialcount :link,
+.fancybox-title .socialcount :visited,
+#cboxTitle .socialcount :link,
+#cboxTitle .socialcount :visited,
+.pp_details .socialcount :link,
+.pp_details .socialcount :visited,
+.photoBoxSocial .socialcount :link,
+.photoBoxSocial .socialcount :visited {
+	color: 							inherit;
+}
+.albumDetails .socialcount > li,
+.photoShare .socialcount > li,
+.fb-album-shareme .socialcount > li,
+.fb-photo-shareme .socialcount > li,
+.fancybox-title .socialcount > li,
+#cboxTitle .socialcount > li,
+.pp_details .socialcount > li,
+.photoBoxSocial .socialcount > li {
+	background-color: 				#999;
+	padding:						0px;
+	display: 						inline-block;
+	*display: 						inline;
+	zoom: 							1;
+	position: 						relative;
+	vertical-align: 				top;
+	text-align: 					center;
+	white-space: 					nowrap;
+	*margin-right: 					4px;
+	float:							right;
+	margin-left:					4px;
+	margin-bottom:					2px;
+}
+.albumDetails .socialcount > li > a,
+.photoShare .socialcount > li > a,
+.fb-album-shareme .socialcount > li > a,
+.fb-photo-shareme .socialcount > li > a,
+.fancybox-title .socialcount > li > a,
+#cboxTitle .socialcount > li > a,
+.pp_details .socialcount > li > a,
+.photoBoxSocial .socialcount > li > a {
+	width: 							22px;
+	height: 						22px;
+	display: 						block;
+	padding: 						0px;
+	text-decoration: 				none;
+	color: 							inherit;
+}
+.albumDetails .socialcount > li > div,
+.photoShare .socialcount > li > div,
+.fb-album-shareme .socialcount > li > div,
+.fb-photo-shareme .socialcount > li > div,
+.fancybox-title .socialcount > li > div,
+#cboxTitle .socialcount > li > div,
+.pp_details .socialcount > li > div,
+.photoBoxSocial .socialcount > li > div {
+	width: 							22px;
+	height: 						22px;
+	display: 						block;
+	padding: 						0px;
+	text-decoration: 				none;
+	color: 							inherit;
+}
+
+.albumDetails .social-icon,
+.photoShare .social-icon,
+.fb-album-shareme .social-icon,
+.fb-photo-shareme .social-icon,
+.fancybox-title .social-icon,
+#cboxTitle .social-icon,
+.pp_details .social-icon,
+.photoBoxSocial .social-icon {
+	display: 						inline-block;
+	*display: 						inline;
+	zoom: 							1;
+	vertical-align: 				middle;
+	*margin-right: 					5px;
+}
+.socialcount .icon-facebook {
+	background: 					url('Images/Share_Facebook.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width:							16px;
+}
+.socialcount .icon-googleplus {
+	background: 					url('Images/Share_Google.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-twitter {
+	background: 					url('Images/Share_Twitter.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-stumbleupon {
+	background: 					url('Images/Share_StumbleUpon.png') no-repeat;
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-printer {
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	background: 					url('Images/Share_Printer.png') no-repeat;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-disk {
+	position: 						absolute;
+	left:							3px;
+	top:							3px;
+	background: 					url('Images/Share_Disk.png') no-repeat;
+	height: 						16px;
+	width: 							16px;
+}
+.socialcount .icon-facebook:before,
+.socialcount .icon-google:before,
+.socialcount .icon-twitter:before,
+.socialcount .icon-stumbleupon:before,
+.socialcount .icon-printer:before,
+.socialcount .icon-disk:before {
+    content: 						"";
+}
+
+
+/* Pagination Settings */
+/* ------------------- */
+.paginationMain .paginationControls .paginationSearch .hidden {
+	display:						none;
+}
+.paginationMain, .paginationBar, .paginationButtons {
+	width:							100%;
+}
+.paginationBar {
+	z-index:						99;
+}
+.paginationMain .float_right {
+	float:							right;
+}
+.paginationMain .float_left {
+	float:							left;
+}
+.paginationMain .btn {
+    display:						inline-block;
+    *display:						inline;
+    font-size: 						12px;
+    padding: 						5px 10px;
+    text-decoration: 				none;
+    zoom:							1;
+}
+
+.paginationMain .btn:hover{}
+.paginationMain .btn:active{}
+
+.paginationMain ul.unstyled,
+.paginationMain ul.unstyled li{
+	list-style-type:				none;
+	margin:							0 !important;
+	padding:						0 !important;
+}
+.Selections {
+	max-height: 					300px;
+	overflow-x: 					hidden;
+	overflow-y: 					auto;
+}
+
+a.paginationItem, a.paginationItem:visited {
+	-webkit-box-shadow: 			0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 				0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+	box-shadow: 					0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+	cursor:							pointer;
+	display:						block;
+	font-size:						14px;
+	line-height:					1.2em;
+	margin:							10px 0;
+	padding:						10px 10px 10px 35px;
+	*padding:						10px;
+	position:						relative;
+	text-decoration:				none;
+	zoom:							1;
+}
+a.paginationItem:after {
+	content:						"";
+	display:						block;
+	height:							20px;
+	left:							10px;
+	margin-right:					2px;
+	position:						absolute;
+	top:							11px;
+	width:							20px;
+}
+a:hover.paginationItem{}
+a:active.paginationItem{
+    -webkit-box-shadow: 			inset 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 				inset 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 					inset 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+}
+
+.paginationButtons {
+	height: 						45px;
+	text-align: 					center;
+}
+.paginationButtons.ControlsTop {
+	height: 						45px;
+    margin-bottom: 					0px;
+	padding-top: 					15px;
+    border-bottom: 					1px dashed #DDDDDD;
+}
+.paginationButtons.ControlsBottom {
+	height: 						45px;
+    margin-bottom: 					0px;
+	padding-top: 					20px;
+    border-top: 					1px dashed #DDDDDD;
+	width:							100%;
+	display:						inline-block;
+}
+.paginationButtons .pagingInfo {
+	font-weight:					bold;
+	font-size:						14px;
+	display:						inline-block;
+	vertical-align:					middle;
+	*display:						inline;
+	zoom:							1;
+	width: 							50%;
+	margin: 						-5px auto 5px ;
+}
+.paginationButtons .pagingInfo .thumbnailStage {
+	font-weight:					normal;
+	font-size:						12px;
+}
+.paginationButtons .thumbnailStage {
+	font-weight:					normal;
+	font-size:						12px;
+	display:						inline-block;
+	vertical-align:					middle;
+	*display:						inline;
+	zoom:							1;
+	width: 							50%;
+	margin: 						0px auto 0px auto;
+}
+.paginationControls .thumbnailStage {
+	font-weight:					normal;
+	font-size:						10px;
+	display:						inline-block;
+	vertical-align:					middle;
+	*display:						inline;
+	zoom:							1;
+	margin: 						-5px 0px 0px 20px;
+}
+.paginationButtons a {
+	display:						inline-block;
+	padding:						5px;
+	*display:						inline;
+	zoom:							1;
+}
+.paginationButtons a.pfl_first {
+	float:							left;
+	margin-left:					20px;
+	margin-right: 					10px;
+}
+#FirstPage {
+	background: 					transparent url(Images/document_page_first.png) no-repeat center center;
+	height: 						16px;
+	width: 							30px;
+}
+.paginationButtons a.pfl_prev {
+	float:							left;
+}
+#PrevPage {
+	background: 					transparent url(Images/document_page_previous.png) no-repeat center center;
+	height: 						16px;
+	width: 							30px;
+}
+.paginationButtons a.pfl_next {
+	float:							right;
+}
+#NextPage {
+	background: 					transparent url(Images/document_page_next.png) no-repeat center center;
+	height: 						16px;
+	width: 							30px;
+}
+.paginationButtons a.pfl_last {
+	float:							right;
+	margin-left: 					10px;
+	margin-right:					20px;
+}
+#LastPage {
+	background: 					transparent url(Images/document_page_last.png) no-repeat center center;
+	height: 						16px;
+	width: 							30px;
+}
+.paginationButtons a.disabled {
+	opacity:						0.4;
+	filter: 						alpha(opacity = 40);
+	cursor:							default;
+}
+.paginationButtons a.disabled:hover {
+	opacity:						0.4;
+	filter: 						alpha(opacity = 40);
+	cursor:							default;
+	border:							solid 1px #CCCCCC;
+    background: 					#FFFFFF;
+}
+
+.paginationMain .showSortingBtn {
+	width: 							110px;
+	margin-top: 					10px;
+	margin-right: 					20px !important;
+	padding-left: 					20px;
+	_padding-left: 					10px;
+	position: 						relative;
+	font-weight: 					bold;
+	text-align: 					center;
+}
+.paginationMain .showSortingBtn:before {
+	background: 					transparent url(Images/sort_columns.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							10px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+.paginationMain .AdjustSort {
+	padding-left: 					15px;
+}
+
+.paginationMain .showFilterBtn {
+	width: 							110px;
+	margin-top: 					10px;
+	margin-right: 					20px !important;
+	padding-left: 					20px;
+	_padding-left: 					10px;
+	position: 						relative;
+	font-weight: 					bold;
+	text-align: 					center;
+}
+.paginationMain .showFilterBtn:before {
+	background: 					transparent url(Images/filter_type.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							10px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+.paginationMain .AdjustType {
+	padding-left: 					2px;
+}
+
+.paginationMain .showPagerBtn {
+	width: 							110px;
+	margin-top: 					10px;
+	margin-right: 					20px !important;
+	padding-left: 					20px;
+	_padding-left: 					10px;
+	position: 						relative;
+	font-weight: 					bold;
+	text-align: 					center;
+}
+.paginationMain .showPagerBtn:before {
+	background: 					transparent url(Images/pages.png) no-repeat 0 0;
+	content:						"";
+	display: 						block;
+	height: 						16px;
+	left: 							10px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+.paginationMain .AdjustPage {
+	padding-left: 					12px;
+}
+
+.paginationMain .paginationControls {
+    border-bottom: 					1px dashed #DDDDDD;
+    padding-bottom: 				10px;
+	/*margin-top:					10px;*/
+	margin-bottom: 					10px;
+    position: 						relative;
+}
+.paginationMain .paginationControls.Floater {
+	margin: 						0px auto 10px auto;
+	padding:						0px;
+	border:							1px solid #DDDDDD;
+	background:						url(Images/stripey.png) center center;
+	-webkit-box-shadow: 			0px 5px 10px #D8D8D8;
+	-moz-box-shadow: 				0px 5px 10px #D8D8D8;
+	-o-box-shadow: 					0px 5px 10px #D8D8D8;
+	box-shadow:						0px 5px 10px #D8D8D8;
+    border-bottom: 					1px solid #DDDDDD;
+	z-index:						99;
+}
+
+.paginationMain .Toggle_Info_Main {
+	padding:						4px 9px;
+	float:							right;
+	cursor: 						pointer;
+	margin-top:						10px;
+	margin-right:					20px;
+}
+.paginationMain .Toggle_Info_Main.Toggle_Info_On {
+    background: 					#ffffff; /* Old browsers */
+    background: 					-moz-linear-gradient(top,  #ffffff 0%, #CCE9FF 47%, #77C6FF 100%); /* FF3.6+ */
+    background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#CCE9FF), color-stop(100%,#77C6FF)); /* Chrome,Safari4+ */
+    background: 					-webkit-linear-gradient(top,  #ffffff 0%,#CCE9FF 47%,#77C6FF 100%); /* Chrome10+,Safari5.1+ */
+    background: 					-o-linear-gradient(top,  #ffffff 0%,#CCE9FF 47%,#77C6FF 100%); /* Opera 11.10+ */
+    background: 					-ms-linear-gradient(top,  #ffffff 0%,#CCE9FF 47%,#77C6FF 100%); /* IE10+ */
+    background: 					linear-gradient(top,  #ffffff 0%,#CCE9FF 47%,#77C6FF 100%); /* W3C */
+    filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#CCE9FF', endColorstr='#77C6FF',GradientType=0 ); /* IE6-9 */
+}
+.paginationMain .Toggle_Info_Main.Toggle_Info_Off {
+    background: 					#ffffff; /* Old browsers */
+    background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* FF3.6+ */
+    background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+    background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Chrome10+,Safari5.1+ */
+    background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Opera 11.10+ */
+    background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* IE10+ */
+    background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* W3C */
+    filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+}
+.paginationMain .Toggle_Info_Main .Toggle_Info {
+	background:						url(Images/information.png) center center no-repeat;
+	width: 							16px;
+	height:							16px;
+	margin:							0px auto;
+}
+
+.paginationMain .Scroll_To_Top {
+	padding:						0px 5px;
+	float:							right;
+	cursor: 						pointer;
+	margin-top:						10px;
+	margin-right:					20px;
+}
+.paginationMain .Scroll_To_Top .To_Top {
+	background:						url(Images/Back_Top.png) center center no-repeat;
+	width: 							24px;
+	height:							24px;
+	margin:							0px auto;
+}
+.paginationMain .paginationControls .btn{
+	margin-left: 					0px;
+}
+.paginationMain .paginationControls .paginationFilters,
+.paginationMain .paginationControls .paginationPagers,
+.paginationMain .paginationControls .paginationSorting{
+	-webkit-box-shadow: 			0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 				0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+	box-shadow: 					0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+	background-color: 				#FFFFFF;
+	border: 						solid 1px #CCCCCC;
+	border-radius: 					0 0 5px 5px;
+	display: 						none;
+	position: 						absolute;
+	font-size: 						11px;
+	line-height: 					1.2em;
+	right: 							0;
+	top: 							34px;
+	width: 							140px;
+	z-index: 						100;
+}
+
+.paginationMain .paginationControls .paginationFilters p,
+.paginationMain .paginationControls .paginationPagers p,
+.paginationMain .paginationControls .paginationSorting p{
+	margin-bottom:					0 !important;
+}
+
+.paginationMain .paginationControls .paginationFilters li a,
+.paginationMain .paginationControls .paginationSorting li a{
+	border-bottom: 					solid 1px #f4f4f4;
+	color: 							#21759B;
+	display: 						block;
+	font-size: 						12px;
+	margin: 						0;
+	padding: 						5px;
+	cursor: 						pointer;
+	text-decoration: 				none;
+	-webkit-transition: 			all 0.2s ;
+	-moz-transition: 				all 0.2s ;
+	-o-transition: 					all 0.2s ;
+	transition: 					all 0.2s ;
+}
+.paginationMain .paginationControls .paginationFilters li a:hover,
+.paginationMain .paginationControls .paginationPagers li a:hover,
+.paginationMain .paginationControls .paginationSorting li a:hover{
+	background-color:				rgb(247,255,224);
+	color:							#D54E21;
+}
+
+.paginationMain .paginationControls .paginationPagers li a.InActive {
+	border-bottom: 					solid 1px #f4f4f4;
+	color: 							#21759B;
+	display: 						block;
+	font-size: 						12px;
+	font-weight: 					normal;
+	margin: 						0;
+	padding: 						5px;
+	cursor: 						pointer;
+	text-decoration: 				none;
+	-webkit-transition: 			all 0.2s ;
+	-moz-transition: 				all 0.2s ;
+	-o-transition: 					all 0.2s ;
+	transition: 					all 0.2s ;
+}
+.paginationMain .paginationControls .paginationPagers li a.Active {
+	background: 					url(Images/selected.png) no-repeat left center;
+	border-bottom: 					solid 1px #f4f4f4;
+	color: 							#21759B;
+	display: 						block;
+	font-size: 						12px;
+	font-weight: 					bold;
+	margin: 						0;
+	padding: 						5px;
+	padding-left: 					20px;
+	margin-left: 					5px;
+	cursor: 						default;
+	text-decoration: 				none;
+	-webkit-transition: 			all 0.2s ;
+	-moz-transition: 				all 0.2s ;
+	-o-transition: 					all 0.2s ;
+	transition: 					all 0.2s ;
+}
+.paginationMain .paginationControls .paginationPagers li a.Disabled {
+	display: 						none;
+}
+
+.paginationMain .paginationControls .paginationSorting li a.asc{
+	background:						transparent url(Images/arrow_up_red.png) no-repeat 120px 4px;
+}
+.paginationMain .paginationControls .paginationSorting li a.dec{
+	background:						transparent url(Images/arrow_down_red.png) no-repeat 120px 4px;
+}
+
+.paginationMain .paginationControls .bar{
+	background-color:				#fbfbfb;
+	border-radius:					0 0 5px 5px;
+	border-top:						solid 1px #ccc;
+	margin:							0;
+	text-align:						right;
+}
+.paginationMain .paginationControls .bar .Closer{
+	background:						transparent url(Images/closer.png) no-repeat 99% 50%;
+	display:						block;
+	height:							16px;
+	padding:						5px;
+	text-align:						left;
+	text-indent:					-9000px;
+	opacity:						0.4;
+}
+.paginationMain .paginationControls .bar .Closer:hover{
+    background-color:				#efefef;
+}
+
+.paginationMain .paginationControls .paginationFilters a.showing {
+	background: 					rgb(247,255,224);
+	color: 							#626933;
+	padding-left:					24px;
+	position:						relative;
+	text-shadow:					0 1px 1px rgba(255,255,255,1);
+	-webkit-transition: 			all 0.2s ;
+	-moz-transition: 				all 0.2s ;
+	-o-transition: 					all 0.2s ;
+	transition: 					all 0.2s ;
+}
+
+.paginationMain .paginationControls .paginationFilters a.showing:after {
+	content:						"";
+	background:						transparent url(Images/selected.png) no-repeat 0 0;
+	display:						block;
+	height:							16px;
+	opacity:						0.8;
+	position:						absolute;
+	top:							3px;
+	left:							3px;
+	width:							16px;
+}
+
+.paginationMain .paginationMessage{
+	height: 						26px;
+	vertical-align: 				middle;
+	background: 					rgb(233,246,253); /* Old browsers */
+	background: 					-moz-linear-gradient(top,  rgba(233,246,253,1) 0%, rgba(211,238,251,1) 100%); /* FF3.6+ */
+	background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(233,246,253,1)), color-stop(100%,rgba(211,238,251,1))); /* Chrome,Safari4+ */
+	background: 					-webkit-linear-gradient(top,  rgba(233,246,253,1) 0%,rgba(211,238,251,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: 					-o-linear-gradient(top,  rgba(233,246,253,1) 0%,rgba(211,238,251,1) 100%); /* Opera 11.10+ */
+	background: 					-ms-linear-gradient(top,  rgba(233,246,253,1) 0%,rgba(211,238,251,1) 100%); /* IE10+ */
+	background: 					linear-gradient(top,  rgba(233,246,253,1) 0%,rgba(211,238,251,1) 100%); /* W3C */
+	filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#e9f6fd', endColorstr='#d3eefb',GradientType=0 ); /* IE6-9 */
+	-webkit-border-radius: 			3px;
+	-moz-border-radius: 			3px;
+	border-radius: 					3px;
+    margin: 						10px 15px;
+    padding: 						10px 10px 10px 35px;
+	position:						relative;
+}
+.paginationMain .paginationMessage:after{
+	content:						"";
+	background:						transparent url(Images/notification.png) no-repeat 0 0;
+	display:						block;
+	height:							20px;
+	left:							10px;
+	position:						absolute;
+	top:							14px;
+	width:							20px;
+}
+.paginationMain .paginationMessage a{
+	margin-left:					10px;
+}
+#ErrorMessage {
+	font-family: 					Verdana;
+	float: 							left;
+	line-height: 					26px;
+}
+
+.paginationMain .paginationEmpty{
+	height: 						21px;
+	vertical-align: 				middle;
+	font-weight: 					bold;
+	background: 					rgb(233,246,253); /* Old browsers */
+	background: 					-moz-linear-gradient(top,  rgba(255,214,214,1) 0%, rgba(255,81,81,1) 100%); /* FF3.6+ */
+	background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,214,214,1)), color-stop(100%,rgba(255,81,81,1))); /* Chrome,Safari4+ */
+	background: 					-webkit-linear-gradient(top,  rgba(255,214,214,1) 0%,rgba(255,81,81,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: 					-o-linear-gradient(top,  rgba(255,214,214,1) 0%,rgba(255,81,81,1) 100%); /* Opera 11.10+ */
+	background: 					-ms-linear-gradient(top,  rgba(255,214,214,1) 0%,rgba(255,81,81,1) 100%); /* IE10+ */
+	background: 					linear-gradient(top,  rgba(255,214,214,1) 0%,rgba(255,81,81,1) 100%); /* W3C */
+	filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFD6D6', endColorstr='#FF5151',GradientType=0 ); /* IE6-9 */
+	-webkit-border-radius: 			3px;
+	-moz-border-radius: 			3px;
+	border-radius: 					3px;
+    margin: 						10px 0;
+    padding: 						15px 10px 10px 35px;
+	position:						relative;
+}
+.paginationMain .paginationEmpty:after{
+	content:						"";
+	background:						transparent url(Images/cancel.png) no-repeat 0 0;
+	display:						block;
+	height:							20px;
+	left:							10px;
+	position:						absolute;
+	top:							14px;
+	width:							20px;
+}
+.paginationMain .paginationEmpty a{
+	margin-left:					10px;
+}
+
+
+.paginationMain .paginationControls .paginationSearch{
+	display:						inline-block;
+	*display:						inline;
+	padding:						10px 0;
+	zoom:							1;
+	margin-left:					20px;
+}
+
+.paginationMain .paginationControls .paginationSearchValue{
+	-webkit-border-radius: 			3px;
+	-moz-border-radius: 			3px;
+	border-radius: 					3px;
+	border: 						solid 1px #ccc;
+	color: 							#ccc;
+	font-size: 						13px;
+	margin: 						0 5px 0 0;
+	padding: 						4px;
+}
+
+.paginationMain .paginationControls .paginationSearchValue:hover{
+	box-shadow: 					0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+	border-color: 					rgba(82, 168, 236, 0.8);
+	color: 							#333;
+}
+
+.paginationMain .paginationControls .paginationSearchValue.active{
+	box-shadow: 					0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+	border-color: 					rgba(82, 168, 236, 0.8);
+	color: 							#333;
+}
+
+.paginationMain .paginationControls .paginationSearchValue.error{
+	border-color: 					#f00;
+}
+
+.paginationMain .paginationControls .paginationSearch a{
+	cursor: 						pointer;
+	display: 						inline-block;
+	*display: 						inline;/*ie6 and 7*/
+	font-size: 						12px;
+	font-weight: 					bold;
+    margin-left: 					0;
+	zoom:							1;/*ie6 and 7*/
+}
+
+.paginationMain .paginationSearchGo {
+	width: 							110px;
+	padding-left: 					20px;
+	_padding-left: 					20px;
+	position: 						relative;
+	font-weight: 					bold;
+	text-align: 					center;
+}
+.paginationMain .paginationSearchGo:before {
+	background: 					transparent url(Images/go_search.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							10px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+.paginationMain .AdjustSearch {
+	padding-left:					12px;
+}
+
+.paginationMain .paginationControls .paginationSearch .clearSearch{
+	margin-left: 					3px;
+	width: 							60px;
+	padding-left: 					20px;
+	_padding-left: 					20px;
+	position: 						relative;
+	font-weight: 					bold;
+}
+.paginationMain .paginationControls .paginationSearch .clearSearch:before {
+	background: 					transparent url(Images/Delete_Icon.png) no-repeat 0 0;
+	content: 						"";
+	display: 						block;
+	height: 						16px;
+	left: 							15px;
+	position: 						absolute;
+	top: 							4px;
+	width: 							16px;
+}
+.paginationMain .paginationFrame{}
+.paginationMain .AdjustClear {
+	padding-left: 					15px;
+}
+
+.paginationMain .paginationFrame.loading{
+	background:						#FFFFFF url("Images/loading32.gif") no-repeat 50% 50%;
+	height:							200px;
+}
+.paginationMain .paginationFrame.loading a{
+	display:						none;
+}
+
+.paginationMain .defaultPaginationStyle{
+    background: 					#ffffff; /* Old browsers */
+    background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* FF3.6+ */
+    background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+    background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Chrome10+,Safari5.1+ */
+    background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Opera 11.10+ */
+    background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* IE10+ */
+    background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* W3C */
+    filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+    -webkit-border-radius: 			5px;
+    -moz-border-radius: 			5px;
+    border-radius: 					5px;
+    text-shadow: 					0px 2px 0px #fff;
+    border:							solid 1px #ccc;
+    color:							#555;
+}
+.paginationMain .defaultPaginationStyle:hover{
+    background-color:				#ccc;
+    border-color:					#aaa;
+    color:							#D54E21;
+    background: 					#ffffff; /* Old browsers */
+    background: 					-moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #EAD3D3 100%); /* FF3.6+ */
+    background: 					-webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#EAD3D3)); /* Chrome,Safari4+ */
+    background: 					-webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* Chrome10+,Safari5.1+ */
+    background: 					-o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* Opera 11.10+ */
+    background: 					-ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* IE10+ */
+    background: 					linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#EAD3D3 100%); /* W3C */
+    filter: 						progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#EAD3D3',GradientType=0 ); /* IE6-9 */
+}
+.paginationMain .defaultPaginationStyle:active{
+    -webkit-box-shadow: 			inset 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 				inset 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 					inset 0px 2px 2px 0px rgba(0, 0, 0, 0.2);
+    background-color:				#ededed;
+    background-position:			0 -10px;
+    background-repeat:				repeat-x;
+    border-color:					#aaa;
+}
+
+.paginationMain .paginationControls .bar{
+	background-color:				#fbfbfb;
+	border-top:						solid 1px #ccc;
+}
+.paginationMain .paginationControls .bar .Closer{
+	opacity:						0.4;
+}
+.paginationMain .paginationControls .bar .Closer:hover{
+	background-color:				#FFE0E0;
+}
+
+
+/* Messi General CSS */
+/* ----------------- */
+.messi-modal {
+    position:                       absolute;
+    top:                            0;
+    left:                           0;
+    width:                          100%;
+    height:                         100%;
+    overflow:                       hidden;
+    background-color:               #000;
+    opacity:                        0;
+}
+.messi {
+    position:                       fixed;
+    padding:                        0;
+    margin:                         0;
+    font-size:                      16px;
+    text-shadow:                    none;
+}
+.messi-box {
+    position:                       relative;
+    width:                          600px;
+    height:                         auto;
+    padding:                        8px;
+    overflow:                       hidden;
+    background-color:               rgba(204, 204, 204, 0.2);
+    border-radius:                  6px;
+    opacity:                        1;
+    box-shadow:                     0 0 1em #444;
+}
+.messi-wrapper {
+    position:                       relative;
+    background-color:               #fff;
+    border-radius:                  5px;
+}
+.messi-titlebox {
+    padding:                        0px 10px;
+    height:                         40px;
+    overflow:                       hidden;
+    font:                           0.9em bold helvetica, arial;
+    color:                          #fff;
+    text-shadow:                    0 -2px 1px rgba(0, 0, 0, 0.25);
+    background-color:               #3b3b3b;
+    background-image:               -webkit-gradient(linear, left bottom, left top, color-stop(0.25, #3b3b3b), color-stop(0.75, #575757));
+    background-image:               linear-gradient(bottom, #3b3b3b 25%, #575757 75%);
+    background-image:               -moz-linear-gradient(bottom, #3b3b3b 25%, #575757 75%);
+    background-image:               -o-linear-gradient(bottom, #3b3b3b 25%, #575757 75%);
+    background-image:               -webkit-linear-gradient(bottom, #3b3b3b 25%, #575757 75%);
+    background-image:               -ms-linear-gradient(bottom, #3b3b3b 25%, #575757 75%);
+}
+.messi-title {
+    vertical-align:                 middle;
+    line-height:                    40px;
+}
+.messi-titlebox.info {
+    background-color:               #4ea5cd;
+    background-image:               none;
+}
+.messi-titlebox.errors {
+    background-color:               #de4343;
+    background-image:               none;
+}
+.messi-titlebox.warning {
+    background-color:               #eaaf51;
+    background-image:               none;
+}
+.messi-titlebox.success {
+    background-color:               #61b832;
+    background-image:               none;
+}
+.messi-closebtn {
+    position:                       absolute;
+    top:                            5px;
+    right:                          5px;
+    display:                        block;
+    color:                          #333333;
+    cursor:                         pointer;
+    width:                          30px;
+    height:                         30px;
+    background:                     url("Images/close-messi.png") 0px 0px no-repeat;
+}
+.messi-closebtn:hover {
+    background:                     url("Images/close-messi.png") -30px 0px no-repeat;
+}
+.messi-content {
+    padding:                        10px;
+    overflow:                       hidden;
+    font:                           .9em normal helvetica, arial;
+    text-align:                     justify;
+	word-wrap: 						break-word;
+	overflow-y: 					auto;
+	overflow-x: 					hidden;
+}
+.messi-content p {
+    margin:                         0 0 1.3em;
+    line-height:                    1.3em;
+}
+.messi-content .messi-closebtn {
+    top:                            7px;
+    font:                           1.3em bold helvetica, arial;
+    color:                          #FFFFFF;
+    background-color:               #333333;
+    opacity:                        0;
+    -webkit-transition:             opacity .25s linear, visibility .1s linear .5s;
+    -moz-transition:                opacity .25s linear, visibility .1s linear .5s;
+    -o-transition:                  opacity .25s linear, visibility .1s linear .5s;
+    transition:                     opacity .25s linear, visibility .1s linear .5s;
+}
+.messi-content:hover .messi-closebtn {
+    opacity:                        1;
+}
+
+.messi-footbox {
+    width:                          100%;
+    height:                         55px;
+    overflow:                       hidden;
+    border-top:                     1px solid #eee;
+}
+.messi-actions {
+    display:                        -webkit-box;
+    display:                        -moz-box;
+    display:                        box;
+    padding-top:                    8px;
+    margin:                         0 10px;
+    -webkit-box-orient:             horizontal;
+    -moz-box-orient:                horizontal;
+    box-orient:                     horizontal;
+}
+.messi-actions .btnbox {
+    text-align:                     center;
+    -webkit-box-flex:               1;
+    -moz-box-flex:                  1;
+    box-flex:                       1;
+    margin-right:                   10px;
+}
+.messi-actions .btnbox .btn {
+    min-width:                      75px;
+}
+.messi-titlebox.anim {
+    background-color:               #666;
+    background-image:               -o-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+    background-image:               linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+    background-image:               -webkit-gradient(linear, left top, right bottom, color-stop(0.25, rgba(255, 255, 255, 0.05)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.05)), color-stop(0.75, rgba(255, 255, 255, 0.05)), color-stop(0.75, transparent), to(transparent));
+    background-image:               -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+    background-image:               -moz-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+    background-image:               -ms-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+    -webkit-background-size:        40px 40px;
+    -moz-background-size:           40px 40px;
+    background-size:                40px 40px;
+    -webkit-box-shadow:             inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+    -moz-box-shadow:                inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+    box-shadow:                     inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+    -webkit-animation:              animate-bg 5s linear infinite;
+    -moz-animation:                 animate-bg 5s linear infinite;
+}
+.messi-titlebox.anim.info {
+    background-color:               #4ea5cd;
+}
+.messi-titlebox.anim.errors {
+    background-color:               #de4343;
+}
+.messi-titlebox.anim.warning {
+    background-color:               #eaaf51;
+}
+.messi-titlebox.anim.success {
+    background-color:               #61b832;
+}
+@-webkit-keyframes animate-bg {
+    from {
+        background-position:        0 0;
+    }
+    to {
+        background-position:        -80px 0;
+    }
+}
+@-moz-keyframes animate-bg {
+    from {
+        background-position:        0 0;
+    }
+    to {
+        background-position:        -80px 0;
+    }
+}
+/* CSS Buttons from Twitter Bootstrap: http://twitter.github.com/bootstrap/ */
+.messi .btn {
+    display:                        inline-block;
+    *display:                       inline;
+    padding:                        4px 10px 4px;
+    margin-bottom:                  0;
+    *margin-left:                   .3em;
+    font-size:                      13px;
+    line-height:                    26px;
+    color:                          #333;
+    text-align:                     center;
+    text-shadow:                    0 1px 1px rgba(255, 255, 255, 0.75);
+    vertical-align:                 middle;
+    cursor:                         pointer;
+    background-color:               #f5f5f5;
+    *background-color:              #e6e6e6;
+    background-image:               -ms-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+    background-image:               -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image:               -o-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image:               linear-gradient(top, #ffffff, #e6e6e6);
+    background-image:               -moz-linear-gradient(top, #ffffff, #e6e6e6);
+    background-repeat:              repeat-x;
+    border:                         1px solid #cccccc;
+    *border:                        0;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-color:                   #e6e6e6 #e6e6e6 #bfbfbf;
+    border-bottom-color:            #b3b3b3;
+    -webkit-border-radius:          4px;
+    -moz-border-radius:             4px;
+    border-radius:                  4px;
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+    *zoom:                          1;
+    -webkit-box-shadow:             inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow:                inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow:                     inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.messi .btn:hover,
+.messi .btn:active,
+.messi .btn.active,
+.messi .btn.disabled,
+.messi .btn[disabled] {
+    background-color:               #e6e6e6;
+    *background-color:              #d9d9d9;
+}
+.messi .btn:active,
+.messi .btn.active {
+    background-color:               #cccccc \9;
+}
+.messi .btn:first-child {
+    *margin-left:                   0;
+}
+.messi .btn:hover {
+    color:                          #333333;
+    text-decoration:                none;
+    background-color:               #e6e6e6;
+    *background-color:              #d9d9d9;
+    background-position:            0 -15px;
+    -webkit-transition:             background-position 0.1s linear;
+    -moz-transition:                background-position 0.1s linear;
+    -ms-transition:                 background-position 0.1s linear;
+    -o-transition:                  background-position 0.1s linear;
+    transition:                     background-position 0.1s linear;
+}
+.messi .btn:focus {
+    outline:                        thin dotted #333;
+    outline:                        5px auto -webkit-focus-ring-color;
+    outline-offset:                 -2px;
+}
+.messi .btn.active,
+.messi .btn:active {
+    background-color:               #e6e6e6;
+    background-color:               #d9d9d9 \9;
+    background-image:               none;
+    outline:                        0;
+    -webkit-box-shadow:             inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow:                inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow:                     inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.messi .btn-primary,
+.messi .btn-primary:hover,
+.messi .btn-warning,
+.messi .btn-warning:hover,
+.messi .btn-danger,
+.messi .btn-danger:hover,
+.messi .btn-success,
+.messi .btn-success:hover,
+.messi .btn-info,
+.messi .btn-info:hover,
+.messi .btn-inverse,
+.messi .btn-inverse:hover {
+    color:                          #ffffff;
+    text-shadow:                    0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.messi .btn-primary.active,
+.messi .btn-warning.active,
+.messi .btn-danger.active,
+.messi .btn-success.active,
+.messi .btn-info.active,
+.messi .btn-inverse.active {
+    color:                          rgba(255, 255, 255, 0.75);
+}
+.messi .btn {
+    border-color:                   #ccc;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+.messi .btn-primary {
+    background-color:               #0074cc;
+    *background-color:              #0055cc;
+    background-image:               -ms-linear-gradient(top, #0088cc, #0055cc);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0055cc));
+    background-image:               -webkit-linear-gradient(top, #0088cc, #0055cc);
+    background-image:               -o-linear-gradient(top, #0088cc, #0055cc);
+    background-image:               -moz-linear-gradient(top, #0088cc, #0055cc);
+    background-image:               linear-gradient(top, #0088cc, #0055cc);
+    background-repeat:              repeat-x;
+    border-color:                   #0055cc #0055cc #003580;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#0088cc', endColorstr='#0055cc', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.messi .btn-primary:hover,
+.messi .btn-primary:active,
+.messi .btn-primary.active,
+.messi .btn-primary.disabled,
+.messi .btn-primary[disabled] {
+    background-color:               #0055cc;
+    *background-color:              #004ab3;
+}
+.messi .btn-primary:active,
+.messi .btn-primary.active {
+    background-color:               #004099 \9;
+}
+.messi .btn-warning {
+    background-color:               #faa732;
+    *background-color:              #f89406;
+    background-image:               -ms-linear-gradient(top, #fbb450, #f89406);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
+    background-image:               -webkit-linear-gradient(top, #fbb450, #f89406);
+    background-image:               -o-linear-gradient(top, #fbb450, #f89406);
+    background-image:               -moz-linear-gradient(top, #fbb450, #f89406);
+    background-image:               linear-gradient(top, #fbb450, #f89406);
+    background-repeat:              repeat-x;
+    border-color:                   #f89406 #f89406 #ad6704;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#fbb450', endColorstr='#f89406', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.messi .btn-warning:hover,
+.messi .btn-warning:active,
+.messi .btn-warning.active,
+.messi .btn-warning.disabled,
+.messi .btn-warning[disabled] {
+    background-color:               #f89406;
+    *background-color:              #df8505;
+}
+.messi .btn-warning:active,
+.messi .btn-warning.active {
+    background-color:               #c67605 \9;
+}
+.messi .btn-danger {
+    background-color:               #da4f49;
+    *background-color:              #bd362f;
+    background-image:               -ms-linear-gradient(top, #ee5f5b, #bd362f);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
+    background-image:               -webkit-linear-gradient(top, #ee5f5b, #bd362f);
+    background-image:               -o-linear-gradient(top, #ee5f5b, #bd362f);
+    background-image:               -moz-linear-gradient(top, #ee5f5b, #bd362f);
+    background-image:               linear-gradient(top, #ee5f5b, #bd362f);
+    background-repeat:              repeat-x;
+    border-color:                   #bd362f #bd362f #802420;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#ee5f5b', endColorstr='#bd362f', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.messi .btn-danger:hover,
+.messi .btn-danger:active,
+.messi .btn-danger.active,
+.messi .btn-danger.disabled,
+.messi .btn-danger[disabled] {
+    background-color:               #bd362f;
+    *background-color:              #a9302a;
+}
+.messi .btn-danger:active,
+.messi .btn-danger.active {
+    background-color:               #942a25 \9;
+}
+.messi .btn-success {
+    background-color:               #5bb75b;
+    *background-color:              #51a351;
+    background-image:               -ms-linear-gradient(top, #62c462, #51a351);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#51a351));
+    background-image:               -webkit-linear-gradient(top, #62c462, #51a351);
+    background-image:               -o-linear-gradient(top, #62c462, #51a351);
+    background-image:               -moz-linear-gradient(top, #62c462, #51a351);
+    background-image:               linear-gradient(top, #62c462, #51a351);
+    background-repeat:              repeat-x;
+    border-color:                   #51a351 #51a351 #387038;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#62c462', endColorstr='#51a351', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.messi .btn-success:hover,
+.messi .btn-success:active,
+.messi .btn-success.active,
+.messi .btn-success.disabled,
+.messi .btn-success[disabled] {
+    background-color:               #51a351;
+    *background-color:              #499249;
+}
+.messi .btn-success:active,
+.messi .btn-success.active {
+    background-color:               #408140 \9;
+}
+.messi .btn-info {
+    background-color:               #49afcd;
+    *background-color:              #2f96b4;
+    background-image:               -ms-linear-gradient(top, #5bc0de, #2f96b4);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2f96b4));
+    background-image:               -webkit-linear-gradient(top, #5bc0de, #2f96b4);
+    background-image:               -o-linear-gradient(top, #5bc0de, #2f96b4);
+    background-image:               -moz-linear-gradient(top, #5bc0de, #2f96b4);
+    background-image:               linear-gradient(top, #5bc0de, #2f96b4);
+    background-repeat:              repeat-x;
+    border-color:                   #2f96b4 #2f96b4 #1f6377;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#5bc0de', endColorstr='#2f96b4', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.messi .btn-info:hover,
+.messi .btn-info:active,
+.messi .btn-info.active,
+.messi .btn-info.disabled,
+.messi .btn-info[disabled] {
+    background-color:               #2f96b4;
+    *background-color:              #2a85a0;
+}
+.messi .btn-info:active,
+.messi .btn-info.active {
+    background-color:               #24748c \9;
+}
+.messi .btn-inverse {
+    background-color:               #414141;
+    *background-color:              #222222;
+    background-image:               -ms-linear-gradient(top, #555555, #222222);
+    background-image:               -webkit-gradient(linear, 0 0, 0 100%, from(#555555), to(#222222));
+    background-image:               -webkit-linear-gradient(top, #555555, #222222);
+    background-image:               -o-linear-gradient(top, #555555, #222222);
+    background-image:               -moz-linear-gradient(top, #555555, #222222);
+    background-image:               linear-gradient(top, #555555, #222222);
+    background-repeat:              repeat-x;
+    border-color:                   #222222 #222222 #000000;
+    border-color:                   rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter:                         progid:dximagetransform.microsoft.gradient(startColorstr='#555555', endColorstr='#222222', GradientType=0);
+    filter:                         progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.messi .btn-inverse:hover,
+.messi .btn-inverse:active,
+.messi .btn-inverse.active,
+.messi .btn-inverse.disabled,
+.messi .btn-inverse[disabled] {
+    background-color:               #222222;
+    *background-color:              #151515;
+}
+.messi .btn-inverse:active,
+.messi .btn-inverse.active {
+    background-color:               #080808 \9;
+}
+
+button.messi .btn,
+input[type="submit"].messi .btn {
+    *padding-top:                   2px;
+    *padding-bottom:                2px;
+}
+.messi button {
+    cursor:                         pointer;
+    -webkit-appearance:             button;
+}
+button.messi .btn::-moz-focus-inner {
+    padding:                        0;
+    border:                         0;
+}

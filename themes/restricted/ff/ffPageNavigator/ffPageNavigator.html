@@ -1,0 +1,85 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+<div class="pageNavigator {component}pageNavigator">
+	<!--BeginSectSelector-->
+	<div class="perPage">
+		{_frame_per_page}
+		<!--BeginSectSelectorPage-->
+		<a href="javascript:void(0)" class="selectors selector_{records_per_page}" onclick="ff.ffPageNavigator.goToPage('{XHRcomponent}', null, {records_per_page});">{records_per_page}</a>
+		<!--EndSectSelectorPage-->
+        <!--BeginSectSelectorPageAll-->
+        <a href="javascript:void(0)" class="selectors selector_all" onclick="ff.ffPageNavigator.goToPage('{XHRcomponent}', null, {totelem});">{_all_element}</a>
+        <!--EndSectSelectorPageAll-->
+        <!--BeginSectTotElem-->
+        <div class="totelem">{_on} <span>{totelem}</span></div>
+        <!--EndSectTotElem-->
+	</div>
+	<!--EndSectSelector-->
+	<div class="pages">
+		<!--BeginSectFirstButton-->
+		<a href="javascript:void(0)" class="first">&nbsp;</a>
+		<!--EndSectFirstButton-->
+		<!--BeginSectPrevFrameButton-->
+		<a href="javascript:void(0)" class="prev-frame">&nbsp;</a>
+		<!--EndSectPrevFrameButton-->
+		<!--BeginSectPrevButton-->
+		<a href="javascript:void(0)" class="prev">&nbsp;</a>
+		<!--EndSectPrevButton-->
+		<span class="{component}pagetemplate" style="display:none;"><a href="javascript:void(0)" class="page" onclick="ff.ffPageNavigator.goToPage('{XHRcomponent}', [page]);">[page]</a></span>
+		<!--BeginSectNextButton-->
+		<a href="javascript:void(0)" class="next">&nbsp;</a>
+		<!--EndSectNextButton-->
+		<!--BeginSectNextFrameButton-->
+		<a href="javascript:void(0)" class="next-frame">&nbsp;</a>
+		<!--EndSectNextFrameButton-->
+		<!--BeginSectLastButton-->
+		<a href="javascript:void(0)" class="last">&nbsp;</a>
+		<!--EndSectLastButton-->
+       </div>
+
+	<!--BeginSectChoice-->
+	<div class="choice">{_go_to_page}
+		<input type="text" onkeydown="
+			if (null == event)
+				event = window.event;
+			if (event.keyCode == 13)  {
+				ff.ffPageNavigator.goToPage('{XHRcomponent}', this.value);
+				return false;
+			}" value="{page}" size="1" class="currentpage" />&nbsp;/&nbsp;<span class="totpage">{tot_page}</span>
+	</div>
+	<!--EndSectChoice-->        
+</div> 
+<!--BeginSectFooters-->
+<script type="text/javascript"> 
+	<!--BeginSectNoXHRDialog-->
+	jQuery(function() {
+		ff.pluginAddInit("ff.ffPageNavigator", function () {
+			ff.ffPageNavigator.addNavigator({
+				"id"							: "{XHRcomponent}"
+				, "page_parname"				: "{page_parname}"
+				, "rec_per_page_parname"		: "{records_per_page_parname}"
+				, "rec_per_page"				: {selected_records_per_page}
+				, "page_per_frame"				: {page_per_frame}
+				, "page"						: {selected_page}
+				, "totrec"						: {totrec}
+				, "doAjax"						: {doAjax}
+			});
+		});
+	});
+	<!--EndSectNoXHRDialog-->
+	<!--BeginSectXHRDialog-->
+	ff.pluginAddInit("ff.ffPageNavigator", function () {
+		ff.ffPageNavigator.addNavigator({
+			"id"							: "{XHRcomponent}"
+			, "page_parname"				: "{page_parname}"
+			, "rec_per_page_parname"		: "{records_per_page_parname}"
+			, "rec_per_page"				: {selected_records_per_page}
+			, "page_per_frame"				: {page_per_frame}
+			, "page"						: {selected_page}
+			, "totrec"						: {totrec}
+			, "doAjax"						: {doAjax}
+		});
+	});
+	<!--EndSectXHRDialog-->
+</script>
+<!--EndSectFooters-->
