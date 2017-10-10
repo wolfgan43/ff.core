@@ -4,7 +4,7 @@
 * @category Common Functions Class
 * @desc ffTemplate.php - Forms Framework Template Engine
 * @author Samuele Diella <samuele.diella@gmail.com>
-* @copyright Copyright &copy; 2004-2016, Samuele Diella
+* @copyright Copyright &copy; 2004-2017, Samuele Diella
 * @license https://opensource.org/licenses/LGPL-3.0
 * @link http://www.formsphpframework.com
 * @version v2, alpha
@@ -230,7 +230,7 @@ class ffTemplate
 			$this->DBlockVars = $res["DBlockVars"];
 		}
 		
-		$res = self::$_events->doEvent("on_loaded_data", array($this));
+		self::$_events->doEvent("on_loaded_data", array($this));
 	}
 
 	function load_content($content, $root_element = null)
@@ -248,8 +248,8 @@ class ffTemplate
 			$this->SetBlock($this->root_element, $nName);
 			$nName = $this->NextDBlockName($this->root_element);
 		}
-		
-		$res = self::$_events->doEvent("on_loaded_data", array($this));
+
+		self::$_events->doEvent("on_loaded_data", array($this));
 	}
 	
 	function getDVars()
@@ -683,7 +683,7 @@ class ffTemplate
 		$rc = end($res);
 		if ($rc !== null)
 			return $rc;
-            
+
 		if (ffTemplate::$_MultiLang_db === null)
 			ffTemplate::$_MultiLang_db = ffDb_Sql::factory();
 	
@@ -723,13 +723,11 @@ class ffTemplate
             else
                 $session_parameter = ffTemplate::$_MultiLang_session_parameter;
 
-            if (strlen($session_parameter) && isset($_SESSION[$session_parameter]))
-            {
+            if (strlen($session_parameter) && isset($_SESSION[$session_parameter])) {
                 $language = $_SESSION[$session_parameter];
             }
         }
-		//.. fino a qui
-		
+        //.. fino a qui
 		if (!strlen($language))
 		{
 			if ($tpl !== null && $tpl->MultiLang_default !== null)

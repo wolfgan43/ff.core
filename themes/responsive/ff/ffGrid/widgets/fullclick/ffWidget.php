@@ -11,10 +11,16 @@ class ffWidget_fullclick extends ffCommon
 	var $class			= "ffWidget_fullclick";
 
 	var $widget_deps	= array();
+
+	var $libraries		= array();
+
     var $js_deps = array(
-							  "jquery" 			=> null
+							"ff.ffGrid.fullclick" => null
 						);
-	var $css_deps = array();
+	var $css_deps = array(
+		
+	);
+	
 	// PRIVATE VARS
 
 	var $source_path		= null;
@@ -47,7 +53,7 @@ class ffWidget_fullclick extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -55,20 +61,16 @@ class ffWidget_fullclick extends ffCommon
 
 	function process(ffGrid_base $grid)
 	{
-		$tpl_id = $grid->id;
+		$tpl_id = $grid->getIDIF();
 		if (!isset($this->tpl[$tpl_id]))
 			$this->prepare_template($tpl_id);
 		
-		$this->tpl[$tpl_id]->set_var("component", $grid->id);
+		$this->tpl[$tpl_id]->set_var("component", $grid->getIDIF());
 		$this->tpl[$tpl_id]->parse("SectIstance", true);
 	}
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("ff.ffGrid.fullclick", "fullclick.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/fullclick"); 
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -85,12 +87,6 @@ class ffWidget_fullclick extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("ff.ffGrid.fullclick", "fullclick.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/fullclick");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

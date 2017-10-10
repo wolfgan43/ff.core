@@ -3,7 +3,7 @@
  * @package theme_responsive
  * @subpackage widgets
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
@@ -12,7 +12,7 @@
  * @package theme_responsive
  * @subpackage widgets
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
@@ -26,32 +26,18 @@ class ffWidget_actex extends ffCommon
 	
 	var $class			= "ffWidget_actex";
 
-	var $widget_deps	= array(array("name" => "dialog"));
+	var $widget_deps	= array(
+		array(
+			"name" => "dialog"
+		)
+	);
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							/*, "jquery.ui"					=> null*/
-/*							, "ff.ffField.actex"	=> array(
-									"file" => "actex.js"
-									, "path" => "/themes/responsive/ff/ffField/widgets/actex"  
-								)*/
+                              "ff.ffField.actex"       => null
 						);
-    var $css_deps 		= array(
-                             /* "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.autocomplete"        => array(
-                                      "file" => "jquery.ui.autocomplete.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
-    					);
+    var $css_deps 		= array();
 
 	var $disable_dialog = false;
 	
@@ -92,7 +78,7 @@ class ffWidget_actex extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -107,14 +93,15 @@ class ffWidget_actex extends ffCommon
 	{
 		global $plgCfg_ActiveComboEX_UseOwnSession;
         
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
-			$Field->parent[0]->processed_widgets[$Field->parent[0]->id . "_" . $id] = "actex";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "actex";
 		}
 		else
 		{
@@ -141,12 +128,19 @@ class ffWidget_actex extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 
+		if ($Field->actex_autocomp) {
+			$Field->parent_page[0]->tplAddJs("jquery-ui");
+			//if($Field->parent_page[0]->jquery_ui_theme) {
+				$this->oPage[0]->tplAddCss("jquery-ui.theme");
+				$this->oPage[0]->tplAddCss("jquery-ui.menu");
+				$this->oPage[0]->tplAddCss("jquery-ui.autocomplete");
+				$this->oPage[0]->tplAddCss("jquery-ui.button");
+			//}		
 		
-		if ($Field->actex_autocomp)
 			$this->tpl[$tpl_id]->set_var("autocomp_enable", "true");
-		else
+		} else {
 			$this->tpl[$tpl_id]->set_var("autocomp_enable", "false");
-
+		}
 		if ($Field->actex_autocomp_ajax)
 			$this->tpl[$tpl_id]->set_var("autocomp_ajax", "true");
 		else
@@ -181,8 +175,15 @@ class ffWidget_actex extends ffCommon
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/actex");
 
-		//$count_editable = 0;
-		if ($Field->actex_update_from_db && $Field->actex_dialog && $Field->actex_dialog_show_add && !$this->disable_dialog && strlen($Field->actex_dialog_url))
+		$dialog_url = $Field->actex_dialog_url;
+		$params = $Field->actex_dialog_add_params;
+		if (
+				$Field->actex_update_from_db 
+				&& $Field->actex_dialog 
+				&& $Field->actex_dialog_show_add 
+				&& !$this->disable_dialog 
+				&& strlen($Field->actex_dialog_url)
+			)
 		{
 			if (strlen($Field->actex_dialog_title))
 				$dialog_title = $Field->actex_dialog_title;
@@ -190,22 +191,36 @@ class ffWidget_actex extends ffCommon
 				$dialog_title = $Field->label;
 			else
 				$dialog_title = $Field->id;
+			
+			if (strpos($dialog_url, "?") === false)
+				$dialog_url .= "?" . $Field->parent_page[0]->get_globals();
+			elseif (substr($dialog_url, -1) !== "&")
+				$dialog_url .= "&";
+			if(is_array($params) && count($params)) 
+			{
+				foreach ($params as $param_key => $param_value)
+				{
+					if ($param_value === null)
+						$dialog_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+					else
+						$dialog_url .= $param_key . "=[[" . $param_value . "]]&";
+				}
+			}
 
-			$link = $Field->parent_page[0]->widgets["dialog"]->process(
+			$this->tpl[$tpl_id]->set_var("dialogaddlink", $Field->parent_page[0]->widgets["dialog"]->process(
 					"actex_dlg_" . $prefix . $id
 					, array(
 							"title"			=> $dialog_title
-							, "url"			=> $Field->actex_dialog_url
+							, "url"			=> $dialog_url
 							/*, "name"		=> '<img alt="add" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_add .'"' . (strlen($Field->actex_dialog_title_add)  ? ' title="' . $Field->actex_dialog_title_add . '"' : '') . ' />'*/
 							//, "callback"	=> (count($Field->resources) ? "ff.ffField.actex.dialog_success('" . $prefix . $id . "', '" . $Field->resources[0] . "')" : "")
 							, "tpl_id"		=> $tpl_id
-							, "addjs"		=> "javascript:ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
+							, "addjs"		=> "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
 							, "class"		=> cm_getClassByFrameworkCss("addnew", "icon", array("class" => "hidden " . cm_getClassByFrameworkCss("control-prefix", "form")))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogaddlink"
 						)
 					, $Field->parent_page[0]
-				);
-			$this->tpl[$tpl_id]->set_var("dialogaddlink", $link);
+				));
 			//$this->tpl[$tpl_id]->parse("SectDialog", false);
 			
 			//$count_editable++;
@@ -240,7 +255,7 @@ class ffWidget_actex extends ffCommon
 				$dialog_edit_title = $Field->id;
 
 			if (strpos($edit_url, "?") === false)
-				$edit_url .= "?";
+				$edit_url .= "?" . $Field->parent_page[0]->get_globals();
 			elseif (substr($edit_url, -1) !== "&")
 				$edit_url .= "&";
 			if(is_array($params) && count($params)) 
@@ -256,7 +271,7 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->set_var("dialogeditlink", $Field->parent_page[0]->widgets["dialog"]->process(
 					"actex_dlg_edit_" . $prefix . $id
 					, array(
-							"title"			=> $dialog_title
+							"title"			=> $dialog_edit_title
 							, "url"			=> $edit_url
 							/*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_edit_" . $Field->parent[0]->id . "_" . $Field->id . "')"
@@ -277,15 +292,16 @@ class ffWidget_actex extends ffCommon
 		}
 
 		$params = ($Field->actex_dialog_delete_params ? $Field->actex_dialog_delete_params : $Field->actex_dialog_edit_params);
+		$delete_url = ($Field->actex_dialog_delete_url ? $Field->actex_dialog_delete_url : ($Field->actex_dialog_edit_url ? $Field->actex_dialog_edit_url : $Field->actex_dialog_url));
 		if (
 				$Field->actex_update_from_db
 				&& $Field->actex_dialog
 				&& $Field->actex_dialog_show_delete
 				&& !$this->disable_dialog
-				&& strlen($Field->actex_dialog_delete_url)
+				&& $delete_url
 				&& (
 						(is_array($params) && count($params))
-						|| (strpos($Field->actex_dialog_delete_url, "[[") !== false)
+						|| (strpos($delete_url, "[[") !== false)
 					)
 			)
 		{
@@ -298,13 +314,16 @@ class ffWidget_actex extends ffCommon
 			else
 				$dialog_delete_title = $Field->id;
 
-			$delete_url = $Field->actex_dialog_delete_url;
+			if (strpos($delete_url, "?") === false)
+				$delete_url .= "?" . $Field->parent_page[0]->get_globals();
+			if (substr($delete_url, -1) !== "&")
+				$delete_url .= "&";
+			
+			if ($Field->actex_dialog_delete_idcomp)
+				$delete_url .= "frmAction=" . $Field->actex_dialog_delete_idcomp . "_confirmdelete&";
+
 			if (is_array($params) && count($params))
 			{
-				if (strpos($delete_url, "?") === false)
-					$delete_url .= "?";
-				elseif (substr($delete_url, -1) !== "&")
-					$delete_url .= "&";
 				foreach ($params as $param_key => $param_value)
 				{
 					if ($param_value === null)
@@ -314,7 +333,8 @@ class ffWidget_actex extends ffCommon
 				}
 			}
 
-			if(method_exists($Field->parent[0], "dialog")) {
+			if(method_exists($Field->parent[0], "dialog"))  // ??? obsoleto probabilmente
+			{
 				$dialog_delete = $Field->parent[0]->dialog(
 													  true
 													, "yesno"
@@ -323,7 +343,9 @@ class ffWidget_actex extends ffCommon
 													, "[CLOSEDIALOG]"
 													, $delete_url
 												);
-			} else {
+			} 
+			else 
+			{
 				$dialog_delete = ffDialog(true, "yesno", $dialog_delete_title, $Field->actex_dialog_delete_message, "[CLOSEDIALOG]", $delete_url, "/dialog");
 			}
 			
@@ -367,7 +389,7 @@ class ffWidget_actex extends ffCommon
 		
 		if ($Field->actex_father === null)
 			$father = null;
-		else if (isset($Field->cont_array[$Field->actex_father]))
+		else if (ffIsset($Field->cont_array, $Field->actex_father))
 			$father = $Field->cont_array[$Field->actex_father];
 		else
 			$father = $Field->actex_father[0];
@@ -419,8 +441,11 @@ class ffWidget_actex extends ffCommon
 			reset($child);
 		}
 
+		if(!is_array($Field->properties))
+			$Field->properties = array();
+
 		$property_set = $Field->properties;
-		if (is_array($property_set) && isset($property_set["onchange"]))
+		if (isset($property_set["onchange"]))
 			ffErrorHandler::raise("DEPRECATED - use ->actex_on_change instead", E_USER_ERROR, $this, get_defined_vars());
 
 		$this->tpl[$tpl_id]->set_var("properties", str_replace("'", "\'", $Field->getProperties($property_set)));
@@ -455,9 +480,6 @@ class ffWidget_actex extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("limit_select", "false");
 
-		if(!is_array($Field->properties))
-			$Field->properties = array();
-		
 		if (strlen($Field->properties["disabled"]))
 			$this->tpl[$tpl_id]->set_var("disabled", "true");
 		else
@@ -467,19 +489,18 @@ class ffWidget_actex extends ffCommon
 
         // TODO: mettere un parametro nell'activecombo
 		if($Field->control_type == "")
-			$Field->control_type = "combo";
-
-		$this->tpl[$tpl_id]->set_var("control_type", $Field->get_control_type());
+			$this->tpl[$tpl_id]->set_var("control_type", "combo");
+		else
+			$this->tpl[$tpl_id]->set_var("control_type", $Field->get_control_type());
 
         if ($Field->actex_add_plus)
             $this->tpl[$tpl_id]->set_var("add_plus", "true");
         else
             $this->tpl[$tpl_id]->set_var("add_plus", "false");
-
         
         if($Field->actex_hide_empty === true)
             $this->tpl[$tpl_id]->set_var("hide_empty", "true");
-        elseif(strlen($Field->actex_hide_empty))
+        elseif($Field->actex_hide_empty)
             $this->tpl[$tpl_id]->set_var("hide_empty", "'" . $Field->actex_hide_empty . "'");
 		else
             $this->tpl[$tpl_id]->set_var("hide_empty", "false");
@@ -505,7 +526,13 @@ class ffWidget_actex extends ffCommon
         $this->tpl[$tpl_id]->set_var("actex_multi_container", cm_getClassByFrameworkCss("group", "list", "actex-multi"));	
         $this->tpl[$tpl_id]->set_var("actex_multi_item", cm_getClassByFrameworkCss("item", "list"));	
         $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "list"));	
-
+            
+		if ($Field->actex_reset_childs) {
+			$this->tpl[$tpl_id]->set_var("reset_childs", "true");
+		} else {
+			$this->tpl[$tpl_id]->set_var("reset_childs", "false");
+		}        
+        
         if(is_array($Field->actex_plugin) 
         	&& count($Field->actex_plugin)
         	&& strlen($Field->actex_plugin["name"])
@@ -534,13 +561,13 @@ class ffWidget_actex extends ffCommon
         	$this->tpl[$tpl_id]->set_var("SectControlLabel", "");
 		}
 
-		$default_empty = new ffData("", $Field->base_type);
+        //$default_empty = new ffData("", $Field->base_type);
 		if ($Field->multi_select_one && !$Field->multi_limit_select)
 		{
-			if ($Field->multi_select_one_val !== null && !$Field->multi_limit_select)
+			if ($Field->multi_select_one_val !== null)
 				$this->tpl[$tpl_id]->set_var("select_one_val", $Field->multi_select_one_val->getValue($Field->get_app_type(), $Field->get_locale()));
 			else
-				$this->tpl[$tpl_id]->set_var("select_one_val", $default_empty->getValue($Field->get_app_type(), $Field->get_locale()));
+				$this->tpl[$tpl_id]->set_var("select_one_val", "");
 			$this->tpl[$tpl_id]->set_var("select_one_label", $Field->multi_select_one_label);
 			$this->tpl[$tpl_id]->set_var("select_one", "true");
 		}
@@ -556,7 +583,7 @@ class ffWidget_actex extends ffCommon
 			if ($Field->multi_select_noone_val !== null)
 				$this->tpl[$tpl_id]->set_var("select_noone_val", $Field->multi_select_noone_val->getValue($Field->get_app_type(), $Field->get_locale()));
 			else
-				$this->tpl[$tpl_id]->set_var("select_noone_val", $default_empty->getValue($Field->get_app_type(), $Field->get_locale()));
+				$this->tpl[$tpl_id]->set_var("select_noone_val", "");
 			$this->tpl[$tpl_id]->set_var("select_noone_label", $Field->multi_select_noone_label);
 			$this->tpl[$tpl_id]->set_var("select_noone", "true");
 		}
@@ -565,10 +592,6 @@ class ffWidget_actex extends ffCommon
 			
 		$this->tpl[$tpl_id]->set_var("SectData", "");
 		$this->tpl[$tpl_id]->set_var("data_src", "");		
-       /* if($Field->actex_service)
-            $this->tpl[$tpl_id]->set_var("data_src", md5($Field->actex_service));
-        else
-		    $this->tpl[$tpl_id]->set_var("data_src", ""); */
 		$no_rec = true;
 		
 		if (strlen($tmp_sql = $Field->getSQL()) && $Field->actex_update_from_db)
@@ -579,13 +602,12 @@ class ffWidget_actex extends ffCommon
                 
 			    if (!defined("FF_ACTEX_SESSION_STARTED") && ($plgCfg_ActiveComboEX_UseOwnSession || $Field->actex_use_own_session))
 			    {
-				    if (!isset($_COOKIE[session_name()]))
-				    {
-					    if (isset($_POST[session_name()]))
-						    session_id($_POST[session_name()]);
-					    elseif (isset($_GET[session_name()]))
-						    session_id($_GET[session_name()]);
-				    }
+				   if (isset($_POST[session_name()]))
+						session_id($_POST[session_name()]);
+					elseif (isset($_GET[session_name()]))
+						session_id($_GET[session_name()]);
+					elseif (isset($_COOKIE[session_name()]))
+						session_id($_COOKIE[session_name()]);
 				    session_start();
 				    if (!defined("FF_ACTEX_SESSION_STARTED"))
 					    define("FF_ACTEX_SESSION_STARTED", true);
@@ -602,8 +624,17 @@ class ffWidget_actex extends ffCommon
 			    $ff["actex"][$tmp]["main_db"] 						= $Field->actex_use_main_db;
 			    $ff["actex"][$tmp]["hide_result_on_query_empty"] 	= $Field->actex_hide_result_on_query_empty;
 			    $ff["actex"][$tmp]["preserve_field"] 				= $Field->actex_preserve_field;
+			    $ff["actex"][$tmp]["crypt"] 						= $Field->crypt;
+			    $ff["actex"][$tmp]["crypt_modsec"] 					= $Field->crypt_modsec;
 			    $ff["actex"][$tmp]["limit"] 						= null;
-			    
+				$ff["actex"][$tmp]["crypt_concat"] 					= $Field->crypt_concat;
+			    $ff["actex"][$tmp]["multi_crypt"] 					= $Field->multi_crypt;
+			    $ff["actex"][$tmp]["multi_crypt_modsec"] 			= $Field->multi_crypt_modsec;
+			    $ff["actex"][$tmp]["multi_crypt_concat"] 			= $Field->multi_crypt_concat;
+			    $ff["actex"][$tmp]["limit"] 						= ($Field->actex_autocomp
+			    														? $Field->actex_limit
+			    														: null
+			    													);
 			    //$ff["actex"][$tmp]["preserve_having"] = $Field->actex_preserve_having;
 			    set_session("ff", $ff);
 
@@ -714,6 +745,7 @@ class ffWidget_actex extends ffCommon
             $arrValue = explode($Field->grouping_separator, $value->getValue($Field->get_app_type(), $Field->get_locale()));
 
             if(is_array($arrValue) && count($arrValue)) {
+                $strCompare = "";
                 foreach($arrValue AS $value_part) {
                     if($Field->extended_type == "Selection") {
                     	$desc = $Field->getDisplayValue(null, $Field->get_locale(), new ffData($value_part, $Field->get_app_type(), $Field->get_locale()));
@@ -758,10 +790,11 @@ class ffWidget_actex extends ffCommon
 				$db->query($sSQL);
             	if($db->nextRecord()) 
             	{
+                    $sSqlWhere = "";
+                    $sSqlHaving = "";
+
             		$condition = 0;
-            		//echo $Field->actex_father;
 					$field_key = ($Field->actex_compare_field ? $Field->actex_compare_field : "`" . $db->fields_names[0] . "`"); //se tolto lo 0 && da enormi problemi con il recupero del default valorizzato vedi vgallery extras modify campo ID_extended_type quando e ti tipo string gia valorizzato nel db
-					//echo $field_key . " asd " . (0 && $Field->actex_related_field ? $Field->actex_related_field : "`" . $db->fields_names[0] . "`") . "<br>";
 					$field_key_having = ($Field->actex_having_field ? $Field->actex_having_field : $field_key);
 				
 					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
@@ -839,7 +872,7 @@ class ffWidget_actex extends ffCommon
 									$arrSelectedValue[$arrData[$label]["value"]] = $arrData[$label]["value"];
 									$arrSelectedLabel[] = $arrData[$label]["label"];
 								}									
-
+								
 								if($Field->actex_group && $db->record[$Field->actex_group])
 								{
 									$arrData[$label]["group"] = ffCommon_charset_encode($db->getField($Field->actex_group, "Text", true));
@@ -867,7 +900,7 @@ class ffWidget_actex extends ffCommon
 							if(!count($arrSelectedValue)) {
 								$arrSelectedValue = $arrOrigValue;
 								$arrSelectedLabel = $arrOrigLabel;
-							}
+							}							
 						}
 					}
 				}
@@ -877,7 +910,7 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->set_var("selected_label", implode(",", $arrSelectedLabel));
 		}		
 		
-//print_r($arrSelectedValue);		
+
 		$this->tpl[$tpl_id]->set_var("SectMulti", "");
 		$this->tpl[$tpl_id]->set_var("SectMultiElem", "");
 		if($Field->actex_multi)
@@ -926,13 +959,6 @@ class ffWidget_actex extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.actex", "actex.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/actex");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -949,15 +975,6 @@ class ffWidget_actex extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.actex", "actex.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/actex");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

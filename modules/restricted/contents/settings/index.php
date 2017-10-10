@@ -11,15 +11,18 @@ $globals = ffGlobals::getInstance("__mod_restricted__");
 
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->id = "settings";
-$oRecord->title = "Settings";
+//$oRecord->title = "Settings";
 $oRecord->buttons_options["insert"]["label"] = "Save Settings";
 $oRecord->buttons_options["cancel"]["display"] = false;
 $oRecord->addEvent("on_done_action", "settings_on_do_action");
 $oRecord->skip_action = true;
-$oRecord->tab = "left";
+$oRecord->tab = "right";
 
 if(is_file(FF_DISK_PATH . FF_THEME_DIR . "/" . $cm->oPage->getTheme() . "/javascript/cm-settings.js")) {
-	//$cm->oPage->tplAddJs("cmsettings", "cm-settings.js", FF_THEME_DIR . "/" . $cm->oPage->getTheme() . "/javascript");
+	$cm->oPage->tplAddJs("cmsettings", array(
+		"file" => "cm-settings.js"
+		, "path" => FF_THEME_DIR . "/" . $cm->oPage->getTheme() . "/javascript"
+	));
 }
 
 $db = ffDB_Sql::factory();
@@ -50,16 +53,22 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 	if(strlen($path_info) && strpos($key, $path_info) !== 0) {
 		continue;
 	}
-	if (!isset($oRecord->groups[$key])) {
+	if (!isset($oRecord->groups[$key]))
+	{
 		$oRecord->addContent(null, true, $key);
 
 	    $oRecord->groups[$key]["title"] = ($value->label ? $value->label: $key);
-        $oRecord->groups[$key]["tab"] = $key;
-        $oRecord->setTabTitle($key, ($value->label ? $value->label: $key));   
+	    if ($value->tab)
+	    {
+	    	$tabid = ($value->tab === true ? $key : $value->tab);
+        	$oRecord->groups[$key]["tab"] = $tabid;
+        	$oRecord->setTabTitle($tabid, ($value->label ? $value->label: $key));
+        }
     }
+    
 	foreach (get_object_vars($value) as $subkey => $subvalue)
 	{
-		if (!is_object($subvalue)) continue;
+		if (!is_object($subvalue) || is_callable($subvalue)) continue;
 		
 		if (isset($subvalue->acl))
 		{
@@ -126,10 +135,13 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 		if (strlen($subvalue->base_type))
 			$oField->base_type = $subvalue->base_type;
 
+		if (strlen($subvalue->base_type))
+			$oField->app_type = $subvalue->app_type;
+
 		if(strlen($subvalue->source_SQL)) {
 			$subvalue->source_SQL = str_replace("[ID_DOMAINS]", $globals->DomainID, $subvalue->source_SQL);
 			$subvalue->source_SQL = str_replace("[FF_PREFIX]", FF_PREFIX, $subvalue->source_SQL);
-			$subvalue->source_SQL = str_replace("[FF_SUPPORT_PREFIX]", FF_SUPPORT_PREFIX, $subvalue->source_SQL);
+            $subvalue->source_SQL = str_replace("[FF_SUPPORT_PREFIX]", FF_SUPPORT_PREFIX, $subvalue->source_SQL);
 			$subvalue->source_SQL = str_replace("[CM_TABLE_PREFIX]", CM_TABLE_PREFIX, $subvalue->source_SQL);
 			$subvalue->source_SQL = str_replace("[FF_LOCALE]", FF_LOCALE, $subvalue->source_SQL);
 			$subvalue->source_SQL = str_replace("[FF_DATABASE_NAME]", FF_DATABASE_NAME, $subvalue->source_SQL);
@@ -139,6 +151,23 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 		{
 			$oField->db[0] = mod_security_get_main_db();
 		}
+		
+		if (isset($subvalue->description))
+			$oField->description = $subvalue->description;
+		
+		if ($subvalue->crypt)
+			$oField->crypt = ($subvalue->crypt == "true" || intval($subvalue->crypt) ? true : false);
+		if ($subvalue->crypt_concat)
+			$oField->crypt_concat = ($subvalue->crypt_concat == "true" || intval($subvalue->crypt_concat) ? true : false);
+		if ($subvalue->crypt_modsec)
+			$oField->crypt_modsec = ($subvalue->crypt_modsec == "true" || intval($subvalue->crypt_modsec) ? true : false);
+		
+		if ($subvalue->multi_crypt)
+			$oField->multi_crypt = ($subvalue->multi_crypt == "true" || intval($subvalue->multi_crypt) ? true : false);
+		if ($subvalue->multi_crypt_concat)
+			$oField->multi_crypt_concat = ($subvalue->multi_crypt_concat == "true" || intval($subvalue->multi_crypt_concat) ? true : false);
+		if ($subvalue->multi_crypt_modsec)
+			$oField->multi_crypt_modsec = ($subvalue->multi_crypt_modsec == "true" || intval($subvalue->multi_crypt_modsec) ? true : false);
 		
 		switch (strtolower($subvalue->extended_type))
 		{
@@ -157,6 +186,10 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 				$oField->unchecked_value = new ffData("0");
 				break;
 
+			case "password":
+				$oField->extended_type = "Password";
+				break;
+
 			case "selection":
 				$oField->extended_type = "Selection";
 				$oField->source_DS = $subvalue->source_DS;
@@ -165,6 +198,20 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
                     $oField->multi_select_one = ($subvalue->select_one == "true" ? true : false);
                 if(isset($subvalue->select_one_label))
                     $oField->multi_select_one_label = $subvalue->select_one_label;
+				
+				if (isset($subvalue->pair) && count($subvalue->pair))
+				{
+					$oField->multi_pairs = array();
+					if (count($subvalue->pair) === 1)
+					{
+						$oField->multi_pairs[] = array(new ffData($subvalue->pair->key, $oField->base_type), new ffData($subvalue->pair->value, $oField->get_app_type()));
+					}
+					else foreach ($subvalue->pair as $value)
+					{
+						$oField->multi_pairs[] = array(new ffData($value->key, $oField->base_type), new ffData($value->value, $oField->get_app_type()));
+					}
+				}
+				
 				break;
 				
             case "selectionpath":
@@ -200,8 +247,9 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 			
 			case "activecombo":
 			case "activecomboex":
+			case "actex":
 				// OBSOLETO
-				$oField->widget = "activecomboex";
+				$oField->widget = "actex";
 				$oField->actex_update_from_db = true;
 				$oField->source_SQL = $subvalue->source_SQL;
 				if ($subvalue->main_db == "true")
@@ -226,6 +274,7 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 		switch (strtolower($subvalue->widget))
 		{
 			case "activecomboex":
+			case "actex":
 				$oField->source_DS = $subvalue->source_DS;
 				$oField->source_SQL = $subvalue->source_SQL;
 				$oField->actex_update_from_db = $subvalue->actex_update_from_db;
@@ -288,35 +337,44 @@ function settings_on_do_action ($oRecord, $frmAction)
 				foreach (get_object_vars($value) as $subkey => $subvalue)
 				{
 					if (!is_object($subvalue) || !isset($oRecord->form_fields[$subkey])) continue;
-                                        
-                                        $sSQL = "SELECT ID
-                                                    FROM " . CM_TABLE_PREFIX . "mod_restricted_settings
-                                                    WHERE name = " . $db->toSql($subkey) . "
-                                                        AND ID_domains = " . $db->toSql($globals->DomainID);
-                                        $db->query($sSQL);
-                                        if($db->nextRecord()) {
-                                            $sSQL = "UPDATE " . CM_TABLE_PREFIX . "mod_restricted_settings
-                                                                    SET
-                                                                            value = " . $db->toSql($oRecord->form_fields[$subkey]->value) . "
-                                                                    WHERE
-                                                                            name = " . $db->toSql($subkey) . "
-                                                                            AND
-                                                                            ID_domains = " . $db->toSql($globals->DomainID) . "
-                                                    ";
-                                            $db->execute($sSQL);
-                                        } else {
-                                            $sSQL = "INSERT INTO " . CM_TABLE_PREFIX . "mod_restricted_settings
-                                                                    (
-                                                                            ID_domains
-                                                                            , name
-                                                                            , value
-                                                                    ) VALUES (
-                                                                            " . $db->toSql($globals->DomainID) . "
-                                                                            , " . $db->toSql($subkey) . "
-                                                                            , " . $db->toSql($oRecord->form_fields[$subkey]->value) . "
-                                                                    )
-                                                    ";
-                                            $db->execute($sSQL);
+					
+					$tmp_val = $oRecord->form_fields[$subkey]->value;
+					if ($oRecord->form_fields[$subkey]->crypt)
+					{
+						if ($oRecord->form_fields[$subkey]->crypt_modsec)
+						{
+							$tmp_val = mod_sec_crypt_string($tmp_val);
+						}
+					}
+
+					$sSQL = "SELECT ID
+								FROM " . CM_TABLE_PREFIX . "mod_restricted_settings
+								WHERE name = " . $db->toSql($subkey) . "
+									AND ID_domains = " . $db->toSql($globals->DomainID);
+					$db->query($sSQL);
+					if($db->nextRecord()) {
+						$sSQL = "UPDATE " . CM_TABLE_PREFIX . "mod_restricted_settings
+												SET
+														value = " . $db->toSql($tmp_val) . "
+												WHERE
+														name = " . $db->toSql($subkey) . "
+														AND
+														ID_domains = " . $db->toSql($globals->DomainID) . "
+								";
+						$db->execute($sSQL);
+					} else {
+						$sSQL = "INSERT INTO " . CM_TABLE_PREFIX . "mod_restricted_settings
+												(
+														ID_domains
+														, name
+														, value
+												) VALUES (
+														" . $db->toSql($globals->DomainID) . "
+														, " . $db->toSql($subkey) . "
+														, " . $db->toSql($tmp_val) . "
+												)
+								";
+						$db->execute($sSQL);
 					}
 				}
 			}

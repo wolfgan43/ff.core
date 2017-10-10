@@ -1,6 +1,12 @@
 <?php
 class ffWidget_gmap3
 {
+/*
+Il file che crea i gruppi (ipoteticamente da eseguire una volta ogni tot) � /contents/gmg.php (in alto trovi i parametri per decidere come creare i gruppi).
+Il servizio che restituisce i gruppi � /services/poi/groups.php
+Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
+*/
+
 
 	// ---------------------------------------------------------------
 	//  PRIVATE VARS (used by code, don't touch or may be explode! :-)
@@ -9,7 +15,10 @@ class ffWidget_gmap3
 	var $class			= "ffWidget_gmap3"; 
 
 	var $widget_deps	= array();
-    var $js_deps = array();
+
+	var $libraries		= array();
+	
+    var $js_deps		= array();
     var $css_deps 		= array();
 
 	// PRIVATE VARS
@@ -20,8 +29,6 @@ class ffWidget_gmap3
 	var $oPage = null;
 	var $source_path	= null;
 	var $style_path = null;
-	
-	var $framework_css		= array();
 	
 	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
 	{
@@ -47,22 +54,29 @@ class ffWidget_gmap3
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-
+			
+		$cm = cm::getInstance();
+		if ($cm->oPage->compact_js)
+			$cm->oPage->tplAddJs("ff.ffField.gmap3.async");
+		else
+			$cm->oPage->tplAddJs("ff.ffField.gmap3.sync");			
 	}
 	
 	function process($id, &$value, ffField_base &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "gmap3";
 		}
 		else
 		{
@@ -97,10 +111,10 @@ class ffWidget_gmap3
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/gmap3"); 
 
 		$this->tpl[$tpl_id]->set_var("key", $Field->gmap_key);
+		$this->tpl[$tpl_id]->set_var("sensor", (0 ? "true" : "false"));
 		
 		$this->tpl[$tpl_id]->set_var("region", (strlen($Field->gmap_region) ? $Field->gmap_region : ""));
 		
-		//$this->oPage[0]->tplAddJs("google.maps", "js?key=" . $Field->gmap_key . "&sensor=false" . (strlen($Field->gmap_region) ? "&region=" . $Field->gmap_region : "") . "&language=" . strtolower(substr(FF_LOCALE, 0, -1)), "http://maps.google.com/maps/api", false, $_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest");
 /*
 		if ($Field->gmap_draggable)
 			$this->tpl[$tpl_id]->set_var("draggable", "true");
@@ -287,11 +301,6 @@ class ffWidget_gmap3
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.gmap3", "gmap.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/gmap3");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -308,13 +317,6 @@ class ffWidget_gmap3
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.gmap3", "gmap.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/gmap3");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

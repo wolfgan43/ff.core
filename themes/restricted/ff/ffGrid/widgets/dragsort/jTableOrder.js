@@ -8,30 +8,24 @@
 			/* public methods */
 			this.construct = function(id) {
 				return this.each(function() {
-
+                    
 					var table = jQuery(".ffGrid", this).get(0);
 					if(table === undefined) 
                         return;
 
-                    if(!table.tHead && !table.tBodies) return;
+                    if(!table.tHead || !table.tBodies) return;
 
 					var $table = jQuery(table);
 					var sort_params = ff.ffGrid.dragsort.inst.get(id);
 
-					$table.find("> tbody > tr").each(function (index) {
+					$table.find("tbody tr").each(function (index) {
                         if(sort_params.data[index] !== undefined)
 						    jQuery(this).data("sort_id", sort_params.data[index].toString());
 					});
 
-					$table.find("> tbody > tr").bind("mousedown.ff.dragsort", function (e) {
+					$table.find("tbody tr").bind("mousedown.ff.dragsort", function (e) {
 						var $tr = jQuery(this);
 						lastY = e.clientY;
-
-						if(jQuery(e.target).is("input,select,a") || jQuery(e.target).closest("a").length)
-							return;
-
-						jQuery(this).attr("data-cur", jQuery(this).children("td:first").css("cursor"))
-						jQuery(this).children("td").css("cursor", "n-resize");
 						/*jQuery(this).children("td").css("cursor", "all-scroll");
 						 This is just for flashiness. It fades the TR element out to an opacity of 0.2 while it is being moved.*/
 						$tr.data("startDragging", true);
@@ -42,7 +36,7 @@
 							}
 						});
 
-						jQuery("> tr", $tr.parent()).not(this).bind("mouseenter.ff.dragsort", function(e){
+						jQuery("tr", $tr.parent()).not(this).bind("mouseenter.ff.dragsort", function(e){
 							if (e.clientY > lastY) {
 								jQuery(this).after($tr);
 							} else {
@@ -55,7 +49,7 @@
 							/*Fade the TR element back to full opacity */
 							$tr.data("startDragging", false);
 							
-							jQuery("> tr", $tr.parent()).unbind('mouseenter.ff.dragsort');
+							jQuery("tr", $tr.parent()).unbind('mouseenter.ff.dragsort');
 							jQuery("body").unbind('mouseup.ff.dragsort');
 
 							/* Make text selectable for IE again with
@@ -64,9 +58,10 @@
 								jQuery(document).unbind("selectstart.ff.dragsort");
 
 							if ($table.data("isDragging")) {
-								$tr.fadeTo("fast", 1, function() {
+								if ($table.jTableFullClick === undefined)
 									$table.data("isDragging", false);
-								});
+
+								$tr.fadeTo("fast", 1);
 								ff.ffGrid.dragsort.reorder(id);
 							}
 						});
@@ -80,14 +75,6 @@
 							jQuery(document).bind("selectstart.ff.dragsort", function () {return false;});
 						
 						return false;
-					});
-					$table.find("> tbody > tr").bind("mouseup.ff.dragsort", function (e) {
-						var $tr = jQuery(this);
-						lastY = e.clientY;
-						if(jQuery(e.target).is("input,select,a"))
-							return;
-
-						jQuery(this).children("td").css("cursor", jQuery(this).attr("data-cur"));
 					});
 				});
 			}

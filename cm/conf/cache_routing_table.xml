@@ -4,7 +4,6 @@
 		<priority>BOTTOM</priority>
 		<source>(.*)</source>
 		<control>DISABLED</control>
-		<expires>604800</expires>
-		<max_age>3600</max_age>
+		<max_age>86400</max_age>
 	</rule>
 </ffxml>

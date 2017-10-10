@@ -3,12 +3,13 @@
 
 <!--BeginSectFooters-->
 <script type="text/javascript">
-    <!--BeginSectBinding-->
-    jQuery("#{container}{title_field}").keyup(function() {
-        var val = jQuery(this).val();
-        jQuery("#{container}{slug_field}").val(ff.slug(val));
-    });
-    <!--EndSectBinding-->
+	ff.pluginAddInit("ff.ffField.slug", function () {
+		<!--BeginSectBinding-->
+		jQuery.fn.escapeGet("{container}{title_field}").keyup(function() {
+			ff.ffField.slug(this, "{container}{slug_field}"); 
+		});
+		<!--EndSectBinding-->
+	});
 </script>
 <!--EndSectFooters-->
 

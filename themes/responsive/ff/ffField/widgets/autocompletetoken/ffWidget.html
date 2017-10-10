@@ -1,30 +1,22 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-		ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js",	function() {
-			ff.injectCSS("jquerytokeninput", "{jquerytokeninput}", function() {
-				ff.pluginLoad("jquery.fn.tokenInput", "/themes/library/plugins/jquery.tokeninput/jquery.tokeninput.js");
-			});
-		});
-	});
-</script>
 <!--EndSectHeaders-->
 
 <!--BeginSectControl-->
-<!--BeginSectControlLabel-->
-<label>{autocompletetoken_label}</label> 
-<!--EndSectControlLabel-->
-<input type="text" id="{prefix}{container}{id}" name="{prefix}{container}{id}" class="autocompletetoken{class}" value="{selected_value}" {properties} />
-<!--BeginSectCombo-->
-	<a class="{combo_class}" href="javascript:void(0);" onclick="jQuery('#{container}{id_encoded}').focus(); jQuery('#{container}{id_encoded}').parent().find('input').keydown(); "></a>
-<!--EndSectCombo-->
-<!--BeginSectDebug--><a href="#" onclick="window.open('{service}{srv_data}', '_blank')">[debug]</a><!--EndSectDebug-->
+<div class="autocomplete-wrap">
+	<!--BeginSectControlLabel-->
+	<label>{autocompletetoken_label}</label> 
+	<!--EndSectControlLabel-->
+	<input type="text" id="{prefix}{container}{id}" name="{prefix}{container}{id}" class="autocompletetoken{class}" value="{selected_value}" {properties} />
+	<!--BeginSectCombo-->
+		<a class="{combo_class}" href="javascript:void(0);" onclick="jQuery('#{container}{id_encoded}').focus(); jQuery('#{container}{id_encoded}').parent().find('input').keydown(); "></a>
+	<!--EndSectCombo-->
+	<!--BeginSectDebug--><a href="#" onclick="window.open('{service}{srv_data}', '_blank')">[debug]</a><!--EndSectDebug-->
+</div>
 <!--EndSectControl-->
 
 <!--BeginSectFooters-->
 <script type="text/javascript">
-	ff.pluginAddInit("jquery.fn.tokenInput", function () {
-      jQuery(document).ready(function() {
+	ff.pluginAddInit("jquery.tokeninput", function () {
         <!--BeginSectBinding-->
             jQuery("#{container}{id_encoded}").tokenInput("{service}{srv_data}", {
                 theme: "{autocomplete_theme}",
@@ -91,7 +83,6 @@
                 <!--EndSectAttr-->
             });
         <!--EndSectBinding-->
-         });
 	});
 </script>
 <!--EndSectFooters-->

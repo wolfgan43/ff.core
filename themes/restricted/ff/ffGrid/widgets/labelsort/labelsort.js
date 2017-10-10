@@ -30,7 +30,7 @@
 					if(typeof(mode) == "function") {
 						t = mode(node);
 					} else {
-						t = $(node).text();
+						t = jQuery(node).text();
 					}
 				}
 				return t;
@@ -115,9 +115,11 @@
 
 			/* public methods */
 			this.construct = function(settings) {
-
 				return this.each(function() {
-					table = this;
+					var id = this.id;
+					var table = jQuery(".ffGrid", this).get(0);
+					if(table === undefined) 
+                        return;
 
 					if(!table.tHead || !table.tBodies) return;
 
@@ -128,7 +130,7 @@
 
 					table.resource_id = table.jTableSort["config"].resource_id;
 
-					tableHeaders = $("thead th", table);
+					tableHeaders = jQuery("thead th", table);
 
 					tableHeaders.each(function(index) {
 						th = this;
@@ -142,14 +144,14 @@
 						if (/*checkHeaderMetadata(th) || */checkHeaderOptions(table, index))
 							th.jTableSort["sortDisabled"] = true;
 						else
-							$(th).css("cursor", "pointer");
+							jQuery(th).css("cursor", "pointer");
 
 						/* add cell to headerList */
 						config.headerList[index] = th;
 
 					});
 
-					/*firstRowCells = $("tbody tr td", table); */
+					/*firstRowCells = jQuery("tbody tr td", table); */
 
 					var rows = table.tBodies[0].rows;
 
@@ -173,7 +175,7 @@
 					/* apply event handling to headers
 					 this is to big, perhaps break it out?*/
 					tableHeaders.click(function(e) {
-						$(table).trigger("sortStart");
+						jQuery(table).trigger("sortStart");
 
 						th = this;
 						var totalRows = (table.tBodies[0] && table.tBodies[0].rows.length) || 0;
@@ -307,9 +309,8 @@
 									}
 								};
 
-								ff.ffGrid.dragsort.reorder(table);
-
-								$(table).trigger("sortEnd");
+								ff.ffGrid.dragsort.reorder(id);
+								jQuery(table).trigger("sortEnd");
 
 							},1);
 							/* stop normal event by returning false */
@@ -476,7 +477,7 @@
 	    },
 	    format: function(s,table,cell) {
 			var c = table.jTableSort["config"], p = (!c.parserMetadataName) ? 'sortValue' : c.parserMetadataName;
-	        return $(cell).metadata()[p];
+	        return jQuery(cell).metadata()[p];
 	    },
 	  type: "numeric"
 	});
@@ -490,16 +491,16 @@ __ff : true, /* used to recognize ff'objects */
 "onHeadGetOrdered" : function(table, index){
 	for (i = 0; i < table.jTableSort.config["headerList"].length; i++)
 	{
-		$(table.jTableSort.config["headerList"][i]).removeClass("first-selected").removeClass("last-selected").removeClass("button-selected");
+		jQuery(table.jTableSort.config["headerList"][i]).removeClass("first-selected").removeClass("last-selected").removeClass("button-selected");
 	}
 
 	th = table.jTableSort.config["headerList"][index];
 	if (index == 0)
-		$(th).addClass("first-selected");
+		jQuery(th).addClass("first-selected");
 	else if (index == table.jTableSort.config["headerList"].length - 1)
-		$(th).addClass("last-selected");
+		jQuery(th).addClass("last-selected");
 	else
-		$(th).addClass("button-selected");
+		jQuery(th).addClass("button-selected");
 }
 
 }; /* publics' end */

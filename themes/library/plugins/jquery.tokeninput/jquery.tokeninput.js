@@ -629,9 +629,9 @@ $.TokenList = function (input, url_or_data, settings) {
     function show_dropdown() {
         dropdown
             .css({
-                position: "absolute",
-                top: $(token_list).position().top + $(token_list).outerHeight(),
-                left: $(token_list).position().left,
+                position: "fixed",
+                //top: $(token_list).position().top + $(token_list).outerHeight(),
+               // left: $(token_list).position().left,
                 zindex: 999
             })
             .show();

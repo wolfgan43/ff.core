@@ -4,14 +4,14 @@
  * @package ContentManager
  * @subpackage contents
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
 $oRecord = ffRecord::factory($cm->oPage);
-$oRecord->id = "MainRecord";
-$oRecord->resources[] = "cmSettings";
+$oRecord->id = "ShowfilesModify";
+$oRecord->resources[] = $oRecord->id;
 $oRecord->title = "ShowFiles - Item";
 $oRecord->src_table = CM_TABLE_PREFIX . "showfiles";
 

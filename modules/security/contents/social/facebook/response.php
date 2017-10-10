@@ -1,21 +1,26 @@
 <?php
 $cm->oPage->layer = "empty";
 
+$old_session_name = null;
+
 $framework_css = mod_sec_get_framework_css();
 $mod_sec_login = $cm->router->getRuleById("mod_sec_login");
 $mod_sec_dashboard = $cm->router->getRuleById("mod_sec_dashboard");
 if($mod_sec_dashboard)
 	$dashboard_ret_url = $mod_sec_dashboard->reverse;
-
+else
+	$dashboard_ret_url = $mod_sec_login->reverse;
+	
 if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)
 {
-	if ($filename === null)
+    $filename = cm_cascadeFindTemplate("/contents/social/logged.html", "security");
+	/*if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
-
+*/
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
 
@@ -86,6 +91,18 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
 	$cm->oPage->addContent($tpl);
 	return;	
 }
+else
+{
+	$old_session_name = session_name();
+	session_name("modsec_fbsess");
+	if (isset($_POST[session_name()]))
+		session_id($_POST[session_name()]);
+	elseif (isset($_GET[session_name()]))
+		session_id($_GET[session_name()]);
+	elseif (isset($_COOKIE[session_name()]))
+		session_id($_COOKIE[session_name()]);
+	session_start();	
+}
 
 use Facebook\FacebookSession;
 use Facebook\FacebookRequest;
@@ -113,10 +130,11 @@ try {
             $arrDefaultFields = explode(",", MOD_SEC_DEFAULT_FIELDS);
             $arrUserParams["email"] = $user_profile->getEmail();
 
-            if(!strlen($username)) {
+            if(!$username) {
                 $username = $user_profile->getName();
             }
-            if(!strlen($username)) {
+
+            if(!$username) {
                 $arrUsername = explode("@", $arrUserParams["email"]);
 
                 $username = $arrUsername[0] . " " . substr($arrUsername[1], 0, strpos($arrUsername[1], "."));
@@ -162,7 +180,6 @@ try {
                 else
                     $arrUserParams["surname"] = $user_profile->getLastName();
 
-
                 $cover = $user_profile->getProperty("cover");
                 if($cover) {
                     if (array_search("avatar", $arrDefaultFields) === false)
@@ -189,20 +206,28 @@ try {
             $UserToken["token"] = $session->getToken();
             $UserToken["type"] = "facebook";
 
-            $res = mod_security_set_user_by_social("facebook", $arrUserParams, $arrUserField, $UserToken, null, false, true);
-            $sError = $res["error"];
+            if ($old_session_name !== null)
+			{
+				session_destroy();
+				session_name($old_session_name);
+				$old_session_name = null;
+			}
+			
+			$res = mod_security_set_user_by_social("facebook", $arrUserParams, $arrUserField, $UserToken, null, false, true);
+			$sError = $res["error"];
 
-            if (strlen($sError))
+			if (strlen($sError))
 			{
 				$cm->modules["security"]["events"]->doEvent("facebook_error", array(&$sError, &$ret_url, &$err_url));
 
-				if ($filename === null)
+                $filename = cm_cascadeFindTemplate("/contents/social/error.html", "security");
+				/*if ($filename === null)
 					$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
 				if ($filename === null)
 					$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
 				if ($filename === null)
 					$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
-
+*/
 				$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 				$tpl->load_file(basename($filename), "main");
 
@@ -227,7 +252,7 @@ try {
 
                 $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
                 $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
-			    $tpl->set_var("login_class", cm_getClassByDef($framework_css["login"]["def"]));
+			    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
 			    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
 			    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
 			    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
@@ -238,12 +263,13 @@ try {
 				return;
 			}
 
-			if ($filename === null)
+            $filename = cm_cascadeFindTemplate("/contents/social/success.html", "security");
+			/*if ($filename === null)
 				$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/success.html", $cm->oPage->theme, false);
 			if ($filename === null)
 				$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/success.html", $cm->oPage->theme, false);
 			if ($filename === null)
-				$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/success.html", $cm->oPage->theme);
+				$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/success.html", $cm->oPage->theme);*/
 
 			$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 			$tpl->load_file(basename($filename), "main");
@@ -330,6 +356,12 @@ try {
 			$cm->oPage->addContent($tpl);
 			
 		} catch (FacebookRequestException $e) {
+			if ($old_session_name !== null)
+			{
+				session_destroy();
+				session_name($old_session_name);
+				$old_session_name = null;
+			}
 			
 			echo "Exception occured, code: " . $e->getCode();
 			echo " with message: " . $e->getMessage();
@@ -337,14 +369,23 @@ try {
 			
 		}
 	} else {
+		if ($old_session_name !== null)
+		{
+			session_destroy();
+			session_name($old_session_name);
+			$old_session_name = null;
+		}
+		
 		$cm->modules["security"]["events"]->doEvent("facebook_error", array(&$sError, &$ret_url, &$err_url));
 
-		if ($filename === null)
+        $filename = cm_cascadeFindTemplate("/contents/social/error.html", "security");
+		/*
+        if ($filename === null)
 			$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
 		if ($filename === null)
 			$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
 		if ($filename === null)
-			$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
+			$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);*/
 
 		$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 		$tpl->load_file(basename($filename), "main");
@@ -382,14 +423,23 @@ try {
 	}
 } catch(FacebookRequestException $ex) {
   // When Facebook returns an error
+	if ($old_session_name !== null)
+	{
+		session_destroy();
+		session_name($old_session_name);
+		$old_session_name = null;
+	}
+	
 	$cm->modules["security"]["events"]->doEvent("facebook_error", array(&$sError, &$ret_url, &$err_url));
 
+    $filename = cm_cascadeFindTemplate("/contents/social/error.html", "security");
+    /*
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
 	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
+		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);*/
 
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
@@ -427,14 +477,23 @@ try {
 	return;
 } catch(\Exception $ex) {
   // When validation fails or other local issues
+	if ($old_session_name !== null)
+	{
+		session_destroy();
+		session_name($old_session_name);
+		$old_session_name = null;
+	}
+	
 	$cm->modules["security"]["events"]->doEvent("facebook_error", array(&$sError, &$ret_url, &$err_url));
 
+    $filename = cm_cascadeFindTemplate("/contents/social/error.html", "security");
+    /*
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
 	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
+		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);*/
 
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
@@ -470,4 +529,11 @@ try {
     
 	$cm->oPage->addContent($tpl);
 	return;
+}
+
+if ($old_session_name !== null)
+{
+	session_destroy();
+	session_name($old_session_name);
+	$old_session_name = null;
 }

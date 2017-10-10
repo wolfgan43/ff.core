@@ -1,10 +1,10 @@
 ff.ffField.uploadify = (function () {
-	var basePath = ff.site_path + "/themes/library/plugins/jquery.uploadify";
+	var basePath = "/themes/library/plugins/jquery.uploadify";
 	var baseUrl = "/";
 	var previewJs = true;
 	var viewUrl = "";
 	var previewUrl = "";
-	var previewPath = ff.site_path + "/cm/showfiles.php";
+	var previewPath = "/cm/showfiles.php";
 	/*var relativePath = '';*/
 
 	var start = "";
@@ -15,6 +15,9 @@ ff.ffField.uploadify = (function () {
 	var that = { /* publics*/
 		__ff : true, /* used to recognize ff'objects*/
 		"init" : function (params) {
+			basePath 				= ff.site_path + basePath;
+			//previewPath				= ff.site_path + previewPath;
+			
 			this.component			= params.component;
 			this.start				= params.start;
 			this.target				= params.target;
@@ -32,70 +35,67 @@ ff.ffField.uploadify = (function () {
 			this.model				= params.model;
 			this.modelThumb			= params.modelThumb;
 			this.showFile			= params.showFile;
+			this.showLink			= params.showLink;
             this.fullPath           = params.fullPath;
             this.dataSrc           	= params.dataSrc;
+            this.preview_qs			= params.preview_qs;
             this.icons              = params.icons;
 
 			this.previewPath		= ff.site_path + "/cm/showfiles.php";
 			/*this.relativePath		= params.relativePath;*/
 			
-                var startComponent      = document.getElementById(this.component + this.start);
-                var targetComponent     = document.getElementById(this.component + this.target);
-                var tmpnameComponent    = document.getElementById(this.component + this.tmpname);
-                var deleteComponent     = document.getElementById(this.component + this.sufdel);
+            var startComponent      = document.getElementById(this.component + this.start);
+            var targetComponent     = document.getElementById(this.component + this.target);
+            var tmpnameComponent    = document.getElementById(this.component + this.tmpname);
+            var deleteComponent     = document.getElementById(this.component + this.sufdel);
 
-/*            var startComponent = this.component + this.start;
-            startComponent = "#" + startComponent.replace(/\[/g, "\\[").replace(/\]/g, "\\]");*/
-
-
-		var idComponent         = this.component.replace(/[^a-zA-Z0-9]+/g,'');
-                jQuery(startComponent).attr("id", idComponent);
+			var idComponent         = this.component.replace(/[^a-zA-Z0-9]+/g,'');
+            jQuery(startComponent).attr("id", idComponent);
             
-            
-            /*jQuery(startComponent).parent().find(".preview").prepend('<div class="uploadifyQueue" id="' + idComponent + 'Queue"></div>');*/
-
 			var component = this.component;
 			var previewJs = this.previewJs;
             var viewUrl = this.viewUrl;
             var previewUrl = this.previewUrl;
             var writable = this.writable;
             var previewPath = this.previewPath;
+            var preview_qs = this.preview_qs;
 			/*var baseUrl = this.baseUrl;*/
 			var basePath = this.basePath;
 			var target = this.target;
 			var model = this.model;
 			var modelThumb = this.modelThumb;
 			var showFile = this.showFile;
+			var showLink = this.showLink;
             var fullPath = this.fullPath;
             var dataSrc = this.dataSrc;
             var icons = this.icons;
             /*var relativePath = this.relativePath;*/
 			
-                if(model == 'default' && modelThumb == '')
-                    modelThumb = "thumb";
+            if(model == 'default' && modelThumb == '')
+                modelThumb = "thumb";
 
-                jQuery("#" + idComponent).parent().find(".preview").attr("id", "uploadify_" + idComponent);
-                jQuery("#" + idComponent).parent().find(".preview").addClass("uploadifyQueueItem");
-                jQuery("#" + idComponent).parent().find(".preview").addClass(model);
-                jQuery("#" + idComponent).parent().find(".preview").find(".cancel a img").attr('src', (this.basePath + "/cancel.png"));
+            jQuery("#" + idComponent).parent().find(".preview").attr("id", "uploadify_" + idComponent);
+            jQuery("#" + idComponent).parent().find(".preview").addClass("uploadifyQueueItem");
+            jQuery("#" + idComponent).parent().find(".preview").addClass(model);
+            jQuery("#" + idComponent).parent().find(".preview").find(".cancel a img").attr('src', (this.basePath + "/cancel.png"));
 
-                if(jQuery("#uploadify_" + idComponent).attr("id") === undefined) {
-                    if(model == "vertical") {
-                        jQuery("#" + idComponent).parent().prepend('<div class="uploadifyQueueItem ' + model + '" id="uploadify_' + idComponent + '"></div>');
-                    } else if(model == "horizzontal") {
-                        jQuery("#" + idComponent).parent().prepend('<div class="uploadifyQueueItem ' + model + '" id="uploadify_' + idComponent + '"></div>');				
-                    } else {
-                        jQuery("#" + idComponent).parent().append('<div class="uploadifyQueueItem ' + model + '" id="uploadify_' + idComponent + '"></div>');
-                    }
-                    jQuery("#uploadify_" + idComponent).hide(); 
+            if(jQuery("#uploadify_" + idComponent).attr("id") === undefined) {
+                if(model == "vertical") {
+                    jQuery("#" + idComponent).parent().prepend('<div class="uploadifyQueueItem ' + model + '" id="uploadify_' + idComponent + '"></div>');
+                } else if(model == "horizzontal") {
+                    jQuery("#" + idComponent).parent().prepend('<div class="uploadifyQueueItem ' + model + '" id="uploadify_' + idComponent + '"></div>');				
                 } else {
-                    if(previewUrl == '') {
+                    jQuery("#" + idComponent).parent().append('<div class="uploadifyQueueItem ' + model + '" id="uploadify_' + idComponent + '"></div>');
+                }
+                jQuery("#uploadify_" + idComponent).hide(); 
+            } else {
+                if(previewUrl == '') {
 	                if(modelThumb == '') {
 	                    previewUrl = previewPath /*+ relativePath*/;
 					} else {
 						previewUrl = previewPath + "/" + modelThumb /*+ relativePath*/;
 					}
-                    }
+                }
 
 				if(modelThumb != '' && jQuery("#uploadify_" + idComponent + " IMG.image").attr("src") !== undefined) {
 					jQuery("#uploadify_" + idComponent + " IMG.image").attr("src", jQuery("#uploadify_" + idComponent + " IMG.image").attr("src").replace(previewPath + "/thumb" /*+ relativePath*/, previewUrl));
@@ -108,7 +108,7 @@ ff.ffField.uploadify = (function () {
 				} else if(model == "horizzontal") {
 					jQuery("#" + idComponent).insertAfter(jQuery("#uploadify_" + idComponent).append());
 				}*/
-                }
+            }
 
 			var scriptData = {};
 			scriptData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
@@ -174,8 +174,12 @@ ff.ffField.uploadify = (function () {
                             fileValue = response["name"];
                         }
 
-                        fileValueOut = response["name"];
+						if (preview_qs.length) {
+							fileValue += "?" + preview_qs;
+						}
 
+                        fileValueOut = response["name"];
+						
                         var byteSize = Math.round(fileObj.size / 1024 * 100) * .01;
                         var suffix = 'KB';
                         if (byteSize > 1000) {
@@ -204,16 +208,23 @@ ff.ffField.uploadify = (function () {
                             }
                         }
 
-                                        if(viewUrl == '') {
-                                                viewUrl = previewPath /*+ relativePath*/;
-                                        }
+                        if(viewUrl == '') {
+                        	viewUrl = previewPath /*+ relativePath*/;
+                        }
 
+                        if(viewUrl.length && !fullPath) {
+							viewUrl += "/";
+						}
+						
                         if(previewJs)
                             previewBlock = '<a href="' + viewUrl + '/' + fileValue + '" target="_blank" rel="' + previewUrl + '"><img id="' + component + target + '_img" class="image" src="' + previewUrl + "/" + fileValue + '" /></a>';
 
                         if(showFile)
                             descBlock = '<span class="fileName">' + strResponse + ' (' + byteSize + suffix + ')' + '</span>';
 
+                        if(showLink)
+                            descBlock = '<a href="' + viewUrl + fileValue + '" rel="' + previewUrl + '" target="_blank">' + strResponse + ' (' + byteSize + suffix + ')' + '</a>';
+                            
                         if(model == "vertical") {
                             jQuery("#uploadify_" + idComponent).html('<span class="top">' + previewBlock + '<div class="cancel"><a href="javascript:ff.ffField.uploadify.del(\'' + component + '\');" alt="delete" class="' + icons.cancel + '"></a></div></span>' + descBlock);
                         } else if(model == "horizzontal") {

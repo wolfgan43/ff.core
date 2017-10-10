@@ -2,31 +2,25 @@
 /**
  * @package ContentManager
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
-/**
- * @package ContentManager
- * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
- * @link http://www.formsphpframework.com
- */
 class cm extends ffCommon
 {
 	static $singleton 			= null;
 	
 	static protected $_events = null;
 	
+	//const LAYOUT_PRIORITY_INERHIT		= 0; // special, get parent'
 	const LAYOUT_PRIORITY_TOPLEVEL		= 1; // special, only one
 	const LAYOUT_PRIORITY_HIGH			= 2;
 	const LAYOUT_PRIORITY_NORMAL			= 3;
 	const LAYOUT_PRIORITY_LOW			= 4;
 	const LAYOUT_PRIORITY_FINAL			= 5; // special, only one
 	const LAYOUT_PRIORITY_DEFAULT		= cm::LAYOUT_PRIORITY_NORMAL;
-		
+	
 	var $content_root			= null;
 	var	$path_info 				= null;
 	var $real_path_info			= null;
@@ -90,7 +84,7 @@ class cm extends ffCommon
 	
 	private function __construct()
 	{
-		if(isset($_REQUEST["__query__"]))
+		if(defined("FF_URLPARAM_QUERY"))
 			ffDB_Sql::$_profile = true;
 			
 		$this->router = cmRouter::getInstance();
@@ -153,7 +147,7 @@ class cm extends ffCommon
 		if (CM_ENABLE_MEM_CACHING)
 		{
 			$this->cache = ffCache::getInstance(CM_CACHE_ADAPTER);
-			if (isset($_REQUEST["__CLEARCACHE__"]))
+			if (defined("FF_URLPARAM_CLEARCACHE"))
 				$this->cache->clear();
 		}
 
@@ -170,18 +164,45 @@ class cm extends ffCommon
 		// #0: verifica configurazione
 
 		// #1: normalizzazione dell'url
-
-		$this->path_info = ffCommon_url_normalize($this->path_info);
-		$this->path_info = ffCommon_url_stripslashes($this->path_info);
+		if (CM_URL_NORMALIZE)
+		{
+			$this->path_info = ffCommon_url_normalize($this->path_info);
+			$this->path_info = ffCommon_url_stripslashes($this->path_info);
+		}
 
 		if (!strlen($this->path_info) || $this->path_info == "/")
 		{
 			$this->path_info = "/index";
-			$_SERVER['PATH_INFO'] = $this->path_info;
+			if (CM_URL_NORMALIZE)
+				$_SERVER['PATH_INFO'] = $this->path_info;
 		}
 		
 		// STATIC CACHE
-		if (CM_PAGECACHE && !$this->isXHR() && !isset($_REQUEST["__nocache__"]) && !isset($_REQUEST["__debug__"]) && !defined("CM_DONT_RUN") && strpos($this->path_info, "sitemap.xml") === false)
+		
+		$cache_avoid_match = false;
+		if (strlen(CM_PAGECACHE_AVOIDPATTERN))
+		{
+			$cache_avoid_patterns = explode(",", CM_PAGECACHE_AVOIDPATTERN);
+			foreach ($cache_avoid_patterns as $cache_tmp_pattern)
+			{
+				if (preg_match("/" . str_replace("/", "\\/", $cache_tmp_pattern) . "/", $this->path_info))
+				{
+					$cache_avoid_match = true;
+					break;
+				}
+			}
+		}
+		
+		if (
+				CM_PAGECACHE
+				&& !$this->isXHR()
+				&& !defined("FF_URLPARAM_NOCACHE")
+				&& !defined("FF_URLPARAM_DEBUG")
+				&& !defined("CM_DONT_RUN")
+				&& strpos($this->path_info, "sitemap.xml") === false
+				&& !$cache_avoid_match
+				&& (!defined("ALLOW_PAGECACHE") || ALLOW_PAGECACHE)
+			)
 		{
 			define("ALLOW_PAGECACHE", true);
 			
@@ -194,16 +215,19 @@ class cm extends ffCommon
 				$cache_dir .= "/" . $cache_domain_prefix;
 			}
 			
+			$cache_path_info = $this->path_info;
 			if (CM_PAGECACHE_GROUPHASH)
 			{
 				$hash = sha1($this->path_info);
-				$parts = str_split($hash, 2);
+				$parts = str_split($hash, CM_PAGECACHE_HASHSPLIT);
 				$cache_dir .= "/" . implode("/", $parts);
+				if (CM_PAGECACHE_GROUPHASH_STRIPPATH)
+					$cache_path_info = "";
 			}
 			
 			if (file_exists($cache_dir))
 			{
-				if (CM_PAGECACHE_ASYNC && array_key_exists("__GENCACHE__", $_REQUEST))
+				if (CM_PAGECACHE_ASYNC && defined("FF_URLPARAM_GENCACHE"))
 				{
 					if (CM_PAGECACHE_GROUPDIRS)
 					{
@@ -214,13 +238,13 @@ class cm extends ffCommon
 								continue;
 
 							$filePath = $fiGroup->getPathname();
-							$file = $filePath . $this->path_info . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
+							$file = $filePath . $cache_path_info;// . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
 							cm_filecache_empty_dir($file);
 						}
 					}
 					else
 					{
-						$file = $cache_dir . $this->path_info . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
+						$file = $cache_dir . $cache_path_info;// . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
 						cm_filecache_empty_dir($file);
 					}
 				}
@@ -228,6 +252,7 @@ class cm extends ffCommon
 				{
 					$now = time();
 
+					// FIRST: try to find the exact file requested (not others) based on E-Tag
 					if (isset($_SERVER["HTTP_IF_NONE_MATCH"]))
 					{
 						if (CM_PAGECACHE_GROUPDIRS)
@@ -239,47 +264,59 @@ class cm extends ffCommon
 									continue;
 
 								$filePath = $fiGroup->getPathname();
-								$file = $filePath . $this->path_info . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
+								$file = $filePath . $cache_path_info . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
 								if (false !== ($fctime = @filectime($file)))
 								{
-									if (
-											(!CM_PAGECACHE_LAST_VALID
+									if (filemtime($file) > $now)
+									{
+										$cache_valid = true;
+									}
+									else if (!CM_PAGECACHE_LAST_VALID
 												|| $now < CM_PAGECACHE_LAST_VALID
 												|| $fctime >= CM_PAGECACHE_LAST_VALID
-											) && (CM_PAGECACHE_ASYNC ||
-												filemtime($file) > $now
 											)
-									)
-										$cache_valid = true;
+									{
+										if (!CM_PAGECACHE_REUSE)
+											@unlink($file);
+										else
+											$cache_valid = true;
+									}
 									else
+									{
 										@unlink($file);
+									}
 								}
+								
+								if ($cache_valid)
+									break;
 							}
 						}
 						else
 						{
-							$file = $cache_dir . $this->path_info . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
-							/*$fctime = @filectime($file);
-							$a = $now < CM_PAGECACHE_LAST_VALID;
-							$b = $fctime >= CM_PAGECACHE_LAST_VALID;
-							$c = filemtime($file) > $now;
-							$d = !CM_PAGECACHE_LAST_VALID;
-							$e = CM_PAGECACHE_ASYNC;*/
+							$file = $cache_dir . $cache_path_info . "/" . $_SERVER["HTTP_IF_NONE_MATCH"];
 							if (false !== ($fctime = @filectime($file)))
 							{
-								if (
-										(!CM_PAGECACHE_LAST_VALID
+								if (filemtime($file) > $now)
+								{
+									$cache_valid = true;
+								}
+								else if (!CM_PAGECACHE_LAST_VALID
 											|| $now < CM_PAGECACHE_LAST_VALID
 											|| $fctime >= CM_PAGECACHE_LAST_VALID
-										) && (CM_PAGECACHE_ASYNC ||
-											filemtime($file) > $now
 										)
-								)
-									$cache_valid = true;
+								{
+									if (!CM_PAGECACHE_REUSE)
+										@unlink($file);
+									else
+										$cache_valid = true;
+								}
 								else
+								{
 									@unlink($file);
+								}
 							}
 						}
+						
 						if ($cache_valid)
 						{
 							http_response_code(304);
@@ -289,26 +326,32 @@ class cm extends ffCommon
 
 					// find right file
 					if (null !== ($find_cache_file = cm_filecache_find($cache_dir
-																		, $this->path_info
+																		, $cache_path_info
 																		, CM_PAGECACHE_GROUPDIRS
-																		, CM_PAGECACHE_USE_STRONG_CACHE
+																		, CM_PAGECACHE_FIXED_MAXAGE
 																		, CM_PAGECACHE_LAST_VALID
 																		, CM_PAGECACHE_SCALEDOWN
-																		, $now))
+																		, $now
+																		, null
+																		, true
+																		, CM_PAGECACHE_REUSE
+																	))
 						)
 					{
-						if (!ffHTTP_encoding_isset("gzip"))
+						if (CM_PAGECACHE_DISABLE_COMPRESSIONS || !ffHTTP_encoding_isset("gzip"))
 						{
 							if ($find_cache_file["uncompressed"] !== null)
 								$cache_file = $find_cache_file["uncompressed"];
-						} else {
+						}
+						else
+						{
 							if ($find_cache_file["compressed"] !== null)
 								$cache_file = $find_cache_file["compressed"];
 							else if (CM_PAGECACHE_SCALEDOWN && $find_cache_file["uncompressed"] !== null)
 								$cache_file = $find_cache_file["uncompressed"];
 						}
 					}
-
+					
 					if ($cache_file !== null)
 					{
 						if ($cache_file["compressed"] !== false)
@@ -319,20 +362,24 @@ class cm extends ffCommon
 							$mime_type .= "; charset=UTF-8";
 						header("Content-type: " . $mime_type);
 
-						// send regenerated info about cache
-						if (CM_PAGECACHE_USE_STRONG_CACHE)
+						// send max-age
+						if (!$cache_file["reused"])
 						{
-							$exp_gmt = gmdate("D, d M Y H:i:s", $cache_file["fmtime"]) . " GMT";
-							header("Expires: $exp_gmt");
+							if (CM_PAGECACHE_FIXED_MAXAGE)
+								$max_age = $cache_file["file_parts"][2];
+							else
+							{
+								$max_age = $cache_file["fmtime"] - $now;
+								if ($max_age > $cache_file["file_parts"][2])
+									$max_age = $cache_file["file_parts"][2];
+							}
 						}
 						else
 						{
-							$max_age = $cache_file["file_parts"][2];
-							if ($cache_file["fmtime"] - $cache_file["fctime"] < $max_age)
-								$max_age = $cache_file["fmtime"] - $cache_file["fctime"];
-
-							header("Cache-Control: public, max-age=" . $max_age);
+							$max_age = CM_PAGECACHE_REUSE_AGE;
 						}
+						
+						header("Cache-Control: public, max-age=" . $max_age);
 
 						header("ETag: " . $cache_file["filename"]);
 
@@ -341,40 +388,34 @@ class cm extends ffCommon
 					}
 				}
 			}
+			
 			// nessuna cache trovata
+			if (CM_PAGECACHE_ASYNC && !defined("FF_URLPARAM_GENCACHE") && CM_PAGECACHE_ASYNC_MISSING)
+			{
+				http_response_code(CM_PAGECACHE_MISSING_HEADER);
+				if (CM_PAGECACHE_MISSING_RETRY !== false)
+				{
+					header("Retry-After: " . CM_PAGECACHE_MISSING_RETRY);
+				}
+				exit;
+			}
+			
 			$this->cache_router = cmRouter::getInstance("__cm_cache__");
 		}
 		else
 		{
-			define("ALLOW_PAGECACHE", false);
+			if (!defined("ALLOW_PAGECACHE"))
+				define("ALLOW_PAGECACHE", false);
 		}
 
 		$this->doEvent("on_before_init", array($this));
 		
-		if (FF_ORM_ENABLE)
-		{
-			if (@is_file(FF_DISK_PATH . "/ds/common.php"))
-				require FF_DISK_PATH . "/ds/common.php";
-			
-			if (@is_dir(FF_DISK_PATH . "/ds/sources"))
-			{
-				$itGroup = new DirectoryIterator(FF_DISK_PATH . "/ds/sources");
-				foreach($itGroup as $fiGroup)
-				{
-					if($fiGroup->isDot() || $fiGroup->isDir())
-						continue;
-
-					require($fiGroup->getPathname());
-				}
-			}
-		}
-		
 		// #2: inizializzazione classi
 
 		$ff = ffGlobals::getInstance("ff");
-		if(!is_object($ff) || !is_object($ff->events) || !(method_exists($ff->events, "addEvent"))) {
+		/*if(!is_object($ff) || !is_object($ff->events) || !(method_exists($ff->events, "addEvent"))) {
 			ffErrorHandler::raise("Errore Critico (Rebecca)", E_USER_ERROR, get_included_files(), get_defined_vars());
-		}
+		}*/
 		$ff->events->addEvent("onRedirect", "cm::onRedirect");
 		
 		if (CM_ENABLE_MEM_CACHING)
@@ -385,14 +426,15 @@ class cm extends ffCommon
 			{
 				$this->router->rules = unserialize($router_rules);
 				$this->router->named_rules = unserialize($router_namedrules);
+				$this->router->ordered = true;
 			}
 		}
 		if (!$ffcache_router_success)
 		{
 			$this->router->loadFile(cm_confCascadeFind(ffCommon_dirname(__FILE__) . "/conf", "/cm", "routing_table.xml"));
 
-			if (is_file(FF_DISK_PATH . "/conf/routing_table.xml"))
-				$this->router->loadFile(FF_DISK_PATH . "/conf/routing_table.xml");
+			if (is_file(__PRJ_DIR__ . "/conf/routing_table.xml"))
+				$this->router->loadFile(__PRJ_DIR__. "/conf/routing_table.xml");
 		}
 		
 		if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE)
@@ -403,14 +445,15 @@ class cm extends ffCommon
 			{
 				$this->cache_router->rules = unserialize($router_rules);
 				$this->cache_router->named_rules = unserialize($router_namedrules);
+				$this->cache_router->ordered = true;
 			}
 		}
 		if (ALLOW_PAGECACHE && !$ffcache_cacherouter_success)
 		{
 			$this->cache_router->loadFile(cm_confCascadeFind(ffCommon_dirname(__FILE__) . "/conf", "/cm", "cache_routing_table.xml"));
 
-			if (is_file(FF_DISK_PATH . "/conf/cache_routing_table.xml"))
-				$this->cache_router->loadFile(FF_DISK_PATH . "/conf/cache_routing_table.xml");
+			if (is_file(__PRJ_DIR__ . "/conf/cache_routing_table.xml"))
+				$this->cache_router->loadFile(__PRJ_DIR__ . "/conf/cache_routing_table.xml");
 		}
 
         $this->doEvent("on_after_init", array($this));
@@ -423,14 +466,20 @@ class cm extends ffCommon
 			if ($entry == "." || $entry == ".." || substr($entry, 0, 1) == ".")
 				continue;
 
+			if (__PRJ_DIR__ !== __TOP_DIR__)
+			{
+				if (!file_exists(__PRJ_DIR__ . "/modules/" . $entry))
+					continue;
+			}
+			
 			if (!isset($this->modules[$entry]))
 				$this->modules[$entry] = array();
 
 			if (!isset($this->modules[$entry]["events"]))
 				$this->modules[$entry]["events"] = new ffEvents();
 
-			if (@is_file(FF_DISK_PATH . "/conf/modules/" . $entry . "/config." . FF_PHP_EXT))
-				require FF_DISK_PATH . "/conf/modules/" . $entry . "/config." . FF_PHP_EXT;
+			if (@is_file(__PRJ_DIR__ . "/conf/modules/" . $entry . "/config." . FF_PHP_EXT))
+				require __PRJ_DIR__ . "/conf/modules/" . $entry . "/config." . FF_PHP_EXT;
 				
 			if (@is_file(CM_MODULES_ROOT . "/" . $entry . "/conf/config." . FF_PHP_EXT))
 				require CM_MODULES_ROOT . "/" . $entry . "/conf/config." . FF_PHP_EXT;
@@ -442,17 +491,6 @@ class cm extends ffCommon
 
 		}
 		$d->close();
-
-		if (CM_ENABLE_MEM_CACHING && !$ffcache_router_success)
-		{
-			$this->cache->set("__cm_router_rules__", null, serialize($this->router->rules), "__cm_router__");
-			$this->cache->set("__cm_router_namedrules__", null, serialize($this->router->named_rules), "__cm_router__");
-		}
-		if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE && !$ffcache_cacherouter_success)
-		{
-			$this->cache->set("__cm_router_cacherules__", null, serialize($this->cache_router->rules), "__cm_router__");
-			$this->cache->set("__cm_router_cachenamedrules__", null, serialize($this->cache_router->named_rules), "__cm_router__");
-		}
 
 		foreach ($this->modules as $key => $value)
 		{
@@ -480,12 +518,43 @@ class cm extends ffCommon
 					}
 				}
 			}
-
+					
 			$res = $this->doEvent("on_load_module", array($this, $key));
 		}
 		reset($this->modules);
-	
-		$res = $this->doEvent("on_modules_loaded", array($this));
+
+		if (FF_ORM_ENABLE)
+		{
+			if (@is_file(__PRJ_DIR__ . "/ds/common.php"))
+				require __PRJ_DIR__ . "/ds/common.php";
+			
+			if (@is_dir(__PRJ_DIR__ . "/ds/sources"))
+			{
+				$itGroup = new DirectoryIterator(__PRJ_DIR__ . "/ds/sources");
+				foreach($itGroup as $fiGroup)
+				{
+					if($fiGroup->isDot() || $fiGroup->isDir())
+						continue;
+
+					require($fiGroup->getPathname());
+				}
+			}
+		}
+		
+		$res = $this->doEvent("on_modules_loaded", array($this, $ffcache_router_success));
+
+		if (CM_ENABLE_MEM_CACHING && !$ffcache_router_success)
+		{
+			$this->router->orderRules();
+			$this->cache->set("__cm_router_rules__", null, serialize($this->router->rules), "__cm_router__");
+			$this->cache->set("__cm_router_namedrules__", null, serialize($this->router->named_rules), "__cm_router__");
+		}
+		if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE && !$ffcache_cacherouter_success)
+		{
+			$this->cache_router->orderRules();
+			$this->cache->set("__cm_router_cacherules__", null, serialize($this->cache_router->rules), "__cm_router__");
+			$this->cache->set("__cm_router_cachenamedrules__", null, serialize($this->cache_router->named_rules), "__cm_router__");
+		}
 
 		if (defined("CM_DONT_RUN"))
 			return;
@@ -513,8 +582,16 @@ class cm extends ffCommon
 		else
 			define("CM_LOADED_THEME", CM_DEFAULT_THEME);
 
-		//define("FF_THEME_ONLY_INIT", true);
 		ffCommon_theme_init(CM_LOADED_THEME);
+		
+		if (isset($this->layout_vars["theme"]) && $this->layout_vars["theme"] !== $this->layout_vars["main_theme"])
+		{
+			if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php"))
+				require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php";
+
+			if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php"))
+				require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php";
+		}
 		
 		foreach ($this->modules as $key => $value)
 		{
@@ -527,7 +604,8 @@ class cm extends ffCommon
 			$this->layout_vars["theme"] = cm_getMainTheme();
 
         $this->doEvent("on_before_page_process", array($this));
-		$this->oPage = ffPage::factory(FF_DISK_PATH, FF_SITE_PATH, $page_path, $this->layout_vars["theme"]);
+		
+		$this->oPage = ffPage::factory(ff_getThemeDir($this->layout_vars["theme"]), FF_SITE_PATH, null, $this->layout_vars["theme"]);
 		$this->oPage->addEvent("on_page_process", "cm::oPage_on_page_process");
 
 		if (CM_IGNORE_THEME_DEFAULTS || $this->layout_vars["ignore_defaults"])
@@ -547,19 +625,19 @@ class cm extends ffCommon
             
         $this->oPage->use_own_form = !$this->layout_vars["exclude_form"];
         $this->oPage->use_own_js = !$this->layout_vars["exclude_ff_js"];
-        $this->oPage->compact_js = $this->layout_vars["compact_js"];
-        $this->oPage->compact_css = $this->layout_vars["compact_css"];
-        $this->oPage->compress = $this->layout_vars["enable_gzip"];
+        $this->oPage->compact_js = (defined("FF_URLPARAM_NOCACHE") || defined("FF_URLPARAM_DEBUG") ? false : $this->layout_vars["compact_js"]);
+        $this->oPage->compact_css = (defined("FF_URLPARAM_NOCACHE") || defined("FF_URLPARAM_DEBUG") ? false : $this->layout_vars["compact_css"]);
+        $this->oPage->compress = (defined("FF_URLPARAM_NOCACHE") || defined("FF_URLPARAM_DEBUG") ? false : $this->layout_vars["enable_gzip"]);
         
         if(is_array($this->layout_vars["cdn"]["css"]) && count($this->layout_vars["cdn"]["css"]))
             $this->oPage->override_css = array_merge($this->oPage->override_css, $this->layout_vars["cdn"]["css"]);
         if(is_array($this->layout_vars["cdn"]["js"]) && count($this->layout_vars["cdn"]["js"]))
             $this->oPage->override_js = array_merge($this->oPage->override_js, $this->layout_vars["cdn"]["js"]);
         
-		$this->oPage->addEvent("on_tpl_load", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
-		$this->oPage->addEvent("on_tpl_layer_loaded", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
+		//$this->oPage->addEvent("on_tpl_load", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
+		//$this->oPage->addEvent("on_tpl_layer_loaded", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
 
-		if (!isset($_REQUEST["__nolayout__"]))
+		if (!defined("FF_URLPARAM_NOLAYOUT"))
 		{
 			$this->doEvent("on_layout_init", array($this->oPage, $this->layout_vars));
 
@@ -568,22 +646,35 @@ class cm extends ffCommon
 				
 			if (strlen($this->layout_vars["layer"]))
 				$this->oPage->layer = $this->layout_vars["layer"];
-                                                               
+
 			if (is_array($this->layout_vars["sect"]) && count($this->layout_vars["sect"]))
 			{
 				foreach ($this->layout_vars["sect"] as $key => $value)
 				{
+					if (strlen($this->layout_vars["sect_theme"][$key]) && array_search($this->oPage->getTheme(), explode(",", $this->layout_vars["sect_theme"][$key])) === false)
+						continue;
+					
 					$this->oPage->addSection($key);
 					$this->oPage->sections[$key]["name"] = $value;
 				}
 				reset($this->layout_vars["sect"]);
 			}
-
+				
 			if (is_array($this->layout_vars["css"]) && count($this->layout_vars["css"]))
 			{
 				foreach ($this->layout_vars["css"] as $key => $value)
 				{
-					$this->oPage->tplAddCss($key, $value["file"], $value["path"], "stylesheet", "text/css", true, false, null, $value["exclude_compact"], $value["priority"]);
+					if (strlen($value["theme"]) && array_search($this->oPage->getTheme(), explode(",", $value["theme"])) === false)
+						continue;
+					
+					$this->oPage->tplAddCss($key, array(
+						"file" => $value["file"]
+						, "path" => $value["path"]
+						, "overwrite" => true
+						, "exclude_compact" => $value["exclude_compact"]
+						, "priority" => $value["priority"]
+						, "index" => $value["index"]
+					));
 				}
 				reset($this->layout_vars["css"]);
 			}
@@ -592,7 +683,16 @@ class cm extends ffCommon
 			{
 				foreach ($this->layout_vars["js"] as $key => $value)
 				{
-					$this->oPage->tplAddJs($key, $value["file"], $value["path"], true, false, null, false, $value["priority"]);
+					if (strlen($value["theme"]) && array_search($this->oPage->getTheme(), explode(",", $value["theme"])) === false)
+						continue;
+
+					$this->oPage->tplAddJs($key, array(
+						"file" => $value["file"]
+						, "path" => $value["path"]
+						, "overwrite" => true
+						, "priority" => $value["priority"]
+						, "index" => $value["index"]
+					));
 				}
 				reset($this->layout_vars["js"]);
 			}
@@ -615,7 +715,7 @@ class cm extends ffCommon
 
 		// caricamento dei config / common
 		$include_script_path_parts = explode("/", $this->path_info);
-		$include_script_path_tmp = FF_DISK_PATH . "/conf/contents";
+		$include_script_path_tmp = __PRJ_DIR__ . "/conf/contents";
 		$include_script_path_count = 0;
 		while ($include_script_path_count < count($include_script_path_parts) && $include_script_path_tmp .= $include_script_path_parts[$include_script_path_count] . "/")
 		{
@@ -627,7 +727,7 @@ class cm extends ffCommon
 		}
 
 		$include_script_path_parts = explode("/", $this->path_info);
-		$include_script_path_tmp = FF_DISK_PATH . "/conf/contents";
+		$include_script_path_tmp = __PRJ_DIR__ . "/conf/contents";
 		$include_script_path_count = 0;
 		while ($include_script_path_count < count($include_script_path_parts) && $include_script_path_tmp .= $include_script_path_parts[$include_script_path_count] . "/")
 		{
@@ -656,7 +756,7 @@ class cm extends ffCommon
 			ffErrorHandler::raise("CM: no available routes!", E_USER_ERROR, $this, get_defined_vars());
 
 		//ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
-         
+ 
 		foreach ($this->router->matched_rules as $key => $match)
 		{
 			$this->process_next_rule = null;
@@ -674,18 +774,6 @@ class cm extends ffCommon
 
 			if (isset($match["rule"]->destination->header))
 			{
-				if (isset($match["rule"]->destination->location))
-				{
-					$location = str_replace("[SITE_PATH]", FF_SITE_PATH, (string)$match["rule"]->destination->location);
-				}
-				
-				/*
-				 * Da sistemare, non funziona con stesso path_info su hostname diverso (probabilmente da togliere)
-				if(strlen($location) && strpos($location, str_replace("/index", "/", $this->path_info)) !== 0 && str_replace("/index", "/", $this->path_info) != "/")
-				{
-					continue;
-				}*/
-
 				if(isset($match["rule"]->useragent))
 				{
 					$skip_rule = true;
@@ -713,14 +801,30 @@ class cm extends ffCommon
 						continue;
 				}
 
-				http_response_code((int)$match["rule"]->destination->header);
-				if (strlen($location))
-					ffRedirect($location);
+				if (isset($match["rule"]->destination->location))
+				{
+					$location = str_replace("[SITE_PATH]", FF_SITE_PATH, (string)$match["rule"]->destination->location);
+				
+					for ($i = 0; $i < 10; $i++)
+					{
+						$location = str_replace('$' . $i, $match["params"][$i][0], $location);
+					}
+					/*
+					 * Da sistemare, non funziona con stesso path_info su hostname diverso (probabilmente da togliere)
+					if(strlen($location) && strpos($location, str_replace("/index", "/", $this->path_info)) !== 0 && str_replace("/index", "/", $this->path_info) != "/")
+					{
+						continue;
+					}*/
+
+					ffRedirect($location, (int)$match["rule"]->destination->header);
+				}
+				else
+					http_response_code((int)$match["rule"]->destination->header);
 				exit;
 			}
 			elseif (isset($match["rule"]->destination->file))
 			{
-				$file = FF_DISK_PATH . "/" . trim((string)$match["rule"]->destination->file, "/");
+				$file = __PRJ_DIR__ . "/" . trim((string)$match["rule"]->destination->file, "/");
 				if (!is_file($file))
 					ffErrorHandler::raise("FILE NOT FOUND", E_USER_ERROR, $this, get_defined_vars());
 				
@@ -728,27 +832,46 @@ class cm extends ffCommon
 				readfile($file);
 				exit;
 			}
-			
+
+            if (isset($match["rule"]->destination->url))
+                $url = (string)$match["rule"]->destination->url;
+            else
+                $url = "";
+
 			if (isset($match["rule"]->destination->module))
 			{
 				$this->module = (string)$match["rule"]->destination->module;
 				$this->module_path = CM_MODULES_ROOT . "/" . $this->module;
-				$doc_root = CM_MODULES_ROOT . "/" . $this->module . "/contents"; 
+				if (isset($match["rule"]->destination->module_root))
+					$doc_root = CM_MODULES_ROOT . "/" . $this->module;
+				else
+					$doc_root = CM_MODULES_ROOT . "/" . $this->module . "/contents";
 			}
 			else
 			{
-				$doc_root = FF_DISK_PATH;
-			}
-			
-			$this->content_root = $doc_root;
+                if (isset($match["rule"]->destination->toplevel))
+                    $doc_root = __TOP_DIR__;
+                else
+                    $doc_root = ff_getAbsDir($url);
+            }
 
-			$url = (string)$match["rule"]->destination->url;
+			if (isset($match["rule"]->destination->content_root))
+				$doc_root = __PRJ_DIR__ . (string)$match["rule"]->destination->content_root;
 			
 			for ($i = 0; $i < 10; $i++)
 			{
 				$url = str_replace('$' . $i, $match["params"][$i][0], $url);
+				$doc_root = str_replace('$' . $i, $match["params"][$i][0], $doc_root);
 			}
 			
+			$url = str_replace("[MAIN_THEME]", FF_THEME_DIR . "/" . cm_getMainTheme(), $url);
+			$url = str_replace("[THEME]", FF_THEME_DIR . "/" . $this->oPage->getTheme(), $url);
+			$doc_root = str_replace("[MAIN_THEME]", FF_THEME_DIR . "/" . cm_getMainTheme(), $doc_root);
+			$doc_root = str_replace("[THEME]", FF_THEME_DIR . "/" . $this->oPage->getTheme(), $doc_root);
+			
+			$this->content_root = $doc_root;
+
+			// TOCHECK: inclusione dei parametri $_REQUEST nelle regole. Perchè è disattivato?
 			/*if (isset($match["rule"]->params) && isset($match["rule"]->params->param) && count($match["rule"]->params->param))
 			{
 				foreach ($match["rule"]->params->param as $key => $value)
@@ -772,15 +895,18 @@ class cm extends ffCommon
 				}
 			}*/
 			
-			$url = str_replace("[MAIN_THEME]", FF_THEME_DIR . "/" . cm_getMainTheme(), $url);
-			$url = str_replace("[THEME]", FF_THEME_DIR . "/" . $this->oPage->getTheme(), $url);
-			
 			// rileva il file giusto da caricare procedendo con test a ritroso
 			$tmp_path = $url;
 			$tmp_url = $url;
 
 			do
 			{
+				if ($tmp_path == "" || $tmp_path == "/")
+				{
+					$tmp_path = "/index";
+					$tmp_url = "/index" . $tmp_url;
+				}
+
 				$tmp_ext = pathinfo($tmp_path, PATHINFO_EXTENSION);
 				if (@is_file($doc_root . $tmp_path . "." . FF_PHP_EXT) || (@is_file($doc_root . $tmp_path) && $tmp_ext == FF_PHP_EXT))
 				{
@@ -790,7 +916,7 @@ class cm extends ffCommon
 					else
 						$this->script_name = $tmp_path . "." . FF_PHP_EXT;
 					$this->is_php = true;
-					$this->is_resource = false;				
+					$this->is_resource = false;
 					break;
 				}
 				elseif (@is_file($doc_root . $tmp_path . ".html") || (@is_file($doc_root . $tmp_path) && $tmp_ext == "html"))
@@ -831,17 +957,15 @@ class cm extends ffCommon
 				
 				if ($tmp_path == "/index")
 					break;
+				
 				if ($tmp_path != "/index")
-					$tmp_path = ffCommon_dirname($tmp_path);
-				if ($tmp_path == "/")
 				{
-					$tmp_path = "/index";
-					$tmp_url = "/index" . $tmp_url;
+					if (substr($tmp_path, -1) == "/")
+						$tmp_path = substr($tmp_path, 0, -1);
+					else
+						$tmp_path = ffCommon_dirname($tmp_path);
 				}
 			} while (true);
-
-            if(strpos($this->content_root . $this->script_name, FF_DISK_PATH . "/index.") === 0)
-                continue;
 
 			if ((!isset($match["rule"]->accept_path_info) || (string)$match["rule"]->accept_path_info == "false") && strlen($this->real_path_info))
 			{
@@ -872,10 +996,14 @@ class cm extends ffCommon
 				if ($this->is_php)
 				{
 					if (file_exists($this->content_root . $this->script_name))
+					{
 						$this->callScript($this->content_root . $this->script_name);
+					}
 					else if (file_exists($this->content_root . $this->script_name . ".php"))
+					{
 						$this->callScript($this->content_root . $this->script_name . ".php");
-						
+					}
+					
 					if ($this->module !== null)
 					{
 						$tmp_mod_parts = explode("/", $this->script_name);
@@ -892,7 +1020,7 @@ class cm extends ffCommon
 							if (is_file($this->oPage->getThemeDir() . "/modules/" . $this->module . $tmp_mod_path . "/common.php"))
 								require $this->oPage->getThemeDir() . "/modules/" . $this->module . $tmp_mod_path . "/common.php";
 						}
-					}						
+					}
 				}
 				else
 				{
@@ -916,8 +1044,6 @@ class cm extends ffCommon
 						$this->doEvent("cm_onParseFixed", array(&$this));
 					}
 				}
-
-				$this->load_ffSettingsByPath(); // TODO: ?? appurare perchè non si trova fuori dal ciclo e non viene richiamato una sola volta
 
 				if (isset($this->processed_rule["rule"]->blocking) && (string)$this->processed_rule["rule"]->blocking != "false")
 					exit;
@@ -943,31 +1069,54 @@ class cm extends ffCommon
 		}
 		
 		// LOAD SETTINGS BY COMPONENT
-		if (is_dir(FF_DISK_PATH . "/conf/ffsettings/components"))
+		if (is_dir(__PRJ_DIR__ . "/conf/ffsettings/components"))
 		{
-			foreach ($cm->oPage->components as $key => $value)
+			foreach ($this->oPage->components as $key => $value)
 			{
-				if (@is_file(FF_DISK_PATH . "/conf/ffsettings/components/" . $key . ".xml"))
-					$this->load_ffSettings(FF_DISK_PATH . "/conf/ffsettings/components/" . $key . ".xml");
+				if (defined("FF_URLPARAM_SHOWCASCADELOADER"))
+					echo __PRJ_DIR__ . "/conf/ffsettings/components/" . $key . "." . $this->oPage->getTheme() . ".xml<br />\n";
+				if (@is_file(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . "." . $this->oPage->getTheme() . ".xml"))
+					$this->load_ffSettings(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . "." . $this->oPage->getTheme() . ".xml");
+				else if (@is_file(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . ".xml"))
+				{
+					if (defined("FF_URLPARAM_SHOWCASCADELOADER"))
+						echo __PRJ_DIR__ . "/conf/ffsettings/components/" . $key . ".xml<br />\n";
+					$this->load_ffSettings(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . ".xml");
+				}
 			}
-			reset($cm->oPage->components);
+			reset($this->oPage->components);
 		}
 
-		$include_script_path_tmp = FF_DISK_PATH . "/conf/contents" . $this->path_info . "/";
+		$rc = $this->load_ffSettingsByPath($this->path_info);
+		if ($rc === false && $this->oPage->page_path !== $this->path_info)
+			$rc = $this->load_ffSettingsByPath($this->oPage->page_path);
+
+		$include_script_path_tmp = __PRJ_DIR__ . "/conf/contents" . rtrim($this->path_info, "/") . "/";
 		if (@is_file($include_script_path_tmp . "custom." . FF_PHP_EXT))
 			require $include_script_path_tmp . "custom." . FF_PHP_EXT;
 		if (@is_file($include_script_path_tmp . "custom_" . $this->oPage->getTheme() . "." . FF_PHP_EXT))
 			require $include_script_path_tmp . "custom_" . $this->oPage->getTheme() . "." . FF_PHP_EXT;
 		unset($include_script_path_tmp);
-
+		
 		$this->doEvent("on_before_process", array($this));
 		
 		$this->oPage->process_params();
 
-		if (!ffErrorHandler::$hide && (isset($_REQUEST["__debug__"]) || isset($_REQUEST["__query__"])))
+		if (!ffErrorHandler::$hide && (defined("FF_URLPARAM_DEBUG") || defined("FF_URLPARAM_QUERY")))
 			$this->oPage->compress = false;
 
-		if (ALLOW_PAGECACHE && $this->cache_force_enable !== false && http_response_code() == 200 && !@file_exists($cache_dir . "/disk_fail") && (!CM_PAGECACHE_ASYNC || (CM_PAGECACHE_ASYNC && array_key_exists("__GENCACHE__", $_REQUEST))))
+		if (
+				ALLOW_PAGECACHE 
+				&& $this->cache_force_enable !== false 
+				&& http_response_code() == 200 
+				&& !@file_exists($cache_dir . "/disk_fail") 
+				&& (
+						!CM_PAGECACHE_ASYNC 
+						|| (
+								CM_PAGECACHE_ASYNC && defined("FF_URLPARAM_GENCACHE")
+							)
+					)
+			)
 		{
 			$enable_cache = false;
 			$cache_disk_fail = false;
@@ -1095,14 +1244,11 @@ class cm extends ffCommon
 				$etag = $id . "." . $extension;
 				$file = $id . "." . $extension;
 
-				if (!CM_PAGECACHE_USE_STRONG_CACHE)
-				{
-					$file .= "." . $max_age;
-					$etag .= "." . $max_age;
-				}
+				$file .= "." . $max_age;
+				$etag .= "." . $max_age;
 				
 				$compression = false;
-				if ($cm->oPage->compress && ffHTTP_encoding_isset("gzip"))
+				if (!CM_PAGECACHE_DISABLE_COMPRESSIONS && $this->oPage->compress && ffHTTP_encoding_isset("gzip"))
 					$compression = true;
 				
 				$rc_cache = true;
@@ -1117,45 +1263,10 @@ class cm extends ffCommon
 					if (CM_PAGECACHE_GROUPDIRS)
 					{
 						$cache_group_dir = 0;
-						$rc_cache = cm_filecache_groupwrite(CM_PAGECACHE_DIR, $cache_dir, $this->path_info, $file, $buffer, ($now + $expires), CM_PAGECACHE_MAXGROUPDIRS, $cache_group_dir, $cache_disk_fail);
+						$rc_cache = cm_filecache_groupwrite(CM_PAGECACHE_DIR, $cache_dir, $cache_path_info, $file, $buffer, ($now + $expires), CM_PAGECACHE_MAXGROUPDIRS, $cache_group_dir, $cache_disk_fail);
 					}
 					else
-						$rc_cache = cm_filecache_write($cache_dir . $this->path_info, $file, $buffer, ($now + $expires));
-					
-					/*do
-					{
-						$cache_group_dir++;
-						
-						if (!is_dir($cache_dir . "/" . $cache_group_dir))
-							$cache_new_groupdir = true;
-						else
-							$cache_new_groupdir = false;
-						
-						if (!is_dir($cache_dir . "/" . $cache_group_dir . $cm->path_info))
-							$rc_cache = @mkdir($cache_dir . "/" . $cache_group_dir . $cm->path_info, 0777, true);
-						if ($rc_cache)
-						{
-							$rc_cache = @file_put_contents($cache_dir . "/" . $cache_group_dir . $cm->path_info . "/" . $file, $buffer, LOCK_EX);
-							if (!$rc_cache && $cache_new_groupdir)
-								$cache_disk_fail = true;
-						}
-						else if ($cache_new_groupdir)
-							$cache_disk_fail = true;
-						
-					} while (!$rc_cache && !$cache_disk_fail && $cache_group_dir < CM_PAGECACHE_MAXGROUPDIRS);
-						
-					if ($rc_cache)
-					{
-						$rc_cache = @touch($cache_dir . "/" . $cache_group_dir . $cm->path_info . "/" . $file, $now + $expires);
-						if (!$rc_cache)
-							@unlink($cache_dir . "/" . $cache_group_dir . $cm->path_info . "/" . $file);
-					} 
-					else if ($cache_group_dir == CM_PAGECACHE_MAXGROUPDIRS)
-					{
-						@touch($cache_dir . "/maxgroup_limit_reached");
-						if ($cache_dir != CM_PAGECACHE_DIR)
-							@touch(CM_PAGECACHE_DIR . "/maxgroup_limit_reached");
-					}*/
+						$rc_cache = cm_filecache_write($cache_dir . $cache_path_info, $file, $buffer, ($now + $expires));
 				}
 
 				// manage compressions
@@ -1171,46 +1282,10 @@ class cm extends ffCommon
 							else
 								$cache_group_dir = 0;
 							
-							$rc_cache = cm_filecache_groupwrite(CM_PAGECACHE_DIR, $cache_dir, $this->path_info, $file . "." . $ret["method"], $ret["data"], ($now + $expires), CM_PAGECACHE_MAXGROUPDIRS, $cache_group_dir, $cache_disk_fail);
+							$rc_cache = cm_filecache_groupwrite(CM_PAGECACHE_DIR, $cache_dir, $cache_path_info, $file . "." . $ret["method"], $ret["data"], ($now + $expires), CM_PAGECACHE_MAXGROUPDIRS, $cache_group_dir, $cache_disk_fail);
 						}
 						else
-							$rc_cache = cm_filecache_write($cache_dir . $this->path_info, $file . "." . $ret["method"], $ret["data"], ($now + $expires));
-						
-						/*
-						do
-						{
-							$cache_group_dir++;
-
-							if (!is_dir($cache_dir . "/" . $cache_group_dir))
-								$cache_new_groupdir = true;
-							else
-								$cache_new_groupdir = false;
-
-							if (!is_dir($cache_dir . "/" . $cache_group_dir . $cm->path_info))
-								$rc_cache = @mkdir($cache_dir . "/" . $cache_group_dir . $cm->path_info, 0777, true);
-							if ($rc_cache)
-							{
-								$rc_cache = @file_put_contents($cache_dir . "/" . $cache_group_dir . $cm->path_info . "/" . $file . "." . $ret["method"], $ret["data"], LOCK_EX);
-								if (!$rc_cache && $cache_new_groupdir)
-									$cache_disk_fail = true;
-							}
-							else if ($cache_new_groupdir)
-								$cache_disk_fail = true;
-
-						} while (!$rc_cache && !$cache_disk_fail && $cache_group_dir < CM_PAGECACHE_MAXGROUPDIRS);
-
-						if ($rc_cache)
-						{
-							$rc_cache = @touch($cache_dir . "/" . $cache_group_dir . $cm->path_info . "/" . $file . "." . $ret["method"], $now + $expires);
-							if (!$rc_cache)
-								@unlink($cache_dir . "/" . $cache_group_dir . $cm->path_info . "/" . $file . "." . $ret["method"]);
-						}
-						else if ($cache_group_dir == CM_PAGECACHE_MAXGROUPDIRS)
-						{
-							@touch($cache_dir . "/maxgroup_limit_reached");
-							if ($cache_dir != CM_PAGECACHE_DIR)
-								@touch(CM_PAGECACHE_DIR . "/maxgroup_limit_reached");
-						}*/
+							$rc_cache = cm_filecache_write($cache_dir . $cache_path_info, $file . "." . $ret["method"], $ret["data"], ($now + $expires));
 					}
 					
 					if ($compression)
@@ -1229,16 +1304,7 @@ class cm extends ffCommon
 				{
 					$this->doEvent("on_cache_write", array(&$this, $now, $compression));
 
-					if (CM_PAGECACHE_USE_STRONG_CACHE)
-					{
-						$exp_gmt = gmdate("D, d M Y H:i:s", $now + $expires) . " GMT";
-						header("Expires: $exp_gmt");
-					}
-					else
-					{
-						//$mod_gmt = gmdate("D, d M Y H:i:s", $now) . " GMT";
-						header("Cache-Control: public, max-age=" . $max_age); // public: to let firefox cache over https
-					}
+					header("Cache-Control: public, max-age=" . $max_age); // public: to let firefox cache over https
 					
 					header("ETag: " . $etag);
 				}
@@ -1252,7 +1318,7 @@ class cm extends ffCommon
 		}
 		
 		$buffer = null;
-
+		
 		if (CM_MIME_FORCE && !$this->isXHR())
 		{
 			$mime = null;
@@ -1296,21 +1362,53 @@ class cm extends ffCommon
 		else
 			echo $buffer;
 
-		if(isset($_REQUEST["__query__"]))
+		if(defined("FF_URLPARAM_QUERY"))
 			ffErrorHandler::raise("QUERY", E_USER_ERROR, null, ffDB_Sql::$_objProfile);	
-
-		if (isset($_REQUEST["__debug__"])) {
+		
+		if (defined("FF_URLPARAM_DEBUG"))
 			ffErrorHandler::raise("DEBUG CM Process End", E_USER_ERROR, $this, get_defined_vars());
-		}
+		
+		/*echo "<pre>";
+		print_r(ffDB_Sql::$_objProfile);*/
+		exit;
 	}
 
-	static function oPage_on_process_parts($oPage, $tpl)
+	static function oPage_on_page_process()
+	{
+		$cm = cm::getInstance();
+
+		$cm->preloadApplets($cm->oPage->tpl[0]);
+		//$cm->parseApplets($cm->oPage->tpl[0]); // DA ESEGUIRE DOPO, IN oPage_on_after_process_components
+		$cm->preloadApplets($cm->oPage->tpl_layer[0]);
+			
+		foreach ($cm->oPage->sections as $key => $value)
+		{
+			$cm->preloadApplets($cm->oPage->sections[$key]["tpl"]);
+		}
+		reset($cm->oPage->sections);
+		
+		foreach  ($cm->oPage->components as $key => $value)
+		{
+			$cm->preloadApplets($cm->oPage->components[$key]->tpl[0]);
+			//$cm->parseApplets($cm->oPage->components[$key]->tpl[0]);  // probabilmente inutile, da eseguire alla fine in oPage_on_after_process_components
+		}
+		
+		foreach ($cm->oPage->contents as $key => $content)
+		{
+			if (is_object($content) && get_class($content) == "ffTemplate")
+				$cm->preloadApplets($content);
+			elseif (is_string($content))
+				$cm->preloadAppletsContent($content);
+		}
+	}
+	
+	/*static function oPage_on_process_parts($oPage, $tpl) // RIDONDANTE, È SUFFICIENTE oPage_on_page_process
 	{
 		if (is_array($tpl))
 			$tpl = $tpl[0];
 
 		cm::getInstance()->preloadApplets($tpl);
-	}
+	}*/
 
 	static function oPage_on_after_process_components($oPage)
 	{
@@ -1327,6 +1425,20 @@ class cm extends ffCommon
 		}
 		reset($cm->oPage->sections);
 		
+		foreach  ($cm->oPage->components as $key => $value)
+		{
+			$cm->parseApplets($cm->oPage->components[$key]->tpl[0]);
+			//$cm->parseApplets($cm->oPage->components[$key]->tpl[0]);  // probabilmente inutile, da eseguire alla fine in oPage_on_after_process_components
+		}
+		
+		foreach ($cm->oPage->contents as $key => $content)
+		{
+			if (is_object($content["data"]) && get_class($content["data"]) == "ffTemplate")
+				$cm->parseApplets($content["data"]);
+			elseif (is_string($content["data"]))
+				$cm->parseAppletsContent($content["data"]);
+		}
+		
 		if ($cm->tpl_content !== null)
 		{
 			$cm->parseApplets(array($cm->tpl_content));
@@ -1340,10 +1452,13 @@ class cm extends ffCommon
 		$cm = cm::getInstance();
 		if ($cm->isXHR())
 		{
+			http_response_code(200); // force proper response code
+
 			$out = array_merge($response, $cm->json_response);
-			$out["url"] = $destination;
+            $out["url"] = $destination;
+            //$out["url"] = $destination === null ? "" : $destination;
 			$out["close"] = false;
-			
+
 			cm::jsonParse($out);
 			exit;
 		}
@@ -1482,23 +1597,36 @@ class cm extends ffCommon
 							&& is_array($this->applets_components[$key]) && count($this->applets_components[$key])
 						)
 					{
+						$applet_full_processed = true;
+						
 						foreach ($this->applets_components[$key] as $subkey => $subvalue)
 						{
-							if ($this->oPage->components[$subkey]->use_own_location)
+							if (ffIsset($this->oPage->components_buffer, $subkey))
 							{
-								if (strlen($this->oPage->components[$subkey]->location_name)) 
+								if ($this->oPage->components[$subkey]->use_own_location)
 								{
-									$tpl->set_var($this->oPage->components[$subkey]->location_name, $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"]);
+									$loc = $this->oPage->components[$subkey]->location_name !== null ? $this->oPage->components[$subkey]->location_name : $subkey;
+
+									$rc = $tpl->set_var($loc, $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"]);
+									if (!$rc && strpos($buffer, "{" . $loc . "}") !== false)
+										$buffer = str_replace("{" . $loc . "}", $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"], $buffer, $rc);
 								}
 								else
 								{
 									$buffer .= $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"];
 								}
 							}
+							else
+							{
+								$applet_full_processed = false;
+							}
 						}
 						reset($this->applets_components[$key]);
 
-						$this->applets_components[$key]["_buffer_"] = $buffer;
+						if ($buffer !== null && $applet_full_processed)
+							$this->applets_components[$key]["_buffer_"] = $buffer;
+						else
+							$buffer = null;
 					}
 				}
 				
@@ -1532,23 +1660,36 @@ class cm extends ffCommon
 							&& is_array($this->applets_components[$key]) && count($this->applets_components[$key])
 						)
 					{
+						$applet_full_processed = true;
+						
 						foreach ($this->applets_components[$key] as $subkey => $subvalue)
 						{
-							if ($this->oPage->components[$subkey]->use_own_location)
+							if (ffIsset($this->oPage->components_buffer, $subkey))
 							{
-								if (strlen($this->oPage->components[$subkey]->location_name))
+								$rc = false;
+								if ($this->oPage->components[$subkey]->use_own_location)
 								{
-									$content = str_replace($this->oPage->components[$subkey]->location_name, $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"], $content);
+									$loc = $this->oPage->components[$subkey]->location_name !== null ? $this->oPage->components[$subkey]->location_name : $subkey;
+
+									if (strpos($buffer, "{" . $loc . "}") !== false)
+										$buffer = str_replace("{" . $loc . "}", $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"], $buffer, $rc);
 								}
 								else
 								{
 									$buffer .= $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"];
 								}
 							}
+							else
+							{
+								$applet_full_processed = false;
+							}
 						}
 						reset($this->applets_components[$key]);
 
-						$this->applets_components[$key]["_buffer_"] = $buffer;
+						if ($buffer !== null && $applet_full_processed)
+							$this->applets_components[$key]["_buffer_"] = $buffer;
+						else
+							$buffer = null;
 					}
 				}
 
@@ -1577,7 +1718,7 @@ class cm extends ffCommon
 		else
 		{
 			$this->loaded_applets[$appletid]["name"] = $appletname;
-			$applet_file = FF_DISK_PATH . "/applets/" . $appletname . "/index." . FF_PHP_EXT;
+			$applet_file = __PRJ_DIR__ . "/applets/" . $appletname . "/index." . FF_PHP_EXT;
 		}
 		
 		$cm = $this;
@@ -1586,8 +1727,30 @@ class cm extends ffCommon
 			include $applet_file;
 		else
 			ffErrorHandler::raise("APPLET NON TROVATA", E_USER_ERROR, $this, get_defined_vars());
+		
+		if (ffIsset($this->loaded_applets[$appletid], "comps"))
+		{
+			// LOAD SETTINGS BY COMPONENT
+			if (is_dir(__PRJ_DIR__ . "/conf/ffsettings/components"))
+			{
+				foreach ($this->loaded_applets[$appletid]["comps"] as $key)
+				{
+					if (defined("FF_URLPARAM_SHOWCASCADELOADER"))
+						echo __PRJ_DIR__ . "/conf/ffsettings/components/" . $key . "." . $this->oPage->getTheme() . ".xml<br />\n";
+					if (@is_file(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . "." . $this->oPage->getTheme() . ".xml"))
+						$this->load_ffSettings(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . "." . $this->oPage->getTheme() . ".xml");
+					else if (@is_file(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . ".xml"))
+					{
+						if (defined("FF_URLPARAM_SHOWCASCADELOADER"))
+							echo __PRJ_DIR__ . "/conf/ffsettings/components/" . $key . ".xml<br />\n";
+						$this->load_ffSettings(__PRJ_DIR__ . "/conf/ffsettings/components/" . $key . ".xml");
+					}
+				}
+			}
+		}
 
-		$this->loaded_applets[$appletid]["buffer"] = $out_buffer;
+        /** @var include $out_buffer */
+        $this->loaded_applets[$appletid]["buffer"] = $out_buffer;
 		
 		$this->oPage->process_params();
 		return $out_buffer;
@@ -1598,6 +1761,8 @@ class cm extends ffCommon
 		$ff = ffGlobals::getInstance("ff");
 		$cm = $this;
 
+		$this->doEvent("on_beforeCallScript", array(&$this, $this->script_name));
+		
 		require $file;
 		
 		$this->doEvent("on_callScript", array(&$this, $this->script_name));
@@ -1608,15 +1773,26 @@ class cm extends ffCommon
 		if ($path_info === null)
 			$path_info = $this->path_info;
 		
-		$file = rtrim(FF_DISK_PATH . "/conf/contents" . $path_info, "/") . "/ff_settings.xml";
-		if (!is_file($file))
+		if (is_file($file = rtrim(__PRJ_DIR__ . "/conf/contents" . $path_info, "/") . "/ff_settings." . $this->oPage->getTheme() . ".xml"))
+			return $this->load_ffSettings($file);
+		else if (is_file($file = rtrim(__PRJ_DIR__ . "/conf/contents" . $path_info, "/") . "/ff_settings.xml"))
+			return $this->load_ffSettings($file);
+		else
 			return false;
-		
-		$this->load_ffSettings($file);
 	}
 
 	function load_ffSettings($file)
 	{
+		$res = $this->doEvent("load_ffSettings", array($this, $file));
+		$rc = end($res);
+		if ($rc !== null)
+		{
+			if ($rc === true)
+				return false;
+			else
+				$file = $rc;
+		}
+		
 		//if (isset($this->ff_settings_loaded[$file]))
 		//	return true;
 
@@ -2026,6 +2202,8 @@ class cm extends ffCommon
 					break;
 
 				default:
+					$value = str_replace("[FF_SITE_PATH]", FF_SITE_PATH, $value);
+					$value = str_replace("[FF_DISK_PATH]", FF_DISK_PATH, $value);
 					break;
 			}
 
@@ -2039,7 +2217,8 @@ class cm extends ffCommon
 	{
 		if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
 		{
-			$res = $this->cache->get("__cm_getLayoutByPath_" . $layout_path . "__", $ffcache_layout_success);
+            /** @var reference $ffcache_layout_success */
+            $res = $this->cache->get("__cm_getLayoutByPath_" . $layout_path . "__", $ffcache_layout_success);
 			if ($ffcache_layout_success === true)
 				return $res;
 		}
@@ -2068,53 +2247,73 @@ class cm extends ffCommon
 		$layout_vars["enable_gzip"] = false;
 		$layout_vars["compact_js"] = false;
 		$layout_vars["compact_css"] = false;
-        $layout_vars["framework_css"] = null;
-        $layout_vars["font_icon"] = null;
 		
 		$tmp = $layout_path;
 		$paths = "";
 		$i = 0;
 		do
 		{
-			if ($i > 0 && $tmp != "/")
+			if (substr($tmp, -1) !== "/" && !($i == 1 && substr($layout_path, -1) === "/")) // this add a directory variant before. This means that /restricted == /restricted/
 			{
-				$paths .= " OR path = '" . $db->toSql(new ffData($tmp . "/"), NULL, false) . "'";
+				if (strlen($paths))
+					$paths .= " OR ";
+				$paths .= " `path` = " . $db->toSql($tmp . "/");
 			}
 
 			if (strlen($paths))
 				$paths .= " OR ";
 
-			$paths .= "path = '" . $db->toSql(new ffData($tmp), NULL, false) . "'";
+			$paths .= "`path` = " . $db->toSql($tmp);
 			$i++;
 		} while($tmp != "/" && $tmp = ffCommon_dirname($tmp));
 
-		if(defined("CM_MULTIDOMAIN_ROUTING") && CM_MULTIDOMAIN_ROUTING)
+		if(CM_MULTIDOMAIN_ROUTING)
         {
-            $sSQL = "SELECT tbl_src.* 
-                    FROM
-                    (
-                        SELECT
-                            " . CM_TABLE_PREFIX . "layout.*
-                            , IF(" . CM_TABLE_PREFIX . "layout.domains = ''
-                                , 0
-                                , 1
-                            ) AS sort_domains
-                        FROM
-                            " . CM_TABLE_PREFIX . "layout
-                        WHERE 1
-                            " . (strlen($paths)
-                                ? " AND (" . $paths . ") " 
-                                : ""
-                            ) . "
-                            AND (" . CM_TABLE_PREFIX . "layout.domains = ''
-                                OR FIND_IN_SET(" . $db->toSql($_SERVER["HTTP_HOST"]) . ", " . CM_TABLE_PREFIX . "layout.domains)
-                            )
-                        ORDER BY
-                            sort_domains DESC, path ASC
-                    ) AS tbl_src
-                    GROUP BY path
-                    ORDER BY tbl_src.path ASC";
-        } else {
+			$find_hosts = array();
+			$host_parts = array_reverse(explode(".", $_SERVER["HTTP_HOST"]));
+			$last_host = "";
+			foreach ($host_parts as $key => $value)
+			{
+				if (strlen($last_host))
+					$last_host = "." . $last_host;
+				$last_host = $value . $last_host;
+				$find_hosts[] = str_replace('\\', '\\\\', preg_quote($last_host));
+				$find_hosts[] = str_replace('\\', '\\\\', preg_quote("*." . $last_host));
+			}
+			$search_host = implode("|", $find_hosts);
+
+			$sSQL = "SELECT
+							`tbl_src`.*
+						FROM
+							(
+								SELECT
+									`" . CM_TABLE_PREFIX . "layout`.*
+									, IF(`" . CM_TABLE_PREFIX . "layout`.`domains` = ''
+										, 0
+										, 1
+									) AS `sort_domains`
+								FROM
+									`" . CM_TABLE_PREFIX . "layout`
+								WHERE 1
+									" . (strlen($paths)
+										? " AND (" . $paths . ") " 
+										: ""
+									) . "
+									AND (`" . CM_TABLE_PREFIX . "layout`.`domains` = ''
+										OR CONCAT(',', `" . CM_TABLE_PREFIX . "layout`.`domains`, ',') REGEXP ',(" . $search_host . "),'
+									)
+								ORDER BY
+									`sort_domains` DESC, `path` ASC
+							) AS `tbl_src`
+						GROUP BY 
+							`path`
+						ORDER BY
+							`tbl_src`.`path` ASC
+					";
+	//									OR FIND_IN_SET(" . $db->toSql($_SERVER["HTTP_HOST"]) . ", `" . CM_TABLE_PREFIX . "layout`.`domains`)
+        } 
+		else 
+		{
             $sSQL = "SELECT
                         " . CM_TABLE_PREFIX . "layout.*
                     FROM
@@ -2166,8 +2365,6 @@ class cm extends ffCommon
 					$layout_vars["enable_gzip"] = false;
 					$layout_vars["compact_js"] = false;
 					$layout_vars["compact_css"] = false;
-                    $layout_vars["framework_css"] = null;
-                    $layout_vars["font_icon"] = null;
 				}
 
 				if($db->getField("ignore_defaults", "Number", true, false))
@@ -2209,12 +2406,6 @@ class cm extends ffCommon
 				if (strlen($db->getField("class_body", "Text", true)))
 					$layout_vars["class_body"] = $db->getField("class_body", "Text", true);
 
-                if (strlen($db->getField("framework_css", "Text", true, false)))
-                    $layout_vars["framework_css"] = $db->getField("framework_css", "Text", true);
-
-                if (strlen($db->getField("font_icon", "Text", true, false)))
-                    $layout_vars["font_icon"] = $db->getField("font_icon", "Text", true);
-
 				$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "layout_sect WHERE ID_layout = " . $db2->toSql($db->getField("ID")) . " ORDER BY ID";
 				
 				$db2->query($sSQL);
@@ -2230,7 +2421,7 @@ class cm extends ffCommon
 					} while ($db2->nextRecord());
 				}
 
-				$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "layout_css WHERE ID_layout = " . $db2->toSql($db->getField("ID")) . " ORDER BY ID";
+				$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "layout_css WHERE ID_layout = " . $db2->toSql($db->getField("ID")) . " ORDER BY `priority`, `order`, `ID`";
 				$db2->query($sSQL);
 				if ($db2->nextRecord())
 				{
@@ -2239,15 +2430,19 @@ class cm extends ffCommon
 						if(!$db2->getField("cascading", "Text", true) && !$bMatchPath)
 							continue;
 
-						if(!strlen($db2->getField("priority", "Text", true)))
-							$priority = "top";
+						if (!$db2->getField("priority", "Number", true))
+							$priority = cm::LAYOUT_PRIORITY_DEFAULT;
 						else
-							$priority = $db2->getField("priority", "Text", true);
+							$priority = $db2->getField("priority", "Number", true);
 
-						$layout_vars["css"][$db2->getField("name", "Text", true)]["path"] = ($db2->getField("path", "Text", true) ? $db2->getField("path", "Text", true) : null);
-						$layout_vars["css"][$db2->getField("name", "Text", true)]["file"] = $db2->getField("file", "Text", true);
-						$layout_vars["css"][$db2->getField("name", "Text", true)]["exclude_compact"] =  $db2->getField("exclude_compact", "Text", true);
-						$layout_vars["css"][$db2->getField("name", "Text", true)]["priority"] = $priority;
+						$layout_vars["css"][$db2->getField("name", "Text", true)] = array(
+							"path" => ($db2->getField("path", "Text", true) ? $db2->getField("path", "Text", true) : null)
+							, "file" => $db2->getField("file", "Text", true)
+							, "theme" =>  $db2->getField("theme_include", "Text", true)
+							, "exclude_compact" =>  $db2->getField("exclude_compact", "Text", true)
+							, "priority" => $priority
+							, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+						);
 					} while ($db2->nextRecord());
 				}
 
@@ -2260,60 +2455,78 @@ class cm extends ffCommon
 						if(!$db2->getField("cascading", "Text", true) && !$bMatchPath)
 							continue;
 
-						if(!strlen($db2->getField("priority", "Text", true)))
-							$priority = "top";
+						if (!$db2->getField("priority", "Number", true))
+							$priority = cm::LAYOUT_PRIORITY_DEFAULT;
 						else
-							$priority = $db2->getField("priority", "Text", true);
-
+							$priority = $db2->getField("priority", "Number", true);
+						
 						if(strlen($db2->getField("plugin_path", "Text", true)))
 						{
-							if(file_exists(FF_DISK_PATH . $db2->getField("plugin_path", "Text", true)))
+							if(file_exists(ff_getThemeDir($layout_vars["theme"]) . $db2->getField("plugin_path", "Text", true)))
 							{
-								$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true)))]["path"] = ffCommon_dirname($db2->getField("plugin_path", "Text", true));
-								$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true)))]["file"] = basename($db2->getField("plugin_path", "Text", true));
-								$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true)))]["exclude_compact"] = $db2->getField("exclude_compact", "Text", true);
-								$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true)))]["priority"] = $priority;
+								$layout_vars["js"][$db2->getField("name", "Text", true)] = array(
+									"path" => ffCommon_dirname($db2->getField("plugin_path", "Text", true))
+									, "file" => basename($db2->getField("plugin_path", "Text", true))
+									, "exclude_compact" => $db2->getField("exclude_compact", "Text", true)
+									, "priority" => $priority
+									, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+								);
 							}
 							if(strlen($db2->getField("js_path", "Text", true)))
 							{ 
-								$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["path"] = "/themes/" . $layout_vars["theme"] . "/javascript" . ffCommon_dirname($db2->getField("js_path", "Text", true));
-								$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["file"] = basename($db2->getField("js_path", "Text", true));
-								$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["exclude_compact"] = $db2->getField("exclude_compact", "Text", true);
-								$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["priority"] = $priority;
+								$layout_vars["js"][$db2->getField("name", "Text", true)] = array(
+									"path" => "/themes/" . $layout_vars["theme"] . "/javascript" . ffCommon_dirname($db2->getField("js_path", "Text", true))
+									, "file" => basename($db2->getField("js_path", "Text", true))
+									, "exclude_compact" => $db2->getField("exclude_compact", "Text", true)
+									, "priority" => $priority
+									, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+								);
 							}
 							else
 							{
-                                if(file_exists(FF_DISK_PATH . "/themes/" . $layout_vars["theme"] . "/javascript/" . basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"))
+                                if(file_exists(ff_getThemeDir($layout_vars["theme"]) . "/themes/" . $layout_vars["theme"] . "/javascript/" . basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"))
                                 {
-                                    $layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["path"] = "/themes/" . $layout_vars["theme"] . "/javascript";
-                                    $layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["file"] = basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js";
-                                    $layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["exclude_compact"] = $db2->getField("exclude_compact", "Text", true);
-                                    $layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["priority"] = $priority;
+                                    $layout_vars["js"][$db2->getField("name", "Text", true) . ".observe"] = array(
+										"path" => "/themes/" . $layout_vars["theme"] . "/javascript"
+										, "file" => basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"
+										, "exclude_compact" => $db2->getField("exclude_compact", "Text", true)
+										, "priority" => $priority
+										, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+									);
                                 } 
-                                elseif(file_exists(FF_DISK_PATH . ffCommon_dirname($db2->getField("plugin_path", "Text", true)) . "/" . basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"))
+                                elseif(file_exists(ff_getThemeDir($layout_vars["theme"]) . ffCommon_dirname($db2->getField("plugin_path", "Text", true)) . "/" . basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"))
 								{
-									$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["path"] = ffCommon_dirname($db2->getField("plugin_path", "Text", true));
-									$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["file"] = basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js";
-									$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["exclude_compact"] = $db2->getField("exclude_compact", "Text", true);
-									$layout_vars["js"][basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe"]["priority"] = $priority;
+									$layout_vars["js"][$db2->getField("name", "Text", true) . ".observe"] = array(
+										"path" => ffCommon_dirname($db2->getField("plugin_path", "Text", true))
+										, "file" => basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"
+										, "exclude_compact" => $db2->getField("exclude_compact", "Text", true)
+										, "priority" => $priority
+										, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+									);
 								}
 							}
 						}
 						elseif (strlen($db2->getField("js_path", "Text", true)))
 						{
-							$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["path"] = "/themes/" . $layout_vars["theme"] . "/javascript" . ffCommon_dirname($db2->getField("js_path", "Text", true));
-							$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["file"] = basename($db2->getField("js_path", "Text", true));
-							$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["theme"] = $db2->getField("theme_include", "Text", true);
-							$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["exclude_compact"] = $db2->getField("exclude_compact", "Text", true);
-							$layout_vars["js"][basename($db2->getField("js_path", "Text", true))]["priority"] = $priority;
+							$layout_vars["js"][$db2->getField("name", "Text", true)] = array(
+								"path" => "/themes/" . $layout_vars["theme"] . "/javascript" . ffCommon_dirname($db2->getField("js_path", "Text", true))
+								, "file" => basename($db2->getField("js_path", "Text", true))
+								, "theme" => $db2->getField("theme_include", "Text", true)
+								, "exclude_compact" => $db2->getField("exclude_compact", "Text", true)
+								, "priority" => $priority
+								, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+							);
 						}
-						elseif (strlen($db2->getField("file", "Text", true)))
+						else
 						{
-							$layout_vars["js"][$db2->getField("name", "Text", true)]["path"]	= ($db2->getField("path", "Text", true) ? $db2->getField("path", "Text", true) : null);
-							$layout_vars["js"][$db2->getField("name", "Text", true)]["file"]	= $db2->getField("file", "Text", true);
-							$layout_vars["js"][$db2->getField("name", "Text", true)]["theme"]	= $db2->getField("theme_include", "Text", true);
-							$layout_vars["js"][$db2->getField("name", "Text", true)]["exclude_compact"] = $db2->getField("exclude_compact", "Text", true);
-							$layout_vars["js"][$db2->getField("name", "Text", true)]["priority"] = $priority;
+							$layout_vars["js"][$db2->getField("name", "Text", true)] = array(
+								"path" => ($db2->getField("path", "Text", true) ? $db2->getField("path", "Text", true) : null)
+								, "file"	=> ($db2->getField("file", "Text", true) ? $db2->getField("file", "Text", true) : null)
+								, "theme" => $db2->getField("theme_include", "Text", true)
+								, "exclude_compact" => $db2->getField("exclude_compact", "Text", true)
+								, "priority" => $priority
+								, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
+							);
 						}
 					} while ($db2->nextRecord());
 				}
@@ -2349,25 +2562,11 @@ class cm extends ffCommon
                 }
             } while($db->nextRecord());
 		}
-		
+
 		if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE) $this->cache->set("__cm_getLayoutByPath_" . $layout_path . "__", null, $layout_vars, "__cm_layout__");
 		return $layout_vars;
 	}
 
-	static function oPage_on_page_process()
-	{
-		$cm = cm::getInstance();
-
-		$cm->preloadApplets($cm->oPage->tpl[0]);
-		$cm->parseApplets($cm->oPage->tpl[0]);
-			
-		foreach  ($cm->oPage->components as $key => $value)
-		{
-			$cm->preloadApplets($cm->oPage->components[$key]->tpl[0]);
-			$cm->parseApplets($cm->oPage->components[$key]->tpl[0]);
-		}
-	}
-	
 	function isXHR()
 	{
 		if ($_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest")
@@ -2386,7 +2585,7 @@ class cm extends ffCommon
 	
 	function jsonAddResponse($data)
 	{
-		$this->json_response = array_replace_recursive($this->json_response, $data);
+		return $this->json_response = array_replace_recursive($this->json_response, $data);
 		
 	}
 	
@@ -2394,7 +2593,7 @@ class cm extends ffCommon
 	{
 		if (!$skip_event)
 			cm::_doEvent("jsonParse", array(&$arData, &$out, &$add_newline, &$standard_encode, &$standard_opts));
-				
+		
 		if ($jsonp = cm::getJSONP())
 		{
 			$jsonp_pre = $jsonp . "(";
@@ -2526,27 +2725,56 @@ class cm extends ffCommon
 	    );
 	}
 	
-	function responseCode($code)
+	function responseCode($code, $mute = false)
 	{
+		//ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
 		$res = $this->doEvent("on_responseCode", array($this, $code));
 		$rc = end($res);
 		if ($rc === null)
 		{
 			$tpl = null;
 			
-			if (is_file(FF_DISK_PATH . "/conf/cm/extras/" . $code . ".html"))
-				$tpl = ffTemplate::factory(FF_DISK_PATH . "/conf/cm/extras");
-			else if (is_file(FF_DISK_PATH . "/cm/extras/" . $code . ".html"))
-				$tpl = ffTemplate::factory(FF_DISK_PATH . "/cm/extras");
-			
-			if ($tpl !== null)
+			if (!$mute)
 			{
-				$tpl->load_file($code . ".html", "main");
-				$tpl->pparse("main", false);
+				if (is_file(__PRJ_DIR__ . "/conf/cm/extras/" . $code . ".html"))
+					$tpl = ffTemplate::factory(__PRJ_DIR__ . "/conf/cm/extras");
+				else if (is_file(__TOP_DIR__ . "/cm/extras/" . $code . ".html"))
+					$tpl = ffTemplate::factory(__TOP_DIR__ . "/cm/extras");
+
+				if ($tpl !== null)
+				{
+					$tpl->load_file($code . ".html", "main");
+					$tpl->pparse("main", false);
+				}
 			}
 			
 			http_response_code($code);
 			exit;
+		}
+	}
+	
+	static public function _layoutOrderElements(&$elements, $priority = null)
+	{
+		if ($priority)
+		{
+			if (!isset($elements[$priority]))
+				return;
+
+			usort($elements[$priority], "ffCommon_IndexOrder");
+			$elements[$priority] = array_reverse($elements[$priority]);
+		}
+		else
+		{
+			ksort($elements);
+		
+			for($i = CM::LAYOUT_PRIORITY_TOPLEVEL; $i <= CM::LAYOUT_PRIORITY_FINAL; $i++)
+			{
+				if (!isset($elements[$i]))
+					continue;
+
+				uasort($elements[$i], "ffCommon_IndexOrder");
+				$elements[$i] = array_reverse($elements[$i]);
+			}
 		}
 	}
 }

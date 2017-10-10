@@ -4,8 +4,8 @@
  * @package ContentManager
  * @subpackage contents
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -39,16 +39,6 @@ $oGrid->addKeyField($oField);
 $oField = ffField::factory($cm->oPage);
 $oField->id = "path";
 $oField->label = "path";
-$oGrid->addContent($oField, false);
-
-$oField = ffField::factory($cm->oPage);
-$oField->id = "framework_css";
-$oField->label = "Framework CSS";
-$oGrid->addContent($oField, false);
-
-$oField = ffField::factory($cm->oPage);
-$oField->id = "font_icon";
-$oField->label = "Font Icon";
 $oGrid->addContent($oField, false);
 
 $oField = ffField::factory($cm->oPage);

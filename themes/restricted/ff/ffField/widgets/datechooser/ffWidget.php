@@ -15,9 +15,16 @@ class ffWidget_datechooser extends ffCommon
 	var $class			= "ffWidget_datechooser";
 
 	var $widget_deps	= array();
-    var $js_deps = array();
-    var $css_deps 		= array();
 
+	var $libraries		= array();
+	
+    var $js_deps = array(
+							"ff.ffField.datechooser" 	=> null
+						);
+	
+    var $css_deps 		= array(
+    					);
+	
 	// PRIVATE VARS
 	
 	var $tpl 			= null;
@@ -25,27 +32,9 @@ class ffWidget_datechooser extends ffCommon
 
 	var $oPage = null;
 	var $source_path	= null;
-	var $style_path = null;
+	var $style_path 	= null;
 	
-	var $framework_css		= array(
-									"container" => array(
-										"class" => null
-										, "row"	=> true
-										, "col" => null
-									)
-									, "day" => array(
-										"class" => null
-										, "col" => array(4)
-									)
-									, "month" => array(
-										"class" => null
-										, "col" => array(4)
-									)
-									, "year" => array(
-										"class" => null
-										, "col" => array(4)
-									)	
-								);
+	
 	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
 	{
 		//$this->get_defaults();
@@ -81,13 +70,15 @@ class ffWidget_datechooser extends ffCommon
 	{
 
 		// THE REAL STUFF
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "datechooser";
 		}
 		else
 		{
@@ -102,35 +93,6 @@ class ffWidget_datechooser extends ffCommon
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-		if(is_array($Field->framework_css["widget"]["datechooser"])) {
-			$this->framework_css = array_replace_recursive($this->framework_css, $Field->framework_css["widget"]["datechooser"]);
-		}
-		if($this->framework_css["container"]["class"] === null)
-			$this->framework_css["container"]["class"] = $this->class;
-
-		if($this->framework_css["container"]["row"])
-			$this->tpl[$tpl_id]->set_var("container_class", cm_getClassByFrameworkCss("row", "form", $this->framework_css["container"]["class"]));
-		elseif($this->framework_css["container"]["col"])
-			$this->tpl[$tpl_id]->set_var("container_class", cm_getClassByFrameworkCss($this->framework_css["container"]["col"], "col", array("class" => $this->framework_css["container"]["class"])));
-		elseif($this->framework_css["container"]["class"])
-			$this->tpl[$tpl_id]->set_var("container_class", $this->framework_css["container"]["class"]);
-
-		if($this->framework_css["day"]["col"])
-			$this->tpl[$tpl_id]->set_var("day_class", cm_getClassByFrameworkCss($this->framework_css["day"]["col"], "col",  array("class" => $this->framework_css["day"]["class"])));
-		elseif($this->framework_css["day"]["class"])
-			$this->tpl[$tpl_id]->set_var("day_class", $this->framework_css["day"]["class"]);
-
-		if($this->framework_css["month"]["col"])
-			$this->tpl[$tpl_id]->set_var("month_class", cm_getClassByFrameworkCss($this->framework_css["month"]["col"], "col",  array("class" => $this->framework_css["month"]["class"])));
-		elseif($this->framework_css["month"]["class"])
-			$this->tpl[$tpl_id]->set_var("month_class", $this->framework_css["month"]["class"]);
-
-		if($this->framework_css["year"]["col"])
-			$this->tpl[$tpl_id]->set_var("year_class", cm_getClassByFrameworkCss($this->framework_css["year"]["col"], "col",  array("class" => $this->framework_css["year"]["class"])));
-		elseif($this->framework_css["year"]["class"])
-			$this->tpl[$tpl_id]->set_var("year_class", $this->framework_css["year"]["class"]);
-				
-		
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
@@ -151,8 +113,6 @@ class ffWidget_datechooser extends ffCommon
 		$this->tpl[$tpl_id]->set_var("sel_year", $year);
 		$this->tpl[$tpl_id]->set_var("sel_month", $month);
 		$this->tpl[$tpl_id]->set_var("sel_day", $day);
-		
-		$this->tpl[$tpl_id]->set_var("type_date", $Field->datechooser_type_date);
  
 		if ($Field->contain_error && $Field->error_preserve)
 			$this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->ori_value));
@@ -165,11 +125,6 @@ class ffWidget_datechooser extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.datechooser", "datechooser.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/datechooser");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -186,13 +141,6 @@ class ffWidget_datechooser extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.datechooser", "datechooser.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/datechooser");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

@@ -1,22 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-	ff.pluginLoad("jquery.ui", "/themes/library/jquery.ui/jquery.ui.js", function() {
-		ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js");
-	});
-/* Remove jquery ui css
-	ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
-		ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
-			ff.injectCSS("jqueryuidialog", "{jqueryuidialog}", function() {
-				<!--BeginSectResizeCss-->
-				ff.injectCSS("jqueryuiresizable", "{jqueryuiresizable}");
-				<!--EndSectResizeCss-->
-			});
-		});
-	});
-*/
-});
-</script>
 <!--EndSectHeaders-->
 <!--BeginSectControl-->
 <a href="{addjs}javascript:ff.ffPage.dialog.doOpen('{id}');" class="{class}">{name}</a>
@@ -49,6 +31,9 @@ ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
 			<!--BeginSectWidth-->
 			, "width" : {width}
 			<!--EndSectWidth-->
+			<!--BeginSectModal-->
+			, "modal" : false
+			<!--EndSectModal-->
 			, "doredirects" : {doredirects}
 			, "responsive" : {responsive}
 			, "unique" : {unique}

@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffGrid
@@ -119,8 +119,8 @@ class ffGrid
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffGrid_base extends ffCommon
@@ -128,137 +128,11 @@ abstract class ffGrid_base extends ffCommon
 	// ----------------------------------
 	//  PUBLIC VARS (used for settings)
 
-/*
-	var $framework_css = array(
-			"component" => array(
-                "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false //false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
-			)
-			, "title" => array(
-					"class" => null
-					, "col" => array(
-								"xs" => 12
-								, "sm" => 12
-								, "md" => 5
-								, "lg" => 5
-							)
-					)
-			, "actionsTop" => array(
-					"class" => null
-					, "col" => array(
-							"xs" => 12
-							, "sm" => 12
-							, "md" => 7
-							, "lg" => 7
-					)
-					, "util" => array(
-						"right"
-					)
-			)
-			, "description" => array(
-					"class" => null
-					, "callout" => "info"
-					, "col" => array(
-							"xs" => 12
-							, "sm" => 12
-							, "md" => 12
-							, "lg" => 12
-					)
-			)
-			, "search" => array(
-				"class" => null
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 5
-						, "lg" => 5						
-				)
-			)
-			, "navigatorTop" => array(
-				"class" => null
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 12
-				)
-			)
-			, "table" => array(
-				"class" => "ffGrid"
-				, "col" => false
-				, "util" => "table"
-			    
-			)
-			, "filters" => array(
-				"class" => null
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 12
-				)
-			)
-			, "navigatorBottom" => array(
-				"class" => null
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 12
-				)
-				, "util" => array(
-					"right"
-				)
-			)
-			, "alphanum" => array(
-				"class" => null
-				, "col" => array(
-					"xs" => 8
-					, "sm" => 8
-					, "md" => 6
-					, "lg" => 5
-				)
-			)			
-			, "actionsBottom" => array(
-				"class" => null
-				, "col" => array(
-					"xs" => 12
-					, "sm" => 12
-					, "md" => 12
-					, "lg" => 12
-				)
-				, "util" => array(
-					"right"
-				)
-			)
-			, "field" => array(
-				"label" => array(
-					"class" => null
-					, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 6
-						, "lg" => 6
-					)
-				)
-				, "control" => array(
-					"class" => null
-					, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 6
-						, "lg" => 6
-					)
-				)
-			)
-	);*/
-
 	/**
 	 * ID dell'oggetto; deve essere univoco per ogni ffPage
 	 * @var Number
 	 */
-	var $id						= "";					
+	var $id						= "";
 
 	/**
 	 * URL relativo al web del sito
@@ -414,38 +288,26 @@ abstract class ffGrid_base extends ffCommon
 											  "display" => true
 											, "index" 	=> 0
 											, "obj" 	=> null
-											, "label" 	=> null
-											, "class"	=> null
-											, "icon"	=> null
-											, "aspect"	=> "link"
+											, "label" 	=> ""
 									)
 									, "delete" => array(
-											"class"		=> null
-											, "label"	=> null
-                                            , "aspect"    => "link" 
-                                            , "disposition" => array("row" => 1, "col" => null)
+											"class"		=> "ico-delete"
+											, "label"		=> "&nbsp;" 
 									)
 									, "edit" => array(
-											"class"		=> null
-											, "label"	=> null
-                                            , "icon"    => null
-                                            , "aspect"  => "link"
-                                            , "disposition" => array("row" => 1, "col" => null)
+											"class"		=> "ico-edit"
+											, "label"		=> "&nbsp;" 
 									)
 									, "addnew" => array(
-											"class"		=> null
-											, "label"	=> null 
-											, "icon"	=> null
-											, "aspect"	=> "link"
+											"class"		=> "ico-add"
+											, "label"		=> "" 
 									)
 									, "export" => array(
-											"class"		=> null
+											"class"		=> "ico-export"
 											, "display" => false
 											, "index" 	=> 0
 											, "obj" 	=> null
-											, "label" 	=> null
-											, "icon"	=> null
-											, "aspect"	=> "link"
+											, "label" 	=> ""
 									)
 								);
 
@@ -503,7 +365,11 @@ abstract class ffGrid_base extends ffCommon
 	var $default_records_per_page	= 25;
 	var $default_page	= 1;
 	var $default_nav_selector_elements = array(10, 25, 50);
-
+	
+	var $pagination_save_memory = true;
+	var $pagination_save_memory_in_use = false;
+	protected $rrow = false;
+	
 	/**
 	 * Visualizza il page navigator
 	 * @var boolean
@@ -551,7 +417,6 @@ abstract class ffGrid_base extends ffCommon
 	//  PRIVATE VARS (used by code, don't touch or may be explode! :-)
 
 	var $parent					= null;					// The containing class
-	var $prefix					= "";					// Global temp var for params prefix.
 
 	/**
 	 * Campi nascosti associati a ffGrid
@@ -570,17 +435,6 @@ abstract class ffGrid_base extends ffCommon
 	 * @var array()
 	 */
 	var $grid_fields			= array();				// array of ffFields to display in grid
-	
-	var $grid_disposition	= null;				// array of ffFields and fButtons to display in grid  by Row and Col
-	var $grid_disposition_options = array(		// Wrap elem with same type in the same Col
-		"button" => array(
-			"wrap_col" => false
-		)
-		, "field" => array(
-			"wrap_col" => false
-		)
-	);
-
 
 	/**
 	 * Array contenente i campi chiave della grid
@@ -640,12 +494,12 @@ abstract class ffGrid_base extends ffCommon
 	 */
 	var $strError				= "";					
 
-	var $alpha					= "";					// the actual letter to filter by
+	var $alpha					= "";					// the selected letter to filter by
 
 	var $searched				= false;					// hold if a search is started
 
-	var $order				    = "";					// the actual field
-	var $direction				= "";					// the actual direction
+	var $order				    = "";					// the selected field
+	var $direction				= "";					// the selected direction
 
 	/**
 	 * Ricerca nella sintassi SQL
@@ -670,6 +524,7 @@ abstract class ffGrid_base extends ffCommon
 	 * @var String
 	 */
 	var $processed_SQL			= null;
+	var $SQL_passthrough		= false;
 
 	/**
 	 * L'uRL completo della pagina
@@ -697,9 +552,12 @@ abstract class ffGrid_base extends ffCommon
 	var $resources = array();
 	var $resources_set = array();
 	var $resources_get = array();
-	var $grid_disposition_elem = array();
 
-	// ---------------------------------------------------------------
+	var $libraries	= array();
+	var $js_deps	= array();
+	var $css_deps	= array();
+	
+// ---------------------------------------------------------------
 	//  ABSTRACT FUNCS (depends on theme)
 	// ---------------------------------------------------------------
 
@@ -733,7 +591,7 @@ abstract class ffGrid_base extends ffCommon
 		if ($this->use_paging && $this->navigator === null)
 			$this->navigator[0] = ffPageNavigator::factory($page, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
 	}
-
+	
 	// -----------------------
 	//  Internal Array funcs
 
@@ -779,11 +637,13 @@ abstract class ffGrid_base extends ffCommon
 
 		$field->parent = array(&$this);
 		$field->cont_array =& $this->grid_fields;
-		
 		$this->grid_fields[$field->id] = $field;
+		
+		if ($field->crypt && $field->order_field === null)
+			$toOrder = false;
+		
 		if ($toOrder && $field->data_type !== "" && $this->use_order)
 			$this->grid_fields[$field->id]->allow_order = true;
-
 	}
 
 	/**
@@ -807,7 +667,7 @@ abstract class ffGrid_base extends ffCommon
 	 * Aggiunge un pulsante a ffGrid; il pulsante viene aggiunto ad ogni riga di ffGrid
 	 * @param ffButton $button
 	 */
-	function addGridButton($button, $col = null, $row = null, $params = null)
+	function addGridButton($button)
 	{
 	    if (!is_subclass_of($button, "ffButton_base"))
 	            ffErrorHandler::raise("Wrong call to addGridButton: object must be a ffButton"
@@ -815,8 +675,6 @@ abstract class ffGrid_base extends ffCommon
 
 		$button->parent = array(&$this);
 		$this->grid_buttons[$button->id] = $button;
-		
-		$this->addGridDisposition($button->id, "button", $col, $row, $params);
 	}
 
 	/**
@@ -847,51 +705,6 @@ abstract class ffGrid_base extends ffCommon
         $this->action_buttons_header[$button->id] = $button;
     }
     
-    function addGridDisposition($ID_component, $component_type, $col = null, $row = null, $params = null) {
-    	$default_type = array(
-    		"button" => -1
-    	);
-    	
-		if(!count($this->grid_disposition))
-			$this->grid_disposition[] = array();
-
-		if($row === null)
-			$row = 0;
-		elseif(is_numeric($row))
-			$row = $row - 1;
-		elseif($row == "last")
-			$row = count($this->grid_disposition) - 1;
-		
-		if($row < 0)
-			$row = 0;
-				
-		if($row - count($this->grid_disposition) > 1)
-			$row = count($this->grid_disposition) + 1;
-
-		if($col === null) {
-			$col = count($this->grid_disposition[$row]);
-
-			if($this->grid_disposition_options[$component_type]["wrap_col"]  && isset($default_type[$component_type]) && $col > 0 && count($this->grid_disposition_elem["data"][$row][$col + $default_type[$component_type]]) == 1 && isset($this->grid_disposition_elem["data"][$row][$col + $default_type[$component_type]][$component_type]))
-				$col = $col + $default_type[$component_type];
-		} elseif(is_numeric($col)) {
-			$col = $col - 1;
-		} elseif($col == "last") {
-			$col = count($this->grid_disposition[$row]) - 1;
-		}
-		
-		if($col < 0)
-			$col = count($this->grid_disposition[$row]);
-			
-		if($col - count($this->grid_disposition[$row]) > 1)
-			$col = count($this->grid_disposition[$row]) + 1;
-
-		$params["type"] = $component_type;
-
-		$this->grid_disposition[$row][$col][$ID_component] = $params;    
-		
-		$this->grid_disposition_elem["data"][$row][$col][$component_type]++;
-		$this->grid_disposition_elem["count"][$row]++;
-    }
 	/**
 	 * Aggiunge un pulsante di ricerca
 	 * @param ffButton_base $button
@@ -925,7 +738,7 @@ abstract class ffGrid_base extends ffCommon
 		}
 		else
 			return $this->source_SQL;
-	}	
+	}
 	
 	/**
 	 * process preparation' function
@@ -940,83 +753,84 @@ abstract class ffGrid_base extends ffCommon
 		$this->process_params();
 		
 		// Finally, prepare SQL
-        $sSQL = $this->getSQL();
+		$sSQL = $this->getSQL();
 
-        if(strlen($sSQL)) 
+        if(strlen($sSQL))
         {
-		    $sSQL = $this->source_SQL;
-
-		    $bFindWhereTag = preg_match("/\[WHERE\]/", $sSQL);
-		    $bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $sSQL);
-		    $bFindOrderTag = preg_match("/\[ORDER\]/", $sSQL);
-		    $bFindOrderOptions = preg_match("/\[COLON\]/", $sSQL);
-		    $bFindHavingTag = preg_match("/\[HAVING\]/", $sSQL);
-		    $bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $sSQL);
-
-		    // Do some (pathetic) SQL syntax check
-			if ($this->sql_check)
+			if (!$this->SQL_passthrough)
 			{
-				if (!$bFindWhereTag)
-					ffErrorHandler::raise("SQL Statement without '[WHERE]' Tag in the SQL!", E_USER_ERROR, $this, get_defined_vars());
-				else if (!$bFindOrderTag)
-					ffErrorHandler::raise("SQL Statement without '[ORDER]' Tag in the SQL", E_USER_ERROR, $this, get_defined_vars());
-				else if (!$bFindHavingTag && strlen($this->sqlHaving))
-					ffErrorHandler::raise("SQL statement with 'having' fields and without a '[HAVING]' tag", E_USER_ERROR, $this, get_defined_vars());
+				$bFindWhereTag = preg_match("/\[WHERE\]/", $sSQL);
+				$bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $sSQL);
+				$bFindOrderTag = preg_match("/\[ORDER\]/", $sSQL);
+				$bFindOrderOptions = preg_match("/\[COLON\]/", $sSQL);
+				$bFindHavingTag = preg_match("/\[HAVING\]/", $sSQL);
+				$bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $sSQL);
+
+				// Do some (pathetic) SQL syntax check
+				if ($this->sql_check)
+				{
+					if (!$bFindWhereTag)
+						ffErrorHandler::raise("SQL Statement without '[WHERE]' Tag in the SQL!", E_USER_ERROR, $this, get_defined_vars());
+					else if (!$bFindOrderTag)
+						ffErrorHandler::raise("SQL Statement without '[ORDER]' Tag in the SQL", E_USER_ERROR, $this, get_defined_vars());
+					else if (!$bFindHavingTag && strlen($this->sqlHaving))
+						ffErrorHandler::raise("SQL statement with 'having' fields and without a '[HAVING]' tag", E_USER_ERROR, $this, get_defined_vars());
+				}
+
+				if (strlen($this->sqlWhere))
+				{
+					if ($bFindWhereOptions)
+						$tmp = "";
+					else
+						$tmp = " WHERE ";
+					$sSQL = str_replace("[WHERE]", $tmp . $this->sqlWhere, $sSQL);
+					$sSQL = str_replace("[AND]", "AND", $sSQL);
+					$sSQL = str_replace("[OR]", "OR", $sSQL);
+				}
+				else
+				{
+					// remove tags, if exist
+					$sSQL = str_replace("[WHERE]", "", $sSQL);
+					$sSQL = str_replace("[AND]", "", $sSQL);
+					$sSQL = str_replace("[OR]", "", $sSQL);
+				}
+
+				if (strlen($this->sqlHaving))
+				{
+					if ($bFindHavingOptions)
+						$tmp = "";
+					else
+						$tmp = " HAVING ";
+					$sSQL = str_replace("[HAVING]", $tmp . "(" . $this->sqlHaving . ")", $sSQL);
+					$sSQL = str_replace("[HAVING_AND]", "AND", $sSQL);
+					$sSQL = str_replace("[HAVING_OR]", "OR", $sSQL);
+				}
+				else
+				{
+					// remove tags, if exist
+					$sSQL = str_replace("[HAVING]", "", $sSQL);
+					$sSQL = str_replace("[HAVING_AND]", "", $sSQL);
+					$sSQL = str_replace("[HAVING_OR]", "", $sSQL);
+				}
+
+				if (strlen($this->sqlOrder))
+				{
+					if ($bFindOrderOptions)
+						$tmp = "";
+					else
+						$tmp = " ORDER BY ";
+					$sSQL = str_replace("[ORDER]", $tmp . $this->sqlOrder, $sSQL);
+					$sSQL = str_replace("[COLON]", ",", $sSQL);
+				}
+				else
+				{
+					// remove tags, if exist
+					$sSQL = str_replace("[ORDER]", "", $sSQL);
+					$sSQL = str_replace("[COLON]", "", $sSQL);
+				}
+				//---------------------------------------------
 			}
-
-		    if (strlen($this->sqlWhere))
-		    {
-			    if ($bFindWhereOptions)
-				    $tmp = "";
-			    else
-				    $tmp = " WHERE ";
-			    $sSQL = str_replace("[WHERE]", $tmp . $this->sqlWhere, $sSQL);
-			    $sSQL = str_replace("[AND]", "AND", $sSQL);
-			    $sSQL = str_replace("[OR]", "OR", $sSQL);
-		    }
-		    else
-		    {
-			    // remove tags, if exist
-			    $sSQL = str_replace("[WHERE]", "", $sSQL);
-			    $sSQL = str_replace("[AND]", "", $sSQL);
-			    $sSQL = str_replace("[OR]", "", $sSQL);
-		    }
-
-		    if (strlen($this->sqlHaving))
-		    {
-			    if ($bFindHavingOptions)
-				    $tmp = "";
-			    else
-				    $tmp = " HAVING ";
-			    $sSQL = str_replace("[HAVING]", $tmp . "(" . $this->sqlHaving . ")", $sSQL);
-			    $sSQL = str_replace("[HAVING_AND]", "AND", $sSQL);
-			    $sSQL = str_replace("[HAVING_OR]", "OR", $sSQL);
-		    }
-		    else
-		    {
-			    // remove tags, if exist
-			    $sSQL = str_replace("[HAVING]", "", $sSQL);
-			    $sSQL = str_replace("[HAVING_AND]", "", $sSQL);
-			    $sSQL = str_replace("[HAVING_OR]", "", $sSQL);
-		    }
-
-		    if (strlen($this->sqlOrder))
-		    {
-			    if ($bFindOrderOptions)
-				    $tmp = "";
-			    else
-				    $tmp = " ORDER BY ";
-			    $sSQL = str_replace("[ORDER]", $tmp . $this->sqlOrder, $sSQL);
-			    $sSQL = str_replace("[COLON]", ",", $sSQL);
-		    }
-		    else
-		    {
-			    // remove tags, if exist
-			    $sSQL = str_replace("[ORDER]", "", $sSQL);
-			    $sSQL = str_replace("[COLON]", "", $sSQL);
-		    }
-		    //---------------------------------------------
-
+			
 		    $this->processed_SQL = $sSQL;
         }
 	}
@@ -1049,7 +863,8 @@ abstract class ffGrid_base extends ffCommon
 		 	return;
 
 		// display error
-		if($this->tpl !== null) {
+		if($this->tpl !== null)
+		{
 			$this->displayError();
 
 			// process all section
@@ -1058,8 +873,11 @@ abstract class ffGrid_base extends ffCommon
 			$this->process_action_buttons();
 	        $this->process_action_buttons_header();
 	        
+			$this->process_search();
+			$this->process_alpha();
 			$this->process_hidden();
 		}
+		
 		$this->process_grid();		// process navigator and labels (with order) from inside
 
 		if ($output_result !== null)
@@ -1085,18 +903,18 @@ abstract class ffGrid_base extends ffCommon
 					reset($property_set[$key]);
 					$buffer .= "\"";
 				}
-				elseif(strlen($value))
+				else
 				{
 					if (strlen($buffer))
 						$buffer .= " ";
-					$buffer .= $key . "=\"" . $value . "\"";
+					$buffer .= $key . (strlen($value) ? "=\"" . $value . "\"" : "");
 				}
 			}
 			reset($property_set);
 		}
 		return $buffer;
 	}
-	
+
 	/**
 	 * Restituisce il tema utilizzato da ffGrid
 	 * @return String Tema utilizzato da ffGrid 
@@ -1133,6 +951,13 @@ abstract class ffGrid_base extends ffCommon
 	 */
 	function process_params()
 	{
+		if ($this->parent[0]->isset_param($this->id, "rrow"))
+		{
+			$this->rrow = intval($this->parent[0]->retrieve_param($this->id, "rrow"));
+			if ($this->rrow < 0)
+				$this->rrow = 0;
+		}
+		
 		$this->process_alpha_params();
 		$this->process_search_params();
 		$this->process_order_params();
@@ -1200,7 +1025,7 @@ abstract class ffGrid_base extends ffCommon
 				$include_record = false;
 				foreach ($this->grid_fields as $key => $FormField)
 				{
-					if ($this->grid_fields[$key]->control_type != "")
+					if ($this->grid_fields[$key]->control_type != "" && !$this->grid_fields[$key]->field_params_ignore_change)
 					{
 						if (isset($this->recordset_values[$rst_key][$key]))
 							$tmp = new ffData($this->recordset_values[$rst_key][$key], $this->grid_fields[$key]->get_app_type(), FF_LOCALE);
@@ -1250,7 +1075,7 @@ abstract class ffGrid_base extends ffCommon
 		{
 			if ($this->hidden_fields[$key] === null)
 				$this->hidden_fields[$key] = new ffData($this->parent[0]->retrieve_param($this->id, $key));
-			$this->hidden_params = $this->prefix . $key . "=" . $this->hidden_fields[$key]->getValue(null, FF_SYSTEM_LOCALE) . "&";
+			$this->hidden_params = $this->getPrefix() . $key . "=" . $this->hidden_fields[$key]->getValue(null, FF_SYSTEM_LOCALE) . "&";
 		}
 		reset($this->hidden_fields);
 	}
@@ -1274,10 +1099,13 @@ abstract class ffGrid_base extends ffCommon
 		if (!$this->nav_selector_elements)
 			$this->nav_selector_elements = $this->default_nav_selector_elements;
 
-		$this->tpl[0]->set_var("page", $this->page);
-		$this->tpl[0]->set_var("records_per_page", $this->records_per_page);
+		if ($this->tpl !== null)
+		{
+			$this->tpl[0]->set_var("page", $this->page);
+			$this->tpl[0]->set_var("records_per_page", $this->records_per_page);
+		}
 
-		$this->navigator_params = $this->prefix . "records_per_page=" . $this->records_per_page . "&" . $this->prefix . "page=" . $this->page;
+		$this->navigator_params = $this->getPrefix() . "records_per_page=" . $this->records_per_page . "&" . $this->getPrefix() . "page=" . $this->page;
 	}
 
 	/**
@@ -1294,10 +1122,10 @@ abstract class ffGrid_base extends ffCommon
 		else
 			$this->alpha = $this->alpha_default;
 
-		$this->tpl[0]->set_var("actual_alpha", $this->alpha);				
+		$this->tpl[0]->set_var("selected_alpha", $this->alpha);				
 		if (strlen($this->search_params))
 			$this->search_params .= "&";
-		$this->search_params .= $this->prefix . "alpha=" . urlencode($this->alpha);
+		$this->search_params .= $this->getPrefix() . "alpha=" . urlencode($this->alpha);
 
 		if (strlen($this->alpha))
 		{
@@ -1327,7 +1155,7 @@ abstract class ffGrid_base extends ffCommon
 					$tmp_sql .= $tmp_field . " LIKE '" . $this->db[0]->toSql($this->alpha, "Text", false) . "%' ";
 			}
 
-			if ($this->search_fields[$this->alpha_field]->src_having)
+			if ($tmp_alpha_cont[$this->alpha_field]->src_having)
 			{
 				if (strlen($this->sqlHaving))
 					$this->sqlHaving .= " AND ";
@@ -1433,7 +1261,7 @@ abstract class ffGrid_base extends ffCommon
 
 					if (strlen( $this->search_fields[$key]->interval_from_value->ori_value ))
 					{
-                		$this->search_params .= $this->prefix . $this->search_fields[$key]->id . "_from_src=" . $this->search_fields[$key]->interval_from_value->ori_value;
+                		$this->search_params .= $this->getPrefix() . $this->search_fields[$key]->id . "_from_src=" . $this->search_fields[$key]->interval_from_value->ori_value;
                 		$tmp_where_value = "";
 						if ($this->search_fields[$key]->src_prefix || $this->search_fields[$key]->src_postfix)
 						{
@@ -1452,7 +1280,7 @@ abstract class ffGrid_base extends ffCommon
 							$tmp_sql .= " AND ";
 							$this->search_params .= "&";
 						}
-                		$this->search_params .= $this->prefix . $this->search_fields[$key]->id . "_to_src=" . $this->search_fields[$key]->interval_to_value->ori_value;
+                		$this->search_params .= $this->getPrefix() . $this->search_fields[$key]->id . "_to_src=" . $this->search_fields[$key]->interval_to_value->ori_value;
 						$tmp_where_value = "";
 						if ($this->search_fields[$key]->src_prefix || $this->search_fields[$key]->src_postfix)
 						{
@@ -1474,7 +1302,7 @@ abstract class ffGrid_base extends ffCommon
     				if (strlen($this->search_params))
         				$this->search_params .= "&";
 
-        			$this->search_params .= $this->prefix . $this->search_fields[$key]->id . "_src=" . $this->search_fields[$key]->getValue();
+        			$this->search_params .= $this->getPrefix() . $this->search_fields[$key]->id . "_src=" . $this->search_fields[$key]->getValue();
 
     				$tmp_where_value = "";
 
@@ -1512,7 +1340,7 @@ abstract class ffGrid_base extends ffCommon
 			{
 				if (strlen($this->search_params))
 					$this->search_params .= "&";
-				$this->search_params .= $this->prefix . $this->search_fields[$key]->id . "_src=" . $this->search_fields[$key]->getValue();
+				$this->search_params .= $this->getPrefix() . $this->search_fields[$key]->id . "_src=" . $this->search_fields[$key]->getValue();
 			}
 
 			if (strlen($tmp_sql))
@@ -1559,7 +1387,7 @@ abstract class ffGrid_base extends ffCommon
 	 */
 	function process_order_params()
 	{
-		if (!strlen($this->order_default))
+		if (!strlen($this->order_default) && !$this->SQL_passthrough)
 			die("You MUST set an order by default!");
 
 		$this->order = $this->parent[0]->retrieve_param($this->id, "order");
@@ -1570,43 +1398,47 @@ abstract class ffGrid_base extends ffCommon
 			$this->order = $this->order_default;
 		}
 		
-		$tmp = null;
-		if (isset($this->key_fields[$this->order]))
-			$tmp = $this->key_fields[$this->order];
-		else if (isset($this->grid_fields[$this->order]))
-			$tmp = $this->grid_fields[$this->order];
-
-		if ($tmp === null)
-			ffErrorHandler::raise("Cannot determine order field!", E_USER_ERROR, $this, get_defined_vars());
-
-		if (!strlen($this->direction))
-			$this->direction = $tmp->order_dir;
-
-		// build order SQL
-		if (strlen($tmp->order_SQL))
+		if (!$this->SQL_passthrough)
 		{
-			if($is_default) 
+			$tmp = null;
+			if (isset($this->key_fields[$this->order]))
+				$tmp = $this->key_fields[$this->order];
+			else if (isset($this->grid_fields[$this->order]))
+				$tmp = $this->grid_fields[$this->order];
+
+			if ($tmp === null)
+				ffErrorHandler::raise("Cannot determine order field!", E_USER_ERROR, $this, get_defined_vars());
+
+			if (!strlen($this->direction))
+				$this->direction = $tmp->order_dir;
+
+			// build order SQL
+			if (strlen($tmp->order_SQL))
 			{
-				$this->sqlOrder = " " . str_replace("[ORDER_DIR]", $this->direction, $tmp->order_SQL); //. " " .  $this->direction . " ";
-			} 
-			else 
-			{
-				if($this->order != $this->order_default) {
-					$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";
-				} else {
+				if($is_default) 
+				{
 					$this->sqlOrder = " " . str_replace("[ORDER_DIR]", $this->direction, $tmp->order_SQL); //. " " .  $this->direction . " ";
+				} 
+				else 
+				{
+					if($this->order != $this->order_default) {
+						$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";
+					} else {
+						$this->sqlOrder = " " . str_replace("[ORDER_DIR]", $this->direction, $tmp->order_SQL); //. " " .  $this->direction . " ";
+					}
 				}
 			}
+			else
+			{
+				$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";				
+			}
 		}
-		else
-		{
-			$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";				
-		}
+		
 		if($this->tpl !== null) {
 			$this->tpl[0]->set_var("actual_order", $this->order);
 			$this->tpl[0]->set_var("actual_direction", $this->direction);
 
-			$this->order_params = $this->prefix . "order=" . $this->order . "&" . $this->prefix . "direction=" . $this->direction;
+			$this->order_params = $this->getPrefix() . "order=" . $this->order . "&" . $this->getPrefix() . "direction=" . $this->direction;
 
 			if($this->use_order) {
 				$this->tpl[0]->parse("SectHiddenOrder", false);
@@ -1642,17 +1474,12 @@ abstract class ffGrid_base extends ffCommon
 	 */
 	function process_grid()
 	{
-		if ($this->display_grid == "never" || ($this->display_grid == "search" && !strlen($this->searched)))
-		{
-			$this->tpl[0]->set_var("SectGrid", "");
-			return;
-		}
-
 		$res = $this->doEvent("on_before_process_grid", array(&$this, $this->tpl[0]));
 
 		//$this->process_labels(); 	// also do order, because order is embedded with labels
 
-		if($this->tpl !== null) {
+		if($this->tpl !== null)
+		{
 			if ($this->display_new) // done at this time due to maxspan
 			{
 				if (strlen($this->bt_insert_url))
@@ -1683,11 +1510,83 @@ abstract class ffGrid_base extends ffCommon
 			}
 		}
 
-        if(strlen($this->processed_SQL)) 
+        if (strlen($this->processed_SQL)) 
         {
-		    $this->db[0]->query($this->processed_SQL);
-        }
+			do
+			{
+				$sSQL = $this->processed_SQL;
+
+				if (!$this->SQL_passthrough)
+				{
+					if (
+						$this->pagination_save_memory 
+						&& strpos($sSQL, "LIMIT") === false 
+						&& strpos($sSQL, "SQL_CALC_FOUND_ROWS") === false 
+						&& strpos($sSQL, "SELECT") === 0
+					)
+					{
+						if ($this->rrow !== false)
+						{
+							$sSQL = "SELECT SQL_CALC_FOUND_ROWS" . substr($sSQL, 6);
+							$sSQL .= " LIMIT " . intval($this->rrow) . ", 1";
+							$this->pagination_save_memory_in_use = true;
+						}
+						elseif ($this->use_paging)
+						{
+							$sSQL = "SELECT SQL_CALC_FOUND_ROWS" . substr($sSQL, 6);
+							$sSQL .= " LIMIT " . intval($this->records_per_page * ($this->page - 1)) . ", " . intval($this->records_per_page);
+							$this->pagination_save_memory_in_use = true;
+						}
+					}
+				}			
+
+				$this->db[0]->query($sSQL);
+
+				// fix if out of bounds
+				if ($num_rows = $this->db[0]->numRows())
+				{
+					$wanted_record = ($this->rrow ? $this->rrow : 
+							($this->use_paging ? $this->records_per_page * ($this->page - 1) : 0)
+						);
+					if ($num_rows <= $wanted_record)
+					{
+						if ($this->use_paging)
+							$this->page = floor($num_rows / $this->records_per_page) + 1;
+						if ($this->rrow !== false)
+							$this->rrow = $num_rows - 1;
+					}
+					else
+						break;
+				}
+				else
+					break;
+			} while (true);
+		}
+		
 		$res = $this->doEvent("on_process_grid", array(&$this, $this->tpl[0]));
+	}
+	
+	function processRow()
+	{
+		foreach ($this->grid_fields as $key => $ff)
+		{
+			if ($ff->crypt)
+			{
+				if (MOD_SEC_CRYPT && $ff->crypt_modsec)
+				{
+					$value = $ff->value->getValue(null, FF_SYSTEM_LOCALE);
+					
+					if ($ff->crypt_concat)
+						$value = mod_sec_decrypt_concat($value);
+					else
+						$value = mod_sec_decrypt_string($value);
+					
+					$this->grid_fields[$key]->value->setValue($value, null, FF_SYSTEM_LOCALE);
+					$this->grid_fields[$key]->value_ori->setValue($value, null, FF_SYSTEM_LOCALE);
+				}
+			}
+		}
+		reset($this->grid_fields);
 	}
 
 	/**
@@ -1814,9 +1713,9 @@ abstract class ffGrid_base extends ffCommon
 	 * Esegue il redirect all'url specificato
 	 * @param String $url
 	 */
-	function redirect($url, $response = array())
+	function redirect($url, $response = null)
 	{
-		ffRedirect($url, null, null, $response);
+		return ffRedirect($url, null, null, ($response === null ? $this->json_result : $response));
 	}
 
 	/**
@@ -1895,22 +1794,12 @@ abstract class ffGrid_base extends ffCommon
 				//$tmp->action_type 	= "gotourl";
 				if  (strlen($tmp->class)) $tmp->class .= " ";
 				$tmp->class .= "noactivebuttons";
-				//$tmp->form_action_url = $this->parent[0]->getRequestUri() . "&" . $this->id . "_t=xls";
-				//$tmp->jsaction = "ff.ajax.doRequest({'component' : '" . $this->id . "', 'addFields' : '" . $this->id . "t=xls'});";
+				//$tmp->form_action_url = $this->parent[0]->getRequestUri() . "&" . $this->getIDIF() . "_t=xls";
+				//$tmp->jsaction = "ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "', 'addFields' : '" . $this->getIDIF() . "t=xls'});";
 				//$tmp->class 		.= "noactivebuttons";
-				//$tmp->url = $this->parent[0]->getRequestUri() . "&" . $this->id . "_t=xls";
+				//$tmp->url = $this->parent[0]->getRequestUri() . "&" . $this->getIDIF() . "_t=xls";
 				$this->addActionButtonHeader($tmp);
 			}
 		}
-	}
-	
-	function setWidthComponent($resolution_large_to_small) 
-	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
-		elseif(strlen($resolution_large_to_small))
-			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
-		else
-			$this->framework_css["component"]["grid"] = false;
 	}
 }

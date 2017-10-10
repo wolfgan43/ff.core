@@ -59,10 +59,9 @@ $concat_field 				= $ff["autocompletetoken"][$data_src]["concat_field"];
 $concat_separator 			= $ff["autocompletetoken"][$data_src]["concat_separator"];
 $limit						= $ff["autocompletetoken"][$data_src]["limit"];
 
-
 if(!$operation)
 	$operation = "LIKE [%[VALUE]%]";
-
+	
 if(!strlen(trim($actex_sql)))
 {
 	/*

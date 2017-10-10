@@ -6,7 +6,7 @@ return array(
 				"plugins" => array(
 					"empty" => true,
 					"js_defs" => array(
-						"bgstretcher" => array(
+						"calendario" => array(
 							"path" => FF_THEME_DIR . "/library/plugins/jquery.calendario",
 							"file" => "jquery.calendario.js",
 							"css_loads" => array(

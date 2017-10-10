@@ -6,15 +6,18 @@ $mod_sec_login = $cm->router->getRuleById("mod_sec_login");
 $mod_sec_dashboard = $cm->router->getRuleById("mod_sec_dashboard");
 if($mod_sec_dashboard)
 	$dashboard_ret_url = $mod_sec_dashboard->reverse;
+else
+	$dashboard_ret_url = $mod_sec_login->reverse;
 
 if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)
 {
-	if ($filename === null)
+    $filename = cm_cascadeFindTemplate("/contents/social/logged.html", "security");
+	/*if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
+		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);*/
 
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
@@ -82,7 +85,7 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
     $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
 
 	$cm->oPage->addContent($tpl);
-	exit;
+	return;
 }
 
 if (isset($_GET['code'])) 
@@ -96,21 +99,19 @@ if (isset($_GET['code']))
 	
 	$ret = $oauth2->userinfo->get();
 	
-	$arrDefaultFields = explode(",", MOD_SEC_DEFAULT_FIELDS);
+    $arrUserParams["email"] = $ret["email"];
 
-    if(!$username) {
+    if(!strlen($username)) {
         $username = $ret["name"];
     }
-    if(!$username) {
-        $arrUsername = explode("@", $ret["email"]);
+	if(!strlen($username)) {
+        $arrUsername = explode("@", $arrUserParams["email"]);
 
         $username = $arrUsername[0] . " " . substr($arrUsername[1], 0, strpos($arrUsername[1], "."));
         $username = ucwords(str_replace(array(".", "-", "_"), array(" "), $username));
     }
-
-
+        
     $arrUserParams["username"] = $username;
-    
 	if(MOD_SEC_STRICT_FIELDS)
 	{
 		if(strlen(MOD_SEC_USER_FIRSTNAME)) 
@@ -166,7 +167,7 @@ if (isset($_GET['code']))
 	}
 	
 	//email
-	
+	$arrUserParams["email"] = $ret["email"];
 	if($ret["verifiedEmail"] == "1") 
 		$arrUserParams["status"] = true; 
 	else
@@ -188,13 +189,14 @@ if (isset($_GET['code']))
 	if (strlen($sError))
     {
         $cm->modules["security"]["events"]->doEvent("google_error", array(&$sError, &$ret_url, &$err_url));
-        
-        if ($filename === null)
+
+        $filename = cm_cascadeFindTemplate("/contents/social/error.html", "security");
+        /*if ($filename === null)
             $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
         if ($filename === null)
             $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
         if ($filename === null)
-            $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
+            $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);*/
 
         $tpl = ffTemplate::factory(ffCommon_dirname($filename));
         $tpl->load_file(basename($filename), "main");
@@ -231,15 +233,13 @@ if (isset($_GET['code']))
         return;
     }
 
-	if (strlen($sError))
-		die($sError);
-	
-	if ($filename === null)
+    $filename = cm_cascadeFindTemplate("/contents/social/success.html", "security");
+    /*if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/success.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/success.html", $cm->oPage->theme, false);
 	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/success.html", $cm->oPage->theme);
+		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/success.html", $cm->oPage->theme);*/
 
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
@@ -305,5 +305,28 @@ if (isset($_GET['code']))
     $tpl->set_var("login_url", $dashboard_ret_url);
     $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));	
 	
+	$cm->oPage->addContent($tpl);
+}
+else
+{
+    $filename = cm_cascadeFindTemplate("/contents/social/error.html", "security");
+	/*if ($filename === null)
+		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
+	if ($filename === null)
+		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
+	if ($filename === null)
+		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);*/
+
+	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
+	$tpl->load_file(basename($filename), "main");
+
+	$tpl->set_var("site_path", FF_SITE_PATH);
+	$tpl->set_var("theme", $cm->oPage->theme);
+	$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
+
+	$tpl->set_var("sError", ffCommon_specialchars("Unable to find code"));
+
+	$tpl->set_var("login_url", $dashboard_ret_url);
+
 	$cm->oPage->addContent($tpl);
 }

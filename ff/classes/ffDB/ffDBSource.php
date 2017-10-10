@@ -6,8 +6,8 @@
  * @package FormsFramework
  * @subpackage Abstract Data Fieldset Rapresentation Class
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2004-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -19,8 +19,8 @@
  * @package FormsFramework
  * @subpackage Abstract Data Fieldset Rapresentation Class
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2004-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffDBSource extends ffCommon
@@ -84,6 +84,11 @@ abstract class ffDBSource extends ffCommon
 		ffDBSource::$aSources[$sName] = $this;
 		
 		return $this;
+	}
+	
+	function getName()
+	{
+		return $this->sName;
 	}
 	
 	function bindToDBConnection($pDBConnection)

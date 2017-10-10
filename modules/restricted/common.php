@@ -48,12 +48,15 @@ if (!$ffcache_success)
 
 	$tmp = cm_confCascadeFind(FF_DISK_PATH, "", "mod_restricted.xml");
 	if (is_file($tmp))
-		mod_restricted_load_config($tmp);
+		mod_restricted_load_config_file($tmp);
 
-	mod_restricted_load_config(cm_confCascadeFind(CM_ROOT . "/conf", "/cm", "mod_restricted.xml"));
+	mod_restricted_load_config_file(cm_confCascadeFind(CM_ROOT . "/conf", "/cm", "mod_restricted.xml"));
 
 	mod_restricted_load_by_path();
 }
+
+if(MOD_RES_NAVTABS && !defined("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID")) 
+	define("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID", true);
 
 function mod_restricted_load_by_path()
 {
@@ -66,7 +69,7 @@ function mod_restricted_load_by_path()
 	{
 		if (is_file($script_path_tmp . "mod_restricted.xml"))
 		{
-			mod_restricted_load_config($script_path_tmp . "mod_restricted.xml");
+			mod_restricted_load_config_file($script_path_tmp . "mod_restricted.xml");
 		}
 		$script_path_count++;
 	}
@@ -76,7 +79,7 @@ function mod_restricted_cm_on_load_module($cm, $mod)
 {
 	$tmp = cm_confCascadeFind(CM_MODULES_ROOT . "/" . $mod . "/conf", "/modules/" . $mod, "mod_restricted.xml");
 	if (is_file($tmp))
-		mod_restricted_load_config($tmp);
+		mod_restricted_load_config_file($tmp);
 }
 
 function mod_restricted_cm_on_modules_loaded($cm)
@@ -91,16 +94,6 @@ function mod_restricted_cm_on_modules_loaded($cm)
 
 function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 {
-	if ($db === null)
-		$db = ffDb_Sql::factory();
-	elseif (is_array($db))
-		$db =& $db[0];
-
-	if (!is_object($db))
-		ffErrorHandler::raise("invalid db object", E_USER_ERROR, null, get_defined_vars());
-
-	$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "mod_restricted_settings WHERE name = " . $db->toSql(new ffData($name));
-
 	if ($DomainID === null)
 	{
 		$res = cm::getInstance()->modules["restricted"]["events"]->doEvent("get_domain");
@@ -113,6 +106,21 @@ function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 		}
 	}	
 	
+	if ($db === null)
+	{
+		if (MOD_SEC_MULTIDOMAIN && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB && $DomainID !== null)
+			$db = mod_security_get_db_by_domain($DomainID);
+		else
+			$db = ffDb_Sql::factory();
+	}
+	elseif (is_array($db))
+		$db =& $db[0];
+
+	if (!is_object($db))
+		ffErrorHandler::raise("invalid db object", E_USER_ERROR, null, get_defined_vars());
+
+	$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "mod_restricted_settings WHERE name = " . $db->toSql(new ffData($name));
+
 	if ($DomainID !== null)
 	{
 		$sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
@@ -153,10 +161,10 @@ function mod_restricted_get_all_setting($DomainID = null, $db = null)
 		}
 	}	
 	
-    if ($DomainID !== null)
-    {
+    /*if ($DomainID !== null) // è corretto che vengano solo presi quelli generici (domain = 0) in assenza di specificazione
+    {*/
         $sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
-    }
+    //}
 
     $db->query($sSQL);
     if ($db->nextRecord())
@@ -184,8 +192,13 @@ function mod_restricted_set_setting($name, $value, $DomainID = null, $db = null)
     if (!is_object($db))
         ffErrorHandler::raise("invalid db object", E_USER_ERROR, null, get_defined_vars());
 	
-    
-    
+    $sSQL = "UPDATE
+					" . CM_TABLE_PREFIX . "mod_restricted_settings
+				SET
+					value = " . $db->toSql($value) . "
+				WHERE
+					name = " . $db->toSql($name) . "
+		";
 
 	if ($DomainID === null)
 	{
@@ -201,47 +214,44 @@ function mod_restricted_set_setting($name, $value, $DomainID = null, $db = null)
 	
 	if ($DomainID !== null)
 	{
-		$sSQL_and = " AND ID_domains = " . $db->toSql($DomainID);
+		$sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
 	}
-        
-        $sSQL = "SELECT ID
-                    FROM " . CM_TABLE_PREFIX . "mod_restricted_settings
-                    WHERE name = " . $db->toSql($name) . $sSQL_and;
-        $db->query($sSQL);
-        if($db->nextRecord()) {
-            $sSQL = "UPDATE " . CM_TABLE_PREFIX . "mod_restricted_settings SET
-                            value = " . $db->toSql($value) . "
-                        WHERE name = " . $db->toSql($name) . $sSQL_and;
-            $db->execute($sSQL);
-        } else {
-            if ($DomainID !== null)
-            {
-                    $fields = ", ID_domains";
-                    $values = ", " . $db->toSql($DomainID);
-            }
-            $sSQL = "INSERT INTO
-                                    " . CM_TABLE_PREFIX . "mod_restricted_settings (
-                                            value
-                                            , name
-                                            " . $fields . "
-                                    ) VALUES (
-                                            " . $db->toSql($value) . "
-                                            , " . $db->toSql($name) . "
-                                            " . $values . "
-                                    )
-                    ";
-            $db->execute($sSQL);
+
+	$db->execute($sSQL);
+	if (!$db->affectedRows())
+	{
+		if ($DomainID !== null)
+		{
+			$fields = ", ID_domains";
+			$values = ", " . $db->toSql($DomainID);
+		}
+		$sSQL = "INSERT INTO
+					" . CM_TABLE_PREFIX . "mod_restricted_settings (
+						value
+						, name
+						" . $fields . "
+					) VALUES (
+						" . $db->toSql($value) . "
+						, " . $db->toSql($name) . "
+						" . $values . "
+					)
+			";
+		$db->execute($sSQL);
 	}
 }
 
-function mod_restricted_load_config($file)
+function mod_restricted_load_config_file($file)
+{
+	$xml = new SimpleXMLElement("file://" . $file, null, true);
+	mod_restricted_load_config($xml, $file);
+}
+
+function mod_restricted_load_config($xml, $file = null)
 {
 	$cm = cm::getInstance();
 	
-	$xml = new SimpleXMLElement("file://" . $file, null, true);
-	
     static $sect_compare;
-    if($sect_compare == "" && strpos($file, FF_DISK_PATH . "/conf/contents") === 0) {
+    if($file !== null && sect_compare == "" && strpos($file, FF_DISK_PATH . "/conf/contents") === 0) {
         $sect_compare = ffCommon_dirname(substr($file, strlen(FF_DISK_PATH . "/conf/contents"))); 
     }
 
@@ -261,28 +271,69 @@ function mod_restricted_load_config($file)
 				if($path != "/" && strlen($sect_compare) && strpos($path, $sect_compare) !== 0 && strpos($cm->path_info, $sect_compare) === 0)
 					continue;
  
+				/*if ($key == "h")
+				{
+					$is_heading = true;
+					$key = "h" . uniqid(rand(), true);
+				}
+				else
+				{
+					$is_heading = false;
+				}*/
+				
 				$cm->modules["restricted"]["menu"][$key] = array();
 					
 				$label = (string)$attrs["label"];
+				$icon = (string)$attrs["icon"];
 				
-                                $class = (string)$attrs["class"];
+				$actions = (string)$attrs["actions"];
+				$dialog = (string)$attrs["dialog"];
+				if ($dialog == "true")
+					$dialog = true;
+				else
+					$dialog = false; // default				
+
+				$readonly = (string)$attrs["readonly"];
+				if ($readonly == "true")
+					$readonly = true;
+				else
+					$readonly = false; // default				
+
+				$description = (string)$attrs["description"];
+				$class = (string)$attrs["class"];
 				$params = (string)$attrs["params"];
 				$acl = (string)$attrs["acl"];
 				$redir = (string)$attrs["redir"];
 				$location = (string)$attrs["location"];
+                $position = (string)$attrs["position"];
+                $settings = (string)$attrs["settings"];
 				$hide = (string)$attrs["hide"];
 				$profiling_skip = (string)$attrs["profiling_skip"];
+				$profiling_default = (string)$attrs["profiling_default"];
+				$profiling_acl = (string)$attrs["profiling_acl"];
 				$globals_exclude = (string)$attrs["globals_exclude"];
-				
+				$collapse = (string)$attrs["collapse"];
+
 				// converte i valori dei flag boolean con i relativi default
 				if (strlen($hide) && $hide == "true")
 					$hide = true;
 				else
 					$hide = false; // default
+
 				if (strlen($profiling_skip) && $profiling_skip == "true")
 					$profiling_skip = true;
 				else
 					$profiling_skip = false; // default
+				
+				if (strlen($profiling_default))
+				{
+					if ($profiling_default === "false" || !$profiling_default)
+						$profiling_default = false;
+					else if ($profiling_default === "true" || $profiling_default)
+						$profiling_default = true;
+				}
+				else
+					$profiling_default = null;
 				
 				if (!strlen($path))
 					$path = strtolower("/" . $key);
@@ -293,9 +344,22 @@ function mod_restricted_load_config($file)
 				$cm->modules["restricted"]["menu"][$key]["name"] = $key;
 				$cm->modules["restricted"]["menu"][$key]["path"] = $path;
 				$cm->modules["restricted"]["menu"][$key]["label"] = $label;
+				//$cm->modules["restricted"]["menu"][$key]["is_heading"] = $is_heading;
+				$cm->modules["restricted"]["menu"][$key]["icon"] = $icon;
+				if($actions)
+					$cm->modules["restricted"]["menu"][$key]["actions"] = explode(",", $actions);
+				
+				$cm->modules["restricted"]["menu"][$key]["dialog"] = $dialog;
+				$cm->modules["restricted"]["menu"][$key]["readonly"] = $readonly;
+
+				if ($description)
+					$cm->modules["restricted"]["menu"][$key]["description"] = $description;
+
 				$cm->modules["restricted"]["menu"][$key]["class"] = $class;
 				$cm->modules["restricted"]["menu"][$key]["hide"] = $hide;
 				$cm->modules["restricted"]["menu"][$key]["profiling_skip"] = $profiling_skip;
+				if ($profiling_default !== null) $cm->modules["restricted"]["menu"][$key]["profiling_default"] = $profiling_default;
+				if (strlen($profiling_acl)) $cm->modules["restricted"]["menu"][$key]["profiling_acl"] = $profiling_acl;
 				$cm->modules["restricted"]["menu"][$key]["params"] = $params;
 				$cm->modules["restricted"]["menu"][$key]["globals_exclude"] = $globals_exclude;
 				if (strlen($acl))
@@ -304,15 +368,29 @@ function mod_restricted_load_config($file)
 					$cm->modules["restricted"]["menu"][$key]["redir"] = $redir;
 				if (strlen($location))
 					$cm->modules["restricted"]["menu"][$key]["location"] = $location;
+                if (strlen($position))
+                    $cm->modules["restricted"]["menu"][$key]["position"] = $position;
+                if (strlen($settings))
+                    $cm->modules["restricted"]["menu"][$key]["settings"] = $settings;
+
+				if($collapse == "true")
+					$cm->modules["restricted"]["menu"][$key]["collapse"] = true;
+				elseif($collapse == "false")
+					$cm->modules["restricted"]["menu"][$key]["collapse"] = false;
 				
 				$cm->modules["restricted"]["menu_bypath"][$path][] =& $cm->modules["restricted"]["menu"][$key];
+
+				$favorite = (string)$attrs["favorite"];
+				if($favorite === "true") {
+					$section_favorite[$key] = $attrs;
+				}
 			}
 
 			if (count($value))
 			{
 				foreach ($value as $subkey => $subvalue)
 				{
-					if ($subkey == "h")
+					/*if ($subkey == "h")
 					{
 						$is_heading = true;
 						$subkey = "h" . uniqid(rand(), true);
@@ -320,7 +398,7 @@ function mod_restricted_load_config($file)
 					else
 					{
 						$is_heading = false;
-					}
+					}*/
 					
 					if (!isset($cm->modules["restricted"]["menu"][$key]["elements"][$subkey]))
 					{
@@ -356,8 +434,8 @@ function mod_restricted_load_config($file)
 						if (strlen($location))
 							$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["location"] = $location;
 
-						if (!$is_heading)
-						{
+						//if (!$is_heading)
+						//{
 							$params = (string)$attrs["params"];
 							$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["params"] = $params;
 
@@ -366,27 +444,63 @@ function mod_restricted_load_config($file)
 								$path = strtolower($cm->modules["restricted"]["menu"][$key]["path"] . "/" . $subkey);
 							$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["path"] = $path;
 							$cm->modules["restricted"]["menu_bypath"][$path][] =& $cm->modules["restricted"]["menu"][$key]["elements"][$subkey];
-						}
+							
+							$favorite = (string)$attrs["favorite"];
+							if($favorite === "true") {
+								$section_favorite[$key. "-" . $subkey] = $attrs;
+							}
+
+						//}
 						
 						$label = (string)$attrs["label"];
+						$icon = (string)$attrs["icon"];
+						$actions = (string)$attrs["actions"];
+						$dialog = (string)$attrs["dialog"];
+						if ($dialog == "true")
+							$dialog = true;
+						else
+							$dialog = false; // default				
+
+						$readonly = (string)$attrs["readonly"];
+						if ($readonly == "true")
+							$readonly = true;
+						else
+							$readonly = false; // default				
 
 						if (!strlen($label))
 							$label = $subkey;
 						
 						$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["label"] = $label;
-						$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["is_heading"] = $is_heading;
+						$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["icon"] = $icon;
+						if($actions)
+							$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["actions"] = explode(",", $actions);
+
+						$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["dialog"] = $dialog;
+						$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["readonly"] = $readonly;
+						//$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["is_heading"] = $is_heading;
                                                 
-                                                $class = (string)$attrs["class"];
-                                                if(strlen($class))
-                                                    $cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["class"] = $class;
+                        $class = (string)$attrs["class"];
+                        if(strlen($class))
+                            $cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["class"] = $class;
+                            
+						if($location && isset($cm->modules["restricted"]["sections"]["nav"]->$location)) {
+							$cm->modules["restricted"]["sections"][$location]["elements"][$subkey] = $cm->modules["restricted"]["menu"][$key]["elements"][$subkey];
+						}
 					}
 				}
 			}
 		}
+
+		if($section_favorite)
+			$cm->modules["restricted"]["sections"]["favorite"] = $section_favorite;
 	}
 	
+	if (isset($xml->fullbar))
+		$cm->modules["restricted"]["fullbar"] = true;
+
 	if (isset($xml->layout) && count($xml->layout->children()))
 	{
+	
 		foreach ($xml->layout->children() as $key => $value)
 		{
 			if ($key == "comment")
@@ -484,9 +598,29 @@ function mod_restricted_load_config($file)
 }
 
 
-function mod_restricted_add_menu_child($key, $path = "", $label = "", $params = "", $acl = "", $redir = "", $visible = true, $class="") {
+function mod_restricted_add_menu_child($data) {
     $cm = cm::getInstance();
     
+    if (ffIsset($data, "key"))					$key 		= $data["key"];
+    if (ffIsset($data, "path"))					$path 		= $data["path"];
+    if (ffIsset($data, "label"))				$label 		= $data["label"];
+    if (ffIsset($data, "icon"))					$icon 		= $data["icon"];
+    if (ffIsset($data, "actions"))				$actions 	= $data["actions"];
+    if (ffIsset($data, "params"))				$params 	= $data["params"];
+    if (ffIsset($data, "visible"))				$visible 	= $data["visible"];
+    if (ffIsset($data, "acl"))					$acl 		= $data["acl"];
+    if (ffIsset($data, "location"))				$location 	= $data["location"];
+    if (ffIsset($data, "position"))				$position 	= $data["position"];
+    if (ffIsset($data, "settings"))				$settings 	= $data["settings"];
+    if (ffIsset($data, "redir"))				$redir 		= $data["redir"];
+    if (ffIsset($data, "class"))				$class 		= $data["class"];
+    if (ffIsset($data, "readonly"))				$readonly 	= $data["readonly"];
+    if (ffIsset($data, "dialog"))				$dialog 	= $data["dialog"];
+    if (ffIsset($data, "favorite"))				$favorite 	= $data["favorite"];
+    if (ffIsset($data, "collapse"))				$collapse 	= $data["collapse"];
+    if (ffIsset($data, "rel"))					$rel 		= $data["rel"];
+    if (ffIsset($data, "profiling_skip"))		$profiling_skip 	= $data["profiling_skip"];
+
     if (!isset($cm->modules["restricted"]["menu"][$key]))
     {
         $cm->modules["restricted"]["menu"][$key] = array();
@@ -507,33 +641,69 @@ function mod_restricted_add_menu_child($key, $path = "", $label = "", $params = 
 
         $cm->modules["restricted"]["menu"][$key]["path"] = $path;
         $cm->modules["restricted"]["menu"][$key]["label"] = $label;
+        $cm->modules["restricted"]["menu"][$key]["icon"] = $icon;
+        $cm->modules["restricted"]["menu"][$key]["actions"] = $actions;
+        $cm->modules["restricted"]["menu"][$key]["dialog"] = $dialog;
+        $cm->modules["restricted"]["menu"][$key]["readonly"] = $readonly;
         $cm->modules["restricted"]["menu"][$key]["class"] = $class;
         $cm->modules["restricted"]["menu"][$key]["params"] = $params;
         $cm->modules["restricted"]["menu"][$key]["visible"] = $visible;
         if (strlen($acl))
             $cm->modules["restricted"]["menu"][$key]["acl"] = explode(",", $acl);
+
+        if ($location)
+            $cm->modules["restricted"]["menu"][$key]["location"] = $location;
+        if ($position)
+            $cm->modules["restricted"]["menu"][$key]["position"] = $position;
+        if ($settings)
+            $cm->modules["restricted"]["menu"][$key]["settings"] = $settings;
+
         if (strlen($redir))
             $cm->modules["restricted"]["menu"][$key]["redir"] = $redir;
 
+		if($collapse !== null)
+			$cm->modules["restricted"]["menu"][$key]["collapse"] = $collapse;
+        
+		if ($profiling_skip)
+			$cm->modules["restricted"]["menu"][$key]["profiling_skip"] = true;
+		else
+			$cm->modules["restricted"]["menu"][$key]["profiling_skip"] = false;
+
+        $cm->modules["restricted"]["menu"][$key]["rel"] = $rel;
+        
         $cm->modules["restricted"]["menu_bypath"][$path][] =& $cm->modules["restricted"]["menu"][$key];
+        
+        if($favorite)
+			$cm->modules["restricted"]["sections"]["favorite"][] =& $cm->modules["restricted"]["menu"][$key];
+
     }
     
 }
 
-function mod_restricted_add_menu_sub_element($key, $subkey, $path = "", $label = "", $params = "", $acl = "", $location = null, $hide = false, $description = null, $profiling_skip = false) { 
+function mod_restricted_add_menu_sub_element($data) {
     $cm = cm::getInstance();
 
-	if ($subkey == "h")
-	{
-		$is_heading = true;
-		$subkey = "h" . uniqid(rand(), true);
-	}
-	else
-	{
-		$is_heading = false;
-	}
+    if (ffIsset($data, "key"))					$key 				= $data["key"];
+    if (ffIsset($data, "subkey"))				$subkey 			= $data["subkey"];
+    if (ffIsset($data, "path"))					$path 				= $data["path"];
+    if (ffIsset($data, "label"))				$label 				= $data["label"];
+    if (ffIsset($data, "icon"))					$icon 				= $data["icon"];
+    if (ffIsset($data, "actions"))				$actions 			= $data["actions"];
+    if (ffIsset($data, "params"))				$params 			= $data["params"];
+    if (ffIsset($data, "acl"))					$acl 				= $data["acl"];
+    if (ffIsset($data, "location"))				$location 			= $data["location"];
+    if (ffIsset($data, "position"))				$position 			= $data["position"];
+    if (ffIsset($data, "settings"))				$settings 			= $data["settings"];
+    if (ffIsset($data, "hide"))					$hide 				= $data["hide"];
+    if (ffIsset($data, "description"))			$description		= $data["description"];
+    if (ffIsset($data, "profiling_skip"))		$profiling_skip 	= $data["profiling_skip"];
+    if (ffIsset($data, "readonly"))				$readonly 			= $data["readonly"];
+    if (ffIsset($data, "dialog"))				$dialog 			= $data["dialog"];
+    if (ffIsset($data, "class"))				$class 				= $data["class"];
+    if (ffIsset($data, "favorite"))				$favorite 			= $data["favorite"];
+    if (ffIsset($data, "rel"))					$rel 				= $data["rel"];
 
-	if (!isset($cm->modules["restricted"]["menu"][$key]["elements"][$subkey]))
+	if ($subkey && !isset($cm->modules["restricted"]["menu"][$key]["elements"][$subkey]))
 	{
 		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey] = array();
 
@@ -555,22 +725,40 @@ function mod_restricted_add_menu_sub_element($key, $subkey, $path = "", $label =
 
 		if (strlen($location))
 			$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["location"] = $location;
-
-		if (!$is_heading)
-		{
+        if (strlen($position))
+            $cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["position"] = $position;
+        if (strlen($settings))
+            $cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["settings"] = $settings;
+		//if (!$is_heading)
+		//{
 			$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["params"] = $params;
 
 			if (!strlen($path))
 				$path = strtolower($cm->modules["restricted"]["menu"][$key]["path"] . "/" . $subkey);
 			$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["path"] = $path;
 			$cm->modules["restricted"]["menu_bypath"][$path][] =& $cm->modules["restricted"]["menu"][$key]["elements"][$subkey];
-		}
+			
+		//}
 
 		if (!strlen($label))
 			$label = $subkey;
 
 		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["label"] = $label;
-		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["is_heading"] = $is_heading;
+		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["icon"] = $icon;
+		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["actions"] = $actions;
+		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["dialog"] = $dialog;
+		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["readonly"] = $readonly;
+		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["class"] = $class;
+		$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["rel"] = $rel;
+		//$cm->modules["restricted"]["menu"][$key]["elements"][$subkey]["is_heading"] = $is_heading;
+
+		if($location && isset($cm->modules["restricted"]["sections"]["nav"]->$location)) {
+			$cm->modules["restricted"]["sections"][$location]["elements"][$subkey] = $cm->modules["restricted"]["menu"][$key]["elements"][$subkey];
+		}		
+		
+		if($favorite)
+            $cm->modules["restricted"]["sections"]["favorite"][] =& $cm->modules["restricted"]["menu"][$key]["elements"][$subkey];
+
 	}
 }
 
@@ -655,9 +843,47 @@ function mod_res_disable_element($topbar, $navbar = null)
 {
 	$mod_data =& cm::getInstance()->modules["restricted"];
 
+	if ($navbar !== null && ffArrIsset($mod_data, "menu", $topbar, "elements", $navbar))
+	{
+		if (!isset($mod_data["menu"][$topbar]["elements"][$navbar]["old_acl"]))
+		{
+			$mod_data["menu"][$topbar]["elements"][$navbar]["old_acl"] = $mod_data["menu"][$topbar]["elements"][$navbar]["acl"];
+			$mod_data["menu"][$topbar]["elements"][$navbar]["acl"] = array(0);
+		}
+	}
+	else if (ffArrIsset($mod_data, "menu", $topbar))
+	{
+		if (isset($mod_data["menu"][$topbar]["elements"]) && count($mod_data["menu"][$topbar]["elements"]))
+		{
+			foreach ($mod_data["menu"][$topbar]["elements"] as $key => $value)
+			{
+				if (!isset($mod_data["menu"][$topbar]["elements"][$key]["old_acl"]))
+				{
+					$mod_data["menu"][$topbar]["elements"][$key]["old_acl"] = $mod_data["menu"][$topbar]["elements"][$key]["acl"];
+					$mod_data["menu"][$topbar]["elements"][$key]["acl"] = array(0);
+				}
+			}
+			reset($mod_data["menu"][$topbar]["elements"]);
+		}
+		if (!isset($mod_data["menu"][$topbar]["acl"]))
+		{
+			$mod_data["menu"][$topbar]["old_acl"] = $mod_data["menu"][$topbar]["acl"];
+			$mod_data["menu"][$topbar]["acl"] = array(0);
+		}
+	}
+}
+
+function mod_res_enable_element($topbar, $navbar = null)
+{
+	$mod_data =& cm::getInstance()->modules["restricted"];
+
 	if ($navbar !== null)
 	{
-		$mod_data["menu"][$topbar]["elements"][$navbar]["acl"] = array(0);
+		if (isset($mod_data["menu"][$topbar]["elements"][$navbar]["old_acl"]))
+		{
+			$mod_data["menu"][$topbar]["elements"][$navbar]["acl"] = $mod_data["menu"][$topbar]["elements"][$navbar]["old_acl"];
+			unset($mod_data["menu"][$topbar]["elements"][$navbar]["old_acl"]);
+		}
 	}
 	else
 	{
@@ -665,18 +891,26 @@ function mod_res_disable_element($topbar, $navbar = null)
 		{
 			foreach ($mod_data["menu"][$topbar]["elements"] as $key => $value)
 			{
-				$mod_data["menu"][$topbar]["elements"][$key]["acl"] = array(0);
+				if (isset($mod_data["menu"][$topbar]["elements"][$key]["old_acl"]))
+				{
+					$mod_data["menu"][$topbar]["elements"][$key]["acl"] = $mod_data["menu"][$topbar]["elements"][$key]["old_acl"];
+					unset($mod_data["menu"][$topbar]["elements"][$key]["old_acl"]);
+				}
 			}
 			reset($mod_data["menu"][$topbar]["elements"]);
 		}
-		$mod_data["menu"][$topbar]["acl"] = array(0);
+		if (isset($mod_data["menu"][$topbar]["old_acl"]))
+		{
+			$mod_data["menu"][$topbar]["acl"] = $mod_data["menu"][$topbar]["old_acl"];
+			unset($mod_data["menu"][$topbar]["old_acl"]);
+		}
 	}
 }
 
 function mod_res_access_denied($confirm_url = null)
 {
 	$cm = cm::getInstance();
-	
+
 	$res_path = (string)$cm->router->getRuleById("restricted")->reverse;
 	
 	if ($confirm_url === null)
@@ -693,7 +927,7 @@ function mod_res_access_denied($confirm_url = null)
 function mod_res_get_hash()
 {
 	$cm = cm::getInstance();
-	
+    $hash = "";
 	if (MOD_RES_MEM_CACHING_BYPATH)
 		$hash .= "_" . $cm->path_info;
 	/*if (MOD_RES_MEM_CACHING_BYDOMAIN && function_exists("mod_security_get_domain"))

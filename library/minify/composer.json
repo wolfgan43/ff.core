@@ -11,6 +11,11 @@
 			"role": "Developer"
 		}
 	],
+	"support": {
+		"email": "minify@googlegroups.com",
+		"issues": "http://code.google.com/p/minify/issues/list",
+		"wiki": "http://code.google.com/p/minify/w/list"
+	},
 	"require": {
 		"php": ">=5.2.1",
 		"ext-pcre": "*"

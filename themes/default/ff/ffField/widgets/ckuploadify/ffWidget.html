@@ -1,11 +1,11 @@
 <!--BeginSectHeaders-->
 <script type="text/javascript">
-ff.pluginLoad("ff.ffField",	ff.site_path + "/themes/library/ff/ffField.js",	function() {
-	ff.pluginLoad("swfobject", "/themes/library/swfobject/swfobject.js", function () {
-		ff.injectCSS("uploadify", "{site_path}/themes/library/plugins/jquery.uploadify/uploadify.css", function() {
-			ff.pluginLoad("ff.lib.ckfinder", "{site_path}/themes/library/ckfinder/ckfinder.js", function () {
-				ff.pluginLoad("jquery.fn.uploadify", "{site_path}/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function () {
-					ff.pluginLoad("ff.ffField.ckuploadify", "{site_path}/themes/default/ff/ffField/widgets/ckuploadify/ckuploadify.js");
+ff.pluginLoad("ff.ffField",	ff.base_path + "/themes/library/ff/ffField.js",	function() {
+	ff.pluginLoad("swfobject", ff.base_path + "/themes/library/swfobject/swfobject.js", function () {
+		ff.injectCSS("uploadify", ff.base_path + "/themes/library/plugins/jquery.uploadify/uploadify.css", function() {
+			ff.pluginLoad("ff.lib.ckfinder", ff.base_path + "/themes/library/ckfinder/ckfinder.js", function () {
+				ff.pluginLoad("jquery.fn.uploadify", ff.base_path + "/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function () {
+					ff.pluginLoad("ff.ffField.ckuploadify", ff.base_path + "/themes/default/ff/ffField/widgets/ckuploadify/ckuploadify.js");
 				}, false);
 			}, false);
 		});

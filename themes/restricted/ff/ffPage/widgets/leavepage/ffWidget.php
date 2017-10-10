@@ -11,15 +11,13 @@ class ffWidget_leavepage extends ffCommon
 	var $class			= "ffWidget_leavepage";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
 							  "jquery" 			=> null
-							/*, "jquery.ui" 		=> null*/
 						);
     var $css_deps 		= array(
-    						  /*"jquery.ui"		=> array(
-    						  		"file" => "jquery.ui.all.css"
-									, "path" => null
-								)*/
     					);
 	// PRIVATE VARS
 	var $oPage			= null;

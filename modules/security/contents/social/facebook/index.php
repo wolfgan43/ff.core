@@ -1,18 +1,22 @@
 <?php
 $cm->oPage->layer = "empty";
 
+$old_session_name = null;
+
 $framework_css = mod_sec_get_framework_css();
 $mod_sec_login = $cm->router->getRuleById("mod_sec_login");
 
 if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)  
 {
+    $filename = cm_cascadeFindTemplate("/contents/social/logged.html", "security");
+    /*
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
-
+*/
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
 
@@ -83,6 +87,19 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
 	$cm->oPage->addContent($tpl);
 	return;
 }
+else
+{
+	$old_session_name = session_name();
+	session_name("modsec_fbsess");
+	if (isset($_POST[session_name()]))
+		session_id($_POST[session_name()]);
+	elseif (isset($_GET[session_name()]))
+		session_id($_GET[session_name()]);
+	elseif (isset($_COOKIE[session_name()]))
+		session_id($_COOKIE[session_name()]);
+	session_start();	
+}
+
 use Facebook\FacebookSession;
 use Facebook\FacebookRequest;
 use Facebook\GraphUser;
@@ -95,5 +112,8 @@ $helper = new FacebookRedirectLoginHelper(MOD_SEC_SOCIAL_FACEBOOK_CLIENT_REDIR_U
 $helper->disableSessionStatusCheck();
 
 $loginUrl = $helper->getLoginUrl(explode(",", MOD_SEC_SOCIAL_FACEBOOK_APPSCOPE), null, true, "https");
+
+if ($old_session_name !== null)
+	session_name($old_session_name);
 
 ffRedirect($loginUrl);

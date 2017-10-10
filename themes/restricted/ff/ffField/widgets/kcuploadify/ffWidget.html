@@ -1,17 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.pluginLoad("swfobject", "/themes/library/swfobject/swfobject.js", function () {
-		ff.injectCSS("uploadify", "{jqueryuploadify}", function() {
-			ff.pluginLoad("jquery.fn.uploadify", "/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function () {
-				ff.pluginLoad("jquery.cookie", "/themes/library/plugins/jquery.cookie/jquery.cookie.js", function () {
-					ff.pluginLoad("ff.ffField.kcuploadify", "{widget_path}/kcuploadify.js");
-				});
-			}, false);
-		});
-	}, false);
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -38,10 +25,7 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 			modelThumb		: '{thumb_model}',
 			showFile		: {show_file},
             fullPath        : {full_path},
-            dataSrc			: "{data_src}",
-            icons           : {
-                                "cancel" : "{cancel_class}"
-                            }
+            dataSrc			: "{data_src}"
 		});
         <!--EndSectBinding-->
 	});
@@ -50,7 +34,7 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 
 <!--BeginSectControl-->
 <div class="uploadify {type_model}"> 
-<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{browse_class}" onclick="ff.ffField.kcuploadify.openKCFinder('/{resource_type}{base_url_kc}', '{container}{id_kc}' );"></a> 
+<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{class}" onclick="ff.ffField.kcuploadify.openKCFinder('/{resource_type}{base_url_kc}', '{container}{id_kc}' );"><img src="{site_path}/themes/{theme}/images/widgets/kcfinder/browse.png" alt="ShowKcFinder" /></a> 
 {control}
 </div> 
 <!--EndSectControl-->

@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS `cm_layout` (
   `page` varchar(255) NOT NULL,
   `main_theme` varchar(255) NOT NULL,
   `theme` varchar(255) NOT NULL,
-  `framework_css` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `class_body` varchar(255) NOT NULL,
   `enable_cascading` char(1) NOT NULL,
@@ -77,10 +76,16 @@ CREATE TABLE IF NOT EXISTS `cm_layout_css` (
   `file` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `cascading` char(1) NOT NULL,
-  `priority` varchar(255) NOT NULL,
+  `priority` int(11) NOT NULL,
+  `order` int(11) NOT NULL,
+  `index` int(11) NOT NULL,
   `exclude_compact` int(1) NOT NULL,
   `visible` char(1) NOT NULL,
-  PRIMARY KEY (`ID`)
+  `theme_include` varchar(255) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `priority` (`priority`),
+  KEY `order` (`order`),
+  KEY `index` (`index`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
@@ -99,12 +104,17 @@ CREATE TABLE IF NOT EXISTS `cm_layout_js` (
   `cascading` char(1) NOT NULL,
   `plugin_path` varchar(255) NOT NULL,
   `js_path` varchar(255) NOT NULL,
-  `priority` varchar(255) NOT NULL,
+  `priority` int(11) NOT NULL,
+  `order` int(11) NOT NULL,
+  `index` int(11) NOT NULL,
   `exclude_compact` int(1) NOT NULL,
   `theme_exclude` varchar(255) NOT NULL,
   `theme_include` varchar(255) NOT NULL,
   `visible` char(1) NOT NULL,
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `priority` (`priority`),
+  KEY `order` (`order`),
+  KEY `index` (`index`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
@@ -137,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `cm_layout_sect` (
   `ID_layout` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
+  `theme_include` varchar(255) NOT NULL,
   `cascading` char(1) NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;

@@ -48,15 +48,17 @@ if ($db->nextRecord())
 
 		    $mail->Subject = SECURITY_REGISTER_EMAIL_OUTDATED;
 
-		    $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_outdated.txt", $cm->oPage->theme, false);
+            $filename = cm_cascadeFindTemplate("/email/mail_outdated.txt", "security");
+		    /*$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_outdated.txt", $cm->oPage->theme, false);
 		    if ($filename === null)
-			    $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_outdated.txt", $cm->oPage->theme);
+			    $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_outdated.txt", $cm->oPage->theme);*/
 		    $tpl_txt = ffTemplate::factory(ffCommon_dirname($filename));
 		    $tpl_txt->load_file("mail_outdated.txt", "main");
 
-		    $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_outdated.html", $cm->oPage->theme, false);
+            $filename = cm_cascadeFindTemplate("/email/mail_outdated.html", "security");
+		    /*$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_outdated.html", $cm->oPage->theme, false);
 		    if ($filename === null)
-			    $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_outdated.html", $cm->oPage->theme);
+			    $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_outdated.html", $cm->oPage->theme);*/
 		    $tpl_html = ffTemplate::factory(ffCommon_dirname($filename));
 		    $tpl_html->load_file("mail_outdated.html", "main");
 

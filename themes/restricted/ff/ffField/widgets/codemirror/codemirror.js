@@ -1,5 +1,4 @@
 ff.ffField.codemirror = (function () {
-   
     var that = { /* publics*/
             __ff : true, /* used to recognize ff'objects*/
             "init" : function(id, syntax, lang, writable) {
@@ -39,9 +38,9 @@ ff.ffField.codemirror = (function () {
                 });
                 editor.on("blur", function() {editor.save()});
             }, 
-			"onUpdateDialog" : function (id, dialog) {
-				ff.struct.each(function (component_id, component) {
-					if ((dialog !== undefined && component.dialog === dialog) || (dialog === undefined && component.dialog === undefined)) {
+			"onUpdateDialog" : function (id, ctx) {
+				ff.struct.get("comps").each(function (component_id, component) {
+					if ((ctx !== undefined && component.ctx === ctx) || (ctx === undefined && component.ctx === undefined)) {
 						component.fields.each(function (field_id, field) {
 							if (field.widget == "codemirror") {
 								switch (component.type) {

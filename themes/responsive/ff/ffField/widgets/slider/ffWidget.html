@@ -3,47 +3,39 @@
 
 <!--BeginSectFooters-->
 <script type="text/javascript">
-	/* Remove jquery ui css
-	ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
-		ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
-			ff.injectCSS("jqueryuislider", "{jqueryuislider}", function() {
-			});
-		});
-	});
-	*/
 	<!--BeginSectBinding-->
-	jQuery(function() {
+	ff.pluginAddInit("jquery-ui", function() {
 		var description = [<!--BeginSectElement-->'{element}',<!--EndSectElement-->];
-		jQuery("#{container}{id}_slider").slider({
+		jQuery.fn.escapeGet("{container}{id}_slider").slider({
 			animate: true
 			,min: {min}
 			,max: {max}
 			,step: {step}
 			,value: {value}			
 			,slide: function(event, ui) {
-				jQuery("#{container}{id}").val(ui.value);
-				jQuery("#{container}{id}_amount").val(ui.value);
+				jQuery.fn.escapeGet("{container}{id}").val(ui.value);
+				jQuery.fn.escapeGet("{container}{id}_amount").val(ui.value);
 				<!--BeginSectDesc-->
-					var label = description[jQuery("#{container}{id}_amount").get(0).value];
-					jQuery("#{container}{id}_label").val(label);
+					var label = description[jQuery.fn.escapeGet("{container}{id}_amount").get(0).value];
+					jQuery.fn.escapeGet("{container}{id}_label").val(label);
 				<!--EndSectDesc-->
 			}
 		});
-		$("#{container}{id}_amount").keyup(function(event) {
+		jQuery.fn.escapeGet("{container}{id}_amount").keyup(function(event) {
 			if (/\D/g.test(this.value))
 			{
 			    this.value = this.value.replace(/\D/g, '');
 			}
 			else
 			{
-				jQuery("#{container}{id}_slider").slider( "value", jQuery(this).val());
-				jQuery("#{container}{id}").val(jQuery(this).val());
+				jQuery.fn.escapeGet("{container}{id}_slider").slider( "value", jQuery(this).val());
+				jQuery.fn.escapeGet("{container}{id}").val(jQuery(this).val());
 			}
 	    });
-
-		$("#{container}{id}_amount").val($("#{container}{id}_slider").slider("value"));
+		
+		jQuery.fn.escapeGet("{container}{id}_amount").val(jQuery.fn.escapeGet("{container}{id}_slider").slider("value"));
 		<!--BeginSectDefault-->
-			jQuery("#{container}{id}_label").val(description[0]);
+		jQuery.fn.escapeGet("{container}{id}_label").val(description[0]);
 		<!--EndSectDefault-->
 	});
 	<!--EndSectBinding-->

@@ -1,83 +1,87 @@
 /* Example tokeninput style #1: Token vertical list*/
-.autocompletetoken { position:relative; } /* div wrapper di label e UL del campo */
-
 ul.token-input-list {
-	overflow: hidden; 
-	height: auto !important; 
-	height: 1%; 
-	cursor: text;
-	z-index: 999;
-	margin: 0;
-	padding: 0 0.5em !important;
-	background-color: #fff;
-	list-style-type: none;
-	width: 100%;
+    overflow: hidden; 
+    height: auto !important; 
+    height: 1%;
+    
+    border: 1px solid #999;
+    cursor: text;
+    font-size: 12px;
+    font-family: Verdana;
+    z-index: 999;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    list-style-type: none;
+    /*clear: left; - tolto perchè non si allineava alla label sulle pubblicazioni- */
+	float:left;
+    width: 92%;
 }
 
 ul.token-input-list li {
     list-style-type: none;
-	overflow:hidden;
-	display:inline-block;
 }
 
 ul.token-input-list li input {
-    border:0;
+    border: 0;
     width: 100%;
+    padding: 3px 8px;
+    background-color: white;
     -webkit-appearance: caret;
 }
 
 li.token-input-token {
-    overflow: hidden !important; 
+    overflow: hidden; 
     height: auto !important; 
-	line-height:2em;
-	padding:0 0.5em !important;
-    margin: 0.5em 0.5em 0.5em 0 !important;
-    background-color: #f1f1f1 !important;
+    height: 1%;
+    margin: 3px;
+    padding: 3px 5px;
+    background-color: #d0efa0;
     color: #000;
-    font-weight: normal;
+    font-weight: bold;
     cursor: default;
-    display: inline-block !important;
+    display: block;
 }
-
-/*.token-input-input-token { margin:3px; }*/
 
 li.token-input-token p {
     float: left;
     padding: 0;
-    margin: 0 5px 0 0 !important;
+    margin: 0;
 }
 
 li.token-input-token span {
-	float: right;
-	color: #777;
-	cursor: pointer;
-	font-weight:bold;
+    float: right;
+    color: #777;
+    cursor: pointer;
 }
 
 li.token-input-selected-token {
-    background-color: #c6c6c6;
+    background-color: #08844e;
+    color: #fff;
+}
+
+li.token-input-selected-token span {
+    color: #bbb;
 }
 
 div.token-input-dropdown {
-	position: absolute;
-	background-color: #fff;
-	overflow-x: hidden;
-	max-height: 200px;
-	border-left: 1px solid #ccc !important;
-	border-right: 1px solid #ccc !important;
-	border-bottom: 1px solid #ccc !important;
-	cursor: default;
-	font-size: 12px;
-	font-family: Verdana;
-	z-index: 1000;
-	width:100%;
-	margin-top:-1px;
-	background:#fff !important;
+    position: absolute;
+    width: 64%;
+    background-color: #fff;
+    overflow-x: hidden;
+    max-height: 200px;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    cursor: default;
+    font-size: 12px;
+    font-family: Verdana;
+    z-index: 1;
 }
 
 div.token-input-dropdown p {
     margin: 0;
-    padding: 5px !important;
+    padding: 5px;
     font-weight: bold;
     color: #777;
 }
@@ -107,12 +111,8 @@ div.token-input-dropdown ul li em {
 }
 
 div.token-input-dropdown ul li.token-input-selected-dropdown-item {
-    background-color: #4081f5;
-    cursor:pointer;
-    color:#fff;
+    background-color: #d0efa0;
 }
-
-div.token-input-dropdown ul li.token-input-selected-dropdown-item p { color:#fff; }
 
 li.token-input-token .image img{
 	height: 50px;
@@ -127,24 +127,17 @@ li.token-input-token .data{
 /* combo custom */
 
 a.autocompletetoken-combo {
-	position:absolute;
-	right:0;
-	bottom:0;
-	box-sizing:border-box;
-	padding:1em !important;
+    position: absolute;
+    display:block;
+    width:24px;
+    height:24px;
+    right: 0;
+    background:url(drop.png) 0 0 no-repeat;
+  
+}
+
+a.autocompletetoken-combo:hover {
+    background:url(drop.png) -34px 0 no-repeat;
 }
 
 .button.activebuttons { margin-top:-3px; }
-
-/* aggiungi */
-
-.autocompletetoken A.link  {
-	position:absolute;
-	bottom:0;
-	right:-11em;
-}
-
-
-.autocompletetoken A.link:hover {
-	background:#cc3a23;
-}

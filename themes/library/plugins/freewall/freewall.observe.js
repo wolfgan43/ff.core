@@ -3,7 +3,7 @@ ff.cms.fn.freewall = function() {
 	if(targetid.length > 0)
 		targetid = targetid + " ";
 	
-	ff.pluginLoad("freewall", "/themes/library/freewall/freewall.js", function() {
+	ff.load("jquery.plugins.freewall", function() {
 		jQuery(targetid + ' > DIV').each(function() {
 			jQuery(this).addClass('brick');
 		});
@@ -29,4 +29,4 @@ ff.cms.fn.freewall = function() {
 
 		});
 	});
-}
+};

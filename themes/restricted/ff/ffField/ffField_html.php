@@ -4,8 +4,8 @@
 * @category Field Class
 * @desc ffField_html.php - Forms Framework Interface Field, html version
 * @author Samuele Diella <samuele.diella@gmail.com>
-* @copyright Copyright &copy; 2004-2009, Samuele Diella
-* @license http://opensource.org/licenses/gpl-3.0.html
+* @copyright Copyright &copy; 2004-2017, Samuele Diella
+* @license https://opensource.org/licenses/LGPL-3.0
 * @link http://www.formsphpframework.com
 * @version beta 2
 * @since beta 2
@@ -14,18 +14,16 @@
 class ffField_html extends ffField_base
 {
 	var $url = null;
-	var $url_ajax = false;
-	var $url_parsed = null;
 	var $label_encode_entities = true;
 
 	var $buttons_options = array(
 		"file" => array(
 			"edit" => array(
-				"class" => "editrow"
+				"class" => "edit-file"
 				, "label" => ""
 			)
 			, "delete" => array(
-				"class" => "cancel"
+				"class" => "del-file"
 				, "label" => ""
 			)
 		)
@@ -45,6 +43,8 @@ class ffField_html extends ffField_base
 	 * @var Mixed può essere stringa o array
 	 */
 	var $actex_child					= null;
+	
+	var $actex_reset_childs				= false;
 	/**
 	 * Se il contenuto dev'essere recuperato con richieste asincrone
 	 * @var Boolean
@@ -137,7 +137,13 @@ class ffField_html extends ffField_base
 	 * Il messaggio da visualizzare per l'eliminazione nel dialog
 	 * @var String
 	 */
-	var $actex_dialog_delete_message	= "Confermi l'eliminazione del dato?<br /><span>Il dato verr&agrave; eliminato definitivamente, non potr&agrave; essere recuperato.</span>";
+	var $actex_dialog_delete_message	= "Confermi l'eliminazione del dato?<span>Il dato verr&agrave; eliminato definitivamente, non potr&agrave; essere recuperato.</span>";
+	/**
+	 * L'ID del componente collegato per l'eliminazione
+	 * @var String
+	 */
+	var $actex_dialog_delete_idcomp = null;
+			
 	/**
 	 * Se l'oggetto DB dell'activecombo deve collegarsi direttamente al database principale (usando mod_security)
 	 * @var Boolean default false
@@ -162,30 +168,26 @@ class ffField_html extends ffField_base
 	var $actex_hide_result_on_query_empty = false;
 	var $actex_preserve_field			= null;
 	var $actex_cache					= true;
-	var $actex_res_limit				= 100;
 	
 	var $actex_autocomp					= false;
 	var $actex_autocomp_ajax			= false;
 	
-	
+	var $autocomplete_service			= null;
     var $autocomplete_disabled          = false;
     var $autocomplete_minLength         = 3;
-    var $autocomplete_delay             = 300;
+    var $autocomplete_delay             = 500;
     var $autocomplete_multi             = false;
     var $autocomplete_cache             = true;
     var $autocomplete_readonly          = true;
     var $autocomplete_combo             = false;
-    var $autocomplete_icon				= "";
     var $autocomplete_compare           = "";
     var $autocomplete_compare_having    = "";
     var $autocomplete_operation         = "LIKE [%[VALUE]%]";
     var $autocomplete_strip_char        = "";
     var $autocomplete_label 			= "";
 	var $autocomplete_use_own_session	= false;
-	var $autocomplete_use_main_db		= false;
+	var $autocomplete_use_main_db	= false;
 	var $autocomplete_hide_result_on_query_empty = false;
-	var $autocomplete_res_limit 		= 100;
-	var $autocomplete_image_field 		= "image";
 	
     var $autocompletetoken_minLength 		= 3;
     var $autocompletetoken_delay 			= 300;
@@ -203,10 +205,12 @@ class ffField_html extends ffField_base
     var $autocompletetoken_combo            = false;
     var $autocompletetoken_concat_field		= array();
     var $autocompletetoken_concat_separator = " - ";
-    var $autocompletetoken_res_limit 		= 100;
     
-    var $datechooser_type_date				= "mixed";
+    
+    var $datepicker_lang					= NULL; // default to first two chars of FF_LOCALE
     var $datepicker_force_datetime			= false;
+    var $datepicker_showbutton				= true;
+	var $datepicker_weekselector			= false;
 	// Slider
 	/**
 	 * Quante posizioni sono a disposizione dello slider
@@ -374,12 +378,14 @@ class ffField_html extends ffField_base
 
 	//uploadifive
     var $uploadifive_model = "default";		//deprecata
+    var $uploadifive_showfile_path = null;
     var $uploadifive_showfile_plugin = "fancybox";
     var $uploadifive_model_thumb = "";
-   
+
     									// (se ckfinder_show_file non e valorizzato la preview sara disabilitata)
     
-   
+    var $placeholder = false;
+    
 	//slug
 	/**
 	 * Il nome del campo slug associato 
@@ -415,7 +421,6 @@ class ffField_html extends ffField_base
     
     var $widget_path = "";
     
-    var $imagepicker_title_field = "";
 	/**
 	 * recupera il file del template
 	 * @param String $control_type il tipo di controllo di cui recuperare il template
@@ -428,6 +433,7 @@ class ffField_html extends ffField_base
 		else
 			return "ffControl_" . $control_type . ".html";
 	}
+	
 	function get_control_class($control_type = null)
 	{
 		if (strlen($this->class))
@@ -447,7 +453,7 @@ class ffField_html extends ffField_base
 			default:
 				return $control_type;
 		}
-	}
+	}	
 	/**
 	 * Esegue il parsing del template
 	 * @param Boolean $output_result se true visualizza a video il risultato del processing, se false restituisce il contenuto del processing
@@ -455,73 +461,10 @@ class ffField_html extends ffField_base
 	 */
 	public function tplParse($output_result)
 	{
-		$fixed_pre_content = $this->fixed_pre_content;
-		$fixed_post_content = $this->fixed_post_content;
-		$buffer = $this->tpl[0]->rpparse("main", false);
-
-		if($this->framework_css["fixed_pre_content"] || $this->framework_css["fixed_post_content"])
-		{
-			$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
-			$arrFieldCol = ($wrap_addon
-							? array(12,12,12,12)
-							: null
-						);
-			if($this->framework_css["fixed_pre_content"]) {
-				$prefix_class = cm_getClassByFrameworkCss("control-prefix", "form");
-				if(strlen($prefix_class))
-					$fixed_pre_content = '<span class="' . $prefix_class . '">' . $fixed_pre_content . '</span>';
-				
-				if($wrap_addon && strlen($fixed_pre_content)) {
-					$i = 0;
-					$arrAddonCol = (array_key_exists("fixed_pre_content", $this->framework_css)
-									? (is_array($this->framework_css["fixed_pre_content"])
-										? $this->framework_css["fixed_pre_content"]
-										: array_fill(0, 4, $this->framework_css["fixed_pre_content"])
-									)
-									: array(3,3,3,3)	
-								);
-
-					foreach($arrAddonCol AS $addon_col_value) {
-						$arrFieldCol[$i] = $arrFieldCol[$i] - $addon_col_value;
-						$i++;
-					}				
-				
-					$fixed_pre_content = '<div class="' . cm_getClassByFrameworkCss($arrAddonCol, "col") . '">' . $fixed_pre_content . '</div>';
-				}
-			}
-
-			if($this->framework_css["fixed_post_content"]) {
-				$postfix_class = cm_getClassByFrameworkCss("control-postfix", "form");
-				if(strlen($postfix_class))
-					$fixed_post_content = '<span class="' . $postfix_class . '">' . $fixed_post_content . '</span>';
-
-				if($wrap_addon && strlen($fixed_post_content)) {
-					$i = 0;
-					$arrAddonCol = (array_key_exists("fixed_post_content", $this->framework_css)
-									? (is_array($this->framework_css["fixed_post_content"])
-										? $this->framework_css["fixed_post_content"]
-										: array_fill(0, 4, $this->framework_css["fixed_post_content"])
-									)
-									: array(3,3,3,3)	
-								);
-
-					foreach($arrAddonCol AS $addon_col_value) {
-						$arrFieldCol[$i] = $arrFieldCol[$i] - $addon_col_value;
-						$i++;
-					}				
-				
-					$fixed_post_content = '<div class="' . cm_getClassByFrameworkCss($arrAddonCol, "col") . '">' . $fixed_post_content . '</div>';
-				}
-					
-			}
-			
-			if(is_array($arrFieldCol))
-				$buffer = '<div class="' . cm_getClassByFrameworkCss($arrFieldCol, "col") . '">' . $buffer . '</div>';
-		}
-		$buffer = $fixed_pre_content . $buffer . $fixed_post_content;
+		$buffer = $this->fixed_pre_content . $this->tpl[0]->rpparse("main", false) . $this->fixed_post_content;
 
 		if ($this->parent_page !== NULL) //code for ff.js
-			$this->parent_page[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
+			$this->parent_page[0]->tplAddJs("ff.ffField");
 
 		if ($output_result)
 		{
@@ -542,14 +485,17 @@ class ffField_html extends ffField_base
 		$this->tpl[0] = ffTemplate::factory($this->getTemplateDir($control_type));
 		$this->tpl[0]->load_file($this->getTemplateFile($control_type), "main");
                               
-		if ($this->parent !== null && strlen($this->parent[0]->id))
+		if ($this->parent !== null && strlen($this->parent[0]->getIDIF()))
 		{
 			if (!$this->omit_parent_id)
-				$this->tpl[0]->set_var("container", $this->parent[0]->id . "_");
+				$this->tpl[0]->set_var("container", $this->parent[0]->getPrefix());
+		}
+
+		if($this->parent_page !== NULL) {
 			$this->tpl[0]->set_var("keys", $this->parent_page[0]->get_params("", "", false));
 			$this->tpl[0]->set_var("query_string", $this->parent_page[0]->get_script_params());
 		}
-
+		
 		$this->tpl[0]->set_var("site_path", ffCommon_specialchars($this->site_path));
 		$this->tpl[0]->set_var("page_path", ffCommon_specialchars($this->page_path));
 
@@ -564,7 +510,7 @@ class ffField_html extends ffField_base
             }
             reset($this->fixed_vars);
         }
-
+    
 		$this->tpl[0]->set_var("properties", $this->getProperties());
 
 		$res = $this->doEvent("on_tpl_load", array(&$this));
@@ -578,19 +524,19 @@ class ffField_html extends ffField_base
 
 			if ($this->placeholder === true)
 				$property_set["placeholder"] = ffCommon_specialchars($this->label);
-			else if($this->placeholder)
+			else if(strlen($this->placeholder))
 				$property_set["placeholder"] = $this->placeholder;
 		}
-
+		
 		return parent::getProperties($property_set);
 	}
 	
 	function process_file($id, &$value)
 	{
-		$this->tpl[0]->set_var("butt_del_class", cm_getClassByFrameworkCss($this->buttons_options["file"]["delete"]["class"], "icon"));
+		$this->tpl[0]->set_var("butt_del_class", $this->buttons_options["file"]["delete"]["class"]);
 		$this->tpl[0]->set_var("butt_del_label", $this->buttons_options["file"]["delete"]["label"]);
 
-		$this->tpl[0]->set_var("butt_edit_class", cm_getClassByFrameworkCss($this->buttons_options["file"]["edit"]["class"], "icon"));
+		$this->tpl[0]->set_var("butt_edit_class", $this->buttons_options["file"]["edit"]["class"]);
 		$this->tpl[0]->set_var("butt_edit_label", $this->buttons_options["file"]["edit"]["label"]);
 		
 		parent::process_file($id, $value);

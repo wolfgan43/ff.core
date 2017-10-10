@@ -11,27 +11,16 @@ class ffWidget_tabs extends ffCommon
 	var $class			= "ffWidget_tabs";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
-							, "jquery.ui" 		=> null
+							"ff.ffPage.tabs"	=> null
 						);
-    var $css_deps 		= array(/*
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.tabs"        => array( 
-                                      "file" => "jquery.ui.tabs.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )
-    					*/);    
+	
+    var $css_deps 		= array(
+    					);
+	
 	// PRIVATE VARS
 	var $oPage			= null;
 	var $source_path	= null;
@@ -72,7 +61,7 @@ class ffWidget_tabs extends ffCommon
 	{
 		if ($component !== null)
 		{
-			$tpl_id = $component;
+			$tpl_id = $oPage->components[$component]->getIDIF();
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
 			$oPage->components[$component]->processed_widgets[$id] = "tabs";
@@ -91,34 +80,7 @@ class ffWidget_tabs extends ffCommon
 
 		$this->tpl[$tpl_id]->set_var("SectElementHead", "");
 		$this->tpl[$tpl_id]->set_var("SectElementBody", "");
-/* Remove jquery ui css
-		$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.tabs"        => array( 
-                      "file" => "jquery.ui.tabs.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);		
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $oPage->widgetResolveCss($css_key, $css_value, $oPage);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$oPage->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-*/
 		$i = 0;
 		foreach ($data["contents"] as $subkey => $subvalue)
 		{
@@ -144,7 +106,7 @@ class ffWidget_tabs extends ffCommon
 				$title = $key;
 
 			$this->tpl[$tpl_id]->set_var("element_count", $i);
-			$this->tpl[$tpl_id]->set_var("element_title", $title);
+			$this->tpl[$tpl_id]->set_var("element_title", ffCommon_specialchars($title));
 			$ret = $oPage->getContentData($subvalue["data"]);
 			if (is_array($ret))
 			{
@@ -174,11 +136,6 @@ class ffWidget_tabs extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			$this->oPage[0]->tplAddJs("ff.history", "history.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffPage.tabs", "tabs.js", FF_THEME_DIR . "/restricted/ff/ffPage/widgets/tabs");
-		}			
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -190,29 +147,11 @@ class ffWidget_tabs extends ffCommon
 		if (!isset($this->tpl[$id]))
 			return;
 
-		/*if(isset($_REQUEST["XHR_DIALOG_ID"])) 
-		{
-			$this->tpl[$id]->set_var("SectNoXHRDialogStart", "");
-			$this->tpl[$id]->set_var("SectNoXHRDialogEnd", "");
-		}
-		else
-		{
-			$this->tpl[$id]->parse("SectNoXHRDialogStart", false);
-			$this->tpl[$id]->parse("SectNoXHRDialogEnd", false);
-		}*/
-
 		return $this->tpl[$id]->rpparse("SectFooters", false);
 	}
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			$this->oPage[0]->tplAddJs("ff.history", "history.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffPage.tabs", "tabs.js", FF_THEME_DIR . "/restricted/ff/ffPage/widgets/tabs");
-			
-			//return;
-		}			
-		
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -224,17 +163,6 @@ class ffWidget_tabs extends ffCommon
 		if (!isset($this->tpl["main"]))
 			return;
 			
-		/*if(isset($_REQUEST["XHR_DIALOG_ID"])) 
-		{
-			$this->tpl["main"]->set_var("SectNoXHRDialogStart", "");
-			$this->tpl["main"]->set_var("SectNoXHRDialogEnd", "");
-		}
-		else
-		{
-			$this->tpl["main"]->parse("SectNoXHRDialogStart", false);
-			$this->tpl["main"]->parse("SectNoXHRDialogEnd", false);
-		}*/
-
 		return $this->tpl["main"]->rpparse("SectFooters", false);
 	}
 }

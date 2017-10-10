@@ -8,7 +8,7 @@ jQuery(function ($, undefined) {
 		<!--EndSect_service_check_session-->
 		<!--BeginSect_service_oauth2-->
 		ff.modules.security.services.oauth2 = '{oauth2_path}';
-		<!--EndSect_service_oauth2-->		
+		<!--EndSect_service_oauth2-->
 		ff.modules.security.session.session_name = '{session_name}';
 	});
 }(jQuery));

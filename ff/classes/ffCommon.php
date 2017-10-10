@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffClassChecks
@@ -63,8 +63,8 @@ abstract class ffClassChecks
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffCommon extends ffClassChecks
@@ -121,6 +121,8 @@ abstract class ffCommon extends ffClassChecks
 						$node->$key = array();
 					ffCommon::get_defaults_walkarray($node->$key, $value);
 				}
+				else
+					ffErrorHandler::raise("Mismatch variable type (try to init as null)", E_USER_ERROR, null, get_defined_vars());
 			}
 			else
 			{
@@ -133,7 +135,7 @@ abstract class ffCommon extends ffClassChecks
 					$node->$key = $value;
 				}
 				else
-					$node[$key] = $value;				
+					ffErrorHandler::raise("Mismatch variable type (try to init as null)", E_USER_ERROR, null, get_defined_vars());
 			}
 		}
 		reset($array);
@@ -179,6 +181,17 @@ abstract class ffCommon extends ffClassChecks
 	 */
 	public function addEvent($event_name, $func_name, $priority = null, $index = 0, $break_when = null, $break_value = null, $additional_data = null)
 	{
+		if (is_array($func_name))
+		{
+			$data = $func_name;
+			$func_name			= $data["func_name"];
+			$priority			= $data["priority"];
+			$index				= $data["index"] === null ? 0 : $data["index"];
+			$break_when			= $data["break_when"];
+			$break_value		= $data["break_value"];
+			$additional_data	= $data["additional_data"];
+		}
+		
 		if ($priority === null)
 		{
 			if (isset($this->events[$event_name]["defaults"]))
@@ -286,6 +299,10 @@ abstract class ffCommon extends ffClassChecks
 								$event_key = $subvalue["event"]->func_name;
 							else
 								$event_key = $key;
+							
+							if (!is_callable($subvalue["event"]->func_name))
+								ffErrorHandler::raise ("Wrong Event Params", E_USER_ERROR, $this, get_defined_vars ());
+							
 							$results[$event_key] = call_user_func_array($subvalue["event"]->func_name, $calling_params);
 							
 							if($subvalue["event"]->checkBreak($results[$event_key]))

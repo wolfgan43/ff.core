@@ -11,30 +11,18 @@ ff.ffField.gmap3 = (function () {
 		/* publics*/
 		__ff : true, /* used to recognize ff'objects*/
 
-		"init" : function (key, region)
+		"init" : function (key, sensor, region)
 		{
-			if(window["google"] === undefined) {
-				jQuery(function() {
-					ff.ffField.gmap3.loadScript(key, region);
-				});
-			} else {
-				jQuery(function() {
-					ff.ffField.gmap3.loadMaps(true); 
-				});
-			}
-		},
-		"loadScript" : function(key, region) {
-			var script = document.createElement("script");
-			script.type = "text/javascript";
-			var url_data = window.location.href.parseUri();
-			script.src = url_data.protocol + "://maps.googleapis.com/maps/api/js?v=3.exp&key=" + key + (region ? "&" + region : "") +"&callback=ff.ffField.gmap3.loadMaps";
-			document.body.appendChild(script);
+			ff.ffField.gmap3.loadMaps(true); 
 		},
 		"addData": function(data) 
 		{
 			if(!googleData[data.id])
 				googleData[data.id] = { "data" : data, "loaded" : false};
 		},
+		"getInst" : function (id) {
+			return googleData[id];
+		},		
 		/*"pinGeocodePosition" : function (pos) {
 			geocoder.geocode({
 			  "location": pos
@@ -46,14 +34,14 @@ ff.ffField.gmap3 = (function () {
 			  }
 			});
 		  },*/
-		"addPin" : function (idmap, lat, lng, draggable, image, info) {
+		"addPin" : function (idmap, lat, lng, draggable, image, info, icon) {
 			if (googleData[idmap]["pins"] === undefined) {
 				googleData[idmap]["pins"] = ff.hash();
 			}
 			
 			var idmarker = lat.toString() + "|" + lng.toString();
 			
-			if (googleData[idmap]["pins"].isset(idmarker) === undefined) {
+			if (!googleData[idmap]["pins"].isset(idmarker)) {
 				var marker_data = {
 						"map": googleData[idmap]["map"],
 						"position": new google.maps.LatLng(lat, lng),
@@ -63,7 +51,11 @@ ff.ffField.gmap3 = (function () {
 				if (image !== undefined) {
 					marker_data.image = image;
 				}
-
+				
+				if (icon !== undefined) {
+					marker_data.icon = icon;
+				}
+				
 				var pin = new google.maps.Marker(marker_data);
 				var rc = googleData[idmap]["pins"].set(idmarker, pin);
 		
@@ -82,12 +74,13 @@ ff.ffField.gmap3 = (function () {
 		},
 		"loadMaps" : function(reload) {
 			for(var i in googleData) {
-				if(document.getElementById(i + "[map]") && (reload || !googleData[i]["loaded"])) {
-					if(!jQuery("#" + i + "\\[map\\]").height()) {
-						jQuery("#" + i + "\\[map\\]").height(300);
+				if(reload || !googleData[i]["loaded"]) {
+					if(!jQuery("#" + i + "\\[map\\]").height() < 100) {
+						jQuery("#" + i + "\\[map\\]").height(350);
 					}
-					
-					googleData[i]["id"] = i + "[map]";					
+
+					googleData[i]["id"] = i + "[map]";	
+									
 					if(googleData[i]["data"]["personalized_style"])
 						mapID = 'custom_style';
 					else
@@ -229,9 +222,9 @@ ff.ffField.gmap3 = (function () {
 */				
 					that.doEvent({
 						"event_name" : "loadMap",
-						"event_params"	: [i]
+						"event_params"	: [i, googleData[i]]
 					});
-
+					/*
 					ff.pluginAddInit("ff.ffPage.dialog", function () {
 						ff.ffPage.dialog.addEvent({
 							"event_name"	: "onDisplayedDialog",
@@ -250,9 +243,9 @@ ff.ffField.gmap3 = (function () {
 									ff.ffField.gmap3.codeAddress(document.getElementById(i + '[search]').value, i + '[map]', true);
 							}
 						});
-					});					
+					});	*/				
 				}
-			} 
+			}
 		},
 		"codeAddress": function(address, map, skip) {
 			if((map["domPrefix"] !== undefined && map["domPrefix"].length > 0) || skip !== undefined) {
@@ -261,17 +254,17 @@ ff.ffField.gmap3 = (function () {
 						document.getElementById(i + "[search]").value = address;
                     if(document.getElementById(i + "[title]"))
 						document.getElementById(i + "[title]").value = address;
+
+					if(!googleData[i]["centered"]) {
+						google.maps.event.trigger(googleData[i]["map"], 'resize'); 
+						googleData[i]["centered"] = true;
+					}				
+					
 					geocoder.geocode({ 'address': address}, function(results, status) {
 						if (status == google.maps.GeocoderStatus.OK) {
 							googleData[i]["marker"].setPosition(results[0].geometry.location);
 							ff.ffField.gmap3.geocodePosition(i, googleData[i]["marker"], map);
 						}
-						
-						if(1 || !googleData[i]["centered"]) {
-							google.maps.event.trigger(googleData[i]["map"], 'resize'); 
-							googleData[i]["map"].setCenter(googleData[i]["marker"].getPosition());
-							googleData[i]["centered"] = true;
-						}						
 					});
 				}
 			}

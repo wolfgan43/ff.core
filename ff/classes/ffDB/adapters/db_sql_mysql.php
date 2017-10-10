@@ -4,8 +4,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2013, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -14,8 +14,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2013, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffDBAdapter_db_sql_mysql extends ffDB_Sql implements ffDBAdapter
@@ -143,6 +143,9 @@ class ffDBAdapter_db_sql_mysql extends ffDB_Sql implements ffDBAdapter
 								case "text":
 								case "char":
 								case "tinytext":
+								case "mediumtext":
+								case "blob":
+								case "varbinary":
 									$tmp->eBaseType = "Text";
 									break;
 									
@@ -160,6 +163,10 @@ class ffDBAdapter_db_sql_mysql extends ffDB_Sql implements ffDBAdapter
 									
 								case "datetime":
 									$tmp->eBaseType = "DateTime";
+									break;
+
+								case "time":
+									$tmp->eBaseType = "Time";
 									break;
 
 								default:

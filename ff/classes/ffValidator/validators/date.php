@@ -6,7 +6,7 @@
  * @subpackage utils
  * @author Matteo Bonvini <matteo.bonvini@gmail.com>
  * @copyright Copyright (c) 2004-2010, Matteo Bonvini
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -17,7 +17,7 @@
  * @subpackage utils
  * @author Matteo Bonvini <samuele.diella@gmail.com>
  * @copyright Copyright (c) 2004-2010, Matteo Bonvini
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffValidator_date extends ffValidator_base
@@ -40,7 +40,7 @@ class ffValidator_date extends ffValidator_base
 	 * @return boolean valodità del valore immesso
 	 */
 
-	public function checkValue(ffData $value, $label, $options)
+	public function checkValue(ffData $value, $label, $options = null)
 	{
                 //verifica sul tipo di ffData
                 if ($value->data_type !== "Date")

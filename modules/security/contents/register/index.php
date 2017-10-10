@@ -1,5 +1,4 @@
 <?php
-
 $globals = ffGlobals::getInstance("mod_security");
 $db = ffDB_Sql::factory();
 
@@ -31,6 +30,11 @@ $oRecord->allow_delete = false;
 $oRecord->allow_update = false;
 $oRecord->addEvent("on_do_action", "MainRecord_on_do_action");
 $oRecord->addEvent("on_done_action", "MainRecord_on_done_action");
+$oRecord->addEvent("on_done_action", array(
+	"func_name" => "MainRecord_on_done_action_redir",
+	"priority" => ffEvent::PRIORITY_LOW,
+	"index" => -100
+));
 $oRecord->buttons_options["cancel"]["display"] = false;
 $oRecord->buttons_options["insert"]["label"] = ffTemplate::_get_word_by_code("mod_sec_register_bt");
 $oRecord->additional_fields = array(
@@ -38,6 +42,8 @@ $oRecord->additional_fields = array(
 										, "level" => new ffData('1')
 									);
 $oRecord->insert_additional_fields["created"] = new ffData(date("d/m/Y H:i:s"), "DateTime", "ITA");
+if ($cm->modules["security"]["overrides"]["register"]["tpl_file"])
+	$oRecord->template_file = $cm->modules["security"]["overrides"]["register"]["tpl_file"];
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "ID";
@@ -113,44 +119,124 @@ if(MOD_SECURITY_REGISTER_PRIVACY) {
 	            , "cols" => 1
 	     );
 	//$oRecord->setTabTitle("privacy", ffTemplate::_get_word_by_code("register_privacy"));
-		
+	if(MOD_SECURITY_REGISTER_CONDITION) {
+		$oField = ffField::factory($cm->oPage);
+		$oField->id = "condition_text";
+		$oField->container_class = "condition-text";
+		$oField->label = "";
+		$oField->base_type = "Text";
+		$oField->extended_type = "Text";
+		$oField->control_type = "textarea";
+		$oField->default_value = new ffData(ffTemplate::_get_word_by_code("condition_text"), "Text");
+		$oField->properties["readonly"] = "readonly";
+		$oField->data_type = "";
+		$oField->store_in_db = false;
+		$oRecord->addContent($oField, "privacy");
 
-	$oField = ffField::factory($cm->oPage);
-	$oField->id = "privacy_text";
-	$oField->container_class = "privacy-text";
-	$oField->label = "";
-	$oField->base_type = "Text";
-	$oField->extended_type = "Text";
-	$oField->control_type = "textarea";
-	$oField->default_value = new ffData(ffTemplate::_get_word_by_code("register_privacy_text"), "Text");
-	$oField->properties["readonly"] = "readonly";
-	$oField->data_type = "";
-	$oField->store_in_db = false;
-	$oRecord->addContent($oField, "privacy");
-
+		$oField = ffField::factory($cm->oPage);
+		$oField->id = "condition_check";
+		$oField->container_class = "condition-check";
+		$oField->label = ffTemplate::_get_word_by_code("condition_check");
+		if (MOD_SECURITY_REGISTER_CONDITION_CHECKBOX)
+		{
+			$oField->control_type = "checkbox";
+			$oField->checked_value = new ffData("1", "Number", FF_SYSTEM_LOCALE);
+			$oField->unchecked_value = new ffData("0", "Number", FF_SYSTEM_LOCALE);
+		}
+		else
+		{
+			$oField->control_type = "radio";
+			$oField->extended_type = "Selection";
+			$oField->multi_pairs = array (
+										array(new ffData(""), new ffData(ffTemplate::_get_word_by_code("no"))),
+										array(new ffData("1"), new ffData(ffTemplate::_get_word_by_code("yes")))
+								   );
+		}
+		$oField->required = true;
+		$oField->data_type = "";
+		$oField->store_in_db = false;
+		$oRecord->addContent($oField, "privacy");		
+	}
+	
+	if (MOD_SECURITY_REGISTER_PRIVACY_TEXT)
+	{
+		$oField = ffField::factory($cm->oPage);
+		$oField->id = "privacy_text";
+		$oField->container_class = "privacy-text";
+		$oField->label = "";
+		$oField->base_type = "Text";
+		$oField->extended_type = "Text";
+		$oField->control_type = "textarea";
+		$oField->default_value = new ffData(ffTemplate::_get_word_by_code("register_privacy_text"), "Text");
+		$oField->properties["readonly"] = "readonly";
+		$oField->data_type = "";
+		$oField->store_in_db = false;
+		$oRecord->addContent($oField, "privacy");
+	}
+	
 	$oField = ffField::factory($cm->oPage);
 	$oField->id = "privacy_check";
 	$oField->container_class = "register_check";
 	$oField->label = ffTemplate::_get_word_by_code("register_privacy_check");
-    $oField->control_type = "radio";
-    $oField->extended_type = "Selection";
-	$oField->multi_pairs = array (
-			                    array(new ffData(""), new ffData(ffTemplate::_get_word_by_code("no"))),
-			                    array(new ffData("1"), new ffData(ffTemplate::_get_word_by_code("yes")))
-			               );
-
-/*
-	$oField->control_type = "checkbox";
-	$oField->checked_value = new ffData("1", "Number", FF_SYSTEM_LOCALE);
-	$oField->unchecked_value = new ffData("0", "Number", FF_SYSTEM_LOCALE);
-*/
+	if (MOD_SECURITY_REGISTER_PRIVACY_CHECKBOX)
+	{
+		$oField->control_type = "checkbox";
+		$oField->checked_value = new ffData("1", "Number", FF_SYSTEM_LOCALE);
+		$oField->unchecked_value = new ffData("0", "Number", FF_SYSTEM_LOCALE);
+	}
+	else
+	{
+		$oField->control_type = "radio";
+		$oField->extended_type = "Selection";
+		$oField->multi_pairs = array (
+									array(new ffData(""), new ffData(ffTemplate::_get_word_by_code("no"))),
+									array(new ffData("1"), new ffData(ffTemplate::_get_word_by_code("yes")))
+							   );
+	}
 	$oField->required = true;
 	$oField->data_type = "";
 	$oField->store_in_db = false;
 	$oRecord->addContent($oField, "privacy");	
-}		
+}	
+	
+if (ffIsset($cm->modules["security"], "custom_events") && ffIsset($cm->modules["security"]["custom_events"], "register") && count($cm->modules["security"]["custom_events"]["register"]))
+	foreach($cm->modules["security"]["custom_events"]["register"] as $key => $value)
+	{
+		$oRecord->addEvent($key, $value);
+	}
 	
 $cm->oPage->addContent($oRecord);
+
+function MainRecord_on_done_action_redir($oRecord, $frmAction)
+{
+	$cm = cm::getInstance();
+	//$globals = ffGlobals::getInstance("mod_security");
+
+	if (strlen($cm->oPage->ret_url))
+		$ret_url = $cm->oPage->ret_url;
+	else
+		$ret_url = $cm->oPage->site_path . "/";
+
+	$mod_sec_register_success = $cm->router->getRuleById("mod_sec_register_success");
+	if ($mod_sec_register_success === null)
+	{
+		$mod_sec_register = $cm->router->getRuleById("mod_sec_register");
+		if ($mod_sec_register === null)
+		{
+			$destination = $ret_url;
+			$oRecord->redirect($cm->oPage->site_path . "/" . ltrim($destination, "/"));
+		}
+		else
+			$destination = $cm->oPage->site_path . (string)$mod_sec_register->reverse . "/success";
+	}
+	else
+		$destination = $cm->oPage->site_path . (string)$mod_sec_register_success->reverse;
+
+	if ($destination)
+		$oRecord->redirect($destination . "?ret_url=" . rawurlencode($ret_url));
+	else
+		$oRecord->redirect($ret_url);
+}
 
 function MainRecord_on_done_action($oRecord, $frmAction)
 {
@@ -223,16 +309,18 @@ function MainRecord_on_done_action($oRecord, $frmAction)
 					}
 					else
 					{
-						$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_register.txt", $cm->oPage->theme, false);
+                        $filename = cm_cascadeFindTemplate("/email/mail_register.txt", "security");
+						/*$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_register.txt", $cm->oPage->theme, false);
 						if ($filename === null)
 							$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_register.txt", $cm->oPage->theme);
-
+*/
 						$tpl_txt = ffTemplate::factory(ffCommon_dirname($filename));
 						$tpl_txt->load_file("mail_register.txt", "main");
 
-						$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_register.html", $cm->oPage->theme, false);
+						$filename = cm_cascadeFindTemplate("/email/mail_register.html", "security");
+						/*$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/email/mail_register.html", $cm->oPage->theme, false);
 						if ($filename === null)
-							$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_register.html", $cm->oPage->theme);
+							$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/email/mail_register.html", $cm->oPage->theme);*/
 						$tpl_html = ffTemplate::factory(ffCommon_dirname($filename));
 						$tpl_html->load_file("mail_register.html", "main");
 					}
@@ -300,31 +388,8 @@ function MainRecord_on_done_action($oRecord, $frmAction)
 					mod_security_create_session($oRecord->form_fields["email"]->value->getValue(), $oRecord->key_fields["ID"]->value->getValue());
 				set_session("UserLevel", 1);
 			}
-
-			$mod_sec_register_success = $cm->router->getRuleById("mod_sec_register_success");
-			if ($mod_sec_register_success === null)
-			{
-				$mod_sec_register = $cm->router->getRuleById("mod_sec_register");
-				if ($mod_sec_register === null)
-				{
-					$destination = $ret_url;
-					ffRedirect($cm->oPage->site_path . "/" . ltrim($destination, "/"));
-				}
-				else
-					$destination = $cm->oPage->site_path . (string)$mod_sec_register->reverse . "/success";
-			}
-			else
-				$destination = $cm->oPage->site_path . (string)$mod_sec_register_success->reverse;
-
-			if (strlen($cm->oPage->ret_url))
-				$ret_url = $cm->oPage->ret_url;
-			else
-				$ret_url = $cm->oPage->site_path . "/";
-
-			if ($destination)
-				ffRedirect($destination . "?ret_url=" . rawurlencode($ret_url));
-			else
-				ffRedirect($ret_url);
+			
+			$cm->modules["security"]["events"]->doEvent("done_user_create", array($ID, $oRecord->additional_fields["status"], false));
 	}
 }
 
@@ -346,7 +411,7 @@ function MainRecord_on_do_action($oRecord, $frmAction)
 				";
 			if (MOD_SEC_EXCLUDE_SQL)
 				$sSQL .= " AND `" . $oRecord->src_table . "`.ID " . MOD_SEC_EXCLUDE_SQL;
-			
+
 			if (
 					(MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "username")
 					&&
@@ -362,7 +427,10 @@ function MainRecord_on_do_action($oRecord, $frmAction)
 				}
 			}
 
-			if (MOD_SECURITY_LOGON_USERID == "email" || MOD_SECURITY_REGISTER_SHOWUSERID == "both" || MOD_SECURITY_REGISTER_SHOWUSERID == "email")
+			if (
+					(MOD_SECURITY_LOGON_USERID == "email" || MOD_SECURITY_REGISTER_SHOWUSERID == "both" || MOD_SECURITY_REGISTER_SHOWUSERID == "email")
+					&& strlen($oRecord->form_fields["email"]->value->getValue())
+				)
 			{
 				$tmp_SQL = $sSQL . " AND `email` = " . $db->toSql($oRecord->form_fields["email"]->value);
 				$db->query($tmp_SQL);

@@ -3,7 +3,7 @@
  * @package theme_responsive
  * @subpackage widgets
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
@@ -12,7 +12,7 @@
  * @package theme_responsive
  * @subpackage widgets
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
@@ -26,32 +26,18 @@ class ffWidget_activecomboex extends ffCommon
 	
 	var $class			= "ffWidget_activecomboex";
 
-	var $widget_deps	= array(array("name" => "dialog"));
+	var $widget_deps	= array(
+		array(
+			"name" => "dialog"
+		)
+	);
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							/*, "jquery.ui"					=> null*/
-/*							, "ff.ffField.activecomboex"	=> array(
-									"file" => "activecomboex.js"
-									, "path" => "/themes/responsive/ff/ffField/widgets/activecomboex" 
-								)*/
+                              "ff.ffField.activecomboex"       => null
 						);
-    var $css_deps 		= array(
-                             /* "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.autocomplete"        => array(
-                                      "file" => "jquery.ui.autocomplete.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
-    					);
+    var $css_deps 		= array();
 
 	var $disable_dialog = false;
 	
@@ -92,7 +78,7 @@ class ffWidget_activecomboex extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -107,14 +93,15 @@ class ffWidget_activecomboex extends ffCommon
 	{
 		global $plgCfg_ActiveComboEX_UseOwnSession;
         
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
-			$Field->parent[0]->processed_widgets[$Field->parent[0]->id . "_" . $id] = "activecomboex";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "activecomboex";
 		}
 		else
 		{
@@ -128,6 +115,10 @@ class ffWidget_activecomboex extends ffCommon
 		else
 			$db =& $this->db[0];
 
+		//if($Field->parent_page[0]->jquery_ui_theme) {
+			$Field->parent_page[0]->tplAddCss("jquery-ui.autocomplete");
+		//}		
+			
 		$this->tpl[$tpl_id]->set_var("SectControl", "");
 		$this->tpl[$tpl_id]->set_var("SectDataEl", "");
 
@@ -144,7 +135,7 @@ class ffWidget_activecomboex extends ffCommon
 		if ($Field->actex_service === null)
 		{
 			$this->tpl[$tpl_id]->set_var("service", "null");
-			if (!$this->innerURL === null) {
+			if ($this->innerURL !== null) {
 				$this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
 				$this->tpl[$tpl_id]->parse("SectInnerUrl", false);
 			}
@@ -350,7 +341,7 @@ class ffWidget_activecomboex extends ffCommon
 		
 		if ($Field->actex_father === null)
 			$father = null;
-		else if (isset($Field->cont_array[$Field->actex_father]))
+		else if (ffIsset($Field->cont_array, $Field->actex_father))
 			$father = $Field->cont_array[$Field->actex_father];
 		else
 			$father = $Field->actex_father[0];
@@ -403,7 +394,10 @@ class ffWidget_activecomboex extends ffCommon
 		}
 
 		$property_set = $Field->properties;
-		if (is_array($property_set) && isset($property_set["onchange"]))
+		if(!is_array($Field->properties))
+			$Field->properties = array();
+
+		if (isset($property_set["onchange"]))
 			ffErrorHandler::raise("DEPRECATED - use ->actex_on_change instead", E_USER_ERROR, $this, get_defined_vars());
 
 		$this->tpl[$tpl_id]->set_var("properties", str_replace("'", "\'", $Field->getProperties($property_set)));
@@ -438,9 +432,6 @@ class ffWidget_activecomboex extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("limit_select", "false");
 
-		if(!is_array($Field->properties))
-			$Field->properties = array();
-		
 		if (strlen($Field->properties["disabled"]))
 			$this->tpl[$tpl_id]->set_var("disabled", "true");
 		else
@@ -530,11 +521,6 @@ class ffWidget_activecomboex extends ffCommon
 			
 		$this->tpl[$tpl_id]->set_var("SectData", "");
 		$this->tpl[$tpl_id]->set_var("data_src", "");		
-
-		/*if($Field->actex_service)
-			$this->tpl[$tpl_id]->set_var("data_src", md5($Field->actex_service));
-		else 
-			$this->tpl[$tpl_id]->set_var("data_src", "");*/
 		$no_rec = true;
 		
 		if (strlen($tmp_sql = $Field->getSQL()) && $Field->actex_update_from_db)
@@ -687,13 +673,6 @@ class ffWidget_activecomboex extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.activecomboex", "activecomboex.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/activecomboex");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -710,15 +689,6 @@ class ffWidget_activecomboex extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.activecomboex", "activecomboex.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/activecomboex");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

@@ -5,19 +5,19 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
 /**
- * validator: time
+ * validator: datetime
  *
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffValidator_datetime extends ffValidator_base
@@ -37,7 +37,7 @@ class ffValidator_datetime extends ffValidator_base
 	 * @param ffData valore inserito
 	 * @param string label del campo
 	 * @param <type> $options
-	 * @return boolean validitÃ  del valore inserito
+	 * @return boolean validità del valore inserito
 	 */
 
 	public function checkValue(ffData $value, $label, $options)
@@ -47,7 +47,7 @@ class ffValidator_datetime extends ffValidator_base
 			return false;
 
 		if (!isValidDateTimeString($plain, "YY-MM-DD HH:ii:ss", $str_timezone))
-			return "Il valore inserito nel campo \"$label\" non Ã¨ valido";
+			return "Il valore inserito nel campo \"$label\" non è valido";
 
 		return false;
 	}

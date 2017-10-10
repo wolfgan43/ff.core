@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -208,3 +208,28 @@ function FormsLocale_ISO9075_SetTimeToSec($oFormsData, $value)
 		$oFormsData[0]->value_date_seconds = intval(gmdate("s", $value));
 	}
 }
+
+function FormsLocale_ISO9075_CheckTime($raw_value)
+{
+    if (!preg_match("/\\d{1,2}:\\d{1,2}(:\\d{1,2}){0,1}/", $raw_value))
+        return FALSE;
+    else
+        return true;
+}
+
+function FormsLocale_ISO9075_CheckDate($raw_value)
+{
+    if (!preg_match("/\\d{1,4}\\-\\d{1,2}\\-\\d{2}/", $raw_value))
+        return FALSE;
+    else
+        return true;
+}
+
+function FormsLocale_ISO9075_CheckDateTime($raw_value)
+{
+    if (!preg_match("/\\d{1,4}\\-\\d{1,2}\\-\\d{2}\\s*\\d{1,2}:\\d{1,2}(:\\d{1,2}){0,1}/", $raw_value))
+        return FALSE;
+    else
+        return true;
+}
+

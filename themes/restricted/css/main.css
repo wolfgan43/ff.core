@@ -368,6 +368,9 @@ tr:hover{
 
 .ffGrid SPAN.descending { background:url(../images/FormsGrid/descending.png) 0 4px no-repeat; }
 
+.ffGrid th.ffButton {
+	width: 20px;
+}
 
 /* Utilità  */
 
@@ -461,118 +464,24 @@ tr:hover{
 	color:#111;
 }
 
-#menu{
-	height:36px;
-	background-color:#0755a1;
-	padding:0 12px;
-	background: #043f8a; /* for non-css3 browsers */
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0755a1', endColorstr='#043f8a'); /* for IE */
-	background:-webkit-gradient(linear, 0% 85%, 0% 100%, from(#0755A1), to(#043F8A)); /* for webkit browsers */
-	background:-moz-linear-gradient(0% 85% 270deg,#0755a1, #043f8a, #043f8a 100%); /* for firefox 3.6+ */
-	
+#account a:link, #account a:visited {
+	padding:3px 6px;
+	background: #ffffff;
+	color:#111111;
 }
 
-#submenu{
-	border-bottom:1px solid #cccccc;
-	height:37px;
-	padding:0 12px;
-	background: #FFF; /* for non-css3 browsers */
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#efefef'); /* for IE */
-	background: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#efefef)); /* for webkit browsers */
-	background: -moz-linear-gradient(top,  #FFF,  #efefef); /* for firefox 3.6+ */
-}
-
-/* Navigazione, pulsanti autoadattanti in larghezza */
-
-#primaryNav{
-	float:left;
-}
-
-#secondaryNav{
-	float:right;
-}
-
-#menu ul, #submenu ul{
-	float:left;
-	list-style:none;
-}
-
-#menu ul li, #submenu ul li{
-	float:left;
-}
-
-#menu ul li a strong, #submenu ul li a strong{
+#account a.logout:link, #account a.logout:visited {
+	background:#83b931;
 	color:#fff;
 }
 
-#menu ul li a:link, #menu ul li a:visited{
-	float:left;
-	color:#ffffff;
-	line-height:27px;
-	font-weight:bold;
-	background:#0e73d5;
-	height:27px;
-	margin-top:9px;
-	padding:0 9px;
-	margin-right:3px;
-	-moz-border-radius-topleft: 5px; /* Firefox */
-	-webkit-border-top-left-radius: 5px; /* Safari, Chrome */
-	border-top-left-radius: 5px; /* CSS3 */
-	-moz-border-radius-topright: 5px; /* Firefox */
-	-webkit-border-top-right-radius: 5px; /* Safari, Chrome */
-	border-top-right-radius: 5px; /* CSS3 */
+#account a:hover{
+	text-decoration:underline;
 }
 
-#menu ul li a:hover{
-	color:white;
-	text-decoration:none;
-	background:#2e8fec;
-}
-
-#menu ul li a.current{
-	background: #ffffff;
-	color:#111111;
-}
-
-#menu ul li a.selected{
-	background: #ffffff;
-	color:#111111;
-}
-
-#submenu ul li a:link, #submenu ul li a:visited{
-	float:left;
-	color:#666666;
-	line-height:24px;
-	font-weight:bold;
-	font-size:11px;
-	height:24px;
-	padding:1px 10px;
-	margin:6px 1px;
-}
-
-#submenu ul li a:hover{
-	text-decoration:none;
-	color:#2b030f;
-	line-height:24px;
-	height:24px;
-	padding:0 9px;
-	border:1px solid #CCCCCC;
-	background-color:#fcfcfc;
-	-moz-border-radius: 13px; /* Firefox */
-	-webkit-border-radius: 13px; /* Safari, Chrome */
-	border-radius: 13px; /* CSS3 */
-}
-
-#submenu ul li a.selected, #submenu ul li a.current{
-	background: #81bb00;
-	border:1px solid #81bb00;
-	color:#FFF;
-	line-height:24px;
-	height:24px;
-	padding:0 9px;
-	-moz-border-radius: 13px; /* Firefox */
-	-webkit-border-radius: 13px; /* Safari, Chrome */
-	border-radius: 13px; /* CSS3 */
+#account a.selected {
+	color:#fff;
+	background:#111111;
 }
 
 /* Contenuti */
@@ -770,13 +679,14 @@ tr:hover{
 
 .pageNavigator {
 	visibility: hidden;
+	height: 30px;
 }
 
 .pageNavigator a:link, .pageNavigator a:visited{
 	height: 15px;
 	padding: 0 8px;
 /*	padding:0 6px 0 6px;*/
-margin-top:1px;
+	margin-top:1px;
 	border:1px solid #A6B3C0;
 }
 
@@ -795,7 +705,7 @@ margin-top:1px;
 	float:right;
 }
 
-.pageNavigator a.current:link, .pageNavigator a.current:visited, .perPage a.current:link, .perPage a.current:visited{
+.pageNavigator .current a:link, .pageNavigator .current a:visited, .perPage a.current:link, .perPage a.current:visited{
 	font-weight:bold;
 	line-height:26px;
 	color:#fff;
@@ -1082,8 +992,8 @@ margin-top:1px;
 }
 
 .GridActions, .ffButton{
-	width:18px;
-	text-align:center;
+	/* width:18px; */
+	/* text-align:center; */
 	vertical-align:middle;
 	position:relative;
 }
@@ -1226,7 +1136,7 @@ tr.hidden_section td{
    ----------------------------------------- */
 
 
-.error {
+.error, .std-error{
 	padding:9px;
 	border:1px solid red;
 	font-weight:bold;
@@ -1332,11 +1242,11 @@ select.ffWidget_activecomboex, select.ffWidget_actex {
 	position:relative;
 }
 
-.record li.ui-state-default a, .record li.ui-state-default span, .record li.ui-tabs-selected a, .record li.ui-tabs-selected span,  .ffRecord li.ui-state-default a, .ffRecord li.ui-state-default span, .ffRecord li.ui-tabs-selected a, .ffRecord li.ui-tabs-selected span{
-	width: auto;
-	text-align:left;
-	font-weight:bold;
-	font-size:12px;
+span.ffButton{
+	/* width: auto; */
+	/* text-align:left; */
+	/* font-weight:bold; */
+	/* font-size:12px; */
 }
 
 .record #MainRecord_discl_sect, .ffRecord #MainRecord_discl_sect{
@@ -1428,65 +1338,6 @@ input.ui-button:hover, div.ui-tabs input.ui-button:hover{
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#dadada', endColorstr='#ffffff'); /* for IE */
 	background: -webkit-gradient(linear, left top, left bottom, from(#dadada), to(#ffffff)); /* for webkit browsers */
 	background: -moz-linear-gradient(top,  #dadada,  #ffffff); /* for firefox 3.6+ */
-}
-
-.loginBox{
-	position:absolute;
-	top:40%;
-	left:50%;
-	margin-left:-330px;
-	margin-top:-165px;
-	width:300px;
-	height:230px;
-	padding-left:360px;
-	padding-top:100px;
-	background:url(../images/logo-login.gif) top left no-repeat;
-}
-
-.loginBox input{
-	width:250px;
-}
-
-.loginBox p{
-	padding-bottom:12px;
-}
-
-.loginBox a:link,.loginBox a:visited{
-	font-size:11px;
-	color:#0e73d5;
-}
-
-.loginBox a:hover{
-	text-decoration:underline;
-}
-
-#account a:link, #account a:visited{
-	padding:3px 6px;
-	color:#fff;
-}
-
-#account a:hover{
-	text-decoration:underline;
-}
-
-#account a.current:link, #account a.current:visited{
-	color:#FFF;
-	background:#8415A2;
-}
-
-#account a.current:hover{
-	color:#aaa;
-}
-
-#account a.selected {
-	background: #ffffff;
-	color:#111111;
-}
-
-a.logout:link, a.logout:visited{
-	padding:3px 6px;
-	background:#83b931;
-	color:#fff;
 }
 
 .grid .text{
@@ -1820,7 +1671,7 @@ a.del-file, a.ico-delete {
 	width:250px;
 }
 
-.loginBox .error{
+.loginBox .std-error{
 	width:230px;
 }
 .ico-visible {
@@ -1925,4 +1776,18 @@ ul.ui-autocomplete li.ui-menu-item a {
 .dialogActionsPanel input.right {
 	min-width: 100px;
 	margin-top: 6px;
+}
+
+.ffDetails_sort .sortable .ico-delete {
+	float: right;
+}
+
+.ffDetails_sort .sortable .jquery-checkbox {
+	float: left;
+}
+
+.totelem {
+	float: right;
+	margin-left: 10px;
+	margin-right: 10px;
 }

@@ -9,29 +9,26 @@
 			this.construct = function(id) {
 				return this.each(function() {
 
-					var table = jQuery(".ffGrid", this).get(0);
-					if(table === undefined) 
-                        return;
-
-                    if(!table.tHead && !table.tBodies) return;
-
-					var $table = jQuery(table);
+					var $table = jQuery("TABLE", this);
 					var sort_params = ff.ffGrid.dragsort.inst.get(id);
-
-					$table.find("> tbody > tr").each(function (index) {
+					
+					if(!$table.length) 
+                        return;
+					$table.find("> thead > tr > :first").attr("colspan", 2);
+					$table.find("> tbody > tr").not("tr tr").each(function (index) {
+						jQuery(this).prepend('<td></td>');
                         if(sort_params.data[index] !== undefined)
 						    jQuery(this).data("sort_id", sort_params.data[index].toString());
 					});
 
-					$table.find("> tbody > tr").bind("mousedown.ff.dragsort", function (e) {
-						var $tr = jQuery(this);
+					$table.find("> tbody > tr :first-child").not("tr tr td").bind("mousedown.ff.dragsort", function (e) {
+						var $tr = jQuery(this).parent();
 						lastY = e.clientY;
 
-						if(jQuery(e.target).is("input,select,a") || jQuery(e.target).closest("a").length)
-							return;
+						//if(jQuery(e.target).is("input,select,a") || jQuery(e.target).closest("a").length)
+						//	return;
 
-						jQuery(this).attr("data-cur", jQuery(this).children("td:first").css("cursor"))
-						jQuery(this).children("td").css("cursor", "n-resize");
+						jQuery(this).addClass("dragging");
 						/*jQuery(this).children("td").css("cursor", "all-scroll");
 						 This is just for flashiness. It fades the TR element out to an opacity of 0.2 while it is being moved.*/
 						$tr.data("startDragging", true);
@@ -81,13 +78,15 @@
 						
 						return false;
 					});
-					$table.find("> tbody > tr").bind("mouseup.ff.dragsort", function (e) {
-						var $tr = jQuery(this);
+					$table.find("> tbody > tr :first-child").not("tr tr td").bind("mouseup.ff.dragsort", function (e) {
+						var $tr = jQuery(this).parent();
 						lastY = e.clientY;
-						if(jQuery(e.target).is("input,select,a"))
-							return;
-
-						jQuery(this).children("td").css("cursor", jQuery(this).attr("data-cur"));
+						//if(jQuery(e.target).is("input,select,a"))
+						//	return;
+						
+						jQuery(this).removeClass("dragging");
+							
+						//jQuery(this).css("cursor", jQuery(this).attr("data-cur"));
 					});
 				});
 			}

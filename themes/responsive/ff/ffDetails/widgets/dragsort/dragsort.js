@@ -8,9 +8,9 @@ __ff : true, /* used to recognize ff'objects*/
 "init" : function (params) {
 	that.inst.set(params.id, params);
 	jQuery("#" + params.id).jTableOrder(params.id);
-	jQuery("#" + params.id + " table.ffDetails > tbody > tr").each(function() { 
-		jQuery(this).children("td:first:not(.norec_cont)").css("background", "url(" + ff.site_path + "/themes/responsive/ff/ffDetails/widgets/dragsort/grippy.png) 4px no-repeat").css("padding", "0 0 0 14px");
-	});
+	//jQuery("#" + params.id + " table.ffDetails > tbody > tr").each(function() { 
+	//	jQuery(this).children("td:first:not(.norec_cont)").css("background", "url(" + ff.site_path + "/themes/responsive/ff/ffDetails/widgets/dragsort/grippy.png) 4px no-repeat").css("padding", "0 0 0 14px");
+	//});
 },
 
 "reorder" : function (id) {
@@ -28,7 +28,7 @@ __ff : true, /* used to recognize ff'objects*/
 
 		toBeSent.push({name: "resource", value: params.resource_id});
 		
-		ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
+		ff.load("ff.ajax", function() {
 			ff.ajax.blockUI();
 			jQuery.ajax({
 				  "url"		: params.service_path

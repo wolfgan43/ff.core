@@ -24,7 +24,7 @@ class ffDetails_html extends ffDetails_base
 					"xs" => 6
 					, "sm" => 6
 					, "md" => 8
-					, "lg" => 9
+					, "lg" => 8
 				)
 				, "util" => "align-right"
 			)
@@ -110,11 +110,28 @@ class ffDetails_html extends ffDetails_base
 			)
 	);
 
-	/**
-	 * Il prefisso di ogni oggetto nel template HTML
-	 * @var String
-	 */
-	public $prefix			= null;
+	var $buttons_options		= array(
+                                    "addrow" => array(
+                                          "display" => true
+                                        , "index"   => 0
+                                        , "obj"     => null
+                                        , "label"   => null 
+                                        , "icon"    => null
+                                        , "class"   => null
+                                        , "aspect"  => "link"
+                                    ),    
+									"delete" => array(
+										  "display" => true
+										, "index" 	=> 0
+										, "obj" 	=> null
+                                        , "label"   => null 
+                                        , "icon"    => null
+										, "class" 	=> null
+                                        , "aspect"  => "link"
+									)
+								);
+	
+	var $id_if = null;
 	
 	/**
 	 * Il template di default
@@ -137,8 +154,8 @@ class ffDetails_html extends ffDetails_base
 	 * Una collezione dei tabs presenti nella pagina
 	 * @var Array
 	 */
-	var $tabs				= array();
-
+	var $tabs				    = array();
+    var $display_group_title    = true;
 	/**
 	 * Il testo descrittivo da inserire nel template
 	 * @var String
@@ -166,6 +183,33 @@ class ffDetails_html extends ffDetails_base
     
     var $fixed_pre_row = "";
     var $fixed_post_row = "";    
+    
+    var $js_deps = array(
+		"ff.ffDetails" => null
+	);
+	
+	function __construct(ffPage_base $page, $disk_path, $theme)
+	{
+		ffDetails_base::__construct($page, $disk_path, $theme);
+
+		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+			$this->id_if = uniqid();
+	}
+	
+	function getIDIF()
+	{
+		if ($this->id_if !== null)
+			return $this->id_if;
+		else
+			return $this->id;
+	}
+
+	function getPrefix()
+	{
+		$tmp = $this->getIDIF();
+		if (strlen($tmp))
+			return $tmp . "_";
+	}    
     
 	/**
 	 * Visualizza il contenuto del dettaglio, riga per riga
@@ -216,6 +260,7 @@ class ffDetails_html extends ffDetails_base
 
 			$this->preProcessDetailButtons();
 
+            $old_group = null;
 			foreach ($this->recordset as $rst_key => $rst_val)
 			{
 				// EVENT HANDLER
@@ -242,7 +287,7 @@ class ffDetails_html extends ffDetails_base
 					$this->tpl[0]->set_var( $value . "_FATHER", $this->main_record[0]->key_fields[$value]->value->getValue());
 				}
 				reset ($this->fields_relationship);
-
+				
 				foreach ($this->key_fields as $key => $value)
 				{
 					$this->tpl[0]->set_var("hidden_name", "recordset_ori[" . $i . "][" . $key . "]");
@@ -276,9 +321,9 @@ class ffDetails_html extends ffDetails_base
 
 				foreach ($this->hidden_fields as $key => $value)
 				{
-					//if(!$value->store_in_db)
+					//if(!$value->store_in_db && (!$this->tab_label || (is_array($this->tab_label) && array_search($key, $this->tab_label) === false) || $this->tab_label != $key))
 					//	continue;
-
+										
 					$this->tpl[0]->set_var("hidden_name", "recordset_ori[" . $i . "][" . $key . "]");
 					$this->tpl[0]->set_var("hidden_value", ffCommon_specialchars($this->recordset_ori[$rst_key][$key]->getValue(null, FF_SYSTEM_LOCALE)));
 					$this->tpl[0]->parse("SectHidden", true);
@@ -307,14 +352,14 @@ class ffDetails_html extends ffDetails_base
 				
 				if ($this->display_delete && $this->buttons_options["delete"]["display"])
 				{
-					$this->getDetailButton($this->button_delete_key)->variables[$this->main_record[0]->id . "_detailaction"] = $this->id;
-					$this->getDetailButton($this->button_delete_key)->variables[$this->id . "_delete_row"] = $i;
+					$this->getDetailButton($this->button_delete_key)->variables[$this->main_record[0]->getIDIF() . "_detailaction"] = $this->getIDIF();
+					$this->getDetailButton($this->button_delete_key)->variables[$this->getIDIF() . "_delete_row"] = $i;
 				}
 
 				$col = $this->tplDisplayFields($this->form_fields, $rst_key);
 				
 				$group_button = $this->processDetailButtons($i, false);
-
+				
 				if(is_array($this->tab_label) && count($this->tab_label)) {
 					$group_key = array();
 					foreach($this->tab_label AS $tab_label_value) {
@@ -330,6 +375,7 @@ class ffDetails_html extends ffDetails_base
 											)
 										);
 					}
+
 					$group_key = implode(" - ", $group_key);
 				} elseif(strlen($this->tab_label) && $rst_val[$this->tab_label]) {
 					$group_key = $rst_val[$this->tab_label]->getValue(
@@ -342,12 +388,12 @@ class ffDetails_html extends ffDetails_base
 										: $this->hidden_fields[$this->tab_label]->get_locale()
 									)
 								);	
-				}							
-
+				}
+							
 				if(!$group_title)
 					$group_title =  ($group_key || !$this->display_new ? $group_key : $i + 1);
 
-				if(!$this->tab) {
+				if($this->display_group_title &&  (!$this->tab || $this->tab === "left" || $this->tab === "right") && $group_title) {
 					$this->tpl[0]->set_var("group_title", $group_title);
 					$this->tpl[0]->set_var("group_buttons", $group_button);
 					$this->tpl[0]->parse("SectFormTitle", false);
@@ -426,6 +472,7 @@ class ffDetails_html extends ffDetails_base
 		$i = 0;
 		$wrap_count = 0;
 		$count_contents = 0;
+        $is_wrapped = false;
 
         if(is_array($contents) && count($contents)) 
         {
@@ -559,10 +606,7 @@ class ffDetails_html extends ffDetails_base
 				    	$required_symbol = "";
 
 						if(($this->form_fields[$key]->get_control_type() == "checkbox" || $this->form_fields[$key]->get_control_type() == "radio") && $this->form_fields[$key]->widget == "") {
-							$control_var = (is_array($this->parent[0]->framework_css)
-												? cm_getClassByFrameworkCss("control-check-position", "form")
-												: "_pre_label"
-											);
+							$control_var = cm_getClassByFrameworkCss("control-check-position", "form");
 							$is_combine_field = true;
 						}
 
@@ -611,46 +655,43 @@ class ffDetails_html extends ffDetails_base
 						    /**
 						    * Label Class
 						    */
-						    $this->tpl[0]->set_var("label_for", $this->id . "_recordset[" . $rst_key . "][" . $key . "]");
+						    $this->tpl[0]->set_var("label_for", $this->getIDIF() . "_recordset[" . $rst_key . "][" . $key . "]");
 						    
-							if(is_array($this->parent[0]->framework_css)) 
+							$arrColumnLabel = $this->form_fields[$key]->framework_css["label"]["col"];
+							$arrColumnControl = $this->form_fields[$key]->framework_css["control"]["col"];
+							$type_label = "";
+							if($primary_field == $key)
+								$type_label = "inline";
+							
+							if(!strlen($control_var))
 							{
-								$arrColumnLabel = $this->form_fields[$key]->framework_css["label"]["col"];
-								$arrColumnControl = $this->form_fields[$key]->framework_css["control"]["col"];
-								$type_label = "";
-								if($primary_field == $key)
+								if(is_array($arrColumnLabel) && count($arrColumnLabel)
+									&& is_array($arrColumnControl) && count($arrColumnControl)
+								) {
+									$this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-right", "util") . '">');
+									$this->tpl[0]->set_var("label_postfix", '</div>');
+								
+									$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . '">';
+									$control_postfix = '</div>';
 									$type_label = "inline";
-								
-								if(!strlen($control_var))
-								{
-									if(is_array($arrColumnLabel) && count($arrColumnLabel)
-										&& is_array($arrColumnControl) && count($arrColumnControl)
-									) {
-									    $this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-right", "util") . '">');
-									    $this->tpl[0]->set_var("label_postfix", '</div>');
-									
-									    $control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . '">';
-									    $control_postfix = '</div>';
-									    $type_label = "inline";
-								    }
 								}
-								
-								if($this->framework_css["component"]["type"] === null && $type_label)
-									$this->framework_css["component"]["type"] = $type_label;
-								
-								$label_class = cm_getClassByFrameworkCss("label" . $this->framework_css["component"]["type"], "form");
-								if($this->framework_css["component"]["type"] && $is_combine_field) {
-									if($control_var == "_in_label")
-										$label_class .= ($label_class ? " " : "") . cm_getClassByFrameworkCss($arrColumnLabel, "push") . " " . cm_getClassByFrameworkCss($arrColumnControl, "col");
-									else
-										$container_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
-								}
-
-							    if($label_class)
-								    $this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
+							}
+							
+							if($this->framework_css["component"]["type"] === null && $type_label)
+								$this->framework_css["component"]["type"] = $type_label;
+							
+							$label_class = cm_getClassByFrameworkCss("label" . $this->framework_css["component"]["type"], "form");
+							if($this->framework_css["component"]["type"] && $is_combine_field) {
+								if($control_var == "_in_label")
+									$label_class .= ($label_class ? " " : "") . cm_getClassByFrameworkCss($arrColumnLabel, "push") . " " . cm_getClassByFrameworkCss($arrColumnControl, "col");
 								else
-									$this->tpl[0]->set_var("label_class", "");								
-							}							    
+									$container_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
+							}
+
+							if($label_class)
+								$this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
+							else
+								$this->tpl[0]->set_var("label_class", "");								
 					    } else {
 					    	$control_var = "";
 					    }
@@ -888,7 +929,7 @@ class ffDetails_html extends ffDetails_base
 						$is_wrapped = false;
 					}			    
 
-				    $rc = $this->tpl[0]->parse("SectFormField" . $suffix, true);
+				    $rc = $this->tpl[0]->parse("SectFormField", true);
 				    if (!$rc) $this->tpl[0]->parse("SectFormField", true);
 				    
 				    $this->tpl[0]->set_var("SectWrapStart", "");
@@ -914,33 +955,32 @@ class ffDetails_html extends ffDetails_base
 			$this->tpl[0]->load_file($this->template_file, "main");
 		}
 
-		if (strlen($this->id))
-			$this->prefix = $this->id . "_";
-		$this->tpl[0]->set_var("component_id", $this->id);
-		$this->tpl[0]->set_var("main_record_component", $this->main_record[0]->prefix);
+		$this->tpl[0]->set_var("component_id", $this->getIDIF());
+		$this->tpl[0]->set_var("main_record_component", $this->main_record[0]->getPrefix());
 
 		$this->tpl[0]->set_var("site_path", $this->site_path);
 		$this->tpl[0]->set_var("page_path", $this->page_path);
 		$this->tpl[0]->set_var("theme", $this->getTheme());
+
+		$this->tpl[0]->set_var("XHR_CTX_ID", $_REQUEST["XHR_CTX_ID"]);
+		$this->tpl[0]->set_var("requested_url", ffCommon_specialchars($_SERVER["REQUEST_URI"]));
 
 		if ($this->description !== null)
 			$this->tpl[0]->set_var("description", $this->description);
 
 		if ($this->doAjax)
 		{
-			if (isset($_REQUEST["XHR_DIALOG_ID"])) {
-				$this->tpl[0]->set_var("submit_action", "ff.ffPage.dialog.doRequest('" . $_REQUEST["XHR_DIALOG_ID"] . "', {'action' : '" . $this->main_record[0]->prefix . "detail_addrows', 'component' :'" . $this->id . "', 'detailaction' : '" . $this->main_record[0]->prefix . "'})");
+			if (isset($_REQUEST["XHR_CTX_ID"])) {
+				$this->tpl[0]->set_var("submit_action", "ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {'action' : '" . $this->main_record[0]->getPrefix() . "detail_addrows', 'component' :'" . $this->getIDIF() . "', 'detailaction' : '" . $this->main_record[0]->getPrefix() . "'})");
 			} else {
-				if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) {//code for ff.js
-					$this->main_record[0]->parent[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-				}
+				$this->main_record[0]->parent[0]->tplAddJs("ff.ajax");		
             
-            	$detail_params = ", 'addFields' : [{'name': '" . $this->main_record[0]->prefix . "detailaction', 'value': '" . $this->id . "'}]";
-				$this->tpl[0]->set_var("submit_action", "ff.ajax.doRequest({'action' : '" . $this->main_record[0]->prefix . "detail_addrows', 'component' : '" . $this->id . "'" . $detail_params . "});");
+            	$detail_params = ", 'addFields' : [{'name': '" . $this->main_record[0]->getPrefix() . "detailaction', 'value': '" . $this->getIDIF() . "'}]";
+				$this->tpl[0]->set_var("submit_action", "ff.ajax.doRequest({'action' : '" . $this->main_record[0]->getPrefix() . "detail_addrows', 'component' : '" . $this->getIDIF() . "'" . $detail_params . "});");
 			}
 		}
 		else
-			$this->tpl[0]->set_var("submit_action", "document.getElementById('" . $this->main_record[0]->prefix . "detailaction').value='" . $this->id . "'; document.getElementById('frmAction').value = '" . $this->main_record[0]->prefix . "detail_addrows'; jQuery(this).closest('form').submit();");
+			$this->tpl[0]->set_var("submit_action", "document.getElementById('" . $this->main_record[0]->getPrefix() . "detailaction').value='" . $this->getIDIF() . "'; document.getElementById('frmAction').value = '" . $this->main_record[0]->getPrefix() . "detail_addrows'; jQuery(this).closest('form').submit();");
 
 		if ($this->display_new === true) {
             if($this->buttons_options["addrow"]["label"] === null)
@@ -1007,6 +1047,9 @@ class ffDetails_html extends ffDetails_base
 		$res = ffDetails::doEvent("on_tplParse", array($this, $this->tpl[0]));
 		$res = $this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
 
+		$this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
+		$this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
+
 		$component_class["default"] = $this->class;
         if($this->framework_css["component"]["grid"]) {
             if(is_array($this->framework_css["component"]["grid"]))
@@ -1037,11 +1080,11 @@ class ffDetails_html extends ffDetails_base
         if($this->framework_css["component"]["outer_wrap"]) 
         {
             if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->id . "Wrap outerWrap"). '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
             } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->id . 'Wrap outerWrap">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->getIDIF() . 'Wrap outerWrap">');
             } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->id . "Wrap outerWrap") . '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
             }
             $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
         }
@@ -1054,7 +1097,7 @@ class ffDetails_html extends ffDetails_base
 
 		if ($this->tab && count($this->tabs))
 		{
-			$this->tpl[0]->set_var("form_tabs", $this->main_record[0]->parent[0]->widgets["tabs"]->process($this->id, $this->tabs, $this->main_record[0]->parent[0], $this->id));
+			$this->tpl[0]->set_var("form_tabs", $this->main_record[0]->parent[0]->widgets["tabs"]->process($this->getIDIF(), $this->tabs, $this->main_record[0]->parent[0], $this->id));
 		}
 		else
 		{
@@ -1074,9 +1117,6 @@ class ffDetails_html extends ffDetails_base
 
 	function process_headers()
 	{
-		if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) //code for ff.js
-			$this->main_record[0]->parent[0]->tplAddJs("ff.ffDetails", "ffDetails.js", FF_THEME_DIR . "/library/ff");
-
 		if (!isset($this->tpl[0]))
 			return;
 
@@ -1101,18 +1141,18 @@ class ffDetails_html extends ffDetails_base
 	{
 		if (is_array($this->detail_buttons) && count($this->detail_buttons))
 		{
+            $output_buffer = "";
 			foreach ($this->detail_buttons as $key => $value)
 			{
 				if ($key == $this->button_delete_key)
 				{
-					if (isset($_REQUEST["XHR_DIALOG_ID"])) {
-						$this->detail_buttons[$key]["obj"]->jsaction = "ff.ffPage.dialog.doRequest('" . $_REQUEST["XHR_DIALOG_ID"] . "', {'action' : '" . $this->main_record[0]->id . "_detail_delete', 'component' : '" . $this->id . "', 'detailaction' : '" . $this->main_record[0]->prefix . "', 'action_param' : " . $rst_key . "});";
+					if (isset($_REQUEST["XHR_CTX_ID"])) {
+						$this->detail_buttons[$key]["obj"]->jsaction = "ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {'action' : '" . $this->main_record[0]->getPrefix() . "detail_delete', 'component' : '" . $this->getIDIF() . "', 'detailaction' : '" . $this->main_record[0]->getPrefix() . "', 'action_param' : " . $rst_key . "});";
 					} else {
-						if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) {//code for ff.js
-							$this->main_record[0]->parent[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-						}
-						$detail_params = ", 'addFields' : [{'name': '" . $this->main_record[0]->prefix . "detailaction', 'value': '" . $this->id . "'}, {'name': '" . $this->id . "_delete_row', 'value': '" . $rst_key . "'}]";
-						$this->detail_buttons[$key]["obj"]->jsaction = "ff.ajax.doRequest({'action' : '" . $this->main_record[0]->prefix . "detail_delete', 'component' : '" . $this->id . "'" . $detail_params . "});";
+						$this->main_record[0]->parent[0]->tplAddJs("ff.ajax");
+
+						$detail_params = ", 'addFields' : [{'name': '" . $this->main_record[0]->getPrefix() . "detailaction', 'value': '" . $this->getIDIF() . "'}, {'name': '" . $this->getIDIF() . "_delete_row', 'value': '" . $rst_key . "'}]";
+						$this->detail_buttons[$key]["obj"]->jsaction = "ff.ajax.doRequest({'action' : '" . $this->main_record[0]->getPrefix() . "detail_delete', 'component' : '" . $this->getIDIF() . "'" . $detail_params . "});";
 					}
 				}
 
@@ -1198,16 +1238,41 @@ class ffDetails_html extends ffDetails_base
                 $tmp->label         = $this->buttons_options["delete"]["label"];
                 $tmp->icon          = $this->buttons_options["delete"]["icon"];
                 $tmp->class         = $this->buttons_options["delete"]["class"];
-                $tmp->aspect        = "button"; //$this->buttons_options["delete"]["aspect"];
+                $tmp->aspect        = "span"; //$this->buttons_options["delete"]["aspect"];
                 $tmp->image 		= false;
 				$tmp->action_type 	= "submit";
-				$tmp->component_action = $this->main_record[0]->id;
+				$tmp->component_action = $this->main_record[0]->getIDIF();
 				$this->addContentButton($tmp
 										, $this->buttons_options["delete"]["index"]);
 			}
 		}
 	}
+	
 	public function structProcess($tpl)
 	{
+		if ($this->id_if !== null)
+		{
+            $tpl->set_var("prop_name",    "factory_id");
+            $tpl->set_var("prop_value",   '"' . $this->id . '"');
+            $tpl->parse("SectFFObjProperty",    true);
+		}
+	}
+	
+	function setWidthComponent($resolution_large_to_small) 
+	{
+		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
+			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+		elseif(strlen($resolution_large_to_small))
+			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
+		else
+			$this->framework_css["component"]["grid"] = false;
+	}
+	
+	function addDefaultButton($type, $obj)
+	{
+		$obj->icon          = $this->buttons_options[$type]["icon"];
+		$obj->activebuttons	= $this->buttons_options[$type]["activebuttons"]; 
+		
+		parent::addDefaultButton($type, $obj);
 	}
 }

@@ -1,5 +1,7 @@
 <?php
 	require_once($basepath . "FileManager/FileManagerPlugin.php");
+	define("CM_DONT_RUN", true);
+	define("DISABLE_CACHE", true);
 
 	$host_name = $_SERVER["HTTP_HOST"];
     if (strpos(php_uname(), "Windows") !== false)
@@ -26,45 +28,64 @@
 		$st_site_path = str_replace("/themes/library/tiny_mce/plugins/filemanager/config.php", "", $_SERVER["SCRIPT_NAME"]);
 	}
 
-	define("DISABLE_CACHE", true);
-	 
-	define("SHOWFILES_IS_RUNNING", true);
-	//define("FF_SKIP_COMPONENTS", true);
-	define("CM_DONT_RUN", true);
-	define("FF_ERROR_HANDLER_HIDE", true);
-
 	require_once($disk_path . "/cm/main.php");
-
-	error_reporting(E_ALL ^ E_NOTICE);
-
-	//da cambiare senno esplode l'activecombo
-	if(!defined("MOD_SECURITY_SESSION_STARTED")) { 
-		mod_security_check_session();  
-
-		//session_name("ckf_" . session_name());
-	/*	if (!mod_security_check_session(false)) {
-			mod_security_create_session(MOD_SEC_GUEST_USER_NAME, MOD_SEC_GUEST_USER_ID);
-		}
-	*/
-	}
 	
-	if(!defined("MAX_UPLOAD"))
-		define("MAX_UPLOAD", 10000000);
-	if(!defined("DISK_UPDIR"))
-		define("DISK_UPDIR", $disk_path . "/upload");
-	if(!defined("AREA_GALLERY_SHOW_ADDNEW"))
-		define("AREA_GALLERY_SHOW_ADDNEW", true);
-	if(!defined("THUMB_CACHE_PATH"))
-		define("THUMB_CACHE_PATH", "_thumb");
+    error_reporting(E_ALL ^ E_NOTICE);
+	ffErrorHandler::$hide = true;
 	
-	if(!function_exists("stripslash")) {
-		function stripslash($temp) {
-			if (substr($temp,-1) == "/")
-				$temp = substr($temp,0,-1);
-			return $temp;
+	if(file_exists($disk_path . "/library/common.php")) {
+		require_once($disk_path . "/library/common.php");
+		
+		if(!defined("MOD_SECURITY_SESSION_STARTED")) { 
+			//session_name("tfm_" . session_name());
+			if (!mod_security_check_session(false)) {
+				mod_security_create_session(MOD_SEC_GUEST_USER_NAME, MOD_SEC_GUEST_USER_ID);
+			}
 		}
-	}
 
+		$user_permission = get_session("user_permission");
+		$selected_lang = strtoupper($_REQUEST["selectedlang"]);
+		$user_path = urldecode($_REQUEST["path_info"]);
+
+		if($user_path == "")
+		    $user_path = "/";
+
+	    if(isset($_REQUEST["orig_path_info"]) && strlen($_REQUEST["orig_path_info"])) {
+	        $src_page_url = $_REQUEST["orig_path_info"];
+	    } elseif(isset($_REQUEST["php_self"]) && strlen($_REQUEST["php_self"])) {
+	        $src_page_url = $_REQUEST["php_self"];
+	    } else {
+	        $src_page_url = $_REQUEST["script_name"];
+	    }
+
+	    if($src_page_url === NULL) {
+	        $settings_path = $user_path;
+	    } else {
+	        $settings_path = str_replace($site_path, "", $src_page_url);
+	    }
+	   
+	    //Nuova parte da testare (seconda parte dei permessi)
+	    if (!(check_function("get_configuration_by_user") && get_configuration_by_user($user_permission, $selected_lang, $settings_path))) {
+	        FormsDialog(false, "OkOnly", ffTemplate::_get_word_by_code("dialog_title_accessdenied"), ffTemplate::_get_word_by_code("dialog_description_invalidpath"), "", $site_path . "/", THEME_INSET);
+	    }
+	} else {
+		if(!defined("MAX_UPLOAD"))
+			define("MAX_UPLOAD", 10000000);
+		if(!defined("DISK_UPDIR"))
+			define("DISK_UPDIR", $disk_path . "/upload");
+		if(!defined("AREA_GALLERY_SHOW_ADDNEW"))
+			define("AREA_GALLERY_SHOW_ADDNEW", true);
+		if(!defined("THUMB_CACHE_PATH"))
+			define("THUMB_CACHE_PATH", "_thumb");
+		
+		if(!function_exists("stripslash")) {
+			function stripslash($temp) {
+				if (substr($temp,-1) == "/")
+					$temp = substr($temp,0,-1);
+				return $temp;
+			}
+		}
+	}    
     $mcFileManagerConfig = get_session("mcFileManagerConfig");    
 
     if($mcFileManagerConfig == "" || strlen($src_page_url)) {

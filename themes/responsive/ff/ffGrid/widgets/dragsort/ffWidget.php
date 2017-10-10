@@ -10,11 +10,14 @@ class ffWidget_dragsort extends ffCommon
 
 	var $class			= "ffWidget_dragsort";
 
+	var $libraries		= array();
+	
 	var $widget_deps	= array();
     var $js_deps = array(
-							  "jquery" 			=> null
+							  "ff.ffGrid.dragsort" 	=> null
 						);
-	var $css_deps = array();
+	var $css_deps = array(
+						);
 	// PRIVATE VARS
 
 	var $source_path		= null;
@@ -47,7 +50,7 @@ class ffWidget_dragsort extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -58,16 +61,16 @@ class ffWidget_dragsort extends ffCommon
 
 	function process(ffGrid_base $grid, $options, $key_field)
 	{ 
-		$tpl_id = $grid->id;
+		$tpl_id = $grid->getIDIF();
 		if (!isset($this->tpl[$tpl_id]))
 			$this->prepare_template($tpl_id);
 			
 		$grid->addEvent("on_before_parse_row", "ffWidget_dragsort::on_before_parse_row", ffEvent::PRIORITY_HIGH, 0, null, null, array(&$this, $options["resource_id"], $key_field));
 		$grid->use_paging = false;
 		$grid->use_order = false;
-		$grid->row_class = $grid->row_class . " draggable";
+		$grid->framework_css["table"]["class"] .= " draggable";
 		
-		$this->tpl[$tpl_id]->set_var("component_id", $grid->id);
+		$this->tpl[$tpl_id]->set_var("component_id", $grid->getIDIF());
 		$this->tpl[$tpl_id]->set_var("resource_id", $options["resource_id"]);
 		$this->tpl[$tpl_id]->set_var("service_path", $options["service_path"]);
 		
@@ -76,13 +79,6 @@ class ffWidget_dragsort extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddCss("ff.ffGrid.dragsort", "ff.ffGrid.dragsort.css", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort"); 
-			$this->oPage[0]->tplAddJs("jquery.fn.jTableOrder", "jTableOrder.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort");
-			$this->oPage[0]->tplAddJs("ff.ffGrid", "ffGrid.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffGrid.dragsort", "dragsort.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -99,13 +95,6 @@ class ffWidget_dragsort extends ffCommon
 	
 	function process_headers()
 	{
-        if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddCss("ff.ffGrid.dragsort", "ff.ffGrid.dragsort.css", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort");
-            $this->oPage[0]->tplAddJs("jquery.fn.jTableOrder", "jTableOrder.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort");
-            $this->oPage[0]->tplAddJs("ff.ffGrid", "ffGrid.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffGrid.dragsort", "dragsort.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort");
-        }
-                
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -122,11 +111,11 @@ class ffWidget_dragsort extends ffCommon
 	
 	static function on_before_parse_row(ffGrid_html $grid, $row, ffWidget_dragsort $plugin, $resource_id, $key_field)
 	{ 
-		$tpl_id = $grid->id;
+		$tpl_id = $grid->getIDIF();
 		if (!isset($plugin->tpl[$tpl_id]))
 			$plugin->prepare_template($tpl_id);
 
-		$plugin->tpl[$tpl_id]->set_var("component_id", $grid->id);
+		$plugin->tpl[$tpl_id]->set_var("component_id", $grid->getIDIF());
 		$plugin->tpl[$tpl_id]->set_var("key_value", $grid->key_fields[$key_field]->getValue());
 		$plugin->tpl[$tpl_id]->parse("SectData", true);
 		return null;

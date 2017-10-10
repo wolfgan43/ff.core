@@ -2,19 +2,19 @@
  * Forms Framework Javascript Handling Object
  *    dialog page' plugin namespace
  */
+ff.pluginAddInit("jquery-ui", function () {
+	jQuery.widget("ui.dialog", jQuery.extend({}, jQuery.ui.dialog.prototype, {
+	    _title: function(title) {
+	        if (!this.options.title ) {
+	            title.html("&#160;");
+	        } else {
+	            title.html(this.options.title);
+	        }
+	    }
+	}));
 
-jQuery.widget("ui.dialog", jQuery.extend({}, jQuery.ui.dialog.prototype, {
-    _title: function(title) {
-        if (!this.options.title ) {
-            title.html("&#160;");
-        } else {
-            title.html(this.options.title);
-        }
-    }
-}));
-
-jQuery.ui.dialog.prototype._position = jQuery.noop;
-
+	jQuery.ui.dialog.prototype._position = jQuery.noop;
+});
 ff.ffPage.dialog = (function () {
 
 // inits
@@ -26,6 +26,42 @@ var old_overflow = {
 
 var unique = null;
 //overflow manage
+
+ff.pluginAddInit("ff.ajax", function () {
+	ff.ajax.addEvent({
+		"event_name" : "onUpdateContent"
+		, "func_name" : function (params, data, injectid) {
+			if (params.ctx && ff.ffPage.dialog.exist(params.ctx) && params.component === undefined) {
+				if (!ff.ffPage.dialog.get(params.ctx).instance) 
+					ff.ffPage.dialog.makeInstance(params.ctx);
+
+				ff.ffPage.dialog.removeDlgBt(params.ctx, data);
+			}
+		}
+	});
+	ff.ajax.addEvent({
+		"event_name" : "onRedirect"
+		, "func_name" : function (url, data, mydata, params) {
+			if (
+				(params.ctx && ff.ffPage.dialog.get(params.ctx) && ff.ffPage.dialog.getInstance(params.ctx))
+				&& (params.doredirects || data["doredirects"] !== undefined)
+			) {
+				ff.ffPage.dialog.getInstance(params.ctx).dialog("close"); 
+			}
+		}
+	});
+	ff.ajax.addEvent({
+		"event_name" : "ctxInitDone"
+		, "func_name" : function (id) {
+			if (dialogs.get(id) && dialogs.get(id).waiting) {
+				ff.ajax.unblockUI();
+				ff.ffPage.dialog.refresh(id, true);
+				return true;
+			}
+		}
+	});
+}, "a65c581e-64d9-473d-a166-c1848dab04cb");
+
 /*
 jQuery('html, body').on('touchstart touchmove', function(e){ 
 	 //prevent native touch activity like scrolling
@@ -34,92 +70,16 @@ jQuery('html, body').on('touchstart touchmove', function(e){
 	 }
 });*/
 
-/*ff.pluginAddInit("ff.ffPage.tabs", function () {
-	ff.ffPage.tabs.addEvent({
-		"event_name"	: "onActivate",
-		"func_name"		: function (id, event, ui) {
-			var dialog = ui.newTab.closest(".ui-dialog-content").attr("id");
-			if (dialog !== undefined) {
-				var id = dialog.replace("ffWidget_dialog_container_", "");
-				ff.ffPage.dialog.refresh(id);
-			}
-		}
-	});
-});*/
-
-/* causa un brutto brutto bug su firefox quando ci sono tanti combo, da rivedere
-ff.pluginAddInit("ff.ffField.activecomboex", function () {
-	ff.ffField.activecomboex.addEvent({
-		"event_name"	: "refill",
-		"func_name"		: function (control, node) {
-			var dialog = jQuery(node).closest(".ui-dialog-content").attr("id");
-			if (dialog !== undefined) {
-				ff.ffPage.dialog.adjSize(dialog.replace("ffWidget_dialog_container_", ""));
-				var id = dialog.replace("ffWidget_dialog_container_", "");
-				var instance = dialogs.get(id).instance;
-				instance.dialog("widget").center(false);
-			}
-		}
-	});
-});*/
-
-/*ff.pluginAddInit("ff.ffField.ckeditor", function () {
-	ff.ffField.ckeditor.addEvent({
-		"event_name"	: "onCreate",
-		"func_name"		: function (node) {
-			var dialog = jQuery(node).closest(".ui-dialog-content").attr("id");
-			if (dialog !== undefined) {
-				ff.ffPage.dialog.adjSize(dialog.replace("ffWidget_dialog_container_", ""));
-			}
-		}
-	});
-});
-
-ff.pluginAddInit("ff.ffField.tinymce", function () {
-	ff.ffField.tinymce.addEvent({
-		"event_name"	: "onCreate",
-		"func_name"		: function (node) {
-			var dialog = jQuery(node).closest(".ui-dialog-content").attr("id");
-			if (dialog !== undefined) {
-				ff.ffPage.dialog.adjSize(dialog.replace("ffWidget_dialog_container_", ""));
-			}
-		}
-	});
-});
-
-ff.pluginAddInit("ff.ffField.codemirror", function () {
-	ff.ffField.codemirror.addEvent({
-		"event_name"	: "onCreate",
-		"func_name"		: function (node, editor) {
-			var dialog = jQuery(node).closest(".ui-dialog-content").attr("id");
-			if (dialog !== undefined) {
-				ff.ffPage.dialog.adjSize(dialog.replace("ffWidget_dialog_container_", ""));
-			}
-		}
-	});
-});
-
-ff.pluginAddInit("ff.ffField.editarea", function () {
-	ff.ffField.editarea.addEvent({
-		"event_name"	: "onCreate",
-		"func_name"		: function (node) {
-			var dialog = jQuery(node).closest(".ui-dialog-content").attr("id");
-			if (dialog !== undefined) {
-				ff.ffPage.dialog.adjSize(dialog.replace("ffWidget_dialog_container_", ""));
-			}
-		}
-	});
-});*/
 
 /* privates */
 var dialogs		= ff.hash();
-var inits_by_dlg = ff.hash();
+/*var inits_by_dlg = ff.hash();
 var inits_by_wdg = ff.hash();
 
 function initsReset(id) {
 	inits_by_dlg.set(id, ff.hash());
 	ff.ffPage.dialog.needInit(id, false);
-}
+}*/
 
 var that = { /* publics */
 __ff : true, /* used to recognize ff'objects */
@@ -128,23 +88,31 @@ __ff : true, /* used to recognize ff'objects */
 /*"dialog_deps"        : ff.hash(),*/
 
 "addDialog" : function (params) {
+	/** mod di alex **/
 	if(unique === null && params.unique) {
 		unique = params.id;
 	}
-unique = null;
+	unique = null;
+	/** fine mod di alex **/
+	if (that.dialog_params.isset(params.id))
+		return;
+			
     that.dialog_params.set(params.id, {
         "callback"		: params.callback,
         "url"			: params.url,
         "title"			: params.title,
-        "params"        : params.params,
+        "params"        : params.params || {},
         "height"        : params.height,
         "width"			: params.width,
         "resizable"		: params.resizable,
         "position"		: params.position,
         "draggable"		: params.draggable,
         "doredirects"	: params.doredirects,
-		"need_init"		: false
+        "modal"			: (params.modal === undefined ? true : false),
+        "class"			: params.dialogClass,
     });
+	
+	ff.ajax.ctxAdd(params.id, that, "dialog");
 
     that.doEvent({
         "event_name"    : "onAddDialog",
@@ -152,12 +120,21 @@ unique = null;
     });
 },
 
-"needInit" : function (id, value) {
-	return that.param(id, "need_init", value);
-},
-
 "get" : function (id) {
     return dialogs.get(id);
+},
+
+"exist" : function (id) {
+	return that.dialog_params.isset(id);
+},
+
+"getInstance" : function (id) {
+    return dialogs.get(id).instance;
+},
+
+"replaceHTML" : function (id, data) {
+	that.getInstance(id).html(data["html"]);
+	ff.ffPage.dialog.makeDlgBt(id, data);
 },
 
 "param" : function (id, param, value) {
@@ -168,7 +145,10 @@ unique = null;
 },
 "getDimensions" : function(elem) {
 	var width = elem.outerWidth();
-	var scrollHeight = elem.get(0).scrollHeight;
+	var scrollHeight = (elem.length > 0
+		? elem.get(0).scrollHeight
+		: elem.scrollHeight
+	);
 	
 	//console.log(width);
 
@@ -176,7 +156,7 @@ unique = null;
 			elem.width(i);
 	//console.log("width " +  elem.innerWidth() + " -/- " +( elem.get(0).scrollWidth  )+ ": " + elem.get(0).scrollHeight + " - " + scrollHeight + " = "  + (elem.get(0).scrollHeight - scrollHeight));
 
-		if(elem.get(0).scrollHeight <= scrollHeight && elem.get(0).scrollWidth <= elem.innerWidth()) {
+		if(/*elem.get(0).scrollHeight <= scrollHeight &&*/ elem.get(0).scrollWidth <= elem.innerWidth()) {
 			width = elem.get(0).scrollWidth + 50;  
 			break;
 		}
@@ -186,7 +166,7 @@ unique = null;
 //console.log(width);
 	return {
 		width: width
-		, height: elem.get(0).scrollHeight + 20
+		, height: scrollHeight + 20
 	}; 
 },
 "adjSize" : function (id) {
@@ -197,7 +177,7 @@ unique = null;
 	var instance = dialogs.get(id).instance;
 	var widget = instance.dialog("widget");
 	
-	var wh = jQuery(window).height();
+	//var wh = jQuery(window).height();
 	var ww = jQuery(window).width();
 	
 
@@ -210,9 +190,9 @@ unique = null;
 	}
 
 	//that.getDimensions(jQuery(".ui-widget-content", widget));
-	if (widget.outerHeight(false) > wh * 0.90) {
-		instance.dialog("option", "height", wh * 0.90);
-	}
+	//if (widget.outerHeight(false) > wh * 0.90) {
+	//	instance.dialog("option", "height", wh * 0.90);
+	//}
 	if (widget.outerWidth(false) > ww * 0.90) {
 		instance.dialog("option", "width", ww * 0.90);
 	}
@@ -224,7 +204,7 @@ unique = null;
 	}
 	
 	var instance = dialogs.get(id).instance;
-		
+	
 	//widget.position({my : "center center", at : "center center", of : window});
 	
 	//if(parseInt(jQuery(widget).css("top")) < 0) {
@@ -237,7 +217,6 @@ unique = null;
 	if (!instance.dialog("isOpen")) {
 		instance.dialog("open");
 	}
-
 	
 	that.adjSize(id);
 	
@@ -245,8 +224,10 @@ unique = null;
 	
 //	widget.position();	
 	widget.position({my : "center center", at : "center center", of : window});
+	if(widget.position().top < 0)
+		widget.position({ my: 'top', at: 'top+10', of : window });
 
-	
+	//show = show || !parseInt(jQuery(widget).parent().css("opacity"));
 	if(show === true)
 		jQuery(widget).parent().fadeTo("fast", 1, function() {
 		    that.doEvent({
@@ -256,8 +237,6 @@ unique = null;
 		});
 	else if(show === false)
 		jQuery(widget).parent().css("opacity", 0);
-
-
 
 	return true;
 },
@@ -270,28 +249,30 @@ unique = null;
 		//jQuery("body").css("overflow", "hidden");
 		old_overflow.dialog = id;
 	}
-	
+
+	var tmp_params = that.dialog_params.get(id) || {};
+
 	dialogs.get(id).instance = jQuery('<div id="ffWidget_dialog_container_' + id + '"></div>').dialog({
 		autoOpen: false
-		, dialogClass : "ff-modal-dialog"
-		, resizable: that.dialog_params.get(id).resizable
-		, position: that.dialog_params.get(id).position
-		, modal: false
+		, dialogClass : tmp_params.class
+		, resizable: tmp_params.resizable
+		, position: { my: tmp_params.position, at: "center", of: window }
+		//, position: tmp_params.position
+		, modal: tmp_params.modal
+		, draggable: tmp_params.draggable
 		, closeText : ''
-		, draggable: that.dialog_params.get(id).draggable
 		, create: function(event, ui ) {
 			var widget = jQuery(this).dialog("widget");
-			var zIndex = 90;
+			/*var zIndex = 90;
 			$("BODY *").each(function() {
 				if($(this).css("position") == "fixed") {
-				    var current = parseInt($(this).css("z-index"), 10);
-				    if(current < 2000 && zIndex < current) zIndex = current;
+					var current = parseInt($(this).css("z-index"), 10);
+					if(current < 2000 && zIndex < current) zIndex = current;
 				}
 			});			
-    		zIndex++;
+    		zIndex++;*/
 
-			jQuery(widget).wrapAll('<div class="ff-modal"/>').parent().css({"opacity": 0, "z-index": zIndex});		
-			
+			jQuery(widget).wrapAll('<div class="ff-modal"/>').parent().css({"opacity": 0,/* "z-index": zIndex */});	
 		}
 		, close: function(ev, ui) {
 			var widget = jQuery(this).dialog("widget");
@@ -306,12 +287,12 @@ unique = null;
 				old_overflow.dialog = null;
 			}
 		}
-		, title: that.dialog_params.get(id).title
-		, height: that.dialog_params.get(id).height || 'auto'
-		, width: that.dialog_params.get(id).width || 'auto'
+		, title: tmp_params.title
+		, height: tmp_params.height || 'auto'
+		, width: tmp_params.width || 'auto'
 		/*, maxHeight: jQuery(window).height() * 0.90*/
 		/*, maxWidth: jQuery(window).width() * 0.90*/
-		, minWidth: 500  
+		, minWidth: tmp_params.params.min_width || 500  
 		, hide: {effect: 'fade', duration: 200}
 		, open: function() {
 			var widget = jQuery(this).dialog("widget");
@@ -327,15 +308,39 @@ unique = null;
 
 			if (jQuery(".ui-dialog-content", widget).get(0).style.height == "auto")
 				jQuery(".ui-dialog-content", widget).height(jQuery(".ui-dialog-content", widget).height());*/
-        
+	    
         	//jQuery(".ui-dialog-content", widget).css("width", "");
 		}
+		, drag: function(event, ui) {
+			if(ui.position.top < 0)
+				ui.position.top = 10;
+			
+/*			var widget = jQuery(this).dialog("widget");
+			console.log(ui);
+			console.log(event.offsetX + " => " + ui.offset.left);
+			if(parseInt(widget.css("left")) <= ui.position.left)
+				ui.position.left = parseInt(widget.css("left")) -1;
+
+			console.log(parseInt(widget.css("left")) + " => " + ui.position.left);
+*/
+	    }
 		, resizeStart: function(event, ui) {
 			var widget = jQuery(this).dialog("widget");
 			
-			widget.css("position", "relative");
+			//widget.css("position", "relative");
 		}
+		, resizeStop : function (ev, ui) {
+			var diffx = Math.floor(ui.size.width) - Math.floor(jQuery("#ffWidget_dialog_container_" + id).dialog("widget").width());
+			if (diffx) jQuery("#ffWidget_dialog_container_" + id).width(jQuery("#ffWidget_dialog_container_" + id).width() - diffx);
+			var diffy = Math.floor(ui.size.height) - Math.floor(jQuery("#ffWidget_dialog_container_" + id).dialog("widget").height());
+			if (diffy) jQuery("#ffWidget_dialog_container_" + id).height(jQuery("#ffWidget_dialog_container_" + id).height() - diffy);
+			ff.ffPage.dialog.doEvent({
+				"event_name" : "resize"
+				, "event_params" : [id, ui]
+			});
+		}		
 	});
+
 	return dialogs.get(id).instance;
 },
 
@@ -352,6 +357,8 @@ unique = null;
 	}
     if (url !== undefined && that.dialog_params.get(id) !== undefined )
         that.dialog_params.get(id)["url"] = url;
+
+	that.updateCursor(id, that.dialog_params.get(id)["url"]);
 
     if (title !== undefined && title.length > 0 && that.dialog_params.get(id) !== undefined)
         that.dialog_params.get(id)["title"] = title;
@@ -379,7 +386,7 @@ unique = null;
         return;
     }
 	
-	initsReset(id);
+	ff.ajax.ctxGet(id).reset();
 	
     dialogs.set(id, {
 		"instance"	: null,
@@ -393,25 +400,20 @@ unique = null;
     
     var evres = that.doEvent({"event_name": "doOpen", "event_params" : [that, id, url, title]});
     if (evres !== true) {
-        var fields = [
-            {name: "XHR_DIALOG_ID", value: id}
-        ];
-             
         ff.ajax.doRequest({
             "url"			: that.parseUrl(id, dialogs.get(id).params.current_url),
             "type"			: "GET",
-            "fields"		: fields,
             "callback"		: that.onSuccess,
             "customdata"	: {
-                "id"                    : id
-                , "elemHighlight"       : elemHighlight
-				, "caller"              : {
-					"func"              : ff.ffPage.dialog.doOpen
-					, "args"            : ff.argsAsArray(arguments)
+                "id" : id
+				, "caller" : {
+					"func" : ff.ffPage.dialog.doOpen
+					, "args" : ff.argsAsArray(arguments)
 				}
             },
             "injectid"		: dialogs.get(id).instance,
-            "dialog"		: id,
+            "ctx"			: id,
+			"brandnew"		: true,
             "doredirects"	: dialogs.get(id).params.doredirects
         });
     }
@@ -458,17 +460,20 @@ unique = null;
 	var instance = dialogs.get(id).instance;
     if (data["close"]) {
         instance.dialog("close");
+	} else if (data["url"]) {
+		dialogs.get(id).params.current_url = data["url"];
+		that.updateCursor(id, data["url"]);
+	} else if (data["cursor_reload"] && data["cursor_reload"] === id) {
+		ff.ffRecord.cursor.reload(id);		
     } else {
 		that.makeDlgBt(id, data);
 		
         if (data["html"]) {
-			if (!that.needInit(id) && dialogs.get(id) !== undefined && !instance.dialog("isOpen"))
+			if (!ff.ajax.ctxGet(id).needInit() && dialogs.get(id) !== undefined && !instance.dialog("isOpen"))
                 instance.dialog("open");
-        } else if (data["url"]) {
-            dialogs.get(id).params.current_url = data["url"];
         }
-
-		if (!that.needInit(id))
+		
+		if (!ff.ajax.ctxGet(id).needInit())
 			ff.ffPage.dialog.refresh(id, true);
 		else {
 			dialogs.get(id).waiting = true;
@@ -494,25 +499,25 @@ unique = null;
         eval(dialogs.get(id).params.callback);
     }
 
-    ff.struct.each(function (componentid, component) {
-        if (component.dialog === id) {
+    ff.struct.get("comps").each(function (componentid, component) {
+        if (component.ctx === id) {
             ff.clearComponent(componentid);
         }
     });
 
-    ff.struct.fields.each(function (key, field) {
-        if (field.dialog !== undefined && field.dialog === id) {
+    ff.struct.get("fields").each(function (key, field) {
+        if (field.ctx !== undefined && field.ctx === id) {
             ff.doEvent({
                 "event_name"    : "onClearField",
                 "event_params"    : [undefined, key, field]
             });
-            ff.struct.fields.unset(key);
+            ff.struct.get("fields").unset(key);
         }
     });
 
     dialogs.get(id).instance.remove();
     dialogs.unset(id);
-	inits_by_dlg.unset(id);
+	ff.ajax.ctxGet(id).reset();
 
     that.doEvent({
         "event_name": "onClose"
@@ -529,10 +534,10 @@ unique = null;
             break;
 
         default:
-			initsReset(id);
+			ff.ajax.ctxGet(id).reset();
             that.doEvent({"event_name": "doAction", "event_params" : [id, action, component, detailaction, action_param]});
 
-            var fields = ff.getFields(dialogs.get(id).instance, id);
+            var fields = ff.getFields(dialogs.get(id).instance.closest(".ui-dialog"), id);
             fields.push(
                 {name: "frmAction", value: component + action}
             );
@@ -547,10 +552,6 @@ unique = null;
                     {name: detailaction + "_delete_row", value: action_param}
                 );
             }
-
-            fields.push(
-                {name: "XHR_DIALOG_ID", value: id}
-            );
 
             if(addit_fields) {
                 for(var i in addit_fields) {
@@ -570,7 +571,7 @@ unique = null;
 					}
                  },
                  "injectid"            : dialogs.get(id).instance,
-                 "dialog"            : id,
+                 "ctx"				: id,
                  "doredirects"        : dialogs.get(id).params.doredirects
             });
             break;
@@ -578,17 +579,14 @@ unique = null;
 },
 
 "goToUrl" : function (id, url) {
-	initsReset(id);
+	ff.ajax.ctxGet(id).reset();
 	
     dialogs.get(id).params.current_url = url;
+	that.updateCursor(id, url);
 
-    var fields = [
-        {name: "XHR_DIALOG_ID", value: id}
-    ];
     ff.ajax.doRequest({
          "url"                : that.parseUrl(id, dialogs.get(id).params.current_url),
          "type"                : "GET",
-         "fields"            : fields,
          "callback"            : that.onSuccess,
          "customdata"        : {
             "id" : id
@@ -598,7 +596,8 @@ unique = null;
 			}
          },
          "injectid"            : dialogs.get(id).instance,
-         "dialog"            : id,
+         "ctx"				: id,
+		 "brandnew"			: true,
          "doredirects"        : dialogs.get(id).params.doredirects
     });
 },
@@ -617,9 +616,9 @@ unique = null;
      *    fields            i campi da passare con la richiesta, se no vengono presi quelli di tutta la pagina
      */
     
-	initsReset(id);
+	ff.ajax.ctxGet(id).reset();
 	
-    var fields = (params.fields === undefined ? jQuery(":input", dialogs.get(id).instance).not("input:checkbox:not(:checked)").not("input:radio:not(:checked)") : params.fields);
+	var fields = (params.fields === undefined ? jQuery(":input", dialogs.get(id).instance.closest(".ui-dialog")).not("input:checkbox:not(:checked)").not("input:radio:not(:checked)") : params.fields);
 
     if (params.action) {
         fields.push(
@@ -639,14 +638,10 @@ unique = null;
         );
     }
 
-    fields.push(
-        {"name": "XHR_DIALOG_ID", "value": id}
-    );
-
     var url = (params.url !== undefined ? params.url : null);
 
-    if (!url && params.component && ff.struct.get(params.component) !== undefined)
-        url = ff.struct.get(params.component).url;
+    if (!url && params.component && ff.struct.get("comps").get(params.component) !== undefined)
+        url = ff.struct.get("comps").get(params.component).url;
 
     if (!url)
         url = dialogs.get(id).params.current_url;
@@ -666,7 +661,7 @@ unique = null;
 			}
          },
          "injectid"            : params.injectid,
-         "dialog"            : id,
+         "ctx"				: id,
          "chainupdate"        : params.chainupdate, 
          "doredirects"        : dialogs.get(id).params.doredirects
     });
@@ -713,96 +708,49 @@ unique = null;
     }
     return parsedurl;
 },
-
-"initInspect" : function (id, component) {
-	var widgets = null;
-	var dlg_inits = inits_by_dlg.get(id);
-	
-	/*if (component === undefined) {
-		if (ff.struct.page !== undefined && ff.struct.page.widget !== unidefined && ff.struct.page.widget !== "") {
-			widgets = ff.struct.page.widget.split(",");
-			widgets.each(function (k, widget) {
-				dlg_inits.page.set(widget, false);
-				if (glb_inits.page.get(widget) === undefined)
-					glb_inits.page.set(widget, ff.hash());
-				glb_inits.page.get(widget).set(id);
-				dlg_inits.need_init = true;
-			});
-		}
-	
-		if (ff.struct.fields.length) ff.struct.fields.each( function (fld_id, field) {
-			if (field.widget !== undefined && field.widget !== "") {
-				if (dlg_inits.field.get(fld_id) === undefined)
-					dlg_inits.field.set(fld_id, ff.hash());
-
-				widgets = field.widget.split(",");
-				widgets.each(function (k, widget) {
-					dlg_inits.field.get(fld_id).set(widget, false);
-					glb_inits.field.set(fld_id, id);
-					dlg_inits.need_init = true;
-				});
-			}
-		});
-	}*/
-		
-	ff.struct.each(function (com_id, com, i) {
-		if (component !== undefined && com_id !== component)
-			return;
-		
-		if (com.dialog === id) {			
-			if (com.widgets !== undefined) com.widgets.each(function (k, widget) {
-				if (dlg_inits.get(widget.id) === undefined)
-					dlg_inits.set(widget.id, ff.hash());					
-				dlg_inits.get(widget.id).set(widget.type, false);
-
-				if (inits_by_wdg.get(widget.type) === undefined)
-					inits_by_wdg.set(widget.type, ff.hash());
-				inits_by_wdg.get(widget.type).set(widget.id, id);
-
-				that.needInit(id, true);
-			});
-			
-			if (com.fields.length) com.fields.each( function (fld_id, field) {
-				if (field.widgets !== undefined) field.widgets.each(function (k, widget) {
-					if (dlg_inits.get(widget.id) === undefined)
-						dlg_inits.set(widget.id, ff.hash());					
-					dlg_inits.get(widget.id).set(widget.type, false);
-
-					if (inits_by_wdg.get(widget.type) === undefined)
-						inits_by_wdg.set(widget.type, ff.hash());
-					inits_by_wdg.get(widget.type).set(widget.id, id);
-
-					that.needInit(id, true);
-				});
-			});
-		}
-	});
-	
-	return dlg_inits.need_init;
-},
 "removeDlgBt" : function(id, data) {
 	var instance = dialogs.get(id).instance;
+	var widget = instance.dialog("widget");
+	
 
 	if(data["html"].indexOf("dialogSubTitleTab")) {
-		jQuery(".dlgTab", instance.dialog("widget")).remove();
+		jQuery(".dlgTab", widget).remove();
 	}
-	jQuery(".dlgSubTitle", instance.dialog("widget")).remove();
+	jQuery(".dlgSubTitle", widget).remove();
 	
 	if(data["html"].indexOf("dialogActionsPanel top")) {
-		jQuery(".dlgTopPanel", instance.dialog("widget")).remove();
+		jQuery(".dlgTopPanel", widget).remove();
 	}
 
 	if(data["html"].indexOf("dialogActionsPanel")) {
-		jQuery(".dlgBottomPanel", instance.dialog("widget")).remove();
+		jQuery(".dlgBottomPanel", widget).remove();
 	}
 },
 "makeDlgBt" : function(id, data) {
 	var instance = dialogs.get(id).instance;
+	var widget = instance.dialog("widget");
 
 	var countRecord = 0;
 	var countGrid = 0;
 	var countDetail = 0;
 	if(data["html"]) {
+		ff.struct.get("comps").each(function(key, value) {
+			switch(value["type"]) {
+				case "ffRecord":
+					if (value["ctx"] === id)
+						countRecord++;
+					return;
+				case "ffGrid":
+					if (value["ctx"] === id)
+						countGrid++;
+					break;
+				case "ffDetails":
+					if (value["ctx"] === id)
+						countDetail++;
+				default:
+			}
+		});	
+/*
 		struct.each(function(key, value) {
 			switch(value["type"]) {
 				case "ffRecord":
@@ -819,15 +767,16 @@ unique = null;
 				default:
 			}
 		});	
+*/
 	}
 	if(countDetail && !countRecord)
 		return;
 
 	if(jQuery(".dialogTitle", instance).length) {
 		jQuery(".ui-dialog-title").addClass(jQuery(".dialogTitle:first", instance).attr("class")).removeClass("dialogTitle");
-		jQuery(".dialogTitle:first", instance).appendTo(jQuery(".ui-dialog-title", instance.dialog("widget")).empty()).attr("class", "dlgTitle");
+		jQuery(".dialogTitle:first", instance).appendTo(jQuery(".ui-dialog-title", widget).empty()).attr("class", "dlgTitle");
 	}
-	
+	/*
 	if(jQuery(".dialogSubTitleTab", instance).length) {
 		var startSel = 0;
 		jQuery(".dialogSubTitleTab", instance).replaceWith(function(i) { 
@@ -840,21 +789,10 @@ unique = null;
 			}
 			var depClass = jQuery(this).attr("class").replace("dep-", "dlg-");
 			
-			//jQuery(this).parent().addClass("dlg-tab " + depClass); 
-
 			return '<a class="dialogSubTitleTab" href="javascript:void(0);" rel="' + depClass + '">' + jQuery(this).html() + '</a>';
 		});
-		jQuery(".dialogSubTitleTab", instance).appendTo(jQuery(".ui-dialog-title", instance.dialog("widget"))).removeClass("dialogSubTitleTab").wrapAll('<div class="dlgTab" />');
-		jQuery(".dlgTab a", instance.dialog("widget")).click(function() {
-			/*var rel = '';
-			var arrRel = jQuery(this).attr("rel").split(' ');
-
-			arrRel.each(function(key, value) {
-				if(value.indexOf("dlg-") === 0) {
-					rel = value;
-					return true;
-				}
-			});*/
+		jQuery(".dialogSubTitleTab", instance).appendTo(jQuery(".ui-dialog-title", widget)).removeClass("dialogSubTitleTab").wrapAll('<div class="dlgTab" />');
+		jQuery(".dlgTab a", widget).click(function() {
 			var rel = jQuery(this).attr("rel");
 			if(rel) {
 				jQuery(".dlg-tab", instance).hide();
@@ -863,36 +801,53 @@ unique = null;
 				
 				ff.ffPage.dialog.refresh(id);
 
-				jQuery(".dlgTab a", instance.dialog("widget")).removeClass("selected");
+				jQuery(".dlgTab a", widget).removeClass("selected");
 				jQuery(this).addClass("selected");
 			}
 		});
 
-		jQuery(".dlgTab a:eq(" + startSel + ")", instance.dialog("widget")).click();
+		jQuery(".dlgTab a:eq(" + startSel + ")", widget).click();
+	}*/
+	
+	if(jQuery(".ffTab", instance).length) {
+		jQuery(".ffTab", instance).replaceWith(function(i) { 
+			var dlgClass = "dialogSubTitleTab";
+
+			if(jQuery(this).is(".active, .selected, .current")) 
+				dlgClass += " selected";
+
+			jQuery("a", this).addClass(dlgClass);
+			return jQuery(this).html();
+		});
+		jQuery(".dialogSubTitleTab", instance).appendTo(jQuery(".ui-dialog-title", widget)).removeClass("dialogSubTitleTab").wrapAll('<div class="dlgTab" />');
+		jQuery(".dlgTab a", widget).click(function() {
+			jQuery(".dlgTab a", widget).removeClass("selected");
+			jQuery(this).addClass("selected");
+		});
 	}
 	
 	if(jQuery(".dialogSubTitle", instance).length) {
-		jQuery(".dialogSubTitle", instance).insertAfter(jQuery(".ui-dialog-titlebar", instance.dialog("widget"))).addClass("dlgSubTitle").removeClass("dialogSubTitle");
+		jQuery(".dialogSubTitle", instance).insertAfter(jQuery(".ui-dialog-titlebar", widget)).addClass("dlgSubTitle").removeClass("dialogSubTitle");
 	}
 
     var skipForceBt = jQuery(".dlgTab").length;
 	if(jQuery(".dialogActionsPanel.top", instance).length) {
         if(!skipForceBt)
-		    jQuery(".dialogActionsPanel.top.force", instance).insertBefore(jQuery(".ui-dialog-content", instance.dialog("widget"))).addClass("dlgTopPanel").removeClass("dialogActionsPanel top force");
+		    jQuery(".dialogActionsPanel.top.force", instance).insertBefore(jQuery(".ui-dialog-content", widget)).addClass("dlgTopPanel").removeClass("dialogActionsPanel top force");
 		if(!countRecord && countGrid == 1)
-			jQuery(".dialogActionsPanel.top:not(.force)", instance).insertBefore(jQuery(".ui-dialog-content", instance.dialog("widget"))).addClass("dlgTopPanel").removeClass("dialogActionsPanel top");
+			jQuery(".dialogActionsPanel.top:not(.force)", instance).insertBefore(jQuery(".ui-dialog-content", widget)).addClass("dlgTopPanel").removeClass("dialogActionsPanel top");
 	}
 
 	if(jQuery(".dialogActionsPanel:not(.top)", instance).length) {
         if(!skipForceBt)
-		    jQuery(".dialogActionsPanel.force", instance).insertAfter(jQuery(".ui-dialog-content", instance.dialog("widget"))).addClass("dlgBottomPanel").removeClass("dialogActionsPanel force");
+		    jQuery(".dialogActionsPanel.force", instance).insertAfter(jQuery(".ui-dialog-content", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel force");
 
 		if(countRecord) {
-			jQuery(".dialogActionsPanel:not(.force):last", instance).insertAfter(jQuery(".ui-dialog-content", instance.dialog("widget"))).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
+			jQuery(".dialogActionsPanel:not(.force):last", instance).insertAfter(jQuery(".ui-dialog-content", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
 		} else if(countGrid == 1) {
-			jQuery(".dialogActionsPanel:not(.force)", instance).insertAfter(jQuery(".ui-dialog-content", instance.dialog("widget"))).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
+			jQuery(".dialogActionsPanel:not(.force)", instance).insertAfter(jQuery(".ui-dialog-content", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
 		} else if(!countRecord && !countGrid) {
-			jQuery(".dialogActionsPanel", instance).insertAfter(jQuery(".ui-dialog-content", instance.dialog("widget"))).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
+			jQuery(".dialogActionsPanel", instance).insertAfter(jQuery(".ui-dialog-content", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
 		}
 	}
 	
@@ -903,52 +858,23 @@ unique = null;
 			breadCrumbs = breadCrumbs + '<li><a href="javascript:void(0);" onClick="' + brdUrl + '">' + dialogs.get(id).breadCrumbs[i]["title"] + '</a></li>';
 		}
 		if(breadCrumbs) {
-			if(!jQuery(".dlgBrdCrumbs", instance.dialog("widget")).length)
-				jQuery('<span class="dlgBrdCrumbs"><a href="javascript:void(0);" onClick="' + brdUrl + '" class="dlgBrdBack"></a><ul>' + breadCrumbs + '</ul></span>').prependTo(jQuery(".ui-dialog-title", instance.dialog("widget")));
+			if(!jQuery(".dlgBrdCrumbs", widget).length)
+				jQuery('<span class="dlgBrdCrumbs"><a href="javascript:void(0);" onClick="' + brdUrl + '" class="dlgBrdBack"></a><ul>' + breadCrumbs + '</ul></span>').prependTo(jQuery(".ui-dialog-title", widget));
 		}
 	}
 },
-"initEvent" : function (widget_id, widget_type) {
-	var id = undefined;
-	
-	if (inits_by_wdg.get(widget_type) !== undefined)
-		id = inits_by_wdg.get(widget_type).get(widget_id);
-	
-	if (id === undefined) return;
-	
-	var dlg_inits = inits_by_dlg.get(id);
-	
-	dlg_inits.get(widget_id).set(widget_type, true);
-	inits_by_wdg.get(widget_type).unset(widget_id);
-	
-	// check if init is done
-	var tmp_still_waiting = false;
-	dlg_inits.each(function (k, v) {
-		v.each(function(wk, wv) {
-			if (!wv)
-				tmp_still_waiting = true;
-		});
-	});
-	
-	if (!tmp_still_waiting) {
-		if (dialogs.get(id).waiting) {
-			ff.ajax.unblockUI();
-			ff.ffPage.dialog.refresh(id, true);
-		} else {
-			that.needInit(id, false);
-		}
+"updateCursor" : function (id, url) {
+	var tmp = null;
+	if (tmp = ff.getURLParameter("cursor[id]", url)) {
+		that.dialog_params.get(id)["cursor"] = {
+			"id" : tmp,
+			"rrow" : ff.getURLParameter("cursor[rrow]", url),
+			"rows" : ff.getURLParameter("cursor[rows]", url),
+		};
 	}
-		
 }
 
 }; /* publics' end */
-
-ff.pluginAddInit("ff", function () {
-	ff.addEvent({
-		"event_name"  : "initIFElement"
-		, "func_name" : that.initEvent
-	});
-});
 
 return that;
 

@@ -42,7 +42,10 @@ ff.pluginAddInit("ff.ajax", function () {
 						, "func_name" : function () {
 							customdata.params.customdata.caller.func.apply(this, customdata.params.customdata.caller.args);
 							ev.remove();
+							return false;
 						}
+						, "break_when" : ff.ffEvent.BREAK_EQUAL
+						, "break_value" : false // break events and stop from redirect
 					});
 				} else if (customdata && customdata.caller) {
 					var ev = ff.modules.security.addEvent({
@@ -50,7 +53,10 @@ ff.pluginAddInit("ff.ajax", function () {
 						, "func_name" : function () {
 							customdata.caller.func.apply(this, customdata.caller.args);
 							ev.remove();
+							return false;
 						}
+						, "break_when" : ff.ffEvent.BREAK_EQUAL
+						, "break_value" : false // break events and stop from redirect
 					});
 				}
 				
@@ -90,7 +96,7 @@ ff.pluginAddInit("ff.ajax", function () {
 
 // privates
 var social_window = undefined;
-var dialog_opened = undefined;
+var login_dialog_id = undefined;
 
 var that = { // publics
 __ff : true, // used to recognize ff'objects
@@ -116,34 +122,12 @@ session : {
 
 openLoginDialog : function (title, url, ret_url, id) {
 	title = title || "Login";
-	dialog_opened = id || "loginDlg";
+	login_dialog_id = id || "loginDlg";
 	url = url || that.services.login + (ret_url ? "?ret_url=" + encodeURIComponent(ret_url) : "");
-	//window.location.origin + window.location.pathname.rtrim("/") + '/login' + (ret_url ? "?ret_url=" + encodeURIComponent(ret_url) : "");
-	
-	//, '{_login_title}'
-	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-		ff.pluginLoad("jquery-ui", "/themes/library/jquery-ui/jquery-ui.js", function() {
-			ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js");
-		});
-	});
-/* Remove jquery ui css
-	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-		ff.injectCSS("jqueryuicore", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.core.css", function() {
-			ff.injectCSS("jqueryuitheme", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.theme.css", function() {
-				ff.injectCSS("jqueryuidialog", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.dialog.css", function() {
-					ff.injectCSS("jqueryuiresizable", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.resizable.css");
-					ff.pluginLoad("jquery.ui", "/themes/library/jquery.ui/jquery.ui.js", function() {
-						ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js");
-					});
-				});
-			});
-		});
-	});
-*/
 
-	ff.pluginAddInit("ff.ffPage.dialog", function () {
+	ff.load("ff.ffPage.dialog", function () {
 		ff.ffPage.dialog.addDialog({
-			"id" : dialog_opened,
+			"id" : login_dialog_id,
 			"callback" : "",
 			"url" : "",
 			"resizable" : true,
@@ -156,10 +140,10 @@ openLoginDialog : function (title, url, ret_url, id) {
 		ff.ffPage.dialog.addEvent({
 			"event_name"	: "onClose"
 			, "func_name"	: function (id) {
-				dialog_opened = undefined;
+				login_dialog_id = undefined;
 			}
 		});
-		ff.ffPage.dialog.doOpen(dialog_opened, url, title);
+		ff.ffPage.dialog.doOpen(login_dialog_id, url, title);
 	});
 },
 reloadPageBySocialLogin : function(ret_url) {
@@ -172,7 +156,7 @@ reloadPageBySocialLogin : function(ret_url) {
 	}
 
     window.close(); 
-},	
+},		
 social : {
 	"requestLogin" : function (title, url) {
 		social_window = window.open(
@@ -216,9 +200,9 @@ onSubmit : function(containerSuccess) {
 						if(!containerSuccess)
 							containerSuccess = injectid;
 
-						ff.injectCSS("ff.modules.security", "/cm/showfiles.php/modules/security/responsive/css/ff.modules.security.css", function() {
+						//ff.injectCSS("ff.modules.security", "/modules/security/responsive/css/ff.modules.security.css", function() {
 							jQuery(containerSuccess).replaceWith(data.modules.security.message);
-						});
+						//});
 					} else {
 						jQuery(injectid + " .secError").remove();
 	                    jQuery(injectid + " .disabled").css({'opacity': '', 'pointer-events': ''}).removeClass("disabled"); 
@@ -233,7 +217,7 @@ onSubmit : function(containerSuccess) {
 },
 submit : function(action, component, elem, url, containerSuccess) { 
 	if(!component)
-		component = dialog_opened;
+		component = login_dialog_id;
 
 	var componentID = "#" + component;
 		
@@ -241,18 +225,18 @@ submit : function(action, component, elem, url, containerSuccess) {
 		action = (!ff.group ? "login" : "logout");
 
 	if(!url)
-		url = '/login';
+		url = window.location.pathname;
 
 	var ret_url = getParameterByName("ret_url");
 	if(ret_url)
 		url = ff.urlAddParam(url, "ret_url", ret_url);
 
 	if(jQuery(componentID).length) {
-		if(dialog_opened) {
+		if(login_dialog_id) {
 			if(elem)
 				jQuery(elem).addClass("disabled").css({'opacity': 0.5, 'pointer-events': 'none'}); 
 
-			ff.ffPage.dialog.doRequest(dialog_opened, {
+			ff.ajax.ctxDoRequest(login_dialog_id, {
 					'action' : action
 					, 'injectid'    : componentID
 			});		
@@ -260,12 +244,13 @@ submit : function(action, component, elem, url, containerSuccess) {
 			if(elem)
 				jQuery(elem).addClass("disabled").css({'opacity': 0.5, 'pointer-events': 'none'}); 
 
-            ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
+            ff.load("ff.ajax", function() {
                 ff.ajax.doRequest({
                     'action' : action
                     , 'formName'    : component 
                     , 'injectid'    : componentID  
                     , 'url'         : url
+                    , "doredirects" : true
                 });
             });
 		}

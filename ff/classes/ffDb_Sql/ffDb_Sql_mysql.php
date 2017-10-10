@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffDB_Sql
@@ -318,69 +318,6 @@ class ffDB_Sql
 		return true;
 	}
 
-	function eachAll($callback)
-	{
-		if (!$this->query_id)
-		{
-			$this->errorHandler("eachAll called with no query pending");
-			return false;
-		}
-
-		$res = @mysqli_fetch_all($this->query_id, MYSQLI_ASSOC);
-		if ($res === null && $this->checkError())
-		{
-			$this->errorHandler("fetch_assoc_error");
-			return false;
-		}
-		
-		$last_ret = null;
-		foreach ($res as $row => $record)
-		{
-			$last_ret = $callback($row, $record, $last_ret);
-		}
-		
-		return $last_ret;
-	}
-	
-	function eachNext($callback)
-	{
-		if (!$this->query_id)
-		{
-			$this->errorHandler("eachAll called with no query pending");
-			return false;
-		}
-
-		$last_ret = null;
-		if ($this->nextRecord())
-		{
-			do
-			{
-				$last_ret = $callback($this->row, $this->record, $last_ret);
-			} while ($this->nextRecord());
-		}
-		
-		return $last_ret;
-	}
-	
-	function getRecordset()
-	{
-		if (!$this->query_id)
-		{
-			$this->errorHandler("eachAll called with no query pending");
-			return false;
-		}
-
-		$res = @mysqli_fetch_all($this->query_id, MYSQLI_ASSOC);
-		if ($res === null && $this->checkError())
-		{
-			$this->errorHandler("fetch_assoc_error");
-			return false;
-		}
-		
-		return $res;
-	}	
-
-	
 	/**
 	 * Esegue una query 
 	 * @param String La query da eseguire
@@ -425,6 +362,30 @@ class ffDB_Sql
 					$this->fields_names[] = $tmp->name;
 				}
 				mysql_field_seek($this->query_id, 0);
+			}
+			
+			if (strpos($Query_String, "SQL_CALC_FOUND_ROWS"))
+			{
+				if (ini_get("mysql.trace_mode"))
+					ffErrorHandler::raise("Disable mysql.trace_mode In order for SQL_CALC_FOUND_ROWS to work", E_USER_ERROR, $this, get_defined_vars ());
+				
+				$tmp = @mysql_query("SELECT FOUND_ROWS()", $this->link_id);
+				if (!$tmp || $this->checkError())
+				{
+					$this->errorHandler("Unable to retrieve num_rows");
+					return $this->query_id;
+				}
+				$tmp_data = @mysql_fetch_array($tmp, MYSQLI_NUM);
+				if ($tmp_data === false)
+				{
+					$this->errorHandler("Unable to retrieve num_rows");
+					return $this->query_id;
+				}
+				$this->num_rows = $tmp_data[0];
+				
+				@mysql_free_result($tmp);
+				$tmp = false;
+				unset($tmp_data);
 			}
 		}
 
@@ -587,7 +548,7 @@ class ffDB_Sql
 			return false;
 		}*/
 
-		if ($this->record !== false)
+		if ($this->record !== false && $this->record !== null)
 		{
 			$this->row += 1;
 			return true;
@@ -750,7 +711,18 @@ class ffDB_Sql
                 $tmp = null;
         }
 		if (!$this->useFormsFramework || $bReturnPlain)
-			return $tmp;
+		{
+			switch ($data_type)
+			{
+				case "Number":
+					if (strpos($tmp, ".") !== false || strpos($tmp, ",") !== false)
+						return (double)$tmp;
+					else
+						return (int)$tmp;
+				default:
+					return $tmp;
+			}
+		}
 		else
 			return new ffData($tmp, $data_type, $this->locale);
 	}
@@ -802,14 +774,14 @@ class ffDB_Sql
 			switch ($data_type)
 			{
 				case "Date":
-					$tmp = new ffData($cDataValue->format("d/m/Y"), "Date", "ISO9075");
+					$tmp = new ffData($cDataValue, "Date");
 					$value = mysql_real_escape_string($tmp->getValue($data_type, $this->locale), $this->link_id);
 					break;
 				
 				case "DateTime":
 				default:
 					$data_type = "DateTime";
-					$tmp = new ffData($cDataValue->format("d/m/Y H:i:s"), "DateTime", "ISO9075");
+					$tmp = new ffData($cDataValue, "DateTime");
 					$value = mysql_real_escape_string($tmp->getValue($data_type, $this->locale), $this->link_id);
 			}
 		}

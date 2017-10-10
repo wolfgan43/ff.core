@@ -16,7 +16,8 @@ $db->on_error = "halt";
 if ($rc !== false)
 	create_domain();
 
-$filename = cm_moduleCascadeFindTemplateByPath("security", "/contents/domains/wizard/step3.html", $cm->oPage->getTheme());
+$filename = cm_cascadeFindTemplate("/contents/domains/wizard/step3.html", "security");
+//$filename = cm_moduleCascadeFindTemplateByPath("security", "/contents/domains/wizard/step3.html", $cm->oPage->getTheme());
 $tpl = ffTemplate::factory(ffCommon_dirname($filename));
 $tpl->load_file("step3.html", "main");
 $cm->oPage->addContent($tpl, null, "testo");
@@ -130,17 +131,22 @@ function create_domain()
 	$ID = $dbmain->getInsertID();
 	if ($ID->getValue())
 	{
-		$dbstruct = file_get_contents(FF_DISK_PATH . "/dbstruct.sql");
-		$subqueries = explode(";\n", $dbstruct);
-
-		$db = mod_security_get_db_by_domain($ID->getValue());
-//		ffErrorHandler::raise("asd", E_USER_ERROR, null, get_defined_vars());
-		foreach ($subqueries as $key => $value)
+		if (is_file(FF_DISK_PATH . "/dbstruct.sql"))
 		{
-			if (strlen(trim($value)))
-				$db->execute($value);
-		}
+			$dbstruct = file_get_contents(FF_DISK_PATH . "/dbstruct.sql");
+			$subqueries = explode(";\n", $dbstruct);
 
+			$db = mod_security_get_db_by_domain($ID->getValue());
+	//		ffErrorHandler::raise("asd", E_USER_ERROR, null, get_defined_vars());
+			foreach ($subqueries as $key => $value)
+			{
+				if (strlen(trim($value)))
+					$db->execute($value);
+			}
+		}
+		
+		cm::getInstance()->modules["security"]["events"]->doEvent("domain_insert", array($ID));
+		
 		ffRedirect("report?" . $globals->transit_params . "&keys[ID]=" . $ID->getValue());
 	}
 }

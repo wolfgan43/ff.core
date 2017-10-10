@@ -6,7 +6,7 @@ return array(
 				"plugins" => array(
 					"empty" => true,
 					"js_defs" => array(
-						"crosslide" => array(
+						"datetimepicker" => array(
 							"type" => "slider",
 							"path" => FF_THEME_DIR . "/library/plugins/jquery.datetimepicker",
 							"file" => "jquery.datetimepicker.full.js",

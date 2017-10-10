@@ -220,14 +220,7 @@
                 restoreCssElem = true;
             }
 
-			if(!$(elem).width()) {
-                $(elem).css({ "clear" : "both"});
-                
-                restoreCssElem = true;
-            }            
-            
             var rect = jQuery(elem)[0].getBoundingClientRect();
-            
             var elemLocalization = {
 		        "top" 			:  rect["top"] 	 - margin
 		        , "left" 		: (rect["left"] - margin	> 0 ? rect["left"] - margin		: margin) 

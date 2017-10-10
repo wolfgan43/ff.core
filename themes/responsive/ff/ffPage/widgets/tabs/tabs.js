@@ -6,7 +6,7 @@ var tabs = [];
 var that = { /* publics */
 	__ff : true, /* used to recognize ff'objects */
 	"addTab" : function (id, type) {
-		switch (type) {
+		switch (type) { 
 			case "base":
 				break;
 			case "bootstrap":
@@ -14,6 +14,12 @@ var that = { /* publics */
 				ff.doEvent({
 					"event_name" : "initIFElement"
 					, "event_params" : [id, "tabs"]
+				});
+				$('a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+				 	that.doEvent({
+						"event_name" : "onActivate"
+						, "event_params" : [id, event, { "newPanel": jQuery(jQuery(this).attr("href"))}]
+					});
 				});
 				break;
 			case "foundation":
@@ -25,7 +31,21 @@ var that = { /* publics */
 				});
 				break;
 			default:	
+				ff.pluginAddInit("jquery-ui", function () {
+					jQuery.widget("ui.tabs", jQuery.ui.tabs, {
+						_getList: function() {
+							if (this.options.tabselector !== undefined) {
+								var list = jQuery("#tab-menu-" + id);
+								return list.length ? list.eq( 0 ) : this._super();
+							} else {
+								return this._super();
+							}
+						}
+					});
+				});
+
 				tabs[id] = jQuery("#tab-" + id).tabs({
+					"tabselector" : "#tab-menu-" + id,
 					"create" : function (event, ui) {
 						that.doEvent({
 							"event_name" : "onCreate"

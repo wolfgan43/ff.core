@@ -63,6 +63,13 @@ $actex_main_db				= $ff["actex"][$data_src]["main_db"];
 $hide_result_on_query_empty = $ff["actex"][$data_src]["hide_result_on_query_empty"];
 $actex_preserve_field		= $ff["actex"][$data_src]["preserve_field"];
 $limit						= $ff["actex"][$data_src]["limit"];
+$crypt						= $ff["actex"][$data_src]["crypt"];
+$crypt_modsec				= $ff["actex"][$data_src]["crypt_modsec"];
+$crypt_concat				= $ff["actex"][$data_src]["crypt_concat"];
+$multi_crypt				= $ff["actex"][$data_src]["multi_crypt"];
+$multi_crypt_modsec			= $ff["actex"][$data_src]["multi_crypt_modsec"];
+$multi_crypt_concat			= $ff["actex"][$data_src]["multi_crypt_concat"];
+
 
 //$actex_preserve_having		= $ff["actex"][$data_src]["preserve_having"];
 
@@ -83,7 +90,7 @@ if(!strlen(trim($actex_sql)))
 	}*/
 	
 	// non dovrebbe mai essere vuota l'SQL
-	ffErrorHandler::raise("debug", E_USER_ERROR, null, get_defined_vars());
+	ffErrorHandler::raise("debug empty query", E_USER_ERROR, null, get_defined_vars());
 }
 
 if(!strlen($father_value) && $hide_result_on_query_empty)

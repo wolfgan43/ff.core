@@ -4,8 +4,8 @@
  * @package FormsFramework
  * @subpackage Abstract DB Index Rapresentation Class
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2004-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -15,8 +15,8 @@
  * @package FormsFramework
  * @subpackage Abstract DB Index Rapresentation Class
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2004-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffDBIndex extends ffCommon

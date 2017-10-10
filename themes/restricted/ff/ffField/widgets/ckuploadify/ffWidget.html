@@ -1,19 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.pluginLoad("swfobject", "/themes/library/swfobject/swfobject.js", function () {
-		ff.injectCSS("uploadify", "{jqueryuploadify}", function() {
-			ff.pluginLoad("ff.lib.ckfinder", "/themes/library/ckfinder/ckfinder.js", function () {
-				ff.pluginLoad("jquery.fn.uploadify", "/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function () {
-					ff.pluginLoad("jquery.cookie", "/themes/library/plugins/jquery.cookie/jquery.cookie.js", function () {
-						ff.pluginLoad("ff.ffField.ckuploadify", "{widget_path}/ckuploadify.js");
-					});
-				}, false);
-			}, false);
-		});
-	}, false);
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -41,10 +26,7 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 			showFile		: {show_file},
             fullPath        : {full_path},
             dataSrc			: "{data_src}", 
-            relativePath	: "{relative_path}", 
-            icons           : {
-                                "cancel" : "{cancel_class}"
-                            }
+            relativePath	: "{relative_path}" 
 		});
         <!--EndSectBinding-->
 	});
@@ -53,7 +35,7 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 
 <!--BeginSectControl-->
 <div class="uploadify {type_model}">
-<a href="#{container}{id}" id="CkFinder_{container}{id}" title="File selector" class="{browse_class}" onclick="ff.ffField.ckuploadify.browseServer('{resource_type}:{base_url}', '{container}{id}{suffix_target}' );"></a>
+<a href="#{container}{id}" id="CkFinder_{container}{id}" title="File selector" class="{class}" onclick="ff.ffField.ckuploadify.browseServer('{resource_type}:{base_url}', '{container}{id}{suffix_target}' );"><img src="{site_path}/themes/{theme}/images/widgets/ckfinder/browse.png" alt="ShowCkFinder" /></a>
 {control}
 </div>
 <!--EndSectControl-->

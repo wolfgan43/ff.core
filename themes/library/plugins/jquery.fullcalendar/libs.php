@@ -6,7 +6,7 @@ return array(
 				"plugins" => array(
 					"empty" => true,
 					"js_defs" => array(
-						"flexslider" => array(
+						"fullcalendar" => array(
 							"path" => FF_THEME_DIR . "/library/plugins/jquery.fullcalendar",
 							"file" => "fullcalendar.js",
 							"css_loads" => array(

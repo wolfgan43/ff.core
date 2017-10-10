@@ -518,7 +518,6 @@ else
 		$cm->oPage->addContent('<div class="warning">No settings defined</div>', "accounts", "Settings", array("title" => "Settings"));
 		return;
 	} else {
-
 		$oRecord2 = ffRecord::factory($cm->oPage);
 		$oRecord2->id = "settings";
 		$oRecord2->title = "Settings";
@@ -636,10 +635,11 @@ else
                         if(strlen($subvalue->source_SQL)) {
                             $subvalue->source_SQL = str_replace("[ID_DOMAINS]", $globals->DomainID, $subvalue->source_SQL);
                             $subvalue->source_SQL = str_replace("[FF_PREFIX]", FF_PREFIX, $subvalue->source_SQL);
+                            $subvalue->source_SQL = str_replace("[FF_SUPPORT_PREFIX]", FF_SUPPORT_PREFIX, $subvalue->source_SQL);
                             $subvalue->source_SQL = str_replace("[CM_TABLE_PREFIX]", CM_TABLE_PREFIX, $subvalue->source_SQL);
                             $subvalue->source_SQL = str_replace("[FF_LOCALE]", FF_LOCALE, $subvalue->source_SQL);
                             $subvalue->source_SQL = str_replace("[FF_DATABASE_NAME]", FF_DATABASE_NAME, $subvalue->source_SQL);
-                        }						
+                        }
 						$oField->source_SQL = str_replace("[ID_DOMAINS]", $_REQUEST["keys"]["ID"], $subvalue->source_SQL);
 						break;
 				}
@@ -695,7 +695,7 @@ else
 					{
 						if (!is_object($subvalue))
 							continue;
-                        
+
 						$sSQL = "SELECT ID
                                     FROM " . CM_TABLE_PREFIX . "mod_restricted_settings
                                     WHERE name = " . $db->toSql($subkey) . "
@@ -762,9 +762,11 @@ function ModSecDomains_on_done_action($oRecord, $frmAction)
 				
 				$sSQL = "DELETE FROM " . CM_TABLE_PREFIX . "mod_security_users WHERE ID_domains = " . $db->toSql($ID);
 				$db->execute($sSQL);
+				
+				$cm->modules["security"]->events->doEvent("domain_delete", array($ID));
 				break;
 
-			case "insert":
+			case "insert": // TOCHECK: mai utilizzata per via del wizard?
 				foreach ($cm->modules["security"]["domains_fields"] as $key => $value)
 				{
 					$sSQL = "INSERT INTO
@@ -812,18 +814,28 @@ function ModSecDomains_on_done_action($oRecord, $frmAction)
 						$db->execute($sSQL);
 					}
 				}
+				
+				$cm->modules["security"]->events->doEvent("domain_update", array($ID));
 				break;
 		}
 	}
 
 	switch ($frmAction)
 	{
-		case "insert":
+		case "confirmdelete":
+			$cm->modules["security"]["events"]->doEvent("domain_delete", array($ID));
+			break;
+
+		case "update":
+			$cm->modules["security"]["events"]->doEvent("domain_update", array($ID));
+			break;
+
+		case "insert": // TOCHECK: mai utilizzata per via del wizard?
             if(MOD_SEC_OWNER && isset($oRecord->form_fields["username"]) && isset($oRecord->form_fields["email"]) && isset($oRecord->form_fields["password"])) {
                 $username = $oRecord->form_fields["username"]->getValue();
                 $email = $oRecord->form_fields["email"]->getValue();
                 $password = $oRecord->form_fields["password"]->getValue();
-                
+				
                 $sSQL = "INSERT INTO cm_mod_security_users 
                         (
                             ID
@@ -911,6 +923,8 @@ function ModSecDomains_on_done_action($oRecord, $frmAction)
 				reset($cm->modules["restricted"]["settings"]);
 			}
         
+			$cm->modules["security"]["events"]->doEvent("domain_insert", array($ID));
+			
 			ffRedirect($_SERVER["REQUEST_URI"] . "&keys[ID]=" . rawurlencode($oRecord->key_fields["ID"]->value->getValue()));
 	}
 }

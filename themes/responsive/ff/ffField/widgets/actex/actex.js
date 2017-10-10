@@ -37,6 +37,7 @@ var activecombo = function(params) {
 	
 	/* privates */
 	var __id = params.id;
+	var component = params.component;
 	
 	var multi = params.multi;
 	var filled = false;
@@ -70,10 +71,29 @@ var activecombo = function(params) {
 			return jQuery.fn.escapeGet("actex_" + __id).get(0);
 		}
 		, "getService" : function () {
+			var tmp;
 			if (that.options.service !== null)
-				return that.options.service;
+				tmp = that.options.service;
 			else
-				return innerURL;
+				tmp = innerURL;
+			
+			if (component === "" || component === undefined)
+				return tmp;
+			
+			var srv_uri_parts = tmp.parseUri();
+			if (srv_uri_parts.host !== "")
+				return tmp;
+			
+			var cmp_uri_parts = ff.struct.get("comps").get(component).url.parseUri();
+			if (cmp_uri_parts.host === "")
+				return tmp;
+
+            var port = (cmp_uri_parts.port && cmp_uri_parts.port != 80
+                    ? ":" + cmp_uri_parts.port
+                    : ""
+            );
+
+            return cmp_uri_parts.protocol + "://" + cmp_uri_parts.host + port + "/" + tmp.ltrim("/");
 		}
 
 		, "getCacheDataSrc" : function () {
@@ -87,7 +107,6 @@ var activecombo = function(params) {
                         )
                     ));
 		}
-		
 		, "setValue" : function (value) {
 			that.value = normalizeVal(value);
 		}
@@ -158,14 +177,18 @@ var activecombo = function(params) {
 			});
 	
 			if (res !== undefined && res[res.length - 1])
-				return;
+				return res[res.length - 1];
 
 			updatebt();
 
 			if (that.childs.length) {
+				var rc = true;
 				that.childs.each(function (a, child) {
-					ff.ffField.actex.getInstance(child).refill(reset_childs ? null : undefined);
+					rc &= ff.ffField.actex.getInstance(child).refill(reset_childs ? null : undefined);
 				});
+				return rc;
+			} else {
+				return true
 			}
 		}
 		
@@ -182,7 +205,8 @@ var activecombo = function(params) {
 
 		, "update" : function (new_value, reset_childs) {
 			new_value = normalizeVal(new_value);
-
+			reset_childs = reset_childs === undefined ? that.options.reset_childs : reset_childs;
+			
 			//var old_value = (displayed_value === undefined ? that.value : displayed_value);
 			var old_value = that.value;
 			if (new_value === undefined)
@@ -274,7 +298,7 @@ var activecombo = function(params) {
 			var $node = jQuery(that.getNode());
 
             jQuery(".checkgroup .line", $node).each(function() {
-                if (jQuery("input", this).is(":checked")) {
+                if (jQuery("input", this).is("checked")) {
                 	data["value"].push(jQuery("input", this).val());
                 	data["label"].push(jQuery("input", this).val());
                 }
@@ -299,7 +323,6 @@ var activecombo = function(params) {
 			var data = {"value" : [], "label" : []};
 			var $node = jQuery(that.getNode());
 			var sep = that.options.separator;
-
 			if(!$node.parent().next(".actex-multi").find("li[data-id='" + item.id + "']").length) {
 				$node.parent().next(".actex-multi").append('<li class="' + frameworkCSS["item"] + '" data-id="' + item.id + '"><mark>' + (item.url ? '<a href="' + item.url + '" target="_blank">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>" : (item.image ? '<img src="' + item.image + '" />' : "") + item.label) + '</mark><a href="javascript:ff.ffField.actex.del(\'' + __id + '\', \'' + item.id + '\');" class="' + frameworkCSS["badge"] + '"><i class="' + icons["delete"] + '"></i></a></li>');
 				$node.parent().next(".actex-multi").children().each(function() {
@@ -311,6 +334,7 @@ var activecombo = function(params) {
 				jQuery.fn.escapeGet(__id + "_label").val("");
 			}
 		}
+
 		, "refill" : function (new_value, father_value, force_refresh) {
 			var node = that.getNode();
 			new_value = normalizeVal(new_value);
@@ -484,7 +508,7 @@ var activecombo = function(params) {
 					
 					buffer += '</select>';
 					if(that.options.addPlus) {
-						buffer += '<a class="qta-piu" href="javascript:void(0);" onClick="jQuery(this).prev(\'select\').children(\'option:selected\').val(parseInt(jQuery(this).prev(\'select\').children(\'option:selected\').val()) + 1); jQuery(this).prev(\'select\').children(\'option:selected\').text(jQuery(this).prev(\'select\').children(\'option:selected\').val());">+</a><a class="qta-meno" href="javascript:void(0);" onClick="if(parseInt(jQuery(this).prev().prev(\'select\').children(\'option:selected\').val()) >= 2) { jQuery(this).prev().prev(\'select\').children(\'option:selected\').val(parseInt(jQuery(this).prev().prev(\'select\').children(\'option:selected\').val()) - 1); jQuery(this).prev().prev(\'select\').children(\'option:selected\').text(jQuery(this).prev().prev(\'select\').children(\'option:selected\').val()); }">-</a>';
+						buffer += '<a class="' + icons.plus + '" href="javascript:void(0);" onClick="jQuery(this).prev(\'select\').children(\'option:selected\').val(parseInt(jQuery(this).prev(\'select\').children(\'option:selected\').val()) + 1); jQuery(this).prev(\'select\').children(\'option:selected\').text(jQuery(this).prev(\'select\').children(\'option:selected\').val());"></a><a class="' + icons.minus + '" href="javascript:void(0);" onClick="if(parseInt(jQuery(this).prev().prev(\'select\').children(\'option:selected\').val()) >= 2) { jQuery(this).prev().prev(\'select\').children(\'option:selected\').val(parseInt(jQuery(this).prev().prev(\'select\').children(\'option:selected\').val()) - 1); jQuery(this).prev().prev(\'select\').children(\'option:selected\').text(jQuery(this).prev().prev(\'select\').children(\'option:selected\').val()); }"></a>';
 					}
 					node.innerHTML = buffer; 
 				}
@@ -495,9 +519,11 @@ var activecombo = function(params) {
 					jQuery(node).next(".actex-actions").children("i:first").remove();
 				if(that.options.hideEmpty && !that.data.length) {
 					if(that.options.hideEmpty === true)
-						jQuery(node).hide();
-					else 
-						jQuery(node).closest("." + that.options.hideEmpty).hide();
+	                        jQuery(node).show();
+	                    else if(that.options.hideEmpty == "all")
+	                        jQuery(node).closest("DIV.actex").css("opacity", "");
+	                    else 
+	                        jQuery(node).closest(that.options.hideEmpty).show();
 				}            
 
 				if (found_value === false)
@@ -517,7 +543,8 @@ var activecombo = function(params) {
 					"event_name"	: "refill",
 					"event_params"	: [__id, node]
 				});
-	
+
+				return true;
 			} else {
 				/* async loading*/
 				cascade_disable(true);  /* disable fathers*/
@@ -542,18 +569,21 @@ var activecombo = function(params) {
 				str_data = str_data + ancest_data;
 
 				delayed_request(str_data, new_value, father_value, force_refresh);
+
+				return false;
 			}
 		}
 
 		, "child_error_display" : function () {
 			var node = that.getNode();
 			if (node) {
-				node.innerHTML = 'Impossibile connettersi con il server, riprovare piu tardi.';
+				node.innerHTML = 'Impossibile connettersi con il server, riprovare più tardi.';
 				if(!that.options.hideEmpty || that.options.hideEmpty === true)
-					jQuery(node).show();
-				else 
-					jQuery(node).closest("." + that.options.hideEmpty).show();
-
+                    jQuery(node).show();
+                else if(that.options.hideEmpty == "all")
+                    jQuery(node).closest("DIV.actex").css("opacity", "");
+                else 
+                    jQuery(node).closest(that.options.hideEmpty).show();
 
 				if (that.childs.length) {
 					that.childs.each(function (a, child) {
@@ -746,9 +776,11 @@ var activecombo = function(params) {
 				jQuery(node).next(".actex-actions").children("i:first").remove();
 			if(that.options.hideEmpty && !retData.length) {
 				if(that.options.hideEmpty === true)
-					jQuery(node).hide();
-				else 
-					jQuery(node).closest("." + that.options.hideEmpty).hide();
+                    jQuery(node).hide();
+                else if(that.options.hideEmpty == "all")
+                    jQuery(node).closest("DIV.actex").css("opacity", "0");
+                else 
+                    jQuery(node).closest(that.options.hideEmpty).hide();
 			}
 
 			if (found_value === false)
@@ -782,9 +814,9 @@ var activecombo = function(params) {
 			var fValue = father_value || "null";
 			var id_data_src = that.getCacheDataSrc();
 
-			if (sources.isset(id_data_src) !== undefined && sources.get(id_data_src).isset(fValue) !== undefined) {
+			if (sources.isset(id_data_src) && sources.get(id_data_src).isset(fValue)) {
 				if (sources.get(id_data_src).get(fValue) === true) {
-					if (controls_waiting.isset(id_data_src) === undefined)
+					if (!controls_waiting.isset(id_data_src))
 						controls_waiting.set(id_data_src, ff.hash());
 					controls_waiting.get(id_data_src).set(ff.getUniqueID(), {"id" : __id, "selected_value" : selected_value, "father_value" : father_value});
 					return;
@@ -794,7 +826,7 @@ var activecombo = function(params) {
 				return;
 			}
 
-			if (sources.isset(id_data_src) === undefined)
+			if (!sources.isset(id_data_src))
 				sources.set(id_data_src, ff.hash());
 
 			sources.get(id_data_src).set(fValue, true);
@@ -802,7 +834,8 @@ var activecombo = function(params) {
 		
 		cascade_disable(true);  /* disable fathers*/
 		cascade_disable(false); /* disable childs*/
-
+		
+		var url = ff.fixPath(that.getService());
 		var dataType = (ff.origin != ff.httpGetOrigin() ? "jsonp json" : "json");
 		var mydata = {
 			"selected_value" : selected_value
@@ -812,7 +845,7 @@ var activecombo = function(params) {
 		};
 
 		jQuery.ajax({
-			  url		: ff.fixPath(that.getService())
+			  url		: url
 			, async		: true
 			, data		: str_data
 			, type		: "GET"
@@ -839,7 +872,9 @@ var activecombo = function(params) {
             ? id_data_src
             : ""
         );        
-		
+		if(!that.options.data_src)
+			console.log("non dovrebbe essere vuoto. da verificare");
+
 		if (!(retData.widget && retData.widget.actex && retData.widget.actex["D" + id_source]))
 			return async_error();
 			
@@ -850,7 +885,7 @@ var activecombo = function(params) {
 		
 		if (that.options.use_cache) {
 			sources.get(id_data_src).set(fValue, retData);
-			if (controls_waiting.isset(id_data_src) !== undefined) 
+			if (controls_waiting.isset(id_data_src)) 
 				controls_waiting.get(id_data_src).each(function (k, v) {
 				var tmp = ff.ffField.actex.getInstance(v.id);
 				if (v.father_value === father_value) {
@@ -929,9 +964,11 @@ var activecombo = function(params) {
 		if(loading_markup)
 			jQuery(node).next(".actex-actions").prepend(loading_markup);
 		if(!that.options.hideEmpty || that.options.hideEmpty === true)
-			jQuery(node).show();
-		else 
-			jQuery(node).closest("." + that.options.hideEmpty).show();
+            jQuery(node).show();
+        else if(that.options.hideEmpty == "all")
+            jQuery(node).closest("DIV.actex").css("opacity", "1");
+        else 
+            jQuery(node).closest(that.options.hideEmpty).show();
 
 	};
 
@@ -1221,7 +1258,7 @@ var activecombo = function(params) {
 			buffer = '<select';
 			buffer += ' class="' + (that.options.class.length ? that.options.class + ' ' : '') + 'select"';
 			buffer += ' name="' + __id + '" id="' + __id + '" ' + that.options.properties;
-			buffer += ' onChange="ff.ffField.actex.change(\'' + __id +'\');" >';
+			buffer += ' onChange="ff.ffField.actex.change(\'' + __id +'\', ' + that.options.reset_childs + ');" >';
 
 			if (that.options.select_one) {
 				buffer += '<option value="' + that.options.select_one_val + '"';
@@ -1281,12 +1318,15 @@ __ff : true, /* used to recognize ff'objects*/
 	return that;
 },
 
-"getInstance" : function (id) {
+"getInstance" : function (id, avoid_undef) {
 	var tmp = instances.get(id);
-	if (tmp === undefined)
+	if (tmp === undefined && !avoid_undef)
 		throw "ff.ffField.actex - instance does not exists [" + id + "]";
 	
 	return tmp;
+},
+"debug" : function () {
+	return instances;
 },
 
 "exists" : function (id) {
@@ -1300,7 +1340,7 @@ __ff : true, /* used to recognize ff'objects*/
 	var inst = that.getInstance(id);
 	var id_data_src = inst.getCacheDataSrc();
 	
-	if (sources.isset(id_data_src) === undefined)
+	if (!sources.isset(id_data_src))
 		return;
 			
 	var father_value = inst.getFatherValue();
@@ -1308,17 +1348,18 @@ __ff : true, /* used to recognize ff'objects*/
 },
 
 "factory" : function (params) {
-	if (!that.exists(params.id)) {
-		var tmp = activecombo(params);
-		instances.set(params.id, tmp);
+	if (that.exists(params.id))
+		return;
 
-		that.doEvent({
-			"event_name"	: "factory",
-			"event_params"	: [tmp]
-		});
-		
-		return tmp;
-	}
+	var tmp = activecombo(params);
+	instances.set(params.id, tmp);
+
+	that.doEvent({
+		"event_name"	: "factory",
+		"event_params"	: [tmp]
+	});
+	
+	return tmp;
 },
 
 "deleteCombo" : function (id) {
@@ -1330,7 +1371,7 @@ __ff : true, /* used to recognize ff'objects*/
 },
 
 "change" : function (id, reset_childs) {
-	that.getInstance(id).change(reset_childs);
+	return that.getInstance(id).change(reset_childs);
 },
 
 "update" : function (id, new_value, reset_childs) {
@@ -1348,23 +1389,13 @@ __ff : true, /* used to recognize ff'objects*/
 "refill" : function (id, selected_value, father_value, force_refresh) {
 	that.getInstance(id).refill(selected_value, father_value, force_refresh);
 },
-"onClearField" : function (component, key, field) {
-	if (field.widget == "actex") {
-		if (component !== undefined) {
-			switch (ff.struct.get(component).type) {
-				case "ffDetails":
-					var rows = parseInt(jQuery.fn.escapeGet(component + "_rows").val());
-					for (var i = 0; i < rows; i++) {
-						ff.ffField.actex.deleteCombo(component + "_recordset[" + i + "][" + key + "]");
-					}
-					break;
 
-				default:
-					ff.ffField.actex.deleteCombo(component + "_" + key);
-			}
-		} else {
-			ff.ffField.actex.deleteCombo(key);
-		}
+"onClearField" : function (component, field_id, field_data, inst_id) {
+	if (field_data.widget !== "actex")
+		return;
+
+	if (that.exists(inst_id)) {
+		ff.ffField.actex.deleteCombo(inst_id);
 	}
 },
 
@@ -1400,21 +1431,23 @@ __ff : true, /* used to recognize ff'objects*/
 		return;
 
 	if (component !== undefined) {
-		switch (ff.struct.get(component).type) {
+		switch (ff.struct.get("comps").get(component).type) {
 			case "ffDetails":
 				var rows = parseInt(jQuery.fn.escapeGet(component + "_rows").val());
 				for (var r = 0; r < rows; r++) {
-					ajaxUpdate(component + "_recordset[" + r + "][" + key + "]", retData);
+					var tmp_id = component + "_recordset[" + r + "][" + key + "]";
+					if (that.exists(tmp_id)) ajaxUpdate(tmp_id, retData);
 				}
 				break;
 
 			default:
-				ajaxUpdate(component + "_" + key, retData);
+				if (that.exists(component + "_" + key)) ajaxUpdate(component + "_" + key, retData);
 		} 
 	} else {
-		ajaxUpdate(key, retData);
+		if (that.exists(key)) ajaxUpdate(key, retData);
 	}
 }
+
 }; /* publics' end*/
 
 /* privates */

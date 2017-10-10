@@ -21,7 +21,7 @@ ff.ffField.kcfinder = (function () {
             this.tmpname            = params.tmpname;
             this.sufdel            	= params.sufdel;
 
-			this.basePath			= ff.site_path + basePath;
+			this.basePath			= ff.base_path + basePath;
 			this.baseUrl			= params.baseUrl;
 			this.previewJs			= params.previewJs;
 			this.viewUrl			= params.viewUrl;
@@ -32,7 +32,6 @@ ff.ffField.kcfinder = (function () {
 			this.modelThumb			= params.modelThumb;
 			this.showFile			= params.showFile;
 			this.aviary				= params.aviary;
-            this.icons                = params.icons;
 		},
 		"openKCFinder" : function (urlSelect, field) {
 			var field = document.getElementById(field);
@@ -80,7 +79,6 @@ ff.ffField.kcfinder = (function () {
 		"setFileField" : function ( fileUrl, field ) {
 			var showFile = this.showFile;
 			var aviary = this.aviary;
-            var icons = this.icons;
 			var previewJs = this.previewJs;
 
 			var previewBlock = '';
@@ -145,9 +143,9 @@ ff.ffField.kcfinder = (function () {
 					descBlock = '<span class="file_name">' + strResponse + ' ' + byteSize + suffix + '' + '</span>';
 
 				if(aviary)
-					editBlock = '<div class="edit"><a href="javascript:void(0);" alt="modify" class="' + icons["aviary"] + '" onclick="ff.pluginLoad(\'ff.ffField.aviary\', \'/themes/restricted/ff/ffField/widgets/aviary/aviary.js\', function() { ff.ffField.aviary.launch(\'' + aviary.key + '\', \'' + aviary.tools + '\', \'' + aviary.theme + '\', \'' + aviary.version + '\', \'' + aviary.post_url + '\', \'' + aviary.img_hash + '\', \'' + field.id + '_img' + '\', \'' + viewFullUrl + '\', \'' + fileUrl.replace(ff.site_path + this.baseUrl, "") + '\'); });"></a></div>';
+					editBlock = '<div class="edit"><a href="javascript:void(0);" alt="modify" class="edit-file" onclick="ff.load(\'ff.ffField.aviary\', function() { ff.ffField.aviary.launch(\'' + aviary.key + '\', \'' + aviary.tools + '\', \'' + aviary.theme + '\', \'' + aviary.version + '\', \'' + aviary.post_url + '\', \'' + aviary.img_hash + '\', \'' + field.id + '_img' + '\', \'' + viewFullUrl + '\', \'' + fileUrl.replace(ff.site_path + this.baseUrl, "") + '\'); });"></a></div>';
 
-				cancelBlock = '<div class="cancel"><a href="javascript:ff.ffField.uploadifive.del(\'' + component + '\');" alt="delete" class="' + icons["cancel"] + '"></a></div>';
+				cancelBlock = '<div class="cancel"><a href="javascript:ff.ffField.uploadifive.del(\'' + component + '\');" alt="delete" class="del-file"></a></div>';
 
 		        if(model == "vertical") {
 	                jQuery("#uploadifive_" + idComponent).html('<span class="top">' + previewBlock + editBlock + cancelBlock + '</span>' + descBlock);

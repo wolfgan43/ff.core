@@ -1,12 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.pluginLoad("ff.ffField.kcfinder", "{widget_path}/kcfinder.js");
-	//ff.pluginLoad("ff.lib.kcfinder", "/themes/library/kcfinder/kcfinder.js", function () {
-		
-	//});
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -27,18 +19,14 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 			model			: '{type_model}', 
 			modelThumb		: '{thumb_model}',
 			showFile		: {show_file},
-            aviary            : {aviary},
-            icons           : {
-                                "cancel" : "{cancel_class}",
-                                "aviary" : "{aviary_class}"
-                            }
+            aviary			: {aviary}
 		});
 	});
 </script>
 <!--EndSectFooters-->
 
 <!--BeginSectControl-->
-<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{browse_class}" onclick="ff.ffField.kcfinder.openKCFinder('/{resource_type}{base_url_kc}', '{container}{id}' );"></a>
+<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{class}" onclick="ff.ffField.kcfinder.openKCFinder('/{resource_type}{base_url_kc}', '{container}{id}' );"><img src="{site_path}/themes/{theme}/images/widgets/kcfinder/browse.png" alt="ShowKcFinder" /></a>
 <!--BeginSectPreview-->
 <a href="{view_url}{view_query_string}" rel="{show_file}" target="_blank">
 	<img id="{container}{id}_img" src="{preview_url}{preview_query_string}" />

@@ -98,7 +98,7 @@ __ff : true, /* used to recognize ff'objects*/
 	cache[ control ] = {};
 
     if(enableMulti) {
-    	ff.pluginLoad("jquery.fn.autogrow", "/themes/library/plugins/jquery.autogrow-textarea/jquery.autogrow-textarea.js", function() {
+    	ff.load("jquery.plugins.autogrow-textarea", function() {
     		jQuery("#" + prefix + control).autogrow();
     	});
 	}        
@@ -179,7 +179,6 @@ __ff : true, /* used to recognize ff'objects*/
 	       /* if(jQuery("#" + control).attr("data-user")) {
 	        	jQuery("#" + control).val(jQuery("#" + control).attr("data-user"));
 	        }*/
-	        
 	        if(enableMulti) {
 				jQuery("#" + prefix + control).val( ff.ffField.autocomplete.recalc( jQuery("#" + prefix + control).val()) );
 			}
@@ -246,7 +245,7 @@ __ff : true, /* used to recognize ff'objects*/
                 else
                 	realInnerUrl = innerURL;
 
-				var str_data = "type=autocomplete";
+                var str_data = "type=autocomplete";
                 if (params.data_src)
                     str_data += "&data_src=" + escape(params.data_src);
                 /*if (params.compare)

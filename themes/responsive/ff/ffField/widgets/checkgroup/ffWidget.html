@@ -1,9 +1,4 @@
 <!--BeginSectHeaders-->	
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.pluginLoad("ff.ffField.checkgroup", "{widget_path}/checkgroup.js");
-});
-</script>
 <!--EndSectHeaders-->
 
 <!--BeginSectFooters-->
@@ -24,8 +19,8 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 <input type="hidden" id="{container}{id}" name="{container}{id}" value="{value}" />
 <!--BeginSectRow-->
 <div class="{class}">
-    <input type="checkbox" id="{container}{id}_{index}" class="{control_class}" value="{element_value}" {checked} {properties} />
-    <label>{label}</label>
+	<input type="checkbox" id="{container}{id}_{index}" class="{control_class}" value="{element_value}" {checked} {properties} />
+    <label for="{container}{id}_{index}">{label}</label>
 </div>
 <!--EndSectRow-->
 <!--EndSectControl--> 

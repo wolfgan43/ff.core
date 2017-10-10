@@ -67,7 +67,6 @@
 .jcarousel-direction-rtl .jcarousel-next-horizontal {
     left: 5px;
     right: auto;
-    background-image: url(prev-horizontal.png);
 }
 
 .jcarousel-next-horizontal:hover {

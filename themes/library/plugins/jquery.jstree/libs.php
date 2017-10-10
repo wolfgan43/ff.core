@@ -7,7 +7,7 @@ return array(
 					"empty" => true,
 					"js_defs" => array(
 						"jstree" => array(
-							"path" => FF_THEME_DIR . "/library/plugins/jquery.jstree",
+							"path" => FF_THEME_DIR . "/themes/library/plugins/jquery.jstree",
 							"file" => "jquery.jstree.js"
 							/*, "css_loads" => array(
 								".style" => array(

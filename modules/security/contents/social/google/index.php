@@ -1,14 +1,25 @@
 <?php
+/*if (FF_ENV === FF_ENV_DEVELOPMENT)
+{
+	if (mod_security_check_session(false))
+		ffRedirect("");
+	else
+		ffRedirect(MOD_SEC_SOCIAL_GOOGLE_CLIENT_REDIR_URI);
+}*/
+
 $cm->oPage->layer = "empty";
+
+$mod_sec_login = $cm->router->getRuleById("mod_sec_login");
 
 if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)
 {
-	if ($filename === null)
+    $filename = cm_cascadeFindTemplate("/contents/social/logged.html", "security");
+	/*if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
+		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);*/
 
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");

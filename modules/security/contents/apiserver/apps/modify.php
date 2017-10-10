@@ -61,7 +61,7 @@ $obj->addEvent("on_done_action", function ($obj, $action) {
 	{
 		if (
 				$obj->form_fields["scope"]->value->getValue() !== $obj->form_fields["scope"]->value_ori->getValue()
-				|| $obj->form_fields["redirect_uri"]->value->getValue() !== $obj->form_fields["redirect_uri"]->value_ori->getValue()
+				|| isset($obj->form_fields["redirect_uri"]) && $obj->form_fields["redirect_uri"]->value->getValue() !== $obj->form_fields["redirect_uri"]->value_ori->getValue()
 			)
 		{
 			$db = ffDB_Sql::factory();
@@ -133,7 +133,7 @@ if (isset($_REQUEST["keys"]["client_id"]))
 	$field->control_type = "label";
 	//$field->default_value = new ffData(sha1(uniqid(time(), true)));
 	$field->store_in_db = false;
-	$field->fixed_post_content .= "<a href='javascript:void(0);' onclick='ff.modules.security.oauth2.refreshSecret(\"" . rawurlencode($_REQUEST["keys"]["client_id"]) . "\")'>" . ffTheme_restricted_icon("NewIcon_refresh") . "</a>";
+	$field->fixed_post_content .= "<a href='javascript:void(0);' onclick='ff.modules.security.oauth2.refreshSecret(\"" . rawurlencode($_REQUEST["keys"]["client_id"]) . "\")'>" . ffTheme_restricted_icon("NewIcon_refresh") . "</a>"; 
 	$field->fixed_post_content .= "&nbsp;<a href='javascript:void(0);' onclick='ff.modules.security.oauth2.emptySecret(\"" . rawurlencode($_REQUEST["keys"]["client_id"]) . "\")'>" . ffTheme_restricted_icon("NewIcon_delete") . "</a>";
 	$obj->addContent($field);
 }
@@ -168,7 +168,7 @@ $obj->addContent($field);
 $field = ffField::factory($cm->oPage);
 $field->id = "scope";
 $field->label = "Scope";
-$field->required = true;
+//$field->required = true;
 $field->extended_type = "Selection";
 $field->source_SQL = "SELECT `scope`, `scope` FROM `oauth_scopes`";
 //$field->source_SQL = "SELECT `scope`, CONCAT(`scope`, ' - ', `description`) FROM `oauth_scopes`";

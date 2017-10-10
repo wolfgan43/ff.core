@@ -69,18 +69,15 @@ define("FF_ERROR_HANDLER_HIDE", true);
 require_once($disk_path . "/cm/main.php");
 
 error_reporting(E_ALL ^ E_NOTICE);
-
 //da cambiare senno esplode l'activecombo
 if(!defined("MOD_SECURITY_SESSION_STARTED")) { 
-	mod_security_check_session();  
-
+	mod_security_check_session();
 	//session_name("ckf_" . session_name());
 /*	if (!mod_security_check_session(false)) {
 		mod_security_create_session(MOD_SEC_GUEST_USER_NAME, MOD_SEC_GUEST_USER_ID);
 	}
 */
 }
-
 $user_permission = get_session("user_permission");
 $user_path = urldecode($_REQUEST["path_info"]);
 

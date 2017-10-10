@@ -41,6 +41,11 @@ define("FF_ERROR_HANDLER_HIDE", true);
 
 require_once($disk_path . "/cm/main.php");
 
+$referer = str_replace($_SERVER["HTTP_ORIGIN"] . FF_SITE_PATH, "", $_SERVER["HTTP_REFERER"]);
+$arrReferer = explode("/", $referer);
+if($arrReferer[1] == "domains")
+    $domain_path = "/domains/" . $arrReferer[2];
+
 $valid_session = false;
 if (isset($_POST[session_name()]))
 {
@@ -77,22 +82,22 @@ if($valid_session)
 	else
 	{
 		$folder = $_REQUEST['folder'];
-		$base_path = FF_DISK_PATH . FF_UPDIR;
+		$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
 	}
 }
 else
 {
 	$folder = $_REQUEST['folder'];
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
 }
 
 if(strpos($folder, FF_UPDIR) === 0)
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
 elseif(strpos($folder, FF_THEME_DIR) === 0)
-	$base_path = FF_DISK_PATH . FF_THEME_DIR;
+	$base_path = ff_getAbsDir(FF_THEME_DIR) . $domain_path . FF_THEME_DIR;
 
 if(!strlen($base_path))
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
 
 if(!function_exists("ffGetFilename")) {
 	function ffGetFilename($path, $return_name = true)
@@ -131,7 +136,7 @@ if(!empty($_FILES))
     
 	if(strlen($fileExt)) 
 	{
-		$arrFileExt = explode("|", $fileExt);
+		$arrFileExt = explode(",", $fileExt);
 		if(is_array($arrFileExt) && count($arrFileExt)) 
 		{
 			foreach($arrFileExt AS $arrFileExt_value) 
@@ -177,7 +182,7 @@ if(!empty($_FILES))
 			if(!is_dir(ffCommon_dirname($targetFile)))
 				@mkdir(ffCommon_dirname($targetFile), 0777, true);
 
-		    if($fileNormalize || (function_exists("check_function") && check_function("check_fs") && function_exists("check_fs")))
+		    if($fileNormalize /*|| (function_exists("check_function") && check_function("check_fs") && function_exists("check_fs"))*/)
 			{
         		//check_fs($targetFile, str_replace($base_path, "", $targetFile), false);
 				$real_file = ffCommon_url_rewrite(ffGetFilename($targetFile))
@@ -257,4 +262,3 @@ if (!empty($_FILES) && $_POST['token'] == $verifyToken) {
 	}
 }
 */
-?>

@@ -1,41 +1,87 @@
 <?php
+//////////////////////////////////////////////////////////////////////////////////////
+// INITS
+//////////////////////////////////////////////////////////////////////////////////////
 $options = mod_security_get_settings($cm->path_info);
+
 $cm->oPage->form_method = "post";
 
 if(MOD_SEC_LOGIN_FORCE_LAYER)
-    $cm->oPage->layer = MOD_SEC_LOGIN_FORCE_LAYER; 
-
-$mod_sec_login = $cm->router->getRuleById("mod_sec_login");
-
-if(basename($cm->path_info . $cm->real_path_info) != "login") {
-    ffRedirect($mod_sec_login->reverse);
-}
-
-$ret_url        = ($_REQUEST["ret_url"]
-                    ? $_REQUEST["ret_url"]
-                    : $_SERVER["HTTP_REFERER"]
-                );
-
-$res = $cm->modules["security"]["events"]->doEvent("on_before_login", array($ret_url));
-$rc = end($res);
-if ($rc !== null) 
+    $cm->oPage->layer = MOD_SEC_LOGIN_FORCE_LAYER;
+else if (ffIsset($cm->modules, "restricted"))
 {
-    $ret_url = $rc;
-} else {
-    if (!strlen($ret_url) || strpos($ret_url, $mod_sec_login->reverse) !== false)
-        $ret_url = rtrim(FF_SITE_PATH, "/") . "/";    
+	if (ffIsset($cm->modules["restricted"], "layout_bypath") && is_array($cm->modules["restricted"]["layout_bypath"]))
+	{
+		$max_level = 0;
+		$found = false;
+		foreach ($cm->modules["restricted"]["layout_bypath"] as $path => $path_opts)
+		{
+			if (strpos($cm->path_info . "/", $path . "/") === 0)
+			{
+				$tmp_level = substr_count($path, "/");
+				if ($tmp_level > $max_level)
+				{
+					$max_level = $tmp_level;
+					$found = $path_opts;
+				}
+			}
+		}
+		
+		if ($found !== false)
+		{
+			if (ffIsset($found, "layer"))
+				$cm->oPage->layer = (string)$found["layer"];
+			else
+				$cm->oPage->layer = "default";
+		}
+		else
+		{
+			$cm->oPage->layer = "default";
+		}
+	}
 }
+else
+	$cm->oPage->layer = "default";
 
-$cm->oPage->ret_url = $ret_url;
+$tiny_lang_code = strtolower(substr(FF_LOCALE, 0, 2));
+//$mod_sec_login = $cm->router->getRuleById("mod_sec_login");
+
+$mod_sec_recover = ($cm->router->getRuleById("mod_sec_recover_" . $tiny_lang_code) 
+						? $cm->router->getRuleById("mod_sec_recover_" . $tiny_lang_code)
+						: $cm->router->getRuleById("mod_sec_recover")
+					);
+$mod_sec_recover_username = ($cm->router->getRuleById("mod_sec_recover_username_" . $tiny_lang_code) 
+								? $cm->router->getRuleById("mod_sec_recover_username_" . $tiny_lang_code)
+								: $cm->router->getRuleById("mod_sec_recover_username")
+							);
+$mod_sec_register = ($cm->router->getRuleById("mod_sec_register_" . $tiny_lang_code) 
+						? $cm->router->getRuleById("mod_sec_register_" . $tiny_lang_code)
+						: $cm->router->getRuleById("mod_sec_register")
+					);
+
+$social_enabled = (MOD_SEC_SOCIAL_GOOGLE || MOD_SEC_SOCIAL_FACEBOOK || MOD_SEC_SOCIAL_JANRAIN);
 
 $sError = "";
-$frmAction 	= strtolower($_REQUEST["frmAction"]);
-$domain 	= $_REQUEST["domain"];
-$username 	= $_REQUEST["username"];
-$permanent_session = $_REQUEST["stayconnected"];
-$password 	= $_REQUEST["password"];
+$sErrorCode = null;
 if (strlen($_REQUEST["sError"]))
 	$sError = strip_tags($_REQUEST["sError"]);
+
+$frmAction = strtolower($_REQUEST["frmAction"]);
+
+$req["username"] = $_REQUEST["username"];
+$req["password"] = $_REQUEST["password"];
+$req["permanent_session"] = $_REQUEST["stayconnected"]; // TOCHECK: troppo semplcistico, vedi common.php
+
+if (MOD_SEC_MULTIDOMAIN && MOD_SEC_LOGIN_DOMAIN)
+{
+	$req["domain"] = $_POST["domain"];
+	if ($frmAction == "" && $req["domain"] == "")
+		$req["domain"] = $_COOKIE["domain"];
+}
+else
+{
+	$req["domain"] = null;
+}
 
 $ID_domain = null;
 $logged = mod_security_check_session(false);
@@ -50,56 +96,67 @@ if ($logged)
 	}
 }
 /*
-$fixed_ret_url = $_REQUEST["ret_url"];
-if (!strlen($fixed_ret_url))
-	$fixed_ret_url = $cm->oPage->site_path . "/";
-$cm->oPage->ret_url = $fixed_ret_url;*/
+$ret_url        = ($_REQUEST["ret_url"]
+                    ? $_REQUEST["ret_url"]
+                    : $_SERVER["HTTP_REFERER"]
+                );*/
 
-$cm->modules["security"]["events"]->doEvent("on_retrieve_params", array(&$sError, &$frmAction, &$logged));
+$ret_url = $_REQUEST["ret_url"];
+
+$res = $cm->modules["security"]["events"]->doEvent("on_before_login", array($ret_url, $frmAction));
+$rc = end($res);
+if ($rc !== null) 
+{
+    $ret_url = $rc;
+} else {
+    if (!strlen($ret_url)/* || strpos($ret_url, $mod_sec_login->reverse) !== false*/)
+        $ret_url = FF_SITE_PATH . "/";    
+}
+
+if(!$ret_url)
+    $ret_url = FF_SITE_PATH . "/";    
+
+$cm->oPage->ret_url = $ret_url;
 
 
+$res = $cm->modules["security"]["events"]->doEvent("on_retrieve_params", array(&$sError, &$frmAction, &$logged, $req));
+$rc = end($res);
+if ($rc !== null)
+{
+	if ($rc)
+		return;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // ACTIONS
 //////////////////////////////////////////////////////////////////////////////////////
+
 switch($frmAction)
 {
 	case "login":
-		$ret =	mod_sec_check_login($username, $password, $domain, $options, $permanent_session, $logged, $sError, false);
-		if($ret["error"])
+		$ret =	mod_sec_check_login($req["username"], $req["password"], $req["domain"], $options, $req["permanent_session"], $logged, $sError, false);
+		if ($ret["logged"] === true)
 		{
 			$cm->jsonAddResponse(array(
-				"success" => false 
-				 , "modules" => array(
-					"security" => array(
-						"action" => "login"
-						, "error" => _modsec_process("error", $ret["error"])
+					"modules" => array(
+						"security" => array(
+							"action" => "login"
+						)
 					)
-				)
-			));		
-		} elseif ($ret["logged"] === true)
-		{
-			$cm->jsonAddResponse(array(
-				"modules" => array(
-					"security" => array(
-						"action" => "login"
-						, "message" => _modsec_process("logout", true, false)
-					)
-				)
-				, "doredirects" => true
-				, "url" => $cm->oPage->ret_url			
-			));
+				));
+			return _modsec_login_redirect($cm->oPage->ret_url, "login");
 		}
 		
-		return _modsec_login_redirect(null, "login");
-		/*$sError			= $ret["error"];
+		$sError			= $ret["error"];
+		$sErrorCode		= $ret["error_code"];
 		$logged			= $ret["logged"];
 		$userID			= $ret["UserID"];
 		$userNID		= $ret["UserNID"];
 		$domain			= $ret["domain"];
 		$ID_domain		= $ret["ID_domain"];
-		$cookiehash		= $ret["cookiehash"];*/
-		//break;
+		$cookiehash		= $ret["cookiehash"];
+		break;
+		
 	case "logout":
 		if(MOD_SEC_ENABLE_TOKEN && $social_enabled)
 		{
@@ -116,6 +173,7 @@ switch($frmAction)
 		}
 		// DISTRUGGE LA SESSIONE
 		mod_security_destroy_session(false);
+		$logged = false;
 
 		$cm->jsonAddResponse(array(
 				"modules" => array(
@@ -123,384 +181,181 @@ switch($frmAction)
 						"action" => "logout"
 					)
 				)
-				, "doredirects" => true
-				, "url" => $cm->oPage->ret_url		
 			));
-
 		return _modsec_login_redirect($cm->oPage->ret_url, "logout");
 	
 	case "cancellogout":
 		return _modsec_login_redirect($cm->oPage->ret_url, "cancellogout");
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT
 //////////////////////////////////////////////////////////////////////////////////////
-/*$user_state = ($logged ? "logout" : "login");
-if ($cm->isXHR() && $frmAction)
+$template_file = mod_sec_login_getTemplate($logged);
+
+$res = $cm->modules["security"]["events"]->doEvent("onOutput", array($logged, &$sErrorCode, &$sError, &$template_file));
+$rc = end($res);
+if ($rc !== null)
 {
-	$cm->jsonAddResponse(array(
-			"modules" => array(
-				"security" => array(
-					"action" => $user_state
-				)
-			)
-		));
+	if ($rc)
+		return;
+}
+$tpl = mod_sec_login_tpl_load($logged, $template_file);
+$cm->oPage->addContent($tpl, null, "login");
 
-	if($sError)
-		$cm->jsonAddResponse(array(
-			"success" => false 
-			, "modules" => array(
-				"security" => array(
-					"error" => _modsec_process("error", $sError)
-				)
-			)
-		));
-	else if($logged) 
-		$cm->jsonAddResponse(array(
-			"modules" => array(
-				"security" => array(
-					"message" => _modsec_process("logout", true, false)
-				)
-			)
-			, "doredirects" => true
-			, "url" => $ret_url			
-		));
-	
-	_modsec_login_redirect($ret_url); 
-} else {
-	$cm->oPage->addContent(_modsec_process($user_state, $sError), null, $user_state);
-}*/
+if(MOD_SEC_CSS_PATH !== false && isset($cm->router->matched_rules["mod_sec_login"]))
+{
 
-$user_state = ($logged ? "logout" : "login");
-$cm->oPage->addContent(_modsec_process($user_state, $sError), null, $user_state);
-	
-		
-function _modsec_process($action, $sError = null, $logo = MOD_SEC_LOGO) {
-	$cm = cm::getInstance();
+	if(MOD_SEC_CSS_PATH)
+		$filename = MOD_SEC_CSS_PATH;
+	else
+        $filename = cm_cascadeFindTemplate("/css/ff.modules.security.css", "security");
+		//$filename = cm_moduleCascadeFindTemplateByPath("security", "/css/ff.modules.security.css", $cm->oPage->theme);
 
-	switch($action) {
-		case "login":
-			$template_file = "login.html";
-			break;
-		case "logout":
-			$template_file = "logout.html";
-			break;
-		case "error":
-			$res = _modsec_process_error($sError);
-			break;
-		default:
-	
-	}
-	
-	if($template_file) 
-	{
-		$framework_css = mod_sec_get_framework_css();
-	
-		$filename = null;
-		if ($filename === null)
-			$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/" . $template_file, $cm->oPage->theme, false);
-		if ($filename === null)
-			$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/login/" . $template_file, $cm->oPage->theme, false);
-		if ($filename === null)
-			$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/login/" . $template_file, $cm->oPage->theme);
-
-		$tpl = ffTemplate::factory(ffCommon_dirname($filename));
-		$tpl->load_file(basename($filename), "main");
-
-		$tpl->set_var("site_path", FF_SITE_PATH);
-		$tpl->set_var("theme", $cm->oPage->theme);
-		$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
-
-		$cm->preloadApplets($tpl);
-		$cm->parseApplets($tpl);
-
-		$cm->modules["security"]["events"]->doEvent("onTplLoad", array(&$tpl));
-
-		$tpl->set_var("ret_url",			$cm->oPage->ret_url);
-		$tpl->set_var("encoded_ret_url",	rawurlencode($cm->oPage->ret_url));
-		$tpl->set_var("encoded_this_url",	rawurlencode($cm->oPage->getRequestUri()));
-		$tpl->set_var("query_string",		$_SERVER["QUERY_STRING"]);
-		$tpl->set_var("path_info",			$_SERVER["PATH_INFO"]);
-		$tpl->set_var("app_title",			ffCommon_specialchars(CM_LOCAL_APP_NAME));
-
-		if($cm->oPage->layer == "empty" && ! $cm->isXHR()) {
-			$framework_css["component"]["class"] = trim(str_replace("nopadding", "", $framework_css["component"]["class"]));
-			$framework_css["component"]["grid"] = "row";
-		}
-
-		if(!$logo) {  
-			$framework_css["login"]["def"]["col"] = array( 
-								                    "xs" => 12
-								                    , "sm" => 12
-								                    , "md" => 12
-								                    , "lg" => 12
-								                ) ;
-			unset($framework_css["login"]["def"]["push"]);
-			$framework_css["logout"]["def"]["col"] = array( 
-														"xs" => 12
-														, "sm" => 12
-														, "md" => 12
-														, "lg" => 12
-													) ;
-			unset($framework_css["logout"]["def"]["push"]);
-			$framework_css["inner-wrap"]["col"] = array( 
-													"xs" => 12
-													, "sm" => 12
-													, "md" => 6
-													, "lg" => 6 
-												);
-			$framework_css["inner-wrap"]["push"] = array( 
-													"xs" => 0
-													, "sm" => 0
-													, "md" => 3
-													, "lg" => 3 
-												);
-		}
-
-		/**
-		* Container Class
-		*/
-		
-		$component_class["base"] = $framework_css["component"]["class"];
-		if($framework_css["component"]["grid"]) {
-		    if(is_array($framework_css["component"]["grid"]))
-		        $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
-		    else {
-		        $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
-		    }
-		}   
-
-		
-		if($action == "login")
-			$component_class = _modsec_process_login($tpl, $sError, $component_class, $framework_css);
-		elseif($action == "logout")
-			$component_class = _modsec_process_logout($tpl, $sError, $component_class, $framework_css);
-
-		if($logo) {
-		    if(MOD_SEC_LOGO_PATH === false) {
-		        $tpl->set_var("SectLogoImg" . $logo, "");
-		    } else {
-		        if(is_file(FF_DISK_PATH . MOD_SEC_LOGO_PATH))
-		            $logo_url = MOD_SEC_LOGO_PATH;
-		        elseif(is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo-login.png")) 
-		            $logo_url = FF_THEME_DIR . "/" . $cm->oPage->getTheme() . "/images/logo-login.png";
-		        elseif(is_file(FF_THEME_DISK_PATH . "/" . cm_getMainTheme() . "/images/logo-login.gif"))
-		            $logo_url = FF_THEME_DIR . "/" . cm_getMainTheme() . "/images/logo-login.gif";
-
-		        $tpl->set_var("logo_login", FF_SITE_PATH . $logo_url);
-		        $tpl->parse("SectLogoImg" . $logo, false);
-		    }
-		    $tpl->set_var("logo_class", cm_getClassByDef($framework_css["logo"]));
-		    $tpl->parse("SectLogo" . $logo, false);
-		}
-
-		$tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-		$tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
-		
-		$res =  $tpl->rpparse("main", false);
-	}
-	return $res;
+	$ret = cm_moduleGetCascadeAttrs($filename);
+	$cm->oPage->tplAddCSS("ff.modules.security.css", array(
+		"file" => $filename
+		, "path" => $ret["path"]
+		, "priority" => cm::LAYOUT_PRIORITY_HIGH
+		, "index" => 100
+	));
 }
 
-function _modsec_process_login(&$tpl, $sError = null, $component_class = null, $framework_css = null) 
+$res = $cm->modules["security"]["events"]->doEvent("onTplLoad", array(&$tpl, $logged, &$sErrorCode, &$sError));
+$rc = end($res);
+if ($rc !== null)
 {
-	$cm = cm::getInstance();
-	$count_links = 0;
-	if(!$framework_css)
-		$framework_css = mod_sec_get_framework_css();
+	if ($rc)
+		return;
+}
 
-	$tiny_lang_code = strtolower(substr(FF_LOCALE, 0, 2));
-	$mod_sec_recover = ($cm->router->getRuleById("mod_sec_recover_" . $tiny_lang_code)
-	                        ? $cm->router->getRuleById("mod_sec_recover_" . $tiny_lang_code)
-	                        : $cm->router->getRuleById("mod_sec_recover")
-	                    );
-	$mod_sec_recover_username = ($cm->router->getRuleById("mod_sec_recover_username_" . $tiny_lang_code) 
-	                                ? $cm->router->getRuleById("mod_sec_recover_username_" . $tiny_lang_code)
-	                                : $cm->router->getRuleById("mod_sec_recover_username")
-	                            );
-	$mod_sec_register = ($cm->router->getRuleById("mod_sec_register_" . $tiny_lang_code) 
-	                        ? $cm->router->getRuleById("mod_sec_register_" . $tiny_lang_code)
-	                        : $cm->router->getRuleById("mod_sec_register")
-	                    );
-	$mod_sec_social_url = (string)$cm->router->getRuleById("mod_sec_social")->reverse;	                    
+if (MOD_SEC_LOGIN_BACK_URL)
+{
+	$back_url = (ffIsset($_SERVER, "HTTP_REFERER") && strlen($_SERVER["HTTP_REFERER"]) && !ffIsset($_REQUEST, "ret_url")
+					? $_SERVER["HTTP_REFERER"] 
+					: FF_SITE_PATH . "/"
+			);
+	$tpl->set_var("back_url", $back_url);
+	$tpl->parse("SectBack", false);
+}
 
-	if(MOD_SEC_LOGIN_TITLE)
-		$tpl->parse("SectLoginTitle", false);
+$tpl->set_var("username", $username);
 
-	$tpl->set_var("sError", _modsec_process_error($sError, $framework_css));
+if (MOD_SEC_MULTIDOMAIN && MOD_SEC_LOGIN_DOMAIN)
+{
+	$tpl->set_var("domain", $domain);
+	$tpl->parse("SectDomain", false);
+	$tpl->set_var("focus_target", "domain");
+}
+else
+{
+	$tpl->set_var("SectDomain", "");
+	$tpl->set_var("focus_target", "username");
+}
 
-	/**
-	* Standard Login Parsing
-	*/ 
-	if(MOD_SEC_LOGIN_STANDARD) {
-		/**
-		* Login Actions
-		*/
-		$tpl->set_var("field_class", cm_getClassByDef($framework_css["login"]["standard"]["field"]));
+if (!strlen($sError) && strlen($sErrorCode))
+{
+	$sError = ffTemplate::_get_word_by_code($sErrorCode);
+}
 
-		if(MOD_SEC_ENABLE_TOKEN)
-		{
-		    $tpl->set_var("stayconnect_class", cm_getClassByDef($framework_css["login"]["standard"]["stayconnect"]));
-		    $tpl->parse("SectStayConnected", false);
-		}
+if (strlen($sError))
+{
+	$tpl->set_var("sError", $sError);
+	$tpl->parse("SectError", false);
+}
 
-		if(MOD_SEC_USERNAME_RECOVER_USERNAME && $mod_sec_recover_username)
-		{     
-		    $tpl->set_var("recover_class", cm_getClassByDef($framework_css["login"]["standard"]["recover"]));
-		    $tpl->set_var("recover", (string)$mod_sec_recover_username->reverse);
-		    $tpl->parse("SectRecoverUsername", false);
-		} 
+//////////////////////////////////////////////////////////////////////////////////////
+// SOCIAL STUFFS
+//////////////////////////////////////////////////////////////////////////////////////
+$social_url = (string)$cm->router->getRuleById("mod_sec_social")->reverse;
 
-		if(MOD_SEC_PASSWORD_RECOVER && $mod_sec_recover)
-		{     
-			$tpl->set_var("recover_class", cm_getClassByDef($framework_css["login"]["standard"]["recover"]));
-		    $tpl->set_var("recover", (string)$mod_sec_recover->reverse);
-			$tpl->parse("SectRecoverPassword", false);
-		} 
+if (MOD_SEC_SOCIAL_GOOGLE)
+{
+	$tpl->set_var("social_url_google", FF_SITE_PATH . $social_url . "/google");
+	$tpl->parse("SectSocialLoginGoogle", false);
+	$tpl->parse("SectSocialLogoutGoogle", false);
+}
 
-		if(MOD_SEC_LOGIN_REGISTER_URL && $mod_sec_register)
-		{
-			$count_links++;
-		    if(is_string(MOD_SEC_LOGIN_REGISTER_URL))
-		        $register_link = MOD_SEC_LOGIN_REGISTER_URL;
-		    elseif($mod_sec_register)
-		        $register_link = (string)$mod_sec_register->reverse;
+if (MOD_SEC_SOCIAL_FACEBOOK)
+{
+	$tpl->set_var("social_url_facebook", FF_SITE_PATH . $social_url . "/facebook");
+	$tpl->parse("SectSocialLoginFacebook", false);
+	$tpl->parse("SectSocialLogoutFacebook", false);
+}
 
-		    $tpl->set_var("register_class", cm_getClassByDef($framework_css["links"]["register"]));
-		    $tpl->set_var("register", $register_link);
-		    $tpl->parse("SectRegister", false);
-		} 	
+if($social_enabled)
+	$tpl->set_var("class_social", " social");
+else 
+	$tpl->set_var("class_social", "");
 
-		/**
-		* Login Label
-		*/
-		if(MOD_SEC_LOGIN_LABEL) {
-		    $tpl->parse("SectDomainLabel", false);
-		    $tpl->parse("SectUsernameLabel", false);
-		    $tpl->parse("SectPasswordLabel", false);
-		}
-
-		/**
-		* Login Field
-		*/
-
-		if (MOD_SEC_MULTIDOMAIN && MOD_SEC_LOGIN_DOMAIN)
-		{
-			$domain = $_POST["domain"];
-			if ($_REQUEST["frmAction"] == "" && $domain == "")
-				$domain = $_COOKIE["domain"];
-			$tpl->set_var("domain", $domain);
-			$tpl->parse("SectDomain", false);
-			$tpl->set_var("focus_target", "domain");
-		}
-		else
-		{
-			$domain = null;
-			$tpl->set_var("SectDomain", "");
-			$tpl->set_var("focus_target", "username");
-		}
-	
-		$tpl->set_var("username", ffCommon_specialchars($_POST["username"]));
-		
-		$tpl->set_var("row_class", cm_getClassByDef($framework_css["login"]["standard"]["record"]));
-		$tpl->set_var("login_button_class", cm_getClassByDef($framework_css["actions"]["login"]));	
-		$tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-		$tpl->set_var("login_standard_class", cm_getClassByDef($framework_css["login"]["standard"]["def"]));
-		$tpl->parse("SectStandardLogin", false);
-	}
-
-	/**
-	* Social Login Parsing
-	*/ 
-	if (MOD_SEC_SOCIAL_GOOGLE)
+//////////////////////////////////////////////////////////////////////////////////////
+// LOGIN SECTION
+//////////////////////////////////////////////////////////////////////////////////////
+if (!$logged)
+{
+	if(MOD_SEC_PASSWORD_RECOVER && $mod_sec_recover)
 	{
-	    $tpl->set_var("social_class", cm_getClassByDef($framework_css["login"]["social"]["google"]));
-	    $tpl->set_var("social_icon", cm_getClassByFrameworkCss("google", "icon-tag"));
-	    $tpl->set_var("social_url_google", FF_SITE_PATH . $mod_sec_social_url . "/google");
-	    $tpl->parse("SectSocialLoginGoogle" . ucfirst(MOD_SEC_SOCIAL_POS), false);
-	    $tpl->parse("SectSocialLogoutGoogle", false);
-	}
+		$tpl->set_var("recover", (string)$mod_sec_recover->reverse);
+		$tpl->parse("SectRecover", false);
+	} 
 
-	if (MOD_SEC_SOCIAL_FACEBOOK)
+	if(MOD_SEC_USERNAME_RECOVER_USERNAME && $mod_sec_recover_username)
+	{     
+		$tpl->set_var("recover", (string)$mod_sec_recover_username->reverse);
+		$tpl->parse("SectRecoverUsername", false);
+	} 
+
+	if(MOD_SEC_LOGIN_REGISTER && $mod_sec_register)
 	{
-	    $tpl->set_var("social_class", cm_getClassByDef($framework_css["login"]["social"]["facebook"]));
-	    $tpl->set_var("social_icon", cm_getClassByFrameworkCss("facebook", "icon-tag"));
-	    $tpl->set_var("social_url_facebook", FF_SITE_PATH . $mod_sec_social_url . "/facebook");
-	    $tpl->parse("SectSocialLoginFacebook" . ucfirst(MOD_SEC_SOCIAL_POS), false);
-	    $tpl->parse("SectSocialLogoutFacebook", false);
+		$tpl->set_var("register", (string)$mod_sec_register->reverse);
+		$tpl->parse("SectRegister", false);
 	}
 
 	if(MOD_SEC_SOCIAL_JANRAIN)
 	{
-	    $tpl->set_var("social_class", cm_getClassByDef($framework_css["login"]["social"]["janrain"]));
-	    $tpl->set_var("janrain_appname", ffCommon_url_rewrite(MOD_SEC_SOCIAL_JANRAIN_APPNAME));
-	   
-	    $tpl->parse("SectJanRainLogin", false);
-	    $tpl->parse("SectJanrainJS", false);
+		$tpl->set_var("janrain_appname", ffCommon_url_rewrite(MOD_SEC_JANRAIN_APPNAME));
+
+		$tpl->parse("SectJanRainLogin", false);
+		$tpl->parse("SectJanrain", false);
 	} 
 
-	if(MOD_SEC_SOCIAL_GOOGLE || MOD_SEC_SOCIAL_FACEBOOK || MOD_SEC_SOCIAL_JANRAIN) { 
-		$component_class["social"] = "social";
+	if($social_enabled)
+		$tpl->parse("SectSocialLogin", false);
 
-		if(MOD_SEC_LOGIN_STANDARD)
-			$framework_css["login"]["social"]["def"]["class"] .= " " . MOD_SEC_SOCIAL_POS . "-standard-login"; 
-			
-	    $tpl->set_var("login_social_class", cm_getClassByDef($framework_css["login"]["social"]["def"]));
-		$tpl->parse("SectSocialLogin" . ucfirst(MOD_SEC_SOCIAL_POS), false);
-	}
 	
-	if (MOD_SEC_LOGIN_BACK_URL)
+	if (MOD_SEC_LOGIN_STANDARD)
 	{
-	    $count_links++;
-	    $tpl->set_var("back_class", cm_getClassByDef($framework_css["links"]["back"]));
-	    $tpl->set_var("back_url", FF_SITE_PATH . "/"); 
-	    $tpl->parse("SectLoginBack", false);
-	}    
-
-	if($count_links) {
-		$tpl->set_var("link_class", cm_getClassByDef($framework_css["links"]["def"]));
-		$tpl->parse("SectLoginLinks", false);
-	}		
-	
-	$tpl->set_var("login_class", cm_getClassByDef($framework_css["login"]["def"]));  
-	$tpl->parse("SectLogin", false);
-
-	return $component_class;
-}
-
-
-function _modsec_process_logout(&$tpl, $skip_action = false, $component_class = null, $framework_css = null) 
-{
-	$cm = cm::getInstance();
-	$count_links = 0;	
-	if(!$framework_css)
-		$framework_css = mod_sec_get_framework_css();
-
-	if (MOD_SEC_MULTIDOMAIN)
-		$ID_domain = mod_security_get_domain();	
-
-	/**
-	* Logout Title
-	*/
-	if(MOD_SEC_LOGOUT_TITLE) {
-		if($skip_action)
-			$tpl->set_var("logout_title", ffTemplate::_get_word_by_code("logout_noaction_title"));
+		if ($cm->oPage->getXHRCtx())
+		{
+			$tpl->set_var("login_bt_confirm", "javascript:ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {
+						'action' : 'login'
+				});");
+		}
+		else if (MOD_SEC_FORCE_XHR || $cm->oPage->isXHR())
+		{
+			$tpl->set_var("login_bt_confirm", "javascript:ff.ajax.doRequest({
+						'action' : 'login'
+						, 'formName'	: 'ffLoginBox'
+						, 'url'			: '" . $_SERVER["REQUEST_URI"] . "'
+				});");
+		}
 		else
-			$tpl->set_var("logout_title", ffTemplate::_get_word_by_code("logout_title"));
-	    $tpl->parse("SectLogoutTitle", false);
+		{
+			$tpl->set_var("login_bt_confirm", "jQuery('#frmAction', this.form).val('login'); this.form.submit();");
+		}
+		
+		$tpl->parse("SectStandardLogin", false);
 	}
-
+}
+else
+{
 	if (MOD_SEC_MULTIDOMAIN && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB && $ID_domain)
 		$db = mod_security_get_db_by_domain($ID_domain);
 	else
 		$db = mod_security_get_main_db();
 
-	    
-	if(MOD_SEC_ENABLE_TOKEN && !$skip_action && (MOD_SEC_SOCIAL_GOOGLE || MOD_SEC_SOCIAL_FACEBOOK || MOD_SEC_SOCIAL_JANRAIN))
+	if(MOD_SEC_ENABLE_TOKEN && $social_enabled)
 	{
-		$options = mod_security_get_settings($cm->path_info);
 		// CHECK VALID TOKENS
 		$valid_token = false;
 		$sSQL = "SELECT
@@ -523,80 +378,47 @@ function _modsec_process_logout(&$tpl, $skip_action = false, $component_class = 
 				$valid_token |= $rc;
 			} while ($db->nextRecord());
 		}
-		
+
 		if ($valid_token)
 			$tpl->parse("SectSocialLogout", false);
 	}
 
-	if(MOD_SEC_USER_AVATAR) {
-		if(MOD_SEC_GROUPS) {
-		    $user_permission = get_session("user_permission");
-			$avatar = $user_permission["avatar"];
-		} else {
-		    $avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
-		}	
-
-		//die(mod_sec_get_avatar($avatar, MOD_SEC_USER_AVATAR_MODE));
-		$tpl->set_var("avatar_class", cm_getClassByDef($framework_css["logout"]["account"]["avatar"]));
-		$tpl->set_var("avatar", mod_sec_get_avatar($avatar, MOD_SEC_USER_AVATAR_MODE));
-		$tpl->parse("SectAvatar", false);
-	}
-		
-	$email = ffCommon_specialchars(mod_security_getUserInfo("email", null, $db)->getValue());
-	$username = ffCommon_specialchars(mod_security_getUserInfo(MOD_SEC_USER_FIRSTNAME, null, $db)->getValue() . " " . mod_security_getUserInfo(MOD_SEC_USER_LASTNAME, null, $db)->getValue());
-	if(!$username)
-		$username = ffCommon_specialchars(mod_security_getUserInfo(MOD_SEC_USER_FIRSTNAME, null, $db)->getValue());
-	if(!$username) {
-		if((MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "username"))
-			$username = ffCommon_specialchars(mod_security_getUserInfo("username", null, $db)->getValue());
-		elseif((MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "email")) {
-			$username = $email;
-			$email = "";
-		}
-	}
-
-	if($username) {
-		$tpl->set_var("username", $username);
-		$tpl->parse("SectUsername", false);
-	}
-	if($email) {
-		$tpl->set_var("email", $email);
-		$tpl->parse("SectEmail", false);
-	}
-	
-	$tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-	if(!$skip_action)
+	if (MOD_SEC_LOGIN_DOMAIN && mod_security_is_admin())
 	{
-		$tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));	
-		$tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));	
-		$tpl->parse("SectStandardLogout", false); 
+		$tpl->set_var("firstname", ffCommon_specialchars(mod_security_getUserInfo("firstname", null, mod_security_get_main_db())->getValue()));
+		$tpl->set_var("lastname", ffCommon_specialchars(mod_security_getUserInfo("lastname", null, mod_security_get_main_db())->getValue()));
 	}
-	
-	if (MOD_SEC_LOGIN_BACK_URL)
+
+	if ($cm->oPage->getXHRCtx())
 	{
-	    $count_links++;
-	    $tpl->set_var("back_class", cm_getClassByDef($framework_css["links"]["back"]));
-	    $tpl->set_var("back_url", $cm->oPage->ret_url); 
-	    $tpl->parse("SectLogoutBack", false);
-	}    
+		if (strlen($_REQUEST["ret_url"]))
+			$tpl->set_var("logout_bt_cancel", "javascript:ff.ajax.ctxGoToUrl('" . $_REQUEST["XHR_CTX_ID"] . "', '" . $_REQUEST["ret_url"] . "')");
+		else
+			$tpl->set_var("logout_bt_cancel", "javascript:ff.ajax.ctxClose('" . $cm->oPage->getXHRCtx() . "');");
 
-	if($count_links) {
-		$tpl->set_var("link_class", cm_getClassByDef($framework_css["links"]["def"]));
-		$tpl->parse("SectLogoutLinks", false);
+		$tpl->set_var("logout_bt_confirm", "javascript:ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {
+				'action' : 'logout'
+			});");
 	}
+	else if (MOD_SEC_FORCE_XHR || $cm->oPage->isXHR())
+	{
+		$tpl->set_var("logout_bt_confirm", "javascript:ff.ajax.doRequest({
+					'action'		: 'logout'
+					, 'formName'	: 'ffLoginBox'
+					, 'url'			: '" . $_SERVER["REQUEST_URI"] . "'
+			});");
 
-	$tpl->set_var("logout_class", cm_getClassByDef($framework_css["logout"]["def"]));
-	$tpl->parse("SectLogout", false); 	
-	
-	return $component_class;
+		$tpl->set_var("logout_bt_cancel", "javascript:ff.ajax.doRequest({
+					'action'		: 'cancellogout'
+					, 'formName'	: 'ffLoginBox'
+					, 'url'			: '" . $_SERVER["REQUEST_URI"] . "'
+			});");
+	}
+	else
+	{
+		$tpl->set_var("logout_bt_confirm", "jQuery('#frmAction', this.form).val('logout'); this.form.submit();");
+		$tpl->set_var("logout_bt_cancel", "jQuery('#frmAction', this.form).val('cancellogout'); this.form.submit();");
+	}
 }
 
-function _modsec_process_error($sError, $framework_css = null) {
-	if($sError) {
-		if(!$framework_css)
-			$framework_css = mod_sec_get_framework_css();
-	
-		$strError = '<div class="' . cm_getClassByDef($framework_css["error"]) . '">' . $sError . '</div>';
-	}
-	return $strError;
-}
+$res = $cm->modules["security"]["events"]->doEvent("onTplLoaded", array(&$tpl, $logged, &$sErrorCode, &$sError));

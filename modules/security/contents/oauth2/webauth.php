@@ -47,6 +47,9 @@ $frmAction = $_REQUEST["frmAction"];
 if (!$granted && !strlen($frmAction))
 {
 	$template_file = "authorize.html";
+
+    $filename = cm_cascadeFindTemplate("/contents/oauth2/" . $template_file, "security");
+    /*
 	$filename = null;
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . rtrim($cm->path_info, "/") . "/" . $template_file, $cm->oPage->theme, false);
@@ -54,7 +57,7 @@ if (!$granted && !strlen($frmAction))
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/oauth2/" . $template_file, $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/oauth2/" . $template_file, $cm->oPage->theme);
-	
+	*/
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
 
@@ -159,7 +162,7 @@ if (!$granted && !strlen($frmAction))
 		}
 		$tpl->parse("SectScopes",	false);
 	}
-
+	
 	$cm->oPage->layer = "empty";
 	$cm->oPage->form_method = "POST";
 	$cm->oPage->use_own_form = true;

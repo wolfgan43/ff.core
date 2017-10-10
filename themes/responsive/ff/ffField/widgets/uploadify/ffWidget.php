@@ -15,13 +15,13 @@ class ffWidget_uploadify extends ffCommon
 	var $class			= "ffWidget_uploadify";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							, "swfobject"					=> null
-							, "jquery.uploadify"			=> "/plugins/jquery.uploadify"
+							"ff.ffField.uploadify"	=> null
 						);
     var $css_deps 		= array(
-    						 /* "jquery.uploadify"		=> "/plugins/jquery.uploadify/uploadify.css"*/
     					);
 
 	// PRIVATE VARS
@@ -58,7 +58,7 @@ class ffWidget_uploadify extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -68,14 +68,11 @@ class ffWidget_uploadify extends ffCommon
 	function process($id, &$value, ffField_base &$Field)
 	{
 		global $plgCfg_uploadify_UseOwnSession;
-		//$Field->parent_page[0]->tplAddCss("jquery.uploadify", "uploadify.css", FF_SITE_PATH	 . "/themes/library/plugins/jquery.uploadify");
 		
 		switch($Field->get_control_type())
 		{
 			case "picture":
 			case "picture_no_link":
-				//$this->process_picture($id, $value);
-				//break;
 			case "file_label":
 			case "file":
 				if($Field->file_show_filename)
@@ -98,13 +95,15 @@ class ffWidget_uploadify extends ffCommon
 				$Field->process_label($id, $value);
 		}
 
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "uploadify";
 		}
 		else
 		{
@@ -131,23 +130,6 @@ class ffWidget_uploadify extends ffCommon
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/uploadify"); 
 		
-		$css_deps 		= array(
-              	"uploadify"        => array(
-                      "file" => "uploadify.css"
-                    , "path" => null
-                    , "rel" => "plugins/jquery.uploadify"
-                ) 
-    	);		
-
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-		
         if($Field->extended_type == "File") {
         	$base_path = $Field->getFileBasePath();
         	$storing_path = $Field->getFilePath();
@@ -156,8 +138,6 @@ class ffWidget_uploadify extends ffCommon
 			if(!strlen($folder))
 				$folder = "/";
         			
-			//$this->tpl[$tpl_id]->set_var("base_url", $folder);
-
 			$tmp = MD5($folder . "-" . $base_path);
 			if (!defined("FF_UPLOADIFY_SESSION_STARTED") && ($plgCfg_uploadify_UseOwnSession || $Field->uploadify_use_own_session))
 			{
@@ -204,7 +184,6 @@ class ffWidget_uploadify extends ffCommon
 						$file_desc .= $file_allowed_mime_value . " (" . "*." . $file_allowed_mime_value . ")";
 					}
 				}
-				//die($file_ext);
 			}
 			if(strlen($file_ext))
 			{
@@ -217,33 +196,41 @@ class ffWidget_uploadify extends ffCommon
 				$this->tpl[$tpl_id]->set_var("file_desc", "null");
 			}
 			
-			if(strlen($Field->file_tmpname)) {
+			if(strlen($Field->file_tmpname))
+			{
 				$view_url				= $Field->file_temp_view_url;
-				$view_query_string		= $Field->file_temp_view_query_string;
+				$view_query_string		= ($Field->file_temp_view_query_string ? $Field->file_temp_view_query_string : 
+						($Field->file_saved_view_query_string ? $Field->file_saved_view_query_string : $Field->file_query_string)
+					);
 
 				$preview_url			= $Field->file_temp_preview_url;
-				$preview_query_string	= $Field->file_temp_preview_query_string;
-			} else {
+				$preview_query_string	= ($Field->file_temp_preview_query_string ? $Field->file_temp_preview_query_string : 
+						($Field->file_saved_preview_query_string ? $Field->file_saved_preview_query_string : $Field->file_query_string)
+					);
+			} 
+			else 
+			{
 				$view_url				= $Field->file_saved_view_url;
-				$view_query_string		= $Field->file_saved_view_query_string;
+				$view_query_string		= ($Field->file_saved_view_query_string ? $Field->file_saved_view_query_string : $Field->file_query_string);
 
 				$preview_url			= $Field->file_saved_preview_url;
-				$preview_query_string	= $Field->file_saved_preview_query_string;
+				$preview_query_string	= ($Field->file_saved_preview_query_string ? $Field->file_saved_preview_query_string : $Field->file_query_string);
 			}
 			
 			$filename = $Field->getValue();
 
 			$view_url = ffProcessTags($view_url, $Field->getKeysArray(), $Field->getDataArray(), "normal");
-			//$this->tpl[$tpl_id]->set_var("view_url", rtrim(str_replace("[_FILENAME_]", "", $view_url), "/"));
 			$this->tpl[$tpl_id]->set_var("view_url", rtrim(str_replace("[_FILENAME_]", "", ffProcessTags($Field->file_temp_view_url, $Field->getKeysArray(), $Field->getDataArray(), "normal")), "/"));
 			
 			$view_url = str_replace("[_FILENAME_]", $filename, $view_url);
 			$view_url = ffProcessTags($view_url, $Field->getKeysArray(), $Field->getDataArray(), "normal");
 			$view_query_string = ffProcessTags($view_query_string, $Field->getKeysArray(), $Field->getDataArray(), "normal");
+			$this->tpl[$tpl_id]->set_var("view_query_string", $view_query_string);
 			
 			$preview_url = ffProcessTags($preview_url, $Field->getKeysArray(), $Field->getDataArray(), "normal");
-			//$this->tpl[$tpl_id]->set_var("preview_url", rtrim(str_replace("[_FILENAME_]", "", $preview_url), "/"));
 			$this->tpl[$tpl_id]->set_var("preview_url", rtrim(str_replace("[_FILENAME_]", "", ffProcessTags($Field->file_temp_preview_url, $Field->getKeysArray(), $Field->getDataArray(), "normal")), "/"));
+			$preview_query_string = ffProcessTags($preview_query_string, $Field->getKeysArray(), $Field->getDataArray(), "normal");
+			$this->tpl[$tpl_id]->set_var("preview_query_string", $preview_query_string);
 
 			$preview_url = str_replace("[_FILENAME_]", $filename, $preview_url);
 			$preview_url = ffProcessTags($preview_url, $Field->getKeysArray(), $Field->getDataArray(), "normal");
@@ -256,7 +243,6 @@ class ffWidget_uploadify extends ffCommon
 				else
 					$this->tpl[$tpl_id]->set_var("preview_js", "false"); 
 
-				//$this->tpl[$tpl_id]->parse("SectPreview", false);
 			} elseif($Field->file_widget_preview) {
 				$this->tpl[$tpl_id]->set_var("preview_js", "true");
 			} else {
@@ -286,6 +272,12 @@ class ffWidget_uploadify extends ffCommon
 			$this->tpl[$tpl_id]->set_var("show_file", "false");
 		}
 
+		if($Field->file_show_link) {
+			$this->tpl[$tpl_id]->set_var("show_link", "true");
+		} else {
+			$this->tpl[$tpl_id]->set_var("show_link", "false");
+		}
+				
         if($Field->file_full_path) {
             $this->tpl[$tpl_id]->set_var("full_path", "true");
         } else {
@@ -297,25 +289,14 @@ class ffWidget_uploadify extends ffCommon
         else
             $this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->getValue($Field->get_app_type(), $Field->get_locale())));
         
-        //$this->tpl[0]->set_var("properties", $Field->getProperties());
-
         $this->tpl[$tpl_id]->parse("SectBinding", true);
 
-        //$Field->tpl[0]->set_var("id", $id);
         $this->tpl[$tpl_id]->set_var("control", $Field->tpl[0]->rpparse("main", false));
         return $this->tpl[$tpl_id]->rpparse("SectControl", FALSE);
     }
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("swfobject", "swfobject.js", FF_THEME_DIR . "/library/swfobject");
-			$this->oPage[0]->tplAddJs("jquery.uploadify", "jquery.uploadify.js", FF_THEME_DIR . "/library/plugins/jquery.uploadify");
-			$this->oPage[0]->tplAddJs("jquery.cookie", "jquery.cookie.js", FF_THEME_DIR . "/library/plugins/jquery.cookie");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.uploadify", "uploadify.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/uploadify");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -332,16 +313,6 @@ class ffWidget_uploadify extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("swfobject", "swfobject.js", FF_THEME_DIR . "/library/swfobject");
-			$this->oPage[0]->tplAddJs("jquery.uploadify", "jquery.uploadify.js", FF_THEME_DIR . "/library/plugins/jquery.uploadify");
-			$this->oPage[0]->tplAddJs("jquery.cookie", "jquery.cookie.js", FF_THEME_DIR . "/library/plugins/jquery.cookie");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.uploadify", "uploadify.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/uploadify");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -356,4 +327,3 @@ class ffWidget_uploadify extends ffCommon
 		return $this->tpl["main"]->rpparse("SectFooters", false);
 	}
 }
-?>

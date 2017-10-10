@@ -2,7 +2,6 @@
 /*
 Aviary
 */
-
 $host_name = $_SERVER["HTTP_HOST"];
 if (strpos(php_uname(), "Windows") !== false)
     $tmp_file = str_replace("\\", "/", __FILE__);
@@ -99,7 +98,7 @@ if($valid_session && $data_src)
 }
 else
 {
-	$fullpath = str_replace(((strpos(CM_SHOWFILES, "/") === 0) ? FF_SITE_PATH : "") . CM_SHOWFILES, FF_UPDIR, $file);
+	$fullpath = str_replace(((strpos(CM_SHOWFILES, "://") !== false) ? "" : FF_SITE_PATH) . CM_SHOWFILES, FF_UPDIR, $file);
 	$base_path = FF_DISK_PATH . FF_UPDIR;
 }
 
@@ -140,5 +139,3 @@ if(strpos($_REQUEST['folder'], FF_THEME_DIR) === 0)
 
 echo ffCommon_jsonenc($res, true);
 exit;
-
-?>

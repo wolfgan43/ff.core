@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffDetails
@@ -118,74 +118,14 @@ class ffDetails
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffDetails_base extends ffCommon
 {
 	// ----------------------------------
 	//  PUBLIC VARS (used for settings)
-    var $framework_css = array(
-            "component" => array(
-                "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false //false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
-            )
-            , "title" => array(
-                    "class" => null
-                    , "col" => array(
-                                "xs" => 12
-                                , "sm" => 12
-                                , "md" => 5
-                                , "lg" => 5
-                            )
-                    )
-            , "actionsTop" => array(
-                    "class" => null
-                    , "col" => array(
-                            "xs" => 12
-                            , "sm" => 12
-                            , "md" => 7
-                            , "lg" => 7
-                    )
-                    , "util" => array(
-                        "right"
-                    )
-            )
-            , "actionsBottom" => array(
-                "class" => null
-                , "col" => array(
-                    "xs" => 12
-                    , "sm" => 12
-                    , "md" => 12
-                    , "lg" => 12
-                )
-                , "util" => array(
-                    "right"
-                )
-            )
-            , "field" => array(
-                "label" => array(
-                    "class" => null
-                    , "col" => array(
-                        "xs" => 12
-                        , "sm" => 12
-                        , "md" => 6
-                        , "lg" => 6
-                    )
-                )
-                , "control" => array(
-                    "class" => null
-                    , "col" => array(
-                        "xs" => 12
-                        , "sm" => 12
-                        , "md" => 6
-                        , "lg" => 6
-                    )
-                )
-            )
-    );
 
 	/**
 	 * ID dell'oggetto; deve essere univoco per ogni FormPage
@@ -343,23 +283,12 @@ abstract class ffDetails_base extends ffCommon
 	 * @var Mixed
 	 */
 	var $buttons_options		= array(
-                                    "addrow" => array(
-                                          "display" => true
-                                        , "index"   => 0
-                                        , "obj"     => null
-                                        , "label"   => null 
-                                        , "icon"    => null
-                                        , "class"   => null
-                                        , "aspect"  => "link"
-                                    ),    
 									"delete" => array(
 										  "display" => true
 										, "index" 	=> 0
 										, "obj" 	=> null
-                                        , "label"   => null 
-                                        , "icon"    => null
-										, "class" 	=> null
-                                        , "aspect"  => "link"
+										, "image" 	=> ""
+										, "class" 	=> "ico-delete"
 									)
 								);
 	
@@ -377,6 +306,7 @@ abstract class ffDetails_base extends ffCommon
 	 * @var String
 	 */
 	var $populate_insert_SQL 			= null;
+	var $populate_insert_DS 			= null;
 	
 	/**
 	 * in assenza di populate_insert_SQL, un array di valori da utilizzare per popolare il dettaglio su inserimento
@@ -396,6 +326,7 @@ abstract class ffDetails_base extends ffCommon
 	 * @var String
 	 */
 	var $populate_edit_SQL 				= null;
+	var $populate_edit_DS 				= null;
 	
 	/**
 	 * in assenza di populate_edit_SQL, un array di valori da utilizzare per popolare il dettaglio su modifica
@@ -684,8 +615,6 @@ abstract class ffDetails_base extends ffCommon
 	 * @var String
 	 */
 	var $sAddWhere				= "";
-	
-	var $sqlOrder				= "";
 
 	/**
 	 * Oggetto interno di tipo ffDB_Sql()
@@ -744,6 +673,10 @@ abstract class ffDetails_base extends ffCommon
 	 */
 	var $cache_clear_resources = array();
 
+	var $libraries	= array();
+	var $js_deps	= array();
+	var $css_deps	= array();
+	
 	abstract protected function tplLoad();
 	abstract public function tplParse($output_result);
 	abstract public function display_rows();
@@ -779,9 +712,6 @@ abstract class ffDetails_base extends ffCommon
 
 		$field->parent = array(&$this);
 		$field->cont_array =& $this->form_fields;
-		
-		$field->framework_css = array_replace_recursive($this->framework_css["field" . ($this->framework_css["component"]["type"] ? "-" : "") . $this->framework_css["component"]["type"]], $field->framework_css);
-
 		$this->form_fields[$field->id] = $field;
 		return $field->id;
 	}
@@ -1011,7 +941,6 @@ abstract class ffDetails_base extends ffCommon
 		{ // retrieve fields from DB
 			if ($this->auto_populate_edit)
 			{
-				
 				if (is_array($this->populate_edit_array) && count($this->populate_edit_array))
 				{
 					$i = 0;
@@ -1069,9 +998,9 @@ abstract class ffDetails_base extends ffCommon
 					$this->rows = $i;
 //										ffErrorHandler::raise("asd", E_USER_ERROR, $this, get_defined_vars());
 				}
-				elseif (strlen($this->populate_edit_SQL))
+				else
 				{
-					$tmp_SQL = $this->populate_edit_SQL;
+					$tmp_SQL = $this->getSqlPopulateEdit();
 
 					// pre-process for father values
 					foreach ($this->main_record[0]->key_fields as $key => $value)
@@ -1146,6 +1075,11 @@ abstract class ffDetails_base extends ffCommon
 												$this->recordset_ori[$i][$key] = $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type);
 											else
 												$this->recordset_ori[$i][$key] = $this->form_fields[$key]->getDefault(array(&$this));
+
+                                            $res = $this->form_fields[$key]->doEvent("on_get_from_db", array(&$this, $this->recordset_ori[$i][$key]));
+                                            $rc = end($res);
+                                            if ($rc !== null)
+                                                $this->recordset_ori[$i][$key] = $rc;
 										}
 										break;
 
@@ -1190,32 +1124,10 @@ abstract class ffDetails_base extends ffCommon
 						while($this->db[0]->nextRecord());
 						$this->rows = $i;
 					}
-				//ffErrorHandler::raise("ad", E_USER_ERROR, $this, get_defined_vars()) ;
 				}
 			}
 			else
 			{
-				$tmp = null;
-				if (isset($this->key_fields[$this->order_default]))
-					$tmp = $this->key_fields[$this->order_default];
-				if (isset($this->hidden_fields[$this->order_default]))
-					$tmp = $this->hidden_fields[$this->order_default];
-				else if (isset($this->form_fields[$this->order_default]))
-					$tmp = $this->form_fields[$this->order_default];			
-
-				// build order SQL
-				if (strlen($tmp->order_SQL))
-				{
-					if($is_default) 
-					{
-						$this->sqlOrder = " " . str_replace("[ORDER_DIR]", $this->direction, $tmp->order_SQL); //. " " .  $this->direction . " ";
-					} 
-				}
-				else
-				{
-					$this->sqlOrder = "`" . $this->order_default . "` " . $this->order_default_dir;
-				}
-			
 				$sSQL = "SELECT
 								*
 							FROM
@@ -1224,7 +1136,7 @@ abstract class ffDetails_base extends ffCommon
 								" . $this->sWhere . "
 								" . $this->sAddWhere . "
 							ORDER BY
-								" . $this->sqlOrder;
+								" . $this->getOrderSQL();
 				$this->db[0]->query($sSQL);
 
 				if ($this->db[0]->nextRecord())
@@ -1267,6 +1179,21 @@ abstract class ffDetails_base extends ffCommon
 										else
 										{
 											$this->recordset_ori[$i][$key] = $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type);
+											if ($this->form_fields[$key]->crypt)
+											{
+												if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+												{
+													$value = $this->recordset_ori[$i][$key]->getValue(null, FF_SYSTEM_LOCALE);
+													$value = mod_sec_decrypt_string($value);
+
+													$this->recordset_ori[$i][$key]->setValue($value, null, FF_SYSTEM_LOCALE);
+												}
+											}
+
+                                            $res = $this->form_fields[$key]->doEvent("on_get_from_db", array(&$this, $this->recordset_ori[$i][$key]));
+                                            $rc = end($res);
+                                            if ($rc !== null)
+                                                $this->recordset_ori[$i][$key] = $rc;
 										}
 										break;
 
@@ -1289,6 +1216,21 @@ abstract class ffDetails_base extends ffCommon
 							{
 								case "db":
 									$this->recordset_ori[$i][$key] = $this->db[0]->getField($this->hidden_fields[$key]->get_data_source(), $this->hidden_fields[$key]->base_type);
+									if ($this->hidden_fields[$key]->crypt)
+									{
+										if (MOD_SEC_CRYPT && $this->hidden_fields[$key]->crypt_modsec)
+										{
+											$value = $this->recordset_ori[$i][$key]->getValue(null, FF_SYSTEM_LOCALE);
+											$value = mod_sec_decrypt_string($value);
+
+											$this->recordset_ori[$i][$key]->setValue($value, null, FF_SYSTEM_LOCALE);
+										}
+									}
+
+									$res = $this->form_fields[$key]->doEvent("on_get_from_db", array(&$this, $this->recordset_ori[$i][$key]));
+									$rc = end($res);
+									if ($rc !== null)
+										$this->recordset_ori[$i][$key] = $rc;
 									break;
 
 								case "callback":
@@ -1371,10 +1313,11 @@ abstract class ffDetails_base extends ffCommon
 					$this->rows = $i;
 //										ffErrorHandler::raise("asd", E_USER_ERROR, $this, get_defined_vars());
 				}
-				elseif (strlen($this->populate_insert_SQL))
+				else
 				{
-					$tmp_SQL = $this->populate_insert_SQL;
+					$tmp_SQL = $this->getSqlPopulateInsert();
 
+					// mod by Alex. Check if really needed
 					// pre-process for father values
 					foreach ($this->main_record[0]->key_fields as $key => $value)
 					{
@@ -1404,14 +1347,9 @@ abstract class ffDetails_base extends ffCommon
 						}
 					}
 					reset($this->main_record[0]->form_fields);
-
-	/*					foreach ($this->fields_relationship as $key => $value)
-					{
-						$tmp_SQL = str_replace("[" . $value . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->key_fields[$value]->value, $this->main_record[0]->key_fields[$value]->base_type), $tmp_SQL);
-					}
-					reset($this->fields_relationship);*/
-
-					$this->db[0]->query($tmp_SQL);				
+					// end mod by Alex
+					
+					$this->db[0]->query($tmp_SQL);
 					if ($this->db[0]->nextRecord())
 					{
 						$i = 0;
@@ -1527,7 +1465,7 @@ abstract class ffDetails_base extends ffCommon
 						case "Boolean":
 							$this->recordset[$i][$key] = new ffData($this->recordset[$i][$key], $this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale());
 
-							if ($this->recordset[$i][$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) !== $this->form_fields[$key]->checked_value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) && $this->form_fields[$key]->unchecked_value !== null)
+							if (!$this->form_fields[$key]->bool_preserve_value && $this->recordset[$i][$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) !== $this->form_fields[$key]->checked_value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) && $this->form_fields[$key]->unchecked_value !== null)
 								$this->recordset[$i][$key] = $this->form_fields[$key]->unchecked_value;
 							break;
 
@@ -1728,7 +1666,7 @@ abstract class ffDetails_base extends ffCommon
 							$this->form_fields[$key]->contain_error = true;
 							$this->contain_error = true;
 							
-							if(($this instanceof ffDetails_html) && (is_array($this->tab_label) || strlen($this->tab_label))) {
+							if(($this instanceof ffDetails_tabs) && (is_array($this->tab_label) || strlen($this->tab_label))) {
 								if(is_array($this->tab_label) && count($this->tab_label)) {
 									$add_label = "";
 									foreach($this->tab_label AS $tab_label_value) {
@@ -1784,6 +1722,67 @@ abstract class ffDetails_base extends ffCommon
 			}
 		}
 	}
+	
+	function getOrderSQL()
+	{
+		$tmp_odf = $this->getOrderDefault();
+		$tmp_odd = $this->getOrderDefaultDir();
+		$tmp_sql = "";
+		
+		$tmp = null;
+		if (isset($this->key_fields[$tmp_odf]))
+			$tmp = $this->key_fields[$tmp_odf];
+		else if (isset($this->hidden_fields[$tmp_odf]))
+			$tmp = $this->hidden_fields[$tmp_odf];
+		else if (isset($this->form_fields[$tmp_odf]))
+			$tmp = $this->form_fields[$tmp_odf];			
+		
+		if ($tmp !== null && strlen($tmp->order_SQL))
+		{
+			// build order SQL
+			$tmp_sql = " " . str_replace("[ORDER_DIR]", $this->direction, $tmp->order_SQL); //. " " .  $this->direction . " ";
+		}
+		else
+		{
+			$tmp_orderfield = ($tmp !== null ? $tmp->get_order_field() : $tmp_odf);
+			if (strpos($tmp_orderfield, "`") !== 0)
+				$tmp_orderfield = "`" . $tmp_orderfield . "`";
+			
+			$tmp_sql = $tmp_orderfield . " " . $tmp_odd;
+		}
+
+		return $tmp_sql;
+	}
+	
+	function getOrderDefault()
+	{
+		return $this->order_default;
+	}
+
+	function getOrderDefaultDir()
+	{
+		return $this->order_default_dir;
+	}
+
+	/**
+	 * elabora la sezione relativa alla visualizzazione dell'errore nel template
+	 * da richiamare ogniqualvolta si aggiorna l'errore
+	 */
+	function displayError($sError = null)
+	{
+		if ($sError !== null)
+			$this->strError = $sError;
+
+		if (strlen($this->strError))
+		{
+			$this->tpl[0]->set_var("strError", $this->strError);
+			$this->tpl[0]->parse("SectError", false);
+		}
+		else
+			$this->tpl[0]->set_var("SectError", "");
+
+		return $sError;
+	}
 
 	/**
 	 * aggiunge record vuoti al recordset
@@ -1825,25 +1824,21 @@ abstract class ffDetails_base extends ffCommon
 				}
 				else
 				{
-					$this->recordset[$next_element][$key] = $this->form_fields[$key]->getDefault(array(&$this));
 					// create a empty object to preserve class functionality
-					if($this->rowstoadd_field_default) {
+					$rowstoadd_default = null;
+					if($this->rowstoadd_field_default)
+					{
 						$rowstoadd_header_default = $this->parent[0]->retrieve_param($this->id, "rowstoadd_header_default_" . $key);
 						$rowstoadd_footer_default = $this->parent[0]->retrieve_param($this->id, "rowstoadd_footer_default_" . $key);
 						if(strlen($rowstoadd_header_default))
 							$rowstoadd_default = $rowstoadd_header_default;
 						else
 							$rowstoadd_default = $rowstoadd_footer_default;
+						$rowstoadd_default = new ffData($rowstoadd_default, $this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE);
 					}
 
-					$this->recordset_ori[$next_element][$key] = (strlen($rowstoadd_default)
-						? new ffData($rowstoadd_default, $this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)
-						: ($this->form_fields[$key]->default_value
-							? $this->form_fields[$key]->default_value
-							: new ffData("", $this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)
-						)
-					);
-					$this->recordset[$next_element][$key] = clone $this->recordset_ori[$next_element][$key];
+					$this->recordset_ori[$next_element][$key] = new ffData(null, $this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+					$this->recordset[$next_element][$key] = ($rowstoadd_default ? $rowstoadd_default : $this->form_fields[$key]->getDefault(array(&$this)));
 				}
 			}
 			reset($this->form_fields);
@@ -1859,12 +1854,6 @@ abstract class ffDetails_base extends ffCommon
 	 */
 	function process_action()
 	{
-		$rc = false; /* if something on the page set this to true, then the parent record
-						must stop processing and show the error */
-
-		if ($this->skip_action)
-			return false;
-			
 		$res = $this->doEvent("on_do_action", array(&$this, $this->frmAction));
 		$rc = end($res);
 		if (null !== $rc)
@@ -1875,12 +1864,11 @@ abstract class ffDetails_base extends ffCommon
 				return false;
 		}
 		
-		/*// EVENT HANDLER
-		if ($this->on_do_action !== null)
-		{
-			if (call_user_func($this->on_do_action, array(&$this), $this->frmAction))
-				return true;
-		}*/
+		if ($this->skip_action) // per fare lo skip del solo SQL, è sufficiente lo skip_action del record
+			return false;
+			
+		$rc = false; /* if something on the page set this to true, then the parent record
+						must stop processing and show the error */
 
 		switch (isset($this->main_record[0]->default_actions[$this->frmAction]) ? $this->main_record[0]->default_actions[$this->frmAction] : $this->frmAction)
 		{
@@ -2097,7 +2085,7 @@ abstract class ffDetails_base extends ffCommon
 	 */
 	function insert_record($rec_SQL, $row)
 	{         
-		$res = $this->doEvent("on_do_record_action", array(&$this, "insert", $this->recordset[$row], null));
+		$res = $this->doEvent("on_do_record_action", array(&$this, "insert", $this->recordset[$row], $this->recordset_ori[$row]));
 		$rc = end($res);
 		if (null !== $rc)
 		{
@@ -2188,17 +2176,59 @@ abstract class ffDetails_base extends ffCommon
 				}
 				else
 				{
+                    $processed_sql_value = false;
+                    
 					if (strlen($fields))
 						$fields .= ", ";
 					$fields .= "`" . $this->form_fields[$key]->get_data_source() . "`";
 
 					if (strlen($values))
 						$values .= ", ";
-					$values .= $this->db[0]->toSql(	$this->recordset[$row][$key],
-														$this->form_fields[$key]->base_type
-													 );
-                    //if ($this->form_fields[$key]->extended_type == "File")
-                    //die($values);
+					
+					$tmpval = $this->recordset[$row][$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+					$tmp_type = $this->form_fields[$key]->base_type;
+					
+					if ($this->form_fields[$key]->crypt_method !== null)
+					{
+						switch ($this->form_fields[$key]->crypt_method)
+						{
+							case "MD5":
+								$tmpval = new ffData(md5($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+								$tmp_type = "Text";
+								break;
+							case "mysql_password":
+								$tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+								$processed_sql_value = true;
+								break;
+							case "mysql_oldpassword":
+								$tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+								$tmp_type = "Text";
+								break;
+							default:
+								ffErrorHandler::raise("Crypt method not supported!", E_USER_ERROR, $this, get_defined_vars());
+						}
+					}
+					elseif ($this->form_fields[$key]->crypt)
+					{
+						if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+						{
+							$tmpval = mod_sec_crypt_string($tmpval);
+							$tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
+                            $processed_sql_value = true;
+							$tmp_type = "Text";
+						}
+					}
+					
+                    $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->recordset[$row][$key]));
+                    $rc = end($res);
+                    if ($rc !== null)
+					{
+                        $tmpval = $rc;
+						$processed_sql_value = false;
+						$tmp_type = $this->form_fields[$key]->base_type;
+					}
+
+                    $values .= ($processed_sql_value ? $tmpval : $this->db[0]->toSql($tmpval, $tmp_type));                    
 				}
 			}
 		}
@@ -2258,7 +2288,7 @@ abstract class ffDetails_base extends ffCommon
 		}
 		reset($this->key_fields);
 
-		$res = $this->doEvent("on_done_record_action", array(&$this, "insert", $this->recordset[$row]));
+		$res = $this->doEvent("on_done_record_action", array(&$this, "insert", $this->recordset[$row], $this->recordset_ori[$row]));
 		$rc = end($res);
 		if (true === $rc)
 			return true;
@@ -2371,10 +2401,11 @@ abstract class ffDetails_base extends ffCommon
 						{
 							if (strlen($fields))
 								$fields .= ", ";
+							
 							$fields .= "`" . $key . "_" . $subkey . "` = "
-										. $this->db[0]->toSql(	$this->recordset[$row][$key][$subkey],
-																$subvalue["type"]
-															);
+									. $this->db[0]->toSql(	$this->recordset[$row][$key][$subkey],
+															$subvalue["type"]
+														 );  
 						}
 					}
 					reset($this->form_fields[$key]->multi_fields);
@@ -2383,11 +2414,53 @@ abstract class ffDetails_base extends ffCommon
 				{
 					if (strlen($fields))
 						$fields .= ", ";
+                    
+					$tmpval = $this->recordset[$row][$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+					$tmp_type = $this->form_fields[$key]->base_type;
+
+					if ($this->form_fields[$key]->crypt_method !== null)
+					{
+						switch ($this->form_fields[$key]->crypt_method)
+						{
+							case "MD5":
+								$tmpval = new ffData(md5($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+								$tmp_type = "Text";
+								break;
+							case "mysql_password":
+								$tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+								$processed_sql_value = true;
+								break;
+							case "mysql_oldpassword":
+								$tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+								$tmp_type = "Text";
+								break;
+							default:
+								ffErrorHandler::raise("Crypt method not supported!", E_USER_ERROR, $this, get_defined_vars());
+						}
+					}
+					elseif ($this->form_fields[$key]->crypt)
+					{
+						if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+						{
+							$tmpval = mod_sec_crypt_string($tmpval);
+							$tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
+							$processed_sql_value = true;
+							$tmp_type = "Text";
+						}
+					}
+							
+                    $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->recordset[$row][$key]));
+                    $rc = end($res);
+                    if ($rc !== null)
+					{
+                        $tmpval = $rc;
+						$processed_sql_value = false;
+						$tmp_type = $this->form_fields[$key]->base_type;
+					}
+                    
 					$fields .= "`" . $this->form_fields[$key]->get_data_source()
 								. "` = "
-								. $this->db[0]->toSql(	$this->recordset[$row][$key],
-														$this->form_fields[$key]->base_type
-													);
+								. ($processed_sql_value ? $tmpval : $this->db[0]->toSql($tmpval, $tmp_type));
 				}
 			}
 			elseif ($this->form_fields[$key]->store_in_db === false)
@@ -2647,6 +2720,12 @@ abstract class ffDetails_base extends ffCommon
 			$this->redirect($ret);
 	}
 
+	function addDefaultButton($type, $obj)
+	{
+		$this->addContentButton($obj
+								, $this->buttons_options[$type]["index"]);
+	}
+    
 	/**
 	 * prepara i pulsanti standard del dettaglio
 	 */
@@ -2666,14 +2745,11 @@ abstract class ffDetails_base extends ffCommon
 				$tmp->id 			= "deleterow";
 				$tmp->frmAction		= "detail_delete";
                 $tmp->label         = $this->buttons_options["delete"]["label"];
-                $tmp->icon          = $this->buttons_options["delete"]["icon"];
                 $tmp->class         = $this->buttons_options["delete"]["class"];
                 $tmp->aspect        = $this->buttons_options["delete"]["aspect"];
-                $tmp->activebuttons	= $this->buttons_options["delete"]["activebuttons"]; 
 				$tmp->action_type 	= "submit";
 				$tmp->component_action = $this->main_record[0]->id;
-				$this->addContentButton($tmp
-										, $this->buttons_options["delete"]["index"]);
+				$this->addDefaultButton("delete", $tmp);
 			}
 		}
 	}
@@ -2700,11 +2776,11 @@ abstract class ffDetails_base extends ffCommon
 					reset($property_set[$key]);
 					$buffer .= "\"";
 				}
-				elseif(strlen($value))
+				else
 				{
 					if (strlen($buffer))
 						$buffer .= " ";
-					$buffer .= $key . "=\"" . $value . "\"";
+					$buffer .= $key . (strlen($value) ? "=\"" . $value . "\"" : "");
 				}
 			}
 			reset($property_set);
@@ -2712,13 +2788,29 @@ abstract class ffDetails_base extends ffCommon
 		return $buffer;
 	}
 	
-	function setWidthComponent($resolution_large_to_small) 
+	function getSqlPopulateEdit()
 	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
-		elseif(strlen($resolution_large_to_small))
-			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
+		if ($this->populate_edit_DS !== null)
+		{
+			if (is_string($this->populate_edit_DS))
+				return ffDBSource::getSource($this->populate_edit_DS)->getSql($this);
+			else
+				return $this->populate_edit_DS->getSql($this);
+		}
 		else
-			$this->framework_css["component"]["grid"] = false;
-	}	
+			return $this->populate_edit_SQL;
+	}
+	
+	function getSqlPopulateInsert()
+	{
+		if ($this->populate_insert_DS !== null)
+		{
+			if (is_string($this->populate_insert_DS))
+				return ffDBSource::getSource($this->populate_insert_DS)->getSql($this);
+			else
+				return $this->populate_insert_DS->getSql($this);
+		}
+		else
+			return $this->populate_insert_SQL;
+	}
 }

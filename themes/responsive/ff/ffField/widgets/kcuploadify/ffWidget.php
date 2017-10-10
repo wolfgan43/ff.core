@@ -15,13 +15,13 @@ class ffWidget_kcuploadify extends ffCommon
 	var $class			= "ffWidget_kcuploadify";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							, "swfobject"					=> null
-							, "jquery.uploadify"			=> "/plugins/jquery.uploadify"
+							  "ff.ffField.kcuploadify" => null
 						);
-    var $css_deps 		= array(/*
-    						  "jquery.uploadify"		=> "/plugins/jquery.uploadify/uploadify.css"*/
+    var $css_deps 		= array(
     					);
 
 	// PRIVATE VARS
@@ -31,7 +31,7 @@ class ffWidget_kcuploadify extends ffCommon
 
 	var $oPage = null;
 	var $source_path	= null;
-	var $style_path = null;
+	var $style_path 	= null;
 	
 	
 	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
@@ -58,7 +58,7 @@ class ffWidget_kcuploadify extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -97,13 +97,15 @@ class ffWidget_kcuploadify extends ffCommon
 				$Field->process_label($id, $value);
 		}
 
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "kcuploadify";
 		}
 		else
 		{
@@ -129,23 +131,6 @@ class ffWidget_kcuploadify extends ffCommon
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/kcuploadify"); 
         
-		$css_deps 		= array(
-              "jquery.uploadify"        => array(
-                      "file" => "uploadify.css"
-                    , "path" => null
-                    , "rel" => "plugins/jquery.uploadify"
-                ) 
-    	);		
-
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-		
         if($Field->extended_type == "File") {
         	$base_path = $Field->getFileBasePath();
         	$temp_path = $Field->getFilePath();
@@ -368,14 +353,6 @@ class ffWidget_kcuploadify extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("swfobject", "swfobject.js", FF_THEME_DIR . "/library/swfobject");
-			$this->oPage[0]->tplAddJs("jquery.uploadify", "jquery.uploadify.js", FF_THEME_DIR . "/library/plugins/jquery.uploadify");
-			$this->oPage[0]->tplAddJs("jquery.cookie", "jquery.cookie.js", FF_THEME_DIR . "/library/plugins/jquery.cookie");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.kcuploadify", "kcuploadify.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/kcuploadify");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -392,16 +369,6 @@ class ffWidget_kcuploadify extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("swfobject", "swfobject.js", FF_THEME_DIR . "/library/swfobject");
-			$this->oPage[0]->tplAddJs("jquery.uploadify", "jquery.uploadify.js", FF_THEME_DIR . "/library/plugins/jquery.uploadify");
-			$this->oPage[0]->tplAddJs("jquery.cookie", "jquery.cookie.js", FF_THEME_DIR . "/library/plugins/jquery.cookie");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.kcuploadify", "kcuploadify.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/kcuploadify");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -416,4 +383,3 @@ class ffWidget_kcuploadify extends ffCommon
 		return $this->tpl["main"]->rpparse("SectFooters", false);
 	}
 }
-?>

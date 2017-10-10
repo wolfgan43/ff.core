@@ -1,10 +1,11 @@
 <?php
 $options = mod_security_get_settings($cm->path_info);
-	
-$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/applets/login/smallbox.html", $cm->oPage->theme, false);
+
+$filename = cm_cascadeFindTemplate("/applets/login/smallbox.html", "security");
+/*$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/applets/login/smallbox.html", $cm->oPage->theme, false);
 if ($filename === null)
 	$filename = cm_moduleCascadeFindTemplate(CM_MODULES_ROOT . "/security/themes", "/applets/login/smallbox.html", $cm->oPage->theme);
-
+*/
 $tpl = ffTemplate::factory(ffCommon_dirname($filename));
 $tpl->load_file("smallbox.html", "main");
 $tpl->set_var("site_path", $cm->oPage->site_path);

@@ -10,7 +10,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// The toolbar groups arrangement, optimized for two toolbar rows.
 	config.toolbarGroups = [
-		{ name: 'clipboard',   groups: [ 'clipboard', 'undo','PasteFromWord' ] },
+		{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
 		{ name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
 		{ name: 'links' },
 		{ name: 'insert' },
@@ -29,9 +29,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';
-        config.pasteFromWordRemoveFontStyles = false;
 
-config.pasteFromWordRemoveStyles = false;
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';
 
@@ -40,5 +38,4 @@ config.pasteFromWordRemoveStyles = false;
         config.protectedSource.push(/<div[^>]><\/div>/g);
         config.protectedSource.push(/<a[^>]><\/a>/g);
         config.protectedSource.push(/<i[^>]><\/i>/g);
-        config.removePlugins = 'iframe';
 };

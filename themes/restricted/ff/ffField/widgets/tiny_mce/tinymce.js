@@ -1,16 +1,8 @@
 ff.ffField.tinymce = (function () {
-	var events = false;
-
 	var that = { /* publics*/
 		__ff : true, /* used to recognize ff'objects*/
         "init" : function(selectorClass, lang, plugins, buttons1, buttons2, buttons3, buttons4, buttons5, buttons6) {
-          	if (!events) {
-          		ff.addEvent({"event_name" : "onClearField", "func_name" : that.onClearComponent});
-          		if(ff.ffPage.dialog)
-          			ff.ffPage.dialog.addEvent({"event_name" : "doAction", "func_name" : that.onUpdateDialog});
-          		events = true;
-			}            
-            tinymce.baseURL = ff.site_path + "/themes/library/tiny_mce";
+            tinymce.baseURL = ff.base_path + "/themes/library/tiny_mce";
 
             tinyMCE.init({  
                 relative_urls : false,
@@ -46,29 +38,17 @@ ff.ffField.tinymce = (function () {
 				"event_params"	: [elem]
 			});
         }, 
-        "onClearComponent" : function (component, key, field) {
-            if (field.widget == "tiny_mce") {
-				var instances = ff.struct.get(component).widgets;
-				instances.each(function(key, value) {
-					tinyMCE.get(value["id"]).destroy();
-				});            
-/*
-                switch (ff.struct.get(component).type) {
-                    case "ffDetails":
-                        var rows = parseInt(jQuery("#" + component + "_rows").val());
-                        for (var i = 0; i < rows; i++) {
-                        	tinyMCE.get(component + "_recordset[" + i + "][" + key + "]").destroy();
-                        }
-                        break;
+        "onClearField" : function (component, field_id, field_data, inst_id) {
+			if (field_data.widget !== "tiny_mce")
+				return;
 
-                    default:
-                    	tinyMCE.get(component + "_" + key).destroy();
-                }*/
-            }
-        },
+			if (tinyMCE.get(inst_id) !== undefined) {
+				tinyMCE.get(inst_id).destroy();
+			}
+		},
         "onUpdateDialog" : function (id) {
-            ff.struct.each(function (component_id, component) {
-                if (component.dialog == id)
+            ff.struct.get("comps").each(function (component_id, component) {
+                if (component.ctx == id)
                     component.fields.each(function (field_id, field) {
                         if (field.widget == "tiny_mce") {
                             switch (component.type) {
@@ -95,6 +75,24 @@ ff.ffField.tinymce = (function () {
         }
         
     }; /* publics' end*/
+
+	ff.pluginAddInitLoad("ff.ffField.tinymce", function () {
+		ff.addEvent({"event_name" : "onClearField", "func_name" : that.onClearField});
+		ff.addEvent({"event_name" : "getFields", "func_name" : that.onUpdate});
+		
+		/*CKEDITOR.on("instanceReady", function(event) {
+			var id = event.editor.name;
+			CKEDITOR.instances[id].instReady = true;
+			that.doEvent({
+				"event_name"	: "onCreate",
+				"event_params"	: [document.getElementById(event.editor.element.getId()), id]
+			});
+			ff.doEvent({
+				"event_name" : "initIFElement"
+				, "event_params" : [id, "ckeditor"]
+			});
+		});*/
+	});
 
     return that;
 })();

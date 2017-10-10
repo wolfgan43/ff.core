@@ -11,15 +11,13 @@ class ffWidget_leavepage extends ffCommon
 	var $class			= "ffWidget_leavepage";
 
 	var $widget_deps	= array();
+	
+   	var $libraries		= array();
+	
     var $js_deps = array(
 							  "jquery" 			=> null
-							/*, "jquery.ui" 		=> null*/
 						);
     var $css_deps 		= array(
-    						  /*"jquery.ui"		=> array(
-    						  		"file" => "jquery.ui.all.css"
-									, "path" => null
-								)*/
     					);
 	// PRIVATE VARS
 	var $oPage			= null;
@@ -46,7 +44,7 @@ class ffWidget_leavepage extends ffCommon
 
 		$this->tpl[0]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[0]->set_var("style_path", $style_path);
 		elseif ($oPage !== null)
 			$this->tpl[0]->set_var("style_path", $oPage->getThemePath());

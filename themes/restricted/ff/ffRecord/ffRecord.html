@@ -1,89 +1,72 @@
 <!--BeginSectHeaders-->
 <!--EndSectHeaders-->
-{outer_wrap_start}
-<{record_tag} id="{component_id}" class="{component_class}"> 
-	<div class="hidden">
+<div id="{component_id}" class="{class}"> 
+	<div id="{component}hidden">
 		<input type="hidden" id="{component}detailaction" name="{component}detailaction" value="" />
 		<!--BeginSectHiddenField-->
 		<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
 		<!--EndSectHiddenField-->
 	</div>
 
-    {inner_wrap_start}
+	<div class="ffRecord">
+		<!--BeginSectTitle-->
+		<h2>{discl_bt}{title}</h2>
+		<!--EndSectTitle-->
+		{fixed_pre_content}
 
-	<!--BeginSectTitle-->
-	<h2>{discl_bt}{title}</h2>
-	<!--EndSectTitle-->
-	{fixed_pre_content}
+	    <!--BeginSectDescription-->
+	    <div class="descrizione">{description}</div>
+	    <!--EndSectDescription-->
 
-	<!--BeginSectDescription-->
-	<div class="{info_class}">{description}</div>
-	<!--EndSectDescription-->
+		<!--BeginSectError-->
+		<div class="error">{strError}</div>
+		<!--EndSectError-->
 
-	<!--BeginSectError-->
-	<div class="{error_class}">{strError}</div>
-	<!--EndSectError-->
+		<div id="{component_id}_discl_sect">
+			<!--BeginSectForm-->
+			<fieldset class="default">
+				<!--BeginSectFormRow-->
+				<!--BeginSectFormCol-->
+				<div class="row{container_class}"> 
+					<!--BeginSectLabel--><label{label_properties}>{label}<!--BeginSectRequiredSymbol-->&nbsp; <span class="required">*</span><!--EndSectRequiredSymbol--><!--BeginSectDescriptionLabel--><span class="description">{description}</span><!--EndSectDescriptionLabel--></label><!--EndSectLabel-->
+					{content}
+				</div>
+				<!--EndSectFormCol-->
+				<!--EndSectFormRow-->
+			</fieldset>
+			<!--EndSectForm-->
 
-    {content_wrap_start}
-		{form_default}
-		{form_tabs}
-		<!--BeginSectGroup-->
-		<!--BeginSectGroupStart-->
-		<fieldset class="{group_class}">
-			<!--BeginSectGroupTitle--> 
-			<legend{title_properties}>{GroupTitle}</legend>
-			<!--EndSectGroupTitle-->
-		<!--EndSectGroupStart-->
-            {group_pre_content}
-			<!--BeginSectGroupDescription-->
-			<div class="desc">{GroupDescription}</div>
-			<!--EndSectGroupDescription-->
-			<!--BeginSectGroupRow-->
-			<!--BeginSectWrapStart-->
-			<div class="{wrap_class}">
-			<!--EndSectWrapStart-->
-			{field_container_start}
-				{content_pre_label}
-				<!--BeginSectGroupLabel-->
-					{label_prefix}
-					<label{label_class} for="{label_for}"{label_properties}>
-						{content_in_label}
-						{label}
-					</label>
-					<!--BeginSectDescriptionLabel-->
-					<span class="description">{description}</span>
-					<!--EndSectDescriptionLabel-->
-					{label_postfix}
-				<!--EndSectGroupLabel-->
-				{content}
-			{field_container_end}
-			<!--BeginSectWrapEnd-->
-			</div>
-			<!--EndSectWrapEnd-->
-			<!--EndSectGroupRow-->
-            {group_post_content}
-        <!--BeginSectGroupEnd-->
-		</fieldset>
-		<!--EndSectGroupEnd-->
-		<!--EndSectGroup-->
+			<!--BeginSectGroup-->
+			<fieldset class="{group_class}">
+				<!--BeginSectGroupTitle-->
+				<legend>{GroupTitle}</legend>
+				<!--EndSectGroupTitle-->
+				<!--BeginSectGroupDescription-->
+				<div class="desc">{GroupDescription}</div>
+				<!--EndSectGroupDescription-->
+				<!--BeginSectGroupRow-->
+				<div class="row{container_class}">
+					<!--BeginSectGroupCol-->
+					<!--BeginSectGroupLabel--><label{label_properties}>{label}<!--BeginSectRequiredSymbol-->&nbsp; <span class="required">*</span><!--EndSectRequiredSymbol--><!--BeginSectDescriptionLabel--><span class="description">{description}</span><!--EndSectDescriptionLabel--></label><!--EndSectGroupLabel-->
+					{content}
+					<!--EndSectGroupCol-->
+				</div>
+				<!--EndSectGroupRow-->
+			</fieldset>
+			<!--EndSectGroup-->
 
-		<!--BeginSectRequiredNote-->
-		{_require_note}
-		<!--EndSectRequiredNote-->
-    {content_wrap_end}
+			<!--BeginSectRequiredNote-->
+			{_require_note}
+			<!--EndSectRequiredNote-->
+
+		</div>
+	</div>
+
 	<!--BeginSectControls-->
-	<div class="{actions_class}">{ActionButtons}{ActionButtonCancel}</div>
+	<div class="actions"><div class="closure"></div>{ActionButtons}{ActionButtonCancel}</div>
 	<!--EndSectControls-->
 	{fixed_post_content}
-
-    {inner_wrap_end}
-</{record_tag}>
-{outer_wrap_end}
+</div>
 <!--BeginSectFooters-->
-<script type="text/javascript"> 
-	ff.pluginLoad("ff.ffRecord", "/themes/library/ff/ffRecord.js", function() {
-		ff.ffRecord.init('{component_id}');
-	});
-</script> 
 <!--EndSectFooters-->
 

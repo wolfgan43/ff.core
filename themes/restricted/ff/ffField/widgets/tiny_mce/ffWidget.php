@@ -16,7 +16,12 @@ class ffWidget_tiny_mce extends ffCommon
     var $class          = "ffWidget_tinymce";
     
     var $widget_deps    = array();
-    var $js_deps        = array();
+
+	var $libraries		= array();
+	
+    var $js_deps        = array(
+    						"ff.ffField.tiny_mce"       => null
+    					);
     var $css_deps       = array();
 
     // PRIVATE VARS
@@ -113,13 +118,15 @@ class ffWidget_tiny_mce extends ffCommon
 
     function process($id, &$value, ffField_base &$Field)
     {
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "tiny_mce";
 		}
 		else
 		{
@@ -188,12 +195,6 @@ class ffWidget_tiny_mce extends ffCommon
     
 	function get_component_headers($id)
 	{
-        if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("tinymce", "tiny_mce.js", FF_THEME_DIR . "/library/tiny_mce", false, false, null, true);
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField.tinymce", "tinymce.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/tiny_mce");
-        }
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -210,14 +211,6 @@ class ffWidget_tiny_mce extends ffCommon
 
 	function process_headers()
 	{
-        if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("tinymce", "tiny_mce.js", FF_THEME_DIR . "/library/tiny_mce", false, false, null, true);
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField.tinymce", "tinymce.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/tiny_mce");
-            
-            //return;
-        }
-
 		if (!isset($this->tpl["main"]))
 			return;
 

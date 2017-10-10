@@ -1,9 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.pluginLoad("ff.ffField.datechooser", "{widget_path}/datechooser.js");
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -11,24 +6,18 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 <script type="text/javascript">
 	ff.pluginAddInit("ff.ffField.datechooser", function () {
 		<!--BeginSectBinding-->
-		ff.ffField.datechooser.fill("{container}{id}", '{container}day_{id}', '{container}month_{id}', '{container}year_{id}', {sel_day}, {sel_month}, {sel_year}, '{type_date}');
+		ff.ffField.datechooser.fill("{container}{id}", '{container}day_{id}', '{container}month_{id}', '{container}year_{id}', {sel_day}, {sel_month}, {sel_year});
 		<!--EndSectBinding-->
 	});
 </script>
 <!--EndSectFooters-->
 
 <!--BeginSectControl-->
-<div class="{container_class}" {properties}>
-	<input type="hidden" id="{container}{id}" name="{container}{id}" value="{value}"/>
-	
-	<div class="{day_class}">
-		<select id="{container}day_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_day}</option></select> 
-	</div>
-	<div class="{month_class}">
-		<select id="{container}month_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_month}</option></select>
-	</div>
-	<div class="{year_class}">
-		<select id="{container}year_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_year}</option></select>
-	</div>
-</div>
+<input type="hidden" id="{container}{id}" name="{container}{id}" value="{value}"/>
+{_day}
+<select id="{container}day_{id}" name="{container}day_{id}" class="{class}" {properties} onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"></select> 
+{_month}
+<select id="{container}month_{id}" name="{container}month_{id}" class="{class}" {properties}  onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"></select>
+{_year}
+<select id="{container}year_{id}" name="{container}year_{id}" class="{class}" {properties}  onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"></select>
 <!--EndSectControl-->

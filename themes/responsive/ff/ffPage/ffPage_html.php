@@ -8,6 +8,7 @@ class ffPage_html extends ffPage_base
 	 * @var String
 	 */
 	var $layer 					= "empty";
+	var $layer_dialog 			= false;
 
 	/**
 	 * Permette di alterare la directory di default da dove
@@ -22,711 +23,37 @@ class ffPage_html extends ffPage_base
 	 */
 	var $sections 				= array();
 
+	var $js_browser_detection	= true;
+	
 	/**
 	 * Se deve essere utilizzato il framework Javascript
 	 * @var Boolean
 	 */
 	var $use_own_js				= true;
 
+	
 	/**
 	 * Javascript di default del framework
 	 * @var Boolean
 	 */
-	var $default_own_js				= array("ff" => array(
-														"path" => "/themes/library/ff"
-														, "file" => "ff.js"
-														, "async" => FALSE
-														, "embed" => NULL
-														, "exclude_compact" => FALSE
-											)
-											, "ff.ffevent" => array(
-														"path" => "/themes/library/ff"
-														, "file" => "ffEvent.js"
-														, "async" => FALSE
-														, "embed" => NULL
-														, "exclude_compact" => FALSE
-											)
-											, "ff.ffevents" => array(
-														"path" => "/themes/library/ff"
-														, "file" => "ffEvents.js"
-														, "async" => FALSE
-														, "embed" => NULL
-														, "exclude_compact" => FALSE
-											)	
-											, "ff.ffpage" => array(
-														"path" => "/themes/library/ff"
-														, "file" => "ffPage.js"
-														, "async" => FALSE
-														, "embed" => NULL
-														, "exclude_compact" => FALSE
-											)
-									);
-    var $cdn_version                = array(
-                                        "jquery" => array(
-                                                            "major" => "2"  
-                                                            , "minor" => "1"
-                                                            , "build" => "4" 
-                                                        )
-                                        , "jquery.ui" => array(
-                                                            "major" => "1"  
-                                                            , "minor" => "11"
-                                                            , "build" => "4"
-                                                        )
-                                        , "swfobject" => array(
-                                                            "major" => "2"  
-                                                            , "minor" => "2"
-                                                        )
-                                    );
-    var $framework_css_setting        = array(
-                                        "base" => array(
-                                            "params" => array(
-                                                "css" => ""
-                                                , "js" => ""
-                                                , "js_init" => ""
-                                            )
-                                            , "class" => array(
-                                                "container" => "container"
-                                                , "wrap" => "row"
-                                                , "skip-full" => false
-                                                , "row-prefix" => "row"
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "push-"
-                                                , "push-prepend" => ""
-                                                , "pull-append" => "pull-"
-                                                , "pull-prepend" => ""
-                                                , "skip-resolution" => true
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "class-fluid" => array(
-                                                "container" => "container-fluid"
-                                                , "wrap" => "row-fluid clearfix"
-                                                , "skip-full" => false
-                                                , "row-prefix" => ""
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "push-"
-                                                , "push-prepend" => ""
-                                                , "pull-append" => "pull-"
-                                                , "pull-prepend" => ""
-                                                , "skip-resolution" => true
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "resolution" => array()
-                                            , "resolution-media" => array()
-                                            , "button" => array(
-                                                "base"              => "btn"
-                                                , "skip-default"    => false
-                                                , "width"       => array(
-                                                    "full"          => "expand"
-                                                )
-                                                , "size"        => array(
-                                                    "large"         => "large"
-                                                    , "small"       => "small"
-                                                    , "tiny"        => "tiny"
-                                                )
-                                                , "state"       => array(
-                                                    "current"       => "current"
-                                                    , "disabled"    => "disabled"
-                                                )
-                                                , "corner"      => array(
-                                                    "round"         => "round"
-                                                    , "radius"      => "radius"
-                                                )
-                                                , "color"       => array(
-                                                    "default"       => ""
-                                                    , "primary"     => "primary"
-                                                    , "success"     => "success"
-                                                    , "info"        => "info"
-                                                    , "warning"     => "warning"
-                                                    , "danger"      => "danger"
-                                                    , "link"        => "link"
-                                                )                                                
-                                            )                                            
-                                            , "form" => array(
-                                                "component" => ""
-                                                , "component-inline" => ""
-                                                , "row" => "row"
-                                                , "row-padding" => "row padding"
-                                                , "row-full" => "row"
-                                                , "group" => "row-smart"
-                                                , "group-padding" => "row-smart padding"
-                                                , "label" => ""
-                                                , "label-inline" => "inline"
-                                                , "control" => ""
-                                                , "control-exclude" => array()
-                                                , "control-check-position" => "_pre_label"
-                                                , "control-prefix" => "prefix"
-                                                , "control-postfix" => "postfix"
-                                                , "control-feedback" => "postfix-feedback"
-                                                , "wrap-addon" => false
-                                            )
-                                            , "bar" => array(
-                                                "topbar" => "topbar"
-                                                , "navbar" => "navbar"
-                                            )
-                                            , "list" => array( ///classsi bootstrap da convertire
-                                                "group" => "list-group"
-                                                , "item" => "list-group-item"
-                                                , "item-button" => "list-group-item-action"
-                                                , "item-success" => "list-group-item-success"
-                                                , "item-info" => "list-group-item-info"
-                                                , "item-warning" => "list-group-item-warning"
-                                                , "item-danger" => "list-group-item-danger"
-                                                , "badge" => "badge"
-                                                , "current" => "active"
-                                                , "disabled" => "disabled"
-                                            )
-                                            , "callout" => array(
-                                                "default"       => "callout"
-                                                , "primary"     => "callout callout-primary"
-                                                , "success"     => "callout callout-success"
-                                                , "info"        => "callout callout-info"
-                                                , "warning"     => "callout callout-warning"
-                                                , "danger"      => "callout callout-danger"
-                                            )
-                                            
-                                            /*da trovare e gestire:
-                                            show        bs
-                                            radius         fd
-                                            round        fd
-                                            active        bs
-                                            disabled        bs
-                                            img-rounded        bs
-                                            img-circle        bs
-                                            img-thumbnail        bs
-                                            
-                                            text-muted        bs
-                                            text-primary        bs
-                                            text-success        bs
-                                            text-info        bs
-                                            text-warning        bs
-                                            text-danger        bs
-                                            
-                                            bg-primary        bs
-                                            bg-success        bs
-                                            bg-info            bs
-                                            bg-warning        bs
-                                            bg-danger        bs
-                                            
-                                            center-block    bs
-                                            
-                                            clearfix        bs
-                                            invisible        bs
-                                            text-hide        bs
-                                            
-                                                
-                                            */
-                                            , "pagination" => array(
-                                                "align-left" => "text-left"
-                                                , "align-center" => "text-center"
-                                                , "align-right" => "text-right"
-                                                , "pages" => "pagination"
-                                                , "arrows" => "arrow"
-                                                , "current" => "current"
-                                            )
-											, "table" => array(
-												"container" => ""
-												, "compact" => "table-condensed"
-												, "hover" => "table-hover"
-												, "border" => "table-bordered"
-												, "oddeven" => "table-striped"
-											)
-											, "tab" => array(
-												"menu" => "nav-tab"
-												, "menu-vertical" => "nav-tab vertical"
-												, "menu-vertical-right" => "nav-tab vertical right"
-												, "menu-vertical-wrap" => false
-												, "menu-item" => ""
-												, "menu-current" => "current"
-												, "pane" => "tab-content"
-												, "pane-item" => "tab-pane"
-												, "pane-current" => ""
-												, "pane-item-effect" => "tab-pane fade"
-												, "pane-current-effect" => ""
-											)
-											, "util" => array(
-                                                "left" => "left"
-                                                , "right" => "right"
-                                                , "hide" => "hidden"
-                                                , "align-left" => "align-left"
-                                                , "align-center" => "align-center"
-                                                , "align-right" => "align-right"
-                                                , "align-justify" => "align-justify"
-                                                , "text-nowrap" => "text-nowrap"
-                                                , "text-overflow" => "text-overflow"
-                                                , "text-lowercase" => "text-lowercase"
-                                                , "text-uppercase" => "text-uppercase"
-                                                , "text-capitalize" => "text-capitalize"
-                                                , "current" => "current"
-                                                , "equalizer-row" => "data-equalizer"
-                                                , "equalizer-col" => "data-equalizer-watch"
-                                                , "corner-radius" => "radius"
-                                                , "corner-round" => "round"
-                                                , "corner-circle" => "circle"
-                                                , "corner-thumbnail" => "thumbnail"
-                                                , "clear" => "clearfix"
-												, "text-muted"                  => "text-muted"
-								                , "text-primary"                => "text-primary"
-								                , "text-success"                => "text-success"
-								                , "text-info"                   => "text-info"
-								                , "text-warning"                => "text-warning"
-								                , "text-danger"                 => "text-danger"
-								                , "bg-primary"                  => "bg-primary"
-								                , "bg-success"                  => "bg-success"
-								                , "bg-info"                     => "bg-info"
-								                , "bg-warning"                  => "bg-warning"
-								                , "bg-danger"                   => "bg-danger"
-                                            )
-                                            , "data" => array(
-                                                "tab" => array(
-                                                        "menu" => 'data-tab'
-                                                        , "menu-link" => null
-                                                        , "pane" => null
-                                                        , "pane-item" => null
-                                                )
-                                                , "tooltip" => array(
-                                                    "elem" => null
-                                                )
-                                            )                                            
-                                        )
-                                        , "bootstrap" => array(
-                                            "params" => array(
-                                                "css" => "//netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"
-                                                , "js" => "//netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" 
-                                                , "js_init" => ""
-                                            )
-                                            , "class" => array(
-                                                "container" => "container"
-                                                , "wrap" => "container"
-                                                , "skip-full" => false 
-                                                , "row-prefix" => "container"
-                                                , "col-prefix" => ""
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "col-"
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => "col-"
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "class-fluid" => array(
-                                                "container" => "container-fluid"
-                                                , "wrap" => "row"
-                                                , "skip-full" => false
-                                                , "row-prefix" => "row"
-                                                , "col-prefix" => ""
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "col-"
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => "col-"
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "resolution" => array(
-                                                "xs"
-                                                , "sm"
-                                                , "md"
-                                                , "lg"
-                                            )
-                                            , "resolution-media" => array(
-                                            	"xs" => "(min-width:34em)"
-												, "sm" => "(min-width:48em)"
-												, "md" => "(min-width:62em)"
-												, "lg" => "(min-width:75em)"
-                                            )
-                                            , "button" => array(
-                                                "base"              => "btn"
-                                                , "skip-default"    => true
-                                                , "width"       => array(
-                                                    "full"          => "btn-block"
-                                                )
-                                                , "size"        => array(
-                                                    "large"         => "btn-lg"
-                                                    , "small"       => "btn-sm"
-                                                    , "tiny"        => "btn-xs"
-                                                )
-                                                , "state"       => array(
-                                                    "current"       => "active"
-                                                    , "disabled"    => "disabled"
-                                                )
-                                                , "corner"      => array(
-                                                    "round"         => false
-                                                    , "radius"      => false
-                                                )
-                                                , "color"       => array(
-                                                    "default"       => "btn-default"
-                                                    , "primary"     => "btn-primary"
-                                                    , "success"     => "btn-success"
-                                                    , "info"        => "btn-info"
-                                                    , "warning"     => "btn-warning"
-                                                    , "danger"      => "btn-danger"
-                                                    , "link"        => "btn-link"
-                                                )                                                
-                                            )
-                                            , "form" => array(
-                                                "component" => ""
-                                                , "component-inline" => "form-horizontal"
-                                                , "row" => "form-group clearfix"
-                                                , "row-padding" => "form-group clearfix padding"
-                                                , "row-full" => "form-group clearfix"
-                                                , "group" => "input-group"
-                                                , "group-padding" => "input-group padding"
-                                                , "label" => ""
-                                                , "label-inline" => "control-label"
-                                                , "control" => "form-control"
-                                                , "control-exclude" => array("checkbox", "radio")
-                                                , "control-check-position" => "_in_label"
-                                                , "control-prefix" => "input-group-addon"
-                                                , "control-postfix" => "input-group-addon"
-                                                , "control-feedback" => "form-control-feedback"
-                                                , "wrap-addon" => false	
-                                            )
-                                            , "bar" => array(
-                                                "topbar" => "nav navbar-nav"
-                                                , "navbar" => "nav nav-pills"
-                                            )
-                                            , "list" => array( 
-                                                "group" => "list-group"
-                                                , "item" => "list-group-item"
-                                                , "item-button" => "list-group-item-action"
-                                                , "item-success" => "list-group-item-success"
-                                                , "item-info" => "list-group-item-info"
-                                                , "item-warning" => "list-group-item-warning"
-                                                , "item-danger" => "list-group-item-danger"
-                                                , "badge" => "badge"
-                                                , "current" => "active"
-                                                , "disabled" => "disabled"
-                                            )
-                                            , "callout" => array(
-                                                "default"       => "bs-callout"
-                                                , "primary"     => "bs-callout bs-callout-primary"
-                                                , "success"     => "bs-callout bs-callout-success"
-                                                , "info"        => "bs-callout bs-callout-info"
-                                                , "warning"     => "bs-callout bs-callout-warning"
-                                                , "danger"      => "bs-callout bs-callout-danger"
-                                            )
-                                            , "pagination" => array(
-                                                "align-left" => "text-left" 
-                                                , "align-center" => "text-center" 
-                                                , "align-right" => "text-right"
-                                                , "pages" => "pagination"
-                                                , "arrows" => ""
-                                                , "current" => "active"
-                                            )          
-											, "table" => array(
-												"container" => "table"
-												, "compact" => "table-condensed"
-												, "hover" => "table-hover"
-												, "border" => "table-bordered"
-												, "oddeven" => "table-striped"
-											)
-											, "tab" => array(
-												"menu" => "nav nav-tabs"
-												, "menu-vertical" => "nav nav-tabs tabs-left"
-												, "menu-vertical-right" => "nav nav-tabs tabs-right"
-												, "menu-vertical-wrap" => true
-												, "menu-item" => ""
-												, "menu-current" => "active"
-												, "pane" => "tab-content"
-												, "pane-item" => "tab-pane"
-												, "pane-current" => "active"
-												, "pane-item-effect" => "tab-pane fade"
-												, "pane-current-effect" => "active in"
-											)
-                                            , "util" => array(
-                                                "left" => "pull-left"
-                                                , "right" => "pull-right"
-                                                , "hide" => "hidden"
-                                                , "align-left" => "text-left"
-                                                , "align-center" => "text-center"
-                                                , "align-right" => "text-right"
-                                                , "align-justify" => "text-justify"
-                                                , "text-nowrap" => "text-nowrap"
-                                                , "text-overflow" => "text-overflow"
-                                                , "text-lowercase" => "text-lowercase"
-                                                , "text-uppercase" => "text-uppercase"
-                                                , "text-capitalize" => "text-capitalize"
-                                                , "current" => "active"
-                                                , "equalizer-row" => "data-equalizer"
-                                                , "equalizer-col" => "data-equalizer-watch"
-                                                , "corner-radius" => "border-radius"
-                                                , "corner-round" => "img-rounded"
-                                                , "corner-circle" => "img-circle"
-                                                , "corner-thumbnail" => "img-thumbnail"
-                                                , "clear" => "clearfix"
-												, "text-muted"                  => "text-muted"
-								                , "text-primary"                => "text-primary"
-								                , "text-success"                => "text-success"
-								                , "text-info"                   => "text-info"
-								                , "text-warning"                => "text-warning"
-								                , "text-danger"                 => "text-danger"
-								                
-								                , "bg-primary"                  => "bg-primary"
-								                , "bg-success"                  => "bg-success"
-								                , "bg-info"                     => "bg-info"
-								                , "bg-warning"                  => "bg-warning"
-								                , "bg-danger"                   => "bg-danger"
-								               
-                                            )
-                                            , "data" => array(
-                                                "tab" => array(
-                                                    "menu" => null
-                                                    , "menu-link" => 'data-toggle="tab"'
-                                                    , "pane" => null
-                                                    , "pane-item" => null
-                                                )
-                                                , "tooltip" => array(
-                                                    "elem" => 'data-toggle="tooltip"'
-                                                )
-                                            )                                            
-                                            , "theme" => array(
-                                                "amelia" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia/bootstrap.min.css"
-                                                , "cerulean" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css"
-                                                , "cosmo" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cosmo/bootstrap.min.css"
-                                                , "cyborg" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cyborg/bootstrap.min.css"
-                                                , "flatly" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/flatly/bootstrap.min.css"
-                                                , "journal" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/journal/bootstrap.min.css"
-                                                , "readable" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/readable/bootstrap.min.css"
-                                                , "simplex" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/simplex/bootstrap.min.css"
-                                                , "slate" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/slate/bootstrap.min.css"
-                                                , "spacelab" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab/bootstrap.min.css"
-                                                , "united" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
-                                            )
-                                        )
-                                        , "foundation" => array(
-                                            "params" => array(
-                                                "css" => "//cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css" 
-                                                , "js" => "//cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.js" 
-                                                , "js_init" => 'jQuery(function() { jQuery(document).foundation(); });'//non funziona con la cache
-                                            )
-                                            , "class" => array(
-                                                "container" => "container"
-                                                , "wrap" => "row"
-                                                , "skip-full" => true
-                                                , "row-prefix" => "row"
-                                                , "col-prefix" => "columns"
-                                                , "col-hidden" => "hide-for-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => "-up"
-                                                , "push-append" => ""
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => ""
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-resolution" => false
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "class-fluid" => array(
-                                                "container" => "container-fluid"
-                                                , "wrap" => "row-fluid clearfix"
-                                                , "skip-full" => true
-                                                , "row-prefix" => ""
-                                                , "col-prefix" => "columns"
-                                                , "col-hidden" => "hide-for-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => "-up"
-                                                , "push-append" => ""
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => ""
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-resolution" => false
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "resolution" => array(
-                                                "small"
-                                                , "medium"
-                                                , "large"
-                                            )
-                                            , "resolution-media" => array(
-                                            	"small" => "(max-width: 40em)"
-												, "medium" => "(min-width: 40.063em)"
-												, "large" => "(min-width: 64.063em)"
-                                            )
-                                            , "button" => array(
-                                                "base"   => "button"
-                                                , "skip-default"    => true
-                                                , "width"     => array(
-                                                    "full"          => "expand"
-                                                )
-                                                , "size"    => array(
-                                                    "large"         => "large"
-                                                    , "small"       => "small"
-                                                    , "tiny"        => "tiny"
-                                                )
-                                                , "state"   => array(
-                                                    "current"       => "current"
-                                                    , "disabled"    => "disabled"
-                                                )
-                                                , "corner"  => array(
-                                                    "round"         => "round"
-                                                    , "radius"      => "radius"
-                                                )
-                                                , "color"   => array(
-                                                    "default"     => "secondary"
-                                                    , "primary"     => ""
-                                                    , "success"     => "success"
-                                                    , "info"        => "secondary"
-                                                    , "warning"     => "alert"
-                                                    , "danger"      => "alert"
-                                                    , "link"        => "secondary"
-                                                )                                                
-                                            )                                            
-                                            , "form" => array(
-                                                "component" => ""
-                                                , "component-inline" => ""
-                                                , "row" => "row"
-                                                , "row-padding" => "row padding"
-                                                , "row-full" => "columns"
-                                                , "group" => "row collapse"
-                                                , "group-padding" => "row collapse padding"
-                                                , "label" => ""
-                                                , "label-inline" => "inline right"
-                                                , "control" => ""
-                                                , "control-exclude" => array()
-                                                , "control-check-position" => "_pre_label"
-                                                , "control-prefix" => "prefix"
-                                                , "control-postfix" => "postfix"
-                                                , "control-feedback" => "postfix-feedback"
-                                                , "wrap-addon" => true
-                                            )
-                                            , "bar" => array(
-                                                "topbar" => "top-bar top-bar-section"
-                                                , "navbar" => "sub-nav"
-                                            )               
-                                            , "list" => array( ///classsi bootstrap da convertire
-                                                "group" => "list-group"
-                                                , "item" => "list-group-item"
-                                                , "item-button" => "list-group-item-action"
-                                                , "item-success" => "list-group-item-success"
-                                                , "item-info" => "list-group-item-info"
-                                                , "item-warning" => "list-group-item-warning"
-                                                , "item-danger" => "list-group-item-danger"
-                                                , "badge" => "badge"
-                                                , "current" => "active"
-                                                , "disabled" => "disabled"
-                                            )
-                                            , "callout" => array(
-                                                "default"       => "panel"
-                                                , "primary"     => "alert-box"
-                                                , "success"     => "alert-box success"
-                                                , "info"        => "panel callout"
-                                                , "warning"     => "alert-box warning"
-                                                , "danger"      => "alert-box alert"
-                                            )
-                                            , "pagination" => array(
-                                                "align-left" => "text-left" 
-                                                , "align-center" => "pagination-centered" //"text-center"
-                                                , "align-right" => "text-right"
-                                                , "pages" => "pagination"
-                                                , "arrows" => "arrow"
-                                                , "current" => "current"
-                                            )
-											, "table" => array(
-												"container" => ""
-												, "compact" => "table-condensed"
-												, "hover" => "table-hover"
-												, "border" => "table-bordered"
-												, "oddeven" => "table-striped"
-											)
-											, "tab" => array(
-												"menu" => "tabs"
-												, "menu-vertical" => "tabs vertical"
-												, "menu-vertical-right" => "tabs vertical right"
-												, "menu-vertical-wrap" => false
-												, "menu-item" => "tabs-title"
-												, "menu-current" => "is-active"
-												, "pane" => "tabs-content"
-												, "pane-item" => "tabs-panel"
-												, "pane-current" => "is-active"
-												, "pane-item-effect" => "tabs-panel fade"
-												, "pane-current-effect" => "is-active"
-											)
-                                            , "tooltip" => array(
-                                                "elem" => "has-tip"
-                                            )
-                                            , "util" => array(
-                                                "left" => "menu-left"
-                                                , "right" => "menu-right"
-                                                , "hide" => "hide"
-                                                , "align-left" => "text-left"
-                                                , "align-center" => "text-center"
-                                                , "align-right" => "text-right"
-                                                , "align-justify" => "text-justify"
-                                                , "text-nowrap" => "text-nowrap"    
-                                                , "text-overflow" => "text-overflow"         //custom
-                                                , "text-lowercase" => "text-lowercase"         //custom
-                                                , "text-uppercase" => "text-uppercase"         //custom
-                                                , "text-capitalize" => "text-capitalize"    //custom
-                                                , "current" => "active"
-                                                , "equalizer-row" => "data-equalizer"
-                                                , "equalizer-col" => "data-equalizer-watch"
-                                                , "corner-radius" => "radius"
-                                                , "corner-round" => "round"
-                                                , "corner-circle" => "img-circle"
-                                                , "corner-thumbnail" => "img-thumbnail"
-                                                , "clear" => "clearfix"
-												, "text-muted"                  => "text-muted"
-								                , "text-primary"                => "text-primary"
-								                , "text-success"                => "text-success"
-								                , "text-info"                   => "text-info"
-								                , "text-warning"                => "text-warning"
-								                , "text-danger"                 => "text-danger"
-								                
-								                , "bg-primary"                  => "bg-primary"
-								                , "bg-success"                  => "bg-success"
-								                , "bg-info"                     => "bg-info"
-								                , "bg-warning"                  => "bg-warning"
-								                , "bg-danger"                   => "bg-danger"
-								                                                               
-                                            )
-                                            , "data" => array(
-                                                "tab" => array(
-                                                    "menu" => 'data-tabs' 
-                                                    , "menu-link" => null
-                                                    , "pane" => 'data-tabs-content'
-                                                    , "pane-item" => null
-                                                ),
-                                                "tooltip" => array(
-                                                    "elem" => "data-tooltip"
-                                                )
-                                            )                                            
-                                        )
-                                    );                                    
-    var $font_icon_setting            = array(
-                                        "base" => array(
-                                             "css" => ""
-                                            , "prefix" => "icon"
-                                            , "postfix" => ""
-                                            , "prepend" => "ico-"
-                                            , "append" => ""
-                                        )
-                                        , "glyphicons" => array(
-                                             "css" => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"
-                                            , "prefix" => "glyphicons"
-                                            , "postfix" => ""
-                                            , "prepend" => ""
-                                            , "append" => ""
-                                        )
-                                        , "fontawesome" => array(
-                                             "css" => "//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css"
-                                            , "prefix" => "fa" 
-                                            , "postfix" => ""
-                                            , "prepend" => "fa-"
-                                            , "append" => ""
-                                        )
-                                    );                                    
+	var $default_js	= array(
+			"ff.ffPage" => null
+		);
+		
+	var $widget_tabs_placeholder = null;
+	var $widget_tabs_context = null;
+	
+	// loaded with libs.json
+    var $libraries = null;
+	
+	var $default_css	= array(
+		);
+	
+	var $libraries_css = array(
+		);
+                                    
+	var $css_browser_detection		= false;	
 
-    var $framework_css              = null;
-    var $font_icon					= null;
 	/**
 	 * Abilita o disabilita l'utilizzo del form
 	 * il default (null) lo considera abilitato
@@ -765,18 +92,11 @@ class ffPage_html extends ffPage_base
 	 */
 	var $form_enctype			= "";
 	
-	var $form_workaround		= true;
 	/**
 	 * Il tema di jquery.ui
 	 * @var String
 	 */
-	var $jquery_ui_theme 		= "smoothness";
-
-	/**
-	 * Il tema alternativo di jquery.ui
-	 * @var String
-	 */
-	var $jquery_ui_force_theme 	= null;
+	var $jquery_ui_theme 		= "base";
 	
 	/**
 	 * Il nome del template da caricare per l'utilizzo con ffPage
@@ -804,18 +124,22 @@ class ffPage_html extends ffPage_base
 	 * @var Array
 	 */
 	public $page_css				= array();
+	
 	public $compact_js 			   = false;
 	public $js_buffer 			   = array();
     public $override_js            = array(); 
+    
 	/**
 	 * I Javascript caricati nella pagina, identificati da un TAG
 	 * @var Array
 	 */
     public $page_js                	= array();
+    public $page_tags               = array();
+    
 	public $compress			   	= false;
-	public $minify					= "strip"; // can be: false, strip, strong_strip, minify
-    public $page_defer				= array(); // array keys js and css of all compress resources (js and css)
 	
+	public $minify					= "strip"; // HTML post-process, can be: false, strip, strong_strip, minify
+	public $page_defer				= array(); // array keys js and css of all compress resources (js and css)
 	/**
 	 * I Meta caricati nella pagina, identificati da un TAG
 	 * @var Array
@@ -834,6 +158,11 @@ class ffPage_html extends ffPage_base
 	 */
     public $class_body             = null;
 
+    /**
+     * Abilita i tab
+     * @var Boolean
+     */
+    public $tab				= true;// false OR top OR left OR right
 	/**
 	 * Il risultato JSON della pagina
 	 * @var Array
@@ -853,7 +182,13 @@ class ffPage_html extends ffPage_base
 	var $browser = null;
 	
 	var $canonical = null;
-	
+
+	var $js_counter = 0;
+	var $js_loaded = array();
+	var $css_counter = 0;
+	var $css_loaded = array();
+	var $above_the_fold = null;
+		
 	/**
 	 * Il costruttore, istanzia un nuovo oggetto ffPage
 	 * @param String $site_path
@@ -865,6 +200,22 @@ class ffPage_html extends ffPage_base
 	{
 		parent::__construct($site_path, $disk_path, $page_path, $theme);
 
+		//if ($this->libraries === null)
+		//	$this->libraries = ffTheme_restricted_get_libs($this, "theme/ff/ffPage");
+		
+		$glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
+
+		if (ffIsset($glob_libs->libs, "theme/ff/ffPage"))
+			$this->libsExtend($glob_libs->libs["theme/ff/ffPage"]);
+
+		foreach ($glob_libs->libs as $key => $value)
+		{
+			if ($key === "theme/ff/ffPage")
+				continue;
+
+			$this->libsExtend($value);
+		}
+		
 		$registry = ffGlobals::getInstance("_registry_");
 
 		if (isset($registry->themes[$this->theme]))
@@ -877,7 +228,7 @@ class ffPage_html extends ffPage_base
 			ffTheme_html_construct($this, cm_getMainTheme());
 		}
 
-		$this->tplAddJs("ff.ffPage", "ffPage.js", FF_THEME_DIR . "/library/ff"); 
+		$this->tplAddJs("ff.ffPage"); 
 	}
 
 	/**
@@ -913,6 +264,46 @@ class ffPage_html extends ffPage_base
 			return $this->disk_path . "/themes/" . $this->getTheme() . "/layouts";
 	}
 
+	public function libsExtend($addon)
+	{
+		cm_libsExtend($this->libraries, $addon);
+	}
+
+	public function resetCSS()
+	{
+		$this->page_css = array();
+		$this->css_buffer = array();
+		$this->css_counter = 0;
+		$this->css_loaded = array();
+	}
+	
+	public function tplAddMultiCss($elements, $priority = null)
+	{
+		if ($priority === null)
+		{
+			foreach ($elements as $css_queue_key => $css_queue)
+			{
+				foreach ($css_queue AS $css_key => $css_value)
+				{
+					$this->tplAddCss(
+							$css_key
+							, ffParamsMerge(array("priority" => $css_queue_key), $css_value)
+						);
+				}
+			}
+		}
+		else
+		{
+			foreach ($elements AS $css_key => $css_value)
+			{
+				$this->tplAddCss(
+						$css_key
+						, ffParamsMerge(array("priority" => $priority), $css_value)
+					);
+			}
+		}
+	}
+
 	/**
 	 * Aggiunge un CSS alla pagina
 	 * @param String $tag
@@ -927,113 +318,409 @@ class ffPage_html extends ffPage_base
 	 * @param String $priority la coda di priorità di caricamento del CSS, di default è "top"
 	 * @return Boolean se l'aggiunta ha avuto successo o meno
 	 */
-	public function tplAddCss($tag, $file = null, $path = null, $css_rel = "stylesheet", $css_type = "text/css", $overwrite = false, $async = false, $css_media = null, $exclude_compact = false, $priority = "top", $embed = null)
-	{
-		static $last_top = 0;
-		static $bottom_exist = false;
-        $found = false;
+    public function tplAddCss($tag, $params = null)
+    {
+        $file = null;
+        $path = null;
+        $css_rel = "stylesheet";
+        $css_type = "text/css";
+        $overwrite = false;
+        $async = null;
+        $css_media = null;
+        $exclude_compact = false;
+        $priority = cm::LAYOUT_PRIORITY_DEFAULT;
+        $embed = null;
+        $index = 0;
+        $version = null;
 
-        if ($file !== null && is_array($file))
+        if ($params !== null && is_array($params))
         {
-            $params = $file;
-            $file = null;
             if (ffIsset($params, "file"))				$file = $params["file"];
             if (ffIsset($params, "path"))				$path = $params["path"];
             if (ffIsset($params, "overwrite"))			$overwrite = $params["overwrite"];
+            if (ffIsset($params, "rel"))				$css_rel = $params["rel"];
+            if (ffIsset($params, "css_rel"))			$css_rel = $params["css_rel"];
+            if (ffIsset($params, "type"))				$css_type = $params["type"];
+            if (ffIsset($params, "css_type"))			$css_type = $params["css_type"];
+            if (ffIsset($params, "overwrite"))			$overwrite = $params["overwrite"];
             if (ffIsset($params, "async"))				$async = $params["async"];
-            if (ffIsset($params, "embed"))				$embed = $params["embed"];
+            if (ffIsset($params, "css_media"))			$css_media = $params["css_media"];
             if (ffIsset($params, "exclude_compact"))	$exclude_compact = $params["exclude_compact"];
             if (ffIsset($params, "priority"))			$priority = $params["priority"];
+            if (ffIsset($params, "embed"))				$embed = $params["embed"];
             if (ffIsset($params, "index"))				$index = $params["index"];
             if (ffIsset($params, "version"))			$version = $params["version"];
         }
 
-		if($css_type != "text/css")
-			$exclude_compact = true;
-
-        foreach ($this->page_css AS $css_key => $css_value)
-        {
-            if(
-                    $css_value["path"] == $path
-                    && $css_value["file"] == $file
-                    && $css_value["path"] !== null
-                    && $css_value["file"] !== null
-                )
-            {
-                $found = $css_key;
-                break;
-            }
-        }
-        reset($this->page_css);
-
-		if (!$found && isset($this->page_css[strtolower($tag)]))
-			$found = strtolower($tag);
-
-        if(!$found)
-        {
-        	if($priority == "first") {
-        		
-        		$this->page_css = array(strtolower($tag) => array(
-															  "path" => $path
-															, "file" => $file
-	                                                        , "rel"  => $css_rel
-	                                                        , "type" => $css_type
-	                                                        , "async" => $async
-	                                                        , "media" => $css_media
-	                                                        , "exclude_compact" => $exclude_compact
-	                                                        , "embed" => $embed
-														)) + $this->page_css;
-	            $last_top++;
-        	} elseif($priority == "top" && $bottom_exist) {
-				$tmp_css_top = array_slice($this->page_css, 0, $last_top, true);
-				$tmp_css_bottom = array_slice($this->page_css, $last_top, count($this->page_css) - $last_top, true);
-				$tmp_css_top[strtolower($tag)] = array(
-															  "path" => $path
-															, "file" => $file
-	                                                        , "rel"  => $css_rel
-	                                                        , "type" => $css_type
-	                                                        , "async" => $async
-	                                                        , "media" => $css_media
-	                                                        , "exclude_compact" => $exclude_compact
-	                                                        , "embed" => $embed
-														);
-	            $this->page_css = array_merge($tmp_css_top, $tmp_css_bottom);
-
-	            $last_top++;
-			} else {
-			    $this->page_css[strtolower($tag)] = array(
-															  "path" => $path
-															, "file" => $file
-	                                                        , "rel"  => $css_rel
-	                                                        , "type" => $css_type
-	                                                        , "async" => $async
-	                                                        , "media" => $css_media
-	                                                        , "exclude_compact" => $exclude_compact
-	                                                        , "embed" => $embed
-														);
-	            if(!$bottom_exist && count($this->page_css) > 1)
-	            	$last_top++;
-	            
-	            $bottom_exist = true;
-			}			
-        }
-		elseif ($overwrite)
+		/*if ($file === "jquery.css")
+			ffErrorHandler::raise("DEBUG CSS", E_USER_ERROR, $this, get_defined_vars());
+		if ($file === "jquery-ui.css")
+			ffErrorHandler::raise("DEBUG CSS", E_USER_ERROR, $this, get_defined_vars());
+		*/	
+		if(!$this->jquery_ui_theme && strpos($tag, "jquery-ui.") === 0) {
+			return true;
+		}
+		
+		if (!$overwrite && ffIsset($this->css_loaded, $tag))
+			return true;
+		
+		$tmp_async = ($async !== null ? $async : (
+							$this->isXHR() ? true : false
+						)
+				);
+		
+		// before, check for libraries
+		$deps = array(
+				"js" => array()
+				, "css" => array()
+			);
+		
+		// before, check for libraries
+		$lib_parts = explode(".", $tag);
+		$lib_parts_last = array_pop($lib_parts); // exclude last (this)
+		$tmp_css_deps = array();
+		$last_ref = $this->libraries;
+		$is_css_defs = false;
+		for ($i = 0; $i < count($lib_parts); $i++)
 		{
-		    $this->page_css[$found] = array(
-														  "path" => $path
-														, "file" => $file
-                                                        , "rel"  => $css_rel
-                                                        , "type" => $css_type
-                                                        , "async" => $async
-                                                        , "media" => $css_media
-                                                        , "exclude_compact" => $exclude_compact
-                                                        , "embed" => $embed
-													);
+			$name = $lib_parts[$i];		
+			$tmp_found = ffIsset($last_ref, $name);
+			if (!$tmp_found)
+			{
+				$ret = $this->doEvent("tplAddCss_not_found", array($this, $tag, $params));
+				$rc = end($ret);
+				if ($rc)
+					return;
+			}
+			
+			if ($tmp_found)
+			{
+				if ($i === 0) // primo livello, controllo di versione
+				{
+					if (!ffIsset($last_ref[$name], "default"))
+						ffErrorHandler::raise ("Malformed Libraries Structure", E_USER_ERROR, null, get_defined_vars());
+					
+					$lib_version = (is_null($version) ? $last_ref[$name]["default"] : $version);
+					if (!ffIsset($last_ref[$name], $lib_version))
+						ffErrorHandler::raise ("Version not found", E_USER_ERROR, null, get_defined_vars());
+
+					$last_ref = $last_ref[$name][$lib_version];
+				}
+				else
+					$last_ref = $last_ref[$name];
+				
+				$tmp_css_deps[] = $name;
+				if (!ffIsset($last_ref, "empty") || !$last_ref["empty"])
+					$deps[($is_css_defs ? "css" : "js")][0] = implode(".", $tmp_css_deps);
+
+				if (ffIsset($last_ref, "css_defs"))
+				{
+					$is_css_defs = true;
+					$last_ref = $last_ref["css_defs"];
+				}
+				else
+					break;
+			}
+			else
+				break;
+		}
+		
+		if ($i > 0 && $i < count($lib_parts))
+		{
+			$last_ref = $this->libraries;
+			$i = 0;
+		}
+		
+		if ($i > 0)
+		{
+			$tmp_found = ffIsset($last_ref, $lib_parts_last);
+
+			if (!$tmp_found)
+			{
+				$ret = $this->doEvent("tplAddCss_not_found", array($this, $tag, $params));
+				$rc = end($ret);
+				if ($rc)
+					return;
+			}
+				
+			if (!$tmp_found)
+			{
+				$last_ref = $this->libraries[$lib_parts_last];
+				$i = 0;
+			}
+			else
+			{
+				$found = true;
+				$lib_data = $last_ref[$lib_parts_last];
+			}
+		}
+		
+		if ($i === 0 && ffIsset($last_ref, $tag))
+		{
+			if (!ffIsset($last_ref[$tag], "default"))
+				ffErrorHandler::raise ("Malformed Libraries Structure", E_USER_ERROR, null, get_defined_vars());
+
+			$lib_version = (is_null($version) ? $last_ref[$tag]["default"] : $version);
+			if (!ffIsset($last_ref[$tag], $lib_version))
+				ffErrorHandler::raise ("Version not found", E_USER_ERROR, null, get_defined_vars());
+
+			$found = true;
+			$lib_data = $last_ref[$tag][$lib_version];
+		}
+
+		// load base deps
+		if (count($deps["js"]))
+		{
+			$ret = $this->tplAddJs($deps["js"][0]);
+			/*foreach ($deps["js"] as $tmp)
+			{
+				$ret = $this->tplAddJs($tmp);
+				//$deps["js"] = array_merge($deps["js"], $ret);
+			}*/
+		}
+		if (count($deps["css"]))
+		{
+			$ret = $this->tplAddCss($deps["css"][0]);
+			/*foreach ($deps["js"] as $tmp)
+			{
+				$ret = $this->tplAddJs($tmp);
+				//$deps["js"] = array_merge($deps["js"], $ret);
+			}*/
+		}
+		
+		// got library! we can replace defaults
+		if ($found)
+		{
+			if (ffIsset($lib_data, "js_deps"))
+			{
+				foreach ($lib_data["js_deps"] as $js_key => $js_value)
+				{
+					if ($js_key === "_//_")
+						continue;
+					
+					if ($js_value !== false && !ffIsset($js_value, "embed"))
+						$deps["js"][] = (strpos($js_key, ".") === 0 ? $tag : "") . $js_key;
+
+					$ret = $this->tplAddJs(
+							(strpos($js_key, ".") === 0 ? $tag : "") . $js_key
+							, ffParamsMerge(array("async" => $tmp_async), ($js_value === false ? null : $js_value))
+						);
+					//$deps["js"] = array_merge($deps["js"], $ret);
+				}
+			}
+			
+			if (ffIsset($lib_data, "css_deps"))
+			{
+				foreach ($lib_data["css_deps"] as $css_key => $css_value)
+				{
+					$tmp_tag = (strpos($css_key, ".") === 0 ? $tag : "") . $css_key;
+					if(!(!$this->jquery_ui_theme && strpos($tmp_tag, "jquery-ui.") === 0)) {
+						$deps["css"][] = $tmp_tag;
+						$ret = $this->tplAddCss(
+								$tmp_tag
+								, ffParamsMerge(array("async" => $tmp_async), $css_value)
+							);
+					}
+				}
+			}
+			
+			if (!ffIsset($lib_data, "empty") || !$lib_data["empty"])
+			{
+                if (!ffIsset($params, "file")) $file = (ffIsset($lib_data, "file") ? $lib_data["file"] : null);
+                if (!ffIsset($params, "path")) $path = (ffIsset($lib_data, "path") ? $lib_data["path"] : null);
+                if (!ffIsset($params, "overwrite")) $overwrite = (ffIsset($lib_data, "overwrite") ? $lib_data["overwrite"] : false);
+                if (!ffIsset($params, "async")) $tmp_async = (ffIsset($lib_data, "async") ? $lib_data["async"] : $tmp_async);
+                if (!ffIsset($params, "embed")) $embed = (ffIsset($lib_data, "embed") ? $lib_data["embed"] : null);
+                if (!ffIsset($params, "exclude_compact")) $exclude_compact = (ffIsset($lib_data, "exclude_compact") ? $lib_data["exclude_compact"] : false);
+                if (!ffIsset($params, "priority")) $priority = (ffIsset($lib_data, "priority") ? $lib_data["priority"] : cm::LAYOUT_PRIORITY_HIGH);
+                if (!ffIsset($params, "index")) $index = (ffIsset($lib_data, "index") ? $lib_data["index"] : 0);
+			}
+		}
+				
+		$this->css_loaded[$tag] = true;
+
+        if (
+            (!ffIsset($lib_data, "empty") || !$lib_data["empty"])
+            || $file !== null || $path !== null
+        )
+        {
+			// found previous occourrence
+			foreach ($this->page_css AS $css_queue_key => $css_queue)
+			{
+				foreach ($css_queue AS $css_key => $css_value)
+				{
+					if (
+							$css_key == $tag
+							/*|| (
+								$css_value["path"] == $path
+								&& $css_value["file"] == $file
+								&& $css_value["path"] !== null
+								&& $css_value["file"] !== null
+							)*/
+						)
+					{
+						$found_tag = $css_key;
+						$found_queue = $css_queue_key;
+						break;
+					}
+				}
+			}
+			
+			if ($found_tag)
+			{
+				if ($overwrite)
+					unset($this->page_css[$found_queue][$found_tag]);
+				else
+					return true;
+					//ffErrorHandler::raise ("Duplicated Element", E_USER_ERROR, null, get_defined_vars());
+			}
+			
+			if (!$found || $file !== null && $path !== null)
+			{
+				if ($priority === CM::LAYOUT_PRIORITY_TOPLEVEL && count($this->page_css[CM::LAYOUT_PRIORITY_TOPLEVEL]))
+						ffErrorHandler::raise("TOPLEVEL CSS already exsts", E_USER_ERROR, null, get_defined_vars());
+				
+				if ($priority === CM::LAYOUT_PRIORITY_FINAL && count($this->page_css[CM::LAYOUT_PRIORITY_FINAL]))
+						ffErrorHandler::raise("FINAL CSS already exsts", E_USER_ERROR, null, get_defined_vars());
+				
+				$this->css_counter++;
+				//if ($file == "ff.js") ffErrorHandler::raise("asd", E_USER_ERROR, $this, get_defined_vars());
+				
+				$this->page_css[$priority][$tag] = array(
+						"path" => $path
+						, "file" => $file
+						, "rel"  => $css_rel
+						, "type" => $css_type
+						, "async" => $tmp_async
+						, "media" => $css_media
+						, "exclude_compact" => $exclude_compact
+						, "embed" => $embed
+						, "index" => $index
+						, "counter" => $this->css_counter * -1
+						, "version" => $lib_version
+					);
+			}
+		}
+		
+		if ($tag === "jquery-ui.core")
+		{
+			$this->tplAddCss(
+				"jquery-ui.theme"
+				, array(
+					"file" => $this->jquery_ui_theme . "/theme.css"
+					, "path" => "/themes/library/jquery-ui.themes"
+					, "css_rel" => "stylesheet"
+					, "css_type" => "text/css"
+					, "async" => $tmp_async
+					, "priority" => cm::LAYOUT_PRIORITY_HIGH
+					, "index" => 199
+				)
+			);
+		}
+		
+		if ($found)
+		{
+			if (ffIsset($lib_data, "js_loads"))
+			{
+				foreach ($lib_data["js_loads"] as $js_key => $js_value)
+				{
+					if ($js_key === "_//_")
+						continue;
+					
+					$tmp_values = array(
+						"async" => $tmp_async
+					);
+					$tmp_key = $js_key;
+					
+					if (strpos($js_key, ".") === 0)
+					{
+						$tmp_values["priority"] = $priority;
+						$tmp_values["index"] = $index;
+						$tmp_key = $tag . $js_key;
+					}
+					
+					//$deps["js"][] = $js_key;
+					$ret = $this->tplAddJs(
+							$tmp_key
+							, ffParamsMerge($tmp_values, $js_value)
+						);
+					//$deps["js"] = array_merge($deps["js"], $ret);
+				}
+			}
+
+			if (ffIsset($lib_data, "css_loads"))
+			{
+				foreach ($lib_data["css_loads"] as $css_key => $css_value)
+				{
+					//$deps["css"][] = $css_key;
+					//$this->page_js[$priority][$tag]["deps"]["css"][] = $css_key;
+					$tmp_values = array(
+						"async" => $tmp_async
+					);
+					$tmp_key = $css_key;
+					
+					if (strpos($css_key, ".") === 0)
+					{
+						$tmp_values["priority"] = $priority;
+						$tmp_values["index"] = $index;
+						$tmp_key = $tag . $css_key;
+					}
+					
+					$ret = $this->tplAddCss(
+							$tmp_key
+							, ffParamsMerge($tmp_values, $css_value)
+						);
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public function resetJS()
+	{
+		$this->page_js = array();
+		$this->js_buffer = array();
+		$this->js_counter = 0;
+		$this->js_loaded = array();
+	}
+	
+	public function tplAddMultiJS($elements, $priority = null)
+	{
+		if ($priority === null)
+		{
+			if (!is_array($elements))
+				ffErrorHandler::raise ("Wrong elements", E_USER_ERROR, $this, get_defined_vars());
+			
+			foreach ($elements as $js_queue_key => $js_queue)
+			{
+				foreach ($js_queue AS $js_key => $js_value)
+				{
+					if ($js_key === "_//_")
+						continue;
+					
+					$this->tplAddJs(
+							$js_key
+							, ffParamsMerge(array("priority" => $js_queue_key), $js_value)
+						);
+				}
+			}
 		}
 		else
-			return false;
-
-		return true;
+		{
+			if (!is_array($elements))
+				ffErrorHandler::raise ("Wrong elements", E_USER_ERROR, $this, get_defined_vars());
+			foreach ($elements AS $js_key => $js_value)
+			{
+				if ($js_key === "_//_")
+					continue;
+				
+				$this->tplAddJs(
+						$js_key
+						, ffParamsMerge(array("priority" => $priority), $js_value)
+					);
+			}
+		}
 	}
 	
     /**
@@ -1046,97 +733,305 @@ class ffPage_html extends ffPage_base
 	 * @param Boolean $embed specifica l'attributo EMBED
 	 * @return Boolean l'esito dell'operazione
 	 */
-    public function tplAddJs($tag, $file = null, $path = null, $overwrite = false, $async = false, $embed = null, $exclude_compact = false, $priority = "top")
+    public function tplAddJs($tag, $file = null, $path = null, $overwrite = false, $async = null, $embed = null, $exclude_compact = false, $priority = cm::LAYOUT_PRIORITY_DEFAULT, $index = 0, $version = null)
     {
-		static $last_top = 0;
-		static $bottom_exist = true;
-        $found = false;
+		/*$globals = ffGlobals::getInstance();
+		if ($globals->test)
+			ffErrorHandler::raise ("ASD", E_USER_ERROR, $this, get_defined_vars ());*/
+	
+		if ($file !== null && is_array($file))
+		{
+			$params = $file;
+			$file = null;
+			if (ffIsset($params, "file"))				$file = $params["file"];
+			if (ffIsset($params, "path"))				$path = $params["path"];
+			if (ffIsset($params, "overwrite"))			$overwrite = $params["overwrite"];
+			if (ffIsset($params, "async"))				$async = $params["async"];
+			if (ffIsset($params, "embed"))				$embed = $params["embed"];
+			if (ffIsset($params, "exclude_compact"))	$exclude_compact = $params["exclude_compact"];
+			if (ffIsset($params, "priority"))			$priority = $params["priority"];
+			if (ffIsset($params, "index"))				$index = $params["index"];
+			if (ffIsset($params, "version"))			$version = $params["version"];
+		}
+			
+		if (!$overwrite && ffIsset($this->js_loaded, $tag))
+			return $this->js_loaded[$tag];
+		
+		$this->js_loaded[$tag] = array(); // avoid infinite recursion
+		
+		$tmp_async = ($async !== null ? $async : (
+							$this->isXHR() ? true : false
+						)
+				);
 
-        if ($file !== null && is_array($file))
-        {
-            $params = $file;
-            $file = null;
-            if (ffIsset($params, "file"))				$file = $params["file"];
-            if (ffIsset($params, "path"))				$path = $params["path"];
-            if (ffIsset($params, "overwrite"))			$overwrite = $params["overwrite"];
-            if (ffIsset($params, "async"))				$async = $params["async"];
-            if (ffIsset($params, "embed"))				$embed = $params["embed"];
-            if (ffIsset($params, "exclude_compact"))	$exclude_compact = $params["exclude_compact"];
-            if (ffIsset($params, "priority"))			$priority = $params["priority"];
-            if (ffIsset($params, "index"))				$index = $params["index"];
-            if (ffIsset($params, "version"))			$version = $params["version"];
-        }
-
-        foreach ($this->page_js AS $js_key => $js_value)
-        {
-            if(
-            		   $js_value["path"] == $path 
-            		&& $js_value["file"] == $file
-            		&& $js_value["path"] !== null 
-            		&& $js_value["file"] !== null
-            	) 
-            {
-                $found = $js_key;
-                break;
-            }
-        }
-        reset($this->page_js);
-        
-		if (!$found && isset($this->page_js[strtolower($tag)]))
-			$found = strtolower($tag);
-
-        if (!$found)
-        {
-        	if($priority == "first") {
-        		$this->page_js = array(strtolower($tag) => array(
-	                                                          "path" => $path
-	                                                        , "file" => $file
-	                                                        , "async" => $async
-	                                                        , "embed" => $embed
-	                                                        , "exclude_compact" => $exclude_compact
-	                                                    )) + $this->page_js;
-	            $last_top++;
-        	} elseif($priority == "top" && $bottom_exist) {
-				$tmp_js_top = array_slice($this->page_js, 0, $last_top, true);
-				$tmp_js_bottom = array_slice($this->page_js, $last_top, count($this->page_js) - $last_top, true);
-				$tmp_js_top[strtolower($tag)] = array(
-	                                                          "path" => $path
-	                                                        , "file" => $file
-	                                                        , "async" => $async
-	                                                        , "embed" => $embed
-	                                                        , "exclude_compact" => $exclude_compact
-	                                                    );
-	            $this->page_js = array_merge($tmp_js_top, $tmp_js_bottom);
-
-	            $last_top++;
-			} else {
-	            $this->page_js[strtolower($tag)] = array(
-	                                                          "path" => $path
-	                                                        , "file" => $file
-	                                                        , "async" => $async
-	                                                        , "embed" => $embed
-	                                                        , "exclude_compact" => $exclude_compact
-	                                                    );
-	            if(!$bottom_exist)
-	            	$last_top++;
-	            
-	            $bottom_exist = true;
+		// before, check for libraries
+		$deps = array(
+				"js" => array()
+				, "css" => array()
+			);
+		
+		$lib_parts = explode(".", $tag);
+		$lib_parts_last = array_pop($lib_parts); // exclude last (this)
+		$tmp_js_deps = array();
+		$last_ref = $this->libraries;
+		for ($i = 0; $i < count($lib_parts); $i++)
+		{
+			$name = $lib_parts[$i];
+			$tmp_found = ffIsset($last_ref, $name);
+			
+			if (!$tmp_found)
+			{
+				$ret = $this->doEvent("tplAddJs_not_found", array($this, $tag, $params));
+				$rc = end($ret);
+				if ($rc)
+					return;				
 			}
-        }
-        elseif ($overwrite)
-        {
-            $this->page_js[$found] = array(
-                                                          "path" => $path
-                                                        , "file" => $file
-                                                        , "async" => $async
-                                                        , "embed" => $embed
-                                                        , "exclude_compact" => $exclude_compact
-                                                    );
-        }
-		else
-			return false;
+			
+			if ($tmp_found)
+			{
+				if ($i === 0) // primo livello, controllo di versione
+				{
+					if (!ffIsset($last_ref[$name], "default"))
+						ffErrorHandler::raise ("Malformed Libraries Structure", E_USER_ERROR, null, get_defined_vars());
+					
+					$lib_version = (is_null($version) ? $last_ref[$name]["default"] : $version);
+					if (!ffIsset($last_ref[$name], $lib_version))
+						ffErrorHandler::raise ("Version not found", E_USER_ERROR, null, get_defined_vars());
 
-		return true;
+//					$lib_data = $lib_value[$lib_version];
+					$last_ref = $last_ref[$name][$lib_version];
+				}
+				else
+					$last_ref = $last_ref[$name];
+				
+				$tmp_js_deps[] = $name;
+				//$deps["js"][] = implode(".", $tmp_js_deps);
+				if (!ffIsset($last_ref, "empty") || !$last_ref["empty"])
+					$deps["js"][0] = implode(".", $tmp_js_deps);
+
+				if (ffIsset($last_ref, "js_defs"))
+					$last_ref = $last_ref["js_defs"];
+				else
+					break;
+			}
+			else
+				break;
+		}
+		
+		if (!$tmp_found)
+		{
+			$last_ref = $this->libraries;
+			$i = 0;
+		}
+		
+		if ($embed === null && $file === null && $path === null)
+		{
+			if ($tmp_found)
+			{
+				$tmp_found = ffIsset($last_ref, $lib_parts_last);
+				if (!$tmp_found)
+				{
+					$ret = $this->doEvent("tplAddJs_not_found", array($this, $tag, $params));
+					$rc = end($ret);
+					if ($rc)
+						return;
+				}
+					
+				if (!$tmp_found)
+				{
+					$last_ref = $this->libraries[$lib_parts_last];
+					$i = 0;
+				}
+				else
+				{
+					$found = true;
+					$lib_data = $last_ref[$lib_parts_last];
+				}
+			}
+		}
+				
+		if ($i === 0 && !$tmp_found && ffIsset($last_ref, $tag))
+		{
+			if (!ffIsset($last_ref[$tag], "default"))
+				ffErrorHandler::raise ("Malformed Libraries Structure", E_USER_ERROR, null, get_defined_vars());
+
+			$lib_version = (is_null($version) ? $last_ref[$tag]["default"] : $version);
+			if (!ffIsset($last_ref[$tag], $lib_version))
+				ffErrorHandler::raise ("Version not found", E_USER_ERROR, null, get_defined_vars());
+
+			$found = true;
+			$lib_data = $last_ref[$tag][$lib_version];
+		}
+
+		// eliminate parents
+		/*if (count($deps["js"]))
+			$deps["js"] = array(end($deps["js"]));*/
+		
+		// load base deps
+		if (count($deps["js"]))
+		{
+			$ret = $this->tplAddJs($deps["js"][0]);
+			/*foreach ($deps["js"] as $tmp)
+			{
+				$ret = $this->tplAddJs($tmp);
+				//$deps["js"] = array_merge($deps["js"], $ret);
+			}*/
+		}
+		
+		// got library! we can load deps and replace defaults
+		if ($found)
+		{
+			if (ffIsset($lib_data, "js_deps"))
+			{
+				foreach ($lib_data["js_deps"] as $js_key => $js_value)
+				{
+					if ($js_key === "_//_")
+						continue;
+					
+					if ($js_value !== false && !ffIsset($js_value, "embed"))
+						$deps["js"][] = (strpos($js_key, ".") === 0 ? $tag : "") . $js_key;
+						
+					$ret = $this->tplAddJs(
+							(strpos($js_key, ".") === 0 ? $tag : "") . $js_key
+							, ffParamsMerge(array("async" => $tmp_async), ($js_value === false ? null : $js_value))
+						);
+					//$deps["js"] = array_merge($deps["js"], $ret);
+				}
+			}
+			
+			if (ffIsset($lib_data, "css_deps"))
+			{
+				foreach ($lib_data["css_deps"] as $css_key => $css_value)
+				{
+					$tmp_tag = (strpos($css_key, ".") === 0 ? $tag : "") . $css_key;
+					if(!(!$this->jquery_ui_theme && strpos($tmp_tag, "jquery-ui.") === 0)) {
+						$deps["css"][] = $tmp_tag;
+						$ret = $this->tplAddCss(
+								$tmp_tag
+								, ffParamsMerge(array("async" => $tmp_async), $css_value)
+							);
+					}
+				}
+			}
+			
+			if (!ffIsset($lib_data, "empty") || !$lib_data["empty"])
+			{
+				$file = (ffIsset($lib_data, "file") ? $lib_data["file"] : null);
+				$path = (ffIsset($lib_data, "path") ? $lib_data["path"] : null);
+				//$overwrite = (ffIsset($lib_data, "overwrite") ? $lib_data["overwrite"] : false);
+				$tmp_async = (ffIsset($lib_data, "async") ? $lib_data["async"] : $tmp_async);
+				$embed = (ffIsset($lib_data, "embed") ? $lib_data["embed"] : null);
+				$exclude_compact = (ffIsset($lib_data, "exclude_compact") ? $lib_data["exclude_compact"] : false);
+				$priority = (ffIsset($lib_data, "priority") ? $lib_data["priority"] : cm::LAYOUT_PRIORITY_HIGH);
+				$index = (ffIsset($lib_data, "index") ? $lib_data["index"] : 0);
+			}
+		}
+		
+		$deps["js"] = array_unique($deps["js"]);
+		$this->js_loaded[$tag] = $deps;
+		
+		if (($found && (!ffIsset($lib_data, "empty") || !$lib_data["empty"])) || (!$found && ($embed !== null || $file !== null || $path !== null)))
+		{
+			foreach ($this->page_js AS $js_queue_key => $js_queue)
+			{
+				foreach ($js_queue AS $js_key => $js_value)
+				{
+					if (
+							$js_key == $tag
+						)
+					{
+						$found_tag = $js_key;
+						$found_queue = $js_queue_key;
+						break;
+					}
+				}
+			}
+
+			if ($found_tag)
+			{
+				if ($overwrite)
+					unset($this->page_js[$found_queue][$found_tag]);
+				else
+					return $deps;
+			}
+
+			if ($priority === CM::LAYOUT_PRIORITY_TOPLEVEL && count($this->page_js[CM::LAYOUT_PRIORITY_TOPLEVEL]))
+					ffErrorHandler::raise("TOPLEVEL JS already exsts", E_USER_ERROR, null, get_defined_vars());
+
+			if ($priority === CM::LAYOUT_PRIORITY_FINAL && count($this->page_js[CM::LAYOUT_PRIORITY_FINAL]))
+					ffErrorHandler::raise("FINAL JS already exsts", E_USER_ERROR, null, get_defined_vars());
+
+			$this->js_counter++;
+
+			$this->page_js[$priority][$tag] = array(
+					"path" => $path
+					, "file" => $file
+					, "async" => $tmp_async
+					, "embed" => $embed
+					, "exclude_compact" => $exclude_compact
+					, "index" => $index
+					, "counter" => $this->js_counter * -1
+					, "version" => $lib_version
+					, "deps" => $deps
+				);
+		}
+		
+		if ($found)
+		{
+			if (ffIsset($lib_data, "js_loads"))
+			{
+				foreach ($lib_data["js_loads"] as $js_key => $js_value)
+				{
+					if ($js_key === "_//_")
+						continue;
+					
+					$tmp_values = array(
+						"async" => $tmp_async
+					);
+					$tmp_key = $js_key;
+					
+					if (strpos($js_key, ".") === 0)
+					{
+						$tmp_values["priority"] = $priority;
+						$tmp_values["index"] = $index;
+						$tmp_key = $tag . $js_key;
+					}
+					
+					$ret = $this->tplAddJs(
+							$tmp_key
+							, ffParamsMerge($tmp_values, $js_value)
+						);
+					//$deps["js"] = array_merge($deps["js"], $ret);
+				}
+			}
+
+			if (ffIsset($lib_data, "css_loads"))
+			{
+				foreach ($lib_data["css_loads"] as $css_key => $css_value)
+				{
+					//$deps["css"][] = $css_key;
+					//$this->page_js[$priority][$tag]["deps"]["css"][] = $css_key;
+					$tmp_values = array(
+						"async" => $tmp_async
+					);
+					$tmp_key = $css_key;
+					
+					if (strpos($css_key, ".") === 0)
+					{
+						$tmp_values["priority"] = $priority;
+						$tmp_values["index"] = $index;
+						$tmp_key = $tag . $css_key;
+					}
+					
+					$ret = $this->tplAddCss(
+							$tmp_key
+							, ffParamsMerge($tmp_values, $css_value)
+						);
+				}
+			}
+		}
+			
+		return $deps;
     }
 
     /**
@@ -1161,6 +1056,40 @@ class ffPage_html extends ffPage_base
 		else
 			return false;
     }
+
+	public function tplAddTag($type, $params = array())
+	{
+		switch($type) 
+		{
+			case "canonical":
+				$params["rel"] = "canonical";
+				$tag = "link";
+				break;
+			case "next":
+				$params["rel"] = "next";
+				$tag = "link";
+				break;
+			case "prev":
+				$params["rel"] = "prev";
+				$tag = "link";
+				break;
+			case "alternate":
+				$params["rel"] = "alternate";
+				$tag = "link";
+				break;
+			case "favicon":
+			case "icon":
+				$params["rel"] = "icon";
+				$tag = "link";
+				break;
+			default:
+				$tag = $type;
+		}			
+
+		$this->page_tags[$tag][] = $params;
+		return true;
+	}
+	    
     /**
 	 * Aggiunge un Attributo al TAG html
 	 * @param String $name il nome dell'attributo
@@ -1186,11 +1115,12 @@ class ffPage_html extends ffPage_base
 	public function tplLoad($tpl = null)
 	{
 		if ($this->template_loaded)
-		    return;
-
+			return;
+		
+		$this->template_loaded = true;
 		if ($tpl === null)
 		{
-			if ($this->getXHRDialog() && $this->template_file === "ffPage.html")
+			if ($this->getXHRCtx() && $this->template_file === "ffPage.html")
 			{
 				$tmp = $this->getTemplateDir("ffPage_dialog.html");
 				if ($tmp !== null)
@@ -1212,24 +1142,24 @@ class ffPage_html extends ffPage_base
 		}
 		else
 			$this->tpl[0] = $tpl;
-		
-        $this->tpl[0]->compress = $this->compress;
-        $this->tpl[0]->minify = $this->minify;
+
+		$this->tpl[0]->compress = $this->compress;
+		$this->tpl[0]->minify = $this->minify;
 
 		// ff.js
-        $this->doEvent("on_tpl_load", array($this, $this->tpl));		
-		
-        $this->tplProcessVars($this->tpl);
-		
+		$this->doEvent("on_tpl_load", array($this, $this->tpl));		
+
+		$this->tplProcessVars($this->tpl);
+
 		$this->tplParseHidden();
-		
+
 		if (is_array($this->globals) && count($this->globals))
 		{
 			foreach ($this->globals as $key => $value)
 			{
 				if (!$value["display_hidden"])
 					continue;
-				
+
 				$this->tpl[0]->set_var("varname", $key);
 				$this->tpl[0]->set_var("varvalue", $this->retrieve_global($key));
 				$this->tpl[0]->parse("SectFormHidden", true);
@@ -1237,17 +1167,27 @@ class ffPage_html extends ffPage_base
 			}
 			reset($this->globals);
 		}
-			
-		$this->doEvent("on_tpl_loaded", array(&$this, $this->tpl));
 
+		$this->doEvent("on_tpl_loaded", array(&$this, $this->tpl));
+	}
+	
+	function tplLoadLayer($tpl = null)
+	{
 		// LAYER SECTION
-		if (strlen($this->layer) && !$this->isXHR())
-		{                                   
+		if ($this->template_layer_loaded)
+			return;
+		
+		$this->template_layer_loaded = true;
+		if (strlen($this->layer) && (!$this->isXHR() || $this->layer_dialog))
+		{
 			$this->tpl_layer[0] = ffTemplate::factory($this->getLayerDir("layer_" . $this->layer  . ".html"));
-			$this->tpl_layer[0]->load_file("layer_" . $this->layer  . ".html", "main");
-			
+			if ($tpl === null)
+				$this->tpl_layer[0]->load_file("layer_" . $this->layer  . ".html", "main");
+			else
+				$this->tpl_layer[0] = $tpl;
+
 			//$this->tpl_layer[0]->strip_extra_newlines = $this->strip_extra_newlines;
-			
+
 			$res = $this->doEvent("on_tpl_layer_load", array(&$this, $this->tpl_layer[0]));
 
 			$this->tplProcessVars($this->tpl_layer);
@@ -1256,56 +1196,57 @@ class ffPage_html extends ffPage_base
 			$res = $this->doEvent("on_tpl_layer_loaded", array(&$this, $this->tpl_layer[0]));
 
 			// SECTIONS
-			if (property_exists("ffPage_html", "navbar") && strlen($this->navbar))
+			if (!$this->isXHR())
 			{
-				ffErrorHandler::raise("Obsolete use of ->navbar, use ->sections[\"navbar\"] instead", E_USER_ERROR, $this, get_defined_vars());
-			}
-
-			if (property_exists("ffPage_html", "topbar") && strlen($this->topbar))
-			{
-				ffErrorHandler::raise("Obsolete use of ->topbar, use ->sections[\"topbar\"] instead", E_USER_ERROR, $this, get_defined_vars());
-			}
-
-			if (is_array($this->sections) && count($this->sections))
-			{
-				foreach ($this->sections as $key => $value)
+				if (property_exists("ffPage_html", "navbar") && strlen($this->navbar))
 				{
-					if (strlen($value["name"]))
+					ffErrorHandler::raise("Obsolete use of ->navbar, use ->sections[\"navbar\"] instead", E_USER_ERROR, $this, get_defined_vars());
+				}
+
+				if (property_exists("ffPage_html", "topbar") && strlen($this->topbar))
+				{
+					ffErrorHandler::raise("Obsolete use of ->topbar, use ->sections[\"topbar\"] instead", E_USER_ERROR, $this, get_defined_vars());
+				}
+
+				if (is_array($this->sections) && count($this->sections))
+				{
+					foreach ($this->sections as $key => $value)
 					{
-						if ($value["is_php"])
+						if (strlen($value["name"]))
 						{
-							ob_start();
-							require($value["name"]);
-							$this->tpl[0]->set_var($key, ob_get_contents());
-							$this->tpl_layer[0]->set_var($key, ob_get_contents());
-							ob_end_clean();
-						}
-						else
-						{
-							if ($value["dir"] === null)
-								$this->sections[$key]["tpl"] = ffTemplate::factory($this->getLayoutDir($key . "_" . $value["name"] . ".html"));
+							if ($value["is_php"])
+							{
+								ob_start();
+								require($value["name"]);
+								$this->tpl[0]->set_var($key, ob_get_contents());
+								$this->tpl_layer[0]->set_var($key, ob_get_contents());
+								ob_end_clean();
+							}
 							else
-								$this->sections[$key]["tpl"] = ffTemplate::factory($value["dir"]);
-							
-							$this->sections[$key]["tpl"]->load_file($key . "_" . $value["name"] . ".html", "main");
+							{
+								if ($value["dir"] === null)
+									$this->sections[$key]["tpl"] = ffTemplate::factory($this->getLayoutDir($key . "_" . $value["name"] . ".html"));
+								else
+									$this->sections[$key]["tpl"] = ffTemplate::factory($value["dir"]);
 
-							//$this->sections[$key]["tpl"]->strip_extra_newlines = $this->strip_extra_newlines;
-							
-							$this->tplProcessVars(array(&$this->sections[$key]["tpl"]));
-							$this->tplSetGlobals(array(&$this->sections[$key]["tpl"]));
+								$this->sections[$key]["tpl"]->load_file($key . "_" . $value["name"] . ".html", "main");
 
-							if ($this->sections[$key]["events"] === null)
-								$this->sections[$key]["events"] = new ffEvents();
-							else
-								$this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"]));
+								//$this->sections[$key]["tpl"]->strip_extra_newlines = $this->strip_extra_newlines;
+
+								$this->tplProcessVars(array(&$this->sections[$key]["tpl"]));
+								$this->tplSetGlobals(array(&$this->sections[$key]["tpl"]));
+
+								if ($this->sections[$key]["events"] === null)
+									$this->sections[$key]["events"] = new ffEvents();
+								else
+									$this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"]));
+							}
 						}
 					}
+					reset($this->sections);
 				}
-				reset($this->sections);
 			}
 		}
-		// END OF LOADING
-		$this->template_loaded = true;
 	}
 	
 	public function tplParseHidden()
@@ -1399,26 +1340,36 @@ class ffPage_html extends ffPage_base
 	 */
 	protected function tplProcessVars($tpl)
 	{
-		$tpl[0]->set_var("site_path", $this->site_path);
+		$framework_css = cm_getFrameworkCss();
+		$font_icon = cm_getFontIcon();
+
+        if(__TOP_DIR__ != __PRJ_DIR__)
+            $tpl[0]->set_var("base_path", substr($this->site_path, 0, strpos($this->site_path, "/domains/")));
+        else
+            $tpl[0]->set_var("base_path", $this->site_path);
+
+        $tpl[0]->set_var("site_path", $this->site_path);
 		$tpl[0]->set_var("language", FF_LOCALE);
 		$tpl[0]->set_var("locale", strtolower(substr(FF_LOCALE, 0, 2)));
+		$tpl[0]->set_var("framework_css", $framework_css["name"]);
+		$tpl[0]->set_var("font_icon", $font_icon["name"]);
+		
 
 		$tpl[0]->set_var("theme", $this->theme);
-		if(strlen($this->jquery_ui_force_theme)) {
-			$tpl[0]->set_var("theme_ui", $this->jquery_ui_force_theme);
-		} elseif(strlen($this->jquery_ui_theme)) {
+		
+		if (strlen($this->jquery_ui_theme)) {
 			$tpl[0]->set_var("theme_ui", $this->jquery_ui_theme);
 		} else {
 			$tpl[0]->set_var("theme_ui", "");
 		}
+		
 		$tpl[0]->set_var("layer", $this->layer);
-        
         $tpl[0]->set_var("lazy_img", (CM_CACHE_IMG_LAZY_LOAD ? "true" : "false"));
         
-        if(MOD_SEC_GROUPS) 
+        if (MOD_SEC_GROUPS) 
 		{
             $user_permission = get_session("user_permission");    
-            if(strlen($user_permission["primary_gid_name"]))
+            if (strlen($user_permission["primary_gid_name"]))
             {
                 $tpl[0]->set_var("group", $user_permission["primary_gid_name"]);
                 $tpl[0]->parse("SectGroup", false);
@@ -1479,6 +1430,27 @@ class ffPage_html extends ffPage_base
 		}
 	}
 
+	protected function parse_tags()
+	{
+		if(is_array($this->page_tags) && count($this->page_tags)) 
+		{
+			foreach($this->page_tags AS $type => $tags)
+			{
+				$this->tpl[0]->set_var("tag_type", $type);
+				foreach($tags AS $attr)
+				{
+					$tag_properties = "";
+					foreach($attr AS $attr_name => $attr_value) 
+					{
+						$tag_properties .= ' ' . $attr_name . '="' . $attr_value . '"';
+					}
+					$this->tpl[0]->set_var("tag_properties", $tag_properties);
+					$this->tpl[0]->parse("SectTags", true);
+				}
+			}		
+		}
+	}
+	
 	/**
 	 * Elabora i template e restituisce il risultato
 	 * il risultato dipende dal formato (XHR, normale, etc)
@@ -1489,65 +1461,87 @@ class ffPage_html extends ffPage_base
 	{
 		$this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
 
-		$this->tpl[0]->set_var("title", $this->title);
+		$this->tpl[0]->set_var("title", strip_tags($this->title));
         if($this->class_body)
             $this->tpl[0]->set_var("class_body", " class=\"" . $this->class_body . "\"");
 
-        if($this->use_own_js) {
-        	if(!array_key_exists("ff", $this->page_js)) {
-				$this->page_js = array_merge($this->default_own_js, $this->page_js); 
-        	}
-			$this->tpl[0]->parse("SectFFJS", false);
-		} else
-			$this->tpl[0]->set_var("SectFFJS", "");
-
-        $this->parse_css();
 		if ($this->canonical)
+			$this->tplAddTag("canonical", array(
+				"href" => $this->canonical
+			));
+
+		if ($this->use_own_js)
 		{
-			$this->tpl[0]->set_var("css_rel", "canonical");
-			$this->tpl[0]->set_var("css_path", "");
-			$this->tpl[0]->set_var("link_properties", "");
-			$this->tpl[0]->set_var("css_file", $this->canonical);
-			$this->tpl[0]->parse("SectCss", true);
-		} 
+			$this->tplAddMultiJS($this->default_js, cm::LAYOUT_PRIORITY_HIGH);
+			$this->tplAddMultiCss($this->default_css, cm::LAYOUT_PRIORITY_HIGH);
+			$this->tplAddJs("ff.init", array(
+					"async" => false
+					, "embed" => "{FFJSINIT}"
+					, "priority" => cm::LAYOUT_PRIORITY_HIGH
+					, "index" => -1000
+				));
+		}
+		
+		$this->parse_css();
+		$this->parse_tags();
         $this->parse_js();
         $this->parse_meta();
         $this->parse_html_attr();
-			
-        $this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));
 
+        if ($this->use_own_js)
+		{
+			$tmp = $this->tpl[0]->rpparse("SectFFJS", false);
+			$this->tpl[0]->ParsedBlocks["SectJs"] = str_replace("{FFJSINIT}", $tmp, $this->tpl[0]->ParsedBlocks["SectJs"]);
+			foreach ($this->js_buffer as $key => $value)
+			{
+				if (ffIsset($value, "content") && $value["content"] === "{FFJSINIT}")
+				{
+					$this->js_buffer[$key]["content"] = $tmp;
+					break;
+				}
+			}
+		}
+		$this->tpl[0]->set_var("SectFFJS", "");	
+
+		$this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));		
 		if ($this->isXHR())
 		{
-			$this->output_buffer["headers"] = $this->tpl[0]->rpparse("SectHeaders", false) . $this->output_buffer["headers"];
-			$this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
-			
-			if (!$this->getXHRComponent())
+			if ($this->getXHRFormat() === false)
 			{
-				$this->tpl[0]->set_var("SectHeaders", "");
-				$this->tpl[0]->set_var("SectFooters", "");
-				$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
-				$this->output_buffer["html"] = $this->tpl[0]->rpparse("main", false);
+				$this->output_buffer["headers"] = $this->tpl[0]->rpparse("SectHeaders", false) . $this->output_buffer["headers"];
+				$this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
+
+				if (!$this->getXHRComponent())
+				{
+					$this->tpl[0]->set_var("SectHeaders", "");
+					$this->tpl[0]->set_var("SectFooters", "");
+					$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
+					$this->output_buffer["html"] = $this->tpl[0]->rpparse("main", false);
+				}
+
+				$this->doEvent("on_tpl_parsed", array(&$this, $this->tpl[0]));
 			}
 
-			$this->doEvent("on_tpl_parsed", array(&$this, $this->tpl[0]));
-			
 			cm::jsonParse(array_merge($this->json_result, $this->output_buffer), $output_result);
 		}
 		else
 		{
 			$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
 			
-			if(strlen($this->output_buffer["headers"])) 
+			if (strlen($this->output_buffer["headers"])) 
 			{
 				$this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["headers"]);
 				$this->tpl[0]->parse("SectWidgetsHeaders", true);
 			}
 			
-			if(strlen($this->output_buffer["footers"])) 
+			if (strlen($this->output_buffer["footers"])) 
 			{
 				$this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["footers"]);
 				$this->tpl[0]->parse("SectWidgetsFooters", true);
 			}
+
+			//$debug = $this->tpl[0];
+			//ffErrorHandler::raise("ASD", E_USER_ERROR, $this, get_defined_vars());
 
 			$this->doEvent("on_tpl_parsed", array(&$this, $this->tpl[0]));
 
@@ -1581,15 +1575,63 @@ class ffPage_html extends ffPage_base
 		}
 	}
 
+
+	private function tplProcessData($data)
+    {
+        if (
+            is_object($data)
+            && (
+                is_subclass_of($data, "ffGrid_base")
+                || is_subclass_of($data, "ffRecord_base")
+                || is_subclass_of($data, "ffDetails_base")
+            )
+        )
+        {
+            if ($data->use_own_location)
+                return;
+
+            $tmp_found = false;
+            foreach (cm::getInstance()->applets_components as $applet_id => $applet_comps)
+            {
+                if (ffIsset($applet_comps, $data->id))
+                {
+                    $tmp_found = true;
+                    break;
+                }
+            }
+
+            if ($tmp_found)
+                return;
+        }
+
+        $tmp = $this->getContentData($data);
+
+        if (is_array($tmp))
+        {
+            //if ($this->isXHR()) {
+            $output                         = $tmp["html"];
+            $this->output_buffer["headers"] .= $tmp["headers"];
+            $this->output_buffer["footers"] .= $tmp["footers"];
+            /*}
+            else
+                $this->output_buffer["html"] .= $tmp["headers"] . $tmp["html"] . $tmp["footers"];*/
+        }
+        else
+            $output = $tmp;
+
+        return $output;
+    }
+
 	/**
 	 * Elabora il template valorizzandone tutte le parti
 	 */
 	protected function tplProcess()
 	{
-		if ($this->getXHRDialog())
-			$this->tpl[0]->set_var("dialog_id", $this->getXHRDialog());
+		if ($this->getXHRCtx())
+			$this->tpl[0]->set_var("ctx", $this->getXHRCtx());
 
-		$this->struct_process();
+		if (!(strlen($this->getXHRComponent()) && strlen($this->getXHRSection()))) // TODO: selective regeneration
+			$this->struct_process();
 
 		$this->doEvent("on_tpl_process", array(&$this, $this->tpl[0]));
 		if ($this->use_own_form !== false)
@@ -1604,11 +1646,6 @@ class ffPage_html extends ffPage_base
 
 			$this->tpl[0]->set_var("script_name", $this->get_script_name() . "?" . $this->get_script_params());
 			
-			if($this->form_workaround) {
-				$this->tpl[0]->parse("SectFormWorkaround", false);
-			} else {
-				$this->tpl[0]->set_var("SectFormWorkaround", "");
-			}
 			$this->tpl[0]->parse("SectFormHeader", false);
 			$this->tpl[0]->parse("SectFormFooter", false);
 		}
@@ -1623,7 +1660,8 @@ class ffPage_html extends ffPage_base
 			if (!isset($this->components_buffer[$this->getXHRComponent()])) {
 				ffErrorHandler::raise("Component Not Found", E_USER_ERROR, $this, get_defined_vars());
 			} else {
-				$this->output_buffer = $this->components_buffer[$this->getXHRComponent()];
+				if ($this->getXHRFormat() === false)
+					$this->output_buffer = $this->components_buffer[$this->getXHRComponent()];
 				foreach ($this->components[$this->getXHRComponent()]->json_result as $key => $value)
 				{
 					if ($key == "refresh")
@@ -1639,44 +1677,74 @@ class ffPage_html extends ffPage_base
 		}
 		else
 		{
-			if(!is_array($this->output_buffer)) //TODO: Fixare veramente :)
+			if (!is_array($this->output_buffer)) //TODO: Fixare veramente :)
 			{
 				$this->output_buffer = array("html" => $this->output_buffer, "headers" => "", "footers" => "");
 			}
 
 			foreach ($this->contents as $key => $content)
 			{
+				if ($this->getXHRFormat() === "json")
+				{
+					foreach ($this->components[$key]->json_result as $subkey => $subvalue)
+					{
+						if ($subkey == "refresh")
+							$this->json_result["refresh"]	|=	$subvalue;
+						elseif ($subkey == "close")
+							$this->json_result["close"]		|=	$subvalue;
+						elseif ($subkey == "insert_id")
+							$this->json_result["insert_id"]	=	$subvalue;
+						else
+							$this->json_result[$key][$subkey]		=	$subvalue;
+					}
+					
+					continue;
+				}
+				
 				if ($content["group"] === true)
 				{
-					if (!count($this->groups[$key]["contents"]))
-						continue;
-						
-					$this->output_buffer["html"] .= $this->widgets["tabs"]->process($key, $this->groups[$key], $this);
+					if($this->tab)
+					{
+                        if (!count($this->groups[$key]["contents"]))
+                            continue;
+
+                        $this->groups[$key]["tab_mode"] = $this->tab;
+                        $this->output_buffer["html"] .= $this->widgets["tabs"]->process($key, $this->groups[$key], $this);
+                    } else {
+					    if(is_array($this->groups[$key]["contents"]) && count($this->groups[$key]["contents"]))
+                        {
+                            foreach($this->groups[$key]["contents"] AS $group)
+                            {
+                                $output = "";
+                                if(is_array($group["data"]) && count($group["data"]))
+                                {
+                                    foreach($group["data"] AS $data)
+                                    {
+                                        $output .= $this->tplProcessData($data);
+                                    }
+
+                                }
+                                if($output)
+                                {
+                                    $this->output_buffer["html"] .= '<h4>' . $group["title"] . '</h4>' . $output;
+                                }
+
+                            }
+                        }
+                    }
 				}
 				else
 				{
-					$tmp = $this->getContentData($content["data"]);
-
-					if (is_array($tmp))
-					{
-						//if ($this->isXHR()) {
-						$this->output_buffer["html"]	.= $tmp["html"];
-						$this->output_buffer["headers"] .= $tmp["headers"];
-						$this->output_buffer["footers"] .= $tmp["footers"];
-						/*}
-						else
-							$this->output_buffer["html"] .= $tmp["headers"] . $tmp["html"] . $tmp["footers"];*/
-					}
-					else
-						$this->output_buffer["html"] .= $tmp;
+                    $this->output_buffer["html"]	.= $this->tplProcessData($content["data"]);
 				}
 			}
 			reset($this->contents);
 
 			$rc = $this->doEvent("on_fixed_process_before", array(&$this));
-			$this->output_buffer["html"] = $this->fixed_pre_content . $this->output_buffer["html"] . $this->fixed_post_content;
+			if ($this->getXHRFormat() === false)
+				$this->output_buffer["html"] = $this->fixed_pre_content . $this->output_buffer["html"] . $this->fixed_post_content;
 
-			if (strlen($this->layer) && !$this->isXHR())
+			if (strlen($this->layer) && (!$this->isXHR() || $this->layer_dialog))
 			{
 				$this->tpl_layer[0]->set_var("content", $this->output_buffer["html"]);
 				$this->output_buffer["html"] = $this->tpl_layer[0]->rpparse("main", false);
@@ -1700,7 +1768,7 @@ class ffPage_html extends ffPage_base
 				)
 			)
 		{
-			if ($content->display !== false)
+			if ($content->display !== false /*&& !$content->use_own_location*/)
 				return $this->components_buffer[$content->id];
 			else
 				return "";
@@ -1727,6 +1795,8 @@ class ffPage_html extends ffPage_base
 					&& get_class($content) == "ffTemplate"
 			)
 		{
+			cm::getInstance()->parseApplets($content);
+
 			foreach($this->components as $key => $item)
 			{
 				$rc = false;
@@ -1769,7 +1839,7 @@ class ffPage_html extends ffPage_base
 											, "is_php" => false
 											, "events" => new ffEvents()
 										);
-			$this->sections[$sName]["events"]->addEvent("on_load_template", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
+			//$this->sections[$sName]["events"]->addEvent("on_load_template", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
 		}
 	}
 
@@ -1838,173 +1908,431 @@ class ffPage_html extends ffPage_base
 		}
 	}
 
-    /**
+   /**
 	 * Elabora i CSS
 	 * Da richiamare ad ogni aggiunta di CSS se si aggiungono CSS dinamicamente post-elaborazione
 	 */
 	public function parse_css()
     {
         $this->tpl[0]->set_var("SectCssEmbed", "");
+        $this->tpl[0]->set_var("SectCssLink", "");
         $this->tpl[0]->set_var("SectCss", "");
-        $this->tpl[0]->set_var("SectAsyncCssPlugin", "");
+		
+		$this->css_buffer = array();
+		
+		cm::_layoutOrderElements($this->page_css);
 
-		if (is_array($this->page_css) && count($this->page_css))
-        {            
-        	if($this->browser === null)
-        		$this->browser = $this->getBrowser();
+		if ($this->browser === null)
+			$this->browser = $this->getBrowser();
 
-            foreach ($this->page_css as $key => $value)
-            {
-            	$tmp_path = "";
-            	$tmp_path_add = "";
-            	$tmp_file = "";
+		//ffErrorHandler::raise("ASD", E_USER_ERROR, $this, get_defined_vars());
+			
+		foreach ($this->page_css as $css_queue_key => $css_queue)
+		{
+			foreach ($css_queue as $key => $value)
+			{
+				$this->tpl[0]->set_var("css_embed", "");
+				$this->tpl[0]->set_var("css_type", "");
+				$this->tpl[0]->set_var("inline", "");
 
-                if($value["embed"])
-                {
-                    if(!$this->isXHR() && $this->compact_css && !$value["exclude_compact"]) {
-						$this->css_buffer["default"][]["content"] = $value["embed"];
-					} else {
-	                    $this->tpl[0]->set_var("css_embed", $value["embed"]);
-	                    $this->tpl[0]->set_var("css_type", $value["type"]);
-                        $this->tpl[0]->set_var("css_key", $key);
-	                    $this->tpl[0]->parse("SectCssEmbed", true);
-					}
-                } 
-                else 
-                {
-                    $this->tpl[0]->set_var("css_embed", "");
-            	
-	                if(isset($this->override_css[$key]) && strlen($this->override_css[$key]))
+				$tmp_path = null;
+				$tmp_file = null;
+				/* Deprecato ADD CSS Custom Browser
+				$tmp_add_tag = null;
+				$tmp_add_path = null;
+				$tmp_add_file = null;
+				*/
+				$tmp_file_version = $value["version"];
+				
+				if ($value["embed"])
+				{
+					if (
+							$this->compact_css 
+							&& !$value["exclude_compact"]
+						)
 					{
-	                    $tmp_path = ffcommon_dirname($this->override_css[$key]);
-	                    $tmp_file = basename($this->override_css[$key]);
-	                } 
-					else 
+						if ($value["media"] === null)
+							$tmp_media = "default";
+						else
+							$tmp_media = $value["media"];
+
+						$this->css_buffer[$tmp_media][]["content"] = $value["embed"];
+					} 
+					else
 					{
-            		    $res = $this->doEvent("on_css_parse", array($this, $key, $value["path"], $value["file"]));
-            		    $rc = end($res);
+						$link_properties = "";
 
-            		    if ($rc === null)
-            		    {
-						    if ($value["path"] === null) 
-							{
-                    		    if(!$this->isXHR() && $this->compact_css)
-                        		    $tmp_path = "/themes/" . $this->theme . "/css";
-							    else
-								    $tmp_path = $this->site_path . "/themes/" . $this->theme . "/css";
-						    } 
-							elseif (strlen($value["path"])) 
-							{
-	                            if (
-	                                substr(strtolower($value["path"]), 0, 7) == "http://"
-	                                || substr(strtolower($value["path"]), 0, 8) == "https://"
-	                            )
-	                                $tmp_path = $value["path"];
-	                            elseif(substr($value["path"], 0, 2) == "//")
-	                            	$tmp_path = "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $value["path"];
-                    		    elseif(!$this->isXHR() && $this->compact_css)
-                    			    $tmp_path = $value["path"];
-							    else
-								    $tmp_path = $this->site_path . $value["path"];
-						    }
-						    if ($value["file"] === null)
-							    $tmp_file = $key . ".css";
-							elseif (substr($value["path"], -4) === ".css")
-								$tmp_file = "";
-						    else
-							    $tmp_file = $value["file"];
-					    }
-					    else
-					    {
-                    		if(!$this->isXHR() && $this->compact_css)
-                    			$tmp_path = $rc["path"];
-							else
-								$tmp_path = $this->site_path . $rc["path"];
+						$this->tpl[0]->set_var("lib_tag", $key);
+						$this->tpl[0]->set_var("lib_type", "css");
+						$this->tpl[0]->set_var("lib_deps", "undefined");
+						$this->tpl[0]->set_var("lib_media", (strlen($value["media"]) ? $value["media"] : "undefined"));
+						$this->tpl[0]->parse("SectLib", true);
+						$this->tpl[0]->parse("SectLibs", false);
 
-						    $tmp_file = $rc["file"];
-					    }
+						$this->tpl[0]->set_var("css_embed", $value["embed"]);
 						
-						if (substr($value["path"], -4) !== ".css")
-						{
-							$tmp_path = rtrim($tmp_path, "/");
-							$tmp_file = ltrim($tmp_file, "/");
+						$link_properties .= ' id="' . $key .'"';
 
-							if($value["path"] === null) {
-								if(strlen($this->browser["name"]) . strlen($this->browser["majorver"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/replace_" . $tmp_file)) {
-									$tmp_path = FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
-									$tmp_file = "replace_" . $tmp_file;
-								} elseif(strlen($this->browser["name"]) . strlen($this->browser["majorver"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/" . $tmp_file)) {
-									$tmp_path_add = FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
-								} else {
-									if(strlen($this->browser["name"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]) . "/replace_" . $tmp_file)) {
-										$tmp_path = FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]);
-										$tmp_file = "replace_" . $tmp_file;
-									} elseif(strlen($this->browser["name"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]) . "/" . $tmp_file)) {
-										$tmp_path_add = FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["name"]);
-									}
-								}
-								if(strlen($this->browser["platform"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $tmp_file)) {
-									$tmp_path = FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["platform"]);
-									$tmp_file = "replace_" . $tmp_file;
-								} elseif(strlen($this->browser["platform"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $tmp_file)) {
-									$tmp_path_add = FF_THEME_DIR . "/" . $this->getTheme() . "/css/" . ffCommon_url_rewrite($this->browser["platform"]);
+						if($value["type"])
+							$link_properties .= ' type="' . $value["type"] .'"';
+							
+						if ($value["exclude_compact"])
+							$link_properties .= " inline";
+
+						if(is_array($value["media"])) {
+							foreach($value["media"] AS $media_key => $media_value) {
+								$link_properties .= ' ' . $media_key . '="' . $media_value .'"';
+							}
+						} elseif ($value["media"] && $value["media"] !== "default") {
+							$link_properties .= ' media="' . $value["media"] .'"';
+						}
+						$this->tpl[0]->set_var("link_properties", $link_properties);	
+							
+						$this->tpl[0]->parse("SectCssEmbed", true);
+						$this->tpl[0]->parse("SectCss", true);
+					}
+					continue;
+				} 
+
+				if (isset($this->override_css[$key]))
+				{
+					$tmp_path = $this->override_css[$key]["path"];
+					$tmp_file = $this->override_css[$key]["file"];
+				} 
+				else 
+				{
+					$res = $this->doEvent("on_css_parse", array($this, $key, $value["path"], $value["file"]));
+					$rc = end($res);
+					if ($rc !== null)
+					{
+						$value["path"] = $rc["path"];
+						$value["file"] = $rc["file"];
+					}
+if(is_array($value["path"])) {
+    print_r($value["path"]);
+					die();}
+					$value["path"] = rtrim($value["path"], "/");
+
+					$flag_path_file = (substr($value["path"], -4) === ".css");
+					$flag_path_ext = (
+										substr(strtolower($value["path"]), 0, 7) === "http://"
+										|| substr(strtolower($value["path"]), 0, 8) === "https://"
+										|| substr(strtolower($value["path"]), 0, 2) === "//"
+									);
+					$flag_path_abs = (
+										$flag_path_ext || substr(strtolower($value["path"]), 0, 1) === "/"
+									);
+					$flag_file_ext = (
+										substr(strtolower($value["file"]), 0, 7) === "http://"
+										|| substr(strtolower($value["file"]), 0, 8) === "https://"
+										|| substr(strtolower($value["file"]), 0, 2) === "//"
+									);
+                    $flag_file_abs = (
+                                        strlen($value["file"]) && ($flag_file_ext || substr(strtolower($value["file"]), 0, 1) === "/" || strpos(realpath($value["file"]), realpath(ff_getAbsDir($value["path"]))) === 0)
+                                    );
+
+					$variants = array();
+
+					if ($flag_path_abs)
+					{
+						$tmp_path = (substr(strtolower($value["path"]), 0, 2) === "//"
+										? "http" . ($_SERVER["HTTPS"] ? "s": "") . ":"
+										: ""
+									) . $value["path"];
+
+						if ($flag_path_file)
+						{
+							if ($value["file"] === null)
+							{
+								if ($flag_path_ext)
+									$tmp_file = $tmp_path;
+								else
+								{
+                                    $tmp_file = ff_getAbsDir($tmp_path) . $tmp_path;
 								}
 							}
-						}
-	                }
-
-					if($value["async"]) 
-					{
-		                $this->tpl[0]->set_var("css_path", $tmp_path . (strlen($tmp_file) ? "/" : ""));
-		                $this->tpl[0]->set_var("css_file", $tmp_file);
-		                //$this->tpl[0]->set_var("css_rel", $value["rel"]);
-		                //$this->tpl[0]->set_var("css_type", $value["type"]);
-		                $this->tpl[0]->parse("SectAsyncCssPlugin", true);
-					} 
-					else 
-					{
-		                if(!$this->isXHR() 
-		                    && $this->compact_css 
-		                    && !$value["exclude_compact"]
-		                    && $value["rel"] == "stylesheet"
-		                    && $value["type"] == "text/css"
-						) {
-							if($value["media"] === null)
-								$tmp_media = "default";
+							elseif ($flag_file_abs)
+							{
+								if ($flag_file_ext)
+									$tmp_file = $value["file"];
+								else
+								{
+                                    if (strpos(realpath($value["file"]), realpath(ff_getAbsDir($tmp_path))) !== 0)
+                                        $tmp_file = ff_getAbsDir($tmp_path) . $value["file"];
+                                    else
+                                        $tmp_file = $value["file"];
+								}
+							}
 							else
-								$tmp_media = $value["media"];
+								ffErrorHandler::raise ("Impossibile determinare il file fisico", E_USER_ERROR, null, get_defined_vars());
+						}
+						else
+						{
+							if ($flag_file_abs)
+								ffErrorHandler::raise ("Impossibile determinare il percorso pubblico", E_USER_ERROR, null, get_defined_vars());
+							elseif (strlen($value["file"]) || $value["file"] === null)
+							{
+								if ($flag_path_ext)
+								{
+									$tmp_path .= "/" . ($value["file"] ? $value["file"] : $key . ".css");
+									$tmp_file = $tmp_path;
+								}
+								else
+								{
+									if ($tmp_file_version)
+									{
+ 										$variants = array(
+												"files" => array(
+													ff_getAbsDir($tmp_path) . $tmp_path . "/" . ($value["file"] ? $value["file"] : $key . ".css")
+													, ff_getAbsDir($tmp_path) . $tmp_path . "/" . $tmp_file_version . "/". ($value["file"] ? $value["file"] : $key . ".css")
+												)
+												, "paths" => array(
+													$tmp_path . "/" . ($value["file"] ? $value["file"] : $key . ".css")
+													, $tmp_path . "/" . $tmp_file_version . "/". ($value["file"] ? $value["file"] : $key . ".css")
+												)
+											);
+									}
+									else
+									{
+										$tmp_path .= "/" . ($value["file"] ? $value["file"] : $key . ".css");
+                                        $tmp_file = ff_getAbsDir($tmp_path) . $tmp_path;
+									}
+								}
+							}
+							elseif (!strlen($value["file"] && $flag_path_ext))
+							{
+								$tmp_file = $tmp_path;
+							}							
+							else
+								ffErrorHandler::raise ("Impossibile determinare il file fisico", E_USER_ERROR, null, get_defined_vars());
+						}
+					}
+					elseif ($value["path"] === null || strlen($value["path"]))
+					{
+						if ($value["path"] === null)
+							$tmp_path = "/themes/" . $this->theme . "/css";
+						else
+							$tmp_path = "/themes/" . $this->theme . "/css/" . $value["path"];
 
-	                        if (
-	                            substr(strtolower($tmp_path), 0, 7) == "http://"
-	                            || substr(strtolower($tmp_path), 0, 8) == "https://"
-	                        )
-	                            $this->css_buffer[$tmp_media][]["path"] = $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-	                        elseif(substr($tmp_path, 0, 2) == "//")
-	                        	$this->css_buffer[$tmp_media][]["path"] = "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-							elseif (strpos($tmp_path, cm_getModulesExternalPath()) === 0 && strpos($tmp_path, "/themes") === false)
-								$this->css_buffer[$tmp_media][]["path"] = preg_replace("/^" . preg_quote(cm_getModulesExternalPath(), "/") . "(\/[^\/]+)/", CM_MODULES_ROOT . "\$1/themes", $tmp_path);
-	                        else
-	                            $this->css_buffer[$tmp_media][]["path"] = FF_DISK_PATH . $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
+						if ($value["file"] === null)
+						{
+							$tmp_path .= "/" . $key . ".css";
+							$tmp_file = ff_getThemeDir($this->theme) . $tmp_path;
+						}
+						elseif (strlen($value["file"]))
+						{
+							if ($flag_file_abs)
+								ffErrorHandler::raise ("Impossibile determinare il percorso pubblico", E_USER_ERROR, null, get_defined_vars());
+							else
+							{
+								$tmp_path .= "/" . $value["file"] . ".css";
+								$tmp_file = ff_getThemeDir($this->theme) . $tmp_path;
+							}
 
-						} else {
-			                if (
-	                            substr(strtolower($tmp_path), 0, 7) == "http://"
-	                            || substr(strtolower($tmp_path), 0, 8) == "https://"
-	                            || (strlen(FF_SITE_PATH) && strpos($tmp_path, FF_SITE_PATH) === 0) 
-	                        ) {
-	                            $this->tpl[0]->set_var("css_path", $tmp_path);
-							} elseif(substr($tmp_path, 0, 2) == "//") {
-								$this->tpl[0]->set_var("css_path", "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path);
-	                        } else {
-	                            $this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path);
-	                        }
+						}
+					} 
+				}
 
-			                $this->tpl[0]->set_var("css_file", (strlen($tmp_file) ? "/" : "") . $tmp_file);
-			                $this->tpl[0]->set_var("css_rel", $value["rel"]);
-							$link_properties = "";
-							if($value["type"])
-								$link_properties = 'type="' . $value["type"] . '"';
-							
+				if (count($variants))
+				{
+					$found = false;
+					for ($i = 0; $i < count($variants["files"]); $i++)
+					{
+						$tmp_path = $variants["paths"][$i];
+						$tmp_file = $variants["files"][$i];
+						
+						
+						/*if (
+								substr($tmp_path, -3) !== ".css"
+								|| substr($tmp_file, -3) !== ".css"
+							)
+							ffErrorHandler::raise ("Eccezione non gestita", E_USER_ERROR, null, get_defined_vars());*/
+
+						//ffErrorHandler::raise ("DEBUG", E_USER_ERROR, null, get_defined_vars());
+						$flag_path_ext = (
+											substr(strtolower($tmp_path), 0, 7) === "http://"
+											|| substr(strtolower($tmp_path), 0, 8) === "https://"
+											|| substr(strtolower($tmp_path), 0, 2) === "//"
+										);
+						$flag_file_ext = (
+											substr(strtolower($tmp_file), 0, 7) === "http://"
+											|| substr(strtolower($tmp_file), 0, 8) === "https://"
+											|| substr(strtolower($tmp_file), 0, 2) === "//"
+										);
+
+						$tmp_path = str_replace("[VERSION]", $tmp_file_version, $tmp_path);
+						$tmp_file = str_replace("[VERSION]", $tmp_file_version, $tmp_file);
+
+						if (!$flag_file_ext && !$flag_path_ext && is_file($tmp_file))
+						{
+							$found = true;
+							break;
+						}
+					}
+					
+					if (!$found)
+						ffErrorHandler::raise ("DEBUG: File CSS non esistente", E_USER_ERROR, null, get_defined_vars());
+				}
+				else
+				{
+					/*if (
+							substr($tmp_path, -3) !== ".css"
+							|| substr($tmp_file, -3) !== ".css"
+						)
+						ffErrorHandler::raise ("Eccezione non gestita", E_USER_ERROR, null, get_defined_vars());*/
+
+					//ffErrorHandler::raise ("DEBUG", E_USER_ERROR, null, get_defined_vars());
+					$flag_path_ext = (
+										substr(strtolower($tmp_path), 0, 7) === "http://"
+										|| substr(strtolower($tmp_path), 0, 8) === "https://"
+										|| substr(strtolower($tmp_path), 0, 2) === "//"
+									);
+					$flag_file_ext = (
+										substr(strtolower($tmp_file), 0, 7) === "http://"
+										|| substr(strtolower($tmp_file), 0, 8) === "https://"
+										|| substr(strtolower($tmp_file), 0, 2) === "//"
+									);
+
+					$tmp_path = str_replace("[VERSION]", $tmp_file_version, $tmp_path);
+					$tmp_file = str_replace("[VERSION]", $tmp_file_version, $tmp_file);
+
+					if (!$flag_file_ext && !$flag_path_ext && !is_file($tmp_file))
+						ffErrorHandler::raise ("DEBUG: File CSS non esistente", E_USER_ERROR, null, get_defined_vars());
+				}
+				/* Deprecato ADD CSS Custom Browser
+				if ($this->css_browser_detection && !$flag_file_ext && !$flag_path_ext)
+				{
+					$check_file_dir = ffCommon_dirname($tmp_file);
+					$check_file_name = basename($tmp_file);
+					$check_path_dir = ffCommon_dirname($tmp_path);
+					$check_path_name = basename($tmp_path);
+
+					if (strlen($this->browser["name"] . $this->browser["majorver"]))
+					{
+						$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/replace_" . $check_file_name;
+						if (is_file($tmp))
+						{
+							$tmp_add_file = $tmp;
+							$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/replace_" . $check_path_name;
+							$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
+						}
+						else
+						{
+							$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/" . $check_file_name;
+							if (is_file($tmp))
+							{
+								$tmp_add_file = $tmp;
+								$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/" . $check_path_name;
+								$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
+							}
+						}
+					}
+
+					if (strlen($this->browser["platform"]))
+					{
+						$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/replace_" . $check_file_name;
+						if (is_file($tmp))
+						{
+							$tmp_add_file = $tmp;
+							$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/replace_" . $check_path_name;
+							$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["platform"]) . $this->browser["majorver"];
+						}
+						else
+						{
+							$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $check_file_name;
+							if (is_file($tmp))
+							{
+								$tmp_add_file = $tmp;
+								$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $check_path_name;
+								$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["platform"]);
+							}
+						}
+					}
+				}*/
+
+				//ffErrorHandler::raise ("DEBUG", E_USER_ERROR, null, get_defined_vars());
+				// common parts
+				if ($value["async"])
+				{
+					$this->tpl[0]->set_var("lib_async", "true");
+					$this->tpl[0]->set_var("css_async", "true");
+				}
+				else
+				{
+					$this->tpl[0]->set_var("lib_async", "false");
+					$this->tpl[0]->set_var("css_async", "false");
+				}
+
+				$link_properties = "";
+				
+				// static libs in normal load (not XHR)
+				$this->tpl[0]->set_var("lib_tag", $key);
+				$this->tpl[0]->set_var("lib_type", "css");
+				$this->tpl[0]->set_var("lib_deps", "undefined");
+				$this->tpl[0]->set_var("lib_media", (strlen($value["media"]) ? $value["media"] : "undefined"));
+
+				// load plugin in XHR loads
+				$this->tpl[0]->set_var("css_tag", $key);
+				
+				if($value["rel"])
+					$link_properties .= ' rel="' . $value["rel"] .'"';
+				
+				if($value["type"])
+					$link_properties .= ' type="' . $value["type"] .'"';
+				
+				if ($flag_path_ext)
+					$this->tpl[0]->set_var("css_path", $tmp_path);
+				else 
+				{
+					if (ff_getAbsDir($tmp_path, false))
+					{
+						$a = FF_DISK_PATH;
+						$b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
+						$c = substr(__TOP_DIR__, strlen($b));
+						$this->tpl[0]->set_var("css_path", $c . $tmp_path);
+					}
+					else
+						$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path);
+				}
+				
+				if (!$this->isXHR() && !$value["async"])
+				{
+					$this->tpl[0]->parse("SectLib", true);
+					$this->tpl[0]->parse("SectLibs", false);
+				}
+				
+				if (
+						$this->compact_css 
+						&& !$value["exclude_compact"]
+						&& $value["rel"] == "stylesheet"
+						&& $value["type"] == "text/css"
+				)
+				{
+					if ($value["media"] === null)
+						$tmp_media = "default";
+					else
+						$tmp_media = $value["media"];
+
+					$this->css_buffer[$tmp_media][]["path"] = $tmp_file;
+				}
+				else
+				{
+					if ($this->isXHR())
+					{
+						$this->tpl[0]->set_var("link_properties", $link_properties);	
+						$this->tpl[0]->parse("SectCss", true);
+					}
+					else
+					{
+						if ($value["async"])
+						{
+							$this->tpl[0]->parse("SectAsyncCssPlugin", true);
+						}
+						else
+						{
+							if ($value["exclude_compact"])
+								$link_properties .= " inline";
+
 							if(is_array($value["media"])) {
 								foreach($value["media"] AS $media_key => $media_value) {
 									$link_properties .= ' ' . $media_key . '="' . $media_value .'"';
@@ -2012,76 +2340,86 @@ class ffPage_html extends ffPage_base
 							} elseif ($value["media"] && $value["media"] !== "default") {
 								$link_properties .= ' media="' . $value["media"] .'"';
 							}
-
-							$this->tpl[0]->set_var("link_properties", $link_properties);
-							/*
-			                $this->tpl[0]->set_var("css_type", $value["type"]);
-			                if($value["media"] !== null) {
-	                			$this->tpl[0]->set_var("css_media", $value["media"]);
-	                			$this->tpl[0]->parse("SectCssMedia", false);
-							} else {
-								$this->tpl[0]->set_var("SectCssMedia", "");
-							}*/
-			                $this->tpl[0]->parse("SectCss", true);
+							$this->tpl[0]->set_var("link_properties", $link_properties);	
+						
+							$this->tpl[0]->set_var("SectCssEmbed", "");
+							$this->tpl[0]->set_var("SectAsyncCssPlugin", "");
+							$this->tpl[0]->parse("SectCssLink", false);
+							$this->tpl[0]->parse("SectCss", true);
 						}
 					}
-					if(!$this->isXHR() && $this->use_own_js && $value["type"] == "text/css") {
-						$preload_data = $preload_data . " ff.preloadCSS('" . $key . "'); ";
+				}
+
+				// --------------------------------------------------------------------------------------------------
+				// add browser customization as additional CSS
+				/* Deprecato ADD CSS Custom Browser
+				if ($this->css_browser_detection && $tmp_add_tag !== null) 
+				{
+					if ($value["async"])
+					{
+						$this->tpl[0]->set_var("lib_async", "true");
+						$this->tpl[0]->set_var("css_async", "true");
 					}
-					if(strlen($tmp_path_add)) {
-						if($value["async"]) 
+					else
+					{
+						$this->tpl[0]->set_var("lib_async", "false");
+						$this->tpl[0]->set_var("css_async", "false");
+					}				
+					
+					// static libs in normal load (not XHR)
+					$this->tpl[0]->set_var("lib_tag", $tmp_add_tag);
+					$this->tpl[0]->set_var("lib_type", "css");
+					$this->tpl[0]->set_var("lib_deps", "undefined");
+					$this->tpl[0]->set_var("lib_media", (strlen($value["media"]) ? $value["media"] : "undefined"));
+					
+					// load plugin in XHR loads
+					$this->tpl[0]->set_var("css_tag", $tmp_add_tag);
+					
+					if($value["rel"])
+					$link_properties .= ' rel="' . $value["rel"] .'"';
+				
+					if($value["type"])
+						$link_properties .= ' type="' . $value["type"] .'"';					
+						
+					$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_add_path);
+					
+					if (!$this->isXHR() && !$value["async"])
+					{
+						$this->tpl[0]->parse("SectLib", true);
+						$this->tpl[0]->parse("SectLibs", false);
+					}					
+					
+					if (
+							$this->compact_css 
+							&& !$value["exclude_compact"]
+							&& $value["rel"] == "stylesheet"
+							&& $value["type"] == "text/css"
+					)
+					{
+						if ($value["media"] === null)
+							$tmp_media = "default";
+						else
+							$tmp_media = $value["media"];					
+							
+						$this->css_buffer[$tmp_media][]["path"] = $tmp_add_file;
+					}
+					else
+					{
+						if ($this->isXHR())
 						{
-			                $this->tpl[0]->set_var("css_path", $tmp_path_add);
-			                $this->tpl[0]->set_var("css_file", $tmp_file);
-			                //$this->tpl[0]->set_var("css_rel", $value["rel"]);
-			               // $this->tpl[0]->set_var("css_type", $value["type"]);
-			                $this->tpl[0]->parse("SectAsyncCssPlugin", true);
-						} 
-						else 
-						{ 
-			                if(!$this->isXHR() 
-			                    && $this->compact_css 
-			                    && !$value["exclude_compact"]
-			                    && $value["rel"] == "stylesheet"
-			                    && $value["type"] == "text/css"
-							) {
-								if($value["media"] === null)
-									$tmp_media = "default";
-								else
-									$tmp_media = $value["media"];
-
-		                        if (
-		                            substr(strtolower($tmp_path_add), 0, 7) == "http://"
-		                            || substr(strtolower($tmp_path_add), 0, 8) == "https://"
-		                        )
-		                            $this->css_buffer[$tmp_media][]["path"] = $tmp_path_add . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-								elseif(substr($tmp_path_add, 0, 2) == "//")
-									$this->css_buffer[$tmp_media][]["path"] = "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path_add . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-								elseif (strpos($tmp_path_add, cm_getModulesExternalPath()) === 0 && strpos($tmp_path_add, "/themes") === false)
-									$this->css_buffer[$tmp_media][]["path"] = preg_replace("/^" . preg_quote(cm_getModulesExternalPath(), "/") . "(\/[^\/]+)/", CM_MODULES_ROOT . "\$1/themes", $tmp_path_add);
-		                        else
-		                            $this->css_buffer[$tmp_media][]["path"] = FF_DISK_PATH . $tmp_path_add . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-
-							} else {
-				                if (
-		                            substr(strtolower($tmp_path_add), 0, 7) == "http://"
-		                            || substr(strtolower($tmp_path_add), 0, 8) == "https://"
-                                    || substr($tmp_path_add, 0, 2) == "//"
-		                            || (strlen(FF_SITE_PATH) && strpos($tmp_path_add, FF_SITE_PATH) === 0) 
-		                        ) {
-		                            $this->tpl[0]->set_var("css_path", $tmp_path_add);
-								} elseif(substr($tmp_path_add, 0, 2) == "//") {
-									$this->tpl[0]->set_var("css_path", "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path_add);
-		                        } else {
-		                            $this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path_add);
-		                        }
-
-				                $this->tpl[0]->set_var("css_file", (strlen($tmp_file) ? "/" : "") . $tmp_file);
-				                $this->tpl[0]->set_var("css_rel", $value["rel"]);
-								
-								$link_properties = "";
-								if($value["type"])
-									$link_properties = 'type="' . $value["type"] . '"';
+							$this->tpl[0]->set_var("link_properties", $link_properties);	
+							$this->tpl[0]->parse("SectCss", true);
+						}
+						else
+						{
+							if ($value["async"])
+							{
+								$this->tpl[0]->parse("SectAsyncCssPlugin", true);
+							}
+							else
+							{
+								if ($value["exclude_compact"])
+									$link_properties .= " inline";
 
 								if(is_array($value["media"])) {
 									foreach($value["media"] AS $media_key => $media_value) {
@@ -2090,34 +2428,19 @@ class ffPage_html extends ffPage_base
 								} elseif ($value["media"] && $value["media"] !== "default") {
 									$link_properties .= ' media="' . $value["media"] .'"';
 								}
-
 								$this->tpl[0]->set_var("link_properties", $link_properties);	
-								/*			                
-				                $this->tpl[0]->set_var("css_type", $value["type"]);
-				                if($value["media"] !== null) {
-	                				$this->tpl[0]->set_var("css_media", $value["media"]);
-	                				$this->tpl[0]->parse("SectCssMedia", false);
-								} else {
-									$this->tpl[0]->set_var("SectCssMedia", "");
-								}*/
-				                $this->tpl[0]->parse("SectCss", true);
+								
+								$this->tpl[0]->set_var("SectCssEmbed", "");
+								$this->tpl[0]->set_var("SectAsyncCssPlugin", "");
+								$this->tpl[0]->parse("SectCssLink", false);
+								$this->tpl[0]->parse("SectCss", true);
 							}
 						}
 					}
-				}				
-                /*$this->tpl[0]->set_var("key", $key);
-                $this->tpl[0]->parse("SectLoadedCSS", true);*/
-            }
-            reset($this->page_css);
-            if(strlen($preload_data)) {
-            	$this->tplAddJs("ff.loaded_css", null, null, false, false, $preload_data); 
+				}*/
 			}
-        }
-        else
-        { 
-            $this->tpl[0]->set_var("SectCss", "");
-            $this->tpl[0]->set_var("SectAsyncCssPlugin", "");
 		}
+		reset($this->page_css);
     }
     
    /**
@@ -2129,272 +2452,563 @@ class ffPage_html extends ffPage_base
         $this->tpl[0]->set_var("SectJs", ""); 
         $this->tpl[0]->set_var("SectAsyncJsPlugin", "");
 
+        $this->js_buffer = array();
+        
 		$this->parse_js_fix();
         
-        if (is_array($this->page_js) && count($this->page_js))
-        {
-        	if($this->browser === null)
-        		$this->browser = $this->getBrowser();
+        cm::_layoutOrderElements($this->page_js);
 
-            foreach ($this->page_js as $key => $value)
-            {
-            	$tmp_path = "";
-            	$tmp_path_add = "";
-            	$tmp_file = "";
+		if ($this->browser === null)
+			$this->browser = $this->getBrowser();        
+        
+		$ffjs_queue = null;
+		$ffjs_index = null;
+
+		$alldeps = array();
+		foreach ($this->page_js as $js_queue_key => $js_queue)
+		{
+			foreach ($js_queue as $key => $value)
+			{
+				$alldeps = array_merge($alldeps, $value["deps"]["js"]);
+			}
+		}
+		$alldeps = array_flip($alldeps);
+		        
+        foreach ($this->page_js as $js_queue_key => $js_queue)
+		{
+			foreach ($js_queue as $key => $value)
+			{
+				$this->tpl[0]->set_var("SectJSAsync", "");
+				$this->tpl[0]->set_var("js_embed", "");
+
+				$tmp_path = null;
+				$tmp_file = null;
+				/* Deprecato ADD JS Custom Browser
+				$tmp_add_tag = null;
+				$tmp_add_path = null;
+				$tmp_add_file = null;
+				*/
+				$tmp_file_version = $value["version"];
 				
-                if($value["embed"])
-                {
-                    if(!$this->isXHR() && $this->compact_js && !$value["exclude_compact"]) {
+				$static_init = true;
+				
+				if ($key === "ff.init")
+				{
+					$ffjs_queue = $js_queue_key;
+					$ffjs_index = $value["index"];
+				}
+				else if ($ffjs_queue !== null && (
+								$js_queue_key > $ffjs_queue
+								|| ($js_queue_key === $ffjs_queue && $value["index"] < $ffjs_index)
+						))
+						$static_init = false;
+				
+				if ($value["embed"])
+				{
+					if (
+							$this->compact_js 
+							&& !$value["exclude_compact"]
+						)
+					{
 						$this->js_buffer[]["content"] = $value["embed"];
-					} else {
-	                    $this->tpl[0]->set_var("js_embed", $value["embed"]);
-	                    $this->tpl[0]->set_var("SectJsSrc", "");
-	                    $this->tpl[0]->parse("SectJs", true);
 					}
-                } 
-                else 
-                {
-                    $this->tpl[0]->set_var("js_embed", "");
-                    
-                    if(isset($this->override_js[$key]) && strlen($this->override_js[$key])) 
-					{                                                                
-                        $tmp_path = ffcommon_dirname($this->override_js[$key]);
-                        $tmp_file = basename($this->override_js[$key]);
-                    } 
 					else 
 					{
-                        $res = $this->doEvent("on_js_parse", array($this, $key, $value["path"], $value["file"]));
-                        $rc = end($res);
-                        
-                        if ($rc === null)
-                        {
-                            if ($value["path"] === null)
-                                $tmp_path = $this->site_path . "/themes/" . $this->theme . "/javascript";
-                            elseif (strlen($value["path"])) 
-							{
-							    if (
-								    substr(strtolower($value["path"]), 0, 7) == "http://"
-								    || substr(strtolower($value["path"]), 0, 8) == "https://"
-							    )
-                            	    $tmp_path = $value["path"];
-								elseif(substr($value["path"], 0, 2) == "//")
-									$tmp_path = "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $value["path"];
-                                elseif(!$this->isXHR() && $this->compact_js)
-                            	    $tmp_path = $value["path"];
-                                elseif(substr($value["path"], -3) === ".js")
-									$tmp_path = $value["path"];
-								else
-								    $tmp_path = $this->site_path . $value["path"];
-						    }
-						    
-                            if ($value["file"] === null)
-                                $tmp_file = $key . ".js";
-                            elseif(substr($value["path"], -3) === ".js")
-								$tmp_file = "";
-                            else
-                                $tmp_file = $value["file"];
-                        }
-                        else
-                        {
-                    		if(!$this->isXHR() && $this->compact_js)
-                    			$tmp_path = $rc["path"];
-							else
-								$tmp_path = $this->site_path . $rc["path"];
+						$this->tpl[0]->set_var("lib_tag", $key);
+						$this->tpl[0]->set_var("lib_type", "js");
+						$this->tpl[0]->set_var("lib_deps", $this->libDepsToString($value["deps"]));
+						$this->tpl[0]->set_var("lib_media", "undefined");
+						if ($value["exclude_compact"])
+							$this->tpl[0]->parse("SectJSAsync", false);
+						// when embed, we can't verify static libs
+						//$this->tpl[0]->parse("SectLib", true);
+						//$this->tpl[0]->parse("SectLibs", false);
 
-                            $tmp_file = $rc["file"];
-                        }
+						$this->tpl[0]->set_var("js_embed", $value["embed"]);
+						$this->tpl[0]->parse("SectJsEmbed", false);
+						$this->tpl[0]->set_var("SectJsSrc", "");
+						$this->tpl[0]->parse("SectJs", true);
+					}
+					continue;
+				}
 
-						if (substr($value["path"], -3) !== ".js")
+
+				if (isset($this->override_js[$key]) && strlen($this->override_js[$key])) 
+				{
+					$tmp_path = $this->override_js[$key];
+					$tmp_file = $tmp_path;
+				} 
+				else 
+				{
+					$res = $this->doEvent("on_js_parse", array($this, $key, $value["path"], $value["file"]));
+					$rc = end($res);
+					if ($rc !== null)
+					{
+						$value["path"] = $rc["path"];
+						$value["file"] = $rc["file"];
+					}
+
+					$value["path"] = rtrim($value["path"], "/");
+
+					$flag_path_file = (substr($value["path"], -3) === ".js");
+					$flag_path_ext = (
+										substr(strtolower($value["path"]), 0, 7) === "http://"
+										|| substr(strtolower($value["path"]), 0, 8) === "https://"
+										|| substr(strtolower($value["path"]), 0, 2) === "//"
+									);
+					$flag_path_abs = (
+										$flag_path_ext || substr(strtolower($value["path"]), 0, 1) === "/"
+									);
+					$flag_file_ext = (
+										substr(strtolower($value["file"]), 0, 7) === "http://"
+										|| substr(strtolower($value["file"]), 0, 8) === "https://"
+										|| substr(strtolower($value["file"]), 0, 2) === "//"
+									);
+
+                    $flag_file_abs = (
+                                        strlen($value["file"]) && ($flag_file_ext || substr(strtolower($value["file"]), 0, 1) === "/" || strpos(realpath($value["file"]), realpath(ff_getAbsDir($value["path"]))) === 0)
+                                    );
+
+                    $variants = array();
+
+					if ($flag_path_abs)
+					{
+						$tmp_path = (substr(strtolower($value["path"]), 0, 2) === "//"
+										? "http" . ($_SERVER["HTTPS"] ? "s": "") . ":"
+										: ""
+									) . $value["path"];
+
+						if ($flag_path_file)
 						{
-							$tmp_path = rtrim($tmp_path, "/");
-							$tmp_file = ltrim($tmp_file, "/");
-
-							if($value["path"] === null) 
+							if ($value["file"] === null)
 							{
-								if(strlen($this->browser["name"]) && strlen($this->browser["majorver"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/replace_" . $tmp_file))
+								if ($flag_path_ext)
+									$tmp_file = $tmp_path;
+								else
 								{
-									$tmp_path = FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
-									$tmp_file = "replace_" . $tmp_file;
-								} 
-								elseif(strlen($this->browser["name"]) && strlen($this->browser["majorver"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/" . $tmp_file))
+                                    $tmp_file = ff_getAbsDir($tmp_path) . $tmp_path;
+								}
+							}
+							elseif ($flag_file_abs)
+							{
+								if ($flag_file_ext)
+									$tmp_file = $value["file"];
+								else
 								{
-									$tmp_path_add = FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
-								} 
-								else 
+                                    if (strpos(realpath($value["file"]), realpath(ff_getAbsDir($tmp_path))) !== 0)
+                                        $tmp_file = ff_getAbsDir($tmp_path) . $value["file"];
+                                    else
+                                        $tmp_file = $value["file"];
+								}
+							}
+							else
+								ffErrorHandler::raise ("Impossibile determinare il file fisico", E_USER_ERROR, null, get_defined_vars());
+						}
+						else
+						{
+							if ($flag_file_abs)
+								ffErrorHandler::raise ("Impossibile determinare il percorso pubblico", E_USER_ERROR, null, get_defined_vars());
+							elseif (strlen($value["file"]) || $value["file"] === null)
+							{
+								if ($flag_path_ext)
 								{
-									if(strlen($this->browser["name"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]) . "/replace_" . $tmp_file)) 
+									$tmp_path .= "/" . ($value["file"] ? $value["file"] : $key . ".js");
+									$tmp_file = $tmp_path;
+								}
+								else
+								{
+									if ($tmp_file_version)
 									{
-										$tmp_path = FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]);
-										$tmp_file = "replace_" . $tmp_file;
-									} 
-									elseif(strlen($this->browser["name"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]) . "/" . $tmp_file))
+										$variants = array(
+												"files" => array(
+													ff_getAbsDir($tmp_path) . $tmp_path . "/" . ($value["file"] ? $value["file"] : $key . ".js")
+													, ff_getAbsDir($tmp_path) . $tmp_path . "/" . $tmp_file_version . "/". ($value["file"] ? $value["file"] : $key . ".js")
+												)
+												, "paths" => array(
+													$tmp_path . "/" . ($value["file"] ? $value["file"] : $key . ".js")
+													, $tmp_path . "/" . $tmp_file_version . "/". ($value["file"] ? $value["file"] : $key . ".js")
+												)
+											);
+									}
+									else
 									{
-										$tmp_path_add = FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["name"]);
+										$tmp_path .= "/" . ($value["file"] ? $value["file"] : $key . ".js");
+										$tmp_file = ff_getAbsDir($tmp_path) . $tmp_path;
 									}
 								}
-								if(strlen($this->browser["platform"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $tmp_file))
-								{
-									$tmp_path = FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["platform"]);
-									$tmp_file = "replace_" . $tmp_file;
-								} 
-								elseif(strlen($this->browser["platform"]) && is_file($this->disk_path . FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $tmp_file))
-								{
-									$tmp_path_add = FF_THEME_DIR . "/" . $this->getTheme() . "/javascript/" . ffCommon_url_rewrite($this->browser["platform"]);
-								}
 							}
-						}
-                    }
-
-                    if($value["async"])
-                    {
-                        $this->tpl[0]->set_var("js_tag", $key);
-                        $this->tpl[0]->set_var("js_path", $tmp_path . (strlen($tmp_file) ? "/" : ""));
-                        $this->tpl[0]->set_var("js_file", $tmp_file);
-                        $this->tpl[0]->parse("SectAsyncJsPlugin", true);
-                    }
-                    else 
-                    {
-	                    if(!$this->isXHR() 
-	                    	&& $this->compact_js 
-	                    	&& !$value["exclude_compact"]
-						) {
-							if (
-	                            substr(strtolower($tmp_path), 0, 7) == "http://"
-	                            || substr(strtolower($tmp_path), 0, 8) == "https://"
-	                        )
-	                            $this->js_buffer[]["path"] = $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-							elseif(substr($tmp_path, 0, 2) == "//")
-								$this->js_buffer[]["path"] = "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-							elseif (strpos($tmp_path, cm_getModulesExternalPath()) === 0 && strpos($tmp_path, "/themes") === false)
-								$this->js_buffer[]["path"] = preg_replace("/^" . preg_quote(cm_getModulesExternalPath(), "/") . "(\/[^\/]+)/", CM_MODULES_ROOT . "\$1/themes", $tmp_path);
 							else
-	                            $this->js_buffer[]["path"] = FF_DISK_PATH . $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-
-							//$this->js_buffer[]["path"] = FF_DISK_PATH . $tmp_path . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-						} else {
-                            if (
-                                substr(strtolower($tmp_path), 0, 7) == "http://"
-                                || substr(strtolower($tmp_path), 0, 8) == "https://"
-                                || (strlen(FF_SITE_PATH) && strpos($tmp_path, FF_SITE_PATH) === 0) 
-                            ) {
-                                $this->tpl[0]->set_var("js_path", $tmp_path);
-							} elseif(substr($tmp_path, 0, 2) == "//") {
-								$this->tpl[0]->set_var("js_path", "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path);
-                            } else {
-                                $this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path);
-                            }
-
-	                        $this->tpl[0]->set_var("js_file", (strlen($tmp_file) ? "/" : "") . $tmp_file);
-	                        $this->tpl[0]->parse("SectJsSrc", false);
-	                        $this->tpl[0]->parse("SectJs", true);
+								ffErrorHandler::raise ("Impossibile determinare il file fisico", E_USER_ERROR, null, get_defined_vars());
 						}
-                    }
-					if(strlen($tmp_path_add)) {
-	                    if($value["async"])
-	                    {
-	                        $this->tpl[0]->set_var("js_tag", $key);
-	                        $this->tpl[0]->set_var("js_path", $tmp_path_add . (strlen($tmp_file) ? "/" : ""));
-	                        $this->tpl[0]->set_var("js_file", $tmp_file);
-	                        $this->tpl[0]->parse("SectAsyncJsPlugin", true);
-	                    }
-	                    else 
-	                    {
-		                    if(!$this->isXHR() 
-	                    		&& $this->compact_js 
-	                    		&& !$value["exclude_compact"]
-							) {
-								if (
-		                            substr(strtolower($tmp_path_add), 0, 7) == "http://"
-		                            || substr(strtolower($tmp_path_add), 0, 8) == "https://"
-		                        )
-		                            $this->js_buffer[]["path"] = $tmp_path_add . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-								elseif(substr($tmp_path_add, 0, 2) == "//")
-									$this->js_buffer[]["path"] = "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path_add . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-								elseif (strpos($tmp_path_add, cm_getModulesExternalPath()) === 0 && strpos($tmp_path_add, "/themes") === false)
-									$this->js_buffer[]["path"] = preg_replace("/^" . preg_quote(cm_getModulesExternalPath(), "/") . "(\/[^\/]+)/", CM_MODULES_ROOT . "\$1/themes", $tmp_path_add);
-								else
-		                            $this->js_buffer[]["path"] = FF_DISK_PATH . $tmp_path_add . (strlen($tmp_file) ? "/" : "") . $tmp_file;
-							} else {
-	                            if (
-	                                substr(strtolower($tmp_path_add), 0, 7) == "http://"
-	                                || substr(strtolower($tmp_path_add), 0, 8) == "https://"
-	                                || (strlen(FF_SITE_PATH) && strpos($tmp_path_add, FF_SITE_PATH) === 0) 
-	                            ) {
-	                                $this->tpl[0]->set_var("js_path", $tmp_path_add);
-								} elseif(substr($tmp_path_add, 0, 2) == "//") {
-									$this->tpl[0]->set_var("js_path", "http" . ($_SERVER["HTTPS"] ? "s": "") . ":" . $tmp_path_add);								
-	                            } else {
-	                                $this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path_add);
-	                            }
-	                            
-		                        $this->tpl[0]->set_var("js_file", (strlen($tmp_file) ? "/" : "") . $tmp_file);
-		                        $this->tpl[0]->parse("SectJsSrc", false);
-		                        $this->tpl[0]->parse("SectJs", true);
+					}
+					elseif ($value["path"] === null || strlen($value["path"]))
+					{
+						if ($value["path"] === null)
+							$tmp_path = "/themes/" . $this->theme . "/js";
+						else
+							$tmp_path = "/themes/" . $this->theme . "/js/" . $value["path"];
+
+						if ($value["file"] === null)
+						{
+							$tmp_path .= "/" . $key . ".js";
+							$tmp_file = FF_DISK_PATH . $tmp_path;
+						}
+						elseif (strlen($value["file"]))
+						{
+							if ($flag_file_abs)
+								ffErrorHandler::raise ("Impossibile determinare il percorso pubblico", E_USER_ERROR, null, get_defined_vars());
+							else
+							{
+								$tmp_path .= "/" . $value["file"] . ".js";
+								$tmp_file = FF_DISK_PATH . $tmp_path;
 							}
-	                    }
-					}                    
-                }
-                /*$this->tpl[0]->set_var("key", $key);
-                $this->tpl[0]->parse("SectLoadedJS", true);*/
-            }
-            reset($this->page_js);
-        }
-        else
-        {
-            $this->tpl[0]->set_var("SectJs", "");
-            $this->tpl[0]->set_var("SectAsyncJsPlugin", "");
+
+						}
+					} 
+				}
+
+				if (count($variants))
+				{
+					$found = false;
+					for ($i = 0; $i < count($variants["files"]); $i++)
+					{
+						$tmp_path = $variants["paths"][$i];
+						$tmp_file = $variants["files"][$i];
+						
+						
+						/*if (
+								substr($tmp_path, -3) !== ".js"
+								|| substr($tmp_file, -3) !== ".js"
+							)
+							ffErrorHandler::raise ("Eccezione non gestita", E_USER_ERROR, null, get_defined_vars());*/
+
+						//ffErrorHandler::raise ("DEBUG", E_USER_ERROR, null, get_defined_vars());
+						$flag_path_ext = (
+											substr(strtolower($tmp_path), 0, 7) === "http://"
+											|| substr(strtolower($tmp_path), 0, 8) === "https://"
+											|| substr(strtolower($tmp_path), 0, 2) === "//"
+										);
+						$flag_file_ext = (
+											substr(strtolower($tmp_file), 0, 7) === "http://"
+											|| substr(strtolower($tmp_file), 0, 8) === "https://"
+											|| substr(strtolower($tmp_file), 0, 2) === "//"
+										);
+
+						$tmp_path = str_replace("[VERSION]", $tmp_file_version, $tmp_path);
+						$tmp_file = str_replace("[VERSION]", $tmp_file_version, $tmp_file);
+
+						if (!$flag_file_ext && !$flag_path_ext && is_file($tmp_file))
+						{
+							$found = true;
+							break;
+						}
+					}
+					
+					if (!$found)
+						ffErrorHandler::raise ("DEBUG: File JS non esistente", E_USER_ERROR, null, get_defined_vars());
+				}
+				else
+				{
+					/*if (
+							substr($tmp_path, -3) !== ".js"
+							|| substr($tmp_file, -3) !== ".js"
+						)
+						ffErrorHandler::raise ("Eccezione non gestita", E_USER_ERROR, null, get_defined_vars());*/
+
+					//ffErrorHandler::raise ("DEBUG", E_USER_ERROR, null, get_defined_vars());
+					$flag_path_ext = (
+										substr(strtolower($tmp_path), 0, 7) === "http://"
+										|| substr(strtolower($tmp_path), 0, 8) === "https://"
+										|| substr(strtolower($tmp_path), 0, 2) === "//"
+									);
+					$flag_file_ext = (
+										substr(strtolower($tmp_file), 0, 7) === "http://"
+										|| substr(strtolower($tmp_file), 0, 8) === "https://"
+										|| substr(strtolower($tmp_file), 0, 2) === "//"
+									);
+
+					$tmp_path = str_replace("[VERSION]", $tmp_file_version, $tmp_path);
+					$tmp_file = str_replace("[VERSION]", $tmp_file_version, $tmp_file);
+
+					if (!$flag_file_ext && !$flag_path_ext && !is_file($tmp_file))
+						ffErrorHandler::raise ("DEBUG: File JS non esistente", E_USER_ERROR, null, get_defined_vars());
+				}
+				
+				/* Deprecato ADD JS Custom Browser
+				if ($this->js_browser_detection && !$flag_file_ext && !$flag_path_ext)
+				{
+					$check_file_dir = ffCommon_dirname($tmp_file);
+					$check_file_name = basename($tmp_file);
+					$check_path_dir = ffCommon_dirname($tmp_path);
+					$check_path_name = basename($tmp_path);
+
+					if (strlen($this->browser["name"] . $this->browser["majorver"]))
+					{
+						$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/replace_" . $check_file_name;
+						if (is_file($tmp))
+						{
+							$tmp_add_file = $tmp;
+							$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/replace_" . $check_path_name;
+							$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
+						}
+						else
+						{
+							$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/" . $check_file_name;
+							if (is_file($tmp))
+							{
+								$tmp_add_file = $tmp;
+								$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"] . "/" . $check_path_name;
+								$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["name"]) . $this->browser["majorver"];
+							}
+						}
+					}
+
+					if (strlen($this->browser["platform"]))
+					{
+						$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/replace_" . $check_file_name;
+						if (is_file($tmp))
+						{
+							$tmp_add_file = $tmp;
+							$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/replace_" . $check_path_name;
+							$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["platform"]) . $this->browser["majorver"];
+						}
+						else
+						{
+							$tmp = $check_file_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $check_file_name;
+							if (is_file($tmp))
+							{
+								$tmp_add_file = $tmp;
+								$tmp_add_path = $check_path_dir . "/" . ffCommon_url_rewrite($this->browser["platform"]) . "/" . $check_path_name;
+								$tmp_add_tag = $key . "." . ffCommon_url_rewrite($this->browser["platform"]);
+							}
+						}
+					}
+				}*/
+				
+				$tmp_lib_deps = $this->libDepsToString($value["deps"]);
+					
+				if ($value["async"])
+				{
+					$this->tpl[0]->set_var("lib_async", "true");
+					$this->tpl[0]->set_var("js_async", "true");
+				}
+				else
+				{
+					$this->tpl[0]->set_var("lib_async", "false");
+					$this->tpl[0]->set_var("js_async", "false");
+				}
+				
+				// static libs in normal load (not XHR)
+				$this->tpl[0]->set_var("lib_tag", $key);
+				$this->tpl[0]->set_var("lib_type", "js");
+				$this->tpl[0]->set_var("lib_deps", $tmp_lib_deps);
+				$this->tpl[0]->set_var("lib_media", "undefined");
+				
+				// load plugin in XHR loads
+				$this->tpl[0]->set_var("js_tag", $key);
+				$this->tpl[0]->set_var("js_deps", $tmp_lib_deps);
+				if ($flag_path_ext)
+					$this->tpl[0]->set_var("js_path", $tmp_path);
+				else
+				{
+                    if (ff_getAbsDir($tmp_path, false))
+					{
+						$a = FF_DISK_PATH;
+						$b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
+						$c = substr(__TOP_DIR__, strlen($b));
+						$this->tpl[0]->set_var("js_path", $c . $tmp_path);
+					}
+					else
+						$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path);
+				}
+				
+				if (!$this->isXHR() && !$value["async"] && $static_init)
+				{
+					$this->tpl[0]->parse("SectLib", true);
+					$this->tpl[0]->parse("SectLibs", false);
+				}
+
+				if (
+					$this->compact_js
+					&& !$value["exclude_compact"]
+				) 
+				{
+					$this->js_buffer[]["path"] = $tmp_file;
+					if (!$this->isXHR() && !$value["async"] && !$static_init/* && ffIsset($alldeps, $key)*/)
+					{
+						$this->js_buffer[]["content"] = "ff.libLoadStatic('js', '$key');"; //, $tmp_lib_deps
+					}
+				}
+				else
+				{
+					if ($this->isXHR())
+					{
+						$this->tpl[0]->parse("SectJsSrc", false);
+						$this->tpl[0]->set_var("SectJsEmbed", "");
+						$this->tpl[0]->parse("SectJs", true);
+					}
+					else
+					{
+						if ($value["async"])
+						{
+							$this->tpl[0]->parse("SectAsyncJsPlugin", true);
+						}
+						else
+						{
+							$this->tpl[0]->parse("SectJsSrc", false);
+							$this->tpl[0]->set_var("SectJsEmbed", "");
+							$this->tpl[0]->parse("SectJs", true);
+							if (!$static_init/* && ffIsset($alldeps, $key)*/)
+							{
+								$this->tpl[0]->set_var("js_embed", "ff.libLoadStatic('js', '$key');"); //, $tmp_lib_deps
+								$this->tpl[0]->parse("SectJsEmbed", false);
+								$this->tpl[0]->set_var("SectJsSrc", "");
+								$this->tpl[0]->parse("SectJs", true);
+							}
+						}
+					}
+				}
+
+				// --------------------------------------------------------------------------------------------------
+				// add browser customization as additional JS
+				/* Deprecato ADD JS Custom Browser
+				if ($this->js_browser_detection && $tmp_add_tag !== null)
+				{
+					$tmp_lib_deps = $this->libDepsToString(array("js" => array($key)));
+					
+					// static libs in normal load (not XHR)
+					$this->tpl[0]->set_var("lib_tag", $tmp_add_tag);
+					$this->tpl[0]->set_var("lib_deps", $tmp_lib_deps);
+
+					// load plugin in XHR loads
+					$this->tpl[0]->set_var("js_tag", $tmp_add_tag);
+					$this->tpl[0]->set_var("js_deps", $tmp_lib_deps);
+					$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_add_path);
+					
+					if (
+							$this->compact_js 
+							&& !$value["exclude_compact"]
+						) 
+					{
+						$this->js_buffer[]["path"] = $tmp_add_file;
+					} 
+					else 
+					{
+						if ($this->isXHR())
+						{
+							$this->tpl[0]->parse("SectJsSrc", false);
+							$this->tpl[0]->set_var("SectJsEmbed", "");
+							$this->tpl[0]->parse("SectJs", true);
+						}
+						else
+						{
+							if ($value["async"])
+							{
+								$this->tpl[0]->parse("SectAsyncJsPlugin", true);
+							}
+							else
+							{
+								if ($static_init)
+								{
+									$this->tpl[0]->parse("SectLib", true);
+									$this->tpl[0]->parse("SectLibs", false);
+								}
+
+								$this->tpl[0]->parse("SectJsSrc", false);
+								$this->tpl[0]->set_var("SectJsEmbed", "");
+								$this->tpl[0]->parse("SectJs", true);
+							}
+						}
+					}
+				}*/
+			}
 		}
+		reset($this->page_js);
 	}
+	
+	function libDepsToString($deps)
+	{
+		$sub = "";
+		foreach ($deps as $key => $value)
+		{
+			$libs = "";
+			foreach ($value as $lib)
+			{
+				if (strlen($libs)) $libs .= ", ";
+				$libs .= "'" . $lib  . "'";
+			}
+			
+			if (strlen($libs))
+			{
+				if (strlen($sub)) $sub .= ", ";
+				$sub .= "{";
+				$sub .= "'id' : '" . $key . "'";
+				$sub .= ", 'value' : [" ;
+
+				$sub .= $libs;
+				$sub .= "]}";
+			}
+		}
+
+		if (strlen($sub))
+		{
+			return "ff.hash([" . $sub . "])";
+		}
+		else
+			return "undefined";
+	}
+	
 	function parse_js_fix() 
 	{
-		if(is_array($this->page_js) && count($this->page_js)) 
+		if (!is_array($this->libraries) || !count($this->libraries))
+			return;
+		
+		foreach ($this->page_js as $js_queue_key => $js_queue)
 		{
-			if(is_array($this->cdn_version) && count($this->cdn_version)) 
+			foreach ($js_queue as $key => $value)
 			{
-				foreach($this->cdn_version AS $version_key => $version_value) 
+				if (ffIsset($this->libraries, $key) && ffIsset($this->libraries[$key], "version"))
 				{
-					if(array_key_exists($version_key, $this->page_js)) 
+					$version_value = $this->libraries[$key]["version"];
+					
+					$tmp_file = FF_DISK_PATH . FF_THEME_DIR . "/library/" . $key . "/" . $key . ".fix." . $version_value . ".js";
+					$tmp_path = FF_THEME_DIR . "/library/" . $key . "/" . $key . ".fix." . $version_value . ".js";
+					if (is_file($tmp_file))
 					{
-						if(is_file(FF_DISK_PATH . FF_THEME_DIR . "/library/" . $version_key . "/" . $version_key . ".fix." . $version_value["major"] . "." . $version_value["minor"] . ".js")) {
-							$tmp_js_top = array_slice($this->page_js, 0, array_search($version_key, array_keys($this->page_js)) + 1, true);
-							$tmp_js_bottom = array_slice($this->page_js, array_search($version_key, array_keys($this->page_js)) + 1, null, true);
+						$tmp_js[$key . ".fix." . $version_value] = array(
+							"path" => $tmp_path
+							, "file" => $tmp_file
+							, "async" => $js_queue[$key]["async"]
+							, "embed" => $js_queue[$key]["embed"]
+							, "exclude_compact" => $js_queue[$key]["exclude_compact"]
+						);
 
-							$tmp_js_top[$version_key . ".fix." . $version_value["major"] . "." . $version_value["minor"]] = array(
-					            "path" => $this->page_js[$version_key]["path"]
-					            , "file" => $version_key . ".fix." . $version_value["major"] . "." . $version_value["minor"] . ".js"
-					            , "async" => $this->page_js[$version_key]["async"]
-					            , "embed" => $this->page_js[$version_key]["embed"]
-					            , "exclude_compact" => $this->page_js[$version_key]["exclude_compact"]
-					        );
-
-							$this->page_js = array_merge($tmp_js_top, $tmp_js_bottom);
-
-						}
+						$this->tplAddMultiJS($tmp_js, $js_queue_key);
 					}
 				}
 			}
 		}
 	}
+	
    /**
 	 * Elabora i Meta Tag
 	 * Da richiamare ad ogni aggiunta di Meta se si aggiungono Meta dinamicamente post-elaborazione
 	 */
     public function parse_meta() 
     {   
-        $this->tpl[0]->set_var("SectMeta", "");
         if (is_array($this->page_meta) && count($this->page_meta))
         {
+			$this->tpl[0]->set_var("tag_type", "meta");
             foreach ($this->page_meta as $key => $value)
             {
             	$this->tpl[0]->set_var("meta_type", $value["type"]);
                 $this->tpl[0]->set_var("meta_content", $value["content"]);
                 $this->tpl[0]->set_var("meta_name", $value["name"]);
-                $this->tpl[0]->parse("SectMeta", true);
+                $this->tpl[0]->set_var("tag_properties", " " . $value["type"] . '="' . $value["name"] . '" content="' . $value["content"] . '"');
+                $this->tpl[0]->parse("SectTags", true);
             }
             reset($this->page_meta);
         }
-        else
-            $this->tpl[0]->set_var("SectMeta", "");
     }
 
    /**
@@ -2425,102 +3039,16 @@ class ffPage_html extends ffPage_base
 	 */
 	function widgetLoad($name, $path = null, &$ref = null)
 	{
-		parent::widgetLoad($name, $path, $ref);
-
-		if(is_array($this->widgets[$name]->js_deps) && count($this->widgets[$name]->js_deps))
-		{
-			foreach ($this->widgets[$name]->js_deps AS $js_key => $js_value)
-			{
-				if (is_array($js_value))
-				{
-					$this->tplAddJs($js_key, $js_value["file"], $js_value["path"]);
-				}
-				elseif (is_null($js_value))
-				{
-					if(file_exists(FF_DISK_PATH . $this->getThemePath(false) . "/javascript/" . $js_key . ".js"))
-						$this->tplAddJs($js_key, $js_key . ".js", $this->getThemePath() . "/javascript");
-					elseif(file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $js_key . "/" . $js_key . ".js"))
-						$this->tplAddJs($js_key, $js_key . ".js", FF_THEME_DIR . "/library/" . $js_key);
-				}
-				else
-				{
-					if(file_exists(FF_DISK_PATH . $this->getThemePath(false) . "/javascript" . $js_value))
-						$this->tplAddJs($js_key, null, $this->getThemePath() . "/javascript" . $js_value);
-					elseif(file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library" . $js_value))
-						$this->tplAddJs($js_key, null, FF_THEME_DIR . "/library" . $js_value);
-					//$this->tplAddJs($js_key, $js_value, null);
-				}
-			}
-			reset($this->widgets[$name]);
-		}
-
-		if(is_array($this->widgets[$name]->css_deps) && count($this->widgets[$name]->css_deps))
-		{
-			foreach ($this->widgets[$name]->css_deps AS $css_key => $css_value)
-			{
-				$rc = $this->widgetResolveCss($css_key, $css_value, $this); 
-
-				$this->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-			reset($this->widgets[$name]);
-		}
-	}
-
-	function widgetResolveCss($css_key, $css_value, &$oPage)
-	{
-		if(is_array($css_value))
-		{
-			if(!is_null($css_value["path"]))
-			{
-				$rc = $css_value;
-			}
-			else 
-			{
-	            if(isset($css_value["rel"]) && strlen($css_value["file"]))
-	                $sub_path_css = $css_value["rel"];
-	            else
-	                $sub_path_css = $css_key;
-
-                if($oPage->jquery_ui_force_theme !== null && strpos($oPage->jquery_ui_force_theme, "/") === 0 && file_exists(FF_DISK_PATH . $oPage->jquery_ui_force_theme . "/" . $css_value["file"]))
-                    $rc = array("file" => $css_value["file"], "path" => $oPage->jquery_ui_force_theme);
-                elseif($oPage->jquery_ui_force_theme !== null && array_key_exists("jquery.ui", $oPage->cdn_version) && file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_force_theme . "/" . $oPage->cdn_version["jquery.ui"]["major"] . "." . $oPage->cdn_version["jquery.ui"]["minor"] . ".x" . "/" . $css_value["file"]))
-                    $rc = array("file" => $css_value["file"], "path" => FF_THEME_DIR . "/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_force_theme . "/" . $oPage->cdn_version["jquery.ui"]["major"] . "." . $oPage->cdn_version["jquery.ui"]["minor"] . ".x");
-				elseif($oPage->jquery_ui_force_theme !== null && file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_force_theme . "/" . $css_value["file"]))
-					$rc = array("file" => $css_value["file"], "path" => FF_THEME_DIR . "/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_force_theme);
-				elseif(file_exists(FF_DISK_PATH . $oPage->getThemePath(false) . "/css/" . $sub_path_css . "/" . $css_value["file"]))
-					$rc = array("file" => $css_value["file"], "path" => $oPage->getThemePath(false) . "/css/" . $sub_path_css);
-				elseif(file_exists(FF_DISK_PATH . $oPage->getThemePath(false) . "/css/" . $css_value["file"]))
-					$rc = array("file" => $css_value["file"], "path" => $oPage->getThemePath(false) . "/css");
-				elseif(file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $sub_path_css . "/" . $css_value["file"]))
-					$rc = array("file" => $css_value["file"], "path" => FF_THEME_DIR . "/library/" . $sub_path_css);
-                elseif(array_key_exists("jquery.ui", $oPage->cdn_version) && file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_theme . "/" . $oPage->cdn_version["jquery.ui"]["major"] . "." . $oPage->cdn_version["jquery.ui"]["minor"] . ".x" . "/" . $css_value["file"]))
-                    $rc = array("file" => $css_value["file"], "path" => FF_THEME_DIR . "/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_theme . "/" . $oPage->cdn_version["jquery.ui"]["major"] . "." . $oPage->cdn_version["jquery.ui"]["minor"] . ".x");
-				elseif(file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_theme . "/" . $css_value["file"]))
-					$rc = array("file" => $css_value["file"], "path" => FF_THEME_DIR . "/library/" . $sub_path_css . "/themes/" . $oPage->jquery_ui_theme);
-			}
-		}
-		elseif (is_null($css_value))
-		{
-			if(file_exists(FF_DISK_PATH . $oPage->getThemePath(false) . "/css/" . $css_key . ".css"))
-				$rc = array("file" => null, "path" => $oPage->getThemePath(false) . "/css");
-			elseif(file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $css_key . "/" . $css_key . ".css"))
-				$rc = array("file" => null, "path" => FF_SITE_PATH . FF_THEME_DIR . "/library/" . $css_key);
-		} 
-		else
-		{
-			if(file_exists(FF_DISK_PATH . $oPage->getThemePath(false) . "/css" . $css_value))
-				$rc = array("file" => $oPage->getThemePath(false) . "/css" . $css_value, "path" => "");
-			elseif(file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library" . $css_value))
-				$rc = array("file" => FF_THEME_DIR . "/library" . $css_value, "path" => "");
-		}					
+		if (!parent::widgetLoad($name, $path, $ref))
+			return;
 		
-		return $rc;
-		/*if (!is_null($css_value))
-			$this->tplAddCss($css_key, $this->getThemePath() . "/css" . $css_value, "");
-		else
+		if (count($this->widgets[$name]->libraries))
 		{
-			$this->tplAddCss($css_key, null, $this->getThemePath() . "/css");
-		}*/
+			$this->libsExtend($this->widgets[$name]->libraries);
+		}
+		
+		$this->tplAddMultiJS($this->widgets[$name]->js_deps, cm::LAYOUT_PRIORITY_HIGH);
+		$this->tplAddMultiCss($this->widgets[$name]->css_deps, cm::LAYOUT_PRIORITY_HIGH);
 	}
 	
 	/**
@@ -2532,10 +3060,136 @@ class ffPage_html extends ffPage_base
 	 */
 	public function addContent($content, $group = null, $id = null, $options = array())
 	{
-		if ($content === null && ($group === true))
-			$this->widgetLoad("tabs");
-			
+		if ($this->tab && $content === null && $group === true)
+		{
+            //$options["tab_mode"] = $this->tab;
+            $this->widgetLoad("tabs");
+        }
 		parent::addContent($content, $group, $id, $options);
+
+		if ($content !== null)	
+		{
+			if (
+					is_object($content)
+					&& (
+						   is_subclass_of($content, "ffGrid_base")
+						|| is_subclass_of($content, "ffRecord_base")
+						|| is_subclass_of($content, "ffDetails_base")
+					)
+				)
+			{
+				if (count($content->libraries))
+				{
+					$this->libsExtend($content->libraries);
+				}
+
+				$this->tplAddMultiJS($content->js_deps, cm::LAYOUT_PRIORITY_HIGH);
+				$this->tplAddMultiCss($content->css_deps, cm::LAYOUT_PRIORITY_HIGH);
+			}
+			else if (
+					is_object($content)
+					&& get_class($content) == "ffTemplate"
+				)
+			{
+				cm::getInstance()->preloadApplets($content);
+			}
+		}
+	}
+	
+	function process_params()
+	{
+		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID && count($this->components))
+		{
+			$tmp = $this->getXHRFFStruct();
+			if ($tmp)
+			{
+				foreach ($this->components as $comp_key => $comp_obj)
+				{
+					foreach ($tmp as $struct_item)
+					{
+						if (
+								isset($struct_item->factory_id)
+								&& $comp_key === $struct_item->factory_id
+								&& (
+										(!$this->getXHRCtx() && (!isset($struct_item->ctx) || !strlen($struct_item->ctx)))
+										|| ($this->getXHRCtx() !== false && $this->getXHRCtx() === $struct_item->ctx)
+								)
+							)
+						{
+							
+							$this->components[$comp_key]->id_if = $struct_item->id;
+							
+							if (ffIsset($_REQUEST, "XHR_COMPONENT") && $_REQUEST["XHR_COMPONENT"] === $struct_item->id)
+							{
+								$_REQUEST["XHR_COMPONENT"] = $struct_item->factory_id;
+								if (ffIsset($_GET, "XHR_COMPONENT"))
+									$_GET["XHR_COMPONENT"] = $_REQUEST["XHR_COMPONENT"];
+								if (ffIsset($_POST, "XHR_COMPONENT"))
+									$_POST["XHR_COMPONENT"] = $_REQUEST["XHR_COMPONENT"];
+							}
+							
+							if (ffIsset($_REQUEST, "frmAction") && strpos($_REQUEST["frmAction"], $struct_item->id . "_") === 0)
+							{
+								$_REQUEST["frmAction"] = $struct_item->factory_id . substr($_REQUEST["frmAction"], strpos($_REQUEST["frmAction"], "_"));
+								if (ffIsset($_GET, "frmAction"))
+									$_GET["frmAction"] = $_REQUEST["frmAction"];
+								if (ffIsset($_POST, "frmAction"))
+									$_POST["frmAction"] = $_REQUEST["frmAction"];
+							}
+							
+							$tmp_req_key = array_keys($_REQUEST);
+							foreach ($tmp_req_key as $key)
+							{
+								if (strpos($key, $struct_item->id . "_") === 0)
+								{
+									$newkey = $struct_item->factory_id . substr($key, strpos($key, "_"));
+									
+									$_REQUEST[$newkey] = $_REQUEST[$key];
+									unset($_REQUEST[$key]);
+									
+									if (ffIsset($_GET, $key))
+									{
+										unset($_GET[$key]);
+										$_GET[$newkey] = $_REQUEST[$newkey];
+									}
+									
+									if (ffIsset($_POST, $key))
+									{
+										unset($_POST[$key]);
+										$_POST[$newkey] = $_REQUEST[$newkey];
+									}
+								}
+							}
+							
+						}
+					}
+				}
+				
+				foreach ($this->components as $comp_key => $comp_obj)
+				{
+					if (
+							is_subclass_of($comp_obj, "ffRecord_base")
+							&& ffIsset($_REQUEST, $comp_key . "_detailaction")
+						)
+					{
+						foreach ($tmp as $struct_item)
+						{
+							if ($struct_item->type === "ffDetails" && isset($struct_item->factory_id))
+							{
+								if ($_REQUEST[$comp_key . "_detailaction"] === $struct_item->id)
+									$_REQUEST[$comp_key . "_detailaction"] = $struct_item->factory_id;
+								if (ffIsset($_GET, $comp_key . "_detailaction"))
+									$_GET[$comp_key . "_detailaction"] = $struct_item->factory_id;
+								if (ffIsset($_POST, $comp_key . "_detailaction"))
+									$_POST[$comp_key . "_detailaction"] = $struct_item->factory_id;
+							}
+						}
+					}						
+				}
+			}
+		}
+		
+		parent::process_params();
 	}
 
 	/**
@@ -2548,13 +3202,14 @@ class ffPage_html extends ffPage_base
 	{
 		$this->output_buffer = array();
 
-		if($this->use_own_form !== false)
+		if ($this->use_own_form !== false)
 			$this->addHiddenField("frmAction", ffCommon_specialchars($_REQUEST["frmAction"]));
 
 		if (!$this->params_processed)
 			$this->process_params();
 
 		$this->tplLoad();
+		$this->tplLoadLayer();
 
 		$this->doEvent("on_page_process", array(&$this));
 
@@ -2665,8 +3320,14 @@ class ffPage_html extends ffPage_base
 			{
 				if ($this->components[$item]->display !== false)
 				{
-					if ($this->getXHRComponent() && $this->getXHRComponent() != $item)
+					if (!(
+							!$this->getXHRComponent()
+							|| $this->getXHRComponent() === $item
+							|| (is_subclass_of($this->components[$item], "ffDetails_base") && $this->components[$item]->main_record[0]->id === $this->getXHRComponent())
+					))
 						continue;
+					
+					$tmp_id_if = $this->components[$item]->getIDIF();
 
 					if ($this->components_buffer[$item] === null) // ignora nel caso in cui sia già stato preso da cache
 					{
@@ -2674,13 +3335,13 @@ class ffPage_html extends ffPage_base
 						$this->components_buffer[$item]["headers"] = $this->components[$item]->process_headers();
 						$this->components_buffer[$item]["footers"] = $this->components[$item]->process_footers();
 						
-						if(property_exists($this->components[$item], "widget_activebt_enable") && $this->components[$item]->widget_activebt_enable && !isset($this->widgets["activebuttons"]))
+						if (property_exists($this->components[$item], "widget_activebt_enable") && $this->components[$item]->widget_activebt_enable && !isset($this->widgets["activebuttons"]))
 							$this->widgetLoad("activebuttons");
 						
-						if(property_exists($this->components[$item], "widget_discl_enable") && $this->components[$item]->widget_discl_enable && !isset($this->widgets["disclosures"]))
+						if (property_exists($this->components[$item], "widget_discl_enable") && $this->components[$item]->widget_discl_enable && !isset($this->widgets["disclosures"]))
 							$this->widgetLoad("disclosures");
 
-						$ret = $this->componentWidgetsProcess($item);
+						$ret = $this->componentWidgetsProcess($tmp_id_if);
 						$this->components_buffer[$item]["headers"] .= $ret["headers"];
 						$this->components_buffer[$item]["footers"] .= $ret["footers"];
 
@@ -2703,30 +3364,37 @@ class ffPage_html extends ffPage_base
 			reset($components_keys);
 
 			// After processing buffers, set inner components
-			$components_keys_copy = array_keys($this->components);
-			do
+			if ($this->getXHRFormat() === false)
 			{
-				$replaces = 0;
-				foreach ($components_keys_copy as $key => $item)
+				$components_keys_copy = array_keys($this->components);
+				do
 				{
-					foreach ($components_keys as $subkey => $subitem)
+					$replaces = 0;
+					foreach ($components_keys_copy as $key => $item)
 					{
-						if ($this->getXHRComponent() == $subitem)
-							continue;
-						
-						$this->components_buffer[$item]["html"] = str_replace("{{" . $subitem . "}}", $this->components_buffer[$subitem]["html"], $this->components_buffer[$item]["html"], $count);
-						$replaces += $count;
-						if ($count)
+						foreach ($components_keys as $subkey => $subitem)
 						{
-							$this->components_buffer[$item]["headers"] .= $this->components_buffer[$subitem]["headers"];
-							$this->components_buffer[$item]["footers"] .= $this->components_buffer[$subitem]["footers"];
-							$this->components_buffer[$subitem] = array();
+							if (!(
+									!$this->getXHRComponent()
+									|| $this->getXHRComponent() === $subitem
+									|| (is_subclass_of($this->components[$subitem], "ffDetails_base") && $this->components[$subitem]->main_record[0]->id === $this->getXHRComponent())
+								))
+									continue;
+
+							$this->components_buffer[$item]["html"] = str_replace("{{" . $subitem . "}}", $this->components_buffer[$subitem]["html"], $this->components_buffer[$item]["html"], $count);
+							$replaces += $count;
+							if ($count)
+							{
+								$this->components_buffer[$item]["headers"] .= $this->components_buffer[$subitem]["headers"];
+								$this->components_buffer[$item]["footers"] .= $this->components_buffer[$subitem]["footers"];
+								$this->components_buffer[$subitem] = array();
+							}
 						}
+						reset($components_keys);
 					}
-					reset($components_keys);
-				}
-				reset($components_keys_copy);
-			} while ($replaces > 0);
+					reset($components_keys_copy);
+				} while ($replaces > 0);
+			}
 		}
 
 		// process buttons with different location
@@ -2747,6 +3415,25 @@ class ffPage_html extends ffPage_base
 		}
 		reset($butt_keys);
 			
+		// process fields with different location
+		$fld_keys = array_keys($this->fields);
+		foreach ($fld_keys as $key => $item)
+		{
+			if ($this->fields[$item]->use_own_location)
+			{
+				if ($this->fields[$item]->location_context !== null)
+				{
+					$tmp = $this->fields[$item]->location_context;
+					if (
+						is_object($this->fields[$item]->location_context)
+						&& get_class($this->fields[$item]->location_context) == "ffTemplate"
+					)
+						$this->fields[$item]->location_context->set_var(($this->fields[$item]->location_name !== null ? $this->fields[$item]->location_name : $this->fields[$item]->id), $this->fields[$item]->process());
+				}
+			}
+		}
+		reset($fld_keys);
+		
 		$this->tplProcessBounceComponents();
 
 		$rc = $this->doEvent("on_after_process_components", array(&$this));
@@ -2781,47 +3468,47 @@ class ffPage_html extends ffPage_base
 	    }
 	   
 	    // Next get the name of the useragent yes seperately and for good reason
-		if(preg_match('/iPad/i',$u_agent))
+		if (preg_match('/iPad/i',$u_agent))
 	    {
 	        $bname = 'Ipad';
 	        $ub = "Ipad";
 	    }
-		elseif(preg_match('/iPhone/i',$u_agent))
+		elseif (preg_match('/iPhone/i',$u_agent))
 	    {
 	        $bname = 'iPhone';
 	        $ub = "iPhone";
 	    }
-		elseif(preg_match('/iPod/i',$u_agent))
+		elseif (preg_match('/iPod/i',$u_agent))
 	    {
 	        $bname = 'Ipod';
 	        $ub = "Ipod";
 	    }
-	    elseif(preg_match('/MSIE/i',$u_agent) && !preg_match('/Opera/i',$u_agent))
+	    elseif (preg_match('/MSIE/i',$u_agent) && !preg_match('/Opera/i',$u_agent))
 	    {
 	        $bname = 'Internet Explorer';
 	        $ub = "MSIE";
 	    }
-	    elseif(preg_match('/Firefox/i',$u_agent))
+	    elseif (preg_match('/Firefox/i',$u_agent))
 	    {
 	        $bname = 'Mozilla Firefox';
 	        $ub = "Firefox";
 	    }
-	    elseif(preg_match('/Chrome/i',$u_agent))
+	    elseif (preg_match('/Chrome/i',$u_agent))
 	    {
 	        $bname = 'Google Chrome';
 	        $ub = "Chrome";
 	    }
-	    elseif(preg_match('/Safari/i',$u_agent))
+	    elseif (preg_match('/Safari/i',$u_agent))
 	    {
 	        $bname = 'Apple Safari';
 	        $ub = "Safari";
 	    }
-	    elseif(preg_match('/Opera/i',$u_agent))
+	    elseif (preg_match('/Opera/i',$u_agent))
 	    {
 	        $bname = 'Opera';
 	        $ub = "Opera";
 	    }
-	    elseif(preg_match('/Netscape/i',$u_agent))
+	    elseif (preg_match('/Netscape/i',$u_agent))
 	    {
 	        $bname = 'Netscape';
 	        $ub = "Netscape";
@@ -2832,12 +3519,12 @@ class ffPage_html extends ffPage_base
 	    $pattern = '#(?P<browser>' . join('|', $known) .
 	    ')[/ ]+(?P<version>[0-9.|a-zA-Z.]*)#';
 	    $rc = @preg_match_all($pattern, $u_agent, $matches);
-	   	if($rc === false) {
+	   	if ($rc === false) {
 			$pattern = '#(?<browser>' . join('|', $known) .
 		    ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
 		    $rc = @preg_match_all($pattern, $u_agent, $matches);
 		    
-		   	if($rc === false) {
+		   	if ($rc === false) {
 			   	ffErrorHandler::raise("unable to check browser version", E_USER_ERROR, null, get_defined_vars());
 		   	}
 	   	}
@@ -2920,16 +3607,34 @@ class ffPage_html extends ffPage_base
 	}
 
 	/**
-	 * rileva se è stata richiesta l'elaborazione di un dialog
+	 * rileva se è stata richiesta l'elaborazione di un contesto
 	 * @return mixed
 	 */
-	function getXHRDialog()
+	function getXHRCtx()
 	{
-		if (!isset($_REQUEST["XHR_DIALOG_ID"]))
+		if (!isset($_REQUEST["XHR_CTX_ID"]))
 			return false;
 		else
-			return $_REQUEST["XHR_DIALOG_ID"];
+			return $_REQUEST["XHR_CTX_ID"];
 	}
 	
+	function getXHRFFStruct($reset = false)
+	{
+		if (!isset($_REQUEST["XHR_FFSTRUCT"]))
+			return false;
+		
+		static $struct = null;
+		if ($struct === null || $reset)
+			$struct = json_decode($_REQUEST["XHR_FFSTRUCT"]);
+		
+		return $struct;
+	}
 	
+	function getXHRFormat()
+	{
+		if (!isset($_REQUEST["XHR_FORMAT"]))
+			return false;
+		else
+			return $_REQUEST["XHR_FORMAT"];
+	}
 }

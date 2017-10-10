@@ -4,10 +4,13 @@
  * @package ContentManager
  * @subpackage common
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
+
+if (!defined("FF_URLPARAMS")) define("FF_URLPARAMS", "__QUERY__,__DEBUG__,__CLEARCACHE__,__GENCACHE__,__NOCACHE__,__NOLAYOUT__,__SHOWCASCADELOADER__");
+
 if (!defined("FF_COMPONENTS") && defined("FF_ONLY_COMPONENTS"))
 {
 	require(dirname(__FILE__) . "/../ff/main.php");
@@ -47,7 +50,7 @@ if (!defined("CM_MAIN_INIT"))
 	// global config
 	if (@is_file(FF_DISK_PATH . "/conf/config." . FF_PHP_EXT))
 		require FF_DISK_PATH . "/conf/config." . FF_PHP_EXT;
-
+	
 	define("CM_MAIN_INIT", true);
 	if (defined("CM_ONLY_INIT"))
 		return;
@@ -75,6 +78,7 @@ if (@is_file(FF_DISK_PATH . "/conf/common." . FF_PHP_EXT))
 	
 // run the Content Manager
 $cm = cm::getInstance();
+$ff->events->doEvent("cm::getInstance", array($cm));
 $cm->process();
 
 // done!

@@ -11,8 +11,11 @@ class ffWidget_dragsort extends ffCommon
 	var $class			= "ffWidget_dragsort";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
+							  "ff.ffDetails.dragsort" 			=> null
 						);
 	var $css_deps = array();
 	// PRIVATE VARS
@@ -73,13 +76,6 @@ class ffWidget_dragsort extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddCss("ff.ffDetails.dragsort", "ff.ffDetails.dragsort.css", FF_THEME_DIR . "/restricted/ff/ffDetails/widgets/dragsort");
-			$this->oPage[0]->tplAddJs("jquery.fn.jTableOrder", "jTableOrder.js", FF_THEME_DIR . "/restricted/ff/ffDetails/widgets/dragsort");
-			$this->oPage[0]->tplAddJs("ff.ffDetails", "ffDetails.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffDetails.dragsort", "dragsort.js", FF_THEME_DIR . "/restricted/ff/ffDetails/widgets/dragsort");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -96,13 +92,6 @@ class ffWidget_dragsort extends ffCommon
 	
 	function process_headers()
 	{
-        if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddCss("ff.ffDetails.dragsort", "ff.ffDetails.dragsort.css", FF_THEME_DIR . "/restricted/ff/ffDetails/widgets/dragsort");
-            $this->oPage[0]->tplAddJs("jquery.fn.jTableOrder", "jTableOrder.js", FF_THEME_DIR . "/restricted/ff/ffDetails/widgets/dragsort");
-            $this->oPage[0]->tplAddJs("ff.ffDetails", "ffDetails.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffDetails.dragsort", "dragsort.js", FF_THEME_DIR . "/restricted/ff/ffDetails/widgets/dragsort");
-        }
-                
 		if (!isset($this->tpl["main"]))
 			return;
 

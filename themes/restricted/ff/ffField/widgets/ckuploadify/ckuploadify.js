@@ -8,7 +8,7 @@ ff.ffField.ckuploadify = (function () {
 	var relativePath = '';
 	var idComponent = undefined;
 
-	var basePathCK = ff.site_path + "/themes/library/ckfinder";
+	var basePathCK = ff.base_path + "/themes/library/ckfinder";
 	var baseUrlCK = "";
 	
     var start = "";
@@ -37,7 +37,6 @@ ff.ffField.ckuploadify = (function () {
 			this.showFile			= params.showFile;
             this.fullPath           = params.fullPath;
             this.dataSrc			= params.dataSrc;
-            this.icons              = params.icons;
 
 			this.previewPath		= ff.site_path + "/cm/showfiles.php";
 			this.relativePath		= params.relativePath;
@@ -74,7 +73,6 @@ ff.ffField.ckuploadify = (function () {
             var fullPath = this.fullPath;
 			var dataSrc = this.dataSrc;
 			var relativePath = this.relativePath;
-            var icons = this.icons;
 			
             if(model == 'default' && modelThumb == '')
                 modelThumb = "thumb";
@@ -208,11 +206,11 @@ ff.ffField.ckuploadify = (function () {
 							descBlock = '<span class="fileName">' + strResponse + ' (' + byteSize + suffix + ')' + '</span>';
 
                         if(model == "vertical") {
-                        	jQuery("#uploadify_" + idComponent).html(previewBlock + '<span class="top"><div class="cancel"><a href="javascript:ff.ffField.ckuploadify.del(\'' + component + '\');" alt="delete" class="' + icons.cancel + '"></a></div></span>' + descBlock);
+                        	jQuery("#uploadify_" + idComponent).html(previewBlock + '<span class="top"><div class="cancel"><a href="javascript:ff.ffField.ckuploadify.del(\'' + component + '\');" alt="delete" class="del-file"></a></div></span>' + descBlock);
 						} else if(model == "horizzontal") {
-							jQuery("#uploadify_" + idComponent).html(previewBlock + '<span class="top"><div class="cancel"><a href="javascript:ff.ffField.ckuploadify.del(\'' + component + '\');" alt="delete" class="' + icons.cancel + '"></a></div></span>' + descBlock);
+							jQuery("#uploadify_" + idComponent).html(previewBlock + '<span class="top"><div class="cancel"><a href="javascript:ff.ffField.ckuploadify.del(\'' + component + '\');" alt="delete" class="del-file"></a></div></span>' + descBlock);
 						} else {
-							jQuery("#uploadify_" + idComponent).html(previewBlock + '<span class="top"><div class="cancel"><a href="javascript:ff.ffField.ckuploadify.del(\'' + component + '\');" alt="delete" class="' + icons.cancel + '"></a></div></span>' + descBlock);
+							jQuery("#uploadify_" + idComponent).html(previewBlock + '<span class="top"><div class="cancel"><a href="javascript:ff.ffField.ckuploadify.del(\'' + component + '\');" alt="delete" class="del-file"></a></div></span>' + descBlock);
 						}
 
                         jQuery("#uploadify_" + idComponent).show();

@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>, Alessandro Stucchi <wolfgan@blueocarina.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>, Alessandro Stucchi <wolfgan@blueocarina.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffCanvas extends ffClassChecks
@@ -328,7 +328,7 @@ class ffCanvas extends ffClassChecks
 					$shell_cmd .= $optim["path"] . $optim["cmd"] . $filename . "; ";
 			}
 			//@shell_exec($shell_cmd);
-			@shell_exec("(" . $shell_cmd . ") > /dev/null 2>/dev/null &");
+			@shell_exec("(" . $shell_cmd . ") > /dev/null 2>/dev/null &"); //serve per far andare la procedura in modo asincrono
                         //die($shell_cmd);
 		}
 	}

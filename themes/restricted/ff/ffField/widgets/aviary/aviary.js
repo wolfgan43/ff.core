@@ -14,35 +14,33 @@ ff.ffField.aviary = (function () {
 			var version = (version ? version : defaultVersion);
 			var postUrl = (postUrl ? postUrl : defaultPostUrl);
 			
-			ff.pluginLoad('jquery.cookie', '/themes/library/plugins/jquery.cookie/jquery.cookie.js', function() {
-				ff.pluginLoad('Aviary', 'http://feather.aviary.com/js/feather.js', function() {
-					featherEditor = new Aviary.Feather({
-						apiKey: key, /* {aviary_api_key}',*/
-	       				apiVersion: version,
-	       				theme: theme, /* Check out our new 'light' and 'dark' themes!*/
-	       				tools: tools, /*['draw', 'stickers'],*/
-	       				appendTo: '',
-	       				onLoad : function() {
-	       					var imgName = '';
-	       					if(newImg) {
-								imgName = "&img=" + newImg;
-	       					}
-
-    						featherEditor.launch({
-								image: imgElem,
-								url: window.location.protocol + '//' + window.location.hostname + imgPath,
-								postUrl: window.location.protocol + '//' + window.location.hostname + postUrl,
-								postData: ff.modules.security.session.session_name + "=" + ff.modules.security.session_id() + "&ref=" + imgHash + imgName
-							}); 
-	       				},
-						onSave: function(imageID, newURL) {
-							ff.ffField.aviary.reloadImg(imageID);
-							featherEditor.close();
-						},
-	       				onError: function(errorObj) {
-	           				alert(errorObj.message);
+			ff.pluginLoad('Aviary', 'http://feather.aviary.com/js/feather.js', function() {
+				featherEditor = new Aviary.Feather({
+					apiKey: key, /* {aviary_api_key}',*/
+	       			apiVersion: version,
+	       			theme: theme, /* Check out our new 'light' and 'dark' themes!*/
+	       			tools: tools, /*['draw', 'stickers'],*/
+	       			appendTo: '',
+	       			onLoad : function() {
+	       				var imgName = '';
+	       				if(newImg) {
+							imgName = "&img=" + newImg;
 	       				}
-					});
+	       				
+    					featherEditor.launch({
+							image: imgElem,
+							url: window.location.protocol + '//' + window.location.hostname + imgPath,
+							postUrl: window.location.protocol + '//' + window.location.hostname + postUrl,
+							postData: ff.modules.security.session.session_name + "=" + ff.modules.security.session_id() + "&ref=" + imgHash + imgName
+						}); 
+	       			},
+					onSave: function(imageID, newURL) {
+						ff.ffField.aviary.reloadImg(imageID);
+						featherEditor.close();
+					},
+	       			onError: function(errorObj) {
+	           			alert(errorObj.message);
+	       			}
 				});
 			});
 		},
@@ -75,7 +73,7 @@ ff.ffField.aviary = (function () {
 		      src = src.substr(0, pos);
 		   }
 		   var date = new Date();
-		   obj.src = src + '?v=' + date.getTime() + '&__nocache__';
+		   obj.src = src + '?_=' + date.getTime();
 		   return false;
 		}		
 	};

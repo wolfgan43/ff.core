@@ -1,47 +1,19 @@
 <?php
 class ffRecord_dialog extends ffRecord_base
 {
+	var $id_if					= null;
+	
+	var $cursor_dialog = false;
+	
 	public $template_file 	= "ffRecord_dialog.html";
 
 	public $tpl				= null;					// Internal ffTemplate() object
-
-	public $prefix			= null;
 
 	public $tabs = array();
 	public $tabs_data = null;
 
 	public $description = null;
 
-	var $framework_css 			= array(
-			"component" => array(
-                "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
-                , "type" => null        //null OR '' OR "-inline"
-			)
-			, "actions" => array(
-				"class" => "actions dialogActionsPanel"
-				, "col" => false		
-			)
-			, "record" => array(
-				"row" => true
-			)
-			, "field" => array(
-				"label" => array(
-					"col" => null
-				)
-				, "control" => array(
-					"col" => null
-				)
-			)
-			, "error" => array(
-				"class" => "error dialogSubTitle"
-				, "callout" => "danger"
-			)
-	
-	
-	);	
-	
 	var $widget_discl_enable = true;
 	var $widget_def_open = true;
 	
@@ -49,19 +21,19 @@ class ffRecord_dialog extends ffRecord_base
 	
 	var $displayed_fields		= 0;
 
-/*	var $buttons_options		= array(
+	var $buttons_options		= array(
 			"insert" => array(
 						  "display" => true
 						, "index" 	=> 1
 						, "obj" 	=> null
-						, "label" 	=> null
+						, "label" 	=> "Inserisci"
                         , "aspect"  => "button"
 							)
 		  , "update" => array(
 						  "display" => true
 						, "index" 	=> 2
 						, "obj" 	=> null
-						, "label" 	=> null
+						, "label" 	=> "Aggiorna"
                         , "aspect"  => "button"
 							)
 
@@ -69,7 +41,7 @@ class ffRecord_dialog extends ffRecord_base
 						  "display" => true
 						, "index" 	=> 1
 						, "obj" 	=> null
-						, "label" 	=> null
+						, "label" 	=> "Elimina"
                         , "aspect"  => "button"
 							)
 
@@ -77,14 +49,71 @@ class ffRecord_dialog extends ffRecord_base
 						  "display" => true  
 						, "index" 	=> 0
 						, "obj" 	=> null
-						, "label" 	=> null
+						, "label" 	=> "Chiudi"
                         , "aspect"  => "button"
 							)
-		);*/
+		  , "cursor_first" => array(
+						  "display" => true  
+						, "index" 	=> 4
+						, "obj" 	=> null
+						, "label" 	=> ""
+                        , "aspect"  => "button"
+						, "newicon" => "NewIcon_firstl"
+							)
+		  , "cursor_prev" => array(
+						  "display" => true  
+						, "index" 	=> 3
+						, "obj" 	=> null
+						, "label" 	=> ""
+                        , "aspect"  => "button"
+						, "newicon" => "NewIcon_left"
+							)
+		  , "cursor_next" => array(
+						  "display" => true  
+						, "index" 	=> 0
+						, "obj" 	=> null
+						, "label" 	=> ""
+                        , "aspect"  => "button"
+						, "newicon" => "NewIcon_right"
+							)
+		  , "cursor_last" => array(
+						  "display" => true  
+						, "index" 	=> -1
+						, "obj" 	=> null
+						, "label" 	=> ""
+                        , "aspect"  => "button"
+						, "newicon" => "NewIcon_lastr"
+							)
+		);
 
 	var $disable_mod_notifier_on_error = false;	
+
+	var $js_deps = array(
+		"ff.ffRecord" => null
+	);
 	
-	var $use_form = false;
+    function __construct(ffPage_base $page, $disk_path, $theme)
+    {
+        parent::__construct($page, $disk_path, $theme);
+		
+		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+			$this->id_if = uniqid();
+	}
+		
+	function getIDIF()
+	{
+		if ($this->id_if !== null)
+			return $this->id_if;
+		else
+			return $this->id;
+	}
+
+	function getPrefix()
+	{
+		$tmp = $this->getIDIF();
+		if (strlen($tmp))
+			return $tmp . "_";
+	}
 	
 	public function addTab($name)
 	{
@@ -116,14 +145,13 @@ class ffRecord_dialog extends ffRecord_base
 			$this->tpl[0]->load_file($this->template_file, "main");
 		}
 
-		if (strlen($this->id))
-			$this->prefix = $this->id . "_";
-		$this->tpl[0]->set_var("component", $this->prefix);
-		$this->tpl[0]->set_var("component_id", $this->id);
+		$this->tpl[0]->set_var("component", $this->getPrefix());
+		$this->tpl[0]->set_var("component_id", $this->getIDIF());
 
 		$this->tpl[0]->set_var("site_path", $this->site_path);
 		$this->tpl[0]->set_var("page_path", $this->page_path);
 		$this->tpl[0]->set_var("theme", $this->getTheme());
+		$this->tpl[0]->set_var("class", $this->class);
 
 		if(strlen($this->title)) {
 			$this->tpl[0]->set_var("title", $this->title);
@@ -131,13 +159,8 @@ class ffRecord_dialog extends ffRecord_base
 		} else
 			$this->tpl[0]->set_var("SectTitle", "");
 
-		if ($this->description !== null) {
-			$this->tpl[0]->set_var("info_class", cm_getClassByDef($this->framework_css["info"]));
+		if ($this->description !== null)
 			$this->tpl[0]->set_var("description", $this->description);
-			$this->tpl[0]->parse("SectDescription", false);
-		} else {
-			$this->tpl[0]->set_var("SectDescription", "");	
-		}
 
 		$this->tpl[0]->set_var("ret_url", ffCommon_specialchars($this->parent[0]->ret_url));
 
@@ -186,57 +209,13 @@ class ffRecord_dialog extends ffRecord_base
 
 		$this->tplSetFixedVars();
 
-		if($this->use_form)
-			$this->tpl[0]->set_var("record_tag", "form");
-		else
-			$this->tpl[0]->set_var("record_tag", "div");
-
-		$component_class["default"] = $this->class;
-		if($this->framework_css["component"]["grid"]) {
-            if(is_array($this->framework_css["component"]["grid"]))
-                $component_class["grid"] = cm_getClassByFrameworkCss($this->framework_css["component"]["grid"], "col");
-            else {
-                $component_class["grid"] = cm_getClassByFrameworkCss("", $this->framework_css["component"]["grid"]);
-            }
-        }
-		$component_class["form"] = cm_getClassByFrameworkCss("component" . $this->framework_css["component"]["type"], "form");
-        
-		$this->tpl[0]->set_var("component_class", implode(" ", array_filter($component_class)));
-
-		if(is_array($this->framework_css["component"]["col"]) && $this->framework_css["component"]["inner_wrap"] === null)
-			$this->framework_css["component"]["inner_wrap"] = "row";
-
-         if($this->framework_css["component"]["inner_wrap"]) 
-         {
-            if(is_array($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
-            } elseif(is_bool($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="innerWrap">');
-            } else {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
-            }
-            $this->tpl[0]->set_var("inner_wrap_end", '</div>');
-        }       
-           
-        if($this->framework_css["component"]["outer_wrap"]) 
-        {
-            if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->id . "Wrap outerWrap"). '">');
-            } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->id . 'Wrap outerWrap">');
-            } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->id . "Wrap outerWrap") . '">');
-            }
-            $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
-        }
-
 		if (count($this->tabs))
 		{
-			$this->tpl[0]->set_var("form_tabs", $this->parent[0]->widgets["tabs"]->process($this->id, $this->tabs_data, $this->parent[0], $this->id));
+			$this->tpl[0]->set_var("SectForm", $this->parent[0]->widgets["tabs"]->process($this->getIDIF(), $this->tabs_data, $this->parent[0], $this->id));
 		}
 		elseif ($this->displayed_fields)
 		{
-			$this->tpl[0]->parse("SectGroup", false);
+			$this->tpl[0]->parse("SectForm", false);
 		}
 
 		$output_buffer = $this->tpl[0]->rpparse("main", false);
@@ -249,8 +228,6 @@ class ffRecord_dialog extends ffRecord_base
 	
 	function process_headers()
 	{
-		$this->parent[0]->tplAddJs("ff.ffRecord", "ffRecord.js", FF_THEME_DIR . "/library/ff");
-
 		if (!isset($this->tpl[0]))
 			return;
 
@@ -302,8 +279,6 @@ class ffRecord_dialog extends ffRecord_base
 			reset($this->hidden_fields);
 		}
 
-		$this->tpl[0]->set_var("maxspan", ($this->cols * 2));
-
 		if ($this->display_required && $this->display_required_note)
 		{
 			$this->tpl[0]->set_var("required_symbol", $this->required_symbol);
@@ -316,8 +291,8 @@ class ffRecord_dialog extends ffRecord_base
 		{
 			$this->parent[0]->widgetLoad("tabs", null, $this->parent[0]);
 			$this->tabs_data = array();
-			//$this->tabs_data["contents"]["_main_"]["title"] = ffTemplate::_get_word_by_code(preg_replace('/[^a-zA-Z0-9]/', "", $this->id) . "_main"); //Dati Generici
-			//$this->tabs_data["contents"]["_main_"]["data"] = null;
+			$this->tabs_data["contents"]["_main_"]["title"] = ffTemplate::_get_word_by_code(preg_replace('/[^a-zA-Z0-9]/', "", $this->id) . "_main"); //Dati Generici
+			$this->tabs_data["contents"]["_main_"]["data"] = null;
 		}
 		else
 		{
@@ -327,582 +302,537 @@ class ffRecord_dialog extends ffRecord_base
 				$this->tpl[0]->set_var("SectTitle", "");
 		}
 
+		$col = 0;
 		$this->displayed_fields = 0;
+		foreach($this->contents as $key => $content)
+		{
+			if ($content["group"])
+				continue;
+
+			if (is_subclass_of($content["data"], "ffField_base"))
+			{
+				if (
+						(isset($this->form_fields[$content["data"]->id]->group) && strlen($this->form_fields[$content["data"]->id]->group))
+						|| (/*!$this->use_fixed_fields && ($this->display_values &&*/ $this->form_fields[$content["data"]->id]->skip_if_empty && !strlen($this->form_fields[$content["data"]->id]->value->ori_value))
+						|| $this->form_fields[$content["data"]->id]->manual_display
+					)
+					continue;
+
+				// EVENT HANDLER
+				$res = $this->doEvent("on_process_field", array(&$this, $content["data"]->id));
+
+				$rc = false;
+				$multi_field = (is_array($this->form_fields[$content["data"]->id]->multi_fields) && count($this->form_fields[$content["data"]->id]->multi_fields));
+
+				if (!$multi_field)
+				{
+					$rc |= $this->tpl[0]->set_var($content["data"]->id . "_value", $this->form_fields[$content["data"]->id]->getValue());
+					$rc |= $this->tpl[0]->set_var($content["data"]->id . "_display_value", $this->form_fields[$content["data"]->id]->getDisplayValue());
+				}
+				if ($this->tpl[0]->isset_var($content["data"]->id . "_field"))
+					$rc |= $this->tpl[0]->set_var($content["data"]->id . "_field", $this->form_fields[$content["data"]->id]->process());
+
+				if (!$rc)
+				{
+					// container
+					$this->tpl[0]->set_var("container_properties", $this->form_fields[$content["data"]->id]->getProperties($this->form_fields[$content["data"]->id]->container_properties));
+
+					$class = $this->form_fields[$content["data"]->id]->container_class;
+					if(!strlen($class))
+					    $class = $this->form_fields[$content["data"]->id]->class;
+
+					if($this->form_fields[$content["data"]->id]->display_label)
+                    {
+                        $label_set = false;
+                        if ($this->form_fields[$content["data"]->id]->description !== null) {
+                            $this->tpl[0]->set_var("description", $this->form_fields[$content["data"]->id]->description);
+                            $this->tpl[0]->parse("SectDescriptionLabel", false);
+                            
+                            $label_set = true;
+                        } 
+                        else 
+                        {
+                            $this->tpl[0]->set_var("description", "");
+                            $this->tpl[0]->set_var("SectDescriptionLabel", "");
+                        }
+                        if(strlen($this->form_fields[$content["data"]->id]->label)) 
+                        {
+                            if($this->form_fields[$content["data"]->id]->encode_label)     
+                                $this->tpl[0]->set_var("label", ffCommon_specialchars($this->form_fields[$content["data"]->id]->label));
+                            else
+                                $this->tpl[0]->set_var("label", $this->form_fields[$content["data"]->id]->label);
+                                
+                            $label_set = true;
+                        }                            
+                        
+                        if($this->form_fields[$content["data"]->id]->label_properties)
+                        {
+                            $this->tpl[0]->set_var("label_properties", $this->form_fields[$content["data"]->id]->getProperties($this->form_fields[$content["data"]->id]->label_properties));
+                            $label_set = true;
+                        }
+						
+                        if ($this->display_required && $this->form_fields[$key]->required) {
+                            $this->tpl[0]->parse("SectRequiredSymbol", false);
+                            $class = $class . (strlen($class) ? " " : "") . "required";
+                            
+                            $label_set = true;
+                        } else {
+                            $this->tpl[0]->set_var("SectRequiredSymbol", "");
+                        }
+                        if($label_set) {
+                            $this->tpl[0]->parse("SectLabel", false);
+                        } else {
+                            $this->tpl[0]->set_var("SectLabel", "");
+                        }
+                    } 
+                    else 
+                    {
+                        $this->tpl[0]->set_var("SectLabel", "");
+                    }
+
+					if(strlen($class)) {
+						$this->tpl[0]->set_var("container_class", " " . $class);
+					} else {
+						$this->tpl[0]->set_var("container_class", "");
+					}
+
+					if (!$this->display_values || strlen($this->form_fields[$content["data"]->id]->control_type))
+					{
+						if ($this->tpl[0]->isset_var("content"))
+							$this->tpl[0]->set_var("content", $this->form_fields[$content["data"]->id]->process());
+					}
+					elseif (!$multi_field)
+						$this->tpl[0]->set_var("content", $this->form_fields[$content["data"]->id]->getDisplayValue());
+
+					$this->displayed_fields++;
+				}
+
+				if (strlen($this->form_fields[$content["data"]->id]->value->ori_value))
+				{
+					$this->tpl[0]->parse("SectSet_" . $content["data"]->id, false);
+					$this->tpl[0]->set_var("SectNotSet_" . $content["data"]->id, "");
+				}
+				else
+				{
+					$this->tpl[0]->set_var("SectSet_" . $content["data"]->id, "");
+					$this->tpl[0]->parse("SectNotSet_" . $content["data"]->id, false);
+				}
+
+				if ($this->form_fields[$content["data"]->id]->extended_type == "Selection")
+				{
+					$this->tpl[0]->set_regexp_var("/SectSet_" . $content["data"]->id . "_.+/", "");
+					$this->tpl[0]->parse("SectSet_" . $content["data"]->id . "_" . $this->form_fields[$content["data"]->id]->value->getValue($this->form_fields[$content["data"]->id]->base_type, FF_SYSTEM_LOCALE), false);
+				}
+
+				$this->tpl[0]->parse("Sect_" . $content["data"]->id, false);
+
+				// "display" hidden original values
+				if (!isset($this->key_fields[$content["data"]->id])) // displayed key fields are threated previously
+				{
+					if ($multi_field)
+					{
+						foreach ($this->form_fields[$content["data"]->id]->multi_fields as $mul_subkey => $mul_subvalue)
+						{
+							$this->tpl[0]->set_var("id", $content["data"]->id . "[" . $mul_subkey . "]");
+							$this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$content["data"]->id]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
+							$this->tpl[0]->parse("SectHiddenField", true);
+
+							$this->tpl[0]->set_var("id", $content["data"]->id . "_ori[" . $mul_subkey . "]");
+							$this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$content["data"]->id]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
+							$this->tpl[0]->parse("SectHiddenField", true);
+						}
+						reset($this->form_fields[$content["data"]->id]->multi_fields);
+					}
+					else
+					{
+						$this->tpl[0]->set_var("id", $content["data"]->id . "_ori");
+						$this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$content["data"]->id]->value_ori->getValue($this->form_fields[$content["data"]->id]->base_type, FF_SYSTEM_LOCALE)));
+						$this->tpl[0]->parse("SectHiddenField", true);
+					}
+				}
+			}
+			elseif (get_class($content["data"]) == "ffTemplate" || is_subclass_of($content["data"], "ffDetails_base") || is_subclass_of($content["data"], "ffGrid_base") || is_subclass_of($content["data"], "ffRecord_base"))
+			{
+				$this->tpl[0]->set_var("SectLabel", "");
+				if (get_class($content["data"]) == "ffTemplate")
+					$this->tpl[0]->set_var("content", $content["data"]->rpparse("main", false));
+				else
+					$this->tpl[0]->set_var("content", "{{" . $content["data"]->id . "}}");
+					
+				$this->displayed_fields++;
+				
+				$this->tpl[0]->set_var("container_class", "");
+
+			}
+			$this->tplSetFixedVars();
+			$this->tpl[0]->parse("SectFormCol", false);
+			$this->tpl[0]->parse("SectFormRow", true);
+		}
+		reset($this->contents);
+
+		if (count($this->tabs) && $this->displayed_fields)
+		{
+			$this->fixed_pre_content .= $this->tpl[0]->rpparse("SectForm", false);
+			//$this->tabs_data["contents"]["_main_"]["data"] = $this->tpl[0]->rpparse("SectForm", false);
+		}
 
 		$groups_tabs = array(); // conteggio gruppi per tab
-		if(!is_array($this->groups))
-			$this->groups = array();
-
-		$this->groups = array_merge(array("_main_" => array(
-											"class" => "default"
-											, "title" => ""
-											, "tab" => false
-											, "contents" => array()
-											, "data" => null
-										)
-									), $this->groups);
-
 		foreach ($this->contents as $key => $content)
 		{
-			if (!$content["group"]) {
-				$this->groups["_main_"]["contents"][$key] = $content;
+			if (!$content["group"])
 				continue;
-			}	
+
 			if ($this->groups[$key]["tab"])
 				$groups_tabs[$this->groups[$key]["tab"]]++;
 		}
 		reset($this->contents);
 
-		if(!count($this->groups["_main_"]["contents"]))
-			unset($this->groups["_main_"]);
-
-		if (is_array($this->groups) && count($this->groups))
+		foreach ($this->contents as $key => $content)
 		{
-			foreach($this->groups AS $group_key => $group_value) 
-			{
-				$i = 0;
-				$suffix = "_" . $group_key;
+			if (!$content["group"])
+				continue;
 
-				$this->tpl[0]->set_var("SectGroupRow", "");
-				$this->tpl[0]->set_var("SectGroupRow" . $suffix, "");
-			
-				$i = $this->tplDisplayFields($this->groups[$group_key]["contents"], $group_value["primary_field"]);
+			$suffix = "_" . $key;
+
+			$this->tpl[0]->set_var("group_class", $key . (strlen($this->groups[$key]["class"]) ? " " . $this->groups[$key]["class"] : ""));
+			if(isset($this->groups[$key]["title"]) && !strlen($this->groups[$key]["title"])) {
+				$this->tpl[0]->set_var("SectGroupTitle", "");
+			} else {
+				$this->tpl[0]->set_var("GroupTitle", ($this->groups[$key]["title"] ? $this->groups[$key]["title"] : $key));
+				if ($this->groups[$key]["hide_title"])
+					$this->tpl[0]->set_var("SectGroupTitle", "");
+				else
+					$this->tpl[0]->parse("SectGroupTitle", false);
+			}				
+			if(isset($this->groups[$key]["description"]) && strlen($this->groups[$key]["description"])) {
+				$this->tpl[0]->set_var("GroupDescription", $this->groups[$key]["description"]);
+				$this->tpl[0]->parse("SectGroupDescription", false);
+			} else {
+				$this->tpl[0]->set_var("SectGroupDescription", "");
+			}
+			$cols = $this->groups[$key]["cols"];
+			if ($cols < 1)
+				$cols = 1;
+			$this->tpl[0]->set_var("maxspan", $cols);
+
+			$col = 0;
+			$i = 0;
+			$this->tpl[0]->set_var("SectGroupRow", "");
+			$this->tpl[0]->set_var("SectGroupCol", "");
+			$this->tpl[0]->set_var("SectGroupRow" . $suffix, "");
+			$this->tpl[0]->set_var("SectGroupCol" . $suffix, "");
+
+			if (is_array($this->groups[$key]["contents"]) && count($this->groups[$key]["contents"]))
+			{
+				foreach ($this->groups[$key]["contents"] as $subkey => $subvalue)
+				{
+					if (is_object($subvalue["data"]) && (get_class($subvalue["data"]) == "ffTemplate" || is_subclass_of($subvalue["data"], "ffDetails_base") || is_subclass_of($subvalue["data"], "ffGrid_base") || is_subclass_of($subvalue["data"], "ffRecord_base")))
+					{
+						$i++;
+						$oldspan = $span;
+						$span = $cols;
+
+						if ($i > 1)
+						{
+							if ($col + $span > $cols)
+							{
+								$this->tpl[0]->set_var("colspan", $cols - ($col - $oldspan));
+
+								$rc = false;
+								$rc = $this->tpl[0]->parse("SectGroupCol" . $suffix, true);
+								if (!$rc) $this->tpl[0]->parse("SectGroupCol", true);
+								$rc = $this->tpl[0]->parse("SectGroupRow" . $suffix, true);
+								if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
+								$rc = $this->tpl[0]->set_var("SectGroupCol" . $suffix, "");
+								if (!$rc) $this->tpl[0]->set_var("SectGroupCol", "");
+
+								$col = 0;
+							}
+							else
+							{
+								$rc = $this->tpl[0]->parse("SectGroupCol" . $suffix, true);
+								if (!$rc) $this->tpl[0]->parse("SectGroupCol", true);
+							}
+						}
+
+						$this->tpl[0]->set_var("colspan", $span);
+						$col += $span;
+
+						$this->tpl[0]->set_var("SectGroupLabel", "");
+						if (get_class($subvalue["data"]) == "ffTemplate")
+							$this->tpl[0]->set_var("content", $subvalue["data"]->rpparse("main", false));
+						else
+							$this->tpl[0]->set_var("content", "{{" . $subvalue["data"]->id . "}}");
+							
+						$this->tpl[0]->set_var("container_class", "");
+					}
+					elseif (is_object($subvalue["data"]) && is_subclass_of($subvalue["data"], "ffField_base"))
+					{
+						if (
+								(/*!$this->use_fixed_fields && $this->display_values && */$this->form_fields[$subkey]->skip_if_empty && !strlen($this->form_fields[$subkey]->value->ori_value))
+							)
+							continue;
+						$i++;
+
+						$oldspan = $span;
+						$span = $this->groups[$key]["contents"][$subkey]->span;
+						if ($span > $cols)
+							$span = $cols;
+						else if ($span < 1)
+							$span = 1;
+
+						// completo la colonna precedente, se esiste
+						if ($i > 1)
+						{
+							// se abbiamo raggiunto il limite, adatto la precedente e passo alla riga successiva
+							if ($col + $span > $cols)
+							{
+								$this->tpl[0]->set_var("colspan", $cols - ($col - $oldspan));
+
+								$rc = $this->tpl[0]->parse("SectGroupCol" . $suffix, true);
+								if (!$rc) $this->tpl[0]->parse("SectGroupCol", true);
+								$rc = $this->tpl[0]->parse("SectGroupRow" . $suffix, true);
+								if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
+								$rc = $this->tpl[0]->set_var("SectGroupCol" . $suffix, "");
+								if (!$rc) $this->tpl[0]->set_var("SectGroupCol", "");
+
+								$col = 0;
+							}
+							else
+							{
+								$rc = $this->tpl[0]->parse("SectGroupCol" . $suffix, true);
+								if (!$rc) $this->tpl[0]->parse("SectGroupCol", true);
+							}
+						}
+
+						$this->tpl[0]->set_var("colspan", $span);
+						$col += $span;
+
+						// EVENT HANDLER
+						$res = $this->doEvent("on_process_field", array(&$this, $subkey));
+
+						// container
+						$this->tpl[0]->set_var("container_properties", $this->form_fields[$subkey]->getProperties($this->form_fields[$subkey]->container_properties));
+
+						$class = $this->form_fields[$subkey]->container_class;
+						if(!strlen($class))
+						    $class = $this->form_fields[$subkey]->class;
+
+						if($this->form_fields[$subkey]->placeholder === true) {
+							$this->form_fields[$subkey]->placeholder = ffCommon_specialchars($this->form_fields[$subkey]->label);
+						}				    	
+
+						// LABEL
+                        if($this->form_fields[$subkey]->display_label)
+                        {
+                            $label_set = false;
+                            if ($this->form_fields[$subkey]->description !== null) 
+                            {       
+                                $this->tpl[0]->set_var("description", $this->form_fields[$subkey]->description);
+                                $this->tpl[0]->parse("SectDescriptionLabel", false);
+                                
+                                $label_set = true;
+                            }    
+                            else
+                            {
+                                $this->tpl[0]->set_var("description", "");
+                                $this->tpl[0]->set_var("SectDescriptionLabel", "");
+                            }
+                            
+                            if(strlen($this->form_fields[$subkey]->label)) 
+                            {
+                                if($this->form_fields[$subkey]->encode_label)     
+                                    $this->tpl[0]->set_var("label", ffCommon_specialchars($this->form_fields[$subkey]->label));
+                                else
+                                    $this->tpl[0]->set_var("label", $this->form_fields[$subkey]->label);
+                                
+                                $label_set = true; 
+                            }
+
+                            if($this->form_fields[$subkey]->label_properties)
+                            {
+                                $this->tpl[0]->set_var("label_properties", $this->form_fields[$subkey]->getProperties($this->form_fields[$subkey]->label_properties));
+                                $label_set = true;
+                            }
+                            
+                            if ($this->display_required && $this->form_fields[$subkey]->required) {
+                                $this->tpl[0]->parse("SectRequiredSymbol", false);
+                                $class = $class . (strlen($class) ? " " : "") . "required";
+                                
+                                $label_set = true;
+                            } else {
+                                $this->tpl[0]->set_var("SectRequiredSymbol", "");
+                            }
+                            
+                            if($label_set)
+                                $this->tpl[0]->parse("SectGroupLabel", false);
+                            else
+                                $this->tpl[0]->set_var("SectGroupLabel", "");
+                        } 
+                        else 
+                        {
+                            $this->tpl[0]->set_var("SectGroupLabel", "");
+                        }
+						
+						if(strlen($class)) {
+							$this->tpl[0]->set_var("container_class", " " . $class);
+						} else {
+							$this->tpl[0]->set_var("container_class", "");
+						}
+						
+						// CONTROL/VALUE SECTION
+						$rc = false;
+						$multi_field = (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields));
+
+						if ($multi_field)
+						{
+							$rc |= $this->tpl[0]->set_var($subkey . "_value", $this->form_fields[$subkey]->getValue());
+							$rc |= $this->tpl[0]->set_var($subkey . "_display_value", $this->form_fields[$subkey]->getDisplayValue());
+						}
+						if ($this->tpl[0]->isset_var($subkey . "_field"))
+							$rc |= $this->tpl[0]->set_var($subkey . "_field", $this->form_fields[$subkey]->process());
+
+						if ($multi_field)
+						{
+							$rc |= $this->tpl[0]->set_var("FIELD_value", $this->form_fields[$subkey]->getValue());
+							$rc |= $this->tpl[0]->set_var("FIELD_display_value", $this->form_fields[$subkey]->getDisplayValue());
+						}
+						if ($this->tpl[0]->isset_var("FIELD_field"))
+							$rc |= $this->tpl[0]->set_var("FIELD_field", $this->form_fields[$subkey]->process());
+
+						if (!$rc)
+						{
+							if (!$this->display_values || strlen($this->form_fields[$subkey]->control_type))
+							{
+								if ($this->tpl[0]->isset_var("content"))
+									$this->tpl[0]->set_var("content", $this->form_fields[$subkey]->process());
+							}
+							else
+								$this->tpl[0]->set_var("content", $this->form_fields[$subkey]->getDisplayValue());
+						}
+
+						$fieldset = false;
+
+						switch ($this->form_fields[$subkey]->extended_type)
+						{
+							case "Selection":
+								switch ($this->form_fields[$subkey]->get_control_type())
+								{
+									case "radio":
+										$fieldset = true;
+										break;
+								}
+								break;
+						}
+
+						if ($fieldset)
+						{
+							$this->tpl[0]->set_var("SectField", "");
+							$this->tpl[0]->parse("SectFieldSet", false);
+						}
+						else
+						{
+							$this->tpl[0]->parse("SectField", false);
+							$this->tpl[0]->set_var("SectFieldSet", "");
+						}
+
+						// Manage Fixed Sections
+						if(!is_array($this->form_fields[$subkey]->value->ori_value))
+						{
+							if (strlen($this->form_fields[$subkey]->value->ori_value))
+							{
+								$this->tpl[0]->parse("SectSet_$subkey", false);
+								$this->tpl[0]->set_var("SectNotSet_$subkey", "");
+							}
+							else
+							{
+								$this->tpl[0]->set_var("SectSet_$subkey", "");
+								$this->tpl[0]->parse("SectNotSet_$subkey", false);
+							}
+						}
+						if ($this->form_fields[$subkey]->extended_type == "Selection")
+						{
+							$this->tpl[0]->set_regexp_var("/SectSet_" . $subkey . "_.+/", "");
+							$this->tpl[0]->parse("SectSet_" . $subkey . "_" . $this->form_fields[$subkey]->value->getValue($this->form_fields[$subkey]->base_type, FF_SYSTEM_LOCALE), false);
+						}
+
+						$this->tpl[0]->parse("Sect_$subkey", false);
+
+						// "display" hidden original values //fondamentale per la mappa con i campi hidden
+						if (!isset($this->key_fields[$subkey])) // displayed key fields are threated previously
+						{
+							if (is_array($this->form_fields[$subkey]->multi_fields) && count($this->form_fields[$subkey]->multi_fields))
+							{
+								foreach ($this->form_fields[$subkey]->multi_fields as $mul_subkey => $mul_subvalue)
+								{
+									$this->tpl[0]->set_var("id", $subkey . "[" . $mul_subkey . "]");
+									$this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subkey]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
+									$this->tpl[0]->parse("SectHiddenField", true);
+									if(is_array($this->form_fields[$subkey]->value_ori)) {
+										$this->tpl[0]->set_var("id", $subkey . "_ori[" . $mul_subkey . "]");
+										$this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subkey]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
+										$this->tpl[0]->parse("SectHiddenField", true);
+									}
+								}
+								reset($this->form_fields[$subkey]->multi_fields);
+							}
+							else
+							{
+								$this->tpl[0]->set_var("id", $subkey . "_ori");
+								$this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subkey]->value_ori->getValue($this->form_fields[$subkey]->base_type, FF_SYSTEM_LOCALE)));
+								$this->tpl[0]->parse("SectHiddenField", true);
+							}
+						}	
+					}
+				}
+				reset($this->groups[$key]["contents"]);
+
 				if ($i > 0)
 				{
-//					$rc = $this->tpl[0]->parse("SectGroupRow" . $suffix, true);
-//					if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
+					$this->tpl[0]->set_var("colspan", $cols - ($col - $span));
 
-					$res = $this->doEvent("on_before_parse_group", array(&$this, $group_key));
+					$rc = $this->tpl[0]->parse("SectGroupCol" . $suffix, true);
+					if (!$rc) $this->tpl[0]->parse("SectGroupCol", true);
+					$rc = $this->tpl[0]->parse("SectGroupRow" . $suffix, true);
+					if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
 
-					//$rc = $this->tpl[0]->parse("SectGroup" . $suffix, true);
+					$res = $this->doEvent("on_before_parse_group", array(&$this, $key));
+
+					$rc = $this->tpl[0]->parse("SectGroup" . $suffix, true);
 					if (!$rc)
 					{
-				        $this->tpl[0]->set_var("group_pre_content", $this->groups[$group_key]["fixed_pre_content"]);
-				        $this->tpl[0]->set_var("group_post_content", $this->groups[$group_key]["fixed_post_content"]);
-					
-						if($group_key == "_main_") 
-						{
-							$this->tpl[0]->set_var("SectGroupStart", "");
-							$this->tpl[0]->set_var("SectGroupEnd", "");
-						} 
-						else 
-						{
-							$group_class = array();
-							$group_class["default"] = (strlen($this->groups[$group_key]["class"]) ? $this->groups[$group_key]["class"] : $group_key);
-														
-							if($this->groups[$group_key]["hide_title"] 
-								|| (!strlen($this->groups[$group_key]["title"]) 
-									&& !strlen($this->groups[$group_key]["tab_dialog"])
-									&& !strlen($this->groups[$group_key]["primary_field"])
-								)
-							) {
-								$this->tpl[0]->set_var("SectGroupTitle", "");
-							} else {
-								$arrTitleProperties = array();
-								$str_title_properties = "";
-								$this->tpl[0]->set_var("title_properties", "");
-
-								if($group_value["primary_field"]) {
-									$arrTitleProperties["class"]["primary_field"] = "ffCheckDep";
-									$arrTitleProperties["onclick"] = "javascript:ff.ffRecord.displayFieldSetElem(this, '" . $this->id . "_" . $group_value["primary_field"] . "');";
-								}
-								$group_class["tab_dialog"] = "dlg-tab dlg-" . ffCommon_url_rewrite($group_key);
-								if($this->groups[$group_key]["tab_dialog"] === true && $group_value["primary_field"]) {
-									$group_title = '<span class="dialogSubTitleTab ' . ($this->groups[$group_key]["tab_dialog_selected"] ? "selected " : "") . 'dep-' . ffCommon_url_rewrite($group_key) . '">' . ($this->groups[$group_key]["title"] ? $this->groups[$group_key]["title"] : ffTemplate::_get_word_by_code($group_key)) . '</span>';
-										
-									$this->tpl[0]->set_var("GroupTitle", $group_title . $this->tpl[0]->getBlockContent("GroupTitle", false));
-								} else {
-									if($this->groups[$group_key]["tab_dialog"] === true)
-										$arrTitleProperties["class"]["tab_dialog"] = "dialogSubTitleTab " . ($this->groups[$group_key]["tab_dialog_selected"] ? "selected " : "") . "dep-" . ffCommon_url_rewrite($group_key);
-									elseif(strlen($this->groups[$group_key]["tab_dialog"])) 
-										$group_class["tab_dialog"] = "dlg-tab dlg-" . ffCommon_url_rewrite($this->groups[$group_key]["tab_dialog"]);
-
-									if(!$group_value["primary_field"]) {
-										if($this->groups[$group_key]["title"])
-											$this->tpl[0]->set_var("GroupTitle", $this->groups[$group_key]["title"]);
-										else 
-											$this->tpl[0]->set_var("GroupTitle", "");
-									}
-								}										
-								if(is_array($arrTitleProperties) && count($arrTitleProperties)) {
-									foreach($arrTitleProperties AS $arrTitleProperties_key => $arrTitleProperties_value) {
-										
-										$str_title_properties .= " " . $arrTitleProperties_key . '="' . (is_array($arrTitleProperties_value) ? implode(" ", array_filter($arrTitleProperties_value)) : $arrTitleProperties_value) . '"';
-									}
-									$this->tpl[0]->set_var("title_properties", $str_title_properties);
-								}
-								if($this->tpl[0]->getBlockContent("GroupTitle", false))
-									$this->tpl[0]->parse("SectGroupTitle", false);
-								else
-									$this->tpl[0]->set_var("SectGroupTitle", "");
-							}
-
-							$this->tpl[0]->set_var("group_class", implode(" ", array_filter($group_class)));
-
-							if(isset($this->groups[$group_key]["description"]) && strlen($this->groups[$group_key]["description"])) {
-								$this->tpl[0]->set_var("GroupDescription", $this->groups[$group_key]["description"]);
-								$this->tpl[0]->parse("SectGroupDescription", false);
-							} else {
-								$this->tpl[0]->set_var("SectGroupDescription", "");
-							}
-						
-							$this->tpl[0]->parse("SectGroupStart", false);
-							$this->tpl[0]->parse("SectGroupEnd", false);
-						}
-					
 						if (count($this->tabs))
 						{
-							if ($this->groups[$group_key]["tab"])
+							if ($this->groups[$key]["tab"])
 							{
-								$tab = $this->groups[$group_key]["tab"];
+								$tab = $this->groups[$key]["tab"];
 								$this->tabs_data["contents"][$tab]["title"] = $this->tabs[$tab]["title"];
-								if ($this->groups[$group_key]["hide_title"] !== false && $groups_tabs[$tab] == 1)
+								if ($this->groups[$key]["hide_title"] === true || ($this->groups[$key]["hide_title"] === null && $groups_tabs[$tab] == 1))
 									$this->tpl[0]->set_var("SectGroupTitle", "");
 								else
 									$this->tpl[0]->parse("SectGroupTitle", false);
-									
 								$this->tabs_data["contents"][$tab]["data"] .= $this->tpl[0]->rpparse("SectGroup", false);
 							}
 							else
-								$this->groups["_main_"]["data"] .= $this->tpl[0]->rpparse("SectGroup", false);
-
+							{
+								$this->tabs_data["contents"]["_main_"]["data"] .= $this->tpl[0]->rpparse("SectGroup", true);
+							}
 							$this->tpl[0]->set_var("SectGroup", "");
 						}
 						else
 							$this->tpl[0]->parse("SectGroup", true);
 					}
-				}	
+				}
 			}
 		}
+		reset($this->contents);
 
-		if (isset($this->groups["_main_"]) && $this->groups["_main_"]["data"] !== null)
-			$this->tpl[0]->set_var("form_default", $this->groups["_main_"]["data"]);
-	}
-	
-	/**
-	 * Visualizza il campo del record
-	 */
-	protected function tplDisplayFields($contents, $primary_field = null) 
-	{
-		$vars_to_reset = array();
-		$i = 0;
-		$wrap_count = 0;
-		$count_contents = 0;
-
-        if(is_array($contents) && count($contents)) 
-        {
-		    foreach ($contents as $subkey => $subvalue)
-		    {
-		    	$count_contents++;
-                $this->tpl[0]->set_var("content_pre_label", "");
-                $this->tpl[0]->set_var("content_in_label", "");
-                $this->tpl[0]->set_var("content", "");
-                $this->tpl[0]->set_var("field_container_start", "");
-                $this->tpl[0]->set_var("field_container_end", "");
-                
-			    if (is_string($subvalue["data"]) || get_class($subvalue["data"]) == "ffTemplate" || is_subclass_of($subvalue["data"], "ffDetails_base") || is_subclass_of($subvalue["data"], "ffGrid_base") || is_subclass_of($subvalue["data"], "ffRecord_base"))
-			    {
-				    $i++;
-
-				    $this->tpl[0]->set_var("SectGroupLabel", "");
-				    $this->tpl[0]->set_var("content_pre_label", "");
-
-				    if (is_string($subvalue["data"]))
-					    $this->tpl[0]->set_var("content", $subvalue["data"]);
-				    else if (get_class($subvalue["data"]) == "ffTemplate")
-					    $this->tpl[0]->set_var("content", $subvalue["data"]->rpparse("main", false));
-				    else
-					    $this->tpl[0]->set_var("content", "{{" . $subvalue["data"]->id . "}}");
-				    
-				    $container_class = array("form-wrap");
-				    //if($this->framework_css["record"]["row"] && (!$wrap_count || $wrap_count >= 12)) //con le grid e troppo piccola la visualizzazione
-				    //	$container_class[] = cm_getClassByFrameworkCss("row", "form");
-
-				    $this->tpl[0]->set_var("container_class", implode(" ", array_filter($container_class)));
-				    //$this->displayed_fields++;
-			    }
-			    elseif (is_subclass_of($subvalue["data"], "ffField_base"))
-			    {
-				    if (
-						    (/*!$this->use_fixed_fields && $this->display_values && */$this->form_fields[$subkey]->skip_if_empty && !strlen($this->form_fields[$subkey]->value->ori_value))
-					    )
-					    continue;
-
-				    if (!isset($this->key_fields[$subvalue["data"]->id])) // displayed key fields are threated previously
-				    {
-					    $multi_field = (is_array($this->form_fields[$subvalue["data"]->id]->multi_fields) && count($this->form_fields[$subvalue["data"]->id]->multi_fields));
-					    if ($multi_field)
-					    {
-						    foreach ($this->form_fields[$subvalue["data"]->id]->multi_fields as $mul_subkey => $mul_subvalue)
-						    {
-							    $this->tpl[0]->set_var("id", $subvalue["data"]->id . "[" . $mul_subkey . "]");
-							    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subvalue["data"]->id]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
-							    $this->tpl[0]->parse("SectHiddenField", true);
-	                            if($this->record_exist) {
-								    $this->tpl[0]->set_var("id", $subvalue["data"]->id . "_ori[" . $mul_subkey . "]");
-								    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subvalue["data"]->id]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
-								    $this->tpl[0]->parse("SectHiddenField", true);
-	                            }
-						    }
-						    reset($this->form_fields[$subvalue["data"]->id]->multi_fields);
-					    }
-					    else
-					    {     
-						    if($this->record_exist) {
-	                            $this->tpl[0]->set_var("id", $subvalue["data"]->id . "_ori");
-							    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subvalue["data"]->id]->value_ori->getValue($this->form_fields[$subvalue["data"]->id]->base_type, FF_SYSTEM_LOCALE)));
-							    $this->tpl[0]->parse("SectHiddenField", true);
-	                        }
-					    }
-				    }
-				    
-				    $container_class = array();
-				    $i++;
-					
-				    // EVENT HANDLER
-				    $res = $this->doEvent("on_process_field", array(&$this, $subkey));
-
-				    // container
-				    foreach ($vars_to_reset as $field_key => $field_values)
-				    {
-					    $this->tpl[0]->set_var($field_key, "");
-				    }
-				    reset($vars_to_reset);
-				    
-				    $this->tpl[0]->set_var("container_properties", $this->form_fields[$subkey]->getProperties($this->form_fields[$subkey]->container_properties));
-
-				    if (is_array($this->form_fields[$subkey]->container_vars) && count($this->form_fields[$subkey]->container_vars))
-				    {
-					    foreach ($this->form_fields[$subkey]->container_vars as $field_key => $field_value)
-					    {
-						    $this->tpl[0]->set_var($field_key, $field_value);
-						    $vars_to_reset[$field_key] = true;
-					    }
-					    reset($this->form_fields[$subkey]->container_vars);
-				    }
-			    
-				    
-				    if(strlen($this->form_fields[$subkey]->container_class))
-					    $container_class["custom"] = $this->form_fields[$subkey]->container_class;
-					else
-						$container_class["custom"] = $this->form_fields[$subkey]->class;
-						
-				    if($this->form_fields[$subkey]->placeholder === true) {
-					    $this->form_fields[$subkey]->placeholder = ffCommon_specialchars($this->form_fields[$subkey]->label);
-				    }				    	
-
-				    $control_var = "";
-					$control_prefix = "";
-					$control_postfix = "";
-					$is_combine_field = false;
-				    $this->tpl[0]->set_var("content_pre_label", "");
-				    $this->tpl[0]->set_var("content_in_label", "");
-				    $this->tpl[0]->set_var("content", "");
-				    $this->tpl[0]->set_var("field_container_start", "");
-				    $this->tpl[0]->set_var("field_container_end", "");
-				    					
-				    // LABEL 
-				    $label_set = false;
-				    if($this->form_fields[$subkey]->display_label)
-				    {
-					    $this->tpl[0]->set_var("label_prefix", "");
-					    $this->tpl[0]->set_var("label_postfix", "");
-					    $required_symbol = "";
-
-						if(($this->form_fields[$subkey]->get_control_type() == "checkbox" || $this->form_fields[$subkey]->get_control_type() == "radio") && $this->form_fields[$subkey]->widget == "") {
-							$control_var = (is_array($this->parent[0]->framework_css)
-												? cm_getClassByFrameworkCss("control-check-position", "form")
-												: "_pre_label"
-											);
-							$is_combine_field = true;
-						}
-					    
-					    if ($this->form_fields[$subkey]->description !== null) 
-					    {       
-						    $this->tpl[0]->set_var("description", $this->form_fields[$subkey]->description);
-						    $this->tpl[0]->parse("SectDescriptionLabel", false);
-	                        
-	                        $label_set = true;
-					    }	
-					    else
-					    {
-						    $this->tpl[0]->set_var("description", "");
-						    $this->tpl[0]->set_var("SectDescriptionLabel", "");
-					    }
-	                    
-	                    if($this->form_fields[$subkey]->label_properties)
-	                    {
-						    $this->tpl[0]->set_var("label_properties", " " . $this->form_fields[$subkey]->getProperties($this->form_fields[$subkey]->label_properties));
-	                        $label_set = true;
-	                    }
-
-					    if ($this->display_required && $this->form_fields[$subkey]->required) {
-							$container_class["require"] = "required";
-							$required_symbol = "*";
-					    }
-
- 						if(strlen($this->form_fields[$subkey]->label)) 
-	                    {
-						    if($primary_field == $subkey && !$control_var) {
-						    	$prefix_label = "content_pre_";
-						    	$label_set = false; 
-						    } 
-						    else
-						    {
-						    	$prefix_label = "";
-						    	$label_set = true; 
-							}
-						    if($this->form_fields[$subkey]->encode_label) 	
-							    $this->tpl[0]->set_var($prefix_label . "label", ffCommon_specialchars($this->form_fields[$subkey]->label) . $required_symbol);
-						    else
-							    $this->tpl[0]->set_var($prefix_label . "label",$this->form_fields[$subkey]->label . $required_symbol);
-	                    }
-
-	                    if($label_set) {
-						    /**
-						    * Label Class
-						    */
-						    $this->tpl[0]->set_var("label_for", $this->id . "_" . $subkey);
-						    
-							if(is_array($this->parent[0]->framework_css)) 
-							{
-								$arrColumnLabel = $this->form_fields[$subkey]->framework_css["label"]["col"];
-								$arrColumnControl = $this->form_fields[$subkey]->framework_css["control"]["col"];
-								$type_label = "";
-								if($primary_field == $subkey)
-									$type_label = "-inline";
-
-								if(!strlen($control_var))
-								{
-									if(is_array($arrColumnLabel) && count($arrColumnLabel)
-										&& is_array($arrColumnControl) && count($arrColumnControl)
-									) {
-									    $this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-right", "util") . '">');
-									    $this->tpl[0]->set_var("label_postfix", '</div>');
-									
-									    $control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . '">';
-									    $control_postfix = '</div>';
-									    $type_label = "-inline";
-								    }
-								}
-								
-								if($this->framework_css["component"]["type"] === null && $type_label)
-									$this->framework_css["component"]["type"] = $type_label;
-
-							    $label_class = cm_getClassByFrameworkCss("label" . $type_label, "form");
-							    if($this->framework_css["component"]["type"] && $is_combine_field) {
-									if($control_var == "_in_label")
-										$label_class .= ($label_class ? " " : "") . cm_getClassByFrameworkCss($arrColumnLabel, "push") . " " . cm_getClassByFrameworkCss($arrColumnControl, "col");
-									else
-										$container_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
-								}
-								
-							    if($label_class)
-								    $this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
-								else
-									$this->tpl[0]->set_var("label_class", "");
-							}							    
-					    } else {
-					    	$control_var = "";
-					    }
-				    } 
-
-				    /**
-				    * Row Class
-				    */
-				    $container_properties = array();
-				    $container_class["default"] = $this->form_fields[$subkey]->get_control_class(null, null, array("framework_css" => false, "control_type" => false)); 
-				    
-					if($primary_field != $subkey) {
-					    if(is_array($this->form_fields[$subkey]->framework_css["container"]["col"]) 
-				    		&& count($this->form_fields[$subkey]->framework_css["container"]["col"])
-					    ) {
-							$container_class["grid"] = cm_getClassByFrameworkCss($this->form_fields[$subkey]->framework_css["container"]["col"], "col");
-							if(!$is_wrapped) {
-								$wrap_class = array("form-wrap");
-								if($this->form_fields[$subkey]->framework_css["container"]["row"]) {
-									$wrap_class[] = cm_getClassByFrameworkCss("row", "form");
-								}
-								$this->tpl[0]->set_var("wrap_class", implode(" ", array_filter($wrap_class)));
-								$is_wrapped = $this->tpl[0]->parse("SectWrapStart", false);
-							}
-
-							$wrap_count = $wrap_count + $this->form_fields[$subkey]->framework_css["container"]["col"]["lg"];
-						} elseif($this->form_fields[$subkey]->framework_css["container"]["row"]) {
-							if($is_wrapped) {
-								$wrap_count = 12;
-								$container_class["grid"] = cm_getClassByFrameworkCss(array($wrap_count), "col");
-							} elseif($label_set) { 
-								$container_class["grid"] = cm_getClassByFrameworkCss("row", "form");
-							}
-						} else {
-							if($is_wrapped) {
-								$wrap_count = 12;
-								$container_class["grid"] = cm_getClassByFrameworkCss(array($wrap_count), "col");
-							}
-						}
-					}
-
-				    if(count($container_class)) {
-				    	$str_container_class = implode(" ", array_filter($container_class));
-				    	if($str_container_class)
-				    		$container_properties["class"] = $str_container_class;
-					}
-					if(is_array($container_properties) && count($container_properties)) {
-						$str_container_properties = "";
-						foreach($container_properties AS $container_properties_key => $container_properties_value) {
-							
-							$str_container_properties .= " " . $container_properties_key . '="' . (is_array($container_properties_value) ? implode(" ", array_filter($container_properties_value)) : $container_properties_value) . '"';
-						}
-						$this->tpl[0]->set_var("container_properties", $str_container_properties);
-						
-						$this->tpl[0]->set_var("field_container_start", '<div' . $str_container_properties . '>');
-						$this->tpl[0]->set_var("field_container_end", '</div>');
-					}				    	
-
-				    // CONTROL/VALUE SECTION
-				    /**
-				    * Control Class
-				    */
-				    $rc = false;
-				    $multi_field = (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields));
-
-				    if ($multi_field)
-				    {
-					    $rc |= $this->tpl[0]->set_var($subkey . "_value", $this->form_fields[$subkey]->getValue());
-					    $rc |= $this->tpl[0]->set_var($subkey . "_display_value", $this->form_fields[$subkey]->getDisplayValue());
-				    }
-				    if ($this->tpl[0]->isset_var($subkey . "_field"))
-					    $rc |= $this->tpl[0]->set_var($subkey . "_field", $this->form_fields[$subkey]->process());
-
-				    if ($multi_field)
-				    {
-					    $rc |= $this->tpl[0]->set_var("FIELD_value", $this->form_fields[$subkey]->getValue());
-					    $rc |= $this->tpl[0]->set_var("FIELD_display_value", $this->form_fields[$subkey]->getDisplayValue());
-				    }
-				    if ($this->tpl[0]->isset_var("FIELD_field"))
-					    $rc |= $this->tpl[0]->set_var("FIELD_field", $this->form_fields[$subkey]->process());
-
-				    if (!$rc)
-				    {
-					    if (!$this->display_values || strlen($this->form_fields[$subkey]->control_type))
-					    {
-						    if ($this->tpl[0]->isset_var("content" . $control_var))
-							    $this->tpl[0]->set_var("content" . $control_var, $control_prefix . $this->form_fields[$subkey]->process() . $control_postfix);
-					    }
-					    else
-						    $this->tpl[0]->set_var("content" . $control_var, $this->form_fields[$subkey]->getDisplayValue());
-				    }
-
-					if($label_set)
-						$this->tpl[0]->parse("SectGroupLabel", false);
-					else
-	                	$this->tpl[0]->set_var("SectGroupLabel", "");
-
-				    /*
-				    $fieldset = false;
-
-				    switch ($this->form_fields[$subkey]->extended_type)
-				    {
-					    case "Selection":
-						    switch ($this->form_fields[$subkey]->get_control_type())
-						    {
-							    case "radio":
-								    $fieldset = true;
-								    break;
-						    }
-						    break;
-				    }
-
-				    if ($fieldset)
-				    {
-					    $this->tpl[0]->set_var("SectField", "");
-					    $this->tpl[0]->parse("SectFieldSet", false);
-				    }
-				    else
-				    {
-					    $this->tpl[0]->parse("SectField", false);
-					    $this->tpl[0]->set_var("SectFieldSet", "");
-				    }*/
-
-				    // Manage Fixed Sections
-				    if(!is_array($this->form_fields[$subkey]->value->ori_value))
-				    {
-					    if (strlen($this->form_fields[$subkey]->value->ori_value))
-					    {
-						    $this->tpl[0]->parse("SectSet_$subkey", false);
-						    $this->tpl[0]->set_var("SectNotSet_$subkey", "");
-					    }
-					    else
-					    {
-						    $this->tpl[0]->set_var("SectSet_$subkey", "");
-						    $this->tpl[0]->parse("SectNotSet_$subkey", false);
-					    }
-				    }
-				    if ($this->form_fields[$subkey]->extended_type == "Selection")
-				    {
-					    $this->tpl[0]->set_regexp_var("/SectSet_" . $subkey . "_.+/", "");
-					    $this->tpl[0]->parse("SectSet_" . $subkey . "_" . $this->form_fields[$subkey]->value->getValue($this->form_fields[$subkey]->base_type, FF_SYSTEM_LOCALE), false);
-				    }
-
-				    $this->tpl[0]->parse("Sect_$subkey", false);
-
-				    // "display" hidden original values
-	    /*						if (!isset($this->key_fields[$subkey])) // displayed key fields are threated previously
-				    {
-					    if (is_array($this->form_fields[$subkey]->multi_fields) && count($this->form_fields[$subkey]->multi_fields))
-					    {
-						    foreach ($this->form_fields[$subkey]->multi_fields as $mul_subkey => $mul_subvalue)
-						    {
-							    $this->tpl[0]->set_var("id", $subkey . "[" . $mul_subkey . "]");
-							    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subkey]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
-							    $this->tpl[0]->parse("SectHiddenField", true);
-
-	                            if($this->record_exist) {
-								    $this->tpl[0]->set_var("id", $subkey . "_ori[" . $mul_subkey . "]");
-								    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subkey]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)));
-								    $this->tpl[0]->parse("SectHiddenField", true);
-	                            }
-						    }
-						    reset($this->form_fields[$subkey]->multi_fields);
-					    }
-					    else
-					    {       
-	                        if($this->record_exist) {
-							    $this->tpl[0]->set_var("id", $subkey . "_ori");
-							    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subkey]->value_ori->getValue($this->form_fields[$subkey]->base_type, FF_SYSTEM_LOCALE)));
-							    $this->tpl[0]->parse("SectHiddenField", true);
-	                        }
-					    }
-				    }
-	    */					
-			    }
-				if($primary_field  == $subkey && is_subclass_of($subvalue["data"], "ffField_base")) {
-					$this->tpl[0]->set_var("GroupTitle", $this->tpl[0]->ProceedTpl($this->tpl[0]->DBlocks["SectGroupRow"]));
-				} else {
-					if(($wrap_count >= 12 || $count_contents == count($contents)) && $is_wrapped) {
-						$this->tpl[0]->parse("SectWrapEnd", false);
-						$wrap_count = 0;
-						$is_wrapped = false;
-					}			    
-
-				    $rc = $this->tpl[0]->parse("SectGroupRow" . $suffix, true);
-				    if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
-				    
-				    $this->tpl[0]->set_var("SectWrapStart", "");
-				    $this->tpl[0]->set_var("SectWrapEnd", "");
-				}
-
-		    }
-		    reset($contents);
-        }
-        
-		return $i;
+		if (isset($this->tabs_data["contents"]["_main_"]) && $this->tabs_data["contents"]["_main_"]["data"] === null)
+		{
+			unset($this->tabs_data["contents"]["_main_"]);
+		}
 	}
 
-	/**
-	 * Visualizza i pulsanti del record
-	 */
 	protected function tplDisplayControls()
 	{
 		if ($this->hide_all_controls || !$this->tplSection["buttons"]["display"])
@@ -930,14 +860,8 @@ class ffRecord_dialog extends ffRecord_base
 		}
 		reset($tmp_action_buttons);
 
-		$action_class["default"] = $this->framework_css["actions"]["class"];
-		if($this->framework_css["actions"]["col"]) {
-            $action_class["grid"] = cm_getClassByFrameworkCss($this->framework_css["actions"]["col"], "col");
-        }
-        
-		$this->tpl[0]->set_var("actions_class", implode(" ", array_filter($action_class)));
 		$this->tpl[0]->set_var("ActionButtons", $buffer);
-		$this->tpl[0]->parse("SectControls", false);
+		$this->tpl[0]->parse("SectControls", "");
 	}
 
 	public function tplDisplayError($sError = null)
@@ -952,18 +876,16 @@ class ffRecord_dialog extends ffRecord_base
 			{
 				if (!MOD_NOTIFIER_DISABLE_AJAX && !$this->disable_mod_notifier_on_error)
 				{
-					mod_notifier_add_message_to_queue($this->strError, MOD_NOTIFIER_ERROR, $this->parent[0]->getXHRDialog());
+					mod_notifier_add_message_to_queue($this->strError, MOD_NOTIFIER_ERROR, $this->parent[0]->getXHRCtx());
 				}
 				else
 				{
-					$this->tpl[0]->set_var("error_class", cm_getClassByDef($this->framework_css["error"]));
 					$this->tpl[0]->set_var("strError", $this->strError);
 					$this->tpl[0]->parse("SectError", false);
 				}			
 			} 
 			else
 			{
-				$this->tpl[0]->set_var("error_class", cm_getClassByDef($this->framework_css["error"]));
 				$this->tpl[0]->set_var("strError", $this->strError);
 				$this->tpl[0]->parse("SectError", false);
 			}
@@ -975,14 +897,72 @@ class ffRecord_dialog extends ffRecord_base
 		if ($this->hide_all_controls)
 			return;
 
+		if ($this->cursor_dialog && $this->record_exist)
+		{
+			// -------------
+			//  FIRST
+
+			$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
+			$tmp->id 			= "ActionButtonFirst";
+			$tmp->label 		= $this->buttons_options["cursor_first"]["label"];
+			$tmp->aspect 		= $this->buttons_options["cursor_first"]["aspect"];
+			$tmp->action_type 	= "submit";
+			$tmp->frmAction		= ($this->buttons_options["cursor_first"]["frmAction"] ? $this->buttons_options["cursor_first"]["frmAction"] : "first");
+
+			if ($this->buttons_options["cursor_first"]["jsaction"])
+				$tmp->jsaction = $this->buttons_options["cursor_first"]["jsaction"];
+			else
+				$tmp->jsaction = "javascript:ff.ffRecord.cursor.first('[[XHR_CTX_ID]]');";
+
+			if (isset($this->buttons_options["cursor_first"]["class"]))
+				$tmp->class			= $this->buttons_options["cursor_first"]["class"];
+			else
+				$tmp->class			= "noactivebuttons";
+
+			if ($this->buttons_options["cursor_first"]["image"])
+				$tmp->image = $this->buttons_options["cursor_first"]["image"];
+
+			if ($this->buttons_options["cursor_first"]["newicon"])
+				$tmp->newicon = $this->buttons_options["cursor_first"]["newicon"];
+
+			$this->addActionButton(	  $tmp
+									, $this->buttons_options["cursor_first"]["index"]);
+
+			// -------------
+			//  PREV
+
+			$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
+			$tmp->id 			= "ActionButtonPrev";
+			$tmp->label 		= $this->buttons_options["cursor_prev"]["label"];
+			$tmp->aspect 		= $this->buttons_options["cursor_prev"]["aspect"];
+			$tmp->action_type 	= "submit";
+			$tmp->frmAction		= ($this->buttons_options["cursor_prev"]["frmAction"] ? $this->buttons_options["cursor_prev"]["frmAction"] : "prev");
+
+			if ($this->buttons_options["cursor_prev"]["jsaction"])
+				$tmp->jsaction = $this->buttons_options["cursor_prev"]["jsaction"];
+			else
+				$tmp->jsaction = "javascript:ff.ffRecord.cursor.prev('[[XHR_CTX_ID]]');";
+
+			if (isset($this->buttons_options["cursor_prev"]["class"]))
+				$tmp->class			= $this->buttons_options["cursor_prev"]["class"];
+			else
+				$tmp->class			= "noactivebuttons";
+
+			if ($this->buttons_options["cursor_prev"]["image"])
+				$tmp->image = $this->buttons_options["cursor_prev"]["image"];
+
+			if ($this->buttons_options["cursor_prev"]["newicon"])
+				$tmp->newicon = $this->buttons_options["cursor_prev"]["newicon"];
+
+			$this->addActionButton(	  $tmp
+									, $this->buttons_options["cursor_prev"]["index"]);
+		}
+		
 		// PREPARE DEFAULT BUTTONS
 		if ($this->buttons_options["cancel"]["display"])
 		{
 			if ($this->buttons_options["cancel"]["obj"] === null)
 			{
-				if($this->buttons_options["cancel"]["label"] === null)
-					$this->buttons_options["cancel"]["label"] = ffTemplate::_get_word_by_code("ffRecord_close");
-				
 				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 				$tmp->id 			= "ActionButtonCancel";
 				$tmp->label 		= $this->buttons_options["cancel"]["label"];
@@ -990,24 +970,16 @@ class ffRecord_dialog extends ffRecord_base
 				$tmp->action_type 	= "submit";
 				$tmp->frmAction		= "close";
 
-				$tmp->class	= $this->buttons_options["cancel"]["class"];
-                $tmp->icon  = $this->buttons_options["cancel"]["icon"]; 
-
-
-/*				$tmp->class	= cm_getClassByFrameworkCss("cancel", $this->buttons_options["cancel"]["aspect"]);
-				if ($this->buttons_options["cancel"]["class"])
-					$tmp->class	.= " " . $this->buttons_options["cancel"]["class"];
-*/
-/*                if (isset($this->buttons_options["cancel"]["class"]))
+                if (isset($this->buttons_options["cancel"]["class"]))
                     $tmp->class     = $this->buttons_options["cancel"]["class"];
-*/
+
 				$this->buttons_options["cancel"]["obj"] =& $tmp;
 			}
 		}
 
 		parent::initControls();
 
-		/*if (isset($this->action_buttons["ActionButtonCancel"]))
+		if (isset($this->action_buttons["ActionButtonCancel"]))
 		{
 			$tmp = $this->getActionButton("ActionButtonCancel");
 			$tmp->class = $tmp->get_class() . " cancel";
@@ -1029,7 +1001,68 @@ class ffRecord_dialog extends ffRecord_base
 		{
 			$tmp = $this->getActionButton("ActionButtonInsert");
 			$tmp->class = $tmp->get_class() . " insert";
-		}*/
+		}
+		
+		if ($this->cursor_dialog && $this->record_exist)
+		{
+			// -------------
+			//  NEXT
+
+			$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
+			$tmp->id 			= "ActionButtonNext";
+			$tmp->label 		= $this->buttons_options["cursor_next"]["label"];
+			$tmp->aspect 		= $this->buttons_options["cursor_next"]["aspect"];
+			$tmp->action_type 	= "submit";
+			$tmp->frmAction		= ($this->buttons_options["cursor_next"]["frmAction"] ? $this->buttons_options["cursor_next"]["frmAction"] : "next");
+
+			if ($this->buttons_options["cursor_next"]["jsaction"])
+				$tmp->jsaction = $this->buttons_options["cursor_next"]["jsaction"];
+			else
+				$tmp->jsaction = "javascript:ff.ffRecord.cursor.next('[[XHR_CTX_ID]]');";
+
+			if (isset($this->buttons_options["cursor_next"]["class"]))
+				$tmp->class			= $this->buttons_options["cursor_next"]["class"];
+			else
+				$tmp->class			= "noactivebuttons";
+
+			if ($this->buttons_options["cursor_next"]["image"])
+				$tmp->image = $this->buttons_options["cursor_next"]["image"];
+
+			if ($this->buttons_options["cursor_next"]["newicon"])
+				$tmp->newicon = $this->buttons_options["cursor_next"]["newicon"];
+
+			$this->addActionButton(	  $tmp
+									, $this->buttons_options["cursor_next"]["index"]);
+
+			// -------------
+			//  LAST
+
+			$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
+			$tmp->id 			= "ActionButtonLast";
+			$tmp->label 		= $this->buttons_options["cursor_last"]["label"];
+			$tmp->aspect 		= $this->buttons_options["cursor_last"]["aspect"];
+			$tmp->action_type 	= "submit";
+			$tmp->frmAction		= ($this->buttons_options["cursor_last"]["frmAction"] ? $this->buttons_options["cursor_last"]["frmAction"] : "last");
+
+			if ($this->buttons_options["cursor_last"]["jsaction"])
+				$tmp->jsaction = $this->buttons_options["cursor_last"]["jsaction"];
+			else
+				$tmp->jsaction = "javascript:ff.ffRecord.cursor.last('[[XHR_CTX_ID]]');";
+
+			if (isset($this->buttons_options["cursor_last"]["class"]))
+				$tmp->class			= $this->buttons_options["cursor_last"]["class"];
+			else
+				$tmp->class			= "noactivebuttons";
+
+			if ($this->buttons_options["cursor_last"]["image"])
+				$tmp->image = $this->buttons_options["cursor_last"]["image"];
+
+			if ($this->buttons_options["cursor_last"]["newicon"])
+				$tmp->newicon = $this->buttons_options["cursor_last"]["newicon"];
+
+			$this->addActionButton(	  $tmp
+									, $this->buttons_options["cursor_last"]["index"]);
+		}
 	}
 
 	/*function redirect($url)
@@ -1041,7 +1074,7 @@ class ffRecord_dialog extends ffRecord_base
 	
 	/**
 	 * Esegue un reload dello stesso componente in base alle caratteristiche del record e della richiesta, se XHR o meno
-	 * NB: se la richiesta non Ã¨ XHR, viene effettuato un redirect completo
+	 * NB: se la richiesta non è XHR, viene effettuato un redirect completo
 	 * @param String $url l'indirizzo di destinazione
 	 * @return String
 	 */
@@ -1051,10 +1084,10 @@ class ffRecord_dialog extends ffRecord_base
 		{
 			$this->json_result["url"] = $this->parent[0]->getRequestUri($refresh_keys);
 			$this->json_result["close"] = false;
-			$this->json_result["component"] = $this->id;
+			$this->json_result["component"] = $this->getIDIF();
 			if ($this->parent[0]->getXHRSection())
 				$this->json_result["section"] = $this->parent[0]->getXHRSection();
-			$this->json_result["dialog"] = $this->parent[0]->getXHRDialog();
+			$this->json_result["ctx"] = $this->parent[0]->getXHRCtx();
 			cm::jsonParse($this->json_result, true);
 			exit;
 		}
@@ -1063,7 +1096,14 @@ class ffRecord_dialog extends ffRecord_base
 			return parent::redirect($this->parent[0]->getRequestUri($refresh_keys));
 		}
 	}
+	
 	public function structProcess($tpl)
 	{
+		if ($this->id_if !== null)
+		{
+            $tpl->set_var("prop_name",    "factory_id");
+            $tpl->set_var("prop_value",   '"' . $this->id . '"');
+            $tpl->parse("SectFFObjProperty",    true);
+		}
 	}
 }

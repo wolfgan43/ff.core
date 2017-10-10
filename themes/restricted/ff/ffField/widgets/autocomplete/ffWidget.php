@@ -16,30 +16,14 @@ class ffWidget_autocomplete extends ffCommon
 	var $class			= "ffWidget_autocomplete";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							, "jquery.ui"					=> null
-/*							, "ff.ffField.autocomplete"	=> array(
-									"file" => "autocomplete.js"
-									, "path" => "/themes/restricted/ff/ffField/widgets/autocomplete"
-								)*/
+                              "ff.ffField.autocomplete"       => null
 						);
-    var $css_deps 		= array(/*
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.autocomplete"        => array(
-                                      "file" => "jquery.ui.autocomplete.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
+    var $css_deps 		= array(
+                              "jquery-ui.autocomplete"       => null
     					);
 
 	var $disable_dialog = false;
@@ -96,13 +80,15 @@ class ffWidget_autocomplete extends ffCommon
 	{
 		global $plgCfg_autocomplete_UseOwnSession;
         
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "autocomplete";
 		}
 		else
 		{
@@ -129,7 +115,7 @@ class ffWidget_autocomplete extends ffCommon
         }
 
 		$this->tpl[$tpl_id]->set_var("id", $id);
-		$this->tpl[$tpl_id]->set_var("class", $Field->get_control_class()); 
+		$this->tpl[$tpl_id]->set_var("class", " " . $this->class . (strlen($Field->class) ? " " . $Field->class : ""));
 		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
         $this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 		if($this->theme !== null) 
@@ -141,72 +127,11 @@ class ffWidget_autocomplete extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/restricted/ff/ffField/widgets/autocomplete");
-/* Remove jquery ui css
-    	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.autocomplete"        => array(
-                      "file" => "jquery.ui.autocomplete.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-*/
-	    $icon = $Field->autocomplete_icon;
-		if(!$icon && $Field->autocomplete_combo)
-			$icon = "caret-down";
-	        
-        if($icon) {
-        	if(is_array($icon)) {
-        		$actex_combo_found = false;
-				foreach($icon AS $icon_name => $icon_value) {
-					if(is_array($icon_value)) {
-						$icon_class = $icon_value["class"];
-						$icon_rel = $icon_value["rel"];
-					} else {
-						$icon_class = $icon_value;
-						$icon_rel = "";
-					}
-
-            		$this->tpl[$tpl_id]->set_var("icon_class", cm_getClassByFrameworkCss($icon_name, "icon", array("class" => ($icon_class ? $icon_class : ""))));
-
-            		if($icon_rel)
-            			$this->tpl[$tpl_id]->set_var("icon_rel", ' rel="' . $icon_rel . '"');
-
-        			$this->tpl[$tpl_id]->parse("SectIcon", true);
-        			
-        			if($Field->autocomplete_combo && $icon_value == "actex-combo") {
-						$actex_combo_found = true;
-        			}
-				}
-				if($Field->autocomplete_combo && !$actex_combo_found) {
-            		$this->tpl[$tpl_id]->set_var("icon_class", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => "actex-combo")));
-        			$this->tpl[$tpl_id]->parse("SectIcon", true);
-				}
-				
-				$this->tpl[$tpl_id]->set_var("combo_class", cm_getClassByFrameworkCss("control-feedback", "form"));
-				$this->tpl[$tpl_id]->parse("SectMultiIcons", false);
-        	} else {
-            	$this->tpl[$tpl_id]->set_var("combo_class", cm_getClassByFrameworkCss($icon, "icon", array("class" => cm_getClassByFrameworkCss("control-feedback", "form") . ($Field->autocomplete_combo ? " actex-combo" : ""))));
-        		$this->tpl[$tpl_id]->parse("SectCombo", false);
-			}
+        if($Field->autocomplete_combo) {
+        	$this->tpl[$tpl_id]->parse("SectCombo", false);
+		} else {
+			$this->tpl[$tpl_id]->set_var("SectCombo", "");
 		}
 		
         if($Field->autocomplete_disabled)
@@ -214,165 +139,59 @@ class ffWidget_autocomplete extends ffCommon
         else
             $this->tpl[$tpl_id]->set_var("disabled", "false");
 
-		if ($value == null || !($value->getValue($Field->get_app_type(), $Field->get_locale()))) {
-			$this->tpl[$tpl_id]->set_var("selected_value", "");
-			$this->tpl[$tpl_id]->set_var("selected_id", "");
-		} else {
-            $arrID = array();
-            $arrValue = explode(",", $value->getValue($Field->get_app_type(), $Field->get_locale()));
-            
-            if(is_array($arrValue) && count($arrValue)) {
-                foreach($arrValue AS $value_part) {
-                    if($Field->extended_type == "Selection") {
-                        $arrID[$value_part] = $Field->getDisplayValue($Field->get_app_type(), $Field->get_locale(), new ffData($value_part, $Field->get_app_type(), $Field->get_locale()));
-                    } else {
-                        if(strlen($strCompare))
-                            $strCompare .= ",";
-
-                        $strCompare .= $value_part;
-                    }
-                    
-                    if(!$Field->autocomplete_readonly && (!$arrID[$value_part] || $arrID[$value_part] != $Field->multi_select_one_label))
-                        $arrID[$value_part] = $value_part;
-                }
-            }
-
-			if($Field->extended_type != "Selection" && strlen($Field->source_SQL)) 
-            {				
-				$sSQL = $Field->source_SQL;
-				$sSQL = str_replace("[AND]", "", $sSQL);
-				$sSQL = str_replace("[OR]", "", $sSQL);
-				$sSQL = str_replace("[WHERE]", "", $sSQL);
-				$sSQL = str_replace("[HAVING_AND]", "", $sSQL);
-				$sSQL = str_replace("[HAVING_OR]", "", $sSQL);
-				$sSQL = str_replace("[HAVING]", "", $sSQL);
-				if(preg_match("/(\[COLON\])/", $sSQL))
-					$sSQL = str_replace("[ORDER]", " ORDER BY ", $sSQL); 
-				else
-					$sSQL = str_replace("[ORDER]", "", $sSQL); 
-				$sSQL = str_replace("[COLON]", "", $sSQL); 
-				$sSQL = str_replace("[LIMIT]", " LIMIT 1", $sSQL); 				
-
-				$db->query($sSQL);
-            	if($db->nextRecord()) 
-            	{
-            		$condition = 0;
-            		$field_key = $db->fields_names[0];
-				
-					$strOperation = "`" . $field_key . "` IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
-
-					$sSQL = $Field->source_SQL;
-					if ($Field->autocomplete_compare) 
-					{
-						if(strpos($sSQL, "[WHERE]") !== false) {
-							$condition++;
-							$bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $sSQL);
-
-							if (!$bFindWhereOptions)
-								$sSqlWhere .= " WHERE ";
-
-							$sSqlWhere .= " ( " . $strOperation . ") ";
-
-							$sSQL = str_replace("[AND]", "AND", $sSQL);
-							$sSQL = str_replace("[OR]", "OR", $sSQL);
-							$sSQL = str_replace("[WHERE]", $sSqlWhere, $sSQL);
-						}
-					} 
-					else 
-					{
-						$sSQL = str_replace("[AND]", "", $sSQL);
-						$sSQL = str_replace("[OR]", "", $sSQL);
-						$sSQL = str_replace("[WHERE]", "", $sSQL);
-					}
-
-					if ($Field->autocomplete_compare_having) 
-					{
-						if(strpos($sSQL, "[HAVING]") !== false) {
-							$condition++;
-							$bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $sSQL);
-
-							if (!$bFindHavingOptions)
-								$sSqlHaving .= " HAVING ";
-
-							$sSqlHaving .= " ( " . $strOperation . ") ";
-
-							$sSQL = str_replace("[HAVING_AND]", "AND", $sSQL);
-							$sSQL = str_replace("[HAVING_OR]", "OR", $sSQL);
-							$sSQL = str_replace("[HAVING]", $sSqlHaving, $sSQL);
-						}
-					} 
-					else 
-					{
-						$sSQL = str_replace("[HAVING_AND]", "", $sSQL);
-						$sSQL = str_replace("[HAVING_OR]", "", $sSQL);
-						$sSQL = str_replace("[HAVING]", "", $sSQL);
-					}
-                    
-					if(preg_match("/(\[COLON\])/", $sSQL))
-						$sSQL = str_replace("[ORDER]", " ORDER BY ", $sSQL); 
-					else
-						$sSQL = str_replace("[ORDER]", "", $sSQL); 
-
-					$sSQL = str_replace("[COLON]", "", $sSQL); 
-                    $sSQL = str_replace("[LIMIT]", "", $sSQL); 
-					
-					if($condition) {
-            			$db->query($sSQL);
-            			if($db->nextRecord()) 
-            			{
-            				$count_field = $db->numFields();
-            				do 
-            				{
-								if ($count_field == 1) 
-								{
-				                    $arrID[trim($db->getField($db->fields_names[0], "Text", true))] = ffCommon_charset_encode(trim($db->getField($db->fields_names[0], "Text", true)));
-								} 
-								else 
-								{
-									if ($count_field >= 2)  
-									{
-					                    $arrID[trim($db->getField($db->fields_names[0], "Text", true))] = ffCommon_charset_encode(trim($db->getField($db->fields_names[1], "Text", true)));
-									}
-								}
-							} while($db->nextRecord());
-            			}
-					}
-				}
-				
-//            } else {
-//               $this->tpl[$tpl_id]->set_var("selected_id", $value->getValue($Field->get_app_type(), $Field->get_locale()));
-//               $this->tpl[$tpl_id]->set_var("selected_value", $value->getValue($Field->get_app_type(), $Field->get_locale()));                
-            }
-
-		   	$this->tpl[$tpl_id]->set_var("selected_id", implode(",", array_keys($arrID)));
-			$this->tpl[$tpl_id]->set_var("selected_value", implode(",", $arrID));
-		}
-		
-		$this->tpl[$tpl_id]->set_var("prefix", "autocomplete_");
-        $this->tpl[$tpl_id]->parse("SectReadOnly", false);
-
         if($Field->autocomplete_readonly) {
+			if ($value == null || !($value->getValue($Field->get_app_type(), $Field->get_locale()))) {
+				$this->tpl[$tpl_id]->set_var("selected_value", "");
+				$this->tpl[$tpl_id]->set_var("selected_id", "");
+			} else {
+                if($Field->autocomplete_multi) {
+                    $arrValue = explode(",", $value->getValue($Field->get_app_type(), $Field->get_locale()));
+                    if(is_array($arrValue) && count($arrValue)) {
+                        foreach($arrValue AS $value_part) {
+                            if(strlen($strValue))
+                                $strValue .= ",";
+
+                            $strValue .= $Field->getDisplayValue($Field->get_app_type(), $Field->get_locale(), new ffData($value_part, $Field->get_app_type(), $Field->get_locale()));
+                        }
+                    }
+                }
+                if(!strlen($strValue))
+                    $strValue = $Field->getDisplayValue();
+				$this->tpl[$tpl_id]->set_var("selected_value", $strValue);
+				$this->tpl[$tpl_id]->set_var("selected_id", $value->getValue($Field->get_app_type(), $Field->get_locale()));
+			}
             $this->tpl[$tpl_id]->set_var("readonly", "true");
+            $this->tpl[$tpl_id]->set_var("prefix", "autocomplete_");
+            $this->tpl[$tpl_id]->parse("SectReadOnly", false);
         } else {
+			if ($value == null || !$value->getValue($Field->get_app_type(), $Field->get_locale()))
+				$this->tpl[$tpl_id]->set_var("selected_value", "");
+			else
+				$this->tpl[$tpl_id]->set_var("selected_value", $value->getValue($Field->get_app_type(), $Field->get_locale()));
+
+			$this->tpl[$tpl_id]->set_var("prefix", "");
             $this->tpl[$tpl_id]->set_var("readonly", "false");
+            $this->tpl[$tpl_id]->set_var("SectReadOnly", "");
         }
         
         $this->tpl[$tpl_id]->set_var("minLength", $Field->autocomplete_minLength);
         $this->tpl[$tpl_id]->set_var("delay", $Field->autocomplete_delay);
-		if ($this->innerURL === null)
-			$this->tpl[$tpl_id]->set_var("innerURL", $this->source_path . "/ff/ffField/widgets/autocomplete/parsedata." . FF_PHP_EXT);
-		else
-			$this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
 
-		if ($Field->actex_service === null)
+		if ($Field->autocomplete_service === null)
+		{
 			$this->tpl[$tpl_id]->set_var("service", "null");
+			
+			if ($this->innerURL === null)
+				$this->tpl[$tpl_id]->set_var("innerURL", $this->source_path . "/ff/ffField/widgets/autocomplete/parsedata." . FF_PHP_EXT);
+			else
+				$this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
+		}
 		else
-			$this->tpl[$tpl_id]->set_var("service", "'" . $Field->actex_service . "'");
+			$this->tpl[$tpl_id]->set_var("service", "'" . $Field->autocomplete_service . "'");
 
-        if($Field->autocomplete_multi) {
-        	$this->oPage[0]->tplAddJs("jquery.autogrow.js", "jquery.autogrow-textarea.js", FF_THEME_DIR . "/library/plugins/jquery.autogrow-textarea");
+        if($Field->autocomplete_multi)
             $this->tpl[$tpl_id]->set_var("multi", "true");
-		} else
+        else
             $this->tpl[$tpl_id]->set_var("multi", "false");
 
         if($Field->autocomplete_cache)
@@ -392,7 +211,7 @@ class ffWidget_autocomplete extends ffCommon
 
 		if (strlen($Field->source_SQL))
 		{
-            if($Field->actex_service === null)
+            if($Field->autocomplete_service === null)
             {
 			    if($father === null) {
 				    $tmp = md5($Field->source_SQL);
@@ -418,13 +237,11 @@ class ffWidget_autocomplete extends ffCommon
 			    $ff["autocomplete"][$tmp]["sql"]						= $Field->source_SQL;
 			    $ff["autocomplete"][$tmp]["main_db"]					= $Field->autocomplete_use_main_db;
 			    $ff["autocomplete"][$tmp]["hide_result_on_query_empty"] = $Field->autocomplete_hide_result_on_query_empty;
-			    $ff["autocomplete"][$tmp]["image_field"] 				= $Field->autocomplete_image_field;
-			    $ff["autocomplete"][$tmp]["limit"] 						= $Field->autocomplete_res_limit;
                 
-                $ff["autocomplete"][$tmp]["field"]                      = $Field->actex_related_field;                                                                                
-			    $ff["autocomplete"][$tmp]["compare"]					= $Field->autocomplete_compare;
-			    $ff["autocomplete"][$tmp]["compare_having"] 			= $Field->autocomplete_compare_having;
-			    $ff["autocomplete"][$tmp]["operation"]					= $Field->autocomplete_operation;
+                $ff["autocomplete"][$tmp]["field"]          = $Field->actex_related_field;                                                                                
+			    $ff["autocomplete"][$tmp]["compare"]		= $Field->autocomplete_compare;
+			    $ff["autocomplete"][$tmp]["compare_having"] = $Field->autocomplete_compare_having;
+			    $ff["autocomplete"][$tmp]["operation"]		= $Field->autocomplete_operation;
 
 			    set_session("ff", $ff);
 			    
@@ -508,13 +325,6 @@ class ffWidget_autocomplete extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.autocomplete", "autocomplete.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/autocomplete");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -531,15 +341,6 @@ class ffWidget_autocomplete extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.autocomplete", "autocomplete.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/autocomplete");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

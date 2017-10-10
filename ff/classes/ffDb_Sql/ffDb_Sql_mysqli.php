@@ -5,30 +5,32 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
 if (!defined("FF_DB_MYSQLI_SHARELINK")) define("FF_DB_MYSQLI_SHARELINK", true);
 if (!defined("FF_DB_MYSQLI_SHUTDOWNCLEAN")) define("FF_DB_MYSQLI_SHUTDOWNCLEAN", false);
-if (!defined("FF_DB_MYSQLI_RECONNECT")) define("FF_DB_MYSQLI_RECONNECT", true);
-if (!defined("FF_DB_MYSQLI_AVOID_REAL_CONNECT")) define("FF_DB_MYSQLI_AVOID_REAL_CONNECT", true); // ATTENZIONE!!! Usare unicamente per oggetti in sola lettura
-
+if (!defined("FF_DB_MYSQLI_RECONNECT")) define("FF_DB_MYSQLI_RECONNECT", false);
+if (!defined("FF_DB_MYSQLI_AVOID_REAL_CONNECT")) define("FF_DB_MYSQLI_AVOID_REAL_CONNECT", false); // ATTENZIONE!!! Usare unicamente per oggetti in sola lettura
+if (!defined("FF_DB_MYSQLI_AVOID_SELECT_DB")) define("FF_DB_MYSQLI_AVOID_SELECT_DB", false); /* ATTENZIONE!!! Se abilitato, non garantisce la correttezza dell'esecuzione delle query 
+																								e non gestisce correttamente gli errori su Database, al guadagno di un minimo 
+																								incremento di performance */
 
 if (FF_DB_MYSQLI_SHUTDOWNCLEAN)
 {
 	register_shutdown_function("ffDB_Sql::free_all");
 }
- 
+
 /**
- * ffDB_Sql Ã¨ la classe preposta alla gestione della connessione con database di tipo SQL
+ * ffDB_Sql è la classe preposta alla gestione della connessione con database di tipo SQL
  * 
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffDB_Sql
@@ -52,7 +54,7 @@ class ffDB_Sql
 	var $HTML_reporting				= true;		## Display Messages in HTML Format
 
 	// PARAMETRI SPECIFICI DI MYSQL
-	var $persistent					= false;	## Setting to true will cause use of mysql_pconnect instead of mysql_connect
+	var $persistent					= true;	## Setting to true will cause use of mysql_pconnect instead of mysql_connect
 	
 	var $transform_null				= true;
 
@@ -343,16 +345,16 @@ class ffDB_Sql
 				}
 
 				if ($this->persistent)
-					$rc = @mysqli_real_connect($this->link_id, "p:" . $this->host, $this->user, $this->password, $this->database, null, null, MYSQLI_CLIENT_FOUND_ROWS);
+					$rc = @mysqli_real_connect($this->link_id, "p:" . $this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null), null, null, MYSQLI_CLIENT_FOUND_ROWS);
 				else
-					$rc = @mysqli_real_connect($this->link_id, $this->host, $this->user, $this->password, $this->database, null, null, MYSQLI_CLIENT_FOUND_ROWS);
+					$rc = @mysqli_real_connect($this->link_id, $this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null), null, null, MYSQLI_CLIENT_FOUND_ROWS);
 			}
 			else
 			{
 				if ($this->persistent)
-					$this->link_id = @mysqli_connect("p:" . $this->host, $this->user, $this->password, $this->database);
+					$this->link_id = @mysqli_connect("p:" . $this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null));
 				else
-					$this->link_id = @mysqli_connect($this->host, $this->user, $this->password, $this->database);
+					$this->link_id = @mysqli_connect($this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null));
 				
 				$rc = is_object($this->link_id);
 			}
@@ -365,8 +367,8 @@ class ffDB_Sql
 				return false;
 			}
 
-			//if ($this->charset_names !== null && $this->charset_collation !== null)
-			//	@mysqli_query($this->link_id, "SET NAMES '" . $this->charset_names . "' COLLATE '" . $this->charset_collation . "'");
+			if ($this->charset_names !== null && $this->charset_collation !== null)
+				@mysqli_query($this->link_id, "SET NAMES '" . $this->charset_names . "' COLLATE '" . $this->charset_collation . "'");
 
 			if ($this->charset !== null)
 				@mysqli_set_charset($this->link_id, $this->charset);
@@ -378,12 +380,12 @@ class ffDB_Sql
 			}
 		}
 		
-        return $this->link_id;
-        /*if ($this->selectDb())
+		if (FF_DB_MYSQLI_AVOID_SELECT_DB)
+			return $this->link_id;
+		else if ($this->selectDb())
 			return $this->link_id;
 		else
 			return false;
-         */
 	}
 	
 	/**
@@ -404,11 +406,11 @@ class ffDB_Sql
 				if ($this->errno == 2006 /* gone away */ && !$this->reconnect_tryed)
 				{
 					$this->reconnect_tryed = true;
-					return $this->connect(null, null, null, null, true); // connect chiamerÃ  da sola selectDb
+					return $this->connect(null, null, null, null, true); // connect chiamerà da sola selectDb
 				}
 			}
-			if ($this->halt_on_connect_error)
-				$this->errorHandler("Cannot use database " . $this->database);
+
+			$this->errorHandler("Cannot use database " . $this->database);
 			$this->cleanup();
 			$this->reconnect_tryed = false;
 			return false;
@@ -436,11 +438,11 @@ class ffDB_Sql
 			if (!$this->connect())
 				return false;
 		}
-		/*else
+		else
 		{
-			if (!$this->selectDb())
+			if (FF_DB_MYSQLI_AVOID_SELECT_DB || !$this->selectDb())
 				return false;
-		}*/
+		}
 
 		$this->freeResult();
 		
@@ -462,6 +464,7 @@ class ffDB_Sql
 		return true;
 	}
 
+	
 	function eachAll($callback)
 	{
 		if (!$this->query_id)
@@ -539,11 +542,11 @@ class ffDB_Sql
 			if (!$this->connect())
 				return false;
 		}
-		/*else
+		else
 		{
-			if (!$this->selectDb())
+			if (FF_DB_MYSQLI_AVOID_SELECT_DB || !$this->selectDb())
 				return false;
-		}*/
+		}
 
 		$this->freeResult();
 
@@ -568,6 +571,30 @@ class ffDB_Sql
 				}
 				mysqli_field_seek($this->query_id, 0);
 			}
+			
+			if (strpos($Query_String, "SQL_CALC_FOUND_ROWS"))
+			{
+				if (ini_get("mysql.trace_mode"))
+					ffErrorHandler::raise("Disable mysql.trace_mode In order for SQL_CALC_FOUND_ROWS to work", E_USER_ERROR, $this, get_defined_vars ());
+				
+				$tmp = @mysqli_query($this->link_id, "SELECT FOUND_ROWS()");
+				if (!$tmp || $this->checkError())
+				{
+					$this->errorHandler("Unable to retrieve num_rows");
+					return $this->query_id;
+				}
+				$tmp_data = @mysqli_fetch_array($tmp, MYSQLI_NUM);
+				if ($tmp_data === false)
+				{
+					$this->errorHandler("Unable to retrieve num_rows");
+					return $this->query_id;
+				}
+				$this->num_rows = $tmp_data[0];
+				
+				@mysqli_free_result($tmp);
+				$tmp = false;
+				unset($tmp_data);
+			}
 		}
 
 		return $this->query_id;
@@ -583,11 +610,11 @@ class ffDB_Sql
 			if (!$this->connect())
 				return false;
 		}
-		/*else
+		else
 		{
-			if (!$this->selectDb())
+			if (FF_DB_MYSQLI_AVOID_SELECT_DB || !$this->selectDb())
 				return false;
-		}*/
+		}
 
 		$this->freeResult();
 
@@ -611,10 +638,10 @@ class ffDB_Sql
 
 	/* function lookup($tabella, $chiave, $valorechiave = null, $defaultvalue = null, $nomecampo = null, $tiporestituito = "Text", $bReturnPlain = false)
 
-		recupera un valore sulla base del match di una o piÃ¹ chiavi in una tabella.
+		recupera un valore sulla base del match di una o più chiavi in una tabella.
 		i valori possono indifferentemente essere specificati sotto forma di ffData o plain values
 
-		chiave puÃ² essere:
+		chiave può essere:
 			$chiave = array(
 								"nomecampo" => "valore"
 								[, ...]
@@ -624,7 +651,7 @@ class ffDB_Sql
 			$value = "valore"
 
 
-		nomecampo puÃ² essere:
+		nomecampo può essere:
 			$nomecampo = "nomecampo"
 
 		oppure:
@@ -632,8 +659,8 @@ class ffDB_Sql
 					"nomecampo" => "tipodato"
 				)
 
-		il valore restituito rispetterÃ  il formato di "nomecampo".
-		nel caso in cui "nomecampo" sia un array, $tiporestituito verrÃ  ignorato.
+		il valore restituito rispetterà il formato di "nomecampo".
+		nel caso in cui "nomecampo" sia un array, $tiporestituito verrà ignorato.
 
 		NB.: Si ricorda che, se non si utilizza Forms Framework, i tipi accettati sono solo "Number" e "Text"
 	*/
@@ -644,11 +671,11 @@ class ffDB_Sql
 			if (!$this->connect())
 				return false;
 		}
-		/*else
+		else
 		{
-			if (!$this->selectDb())
+			if (FF_DB_MYSQLI_AVOID_SELECT_DB || !$this->selectDb())
 				return false;
-		}*/
+		}
 
 		if ($tiporestituito === null)
 			$tiporestituito = "Text";
@@ -764,7 +791,7 @@ class ffDB_Sql
 			return false;
 		}*/
 
-		if ($this->record !== false)
+		if ($this->record !== false && $this->record !== null)
 		{
 			$this->row += 1;
 			return true;
@@ -891,11 +918,11 @@ class ffDB_Sql
 	/* ----------------------------------------
 	    FUNZIONI PER LA GESTIONE DEI RISULTATI
 
-	    Ogni volta che verrÃ  restituito un valore da una query il tipo di valore dipenderÃ 
+	    Ogni volta che verrà restituito un valore da una query il tipo di valore dipenderà
 	    dal settaggio globale della classe "useFormsFramework".
 
-	    Nel caso sia abilitato, verrÃ  restituito un oggetto di tipo ffData, nel caso
-	    sia disabilitato verrÃ  restituito un plain value.
+	    Nel caso sia abilitato, verrà restituito un oggetto di tipo ffData, nel caso
+	    sia disabilitato verrà restituito un plain value.
 	    E' possibile forzare la restituzione di un plain value usando il parametro $bReturnPlain.
 
 	    Nel caso in cui non si utilizzi Forms Framework, i data_type accettati saranno solo
@@ -951,10 +978,10 @@ class ffDB_Sql
 			switch ($data_type)
 			{
 				case "Number":
-					if(strpos($tmp, ".") === false)
-						return (int)$tmp;
-					else
+					if (strpos($tmp, ".") !== false || strpos($tmp, ",") !== false)
 						return (double)$tmp;
+					else
+						return (int)$tmp;
 				default:
 					return $tmp;
 			}
@@ -963,7 +990,7 @@ class ffDB_Sql
 			return new ffData($tmp, $data_type, $this->locale);
 	}
 
-	// PERMETTE DI RECUPERARE IL VALORE DI UN CAMPO SPECIFICO DI UNA RIGA SPECIFICA. NB: Name puÃ² essere anche un indice numerico
+	// PERMETTE DI RECUPERARE IL VALORE DI UN CAMPO SPECIFICO DI UNA RIGA SPECIFICA. NB: Name può essere anche un indice numerico
 	function getResult($row, $Name, $data_type = "Text", $bReturnPlain = false)
 	{
 		if (!$this->query_id)

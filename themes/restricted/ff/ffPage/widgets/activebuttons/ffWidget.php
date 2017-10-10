@@ -11,30 +11,14 @@ class ffWidget_activebuttons extends ffCommon
 	var $class			= "ffWidget_activebuttons";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
-							/*, "jquery.ui" 		=> null*/
+							  "ff.ffPage.activebuttons" => null
 						);
-    //var $css_deps 		= array();
     var $css_deps 		= array();
-    /*
-    var $css_deps 		= array(
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.button"        => array(
-                                      "file" => "jquery.ui.button.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )
-    					);*/
+	
 	// PRIVATE VARS
 	var $oPage			= null;
 	var $source_path	= null;
@@ -74,10 +58,6 @@ class ffWidget_activebuttons extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			$this->oPage[0]->tplAddJs("ff.ffPage.activebuttons", "activebuttons.js", FF_THEME_DIR . "/restricted/ff/ffPage/widgets/activebuttons");
-		}			
-
 		if (!isset($this->tpl[$id])) {
 			$id = 0;
 		}
@@ -100,12 +80,6 @@ class ffWidget_activebuttons extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			$this->oPage[0]->tplAddJs("ff.ffPage.activebuttons", "activebuttons.js", FF_THEME_DIR . "/restricted/ff/ffPage/widgets/activebuttons");
-			
-			//return;
-		}			
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

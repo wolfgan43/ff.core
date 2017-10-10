@@ -5,6 +5,7 @@
 class ffGrid_xls extends ffGrid_base 
 {
 	var $framework_css = array(); 
+
     /**
      * Se la grid dev'essere full ajax
      * @var Boolean
@@ -35,6 +36,8 @@ class ffGrid_xls extends ffGrid_base
      * @var String
      */
     var $row_class        = "";
+    
+    var $pagination_save_memory = false;
 
     /**
      * Un elenco di classi da associare alle righe della grid, ciclate in sequenza
@@ -46,6 +49,8 @@ class ffGrid_xls extends ffGrid_base
                                 , "second" => "even"
                             );
 
+	var $id_if					= null;                            
+	
     /**
      * La classe da assegnare alle colonne intermedie
      * @var String
@@ -140,6 +145,9 @@ class ffGrid_xls extends ffGrid_base
     var $csv_field_sep		        	= ";"; /*AVEVO DEI PROBLEMI DI FORMATTAZIONE CON "\t"*/
     var $csv_field_caps		        	= '"';
     var $csv_row_sep		        	= "\n";
+    
+	var $raw_values						= false;
+	
     /**
      * Una descrizione aggiuntiva da assegnare al componente
      * @var String
@@ -198,6 +206,21 @@ class ffGrid_xls extends ffGrid_base
 		$this->objPHPExcel = new PHPExcel();
     }
 
+	function getIDIF()
+	{
+		if ($this->id_if !== null)
+			return $this->id_if;
+		else
+			return $this->id;
+	}
+
+	function getPrefix()
+	{
+		$tmp = $this->getIDIF();
+		if (strlen($tmp))
+			return $tmp . "_";
+	}    
+    
     /**
      * Carica il template della griglia
      */
@@ -555,6 +578,8 @@ class ffGrid_xls extends ffGrid_base
                 }
                 reset($this->grid_fields);
 
+				parent::processRow();
+				
                 /* Step 2: display values */
 
                 // EVENT HANDLER
@@ -587,46 +612,55 @@ class ffGrid_xls extends ffGrid_base
                         //---------------------------------------------------------------------
                         //---------------------------------------------------------------------
                         
-                        if(strlen($symbol_valuta) && $this->grid_fields[$key]->app_type == "Currency")
-                        {
-                            $symbol_valuta = " " . $symbol_valuta;
-                        }
-                        else {
-                            $symbol_valuta = "";
-                        }
-
-                        if (1 || $this->grid_fields[$key]->control_type === "")
-                        {
-                            $this->grid_fields[$key]->pre_process(true);
-	                        switch($this->grid_fields[$key]->base_type) {
+						if ($this->raw_values)
+						{
+							$this->grid_fields[$key]->pre_process(true);
+							switch($this->grid_fields[$key]->base_type) {
 								case "Number":
-		                            $buffer = $this->grid_fields[$key]->fixed_pre_content . $this->grid_fields[$key]->getValue() . $this->grid_fields[$key]->fixed_post_content;
-									$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00);
+									$buffer = $this->grid_fields[$key]->getValue("Number", FF_SYSTEM_LOCALE);
+									$this->objPHPExcel->setActiveSheetIndex(0)->getCell(ffCommon_colNumber2Letter($col) . $i)->setValueExplicit($buffer, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+									if ($this->grid_fields[$key]->app_type === "Currency")
+										$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_EUR_SYMBOL);
+									else
+										$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00);
 									break;
 								case "Date":
-			                        $buffer = $this->grid_fields[$key]->fixed_pre_content . $this->grid_fields[$key]->getDisplayValue() . $this->grid_fields[$key]->fixed_post_content;
+									$tmp = $this->grid_fields[$key]->value;
+									$this->objPHPExcel->setActiveSheetIndex(0)->setCellValue(ffCommon_colNumber2Letter($col) . $i, PHPExcel_Shared_Date::FormattedPHPToExcel($tmp->value_date_year, $tmp->value_date_month, $tmp->value_date_day));
 									$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DDMMYYYY);
 									break;
 								case "DateTime":
-			                        $buffer = $this->grid_fields[$key]->fixed_pre_content . $this->grid_fields[$key]->getDisplayValue() . $this->grid_fields[$key]->fixed_post_content;
+									$tmp = $this->grid_fields[$key]->value;
+									$this->objPHPExcel->setActiveSheetIndex(0)->setCellValue(ffCommon_colNumber2Letter($col) . $i, PHPExcel_Shared_Date::FormattedPHPToExcel($tmp->value_date_year, $tmp->value_date_month, $tmp->value_date_day, $tmp->value_date_hours, $tmp->value_date_minutes, $tmp->value_date_seconds));
 									$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DATETIME);
 									break;
 								default:
-		                            $buffer = $this->grid_fields[$key]->fixed_pre_content . $this->grid_fields[$key]->getDisplayValue() . $this->grid_fields[$key]->fixed_post_content;
-									$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_GENERAL);
-	                        }
+									$buffer = $this->grid_fields[$key]->fixed_pre_content . $this->grid_fields[$key]->getDisplayValue() . $this->grid_fields[$key]->fixed_post_content;
+									$this->objPHPExcel->setActiveSheetIndex(0)->setCellValue(ffCommon_colNumber2Letter($col) . $i, $this->normalizeTag($buffer));
+									$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getAlignment()->setWrapText(true);
+							}
 						}
-                        else
-                        {
-                            $buffer = $this->grid_fields[$key]->process(
-                                        "recordset_values[$recordset_key][" . $this->grid_fields[$key]->id . "]");
-                        }
-                        
+						else
+						{
+							if(strlen($this->symbol_valuta) && $this->grid_fields[$key]->app_type == "Currency")
+								$symbol_valuta = " " . $this->symbol_valuta;
+							else 
+								$symbol_valuta = "";
 
-                        $this->objPHPExcel->setActiveSheetIndex(0)->setCellValue(ffCommon_colNumber2Letter($col) . $i, $this->normalizeTag($symbol_valuta . $buffer));
-                        $this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getAlignment()->setWrapText(true);
-                        $this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-                        $this->objPHPExcel->setActiveSheetIndex(0)->getColumnDimension(ffCommon_colNumber2Letter($col))->setAutoSize(true);
+							$this->grid_fields[$key]->pre_process(true);
+							$buffer = $this->normalizeTag(
+									$this->grid_fields[$key]->fixed_pre_content 
+									. $symbol_valuta 
+									. $this->grid_fields[$key]->getDisplayValue() 
+									. $this->grid_fields[$key]->fixed_post_content
+								);
+
+							$this->objPHPExcel->setActiveSheetIndex(0)->setCellValue(ffCommon_colNumber2Letter($col) . $i, $buffer);
+							$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getAlignment()->setWrapText(true);
+						}
+						
+						$this->objPHPExcel->setActiveSheetIndex(0)->getStyle(ffCommon_colNumber2Letter($col) . $i)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$this->objPHPExcel->setActiveSheetIndex(0)->getColumnDimension(ffCommon_colNumber2Letter($col))->setAutoSize(true);
                         
                         //$this->objPHPExcel->setActiveSheetIndex(0)->getRowDimension($i)->setRowHeight(-1);
                         //ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
@@ -650,10 +684,14 @@ class ffGrid_xls extends ffGrid_base
         $res = str_replace("</div>", "</div><br />", $buffer);
         $res = str_replace("</span>", "</span> ", $res);
         $res = str_replace("</label>", "</label> ", $res);
+        $res = str_replace("&#039;", "'", $res);
         $res = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $res);
-
-        $res = trim(strip_tags($res), "\n");
-        
+		$res = html_entity_decode($res);
+		
+        $res = strip_tags($res);
+		$res = preg_replace('/^[\pZ\pC]+|[\pZ\pC]+$/u','',$res);
+        $res = trim($res);
+		
         return $res;
     }
     /**
@@ -705,6 +743,20 @@ class ffGrid_xls extends ffGrid_base
     }
 	
 	public function structProcess($tpl)
+	{
+	}
+	
+	function setWidthComponent($resolution_large_to_small) 
+	{
+	}
+	
+	function setWidthDialog($width, $action = null) 
+	{
+	}
+	function setTitleDialog($title, $action = null) 
+	{
+	}
+	function setTitle($title, $class = null) 
 	{
 	}
 }

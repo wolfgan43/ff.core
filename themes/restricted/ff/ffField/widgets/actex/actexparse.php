@@ -23,9 +23,6 @@ if (!$cm->isXHR()/* && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "googlebo
 	ffRedirect(str_replace("/parsedata", "", $_SERVER["REQUEST_URI"]), 301); // TO FIX!!!
 }
 
-//require_once("../../../../../../ff/main.php");
-//require_once("../../../../../../modules/security/common.php");
-
 //if ($plgCfg_ActiveComboEX_UseOwnSession)
 if (isset($_POST[session_name()]))
 	session_id($_POST[session_name()]);
@@ -42,14 +39,11 @@ $php_array = array();
 $father_value	= $_REQUEST["father_value"];
 $data_src		= $_REQUEST["data_src"];
 $selected_value = $_REQUEST["sel_val"];
-$search_value = str_replace("%", "\%", $search_value);
-$search_value = str_replace(" ", "%", $search_value);
-$search_value = str_replace("*", "%", $search_value);
-
 
 $ff = get_session("ff");
 $actex_sql					= $ff["actex"][$data_src]["sql"];
 $actex_field				= $ff["actex"][$data_src]["field"];
+//$actex_extra_fields			= $ff["actex"][$data_src]["extra_fields"];
 $actex_operation			= $ff["actex"][$data_src]["operation"];
 $actex_skip_empty			= $ff["actex"][$data_src]["skip_empty"];
 $actex_group				= $ff["actex"][$data_src]["group"];
@@ -57,8 +51,12 @@ $actex_attr					= $ff["actex"][$data_src]["attr"];
 $actex_main_db				= $ff["actex"][$data_src]["main_db"];
 $hide_result_on_query_empty = $ff["actex"][$data_src]["hide_result_on_query_empty"];
 $actex_preserve_field		= $ff["actex"][$data_src]["preserve_field"];
-$limit						= $ff["actex"][$data_src]["limit"];
-
+$crypt						= $ff["actex"][$data_src]["crypt"];
+$crypt_modsec				= $ff["actex"][$data_src]["crypt_modsec"];
+$crypt_concat				= $ff["actex"][$data_src]["crypt_concat"];
+$multi_crypt				= $ff["actex"][$data_src]["multi_crypt"];
+$multi_crypt_modsec			= $ff["actex"][$data_src]["multi_crypt_modsec"];
+$multi_crypt_concat			= $ff["actex"][$data_src]["multi_crypt_concat"];
 //$actex_preserve_having		= $ff["actex"][$data_src]["preserve_having"];
 
 if(!strlen(trim($actex_sql)))
@@ -98,10 +96,6 @@ else
 $sSQL = $actex_sql;
 $sSqlWhere = "";
 $sSqlHaving = "";
-$relevance = array();
-$relevance_search = array();
-if($search_value)
-	$relevance_search = explode("%", $search_value);
 
 if($father_value == "null")
 	$father_value = "";
@@ -161,12 +155,6 @@ if (strlen($actex_field) && (strlen($father_value) || !$actex_skip_empty))
 		$sSqlWhere .= ")";
 		$sSqlHaving .= ")";
 	}
-	
-	if(count($relevance_search)) {
-        foreach($relevance_search AS $relevance_term) {
-            $relevance[] = "IF(LOCATE(" . $db->toSql($relevance_term) . ", " . $actex_field . ") = 1, 0, 1)";
-        }
-    }
 }
 	
 if (strlen($sSqlWhere))
@@ -193,23 +181,6 @@ else
 	$sSQL = str_replace("[HAVING_OR]", "", $sSQL);
 }
 
-if(count($relevance)) {
-    $sSQL = str_replace("[ORDER]", " ORDER BY " . implode(", ", $relevance), $sSQL);
-    $sSQL = str_replace("[COLON]", ", ", $sSQL);
-} else {
-	if(preg_match("/(\[COLON\])/", $sSQL))
-		$sSQL = str_replace("[ORDER]", " ORDER BY ", $sSQL); 
-	else
-		$sSQL = str_replace("[ORDER]", "", $sSQL); 
-
-    $sSQL = str_replace("[COLON]", "", $sSQL);
-}
-
-if($limit > 0)
-	$sSQL = str_replace("[LIMIT]", " LIMIT " . $limit, $sSQL);
-else
-	$sSQL = str_replace("[LIMIT]", "", $sSQL);
-
 $sSQL = str_replace("[FATHER_VALUE]", $db->toSql($father_value), $sSQL); 
 
 if (is_array($_REQUEST["ffActex_parent_data"]) && count($_REQUEST["ffActex_parent_data"]))
@@ -228,8 +199,46 @@ if ($db->nextRecord())
 	do
 	{
 		$i++;
-		$php_array[$i]["value"] = ffCommon_charset_encode($db->getField($db->fields_names[0], "Text", true));
-		$php_array[$i]["desc"] = ffCommon_charset_encode($db->getField($db->fields_names[1], "Text", true));
+		/*if (is_array($actex_extra_fields) && count($actex_extra_fields))
+		{
+			$php_array[$i]["extra"] = array();
+			foreach ($actex_extra_fields as $extra_name => $extra_type)
+			{
+				$php_array[$i]["extra"][$extra_name] = ffCommon_charset_encode($db->getField($extra_name, $extra_type, true));
+			}
+		}*/
+		if ($crypt)
+		{
+			if (MOD_SEC_CRYPT && $crypt_modsec)
+			{
+				if ($crypt_concat)
+					$php_array[$i]["value"] = ffCommon_charset_encode(mod_sec_decrypt_concat($db->getField($db->fields_names[0], "Text", true)));
+				else
+					$php_array[$i]["value"] = ffCommon_charset_encode(mod_sec_decrypt_string($db->getField($db->fields_names[0], "Text", true)));
+			}
+			
+		}
+		else
+		{
+			$php_array[$i]["value"] = ffCommon_charset_encode($db->getField($db->fields_names[0], "Text", true));
+		}
+		
+		if ($multi_crypt)
+		{
+			if (MOD_SEC_CRYPT && $multi_crypt_modsec)
+			{
+				if ($multi_crypt_concat)
+					$php_array[$i]["desc"] = ffCommon_charset_encode(mod_sec_decrypt_concat($db->getField($db->fields_names[1], "Text", true)));
+				else
+					$php_array[$i]["desc"] = ffCommon_charset_encode(mod_sec_decrypt_string($db->getField($db->fields_names[1], "Text", true)));
+			}
+			
+		}
+		else
+		{
+			$php_array[$i]["desc"] = ffCommon_charset_encode($db->getField($db->fields_names[1], "Text", true));
+		}
+		
 		if($actex_group && array_search($actex_group, $db->fields_names))
 		{
 			$php_array[$i]["group"] = ffCommon_charset_encode($db->getField($actex_group, "Text", true));
@@ -267,6 +276,3 @@ cm::jsonParse(array(
 	)
 );
 exit;
-/*
-header("Content-type: application/json; charset=utf-8");
-die(json_encode($php_array));*/

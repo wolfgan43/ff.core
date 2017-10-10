@@ -1,14 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-	$(function(){
-		$("#{component_id}_items").sortable({
-			/*  connectWith: 	["#{component_id}_avaiable, #{component_id}_selected"]
-				,*/ items: 		"li:not(.not-draggable)"
-			, stop:		function (ev, ui) {}
-			, update:	function (ev, ui) {}
-		});
-	});
-</script>
 <!--EndSectHeaders-->
 {outer_wrap_start}
 <div id="{component_id}" class="{component_class}">
@@ -77,4 +67,11 @@
 </div>
 {outer_wrap_end}
 <!--BeginSectFooters-->
+<script type="text/javascript">
+	ff.pluginAddInit("ff.ffDetails.sortable", function () {
+		ff.ffDetails.sortable.init({
+			'id' : '{component_id}'
+		})
+	});
+</script>
 <!--EndSectFooters-->

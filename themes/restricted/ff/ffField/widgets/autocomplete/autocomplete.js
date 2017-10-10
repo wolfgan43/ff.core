@@ -12,7 +12,7 @@ var theme_dir			= "";
 var data			= ff.hash();
 
 var sources			= ff.hash();
-var actualData      = {};
+var actualData      = new Array();
 var cache           = { };
 var that = { /* publics*/
 __ff : true, /* used to recognize ff'objects*/
@@ -40,32 +40,25 @@ __ff : true, /* used to recognize ff'objects*/
     return ff.ffField.autocomplete.split( term ).pop();
 }, 
 
-"recalc" : function ( term , control, readOnly) {
+"recalc" : function ( term ) {
     var terms = ff.ffField.autocomplete.split( term );
     var strNewData = '';
-    
-    terms.each(function(key, value) {
-        if(value.length > 0) {
-	        if(actualData[control][value.replace(/^\s+|\s+$/g,"")] !== undefined) {
-				if(strNewData.length > 0)
-					strNewData = strNewData + ",";
-	           
-	            strNewData = strNewData + actualData[control][value.replace(/^\s+|\s+$/g,"")];
-	        } else if(!readOnly) {
-				if(strNewData.length > 0)
-					strNewData = strNewData + ",";
 
-        		strNewData = strNewData + value;
-	        }
-		}
-    });
-    /*
+    for (var a = 0; a < terms.length; a++) {  
+        if(terms[a].length > 0 && actualData[terms[a].replace(/^\s+|\s+$/g,"")] !== undefined) {
+			if(strNewData.length > 0)
+				strNewData = strNewData + ",";
+           
+            strNewData = strNewData + actualData[terms[a].replace(/^\s+|\s+$/g,"")];
+        }
+    }
 	if(!strNewData.length > 0) {
 		if(actualData[term.replace(/^\s+|\s+$/g,"")] !== undefined) {
 			strNewData = actualData[term.replace(/^\s+|\s+$/g,"")];
 		}
-	}*/
-    return strNewData ;
+	}
+
+    return strNewData;
 }, 
  /* da gestire multi off
   image se possibile
@@ -74,10 +67,10 @@ __ff : true, /* used to recognize ff'objects*/
 "loadData": function( prefix, control ) {
     var terms = ff.ffField.autocomplete.split( jQuery("#" + prefix + control).val() );
     var termsID = ff.ffField.autocomplete.split( jQuery("#" + control).val() );
-	actualData[control] = [];
-    terms.each(function(key, value) {
-     	actualData[control][value.replace(/^\s+|\s+$/g,"")] = termsID[key];
-    });
+
+    for (var a = 0; a < terms.length; a++) {  
+        actualData[terms[a].replace(/^\s+|\s+$/g,"")] = termsID[a];
+    }
 
     return true;
 },
@@ -87,121 +80,65 @@ __ff : true, /* used to recognize ff'objects*/
     var prefix = '';
     var enableMulti = params.multi;
     var altInnerUrl = params.service;
-
-    var readOnly = params.readonly;
-
-    //if(params.readonly) {
+    
+    if(params.readonly) {
         var prefix = "autocomplete_";
-    //}
-                             
-    if(enableMulti) {
-    	ff.pluginLoad("jquery.fn.autogrow", "/themes/library/plugins/jquery.autogrow-textarea/jquery.autogrow-textarea.js", function() {
-    		jQuery("#" + prefix + control).autogrow();
-    	});
-	}        
+    }
                              
 
 	if(prefix) {
 		ff.ffField.autocomplete.loadData(prefix, control);
 	}
 	
-	jQuery("#" + prefix + control).parent().find(".actex-combo").click(function() {
-		jQuery("#" + prefix + control).focus(); 
-		jQuery("#" + prefix + control).autocomplete('search');
-	});
-	jQuery("#" + prefix + control).parent().find(".actex-search").click(function() {
-		var e = jQuery.Event("keydown", { keyCode: 13}); 
-
-		jQuery("#" + prefix + control).trigger(e);		
-	});
-	jQuery("#" + prefix + control).parent().find(".actex-menu").click(function() {
-		jQuery("#" + jQuery(this).attr("rel")).toggleClass("hidden"); 
+	jQuery(".autocomplete-combo").click(function() {
+		jQuery(this).prevAll(".autocomplete").focus();
+		jQuery(this).prevAll(".autocomplete").autocomplete('search');
 	});
 	
+
     jQuery("#" + prefix + control)
-        .keyup(function(event) {
-            var stripChar = unescape(params.stripChar);
-           
-            if(prefix) {
-                jQuery("#" + control).val( ff.ffField.autocomplete.recalc( jQuery(this).val(), control, readOnly ) );
-            }
-            if(stripChar.length > 0) {
-                patt = new RegExp(stripChar);
-                jQuery(this).val(jQuery(this).val().replace(patt, ''));
-            }
-			if(!jQuery(this).val()) {
-	            if(!enableMulti) {
-	            	jQuery("#suggest_" + control).val("");
-	        		if(jQuery("#" + prefix + control).attr("data-placeholder")) {
-	        			jQuery("#" + prefix + control).attr("placeholder", jQuery("#" + prefix + control).attr("data-placeholder"));
-	        			jQuery("#" + prefix + control).attr("data-placeholder", "");
-	        		}
-				}
-	            jQuery("#" + control).val("");
-			} else if(!enableMulti && jQuery("#suggest_" + control).val().indexOf(jQuery("#" + prefix + control).val()) !== 0) {
-				jQuery("#suggest_" + control).val("");
-				//jQuery("#" + control).val("");
-			}  
-        })
-        .keydown(function(event) {
+        .bind( "keydown", function( event ) {
             if ( event.keyCode === jQuery.ui.keyCode.TAB &&
                     jQuery( this ).data( "autocomplete" ).menu.active ) {
                 event.preventDefault();
             }
 
-			if(!enableMulti && !jQuery("#" + prefix + control).val())
-        		jQuery("#suggest_" + control).val("");        	
+        })
+        .keyup(function(event) {
+            var stripChar = unescape(params.stripChar);
+
+            if(stripChar.length > 0) {
+                patt = new RegExp(stripChar);
+                jQuery(this).val(jQuery(this).val().replace(patt, ''));
+            }
+ 			
+ 			if(!jQuery(this).val().length) {
+	            jQuery("#" + control + "_suggest").val("");
+	            jQuery("#" + control).val("");
+			} else if(jQuery("#" + control + "_suggest").val().indexOf(jQuery("#" + prefix + control).val()) !== 0) {
+				jQuery("#" + control + "_suggest").val("");
+				jQuery("#" + control).val("");
+			}            
         })
         .blur(function(event) {
-        	if(!enableMulti)
-            	jQuery("#suggest_" + control).val("");
-
-	        if(jQuery("#" + prefix + control).attr("data-placeholder")) {
-	        	jQuery("#" + prefix + control).attr("placeholder", jQuery("#" + prefix + control).attr("data-placeholder"));
-	        	jQuery("#" + prefix + control).attr("data-placeholder", "");
-	        }
-        })  
- 		.focus(function(event) {
- 			if(!enableMulti && jQuery("#suggest_" + control).val().indexOf(jQuery("#suggest_" + control).nextAll("UL.ui-autocomplete").children("li:first").text()) === 0)
-            	jQuery("#suggest_" + control).val(jQuery("#suggest_" + control).nextAll("UL.ui-autocomplete").children("li:first").text());
+            jQuery("#" + control + "_suggest").val("");
         })
         .autocomplete({
             disabled: params.disabled,
             minLength : params.minLength,
             delay: params.delay, 
             appendTo: jQuery("#" + prefix + control).parent(),
-            messages: {
-                noResults: '',
-                results: function() {}
-            },
             open: function(event, ui) {
                 
                 /*var p = jQuery(this).offset();*/
                 
-                jQuery(".ui-autocomplete").css({
-                	"height"				: "200px"
-                	, "overflow-y"			: "scroll"
-                	, "overflow-x"			: "hidden"
-                	, "position"			: "absolute"
-                	, "top"					: ""
-                	, "z-index" 			: 3 
-					, "background"			: "#fff"
-					, "border"				: "1px solid #ccc"
-					, "border-top-color"	: "#d9d9d9"
-					, "box-shadow"			: "0 2px 4px rgba(0,0,0,0.2)"
-					, "cursor"				: "default"
-                });
-                
-                jQuery(".ui-autocomplete .ui-menu-item").css({
-                	"padding"				: "0 10px"
-                	, "color"				: "#222"
-                });
+                jQuery(".ui-autocomplete").css("height", "200px").css("overflow-y", "scroll").css("overflow-x", "hidden");
             },
             source: function( request, response ) {
                 var strTerm = '';
                 var realInnerUrl = "";
                 var fatherValue = jQuery("#" + jQuery("#" + prefix + control).data("father")).val() || '';
-
+                
                 if(enableMulti) {
                     strTerm = ff.ffField.autocomplete.extractLast( request.term ).replace(/^\s+|\s+$/g,"");
                 } else {
@@ -212,14 +149,14 @@ __ff : true, /* used to recognize ff'objects*/
                 	realInnerUrl= altInnerUrl;
                 else
                 	realInnerUrl = innerURL;
-
+                	
                 if(0 && enableCache) {
                     if ( strTerm in cache ) {
                         response( cache[ strTerm ] );
                         return;
                     }
 					
-                    lastXhr = jQuery.getJSON( realInnerUrl + (realInnerUrl.indexOf("?") >= 0 ? "&" : "?") + "data_src=" + params.data_src + "&compare=" + escape(params.compare) + "&compareh=" + escape(params.compareH) + "&operation=" + escape(params.operation) + "&fv=" + escape(fatherValue), {
+                    lastXhr = jQuery.getJSON( realInnerUrl + (realInnerUrl.indexOf("?") >= 0 ? "&" : "?") + "data_src=" + params.data_src + "&compare=" + escape(params.compare) + "&compareh=" + escape(params.compareH) + "&operation=" + escape(params.operation), {
                         term: strTerm
                     }, function( data, status, xhr ) {
                         cache[ strTerm ] = data;
@@ -235,47 +172,31 @@ __ff : true, /* used to recognize ff'objects*/
             },
             search: function(event, ui) { 
                 if(prefix) {
-                    jQuery("#" + control).val( ff.ffField.autocomplete.recalc( this.value, control, readOnly ) );
+                    jQuery("#" + control).val( ff.ffField.autocomplete.recalc( this.value ) );
                 }
-                if(!enableMulti) {
-                	jQuery("#" + prefix + control).attr("data-placeholder", jQuery("#" + prefix + control).attr("placeholder"));
-                	jQuery("#" + prefix + control).attr("placeholder", "");
+
+               /* var term = ff.ffField.autocomplete.extractLast( this.value );
+                if ( term.length < params.minLength ) {
+                    return false;
+                }*/
+            },
+            response: function(event, ui) { 
+            	if(ui.content[0] && ui.content[0].label.indexOf(jQuery("#" + prefix + control).val()) === 0) {
+	                jQuery("#" + control + "_suggest").val(ui.content[0].label);
+				} else {
+				 	jQuery("#" + control + "_suggest").val("");
 				}
                /* var term = ff.ffField.autocomplete.extractLast( this.value );
                 if ( term.length < params.minLength ) {
                     return false;
                 }*/
             },
-			response: function(event, ui) { 
-				if(!enableMulti) {
-            		if(ui.content[0] && ui.content[0].label.indexOf(jQuery("#" + prefix + control).val()) === 0) {
-		                jQuery("#suggest_" + control).val(ui.content[0].label);
-					} else {
-				 		jQuery("#suggest_" + control).val("");
-					}
-				}
-               /* var term = ff.ffField.autocomplete.extractLast( this.value );
-                if ( term.length < params.minLength ) {
-                    return false;
-                }*/
-            },            
             focus: function(event, ui) {
-            	if(!enableMulti) {
-					if(ui.item && ui.item.label.indexOf(jQuery("#" + prefix + control).val()) === 0) {
-		                jQuery("#suggest_" + control).val(ui.item.label);
-					} else {
-				 		jQuery("#suggest_" + control).val("");
-					}
-				}
-
-                $(".ui-helper-hidden-accessible").hide();
-                event.preventDefault();
-
                 var terms = '';
                 var termsID = '';
                 var tmpData = '';
 
-                var tmpLabel = ui.item.label.replace(/^\s+|\s+$/g,"").replace(/,/g, "");
+                var tmpLabel = ui.item.label.replace(/^\s+|\s+$/g,"");
                 var tmpValue = ui.item.value.replace(/^\s+|\s+$/g,"");
                 /*actualData[tmpLabel] = ui.item.value;*/
 
@@ -359,10 +280,10 @@ __ff : true, /* used to recognize ff'objects*/
                 var termsID = '';
                 var tmpData = '';
 
-                var tmpLabel = ui.item.label.replace(/^\s+|\s+$/g,"").replace(/,/g, "");
+                var tmpLabel = ui.item.label.replace(/^\s+|\s+$/g,"");
                 var tmpValue = ui.item.value.replace(/^\s+|\s+$/g,"");
 
-                actualData[control][tmpLabel] = tmpValue;
+                actualData[tmpLabel] = tmpValue;
 
                 if(enableMulti) {
                     terms = ff.ffField.autocomplete.split( this.value );
@@ -417,12 +338,10 @@ __ff : true, /* used to recognize ff'objects*/
 
 
                 if(prefix) {
-                    jQuery("#" + control).val( ff.ffField.autocomplete.recalc( this.value, control, readOnly ) );
+                    jQuery("#" + control).val( ff.ffField.autocomplete.recalc( this.value ) );
                 }
-				//jQuery("#suggest_" + control).val(this.value);
 
-//				var e = $.Event("keydown", { keyCode: 13}); //"keydown" if that's what you're doing
-//				$("#" + prefix + control).trigger(e);			    
+				jQuery("#" + control + "_suggest").val(this.value);
 
 				jQuery("#" + prefix + control).change();
 
@@ -432,7 +351,7 @@ __ff : true, /* used to recognize ff'objects*/
         .data("ui-autocomplete")._renderItem = function (ul, item) {
          return $("<li></li>")
              .data("item.autocomplete", item)
-             .append("<a>" + (item.image ? item.image : "") + item.label + "</a>")
+             .append("<a>" + item.label + "</a>")
              .appendTo(ul);
      };
 

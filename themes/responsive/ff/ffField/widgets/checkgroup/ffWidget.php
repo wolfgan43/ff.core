@@ -15,7 +15,12 @@ class ffWidget_checkgroup
 	var $class			= null;
 
 	var $widget_deps	= array();
-    var $js_deps 		= array();
+	
+	var $libraries		= array();
+	
+    var $js_deps 		= array(
+    						"ff.ffField.checkgroup"       => null
+    					);
     var $css_deps 		= array();
 
 	// PRIVATE VARS
@@ -52,11 +57,10 @@ class ffWidget_checkgroup
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-
 	}
 	
 	function process($id, &$value, ffField_base &$Field)
@@ -90,15 +94,15 @@ class ffWidget_checkgroup
 		}
 		
 		// THE REAL STUFF
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			
-			$field_container = $Field->parent[0]->id . "_";
-			$this->tpl[$tpl_id]->set_var("container", $field_container);
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "checkgroup";
 		}
 		else
 		{
@@ -123,7 +127,7 @@ class ffWidget_checkgroup
 		if(!is_array($Field->properties))
 			$Field->properties = array();
 
-		$Field->properties["onchange"] = " ff.ffField.checkgroup.recalc('" . $field_container . $id . "', this); " . $Field->properties["onchange"];
+		$Field->properties["onchange"] = " ff.ffField.checkgroup.recalc('" . $prefix . $id . "', this); " . $Field->properties["onchange"];
 		
 		if (count($Field->recordset))
 		{
@@ -147,7 +151,7 @@ class ffWidget_checkgroup
 					$class = $class . ($class ? " " : "") . "off";				
 				}
 				
-				$class .= " " . cm_getClassByFrameworkCss("", "row-default");
+				$class .= " " . cm_getClassByFrameworkCss("row-padding", "form");
 				$class .= " checkbox";
 
 				$this->tpl[$tpl_id]->set_var("class", $class);
@@ -178,11 +182,6 @@ class ffWidget_checkgroup
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.checkgroup", "checkgroup.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/checkgroup");
-		}
-		
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -199,13 +198,6 @@ class ffWidget_checkgroup
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.checkgroup", "checkgroup.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/checkgroup");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

@@ -14,6 +14,11 @@ class ffButton_html extends ffButton_base
 	var $fixed_pre_content = "";
 	var $fixed_post_content = "";
 	
+	var $column_label = "";
+	var $column_label_encode_ent = true;
+	
+	var $newicon = null; // null = default (may be default is without icon), "" = no icon
+	
 	/**
 	 * recupera il file del template
 	 * @return String 
@@ -27,21 +32,20 @@ class ffButton_html extends ffButton_base
 			switch ($this->aspect)
 			{
 				case "button":
-					if ($this->image === null)
-						return "ffButton_button.html";
-					else
-					{
+					if (strlen($this->getImage()))
 						return "ffButton_button_image.html";
-					}
+					else
+						return "ffButton_button.html";
 				
 				case "link":
-					if ($this->image === null)
-						return "ffButton_link.html";
-					else
+					if (strlen($this->getImage()))
 						return "ffButton_link_image.html";
+					else
+						return "ffButton_link.html";
 			}
 		}
 	}
+	
 	/**
 	* recupera la classe HTML associata al pulsante
 	* @return String
@@ -65,10 +69,7 @@ class ffButton_html extends ffButton_base
 		else
 			return $this->class;
 	}
-	function get_icon()
-    {              
-	   return $this->icon; 
-    }
+	
 	/**
 	 * carica l'oggetto template dentro $tpl
 	 */
@@ -84,20 +85,12 @@ class ffButton_html extends ffButton_base
 		$this->tpl[0]->set_var("site_path", $this->site_path);
 		$this->tpl[0]->set_var("page_path", $this->page_path);
 		$this->tpl[0]->set_var("theme",  $this->getTheme());
+		$this->tpl[0]->set_var("class", $this->get_class());
 		
-		
-		$icons = $this->get_icon(true);
-		if(is_array($icons)) {
-			$this->tpl[0]->set_var("class", $this->get_class());
-			$this->tpl[0]->set_var("icon", implode("", $icons));
-		} else {
-			$this->tpl[0]->set_var("class", $this->get_class() . " " . $icons);
-			$this->tpl[0]->set_var("icon", "");
-		}
 		$this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
 		$this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
 		
-		if(strpos($this->get_class(), "activebuttons") !== false) {
+		if(strpos($this->get_class(), "noactivebuttons") === false) {
 			$this->widget_activebt_enable = true;
 
 			if($this->parent !== NULL && property_exists($this->parent[0], "widget_activebt_enable")) {
@@ -108,8 +101,8 @@ class ffButton_html extends ffButton_base
 		$this->tpl[0]->set_var("properties", $this->getProperties());
 
 		$this->tpl[0]->set_var("id", $this->id);
-        
 		$this->tpl[0]->set_var("label", $this->label);
+
 		if (is_array($this->fixed_vars) && count($this->fixed_vars))
 		{
 			foreach ($this->fixed_vars as $key => $value)
@@ -118,6 +111,14 @@ class ffButton_html extends ffButton_base
 			}
 			reset($this->fixed_vars);
 		}
+	}
+	
+	function getImage($only_path = false)
+	{
+		if (strlen($this->newicon))
+			return ffTheme_restricted_icon($this->newicon);
+		
+		return parent::getImage($only_path);
 	}
 		
 	/**

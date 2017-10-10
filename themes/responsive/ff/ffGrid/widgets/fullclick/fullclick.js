@@ -4,10 +4,11 @@
 			/* public methods */
 			this.construct = function() {
 				return this.each(function() {
-					var $table = jQuery(".ffGrid", this);
+					var $table = jQuery("TABLE", this);
 
 					jQuery("TR.clickable .ffField:not(.clickable)", $table).bind("click.ff.ffGrid.fullclick", function(e) {
-						if ($table.data("isDragging") || jQuery(e.srcElement).is("a") || jQuery(e.srcElement).closest("a").length) 
+						var target = e.target || e.srcElement;
+						if ($table.data("isDragging") || jQuery(target).is("a") || jQuery(target).closest("a").length) 
 							return;
 
 						if(jQuery(this).hasClass("custom"))
@@ -19,7 +20,8 @@
 					}).css("cursor", "pointer");
 					
 					jQuery("TR .ffField.clickable", $table).bind("click.ff.ffGrid.fullclick", function(e) {
-						if ($table.data("isDragging") || jQuery(e.srcElement).is("a") || jQuery(e.srcElement).closest("a").length) 
+						var target = e.target || e.srcElement;
+						if ($table.data("isDragging") || jQuery(target).is("a") || jQuery(target).closest("a").length) 
 							return;
 
 						if(jQuery(this).hasClass("custom"))

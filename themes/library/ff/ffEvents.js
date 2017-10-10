@@ -30,7 +30,7 @@ events : ff.hash(),
 	
 	event.context = this;
 
-	if (that.events.isset(event_name) === undefined)
+	if (!that.events.isset(event_name))
 		that.events.set(event_name, ff.hash());
 
 	switch (priority) {
@@ -43,7 +43,7 @@ events : ff.hash(),
 			break;
 
 		case ff.ffEvent.PRIORITY_FINAL:
-			if (that.events.isset(event_name).get("final") !== undefined)
+			if (that.events.isset(event_name).get("final"))
 				console.log("A final event already exists");
 			else {
 				that.events.get(event_name).set("final", event);
@@ -51,7 +51,7 @@ events : ff.hash(),
 			break;
 
 		default:
-			if (that.events.get(event_name).isset(priority) === undefined)
+			if (!that.events.get(event_name).isset(priority))
 				that.events.get(event_name).set(priority, ff.hash());
 			
 			that.events.get(event_name).get(priority).set(event.id, event);
@@ -70,15 +70,17 @@ events : ff.hash(),
 	var tmp_events;
 	var event;
 	var tmp_args;
+	var rc = undefined;
 
 	if (tmp_queue !== undefined) {
-		if (tmp_queue.isset("toplevel") !== undefined) {
+		if (tmp_queue.isset("toplevel")) {
 			event = tmp_queue.get("toplevel");
 			tmp_args = event_params.slice().concat(event.additional_data.slice());
 			tmp_args.push(undefined);
-			results.push(event.func_name.apply(event, tmp_args));
+			rc = event.func_name.apply(event, tmp_args);
+			if (rc !== undefined) results.push(rc);
 
-			if (event.checkBreak(results[results.length - 1]))
+			if (event.checkBreak(rc))
 				return results;
 		}
 
@@ -88,22 +90,24 @@ events : ff.hash(),
 				tmp_events.each(function (key, event, i) {
 					tmp_args = event_params.slice().concat(event.additional_data.slice());
 					tmp_args.push(results[results.length - 1]);
-					results.push(event.func_name.apply(event, tmp_args));
+					rc = event.func_name.apply(event, tmp_args);
+					if (rc !== undefined) results.push(rc);
 
-					if (event.checkBreak(results[results.length - 1]))
+					if (event.checkBreak(rc))
 						return (b = true);
 				});
 				if (b) return results;
 			}
 		}
 
-		if (tmp_queue.isset("final") !== undefined) {
+		if (tmp_queue.isset("final")) {
 			event = tmp_queue.get("final");
 			tmp_args = event_params.slice().concat(event.additional_data.slice());
 			tmp_args.push(results[results.length - 1]);
-			results.push(event.func_name.apply(event, tmp_args));
+			rc = event.func_name.apply(event, tmp_args);
+			if (rc !== undefined) results.push(rc);
 
-			if (event.checkBreak(results[results.length - 1]))
+			if (event.checkBreak(rc))
 				return results;
 		}
 	}
@@ -128,6 +132,14 @@ events : ff.hash(),
 		}
 	} else {
 		that.events.get(event_name).clear();
+	}
+}
+
+, "getLastRes" : function (res) {
+	if (res !== undefined && res[res.length - 1]) {
+		return res[res.length - 1];
+	} else {
+		return undefined;
 	}
 }
 

@@ -4,7 +4,7 @@
 * @category Field Class
 * @desc ffField_html.php - Forms Framework Interface Field, html version
 * @author Samuele Diella <samuele.diella@gmail.com>
-* @copyright Copyright &copy; 2004-2009, Samuele Diella
+* @copyright Copyright &copy; 2004-2017, Samuele Diella
 * @license http://opensource.org/licenses/gpl-3.0.html
 * @link http://www.formsphpframework.com
 * @version beta 2
@@ -65,6 +65,8 @@ class ffField_html extends ffField_base
 	 * @var Mixed può essere stringa o array
 	 */
 	var $actex_child					= null;
+	
+	var $actex_reset_childs				= false;
 	/**
 	 * Se il contenuto dev'essere recuperato con richieste asincrone
 	 * @var Boolean
@@ -100,11 +102,20 @@ class ffField_html extends ffField_base
 	 * @var Boolean
 	 */
 	var $actex_dialog_show_add			= true; // without actex_dialog_url this is ignored
-	var $actex_dialog_add_params			= "";
+
+	/**
+	 * Un elenco di parametri nel formato query_string da passare all'url di editing
+	 * E' possibile usare i tag speciali [[ID_DOM]] per recuperare valori dal dom,
+	 * così come i normali tag [ID] per recuperare valori dai fields del framework
+	 * @var String
+	 */
+	var $actex_dialog_add_params		= "";
+
 	/**
 	 * l'url di apertura del Dialog
 	 * @var String
 	 */
+
 	var $actex_dialog_url				= "";
 	/**
 	 * il titolo del dialog
@@ -162,6 +173,12 @@ class ffField_html extends ffField_base
 	 */
 	var $actex_dialog_delete_message	= "Confermi l'eliminazione del dato?<br /><span>Il dato verr&agrave; eliminato definitivamente, non potr&agrave; essere recuperato.</span>";
 	/**
+	 * L'ID del componente collegato per l'eliminazione
+	 * @var String
+	 */
+	var $actex_dialog_delete_idcomp = null;
+		
+	/**
 	 * Se l'oggetto DB dell'activecombo deve collegarsi direttamente al database principale (usando mod_security)
 	 * @var Boolean default false
 	 */
@@ -171,12 +188,12 @@ class ffField_html extends ffField_base
     var $actex_on_change				= null;
     var $actex_on_update_bt 			= null;
     var $actex_on_refill 				= null;
-    var $actex_hide_empty 				= false;
+    var $actex_hide_empty				= false;
     var $actex_group 					= null;
     var $actex_attr 					= null;
     var $actex_plugin 					= null;
     var $actex_multi             		= false;
-    var $actex_multi_sort             	= true;
+    var $actex_multi_sort             	= true;    
 	var $actex_use_own_session 			= false;
 	var $actex_dialog_icon_add			= "add.png";
 	var $actex_dialog_icon_edit			= "edit.png";
@@ -187,6 +204,7 @@ class ffField_html extends ffField_base
 	var $actex_hide_result_on_query_empty = false;
 	var $actex_preserve_field			= null;
 	var $actex_cache					= true;
+	var $actex_limit					= null;
 	
 	var $actex_autocomp					= false;
 	var $actex_autocomp_ajax			= false;
@@ -229,9 +247,13 @@ class ffField_html extends ffField_base
     var $autocompletetoken_concat_field		= array();
     var $autocompletetoken_concat_separator = " - ";
     var $autocompletetoken_res_limit 		= 100;
-    
+
     var $datechooser_type_date				= "mixed";
+    var $datepicker_lang					= NULL; // default to first two chars of FF_LOCALE
     var $datepicker_force_datetime			= false;
+    var $datepicker_showbutton				= true;
+	var $datepicker_weekselector			= false;
+
 	// Slider
 	/**
 	 * Quante posizioni sono a disposizione dello slider
@@ -270,7 +292,7 @@ class ffField_html extends ffField_base
 	 * Il livello di zoom iniziale
 	 * @var Int
 	 */
-	var $gmap_start_zoom = 6;   
+	var $gmap_start_zoom = 6;
 	/**
 	 * La latitudine di default
 	 * @var Int
@@ -321,7 +343,7 @@ class ffField_html extends ffField_base
 	var $ckeditor_custom_config = array();		//Altera la configurazione di base
 	var $ckeditor_theme = "default";	//Altera la struttura di ckeditor
 	var $ckeditor_br_mode = false;		//Usa i br o le p per costruire la paragrafazione dei testi
-	var $ckeditor_skin = "kama";		//Altera l'aspetto grafico  di ckeditor
+	var $ckeditor_skin = "office2013";		//Altera l'aspetto grafico  di ckeditor
 	var $ckeditor_group_by_auth = false;//Abilita l'assegnazione del gruppo per le toolbar di ckeditor basandosi 
 										//sul nome del gruppo di appartenenza dell'utente definito in sessione.
 	var $ckeditor_group = "default";	//Altera le toolbar all'interno di ckeditor.
@@ -405,14 +427,15 @@ class ffField_html extends ffField_base
    
     									// (se ckfinder_show_file non e valorizzato la preview sara disabilitata)
     
-    
+    var $placeholder = false;
+
 	//slug
 	/**
 	 * Il nome del campo slug associato 
 	 * @var String
 	 */
 	var $slug_title_field = null;
-        var $imagepicker_title_field = null;
+    var $imagepicker_title_field = null;
 
 	// List Splitter Stuffs
 	var $size = 7;
@@ -584,7 +607,7 @@ class ffField_html extends ffField_base
 			$buffer = '<div class="' . cm_getClassByFrameworkCss("group", "form") . '">' . $buffer . '</div>';
 
 		if ($this->parent_page !== NULL) //code for ff.js
-			$this->parent_page[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
+			$this->parent_page[0]->tplAddJs("ff.ffField");
 
 		if ($output_result)
 		{
@@ -605,10 +628,11 @@ class ffField_html extends ffField_base
 		$this->tpl[0] = ffTemplate::factory($this->getTemplateDir($control_type));
 		$this->tpl[0]->load_file($this->getTemplateFile($control_type), "main");
                               
-		if ($this->parent !== null && strlen($this->parent[0]->id))
+		if ($this->parent !== null && strlen($this->parent[0]->getIDIF()))
 		{
 			if (!$this->omit_parent_id)
-				$this->tpl[0]->set_var("container", $this->parent[0]->id . "_");
+				$this->tpl[0]->set_var("container", $this->parent[0]->getPrefix());
+
 		}
 
 		if($this->parent_page !== NULL) {
@@ -670,10 +694,14 @@ class ffField_html extends ffField_base
 			$this->framework_css["container"]["row"] = $resolution_large_to_small;
 	}	
 
-	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true) 
+	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true, $align = "right") 
 	{
 		$this->framework_css["label"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
-			
+		if($align) {
+			$this->framework_css["label"]["util"] = array(
+				"align-" . $align
+			);			
+		}
 		if($reverse_control_class && is_array($this->framework_css["label"]["col"])) {
 			$this->framework_css["control"]["col"] = array(
 				"xs" => ($this->framework_css["label"]["col"]["xs"] == 12 ? 12 : 12 - $this->framework_css["label"]["col"]["xs"])
@@ -687,5 +715,21 @@ class ffField_html extends ffField_base
 	function setWidthControl($resolution_large_to_small) 
 	{
 		$this->framework_css["control"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+	}	
+	
+	function setLabelProperties($properties) 
+	{
+		if(isset($properties["col"]))
+			$properties["col"] = ffCommon_setClassByFrameworkCss($properties["col"]);
+
+		$this->framework_css["label"] = array_replace($this->framework_css["label"], $properties);
+	}	
+
+	function setControlProperties($properties) 
+	{
+		if(isset($properties["col"]))
+			$properties["col"] = ffCommon_setClassByFrameworkCss($properties["col"]);
+			
+		$this->framework_css["control"] = array_replace($this->framework_css["control"], $properties);
 	}	
 }

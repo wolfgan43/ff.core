@@ -10,9 +10,14 @@ class ffWidget_labelsort extends ffCommon
 
 	var $class			= "ffWidget_labelsort";
 
-	var $widget_deps	= array();
+	var $widget_deps	= array(
+		//"dragsort"
+	);
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
+							  "ff.ffGrid.labelsort" => null
 						);
 	var $css_deps = array();
 	// PRIVATE VARS
@@ -47,7 +52,7 @@ class ffWidget_labelsort extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -55,11 +60,11 @@ class ffWidget_labelsort extends ffCommon
 
 	function process(ffGrid_base $grid, $options)
 	{
-		$tpl_id = $grid->id;
+		$tpl_id = $grid->getIDIF();
 		if (!isset($this->tpl[$tpl_id]))
 			$this->prepare_template($tpl_id);
 
-		$this->tpl[$tpl_id]->set_var("component", $grid->id);
+		$this->tpl[$tpl_id]->set_var("component", $grid->getIDIF());
 		$this->tpl[$tpl_id]->set_var("resource_id", $options["resource_id"]);
 		$this->tpl[$tpl_id]->set_var("service_path", $options["service_path"]);
 
@@ -68,12 +73,6 @@ class ffWidget_labelsort extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("ff.ffGrid", "ffGrid.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffGrid.dragsort", "dragsort.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort"); 
-			$this->oPage[0]->tplAddJs("ff.ffGrid.labelsort", "labelsort.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/labelsort");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -87,16 +86,9 @@ class ffWidget_labelsort extends ffCommon
 
 		return $this->tpl[$id]->rpparse("SectFooters", false);
 	}
+	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffGrid", "ffGrid.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffGrid.dragsort", "dragsort.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/dragsort");
-			$this->oPage[0]->tplAddJs("ff.ffGrid.labelsort", "labelsort.js", FF_THEME_DIR . "/responsive/ff/ffGrid/widgets/labelsort");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

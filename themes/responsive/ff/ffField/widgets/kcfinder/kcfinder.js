@@ -21,7 +21,7 @@ ff.ffField.kcfinder = (function () {
             this.tmpname            = params.tmpname;
             this.sufdel            	= params.sufdel;
 
-			this.basePath			= ff.site_path + basePath;
+			this.basePath			= ff.base_path + basePath;
 			this.baseUrl			= params.baseUrl;
 			this.previewJs			= params.previewJs;
 			this.viewUrl			= params.viewUrl;
@@ -145,7 +145,7 @@ ff.ffField.kcfinder = (function () {
 					descBlock = '<span class="file_name">' + strResponse + ' ' + byteSize + suffix + '' + '</span>';  
 
 				if(aviary)
-					editBlock = '<div class="edit"><a href="javascript:void(0);" alt="modify" class="' + icons["aviary"] + '" onclick="ff.pluginLoad(\'ff.ffField.aviary\', \'/themes/responsive/ff/ffField/widgets/aviary/aviary.js\', function() { ff.ffField.aviary.launch(\'' + aviary.key + '\', \'' + aviary.tools + '\', \'' + aviary.theme + '\', \'' + aviary.version + '\', \'' + aviary.post_url + '\', \'' + aviary.img_hash + '\', \'' + field.id + '_img' + '\', \'' + viewFullUrl + '\', \'' + fileUrl.replace(ff.site_path + this.baseUrl, "") + '\'); });"></a></div>';
+					editBlock = '<div class="edit"><a href="javascript:void(0);" alt="modify" class="' + icons["aviary"] + '" onclick="ff.load(\'ff.ffField.aviary\', function() { ff.ffField.aviary.launch(\'' + aviary.key + '\', \'' + aviary.tools + '\', \'' + aviary.theme + '\', \'' + aviary.version + '\', \'' + aviary.post_url + '\', \'' + aviary.img_hash + '\', \'' + field.id + '_img' + '\', \'' + viewFullUrl + '\', \'' + fileUrl.replace(ff.site_path + this.baseUrl, "") + '\'); });"></a></div>';
 
 				cancelBlock = '<div class="cancel"><a href="javascript:ff.ffField.uploadifive.del(\'' + component + '\');" alt="delete" class="' + icons["cancel"] + '"></a></div>';
 

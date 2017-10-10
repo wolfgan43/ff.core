@@ -8,20 +8,211 @@ ff.ajax = (function () {
 // privates
 var blocked_ui		= 0;
 
+var ctxs = ff.hash();
+ctxs.inits_by_wdg = ff.hash();
+
 var that = { // publics
 __ff : true, // used to recognize ff'objects
-defaults : {
-	css			: {
-			padding:	0,
-			margin:		0,
-			top:		'40%',
-			left:		'45%',
-			textAlign:	'center',
-			cursor:		'wait'
+
+"ctx" : function (id, obj, type) {
+	
+	var that = {
+		"id" : id,
+		"need_init" : false,
+		"inits" : ff.hash(),
+		"obj" : obj,
+		"type" : type,
+		
+		"needInit" : function (value) {
+			if (value !== undefined) {
+				that.need_init = value;
+			}
+			return that.need_init;
 		},
-	overlayCSS	: {},
-	message		: '<h1 class="block-loader"></h1>',
-	display: false
+
+		"reset" : function () {
+			that.inits = ff.hash();
+			that.need_init = false;
+		},
+
+		"initInspect" : function (component) {
+			//var widgets = null;
+
+			/*if (component === undefined) {
+				if (ff.struct.page !== undefined && ff.struct.page.widget !== unidefined && ff.struct.page.widget !== "") {
+					widgets = ff.struct.page.widget.split(",");
+					widgets.each(function (k, widget) {
+						dlg_inits.page.set(widget, false);
+						if (glb_inits.page.get(widget) === undefined)
+							glb_inits.page.set(widget, ff.hash());
+						glb_inits.page.get(widget).set(id);
+						dlg_inits.need_init = true;
+					});
+				}
+
+				if (ff.struct.fields.length) ff.struct.fields.each( function (fld_id, field) {
+					if (field.widget !== undefined && field.widget !== "") {
+						if (dlg_inits.field.get(fld_id) === undefined)
+							dlg_inits.field.set(fld_id, ff.hash());
+
+						widgets = field.widget.split(",");
+						widgets.each(function (k, widget) {
+							dlg_inits.field.get(fld_id).set(widget, false);
+							glb_inits.field.set(fld_id, id);
+							dlg_inits.need_init = true;
+						});
+					}
+				});
+			}*/
+
+			ff.struct.get("comps").each(function (com_id, com, i) {
+				if (component !== undefined && com_id !== component)
+					return;
+
+				if (com.ctx === that.id) {
+					if (com.widgets !== undefined) com.widgets.each(function (k, widget) {
+						if (that.inits.get(widget.id) === undefined)
+							that.inits.set(widget.id, ff.hash());					
+						that.inits.get(widget.id).set(widget.type, false);
+
+						if (ctxs.inits_by_wdg.get(widget.type) === undefined)
+							ctxs.inits_by_wdg.set(widget.type, ff.hash());
+						ctxs.inits_by_wdg.get(widget.type).set(widget.id, that);
+
+						that.needInit(true);
+					});
+
+					if (com.fields.length) com.fields.each( function (fld_id, field) {
+						if (field.widgets !== undefined) field.widgets.each(function (k, widget) {
+							if (that.inits.get(widget.id) === undefined)
+								that.inits.set(widget.id, ff.hash());					
+							that.inits.get(widget.id).set(widget.type, false);
+
+							if (ctxs.inits_by_wdg.get(widget.type) === undefined)
+								ctxs.inits_by_wdg.set(widget.type, ff.hash());
+							ctxs.inits_by_wdg.get(widget.type).set(widget.id, that);
+
+							that.needInit(true);
+						});
+					});
+				}
+			});
+
+			return that.needInit();
+		},
+
+		"initEvent" : function (widget_id, widget_type) {
+			that.inits.get(widget_id).set(widget_type, true);
+			ctxs.inits_by_wdg.get(widget_type).unset(widget_id);
+
+			// check if init is done
+			var tmp_still_waiting = false;
+			that.inits.each(function (k, v) {
+				v.each(function(wk, wv) {
+					if (!wv)
+						tmp_still_waiting = true;
+				});
+			});
+
+			if (!tmp_still_waiting) {
+				var res = ff.ajax.doEvent({
+					"event_name"	: "ctxInitDone",
+					"event_params"	: [that.id]
+				});
+				var lastres = ff.getLastRes(res);
+
+				if (!lastres)
+					that.needInit(false);
+			}
+
+		},
+		
+		"getInstance" : function () {
+			return obj.getInstance(that.id);
+		},
+		
+		"doRequest" : function (params) {
+			return obj.doRequest(that.id, params);
+		},
+
+		"doAction" : function (action, component, detailaction, action_param, addit_fields) {
+			return obj.doAction(that.id, action, component, detailaction, action_param, addit_fields);
+		},
+
+		"goToUrl" : function (url) {
+			return obj.goToUrl(that.id, url);
+		},
+
+		"close" : function () {
+			return obj.close(that.id);
+		},
+		
+		"replaceHTML" : function (data) {
+			return obj.replaceHTML(that.id, data);
+		}
+	};
+	
+	return that;
+},
+
+"ctxGet" : function (id) {
+	if (id === undefined)
+		return ctxs;
+	else
+		return ctxs.get(id);
+},
+
+"ctxAdd" : function (id, obj, type) {
+	ctxs.set(id, that.ctx(id, obj, type));
+},
+
+"ctxDel" : function (id) {
+	ctxs.unset(id);
+},
+
+"ctxInitEvent" : function (widget_id, widget_type) {
+	var tmp = undefined;
+	
+	if (ctxs.inits_by_wdg.get(widget_type) !== undefined)
+		tmp = ctxs.inits_by_wdg.get(widget_type).get(widget_id);
+	
+	if (tmp === undefined) return;
+	
+	tmp.initEvent(widget_id, widget_type);
+},
+
+"ctxDoRequest" : function (id, params) {
+	return that.ctxGet(id).doRequest(params);
+},
+
+"ctxDoAction" : function (id, action, component, detailaction, action_param, addit_fields) {
+	return that.ctxGet(id).doAction(action, component, detailaction, action_param, addit_fields);
+},
+
+"ctxGoToUrl" : function (id, url) {
+	return that.ctxGet(id).goToUrl(url);
+},
+
+"ctxClose" : function (id) {
+	return that.ctxGet(id).close();
+},
+
+"ctxReplaceHTML" : function (id, data) {
+	return that.ctxGet(id).replaceHTML(data);
+},
+
+"defaults" : {
+	"css"			: {
+			"padding":	0,
+			"margin":		0,
+			"top":		'40%',
+			"left":		'45%',
+			"textAlign":	'center',
+			"cursor":		'wait'
+		},
+	"overlayCSS"	: {},
+	"message"		: '<h1 class="block-loader"></h1>',
+	"display": true
 },
 
 "chainupdate"	: {},
@@ -39,14 +230,14 @@ defaults : {
 	that.chainupdate.resources = ff.hash();
 	that.chainupdate.updated = ff.hash();
 	if(that.defaults.display) {
-		if(jQuery.blockUI === undefined) {
-			ff.pluginLoad("jquery.fn.block", "/themes/library/plugins/jquery.blockui/jquery.blockui.js", function() {
+		if(jQuery.blockUI === undefined) { //TOCHECK
+			ff.load("jquery.plugins.blockui", function () {
 				if (that.defaults.css !== undefined) jQuery.blockUI.defaults.css = that.defaults.css;
 				if (that.defaults.overlayCSS !== undefined) jQuery.blockUI.defaults.overlayCSS = that.defaults.overlayCSS;
 				jQuery.blockUI(
 					(that.defaults.message !== undefined ? {message : that.defaults.message} : {})
 				);
-			}, false);
+			}, undefined, "", false);
 		} else {
 			if (that.defaults.css !== undefined) jQuery.blockUI.defaults.css = that.defaults.css;
 			if (that.defaults.overlayCSS !== undefined) jQuery.blockUI.defaults.overlayCSS = that.defaults.overlayCSS;
@@ -56,54 +247,16 @@ defaults : {
 		}
 	} else {
 		jQuery("body").addClass("pbar");
-/*	
-		jQuery("html").prepend('<span class="pr-bar" />')
-		jQuery("html > .pr-bar").css({
-			"position": "fixed"
-			, "left": 0
-			, "top" : 0
-			, "z-index": 99999
-			, "height": "2px"
-			, "background-color": "#FF4715"
-			, "width": "0%"
-		}).animate({
-			"width": "100%"
-		}, 3000, function() {
-			longAnimation = function() {
-				jQuery(".pr-bar > .pr-long-bar").css("left", "0");
-				jQuery(".pr-bar > .pr-long-bar").animate({
-					"left" : "100%"
-				}, 2000, longAnimation);
-			};
-			jQuery(this).append('<span class="pr-long-bar" />');
-			jQuery(".pr-bar > .pr-long-bar").css({
-				"position": "absolute"
-				, "left": 0
-				, "bottom": 0
-				, "top" : 0
-				, "height": "100%"
-				, "background-color": "#FFAE98"
-				, "width": "4%"
-			});
-			longAnimation();
-		});
-		
-		
-
-		jQuery("body").css({
-			"pointer-events": "none"
-		});
-*/
 	}
 },
 
 "unblockUI" : function (chainupdate, reset, data) {
 	if (reset || blocked_ui === 1) if (chainupdate === undefined && that.chainupdate.resources.length) {
 		var chainupdated = false;
-		ff.struct.each(function (componentid, component) {if (that.chainupdate.updated.isset(componentid) === undefined) {
+		ff.struct.get("comps").each(function (componentid, component) {if (!that.chainupdate.updated.isset(componentid)) {
 			var update = false;
 			for (var i = 0; i < component.resources.length; i++) {
-				if (that.chainupdate.resources.isset(component.resources[i]) !== undefined) {
+				if (that.chainupdate.resources.isset(component.resources[i])) {
 					update = true;
 				}
 			}
@@ -122,10 +275,10 @@ defaults : {
 			} else {
 				component.fields.each(function (fieldid, field) {
 					var tmp = componentid + "_" + fieldid;
-					if (that.chainupdate.updated.isset(tmp) === undefined) {
+					if (!that.chainupdate.updated.isset(tmp)) {
 						update = false;
 						for (var i = 0; i < field.resources.length; i++) {
-							if (that.chainupdate.resources.isset(field.resources[i]) !== undefined) {
+							if (that.chainupdate.resources.isset(field.resources[i])) {
 								update = true;
 							}
 						}
@@ -141,10 +294,10 @@ defaults : {
 			}
 		}});
 
-		ff.struct.fields.each(function (fieldid, field) {if (that.chainupdate.updated.isset(fieldid) === undefined) {
+		ff.struct.get("fields").each(function (fieldid, field) {if (!that.chainupdate.updated.isset(fieldid)) {
 			var update = false;
 			for (var i = 0; i < field.resources.length; i++) {
-				if (that.chainupdate.resources.isset(field.resources[i]) !== undefined) {
+				if (that.chainupdate.resources.isset(field.resources[i])) {
 					update = true;
 				}
 			}
@@ -170,14 +323,6 @@ defaults : {
 			if(that.defaults.display)
 				jQuery.unblockUI();
 			else {
-				/*
-				jQuery("html > .pr-bar > .pr-long-bar").stop(true, true).remove();
-				jQuery("html > .pr-bar").stop(true,true);
-				jQuery("body").css({
-					"pointer-events": ""
-				});
-				setTimeout('jQuery("html > .pr-bar").remove();', 700);
-				*/
 				setTimeout('jQuery("body").removeClass("pbar");', 700);
 			}
 		}
@@ -191,14 +336,7 @@ defaults : {
 		if(that.defaults.display) {
 			if(jQuery.blockUI !== undefined)
 			jQuery.unblockUI();
-		} else {/*
-			jQuery("html > .pr-bar > .pr-long-bar").stop(true, true).remove();
-			jQuery("html > .pr-bar").stop(true,true);
-			jQuery("body").css({
-				"pointer-events": ""
-			});
-			setTimeout('jQuery("html > .pr-bar").remove();', 700);
-			*/
+		} else {
 			setTimeout('jQuery("body").removeClass("pbar");', 700);   
 		}
 			
@@ -225,7 +363,7 @@ defaults : {
  *	callback		la funzione da richiamare su completamento della richiesta
  *	customdata		dati aggiuntivi da passare con la richiesta alla callback
  *	injectid		l'id dell'elemento DOM da sostituire in caso di successo
- *	dialog			se la richiesta è avvenuta tramite un dialog
+ *	ctx				se la richiesta è avvenuta in un contesto ristretto (es.: dialog)
  *	action			sovrascrive o aggiunge frmAction
  *	replace			sovrascrive l'item
  *	doredirects		esegue i redirect invece di seguirli con chiamate ajax a cascata
@@ -234,14 +372,17 @@ defaults : {
  *  wholePage		normalmente false, richiede l'intera pagina invece del solo contenuto
  *  jsonp			normalmente false, permette di fare chiamate jsonp su richiesta
  *  async			normalmente true, permette di forzare una richiesta sincrona
+ *  brandnew		normalmente false, permette di forzare una richiesta nuova
+ *  sendstruct		normalmente false, permette di forzare l'invio di ff.struct
+ *  blockui			default: true
  */
 "doRequest" : function (params) {
 	var async	= params.async !== undefined ? params.async : true;
-	var form	= (params.formName ? jQuery("#" + params.formName) : (jQuery("#frmMain").length ? jQuery("#frmMain") : jQuery("#" + params.component)));
+	var form	= (params.formName ? jQuery("#" + params.formName) : jQuery("#frmMain"));
 
 	var url		= (params.url ? params.url : (function () {
 		if (params.component) {
-			var tmp = ff.struct.get(params.component);
+			var tmp = ff.struct.get("comps").get(params.component);
 			if (tmp !== undefined && tmp.url)
 				return tmp.url;
 		}
@@ -253,9 +394,21 @@ defaults : {
 	if (params.wholePage)
 		url = ff.urlAddParam(url, "XHR_GET_FULL");
 	
-	var fields		= (params.fields === undefined ? ff.getFields(form) : params.fields);
+	var fields		= (params.fields === undefined ? (params.brandnew ? [] : ff.getFields(form)) : params.fields);
 	var type		= (params.type === undefined ? "POST" : params.type);
 
+	if (params.ctx) {
+		/*fields.push(
+			{name: "XHR_CTX_ID", value: params.ctx}
+		);*/
+		url = ff.urlAddParam(url, "XHR_CTX_ID", params.ctx);
+		var ctx = that.ctxGet(params.ctx);
+		/*fields.push(
+			{name: "XHR_CTX_TYPE", value: ctx.type}
+		);*/
+		url = ff.urlAddParam(url, "XHR_CTX_TYPE", ctx.type);
+	}
+	
 	if (params.addFields) {
 		if (Object.prototype.toString.call(fields) == "[object Array]")
 			fields = fields.concat(params.addFields);
@@ -263,13 +416,35 @@ defaults : {
 			fields = fields.add(params.addFields);
 	}
 
+	var out_struct = [];
 	if (params.component) {
 		fields.push({name: "XHR_COMPONENT", value: params.component});
 
 		if (params.section && jQuery("#" + params.component + "_" + params.section).attr("id") !== undefined)
 			fields.push({name: "XHR_SECTION", value: params.section});
 	}
-
+	
+	if (!params.brandnew) {
+		var url_parts = url.parseUri();
+		
+		ff.struct.get("comps").each(function(k, v, i) {
+			var tmp_parts = v.url.parseUri();
+			if (url_parts.path === tmp_parts.path || params.sendstruct) {
+				out_struct.push({
+					'id' : k
+					, 'type' : v.type
+					, 'factory_id' : v.factory_id
+					, 'ctx' : v.ctx
+				});
+			}
+		});
+		
+		if (out_struct.length) {
+			//fields.push({name: "XHR_FFSTRUCT", value: JSON.stringify(out_struct)});
+			url = ff.urlAddParam(url, "XHR_FFSTRUCT", JSON.stringify(out_struct));
+		}
+	}
+	
 	if (params.action) {
 		for (var i = 0; i < fields.length; i++) {
 			if (fields[i].name == "frmAction") {
@@ -279,8 +454,10 @@ defaults : {
 		}
 		fields.push({name: "frmAction", value: params.action});
 	}
-
-	ff.ajax.blockUI(params.chainupdate);
+	
+	if (params.blockui === undefined || params.blockui) {
+		ff.ajax.blockUI(params.chainupdate);
+	}
 	
 	var dataType = (params.jsonp !== undefined ? (params.jsonp ? "jsonp json" : "json") : (ff.origin != ff.httpGetOrigin() ? "jsonp json" : "json"));
 
@@ -307,10 +484,13 @@ defaults : {
 },
 
 "jsonpProxy" : function () {
-}, 
+},
 
 "onError" : function (jqXHR, textStatus, errorThrown) {
-	that.unblockUI(false, true);
+	if (this.mydata.params.blockui === undefined || this.mydata.params.blockui) {
+		that.unblockUI(false, true);
+	}
+		
 	alert("Impossibile connettersi con il server, riprovare più tardi " + errorThrown) ;
 
 	if (this.mydata && this.mydata.params.callback !== undefined) {
@@ -322,6 +502,7 @@ defaults : {
 "onSuccess" : function (data) {
 	// shortcuts
 	var params = this.mydata.params;
+
 	var injectid	= (params.injectid
 						? params.injectid 
 						: "#" + (params.component 
@@ -332,6 +513,7 @@ defaults : {
 									: "content"
 								)
 					);
+						
 	if (data === null) { 
         //that.onError(null, null, "error");
 		if (params.callback !== undefined)
@@ -343,12 +525,15 @@ defaults : {
 		"event_name"	: "onSuccess",
 		"event_params"	: [data, params, injectid]
 	});
+	
+	injectid = data["injectid"] || injectid;
+	var doredirects = (data["doredirects"] !== undefined ? data["doredirects"] === true || data["doredirects"] === "true" : params.doredirects === true || params.doredirects === "true");
 
 	// aggiorno lo stato degli oggetti correlati
 	if (params.chainupdate !== true) {
 		if (data.resources && (data["insert_id"] !== undefined || data.refresh)) {
-			ff.struct.each(function (key, value) {
-				if (data["url"] !== undefined && value.dialog === params.dialog)
+			ff.struct.get("comps").each(function (key, value) {
+				if (data["url"] !== undefined && value.ctx === params.ctx)
 					that.chainupdate.updated.set(key, true);
 				else if (params.component !== undefined && key === params.component)
 					that.chainupdate.updated.set(key, true);
@@ -372,14 +557,15 @@ defaults : {
 					ff.clearComponent(params.component);
 				}
 			} else { // più di un componente
-				if (params.dialog) { // internamente al dialog
-					ff.struct.each(function (key, value) {
-						if (value.dialog === params.dialog)
+				if (params.ctx) { // internamente al ctx
+					ff.struct.get("comps").each(function (key, value) {
+						if (value.ctx === params.ctx)
 							ff.clearComponent(key);
 					});
 				} else { // l'intero contenuto della pagina
-					ff.struct.each(function (key) {
-						ff.clearComponent(key);
+					ff.struct.get("comps").each(function (key) {
+						if (key !== "fields")
+							ff.clearComponent(key);
 					});
 				}
 			}
@@ -390,25 +576,28 @@ defaults : {
 		// inserisco il nuovo contenuto
 		if (data["headers"] !== undefined) {
 			var tmpdiv = ff.getUniqueID();
-			jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["headers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
+			//jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["headers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
+			jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["headers"] + '</div>');
+			jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
+		}
+		
+		if(params.ctx && ctxs.get(params.ctx) !== undefined) {
+			var ctx = that.ctxGet(params.ctx);
+			if (params.component === undefined || params.section === undefined) { // TODO: gestire le sezioni
+				ctx.initInspect(params.component);
+			}
 		}
 
-		if(params.dialog && ff.ffPage.dialog.get(params.dialog) !== undefined)
-			ff.ffPage.dialog.initInspect(params.dialog, params.component);
-			
-		if (params.component === undefined) {
-			if (params.dialog) {
-				if (!ff.ffPage.dialog.get(params.dialog).instance) 
-					ff.ffPage.dialog.makeInstance(params.dialog);
+		var res = that.doEvent({
+			"event_name" : "onUpdateContent"
+			, "event_params" : [params, data, injectid]
+		});
+		//var lastres = ff.ffEvents.getLastRes(res);
 
-				var dlgInst = ff.ffPage.dialog.get(params.dialog).instance;
-				
-				ff.ffPage.dialog.removeDlgBt(params.dialog, data);
-			}
-			
-			if (injectid == "#content") {
-				if(params.dialog) {
-					dlgInst.html(data["html"]);
+		if (params.component === undefined) {
+			if (injectid === "#content") {
+				if(params.ctx) {
+					ctx.replaceHTML(data);
 				} else {
 					if(data["injectid"] !== undefined) {
 						jQuery("#" + data["injectid"]).html(data["html"]);
@@ -417,17 +606,15 @@ defaults : {
 					}
 				}
 			} else {
-                if(params.dialog) {
-					dlgInst.html(data["html"]);
+                if(params.ctx) {
+					ctx.replaceHTML(data);
                 } else {
-				    if (params.replace || jQuery(data["html"]).is(injectid.replace("#", "")) || jQuery(injectid, data["html"]))
+                	if (params.replace /*|| jQuery(data["html"]).is(injectid.replace("#", "")) || jQuery(injectid, data["html"])*/) // TOCHECK
 					    jQuery(injectid).replaceWith(data["html"]);
 				    else
 					    jQuery(injectid).html(data["html"]);
                 }
 			}
-			//if(params.dialog)
-				//ff.ffPage.dialog.makeDlgBt(params.dialog, data);			
 		} else {
 			if(params.component === null && injectid == "#content" && data["injectid"] !== undefined) {
 				jQuery("#" + data["injectid"]).replaceWith(data["html"]);
@@ -441,11 +628,14 @@ defaults : {
 			if (data["hidden"] !== undefined)
 				jQuery("#" + params.component + "_hidden").replaceWith(data["hidden"]);
 		}
-        		
+
 		if (data["footers"] !== undefined) {
 			var tmpdiv = ff.getUniqueID();
-			jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
+			//jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
+			jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '</div>');
+			jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
 		}
+        
 		that.doEvent({
 			"event_name" : "onUpdatedContent"
 			, "event_params" : [params, data]
@@ -459,20 +649,20 @@ defaults : {
 			"event_params"	: [data, params, injectid]
 		});
 
-		ff.ajax.unblockUI(params.chainupdate, false, data);
+		if (params.blockui === undefined || params.blockui) {
+			ff.ajax.unblockUI(params.chainupdate, false, data);
+		}
 	} else if (data["url"] !== undefined) {
-		if (params.doredirects || data["doredirects"] !== undefined) {
-			if (params.dialog && ff.ffPage.dialog.get(params.dialog) && ff.ffPage.dialog.get(params.dialog).instance) {
-				ff.ffPage.dialog.get(params.dialog).instance.dialog("close"); 
-			}
-			
+		if (doredirects) {
 			var res = that.doEvent({
 				"event_name"	: "onRedirect",
-				"event_params"	: [data["url"], data, this.mydata]
+				"event_params"	: [data["url"], data, this.mydata, params]
 			});
 
 			if (res !== undefined && res[res.length - 1]) {
-				ff.ajax.unblockUI(params.chainupdate, false, data);		
+				if (params.blockui === undefined || params.blockui) {
+					ff.ajax.unblockUI(params.chainupdate, false, data);
+				}
 				return;
 			}
 
@@ -482,15 +672,17 @@ defaults : {
 
 		var res = that.doEvent({
 			"event_name"	: "onRedirect",
-			"event_params"	: [data["url"], data, this.mydata]
+			"event_params"	: [data["url"], data, this.mydata, params]
 		});
 
 		var lastres = null;
 		if (res !== undefined && res[res.length - 1]) {
 			lastres = res[res.length - 1];
 			
-			if (lastres.break) {
-				ff.ajax.unblockUI(params.chainupdate, false, data);
+			if (lastres['break']) {
+				if (params.blockui === undefined || params.blockui) {
+					ff.ajax.unblockUI(params.chainupdate, false, data);
+				}
 				return;
 			}
 		}
@@ -498,7 +690,9 @@ defaults : {
 		if (params.callback !== undefined && !params.chainupdate) {
 			var res = params.callback(data, params.customdata);
 			if(res === "return") {
-				ff.ajax.unblockUI(params.chainupdate, false, data);
+				if (params.blockui === undefined || params.blockui) {
+					ff.ajax.unblockUI(params.chainupdate, false, data);
+				}
 				return true;
 			}
 		}
@@ -523,8 +717,10 @@ defaults : {
 			"event_name"	: "onRequestDone",
 			"event_params"	: [data, params, injectid]
 		});
-		if (res !== undefined && res[res.length - 1] && res[res.length - 1].break) {
-			ff.ajax.unblockUI(params.chainupdate, false, data);
+		if (res !== undefined && res[res.length - 1] && res[res.length - 1]['break']) {
+			if (params.blockui === undefined || params.blockui) {
+				ff.ajax.unblockUI(params.chainupdate, false, data);
+			}
 			return;
 		}
 		
@@ -544,8 +740,12 @@ defaults : {
 				params.injectid = "#" + data["injectid"];
 		}
             
-		if (params.dialog) {
-            fields.push({name: "XHR_DIALOG_ID", value: params.dialog});
+		if (params.ctx) {
+            fields.push({name: "XHR_CTX_ID", value: params.ctx});
+			var ctx = that.ctxGet(params.ctx);
+			fields.push(
+				{name: "XHR_CTX_TYPE", value: ctx.type}
+			);
         }
 			
 		var dataType = (params.jsonp !== undefined ? (params.jsonp ? "jsonp json" : "json") : (ff.origin != ff.httpGetOrigin() ? "jsonp json" : "json"));
@@ -567,7 +767,9 @@ defaults : {
 		});
 	} else {
 		if (params.callback !== undefined && !params.chainupdate) {
-			ff.ajax.unblockUI(params.chainupdate, false, data);
+			if (params.blockui === undefined || params.blockui) {
+				ff.ajax.unblockUI(params.chainupdate, false, data);
+			}
 			params.callback(data, params.customdata);
 		}
 
@@ -575,25 +777,35 @@ defaults : {
 			"event_name"	: "onRequestDone",
 			"event_params"	: [data, params, injectid]
 		});
-		if (res !== undefined && res[res.length - 1] && res[res.length - 1].break) {
-			ff.ajax.unblockUI(params.chainupdate, false, data);
+		if (res !== undefined && res[res.length - 1] && res[res.length - 1]['break']) {
+			if (params.blockui === undefined || params.blockui) {
+				ff.ajax.unblockUI(params.chainupdate, false, data);
+			}
 			return;
 		}
 		
-		if (params.doredirects && !(params.dialog && data["close"] === false)) {
+		if (doredirects) {
 			top.location.reload(true);
 			return true;
 		}
 		
 		if (params.callback === undefined) {
-			ff.ajax.unblockUI(params.chainupdate, false, data);		
+			if (params.blockui === undefined || params.blockui) {
+				ff.ajax.unblockUI(params.chainupdate, false, data);
+			}
 		}
 	}
 	return true;
-}
+},
 
 }; // publics' end
 
+ff.pluginAddInit("ff", function () {
+	ff.addEvent({
+		"event_name"  : "initIFElement"
+		, "func_name" : that.ctxInitEvent
+	});
+});
 
 return that;
 

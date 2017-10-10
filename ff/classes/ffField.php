@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage interface
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -14,8 +14,8 @@
  * @package FormsFramework
  * @subpackage interface
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffField
@@ -155,8 +155,8 @@ class ffField
  * @package FormsFramework
  * @subpackage interface
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffField_base extends ffCommon
@@ -390,6 +390,8 @@ abstract class ffField_base extends ffCommon
 	 */
 	var	$unchecked_value		= null;
 
+	var $bool_preserve_value	= false;
+	
 	/**
 	 * Per i field con tipo esteso "Selection" con control_type "checkbox", permette
 	 * d'impostare una funzione per il raggruppamento dei valori
@@ -414,6 +416,16 @@ abstract class ffField_base extends ffCommon
 	 * @var Boolean
 	 */
 	var $radio_hyphen			= true;
+	
+	var $crypt = false;
+	var $crypt_key = null;
+	var $crypt_modsec = false;
+	var $crypt_concat = false;
+
+	var $multi_crypt = false;
+	var $multi_crypt_key = null;
+	var $multi_crypt_modsec = false;
+	var $multi_crypt_concat = false;
 
 	/**
 	 *
@@ -430,7 +442,7 @@ abstract class ffField_base extends ffCommon
 	var $file_mime 		= "";						// the mime type of an embedded file
 	var $file_name 		= "";						// the name of an embedded file
 	var $file_tmpname   = "";
-
+	
 	/**
 	 * Cartella in cui il file ï¿½ salvato
 	 * @var String
@@ -517,7 +529,6 @@ abstract class ffField_base extends ffCommon
 	 */
 	var $file_show_control	= true;
 
-
 	/**
 	 * URL per la visualizzazione del file salvato
 	 * @var String
@@ -529,6 +540,12 @@ abstract class ffField_base extends ffCommon
 	 * @var String
 	 */
 	var $file_saved_preview_url				= "";
+
+	/**
+	 * eventuale query string da accodare all'url di visualizzazione (GLOBALE)
+	 * @var String
+	 */
+	var $file_query_string					= "";
 	
 	var $file_modify_path					= "";
 	var $file_modify_dialog					= "";
@@ -603,6 +620,12 @@ abstract class ffField_base extends ffCommon
 	var $file_show_filename	= false;
 
 	/**
+	 * visualizza il link
+	 * @var Boolean
+	 */
+	var $file_show_link	= false;
+
+	/**
 	 * visualizza la dimensione dei file caricati
 	 * @var Boolean
 	 */
@@ -619,9 +642,9 @@ abstract class ffField_base extends ffCommon
 	 * @var Boolean
 	 */
 	var $file_avoid_temporary = false;
-
-	var $file_name_override = null;
 	
+	var $file_name_override = null;
+
 	/**
 	 * Abilita il salvataggio di file multipli
 	 * Di default settato a false
@@ -638,9 +661,11 @@ abstract class ffField_base extends ffCommon
     var $file_thumb = array("width" => 100
     						, "height" => 100
     					);
-    
+    	
 	//  multi selection (combo, lists, groups)
 
+	var $field_params_ignore_change = false;
+	
 	/**
 	 * SELECT SQL per valorizzare il combo
 	 * @var String
@@ -674,7 +699,7 @@ abstract class ffField_base extends ffCommon
 	 * a livello di ricerca o ordinamento verrà utilizzato il dato non formattato
 	 * @var String
 	 */
-	var $format_string	= "";		
+	var $format_string	= null;
 
 	//----------------------
 	//  Widget Settings
@@ -739,6 +764,8 @@ abstract class ffField_base extends ffCommon
 	 * @var Boolean
 	 */
 	var $use_own_location = false;
+	var $location_name = null;
+	var $location_context = null;
 
 	/**
 	 * determina se l'id del campo generato dev'essere comprensivo o meno dell'id del componente associato
@@ -1131,6 +1158,19 @@ abstract class ffField_base extends ffCommon
 		else
 			return null;
 	}
+	
+	function getParentPage()
+	{
+		if ($this->parent_page !== null)
+			return $this->parent_page[0];
+		else if ($this->parent !== null)
+		{
+			$this->parent_page = array($this->parent[0]->parent[0]);
+			return $this->parent_page[0];
+		}
+		else
+			ffErrorHandler::raise ("Field not added to a ffPage instance", E_USER_ERROR, $this, get_defined_vars());
+	}
 
 	function pre_process($reset = false, $value = null)
 	{
@@ -1188,11 +1228,11 @@ abstract class ffField_base extends ffCommon
 						}
 						else
 						{
-							$tmp_SQL = str_replace("[WHERE]", $tmp, $tmp_SQL);
 							if (strpos($tmp_SQL, "[WHERE]") === false && strpos($tmp_SQL, "[OR]") === false)
 								ffErrorHandler::raise ("multi_preserve_field require [WHERE] and [OR] tag into SQL", E_USER_ERROR, $this, get_defined_vars ());
 							else
 								$tmp_SQL = str_replace("[OR]", "OR", $tmp_SQL);
+							$tmp_SQL = str_replace("[WHERE]", $tmp, $tmp_SQL);
 						}
 					}
 
@@ -1235,6 +1275,17 @@ abstract class ffField_base extends ffCommon
 								$dbvalue = $pair[0];
 								$dblabel = $pair[1];
 							}
+
+							if ($this->multi_crypt)
+							{
+								if (MOD_SEC_CRYPT && $this->multi_crypt_modsec)
+								{
+									if ($this->multi_crypt_concat)
+										$dblabel->setValue(mod_sec_decrypt_concat($dblabel->getValue()));
+									else
+										$dblabel->setValue(mod_sec_decrypt_string($dblabel->getValue()));
+								}
+							}
 							$this->recordset[] = array($dbvalue, $dblabel);
 						} while ($this->db[0]->nextRecord());
 					}
@@ -1251,15 +1302,17 @@ abstract class ffField_base extends ffCommon
 
 	function widget_init()
 	{
-		if (!$this->widget_init && strlen($this->widget))
-		{
-			// invoke method from ffPage
-			$this->parent_page[0]->widgetLoad($this->widget, $this->parent_page[0]->getThemeDir() . "/ff/ffField/widgets", $this);
-			if (method_exists($this->parent_page[0]->widgets[$this->widget], "init"))
-				$this->parent_page[0]->widgets[$this->widget]->init(array(&$this));
+		if ($this->widget_init || !strlen($this->widget))
+			return;
+		
+		$pp = $this->getParentPage();
+		
+		// invoke method from ffPage
+		$pp->widgetLoad($this->widget, $pp->getThemeDir() . "/ff/ffField/widgets", $this);
+		if (method_exists($pp->widgets[$this->widget], "init"))
+			$pp->widgets[$this->widget]->init(array(&$this));
 
-			$this->widget_init = true;
-		}
+		$this->widget_init = true;
 	}
 
 	function widget_process($id = null, $value = null)
@@ -1287,7 +1340,7 @@ abstract class ffField_base extends ffCommon
 
 		if ($control_type === null)
 			$control_type = $this->get_control_type();
-			
+		
 		$this->tplLoad($control_type);
 
 		if (strlen($this->widget))
@@ -1475,16 +1528,19 @@ abstract class ffField_base extends ffCommon
 					$buffer .= $key . "=\"";
 					foreach ($property_set[$key] as $subkey => $subvalue)
 					{
+						$subvalue = ffProcessTags($subvalue, $this->getKeysArray(), $this->getDataArray());
 						$buffer .= $subkey . ": " . $subvalue . ";";
 					}
 					reset($property_set[$key]);
 					$buffer .= "\"";
 				}
-				elseif(strlen($value))
+				else
 				{
+					$value = ffProcessTags($value, $this->getKeysArray(), $this->getDataArray());
+					
 					if (strlen($buffer))
 						$buffer .= " ";
-					$buffer .= $key . "=\"" . $value . "\"";
+					$buffer .= $key . (strlen($value) ? "=\"" . $value . "\"" : "");
 				}
 			}
 			reset($property_set);
@@ -1630,10 +1686,14 @@ abstract class ffField_base extends ffCommon
 						$filename = str_replace($this->getFileBasePath(), "", $this->file_temp_path) . "/" . $this->file_tmpname;
 
 						$view_url				= ($this->file_temp_view_url ? $this->file_temp_view_url : $this->file_saved_view_url);
-						$view_query_string		= ($this->file_temp_view_query_string ? $this->file_temp_view_query_string : $this->file_saved_view_query_string);
+						$view_query_string		= ($this->file_temp_view_query_string ? $this->file_temp_view_query_string : 
+								($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string)
+							);
 
 						$preview_url			= ($this->file_temp_preview_url ? $this->file_temp_preview_url : $this->file_saved_preview_url);
-						$preview_query_string	= ($this->file_temp_preview_query_string ? $this->file_temp_preview_query_string : $this->file_saved_preview_query_string); 
+						$preview_query_string	= ($this->file_temp_preview_query_string ? $this->file_temp_preview_query_string : 
+								($this->file_saved_preview_query_string ? $this->file_saved_preview_query_string : $this->file_query_string)
+							);
 
 /*						$view_url				= $this->file_temp_view_url;
 						$view_query_string		= $this->file_temp_view_query_string;
@@ -1647,10 +1707,10 @@ abstract class ffField_base extends ffCommon
 						$filename = $value->getValue();
 
 						$view_url				= $this->file_saved_view_url;
-						$view_query_string		= $this->file_saved_view_query_string;
+						$view_query_string		= ($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string);
 
 						$preview_url			= $this->file_saved_preview_url;
-						$preview_query_string	= $this->file_saved_preview_query_string;
+						$preview_query_string	= ($this->file_saved_preview_query_string ? $this->file_saved_preview_query_string : $this->file_query_string);
 					}
 
 					if ($filename == "")
@@ -1663,6 +1723,12 @@ abstract class ffField_base extends ffCommon
 					$preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), "normal");
 					$preview_url = str_replace("[_FILENAME_]", $filename, $preview_url);
 					$preview_query_string = ffProcessTags($preview_query_string, $this->getKeysArray(), $this->getDataArray(), "normal");
+					
+					if (strlen($view_query_string) && strpos($view_query_string, "?") !== 0)
+						$view_query_string = "?" . $view_query_string;
+					if (strlen($preview_query_string) && strpos($preview_query_string, "?") !== 0)
+						$preview_query_string = "?" . $preview_query_string;
+					
 					if (count($this->parent) && is_subclass_of($this->parent[0], "ffDetails_base"))
 					{
 						foreach ($this->parent[0]->fields_relationship as $key => $value)
@@ -1682,7 +1748,7 @@ abstract class ffField_base extends ffCommon
 						reset ($this->parent[0]->main_record[0]->form_fields);
 					}
 
-					return $preview_url;
+					return $preview_url . $preview_query_string;
 
 				default:
 					return  $this->get_encoded($display_value->getValue($data_type, $locale));
@@ -1832,7 +1898,7 @@ abstract class ffField_base extends ffCommon
 	function process_label($id, &$value)
 	{
 		$this->tpl[0]->set_var("id", $id);
-		if($this->encode_entities)   
+		if($this->encode_entities)
 			$this->tpl[0]->set_var("value", ffCommon_specialchars($value->getValue($this->get_app_type(), $this->get_locale())));
 		else
 			$this->tpl[0]->set_var("value", $value->getValue($this->get_app_type(), $this->get_locale()));
@@ -1869,6 +1935,7 @@ abstract class ffField_base extends ffCommon
 				$this->tpl[0]->set_var("value", ffCommon_specialchars($value->getValue($this->get_app_type(), $this->get_locale())));
 		}
 	}
+
 	function process_textarea($id, &$value)
 	{
 		$this->process_input($id, $value);
@@ -1876,6 +1943,7 @@ abstract class ffField_base extends ffCommon
 		if(!$this->properties || !$this->properties["readonly"])
 			$this->tpl[0]->parse("SectAutoGrow", false);
 	}
+	
 	/**
 	 * Esegue il process del Field nel caso si tratti di un checkbox
 	 * @param String $id ID del Field
@@ -2025,20 +2093,29 @@ abstract class ffField_base extends ffCommon
 			}
 			else
 				$is_local = true;
-				
-            $view_url = ($this->file_temp_view_url
-                ? $this->file_temp_view_url
-                : str_replace($this->getFileBasePath(), CM_SHOWFILES, $this->file_temp_path) . "/[_FILENAME_]"
+
+            $view_url               = ($this->file_temp_view_url 
+            	? $this->file_temp_view_url 
+            	: ($is_local 
+            		? FF_SITE_PATH . CM_SHOWFILES
+            		: ""
+            	) . $filename
             );
-            $view_query_string = $this->file_temp_view_query_string;
+            $view_query_string      = ($this->file_temp_view_query_string ? $this->file_temp_view_query_string : 
+					($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string)
+				);
             
             $preview_url = ($this->file_temp_preview_url
                 ? $this->file_temp_preview_url
-                : str_replace(DISK_UPDIR, CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $this->file_temp_path) . "/[_FILENAME_]"
+                : ($is_local 
+                	? FF_SITE_PATH . str_replace($this->getFileBasePath(), CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $this->file_temp_path)
+                	: $filename
+                ) 
             );
-			$preview_query_string	= $this->file_temp_preview_query_string;
-				
-							
+            $preview_query_string   = ($this->file_temp_preview_query_string ? $this->file_temp_preview_query_string : 
+					($this->file_saved_preview_query_string ? $this->file_saved_preview_query_string : $this->file_query_string)
+				); 
+			
 //SBAGLIATO DA SISTEMARE
 
 			$is_tmpfile = true;
@@ -2079,15 +2156,21 @@ abstract class ffField_base extends ffCommon
 
             $view_url = ($this->file_saved_view_url
                 ? $this->file_saved_view_url
-                : str_replace($this->getFileBasePath(), CM_SHOWFILES, $storing_path) . "/[_FILENAME_]"
+                : ($is_local
+                	? FF_SITE_PATH . str_replace($this->getFileBasePath(), CM_SHOWFILES, $storing_path)
+                	: $storing_path
+                ) . "/[_FILENAME_]"
             );
-            $view_query_string = $this->file_saved_view_query_string;
+			$view_query_string		= ($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string);
             
             $preview_url = ($this->file_saved_preview_url 
                 ? $this->file_saved_preview_url
-                : str_replace(DISK_UPDIR, CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $storing_path) . "/[_FILENAME_]" 
+                : ($is_local
+                	? FF_SITE_PATH . str_replace($this->getFileBasePath(), CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $storing_path) 
+                	: $storing_path
+                ) . "/[_FILENAME_]"
             );
-			$preview_query_string	= $this->file_saved_preview_query_string;
+			$preview_query_string	= ($this->file_saved_preview_query_string ? $this->file_saved_preview_query_string : $this->file_query_string);
             
             
             $is_tmpfile = false;
@@ -2099,13 +2182,13 @@ abstract class ffField_base extends ffCommon
 			$view_url = ffProcessTags($view_url, $this->getKeysArray(), $this->getDataArray(), $mode);
 		   // $view_url = str_replace("[_FILENAME_]", ($this->file_full_path ? ltrim($filename, "/") : $filename), $view_url);
 
-		    $view_url = ffProcessTags($view_url, $this->getKeysArray(), $this->getDataArray(), $mode);
+		    //$view_url = ffProcessTags($view_url, $this->getKeysArray(), $this->getDataArray(), $mode);
             //$view_url = str_replace("//", "/0/", $view_url); //procedura per fixare il bug nel ffprocesstag che con un valore di tipo numerico ritorna "" al posto di 0
 		    $view_query_string = ffProcessTags($view_query_string, $this->getKeysArray(), $this->getDataArray(), $mode);
 		    
 		    $preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), $mode);
 		   // $preview_url = str_replace("[_FILENAME_]", ($this->file_full_path ? ltrim($filename, "/") : $filename), $preview_url);
-		    $preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), $mode);
+		    //$preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), $mode);
             //$preview_url = str_replace("//", "/0/", $preview_url);  //procedura per fixare il bug nel ffprocesstag che con un valore di tipo numerico ritorna "" al posto di 0
             $preview_query_string = ffProcessTags($preview_query_string, $this->getKeysArray(), $this->getDataArray(), $mode);
 		}
@@ -2115,6 +2198,10 @@ abstract class ffField_base extends ffCommon
             $preview_url = $filename;
         }
 
+		if (strlen($view_query_string) && strpos($view_query_string, "?") !== 0)
+			$view_query_string = "?" . $view_query_string;
+		if (strlen($preview_query_string) && strpos($preview_query_string, "?") !== 0)
+			$preview_query_string = "?" . $preview_query_string;
 
 	/*	if (strlen($this->file_tmpname))
 		{
@@ -2190,7 +2277,6 @@ abstract class ffField_base extends ffCommon
 						$this->tpl[0]->set_var("SectWidgetDel", "");
 					}
 						
-						
 					$check_file = true;
 					
 					if($is_local && $this->file_check_exist && !@is_file($file_full_path)) 
@@ -2205,12 +2291,13 @@ abstract class ffField_base extends ffCommon
 					if($check_file) {
 						$processed_view_url = ffCommon_specialchars(str_replace("[_FILENAME_]", $real_file_value, $view_url));
 						if($this->file_modify_path) {
+							$file_path = substr($file_full_path, strlen($this->getFileBasePath()));
 							if($this->file_modify_dialog) {
- 								$this->tpl[0]->set_var("ajax_view_url", " onclick=\"ff.ffPage.dialog.doOpen('" . $this->file_modify_dialog ."', '" . ffCommon_specialchars($this->file_modify_path . $file_value) . "', undefined, undefined, jQuery(this).closest('.uploaded-thumb'));\"");
+ 								$this->tpl[0]->set_var("ajax_view_url", " onclick=\"ff.ffPage.dialog.doOpen('" . $this->file_modify_dialog ."', '" . ffCommon_specialchars($this->file_modify_path . $file_path) . "', undefined, undefined, jQuery(this).closest('.uploaded-thumb'));\"");
                                 $this->tpl[0]->set_var("view_url", "javascript:void(0);");
 							} else {
                                 $this->tpl[0]->set_var("ajax_view_url", "");
-								$this->tpl[0]->set_var("view_url", ffCommon_specialchars($this->file_modify_path . $file_value));
+								$this->tpl[0]->set_var("view_url", ffCommon_specialchars($this->file_modify_path . $file_path));
 							}
 						} else {
                             $this->tpl[0]->set_var("ajax_view_url", "");
@@ -2267,7 +2354,7 @@ abstract class ffField_base extends ffCommon
 							}
 						} else 
 							$this->tpl[0]->set_var("ShowEdit", "");							
-
+						
 						$this->tpl[0]->set_var("filename_base", $filename_base);
 						$this->tpl[0]->parse("ShowPreviewImg", false);
 						$this->tpl[0]->set_var("ShowPreviewNoImg", "");
@@ -2279,6 +2366,10 @@ abstract class ffField_base extends ffCommon
 					$this->tpl[0]->parse("ShowPreview", true);
 				}
 
+				if ($this->file_show_link) {
+					$this->tpl[0]->parse("ShowLink", false);
+				}
+			
 				$this->tpl[0]->set_var("preview_class", $preview_class);
 				$this->tpl[0]->parse("SectAddon", false);
 			} else {
@@ -2388,7 +2479,7 @@ abstract class ffField_base extends ffCommon
 					$this->tpl[0]->set_var("Checked", "");
 
 				$this->tpl[0]->set_var("properties", $this->getProperties());
-					
+
 				if ($this->radio_display_label)
 				{
 					$this->tpl[0]->parse("LabelPre", false);

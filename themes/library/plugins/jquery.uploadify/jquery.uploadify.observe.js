@@ -1,14 +1,8 @@
-jQuery(document).ready(function() {
-	ff.pluginLoad("swfobject", "/themes/library/swfobject/swfobject.js", function() {
-	    ff.pluginLoad("jquery.fn.uploadify", "/themes/library/plugins/jquery.uploadify/jquery.uploadify.js");
-	});
-});
-
-ff.pluginAddInit("jquery.fn.uploadify", function () {
+ff.pluginAddInit("jquery.uploadify", function () {
 	jQuery(".uploadify").uploadify({
 		'uploader'       : ff.site_path + '/themes/library/plugins/jquery.uploadify/uploadify.swf',
 		'script'         : ff.site_path + '/themes/library/plugins/jquery.uploadify/uploadify.php',
-		'cancelImg'      : ff.site_path + '/themes/library/plugins/jquery.uploadify/cancel.png',
+		'cancelImg'      : ff.base_path + '/themes/library/plugins/jquery.uploadify/cancel.png',
 		'folder'         : jQuery("#path_upload").attr("value"),
 		'buttonText'	 : 'Sfoglia', 
 		/*'buttonImg'      : ff.site_path + '/themes/library/plugins/jquery.uploadify/browse.png',*/

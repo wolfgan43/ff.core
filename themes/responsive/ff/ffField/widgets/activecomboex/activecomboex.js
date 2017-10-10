@@ -1,6 +1,6 @@
 /**
  * Forms Framework Javascript Handling Object
- *    activecombo fields' plugin namespace
+ *	activecombo fields' plugin namespace
  **/
 
 ff.ffField.activecomboex = (function () {
@@ -28,31 +28,31 @@ var activecombo = function(params) {
     
     var that = { /* publics */
         "father"                    : params.father
-        , "childs"                    : params.childs
+        , "childs"                  : params.childs
         , "data"                    : params.data
-        , "value"                    : params.selected_value
+        , "value"                   : params.selected_value
         , "options" : {
-            "name"                    : params.options.name
-            , "service"                : params.options.service
-            , "properties"            : params.options.properties
-            , "select_one"            : params.options.select_one
-            , "select_one_val"        : params.options.select_one_val
+            "name"                  : params.options.name
+            , "service"             : params.options.service
+            , "properties"          : params.options.properties
+            , "select_one"          : params.options.select_one
+            , "select_one_val"      : params.options.select_one_val
             , "select_one_label"    : params.options.select_one_label
             , "select_noone"        : params.options.select_noone
             , "select_noone_val"    : params.options.select_noone_val
-            , "select_noone_label"    : params.options.select_noone_label
+            , "select_noone_label"  : params.options.select_noone_label
             , "data_src"            : params.options.data_src
-            , "class"                : params.options.class
+            , "class"               : params.options.class
             , "limit_select"        : params.options.limit_select
             , "disabled"            : params.options.disabled
             , "control_type"        : params.options.control_type
-            , "separator"            : params.options.separator
-            , "addPlus"                : params.options.addPlus
-            , "hideEmpty"            : params.options.hideEmpty
-            , "use_cache"            : params.options.use_cache
-            , "plugin"                : params.options.plugin
+            , "separator"           : params.options.separator
+            , "addPlus"             : params.options.addPlus
+            , "hideEmpty"           : params.options.hideEmpty
+            , "use_cache"           : params.options.use_cache
+            , "plugin"              : params.options.plugin
         }
-        , "insert_mode"                : false
+        , "insert_mode"             : false
         
         , "getID" : function () {
             return __id;
@@ -119,7 +119,7 @@ var activecombo = function(params) {
 
             var res = that.doEvent({
                 "event_name"    : "change",
-                "event_params"    : [that, old_value]
+                "event_params"  : [that, old_value]
             });
         
             if (res !== undefined && res[res.length - 1])
@@ -127,7 +127,7 @@ var activecombo = function(params) {
 
             res = ff.ffField.activecomboex.doEvent({
                 "event_name"    : "change",
-                "event_params"    : [that, old_value]
+                "event_params"  : [that, old_value]
             });
     
             if (res !== undefined && res[res.length - 1])
@@ -175,14 +175,14 @@ var activecombo = function(params) {
 
             that.value = new_value;
 
-            /*ìif (new_index !== old_index) {
+            /*if (new_index !== old_index) {
                 jQuery.fn.escapeGet(__id).val(new_value);
             }*/
 
             if (that.value != old_value) {
                 var res = that.doEvent({
                     "event_name"    : "updatebt",
-                    "event_params"    : [that, old_value]
+                    "event_params"  : [that, old_value]
                 });
 
                 if (res !== undefined && res[res.length - 1])
@@ -400,7 +400,7 @@ var activecombo = function(params) {
                 cascade_disable(false); /* disable childs*/
                 display_loading();
 
-				var str_data = "type=actex";
+                var str_data = "type=actex";
 				if(father_value)
                 	str_data += "&father_value=" + escape(father_value);
                 if (that.options.data_src)
@@ -447,16 +447,16 @@ var activecombo = function(params) {
                 /* prototype
                     plugin {
                         name : [plugin func name]
-                        path : [plutin relative path from /library/plugins]
-                        css : [css file name]
-                        js : [js file name]
+                        path : [plutin relative path from /library/plugins]  no
+                        css : [css file name] 								no
+                        js : [js file name] 								no
                         params : [object JSON of params]
                     }
 
                 */
                 if(params) {
                     var setPlugin = function(params) {
-                        ff.pluginLoad("jquery.fn." + params["name"], "/themes/library/plugins/jquery." + params["path"] + "/jquery." + params["js"] + ".js", function() {
+                        ff.load("jquery.plugins." + params["name"], function() {
                             try {
                                 eval("jQuery.fn.escapeGet('" + __id +"')." + params["name"] + "(" + JSON.stringify(params["params"]) + ");");
                             } catch(e) {
@@ -464,7 +464,8 @@ var activecombo = function(params) {
                             }                            
                         });
                     }
-
+                    setPlugin(params);
+/*
                     if(params["css"]) {
                         ff.injectCSS(params["css"], "/themes/library/plugins/jquery." + params["path"] + "/jquery." + params["css"] + ".css", function() {    
                             setPlugin(params);
@@ -472,6 +473,7 @@ var activecombo = function(params) {
                     } else {
                         setPlugin(params);
                     }
+*/
                 }
             }
 
@@ -602,12 +604,12 @@ var activecombo = function(params) {
 
             that.doEvent({
                 "event_name"    : "refill",
-                "event_params"    : [node]
+                "event_params"  : [node]
             });
                 
             ff.ffField.activecomboex.doEvent({
                 "event_name"    : "refill",
-                "event_params"    : [__id, node]
+                "event_params"  : [__id, node]
             });
     }
 
@@ -620,7 +622,7 @@ var activecombo = function(params) {
             var id_data_src = that.getCacheDataSrc();
             var father_value = that.getFatherValue();
 
-            if (sources.isset(id_data_src) !== undefined && sources.get(id_data_src).isset(father_value) !== undefined) {
+            if (sources.isset(id_data_src) && sources.get(id_data_src).isset(father_value)) {
                 if (sources.get(id_data_src).get(father_value) === true) {
                     controls_waiting.set(__id, selected_value);
                     return;
@@ -630,7 +632,7 @@ var activecombo = function(params) {
                 return;
             }
 
-            if (sources.isset(id_data_src) === undefined)
+            if (!sources.isset(id_data_src))
                 sources.set(id_data_src, ff.hash());
 
             sources.get(id_data_src).set(father_value, true);
@@ -642,14 +644,14 @@ var activecombo = function(params) {
         };
 
         jQuery.ajax({
-              url        : ff.fixPath(that.getService())
-            , async        : true
-            , data        : str_data
-            , type        : "GET"
-            , dataType    : dataType
-            , jsonp        : (dataType == "jsonp json" ? "XHR_JSONP" : undefined)
-            , success    : async_success
-            , error        : async_error
+              url   	: ff.fixPath(that.getService())
+            , async     : true
+            , data      : str_data
+            , type      : "GET"
+            , dataType  : dataType
+            , jsonp     : (dataType == "jsonp json" ? "XHR_JSONP" : undefined)
+            , success   : async_success
+            , error     : async_error
             , mydata    : mydata
         });
     };
@@ -688,18 +690,29 @@ var activecombo = function(params) {
     };
 
     function parent_enable (inst) {
-        if (inst === undefined)
-            inst = that;
-        
-        if (inst.father) {
-            var father = inst.getFather();
-            var node = father.getNode();
-            if (node && node.firstChild)
-                node.firstChild.disabled = false;
+		if (inst === undefined)
+			inst = that;
+		
+		if (inst.father) {
+			var father = inst.getFather();
+			var node = father.getNode();
+			if (node && node.firstChild && node.firstChild.disabled)
+			{
+				node.firstChild.disabled = false;
+				var res = father.doEvent({
+					"event_name"	: "enable",
+					"event_params"	: [father]
+				});
+				
+				var res = ff.ffField.activecomboex.doEvent({
+					"event_name"	: "enable",
+					"event_params"	: [father]
+				});
+			}
 
-            parent_enable(father);
-        }
-    };
+			parent_enable(father);
+		}
+	};
 
     function cascade_disable (moveup, inst) {
         if (inst === undefined)
@@ -741,7 +754,7 @@ var activecombo = function(params) {
 
         var res = that.doEvent({
             "event_name"    : "updatebt",
-            "event_params"    : [that]
+            "event_params"  : [that]
         });
         
         if (res !== undefined && res[res.length - 1])
@@ -749,7 +762,7 @@ var activecombo = function(params) {
 
         res = ff.ffField.activecomboex.doEvent({
             "event_name"    : "updatebt",
-            "event_params"    : [that]
+            "event_params"  : [that]
         });
             
         if (res !== undefined && res[res.length - 1])
@@ -873,22 +886,22 @@ __ff : true, /* used to recognize ff'objects*/
     var inst = that.getInstance(id);
     var id_data_src = inst.getCacheDataSrc();
     
-    if (sources.isset(id_data_src) === undefined)
-        return;
+	if (!sources.isset(id_data_src))
+		return;
             
     var father_value = inst.getFatherValue();
     sources.get(id_data_src).unset(father_value);
 },
 
 "factory" : function (params) {
-    if (1 || !that.exists(params.id)) {
+    if (!that.exists(params.id)) { // prima era 1 ||
         var tmp = activecombo(params);
         jQuery.extend(true, tmp, ff.ffEvents());
         instances.set(params.id, tmp);
 
         that.doEvent({
             "event_name"    : "factory",
-            "event_params"    : [tmp]
+            "event_params"  : [tmp]
         });
         
         return tmp;
@@ -920,23 +933,27 @@ __ff : true, /* used to recognize ff'objects*/
 },
 
 "onClearField" : function (component, key, field) {
-    if (field.widget == "activecomboex") {
-        if (component !== undefined) {
-            switch (ff.struct.get(component).type) {
-                case "ffDetails":
-                    var rows = parseInt(jQuery.fn.escapeGet(component + "_rows").val());
-                    for (var i = 0; i < rows; i++) {
-                        ff.ffField.activecomboex.deleteCombo(component + "_recordset[" + i + "][" + key + "]");
-                    }
-                    break;
+	if (field.widget == "activecomboex") {
+		if (component !== undefined) {
+			switch (ff.struct.get("comps").get(component).type) {
+				case "ffDetails":
+					if (key.indexOf("_recordset[") >= 0) {
+						ff.ffField.activecomboex.deleteCombo(key);
+					} else {
+						var rows = parseInt(jQuery.fn.escapeGet(component + "_rows").val());
+						for (var i = 0; i < rows; i++) {
+							ff.ffField.activecomboex.deleteCombo(component + "_recordset[" + i + "][" + key + "]");
+						}
+					}
+					break;
 
-                default:
-                    ff.ffField.activecomboex.deleteCombo(component + "_" + key);
-            }
-        } else {
-            ff.ffField.activecomboex.deleteCombo(key);
-        }
-    }
+				default:
+					ff.ffField.activecomboex.deleteCombo(component + "_" + key);
+			}
+		} else {
+			ff.ffField.activecomboex.deleteCombo(key);
+		}
+	}
 },
 
 "insertModeOn" : function (id, dialog) {
@@ -971,7 +988,7 @@ __ff : true, /* used to recognize ff'objects*/
         return;
 
     if (component !== undefined) {
-        switch (ff.struct.get(component).type) {
+        switch (ff.struct.get("comps").get(component).type) {
             case "ffDetails":
                 var rows = parseInt(jQuery.fn.escapeGet(component + "_rows").val());
                 for (var r = 0; r < rows; r++) {
@@ -991,37 +1008,37 @@ __ff : true, /* used to recognize ff'objects*/
 "addCombo" : function (params) {
     var tmp = ff.ffField.activecomboex.factory({
         "id"            : params.id
-        , "father"        : params.father
-        , "childs"        : params.attr.child
+        , "father"      : params.father
+        , "childs"      : params.attr.child
         , "data"        : params.data
         , "selected_value" : params.selected_value 
-        , "options"        : {
-            "name"                        : params.attr.name
-            , "service"                    : params.attr.service
-            , "properties"                : params.attr.onchange
-            , "select_one"                : params.attr.select_one
-            , "select_one_val"            : params.attr.select_one_val
+        , "options"     : {
+            "name"                      : params.attr.name
+            , "service"                 : params.attr.service
+            , "properties"              : params.attr.onchange
+            , "select_one"              : params.attr.select_one
+            , "select_one_val"          : params.attr.select_one_val
             , "select_one_label"        : params.attr.select_one_label
             , "select_noone"            : params.attr.select_noone
             , "select_noone_val"        : params.attr.select_noone_val
-            , "select_noone_label"        : params.attr.select_noone_label
+            , "select_noone_label"      : params.attr.select_noone_label
             , "data_src"                : params.attr.data_src
-            , "class"                    : params.attr.class
+            , "class"                   : params.attr.class
             , "limit_select"            : params.attr.limit_select
             , "disabled"                : params.attr.disabled
             , "control_type"            : params.attr.control_type
-            , "separator"                : params.attr.separator
-            , "addPlus"                    : params.attr.addPlus
-            , "hideEmpty"                : params.attr.hideEmpty
-            , "use_cache"                : params.attr.use_cache || true
-            , "plugin"                    : params.attr.plugin
+            , "separator"               : params.attr.separator
+            , "addPlus"                 : params.attr.addPlus
+            , "hideEmpty"               : params.attr.hideEmpty
+            , "use_cache"               : params.attr.use_cache || true
+            , "plugin"                  : params.attr.plugin
         }
     });
     
     if (params.attr.onUpdateBT) {
         tmp.addEvent({
             "event_name"    : "updatebt"
-            , "func_name"    : params.attr.onUpdateBT
+            , "func_name"   : params.attr.onUpdateBT
         });
     }
 }

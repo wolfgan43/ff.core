@@ -15,8 +15,14 @@ class ffWidget_ckfinder extends ffCommon
 	var $class			= "ffWidget_ckfinder";
 
 	var $widget_deps	= array();
-    var $js_deps = array();
-    var $css_deps 		= array();
+	
+	var $libraries		= array();
+	
+    var $js_deps = array(
+                              "ff.ffField.ckfinder"       => null
+						);
+    var $css_deps 		= array(
+    					);
 
 	// PRIVATE VARS
 	
@@ -78,13 +84,15 @@ class ffWidget_ckfinder extends ffCommon
 				$Field->process_label($id, $value);
 		}
 
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "ckfinder";
 		}
 		else
 		{
@@ -96,9 +104,8 @@ class ffWidget_ckfinder extends ffCommon
 		$this->tpl[$tpl_id]->set_var("id", $id . $suffix_name);
 		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
 		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
-		//$this->tpl[$tpl_id]->set_var("class", $this->class);
-		//$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
-        $this->tpl[$tpl_id]->set_var("browse_class", cm_getClassByFrameworkCss("search", "icon", "lg"));
+		$this->tpl[$tpl_id]->set_var("class", $this->class);
+		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
@@ -239,12 +246,6 @@ class ffWidget_ckfinder extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("ff.lib.ckfinder", "ckfinder.js", FF_THEME_DIR . "/library/ckfinder");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.ckfinder", "ckfinder.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/ckfinder");
-		}
-		
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -261,14 +262,6 @@ class ffWidget_ckfinder extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("ff.lib.ckfinder", "ckfinder.js", FF_THEME_DIR . "/library/ckfinder");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.ckfinder", "ckfinder.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/ckfinder");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -283,4 +276,3 @@ class ffWidget_ckfinder extends ffCommon
 		return $this->tpl["main"]->rpparse("SectFooters", false);
 	}
 }
-?>

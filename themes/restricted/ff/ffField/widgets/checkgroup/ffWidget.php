@@ -12,10 +12,15 @@ class ffWidget_checkgroup
 	//  PRIVATE VARS (used by code, don't touch or may be explode! :-)
 	var $template_file 	 = "ffWidget.html";
 	
-	var $class			= null;
+	var $class			= "ffWidget_checkgroup";
 
 	var $widget_deps	= array();
-    var $js_deps 		= array();
+	
+	var $libraries		= array();
+	
+    var $js_deps 		= array(
+    						"ff.ffField.checkgroup"       => null
+    					);
     var $css_deps 		= array();
 
 	// PRIVATE VARS
@@ -56,7 +61,6 @@ class ffWidget_checkgroup
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-
 	}
 	
 	function process($id, &$value, ffField_base &$Field)
@@ -90,15 +94,15 @@ class ffWidget_checkgroup
 		}
 		
 		// THE REAL STUFF
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			
-			$field_container = $Field->parent[0]->id . "_";
-			$this->tpl[$tpl_id]->set_var("container", $field_container);
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "checkgroup";
 		}
 		else
 		{
@@ -119,11 +123,7 @@ class ffWidget_checkgroup
 		$this->tpl[$tpl_id]->set_var("separator", $Field->grouping_separator);
 
 		$selected_values = explode($Field->grouping_separator, $value->getValue());
-
-		if(!is_array($Field->properties))
-			$Field->properties = array();
-
-		$Field->properties["onchange"] = " ff.ffField.checkgroup.recalc('" . $field_container . $id . "', this); " . $Field->properties["onchange"];
+		$Field->properties["onchange"] = " ff.ffField.checkgroup.recalc('" . $prefix . $id . "', this); " . $Field->properties["onchange"];
 		
 		if (count($Field->recordset))
 		{
@@ -135,24 +135,20 @@ class ffWidget_checkgroup
 				$this->tpl[$tpl_id]->set_var("index", $i);
 				$this->tpl[$tpl_id]->set_var("element_value", $tmp_value[0]->getValue());
 				$this->tpl[$tpl_id]->set_var("label", ffCommon_specialchars($tmp_value[1]->getValue($Field->multi_app_type, FF_LOCALE)));
-				
-				$class = $this->class;
-				$control_class = $Field->get_control_class("checkbox");
+
 				if (in_array($tmp_value[0]->getValue(), $selected_values)) {
 					$this->tpl[$tpl_id]->set_var("checked", "checked=\"checked\"");
-					$class = $class . ($class ? " " : "") . "on";
+					$add_class = " on";
+                    
                     $data_filled = true;
 				} else {
 					$this->tpl[$tpl_id]->set_var("checked", "");
-					$class = $class . ($class ? " " : "") . "off";				
+					$add_class = " off";
 				}
 				
-				$class .= " " . cm_getClassByFrameworkCss("", "row-default");
-				$class .= " checkbox";
-
-				$this->tpl[$tpl_id]->set_var("class", $class);
-                $this->tpl[$tpl_id]->set_var("control_class", $control_class);
-				$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties()); 
+				$this->tpl[$tpl_id]->set_var("class", $this->class . $add_class);
+                $this->tpl[$tpl_id]->set_var("control_class", $Field->get_control_class("checkbox"));
+				$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 				
 				$this->tpl[$tpl_id]->parse("SectRow", TRUE);
 				$i++;
@@ -178,11 +174,6 @@ class ffWidget_checkgroup
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.checkgroup", "checkgroup.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/checkgroup");
-		}
-		
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -199,13 +190,6 @@ class ffWidget_checkgroup
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.checkgroup", "checkgroup.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/checkgroup");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

@@ -2,7 +2,6 @@
 /*
 Aviary
 */
-
 $host_name = $_SERVER["HTTP_HOST"];
 if (strpos(php_uname(), "Windows") !== false)
     $tmp_file = str_replace("\\", "/", __FILE__);
@@ -15,7 +14,7 @@ if(strpos($tmp_file, $_SERVER["DOCUMENT_ROOT"]) !== false)
 	if (substr($document_root,-1) == "/")
 		$document_root = substr($document_root,0,-1);
 
-	$site_path = str_replace($document_root, "", str_replace("/themes/responsive/ff/ffField/widgets/aviary/save.php", "", $tmp_file)); 
+	$site_path = str_replace($document_root, "", str_replace("/themes/restricted/ff/ffField/widgets/aviary/save.php", "", $tmp_file));
 	$disk_path = $document_root . $site_path;
 }
 elseif(strpos($tmp_file, $_SERVER["PHP_DOCUMENT_ROOT"]) !== false)
@@ -24,11 +23,11 @@ elseif(strpos($tmp_file, $_SERVER["PHP_DOCUMENT_ROOT"]) !== false)
 	if (substr($document_root,-1) == "/")
 		$document_root = substr($document_root,0,-1);
 
-	$site_path = str_replace($_SERVER["DOCUMENT_ROOT"], "", str_replace("/themes/responsive/ff/ffField/widgets/aviary/save.php", "", $_SERVER["SCRIPT_FILENAME"]));
-	$disk_path = $document_root . str_replace($document_root, "", str_replace("/themes/responsive/ff/ffField/widgets/aviary/save.php", "", $tmp_file));
+	$site_path = str_replace($_SERVER["DOCUMENT_ROOT"], "", str_replace("/themes/restricted/ff/ffField/widgets/aviary/save.php", "", $_SERVER["SCRIPT_FILENAME"]));
+	$disk_path = $document_root . str_replace($document_root, "", str_replace("/themes/restricted/ff/ffField/widgets/aviary/save.php", "", $tmp_file));
 } else {
-	$st_disk_path = str_replace("/themes/responsive/ff/ffField/widgets/aviary/save.php", "", $tmp_file);
-	$st_site_path = str_replace("/themes/responsive/ff/ffField/widgets/aviary/save.php", "", $_SERVER["SCRIPT_NAME"]);
+	$st_disk_path = str_replace("/themes/restricted/ff/ffField/widgets/aviary/save.php", "", $tmp_file);
+	$st_site_path = str_replace("/themes/restricted/ff/ffField/widgets/aviary/save.php", "", $_SERVER["SCRIPT_NAME"]);
 }
 
 define("DISABLE_CACHE", true);
@@ -85,11 +84,20 @@ if($valid_session && $data_src)
 	)
 	{
 		$base_path = $ff["aviary"][$data_src]["base_path"];
-		$folder = $ff["aviary"][$data_src]["folder"];				
+
+		if(array_key_exists("source", $ff["aviary"][$data_src]) && !isset($file)) {
+			$fullpath = $ff["aviary"][$data_src]["source"];
+		} else {
+			if(strpos($file, "/") === 0) {
+				$folder = "";
+			} else {
+				$folder = $ff["aviary"][$data_src]["folder"];				
+			}
 
 
-		$targetPath = $folder . '/';
-		$fullpath = strtolower(str_replace('//','/',$targetPath . basename($file)));
+			$targetPath = $folder . '/';
+			$fullpath = strtolower(str_replace('//','/',$targetPath . $file));
+		}
 	}
 	else
 	{
@@ -99,7 +107,7 @@ if($valid_session && $data_src)
 }
 else
 {
-	$fullpath = str_replace(((strpos(CM_SHOWFILES, "/") === 0) ? FF_SITE_PATH : "") . CM_SHOWFILES, FF_UPDIR, $file);
+	$fullpath = $_REQUEST['source'];
 	$base_path = FF_DISK_PATH . FF_UPDIR;
 }
 
@@ -113,23 +121,21 @@ if(!strlen($fullpath))
 
 $res = array();
 
-if(strlen($fullpath) && is_file($base_path . $fullpath) && strlen($_REQUEST['url'])) { 
+if(strlen($fullpath) && is_file($base_path . $fullpath) && strlen($_REQUEST['url'])) {
 	$image_data = file_get_contents($_REQUEST['url']);
 
-	$error = file_put_contents($base_path . $fullpath ,$image_data);
+	file_put_contents($base_path . $fullpath ,$image_data);
 	
-	if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && $error) 
-		ffImageOptimize($base_path . $fullpath);
-
+	@unlink($base_path . "/.thumbs" . str_replace(FF_DISK_PATH, "", $base_path) . $fullpath);
 	$res["status"] = true;
 } else {
-	//ffErrorHandler::raise($base_path . $fullpath, E_USER_ERROR, null, get_defined_vars());
 	$res["error"] = ffTemplate::_get_word_by_code("aviary_invalid_data");
 	$res["status"] = false;
 }
 
 
-//ffErrorHandler::raise($base_path . $fullpath, E_USER_ERROR, null, get_defined_vars());
+
+ffErrorHandler::raise($base_path . "/.thumbs" . str_replace(FF_DISK_PATH, "", $base_path) . $fullpath, E_USER_ERROR, null, get_defined_vars());
 
 /*
 if(strpos($_REQUEST['folder'], "/uploads") === 0)
@@ -142,4 +148,3 @@ if(strpos($_REQUEST['folder'], FF_THEME_DIR) === 0)
 echo ffCommon_jsonenc($res, true);
 exit;
 
-?>

@@ -1,69 +1,96 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"<!--BeginSectHtmlAttr--> {attr_type}="{attr_content}"<!--EndSectHtmlAttr-->>
 <head>
 <title>{title}</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
 <!--BeginSectMeta-->
-	<meta {meta_type}="{meta_name}" content="{meta_content}" />
+	<meta {meta_type}="{meta_name}" content="{meta_content}"/>
 <!--EndSectMeta-->
+<!--BeginSectCanonical-->
+<link rel="canonical" href="{canonical_href}"/>
+<!--EndSectCanonical-->
 <!--BeginSectCss-->
-<link href="{css_path}{css_file}" {link_properties}/>
+<!--BeginSectCssLink-->
+<link href="{css_path}" rel="{css_rel}" type="{css_type}"<!--BeginSectCssMedia--> media="{css_media}"<!--EndSectCssMedia-->/>
+<!--EndSectCssLink-->
+<!--BeginSectCssEmbed-->
+<style type="{css_type}"<!--BeginSectCssMedia--> media="{css_media}"<!--EndSectCssMedia-->{inline}>{css_embed}</style>
+<!--EndSectCssEmbed-->
 <!--EndSectCss-->
 <!--BeginSectJs-->
-<script<!--BeginSectJsSrc--> src="{js_path}{js_file}"<!--EndSectJsSrc-->>{js_embed}</script>
+<script<!--BeginSectJsSrc--> src="{js_path}"<!--EndSectJsSrc--><!--BeginSectJSAsync--> async="async" defer="defer"<!--EndSectJSAsync-->>{js_embed}</script>
 <!--EndSectJs-->
 <!--BeginSectFFJS-->
-<script type="text/javascript">
-	var libs = ff.hash();
-	var struct = ff.hash();
-	struct.fields = ff.hash();
-	<!--BeginSectFFObject-->
-	struct.set("{objid}", {
-		"type"			: "{type}"
-		, "resources"	: [<!--BeginSectResource-->{resource}<!--EndSectResource-->]
-		, "fields"		: ff.hash()
-		<!--BeginSectProperty-->
-		, "{prop_name}"	: {prop_value}
-		<!--EndSectProperty-->
-	});
-	<!--EndSectFFObject-->
-	<!--BeginSectField-->
-	struct.{getobj}fields.set("{fieldid}", {
-		"widget"		: "{widget}"
-		, "resources"	: [<!--BeginSectFieldResource-->{resource}<!--EndSectFieldResource-->]
-	});
-	<!--EndSectField-->
-
 	ff.initFF({
-		"site_path"		: "{site_path}", 
+		"base_path"		: "{base_path}",
+		"site_path"		: "{site_path}",
 		"theme"			: "{theme}", 
 		"theme_ui"		: "{theme_ui}", 
 		"language"		: "{language}", 
-		"locale"		: "{locale}", 
 		"layer"			: "{layer}",
+		<!--BeginSectFFProperty-->
+		"{prop_name}"	: {prop_value},
+		<!--EndSectFFProperty-->
         <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->    
-		"struct"		: struct,
-		"libs"			: libs
+		"struct"		: ff.hash([
+			{'id': 'fields', 'value' : ff.hash([
+				<!--BeginSectFFFld-->
+				{
+					'id' : '{fieldid}',
+					'value' : {
+						"type"		: undefined
+						, "widget"		: "{widget}"
+						, "resources"	: [<!--BeginSectFFFldResource-->{resource}<!--EndSectFFFldResource-->]
+					}
+				},
+				<!--EndSectFFFld-->
+			])},
+			{'id': 'comps', 'value' : ff.hash([
+				<!--BeginSectFFObj-->
+				{'id': '{objid}', 'value' : {
+					"type"			: "{type}"
+					, "resources"	: [<!--BeginSectFFObjResource-->{resource}<!--EndSectFFObjResource-->]
+					, "fields"		: ff.hash([
+						<!--BeginSectFFObjFld-->
+						{
+							'id' : '{fieldid}',
+							'value' : {
+								"type"		: "{fldtype}"
+								, "widget"		: "{widget}"
+								, "resources"	: [<!--BeginSectFFFldResource-->{resource}<!--EndSectFFFldResource-->]
+							}
+						},
+						<!--EndSectFFObjFld-->
+					])
+					<!--BeginSectFFObjProperty-->
+					, "{prop_name}"	: {prop_value}
+					<!--EndSectFFObjProperty-->
+				}},
+				<!--EndSectFFObj-->
+			])}
+		])
+		<!--BeginSectLibs-->
+		, "libs"		: [
+			<!--BeginSectLib-->
+			{'type' : '{lib_type}', 'id' : '{lib_tag}', 'deps' : {lib_deps}, 'media' : {lib_media}} ,<!--EndSectLib-->
+		]
+		<!--EndSectLibs-->
 	});
-
+	
 	<!--BeginSectAsyncCssPlugin-->
-	ff.injectCSS("{css_file}", "{css_path}{css_file}");
+	ff.injectCSS("{css_tag}", "{css_path}", undefined, {lib_media}, {css_async});
 	<!--EndSectAsyncCssPlugin-->
 	<!--BeginSectAsyncJsPlugin-->
-	ff.pluginLoad("{js_tag}", "{js_path}{js_file}", undefined, false);
+	ff.pluginLoad("{js_tag}", "{js_path}", undefined, {js_async}, {js_deps});
 	<!--EndSectAsyncJsPlugin-->
-</script>
 <!--EndSectFFJS-->
 <!--BeginSectWidgetsHeaders-->
 {WidgetsContent}
 <!--EndSectWidgetsHeaders-->
-<!--BeginSectCssEmbed-->
-<style type="{css_type}">{css_embed}</style>
-<!--EndSectCssEmbed-->
 </head>
 <body{class_body}>
 <!--BeginSectFormHeader-->
-	<form id="{form_id}" name="{form_name}" method="{form_method}"{form_action}{form_enctype}>
+	<form id="{form_id}" name="{form_name}" method="{form_method}" action="{form_action}" enctype="{form_enctype}">
 	<!--BeginSectFormWorkaround-->
 	<input disabled="disabled" type="text" value="" style="position:fixed; bottom:0px; right: 0px; width:1px; height:1px; margin:0px; padding: 0px; background-color: transparent; border: 0px;" />
 	<!--EndSectFormWorkaround-->
@@ -83,14 +110,102 @@
 <!--BeginSectJSDefer-->
 <script type="text/javascript" defer="defer" async="async">
 	function downloadJSAtOnload() {
-		var scripts = {defer_js};
+		function loadScripts(array, type, callback, media) {
+			var index = 0;
+			var loader = function(src, handler) {
+				switch(type) {
+					case "css":
+						/*Based on https://github.com/filamentgroup/loadCSS/blob/master/src/loadCSS.js */
 
-		for(var i = 0; i< scripts.length; i++) {
-			var elem = document.createElement("script");
-			elem.type = "text/javascript"; 
-			elem.src = scripts[i];
-			document.head.appendChild(elem);
+						var doc = window.document;
+						var ss = doc.createElement( "link" );
+						var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+						var ref = refs[ refs.length - 1];
+
+						var sheets = doc.styleSheets;
+						ss.rel = "stylesheet";
+						ss.href = src;
+						// temporarily set media to something inapplicable to ensure it'll fetch without blocking render
+						ss.media = "only x";
+
+						// wait until body is defined before injecting link. This ensures a non-blocking load in IE11.
+						function ready( cb ){
+							if( doc.body ){
+								return cb();
+							}
+							setTimeout(function(){
+								ready( cb );
+							});
+						}
+						// Inject link
+						// Note: `insertBefore` is used instead of `appendChild`, for safety re: http://www.paulirish.com/2011/surefire-dom-element-insertion/
+						ready( function(){
+							ref.parentNode.insertBefore( ss, ref.nextSibling );
+						});
+						// A method (exposed on return object for external use) that mimics onload by polling document.styleSheets until it includes the new sheet.
+						var onloadcssdefined = function( cb ){
+							var resolvedHref = ss.href;
+							var i = sheets.length;
+							while( i-- ){
+								if( sheets[ i ].href === resolvedHref ){
+									return cb();
+								}
+							}
+							setTimeout(function() {
+								onloadcssdefined( cb );
+							});
+						};
+
+						function loadCB(){
+							if( ss.addEventListener ){
+								ss.removeEventListener( "load", loadCB );
+							}
+							ss.media = media || "all";
+							handler();
+						}
+
+						// once loaded, set link's media back to `all` so that the stylesheet applies once it loads
+						if( ss.addEventListener ){
+							ss.addEventListener( "load", loadCB);
+						}
+						ss.onloadcssdefined = onloadcssdefined;
+						onloadcssdefined( loadCB );
+						break;
+					case "js":
+						var elem = document.createElement("script");
+						elem.type = "text/javascript"; 
+						elem.src = src;
+						elem.onerror = elem.onload = elem.onreadystatechange = function(){
+							elem.onreadystatechange = elem.onload = null;
+							handler();
+						};
+						
+						var ref = document.getElementsByTagName("script")[index];
+						ref.parentNode.insertBefore(elem, ref);
+
+						index++;
+						break;
+				}
+			};
+			
+			function removeElement(element) {
+				element && element.parentNode && element.parentNode.removeChild(element);
+			}
+
+			(function asynciterator () { // array, type and callback are taken from global scope
+				if (array.length!=0){
+					loader(array.shift(), asynciterator);
+				}else{
+					if (type == "css") {
+						setTimeout(function(){
+							removeElement(document.getElementById("abovethefold"));
+						}, 1000); /* time needed to apply last css */
+					}
+					callback && callback();
+				}
+			})();
 		}
+		<!--BeginSectJSDeferType-->loadScripts([{defer_paths}], '{defer_type}'{cssdefer_media});<!--EndSectJSDeferType-->
 	}
 
 	if (window.addEventListener)
@@ -103,4 +218,3 @@
 <!--EndSectJSDefer-->
 </body>
 </html>
-<!--BeginSectCSSDefer-->{defer_css}<!--EndSectCSSDefer-->

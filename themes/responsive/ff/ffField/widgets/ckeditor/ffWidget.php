@@ -18,8 +18,14 @@ class ffWidget_ckeditor extends ffCommon
 	var $class			= "ffWidget_ckeditor";
 
 	var $widget_deps	= array();
-    var $js_deps 		= array();
-    var $css_deps 		= array();
+	
+	var $libraries		= array();
+	
+    var $js_deps = array(
+                              "ff.ffField.ckeditor"       => null
+						);
+    var $css_deps 		= array(
+    					);
 
 	// PRIVATE VARS
 	
@@ -107,7 +113,7 @@ class ffWidget_ckeditor extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -116,14 +122,16 @@ class ffWidget_ckeditor extends ffCommon
 	
 	function process($id, &$value, ffField_base &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
+
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
-			$Field->parent[0]->processed_widgets[$Field->parent[0]->id . "_" . $id] = "ckeditor";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "ckeditor";
 		}
 		else
 		{
@@ -141,6 +149,12 @@ class ffWidget_ckeditor extends ffCommon
 		$this->tpl[$tpl_id]->set_var("fixed_pre_content", $Field->fixed_pre_content);
 		$this->tpl[$tpl_id]->set_var("fixed_post_content", $Field->fixed_post_content);
 
+		
+		if($_REQUEST["XHR_CTX_TYPE"]) {
+			$this->tpl[$tpl_id]->set_var("dialog", "'" . $_REQUEST["XHR_CTX_TYPE"] . "'");
+		} else {
+			$this->tpl[$tpl_id]->set_var("dialog", "false");
+		}
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
@@ -188,13 +202,6 @@ class ffWidget_ckeditor extends ffCommon
     
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.lib.ckeditor", "ckeditor.js", FF_THEME_DIR . "/library/ckeditor", false, false, null, true);
-            $this->oPage[0]->tplAddJs("ff.lib.ckeditor.adapters.jquery", "jquery.js", FF_THEME_DIR . "/library/ckeditor/adapters", false, false, null, true);
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.ckeditor", "ckeditor.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/ckeditor");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -212,15 +219,6 @@ class ffWidget_ckeditor extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.lib.ckeditor", "ckeditor.js", FF_THEME_DIR . "/library/ckeditor", false, false, null, true);
-            $this->oPage[0]->tplAddJs("ff.lib.ckeditor.adapters.jquery", "jquery.js", FF_THEME_DIR . "/library/ckeditor/adapters", false, false, null, true);
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.ckeditor", "ckeditor.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/ckeditor");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

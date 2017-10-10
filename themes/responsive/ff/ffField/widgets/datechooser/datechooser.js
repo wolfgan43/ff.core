@@ -43,7 +43,8 @@ ff.ffField.datechooser = (function () {
 				var minVal = 0;
 				var maxVal = 0;
 				var inv = undefined;
-
+				var currentYear = new Date().getFullYear();
+				
 				switch(typeDate) {
 					case "booking":
 						maxVal = 20;
@@ -61,11 +62,11 @@ ff.ffField.datechooser = (function () {
 						inv = 30;
 						break;
 					default:
-						minVal = typeDate["min"];
-						maxVal = typeDate["max"];
+						minVal = typeDate["min"] - currentYear;
+						maxVal = typeDate["max"] - currentYear;
 				}
 				
-				var currentYear = new Date().getFullYear();
+				
 				var n = 1;  
 
 				if(inv !== undefined)

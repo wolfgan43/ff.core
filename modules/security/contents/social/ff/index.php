@@ -9,13 +9,14 @@ $cm->oPage->layer = "empty";
 
 if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)
 {
-	if ($filename === null)
+    $filename = cm_cascadeFindTemplate("/contents/social/logged.html", "security");
+	/*if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
-
+*/
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
 

@@ -1,18 +1,14 @@
 <!--BeginSectHeaders-->
 <script type="text/javascript">
-	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-		ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js",	function() {
-			ff.pluginLoad("ff.ffField.activecomboex", "{widget_path}/activecomboex.js", function () {
-				ff.ffField.activecomboex.init({
-					<!--BeginSectInnerUrl-->innerURL			: "{innerURL}",<!--EndSectInnerUrl-->
-	                "icons"                   : {
-	                    "caret"                 : "{icon_caret_down}"
-	                    , "plus"                : '{icon_plus}'
-	                    , "minus"               : '{icon_minus}'
-	                    , "loader"				: '{icon_loader}'
-	                }
-				});
-			});
+	ff.pluginAddInitLoad("ff.ffField.activecomboex", function () {
+		ff.ffField.activecomboex.init({
+			<!--BeginSectInnerUrl-->innerURL			: "{innerURL}",<!--EndSectInnerUrl-->
+	        "icons"                   : {
+	            "caret"                 : "{icon_caret_down}"
+	            , "plus"                : '{icon_plus}'
+	            , "minus"               : '{icon_minus}'
+	            , "loader"				: '{icon_loader}'
+	        }
 		});
 	});
 </script>
@@ -71,7 +67,6 @@
                 , "addPlus"				: {add_plus}
                 , "hideEmpty"			: {hide_empty}
                 , "use_cache"			: {use_cache}
-
                 <!--BeginSezPlugin-->
                 , "plugin" : {
 					"name"		: "{plugin_name}",

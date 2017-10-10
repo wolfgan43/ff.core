@@ -4,7 +4,7 @@
 <!--BeginSectFooters-->
 <script type="text/javascript">
 	<!--BeginSectBinding-->
-	jQuery(function() {
+	ff.pluginAddInit("jquery-ui", function() {
 		var id = "#{container}{id}_progressbar";
 		jQuery(id.replace(/[\[]/g,"\\[").replace(/[\]]/g,"\\]")).progressbar({
 			value: {value}

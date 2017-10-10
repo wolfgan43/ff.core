@@ -16,31 +16,13 @@ class ffWidget_autocomplete extends ffCommon
 	var $class			= "ffWidget_autocomplete";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							, "jquery.ui"					=> null
-/*							, "ff.ffField.autocomplete"	=> array(
-									"file" => "autocomplete.js"
-									, "path" => "/themes/responsive/ff/ffField/widgets/autocomplete"
-								)*/
+                              "ff.ffField.autocomplete"       => null
 						);
-    var $css_deps 		= array(/*
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array( 
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.autocomplete"        => array(
-                                      "file" => "jquery.ui.autocomplete.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
-    					);
+    var $css_deps 		= array();
 
 	var $disable_dialog = false;
 	
@@ -81,7 +63,7 @@ class ffWidget_autocomplete extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -96,13 +78,15 @@ class ffWidget_autocomplete extends ffCommon
 	{
 		global $plgCfg_autocomplete_UseOwnSession;
         
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "autocomplete";
 		}
 		else
 		{
@@ -116,6 +100,10 @@ class ffWidget_autocomplete extends ffCommon
 		else
 			$db =& $this->db[0];
 
+		//if($Field->parent_page[0]->jquery_ui_theme) {
+			$Field->parent_page[0]->tplAddCss("jquery-ui.autocomplete");
+		//}		
+			
 		$this->tpl[$tpl_id]->set_var("SectControl", "");
 
 		if(strpos($id, "[") === false) {
@@ -141,34 +129,7 @@ class ffWidget_autocomplete extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/autocomplete");
-/* Remove jquery ui css
-    	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.autocomplete"        => array(
-                      "file" => "jquery.ui.autocomplete.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-*/
 	    $icon = $Field->autocomplete_icon;
 		if(!$icon && $Field->autocomplete_combo)
 			$icon = "caret-down";
@@ -363,7 +324,7 @@ class ffWidget_autocomplete extends ffCommon
 		if ($Field->actex_service === null)
 		{
 			$this->tpl[$tpl_id]->set_var("service", "null");
-			if (!$this->innerURL === null) {
+			if (!$this->innerURL !== null) {
 				$this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
 				$this->tpl[$tpl_id]->parse("SectInnerUrl", false);
 			}
@@ -378,7 +339,7 @@ class ffWidget_autocomplete extends ffCommon
 			$this->tpl[$tpl_id]->set_var("service", "'" . $Field->actex_service . "'");
 
         if($Field->autocomplete_multi) {
-        	$this->oPage[0]->tplAddJs("jquery.autogrow.js", "jquery.autogrow-textarea.js", FF_THEME_DIR . "/library/plugins/jquery.autogrow-textarea");
+        	$this->oPage[0]->tplAddJs("jquery.plugins.autogrow-textarea");
             $this->tpl[$tpl_id]->set_var("multi", "true");
 		} else
             $this->tpl[$tpl_id]->set_var("multi", "false");
@@ -522,13 +483,6 @@ class ffWidget_autocomplete extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.autocomplete", "autocomplete.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/autocomplete");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -545,15 +499,6 @@ class ffWidget_autocomplete extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.autocomplete", "autocomplete.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/autocomplete");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

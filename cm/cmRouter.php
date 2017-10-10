@@ -3,8 +3,8 @@
  * @package ContentManager
  * @subpackage router
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -12,8 +12,8 @@
  * @package ContentManager
  * @subpackage router
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class cmRouter extends ffCommon
@@ -33,6 +33,8 @@ class cmRouter extends ffCommon
 	public $named_rules 	= array();
 	public $matched_rules 	= null;
 	public $counter			= 0;
+	
+	public $ordered		= false;
 	
 	private function __construct()
 	{
@@ -155,7 +157,7 @@ class cmRouter extends ffCommon
 		}
 		
 		if ($reverse)
-			$rule->addChild("reverse");
+			$rule->addChild("reverse", $reverse);
 
 		if ($query !== null)
 			$rule->addChild("query", $query);
@@ -214,6 +216,8 @@ class cmRouter extends ffCommon
 	
 	private function addElementRule($rule)
 	{
+		$this->ordered = false;
+		
 		$this->counter++;
 		$rule->counter = $this->counter;
 
@@ -266,6 +270,31 @@ class cmRouter extends ffCommon
 		}
 	}
 	
+	public function orderRules($priority = null)
+	{
+		if ($priority)
+		{
+			if (!isset($this->rules[$priority]))
+				return;
+
+			usort($this->rules[$priority], "ffCommon_IndexOrder");
+			$this->rules[$priority] = array_reverse($this->rules[$priority]);
+		}
+		else
+		{
+			for($i = cmRouter::PRIORITY_TOP; $i <= cmRouter::PRIORITY_BOTTOM; $i++)
+			{
+				if (!isset($this->rules[$i]))
+					continue;
+
+				usort($this->rules[$i], "ffCommon_IndexOrder");
+				$this->rules[$i] = array_reverse($this->rules[$i]);
+			}
+			
+			$this->ordered = true;
+		}
+	}
+	
 	public function process($url, $query = null, $host = null)
 	{
 		$this->matched_rules = array();
@@ -275,8 +304,8 @@ class cmRouter extends ffCommon
 			if (!isset($this->rules[$i]))
 				continue;
 
-			usort($this->rules[$i], "ffCommon_IndexOrder");
-			$this->rules[$i] = array_reverse($this->rules[$i]);
+			if (!$this->ordered)
+				$this->orderRules($i);
 				
 			foreach ($this->rules[$i] as $key => $value)
 			{
@@ -348,12 +377,13 @@ class cmRouter extends ffCommon
 					if (strlen((string)$attrs["id"]))
 						$this->matched_rules[(string)$attrs["id"]] = array("rule" => $value, "params" => $matches);
 					else
-						$this->matched_rules[] = array("rule" => $value, "params" => $matches);
+						$this->matched_rules[] = array("rule" => $value, "params" => $matches, "host_params" => $host_matches);
 				}
 			}
 			reset($this->rules[$i]);
-
 		}
+		
+		$this->ordered = true;
 	}
 	
 	static function getRuleAttrs($rule)

@@ -63,8 +63,7 @@ $limit						= $ff["autocomplete"][$data_src]["limit"];
 
 if(!$operation)
 	$operation = "LIKE [%[VALUE]%]";
-
-
+	
 //$actex_sql = get_session("autocomplete_sql_" . $data_src);
 //$actex_main_db = get_session("autocomplete_main_db_" . $data_src);
 
@@ -85,7 +84,7 @@ if(!strlen(trim($actex_sql)))
 	}*/
 	
 	// non dovrebbe mai essere vuota l'SQL
-	ffErrorHandler::raise("debug", E_USER_ERROR, null, get_defined_vars());
+	ffErrorHandler::raise("debug empty query", E_USER_ERROR, null, get_defined_vars());
 }
 
 if (!strlen($search_value) && $hide_result_on_query_empty) 

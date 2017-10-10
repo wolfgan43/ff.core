@@ -1,24 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.injectCSS("uploadifive", "{uploadifive}", function() {
-		ff.pluginLoad("jquery.fn.uploadifive", "/themes/library/plugins/jquery.uploadifive/jquery.uploadifive.js", function () {
-			<!--BeginSectPluginCss-->
-			ff.injectCSS("{uploadifive_plugin_name}", "{uploadifive_plugin_css}");
-			<!--EndSectPluginCss-->
-			<!--BeginSectPluginJs-->
-			ff.pluginLoad("{uploadifive_plugin_name}", "{uploadifive_plugin_js}", function() {
-				ff.pluginLoad("ff.ffField.uploadifive", "{widget_path}/uploadifive.js");
-			});
-			<!--EndSectPluginJs-->
-			<!--BeginSectNoPlugin-->
-			ff.pluginLoad("ff.ffField.uploadifive", "{widget_path}/uploadifive.js");
-			<!--EndSectNoPlugin-->
-			
-		}, false);
-	});
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -41,19 +21,15 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 			modelThumb		: '{thumb_model}',
 			showFile		: {show_file},
 			showFilePath	: {showfile_path},
+			showFileDialog	: {showfile_dialog},
 			showFilePlugin	: {showfile_plugin},
+			showFileSort	: {showfile_sort},
             fullPath        : {full_path},
             dataSrc			: "{data_src}", 
             folder			: "{folder}", 
             height			: "{height}", 
             width			: "{width}",
-            aviary			: {aviary},
-            icons           : {
-                                "cancel" : '{cancel_class}',
-                                "aviary" : "{aviary_class}",
-                                "upload" : "{upload_class}"
-                                
-                            }
+            aviary			: {aviary}
 		});
         <!--EndSectBinding-->
 	});

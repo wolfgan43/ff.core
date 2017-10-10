@@ -6,8 +6,8 @@
  * @package FormsFramework
  * @subpackage Abstract Data Fieldset Rapresentation Class
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2004-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -19,12 +19,14 @@
  * @package FormsFramework
  * @subpackage Abstract Data Fieldset Rapresentation Class
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2004-2007, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffDBQuery extends ffDBSource
 {
+	public $bPopulateOnDemand		= true;
+	
 	private $sSql					= null;
 	
 	private $pDBRes					= null;
@@ -55,6 +57,16 @@ class ffDBQuery extends ffDBSource
 	
 	function populate()
 	{
+		try
+		{
+			$this->aParsed = $this->getSQLParser()->parse($this->sSql);
+			$this->bPopulated = true;
+		} 
+		catch (Exception $exc) 
+		{
+			ffErrorHandler::raise("Wrong SQL", E_USER_ERROR, $this, get_defined_vars());
+		}
+		//$this->sOutSql = $sSql; // avoid useless processing
 		
 		return $this;
 	}
@@ -78,27 +90,25 @@ class ffDBQuery extends ffDBSource
 	public function setSql($sSql)
 	{
 		$this->sSql = $sSql;
-		try
-		{
-			$this->aParsed = $this->getSQLParser()->parse($sSql);
-		} 
-		catch (Exception $exc) 
-		{
-			ffErrorHandler::raise("Wrong SQL", E_USER_ERROR, $this, get_defined_vars());
-		}
-		//$this->sOutSql = $sSql; // avoid useless processing
 		
-		return $this;
+		if (!$this->bPopulateOnDemand)
+			$this->populate();
 	}
 	
 	public function create()
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->sOutSql = $this->getSQLCreator()->create($this->aParsed);
 		return $this->sOutSql;
 	}
 
 	public function getSql($context = null)
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		if ($this->sOutSql !== null)
 		{
 			$res = $this->doEvent("on_getSql", array($this, $this->sOutSql, $context));
@@ -128,6 +138,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function setOrderByField($field, $ascending = true, $add = true)
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		if ($add)
 			$index = null;
 		else
@@ -140,6 +153,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function resetOrder()
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->sOutSql = null;
 		unset($this->aParsed["ORDER"]);
 		
@@ -148,6 +164,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function filterByValue($sFieldName, $oFieldValue, $operation = "=", $add = true, $having = false, $or = false)
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->sOutSql = null;
 		
 		if ($having)
@@ -184,6 +203,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function setOrder($index = null, $expr_type = "colref", $base_expr = "", $no_quotes = "", $sub_tree = false, $direction = "ASC")
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->sOutSql = null;
 		
 		if ($index === null)
@@ -204,6 +226,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function resetMaxResults()
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->sOutSql = null;
 		unset($this->aParsed["LIMIT"]);
 		
@@ -212,6 +237,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function setMaxResults($rowcount)
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->setLimit(0, $rowcount);
 		
 		return $this;
@@ -219,6 +247,9 @@ class ffDBQuery extends ffDBSource
 	
 	public function setLimit($offset, $rowcount)
 	{
+		if (!$this->isPopulated() && $this->bPopulateOnDemand)
+			$this->populate();
+		
 		$this->sOutSql = null;
 		
 		$this->aParsed["LIMIT"] = array(

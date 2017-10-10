@@ -17,6 +17,19 @@ __ff : true, /* used to recognize ff'objects */
 				"event_name" : "initIFElement"
 				, "event_params" : [id, "tabs"]
 			});
+			ff.pluginAddInit("ff.ffPage.dialog", function () {
+				ff.ffPage.dialog.addEvent({
+					"event_name" : "resize"
+					, "func_name" : function(dlg, ui, tab) {
+						if (ff.struct.get("comps").get(tab) && ff.struct.get("comps").get(tab).ctx === dlg) {
+							if (ui === undefined || ui.originalSize.width != ui.size.width) {
+								jQuery.fn.escapeGet("tabs_" + tab).width(jQuery.fn.escapeGet("ffWidget_dialog_container_" + dlg).width() - 20);
+							}
+						}
+					}
+					, "additional_data" : [id]
+				});
+			});
 		}
 		
 		, "beforeActivate": function(event, ui) {

@@ -15,16 +15,13 @@ class ffWidget_kcuploadifive extends ffCommon
 	var $class			= "ffWidget_kcuploadifive";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery"						=> null
-							, "jquery.uploadifive"			=> "/plugins/jquery.uploadifive"
+							  "ff.ffField.kcuploadifive" => null
 						);
     var $css_deps 		= array(
-    						  "uploadifive"		=> array(
-									                      "file" => "uploadifive.css"
-									                    , "path" => null
-									                    , "rel" => "plugins/jquery.uploadifive"
-									                ) 
     					);
 
 	// PRIVATE VARS
@@ -61,7 +58,7 @@ class ffWidget_kcuploadifive extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -101,13 +98,15 @@ class ffWidget_kcuploadifive extends ffCommon
 				$Field->process_label($id, $value);
 		}
 
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "kcuploadifive";
 		}
 		else
 		{
@@ -137,75 +136,18 @@ class ffWidget_kcuploadifive extends ffCommon
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/kcuploadifive");  
         
-		$css_deps["uploadifive"]        = array(
-                      "file" => "uploadifive.css"
-                    , "path" => null
-                    , "rel" => "plugins/jquery.uploadifive"
-                );
-
-		
-		if($Field->uploadifive_showfile_plugin && is_file(FF_DISK_PATH . FF_THEME_DIR . "/library/plugins/jquery." . $Field->uploadifive_showfile_plugin . "/jquery." . $Field->uploadifive_showfile_plugin . ".js")) {
-			if($Field->uploadifive_showfile_plugin && is_file(FF_DISK_PATH . FF_THEME_DIR . "/library/plugins/jquery." . $Field->uploadifive_showfile_plugin . "/jquery." . $Field->uploadifive_showfile_plugin . ".css")) {
-				$css_deps[$Field->uploadifive_showfile_plugin] = array(
-		                      "file" => "jquery." . $Field->uploadifive_showfile_plugin . ".css"
-		                    , "path" => null
-		                    , "rel" => "plugins/jquery." . $Field->uploadifive_showfile_plugin
-		                );
-		        $this->tpl[$tpl_id]->set_var("uploadifive_plugin_name", $Field->uploadifive_showfile_plugin);
-		        $this->tpl[$tpl_id]->set_var("uploadifive_plugin_css", FF_SITE_PATH . FF_THEME_DIR . "/library/plugins/jquery." . $Field->uploadifive_showfile_plugin . "/jquery." . $Field->uploadifive_showfile_plugin . ".css");
-		        $this->tpl[$tpl_id]->parse("SectPluginCss", false);
-			}
-			$js_deps["jquery.fn." . $Field->uploadifive_showfile_plugin] = array(
- 						"file" => "jquery." . $Field->uploadifive_showfile_plugin . ".js"
-				        , "path" => FF_THEME_DIR . "/library/plugins/jquery." . $Field->uploadifive_showfile_plugin
-					);
-			
-
-	        $this->tpl[$tpl_id]->set_var("uploadifive_plugin_name", "jquery." . $Field->uploadifive_showfile_plugin);
-	        $this->tpl[$tpl_id]->set_var("uploadifive_plugin_js", FF_SITE_PATH . FF_THEME_DIR . "/library/plugins/jquery." . $Field->uploadifive_showfile_plugin . "/jquery." . $Field->uploadifive_showfile_plugin . ".js");
-	        $this->tpl[$tpl_id]->parse("SectPluginJs", false);
-	        $this->tpl[$tpl_id]->set_var("SectNoPlugin", "");
-		} else {
-			$this->tpl[$tpl_id]->set_var("SectPluginCss", "");
-			$this->tpl[$tpl_id]->set_var("SectPluginJs", "");
-			$this->tpl[$tpl_id]->parse("SectNoPlugin", false);
-		
-		}
-
 		if($Field->uploadifive_showfile_plugin) {
+			$this->oPage[0]->tplAddJs("jquery." . $Field->uploadifive_showfile_plugin);  
+
 			$this->tpl[$tpl_id]->set_var("showfile_plugin", "'" . $Field->uploadifive_showfile_plugin . "'");
 		} else {
 			$this->tpl[$tpl_id]->set_var("showfile_plugin", "undefined");
-		}
-		
-		//e necessario perche il widgetlaod viene caricato prima del process
-		if(is_array($js_deps) && count($js_deps)) {
-			foreach($js_deps AS $js_key => $js_value) {
-				$Field->parent_page[0]->tplAddJs($js_key, $js_value["file"], $js_value["path"]);
-			}
-		}		
-
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
 		}
 
         $base_path = $Field->getFileBasePath();
         $storing_path = $Field->getFilePath();
 		$folder = str_replace($base_path, "", $storing_path);
-		/*if(strlen($Field->file_normalize)) {
-			$arrFolder = explode("/", trim($folder, "/"));
-			if(is_array($arrFolder) && count($arrFolder)) {
-				foreach($arrFolder AS $part_folder) {
-					$folder_normalized .= "/" . ffCommon_url_rewrite($part_folder);
-				}
-			}
-			$folder = $folder_normalized;
-		}*/		
+		
 		if(!strlen($folder))
 			$folder = "/";
 
@@ -307,6 +249,7 @@ class ffWidget_kcuploadifive extends ffCommon
 		}
 
 		if($Field->uploadifive_sort_path) {
+			$this->oPage[0]->tplAddJs("jquery-ui");
 			$this->tpl[$tpl_id]->set_var("showfile_sort", "'" . $Field->uploadifive_sort_path . "'");
 		} else {
 			$this->tpl[$tpl_id]->set_var("showfile_sort", "undefined");
@@ -378,14 +321,6 @@ class ffWidget_kcuploadifive extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("swfobject", "swfobject.js", FF_THEME_DIR . "/library/swfobject");
-			$this->oPage[0]->tplAddJs("jquery.uploadifive", "jquery.uploadifive.js", FF_THEME_DIR . "/library/plugins/jquery.uploadifive");
-			$this->oPage[0]->tplAddJs("jquery.cookie", "jquery.cookie.js", FF_THEME_DIR . "/library/plugins/jquery.cookie");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.kcuploadifive", "kcuploadifive.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/kcuploadifive");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -402,16 +337,6 @@ class ffWidget_kcuploadifive extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("swfobject", "swfobject.js", FF_THEME_DIR . "/library/swfobject");
-			$this->oPage[0]->tplAddJs("jquery.uploadifive", "jquery.uploadifive.js", FF_THEME_DIR . "/library/plugins/jquery.uploadifive");
-			$this->oPage[0]->tplAddJs("jquery.cookie", "jquery.cookie.js", FF_THEME_DIR . "/library/plugins/jquery.cookie");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.kcuploadifive", "kcuploadifive.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/kcuploadifive");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -426,4 +351,3 @@ class ffWidget_kcuploadifive extends ffCommon
 		return $this->tpl["main"]->rpparse("SectFooters", false);
 	}
 }
-?>

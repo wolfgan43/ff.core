@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage interface
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage interface
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffPageNavigator
@@ -66,7 +66,7 @@ class ffPageNavigator
 	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null, array $variant = null)
 	{
 		if ($page === null && ($disk_path === null || $site_path === null))
-			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, $this, get_defined_vars());
+			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, null, get_defined_vars());
 		
 		if ($theme === null)
 		{
@@ -144,58 +144,15 @@ class ffPageNavigator
  * @package FormsFramework
  * @subpackage interface
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffPageNavigator_base extends ffCommon
 {
 	// ----------------------------------
 	//  PUBLIC VARS (used for settings)
-	var $framework_css					= array(
-											"component" => array(
-												"class" => "pageNavigator" 
-												, "pagination" => "align-center"
-											)
-											, "pagination" => array(
-												"class" => null
-												, "col" => array(
-														"xs" => 12
-														, "sm" => 10
-														, "md" => 12
-														, "lg" => 6
-												)
-											)
-											, "choice" => array(
-												"class" => null
-												, "col" => array(
-														"xs" => 0
-														, "sm" => 0
-														, "md" => 2
-														, "lg" => 2
-												)
-											)
-											, "totelem" => array(
-												"class" => null
-												, "col" => array(
-														"xs" => 0
-														, "sm" => 2
-														, "md" => 2
-														, "lg" => 1
-												)											
-											)
-											, "perPage" => array(
-												"class" => null
-												, "col" => array(
-														"xs" => 0
-														, "sm" => 0
-														, "md" => 8
-														, "lg" => 3
-												)
-											)
-	
-	);
-	
+
 	/**
 	 * ID dell'oggetto; deve essere univoco per ogni ffPage
 	 * @var Number
@@ -335,12 +292,6 @@ abstract class ffPageNavigator_base extends ffCommon
 	 * @var mixed
 	 */
 	var $parent					= null;
-
-	/**
-	 * Il prefisso per gli elementi form che vengono creati
-	 * @var String
-	 */
-	var $prefix					= null;					// Global temp var for params prefix.
 
 	/**
 	 * l'oggetto pagina a cui appartiene il navigator

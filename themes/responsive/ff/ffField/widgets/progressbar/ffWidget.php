@@ -16,13 +16,13 @@ class ffWidget_progressbar extends ffCommon
 	var $class			= "ffWidget_progressbar";
 	
 	var $widget_deps	= array();
-    var $js_deps = array(
-							  "jquery" 			=> null
-							, "jquery.ui" 		=> null							
+	
+	var $libraries		= array();
+	
+    var $js_deps		= array(
+							"jquery-ui" 		=> null							
 						);		
-    var $css_deps 		= array(
-                              
-    					);
+    var $css_deps 		= array();
 	// PRIVATE VARS
 	
 	var $oPage			= null;
@@ -52,7 +52,7 @@ class ffWidget_progressbar extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -60,12 +60,15 @@ class ffWidget_progressbar extends ffCommon
 
 	function process($id, &$value, ffField_html &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "progressbar";
 		}
 		else
 		{
@@ -77,40 +80,17 @@ class ffWidget_progressbar extends ffCommon
 		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
 		$this->tpl[$tpl_id]->set_var("theme", $Field->parent_page[0]->theme);
 
+		//if($Field->parent_page[0]->jquery_ui_theme) {
+			$this->oPage[0]->tplAddCss("jquery-ui.progressbar");
+		//}		
+		
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/progressbar"); 
 
 		$this->tpl[$tpl_id]->set_var("id", $id);
-/*
-    	$css_deps 		= array(
-              					"jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              	"jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              	"jquery.ui.progressbar"        => array(
-                                      "file" => "jquery.ui.progressbar.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )
-    	);
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-*/
 		if ($Field->contain_error && $Field->error_preserve)
 			$this->tpl[$tpl_id]->set_var("value", intval($value->ori_value));
 		else

@@ -2,7 +2,7 @@ ff.cms.fn.uploadifyDialogInit = function() {
 	jQuery(".uploadify").uploadify({
 		'uploader'       : ff.site_path + '/themes/library/plugins/jquery.uploadify/uploadify.swf',
 		'script'         : ff.site_path + '/themes/library/plugins/jquery.uploadify/uploadify.php',
-		'cancelImg'      : ff.site_path + '/themes/library/plugins/jquery.uploadify/cancel.png',
+		'cancelImg'      : ff.base_path + '/themes/library/plugins/jquery.uploadify/cancel.png',
 		'folder'         : jQuery("#path_upload").attr("value"),
 		'buttonText'	 : 'Sfoglia', 
 		/*'buttonImg'      : ff.site_path + '/themes/library/plugins/jquery.uploadify/browse.png',*/
@@ -15,7 +15,7 @@ ff.cms.fn.uploadifyDialogInit = function() {
 		'onAllComplete' : function(event,data) {
 			if(jQuery("#upload_ret_url").attr("value") != '') {
 				ff.ffPage.dialog.close(jQuery("#upload_ret_url").attr("value"));
-				ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
+				ff.load("ff.ajax", function() {
 					ff.ajax.blockUI();
 				});
 			}
@@ -24,8 +24,6 @@ ff.cms.fn.uploadifyDialogInit = function() {
 	});
 };
 
-ff.pluginLoad("swfobject", "/themes/library/swfobject/swfobject.js", function() {
-    ff.pluginLoad("jquery.fn.uploadify", "/themes/library/plugins/jquery.uploadify/jquery.uploadify.js", function() {
-        ff.cms.fn.uploadifyDialogInit(); 
-    });
+ff.pluginAddInit("jquery.uploadify", function() {
+    ff.cms.fn.uploadifyDialogInit(); 
 });

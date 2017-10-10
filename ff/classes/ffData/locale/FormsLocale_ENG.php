@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -30,7 +30,7 @@ function FormsLocale_ENG_SetDateTime($oFormsData, $value)
 
 		FormsLocale_ENG_NormalizeDate($oFormsData);
 	}
- 
+
 function FormsLocale_ENG_SetDate($oFormsData, $value)
 	{
 		preg_match_all("/(\d+)[-\/\s]*(\d+)[-\/\s]*(\d+)/", $value, $matches);
@@ -48,7 +48,7 @@ function FormsLocale_ENG_SetTime($oFormsData, $value)
 		$oFormsData[0]->value_date_minutes = $matches[2][0];
 	}
 
-function FormsLocale_ENG_NormalizeDate($oFormsData)
+function FormsLocale_ENG_NormalizeDate($oFormsData) 
 	{
 		if (strlen($oFormsData[0]->value_date_year) == 2)
 			{

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configdata>
 	<auth>
-		<noauth path="/login" />
-		<noauth path="/recover" />
+		<noauth path="/restricted/login" />
+		<noauth path="/restricted/recover" />
+		<noauth path="/restricted/change_password" />
 		<!--<noauth path="/services/security/check_session" />-->
 		<!--<noauth path="/services/security/checkaccounts" />-->
-		<!--<noauth path="/oauth2" />-->
+		<noauth path="/oauth2" />
 	</auth>
 	<fields>
 		<firstname label="Nome" group="userinfo" required="true" />

@@ -16,17 +16,22 @@ class ffWidget_imagepicker extends ffCommon
 	var $class			= "ffWidget_imagepicker";
 	
 	var $widget_deps	= array();
+	
+	var $libraries = array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
-						);		
-    var $css_deps 		= array();
+    						"ff.ffField.imagepicker" => null
+						);
+    var $css_deps 		= array(
+    					);
+    					
 	// PRIVATE VARS
 	
 	var $oPage			= null;
 	var $source_path	= null;
 	var $style_path		= null;
 
-	var $tpl 				= null;
+	var $tpl 			= null;
 
 	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
 	{
@@ -57,12 +62,15 @@ class ffWidget_imagepicker extends ffCommon
 
 	function process($id, &$value, ffField_html &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "imagepicker";
 		}
 		else
 		{
@@ -77,7 +85,7 @@ class ffWidget_imagepicker extends ffCommon
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
-            $this->tpl[$tpl_id]->set_var("widget_path", "/themes/restricted/ff/ffField/widgets/imagepicker");
+            $this->tpl[$tpl_id]->set_var("widget_path", "/themes/restricted/ff/ffField/widgets/imagepicker"); 
 		
 		$this->tpl[$tpl_id]->set_var("imagepicker_field", str_replace("[", '\\\\[', str_replace("]", '\\\\]', $id)));
 		if(strpos($id, "[") === false) {
@@ -91,14 +99,6 @@ class ffWidget_imagepicker extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-                    $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-                    $this->oPage[0]->tplAddCss("image-picker-css", "jquery.image-picker.css", FF_THEME_DIR . "/library/plugins/jquery.image-picker"); 
-                    $this->oPage[0]->tplAddJs("image-picker","jquery.image-picker.min.js",FF_THEME_DIR . "/library/plugins/jquery.image-picker");
-                    $this->oPage[0]->tplAddJs("ff.ffField.imagepicker", "imagepicker.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/imagepicker");
-		
-                }
-		
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -115,15 +115,6 @@ class ffWidget_imagepicker extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js 
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddCss("image-picker-css", "jquery.image-picker.css", FF_THEME_DIR . "/library/plugins/jquery.image-picker"); 
-                    $this->oPage[0]->tplAddJs("image-picker","jquery.image-picker.min.js",FF_THEME_DIR . "/library/plugins/jquery.image-picker");
-                    $this->oPage[0]->tplAddJs("ff.ffField.imagepicker", "imagepicker.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/imagepicker");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

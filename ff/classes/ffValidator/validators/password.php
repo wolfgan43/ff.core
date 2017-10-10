@@ -1,23 +1,23 @@
 <?php
 /**
- * validator: piva
+ * validator: password
  *
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
 /**
- * validator: piva
+ * validator: password
  *
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffValidator_password extends ffValidator_base
@@ -45,16 +45,8 @@ class ffValidator_password extends ffValidator_base
 		$password = $value->getValue();
 
 		//verifica formale dell'password
-        if(strlen($password) < 8)
-            return "Il valore inserito nel campo \"$label\" non soddisfa i criteri minimi di sicurezza: la lunghezza deve essere compresa tra gli 8 e i 30 caratteri";
-        elseif(preg_match('/[a-z]+/', $password) < 1 )
-            return "Il valore inserito nel campo \"$label\" non soddisfa i criteri minimi di sicurezza: deve essere presente almeno una lettera minuscola";
-        elseif(preg_match('/[A-Z]+/', $password) < 1 )
-            return "Il valore inserito nel campo \"$label\" non soddisfa i criteri minimi di sicurezza: deve essere presente almeno una lettera maiuscola";
-        elseif(preg_match('/[0-9]+/', $password) < 1 )
-            return "Il valore inserito nel campo \"$label\" non soddisfa i criteri minimi di sicurezza: deve essere presente almeno un numero";        
-
-            
+        if(preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%\.]{8,30}$/', $password) < 1) 
+            return "Il valore inserito nel campo \"$label\" non soddisfa i criteri minimi di sicurezza: La lunghezza deve essere compresa tra gli 8 e i 30 caratteri, e deve essere composta sia da lettere che da numeri.";
 
 		return false;
 	}

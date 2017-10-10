@@ -1,17 +1,9 @@
 ff.ffField.ckeditor = (function () {
 	/* privates*/
-	var events = false;
 	
 	var that = { /* publics*/
 		__ff : true, /* used to recognize ff'objects*/
-		"init" : function(id, brmode, theme, skin, lang, toolbar, custom_config) {
-
-			if (!events) { 
-				ff.addEvent({"event_name" : "onClearField", "func_name" : that.onClearComponent});
-				ff.addEvent({"event_name" : "getFields", "func_name" : that.onUpdate});
-				events = true;
-			}
-			
+		"init" : function(id, brmode, theme, skin, lang, toolbar, custom_config, isDialog) {
 			var config = {};
 			config.allowedContent                           = true;
 			config.enterMode                                = CKEDITOR.ENTER_P;
@@ -71,12 +63,18 @@ ff.ffField.ckeditor = (function () {
 			config.pasteFromWordIgnoreFontFace		= true; /*Whether the "Ignore font face definitions" checkbox is enabled by default in the Paste from Word dialog. */
 			config.pasteFromWordKeepsStructure		= true; /*Whether to keep structure markup (<h1>, <h2>, etc.) or replace it with elements that create more similar pasting results when pasting content from Microsoft Word into the Paste from Word dialog. */
 			config.pasteFromWordRemoveStyle			= true; /*Whether the "Remove styles definitions" checkbox is enabled by default in the Paste from Word dialog. */
-			config.resize_enabled					= true; /*Whether to enable the resizing feature. If disabed the resize handler will not be visible. */
-			config.resize_maxHeight					= 400; /*The maximum editor height, in pixels, when resizing it with the resize handle. */
-			config.resize_maxWidth					= 1400; /*The maximum editor width, in pixels, when resizing it with the resize handle. */
-			config.resize_minHeight					= 300; /*The minimum editor height, in pixels, when resizing it with the resize handle. */
-			config.skin = 'office2013';
-                        config.smiley_descriptions				= [
+			if(isDialog) {
+				config.resize_enabled					= false;
+				config.extraPlugins						+= ",autogrow";
+				config.height							= "auto";
+			} else {
+				config.resize_enabled					= true; /*Whether to enable the resizing feature. If disabed the resize handler will not be visible. */
+				config.resize_maxHeight					= 400; /*The maximum editor height, in pixels, when resizing it with the resize handle. */
+				config.resize_maxWidth					= 1400; /*The maximum editor width, in pixels, when resizing it with the resize handle. */
+				config.resize_minHeight					= 300; /*The minimum editor height, in pixels, when resizing it with the resize handle. */
+			}
+			config.skin = (skin || "bootstrapck"); // The skin to load. It may be the name of the skin folder inside the editor installation path, or the name and the path separated by a comma. */
+			config.smiley_descriptions				= [
 				':)', ':(', ';)', ':D', ':/', ':P',
 				'', '', '', '', '', '',
 				'', ';(', '', '', '', '',
@@ -97,7 +95,7 @@ ff.ffField.ckeditor = (function () {
                                             { name: 'document', items : [ 'mode', 'document', 'doctools' ] },
                                             { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','-','Undo','Redo' ] },
                                             { name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
-                                            { name: 'links', items : [ 'Link','Unlink','Anchor', '-','Image', 'oembed' ] }, 
+                                            { name: 'links', items : [ 'Link','Unlink','Anchor', '-','Image', 'Youtube', 'VideoDetector', 'oembed' ] }, 
                                             { name: 'insert', items : [ 'Table','HorizontalRule','SpecialChar','PageBreak'] }, 
                                             { name: 'tools', items : [ 'Maximize', '-','Source', '-', 'Preview',  'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
                                             { name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
@@ -112,12 +110,12 @@ ff.ffField.ckeditor = (function () {
 			config.toolbarLocation					= 'top'; /*The "theme space" to which rendering the toolbar. For the default theme, the recommended options are "top" and "bottom". */
 			config.toolbarStartupExpanded			= true; /*Whether the toolbar must start expanded when the editor is loaded. */
 			config.undoStackSize					= 20; /*The number of undo steps to be saved. The higher this setting value the more memory is used for it. */
-			config.filebrowserBrowseUrl 			= ff.site_path + '/themes/library/kcfinder/browse.php?type:';
-			config.filebrowserImageBrowseUrl 		= ff.site_path + '/themes/library/kcfinder/browse.php?type:';
-			config.filebrowserFlashBrowseUrl 		= ff.site_path + '/themes/library/kcfinder/browse.php?type:'; 
-			config.filebrowserUploadUrl 			= ff.site_path + '/themes/library/kcfinder/upload.php?type:';
-			config.filebrowserImageUploadUrl 		= ff.site_path + '/themes/library/kcfinder/upload.php?type:';
-			config.filebrowserFlashUploadUrl 		= ff.site_path + '/themes/library/kcfinder/upload.php?type:';
+			config.filebrowserBrowseUrl 			= ff.base_path + '/themes/library/kcfinder/browse.php?type:';
+			config.filebrowserImageBrowseUrl 		= ff.base_path + '/themes/library/kcfinder/browse.php?type:';
+			config.filebrowserFlashBrowseUrl 		= ff.base_path + '/themes/library/kcfinder/browse.php?type:';
+			config.filebrowserUploadUrl 			= ff.base_path + '/themes/library/kcfinder/upload.php?type:';
+			config.filebrowserImageUploadUrl 		= ff.base_path + '/themes/library/kcfinder/upload.php?type:';
+			config.filebrowserFlashUploadUrl 		= ff.base_path + '/themes/library/kcfinder/upload.php?type:';
                         
 			/*config.width							= '100%'; /* The editor width in CSS size format or pixel integer.*/
 			
@@ -129,82 +127,31 @@ ff.ffField.ckeditor = (function () {
 			
 			jQuery.extend(config, custom_config);
                         
-                        CKEDITOR.dtd.$removeEmpty['a'] = false;
-                        CKEDITOR.dtd.$removeEmpty['div'] = false;
-                        CKEDITOR.dtd.$removeEmpty['i'] = false;
-			CKEDITOR.on("instanceReady", function(event) {
-				that.doEvent({
-					"event_name"	: "onCreate",
-					"event_params"	: [document.getElementById(event.editor.element.getId())]
-				});
-				ff.doEvent({
-					"event_name" : "initIFElement"
-					, "event_params" : [id, "ckeditor"]
-				});
-			});			
+            CKEDITOR.dtd.$removeEmpty['a'] = false;
+            CKEDITOR.dtd.$removeEmpty['div'] = false;
+            CKEDITOR.dtd.$removeEmpty['i'] = false;
 
-			jQuery("#" + id.replace(/\[/g, "\\[").replace(/\]/g, "\\]")).each(function(index, textarea) {
+			jQuery.fn.escapeGet(id).each(function(index, textarea) {
 				if (CKEDITOR.instances[textarea.id])
 					return;
 
 				CKEDITOR.replace(textarea, config);
-				/*jQuery(textarea).ckeditor(config);*/
-				
-	
 			});
-
-				
-			/*CKEDITOR.appendTo(jQuery("." + selectorClass).attr("id"));
- 			CKEDITOR.replaceAll(function( textarea, config ) 
- 			{
- 				if(textarea.className != selectorClass || CKEDITOR.instances[textarea.id])
- 					return false;
- 					
- 			});
-
- 			CKEDITOR.add;*/
 		}, 
-		"onClearComponent" : function (component, key, field) {
-			if (field.widget == "ckeditor") {
-				var instances = ff.struct.get(component).widgets;
-				if(instances) {
-					instances.each(function(key, value) {
-						if(CKEDITOR.instances[value["id"]] !== undefined) {
-							CKEDITOR.remove(value["id"]);
-							delete CKEDITOR.instances[value["id"]];
-						}				
-					});
-				}
-/*			
-				switch (ff.struct.get(component).type) {
-					case "ffDetails":
-						var rows = parseInt(jQuery("#" + component + " .box2").length);
-						console.log(ff.struct.get(component));
-						for (var i = 0; i < rows; i++) {
-							if(CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"] !== undefined) {
-								CKEDITOR.remove(component + "_recordset[" + i + "][" + key + "]");
-								delete CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"];
-								//CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"].destroy();	
-							}
-							 
-						}
-						break;
+		"onClearField" : function (component, field_id, field_data, inst_id) {
+			if (field_data.widget !== "ckeditor")
+				return;
 
-					default:
-						if(CKEDITOR.instances[component + "_" + key] !== undefined) {
-							CKEDITOR.remove(component + "_" + key);
-							delete CKEDITOR.instances[component + "_" + key];
-							//CKEDITOR.instances[component + "_" + key].destroy();
-						}
-				}
-*/
+			if (CKEDITOR.instances[inst_id] !== undefined) {
+				CKEDITOR.remove(inst_id);
+				delete CKEDITOR.instances[inst_id];
 			}
 		},
-		"onUpdate" : function (container, dialog) {
-			ff.struct.each(function (component_id, component) {
-				if ((dialog !== undefined && component.dialog === dialog) || (dialog === undefined && component.dialog === undefined)) {
+		"onUpdate" : function (container, ctx) {
+			ff.struct.get("comps").each(function (component_id, component) {
+				if ((ctx !== undefined && component.ctx === ctx) || (ctx === undefined && component.ctx === undefined)) {
 					component.fields.each(function (field_id, field) {
-						if (field.widget == "ckeditor") {
+						if (field.widget == "ckeditor") { // in dialog/dettaglio nn e valorizzato il widget. cosi nn dovrebbe andare con || 1 andava
 							switch (component.type) {
 								case "ffDetails":
 									var rows = parseInt(jQuery("#" + component_id + "_rows").val());
@@ -226,5 +173,23 @@ ff.ffField.ckeditor = (function () {
 		
 	}; /* publics' end*/
 
+	ff.pluginAddInitLoad("ff.ffField.ckeditor", function () {
+		ff.addEvent({"event_name" : "onClearField", "func_name" : that.onClearField});
+		ff.addEvent({"event_name" : "getFields", "func_name" : that.onUpdate});
+		
+		CKEDITOR.on("instanceReady", function(event) {
+			var id = event.editor.name;
+			CKEDITOR.instances[id].instReady = true;
+			that.doEvent({
+				"event_name"	: "onCreate",
+				"event_params"	: [document.getElementById(event.editor.element.getId()), id]
+			});
+			ff.doEvent({
+				"event_name" : "initIFElement"
+				, "event_params" : [id, "ckeditor"]
+			});
+		});
+	});
+	
 	return that;
 })();

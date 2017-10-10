@@ -1,24 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.injectCSS("uploadifive", "{uploadifive}", function() {
-		ff.pluginLoad("jquery.fn.uploadifive", "/themes/library/plugins/jquery.uploadifive/jquery.uploadifive.js", function () {
-			<!--BeginSectPluginCss-->
-			ff.injectCSS("{uploadifive_plugin_name}", "{uploadifive_plugin_css}");
-			<!--EndSectPluginCss-->
-			<!--BeginSectPluginJs-->
-			ff.pluginLoad("{uploadifive_plugin_name}", "{uploadifive_plugin_js}", function() {
-				ff.pluginLoad("ff.ffField.kcuploadifive", "{widget_path}/kcuploadifive.js");
-			});
-			<!--EndSectPluginJs-->
-			<!--BeginSectNoPlugin-->
-			ff.pluginLoad("ff.ffField.kcuploadifive", "{widget_path}/kcuploadifive.js");
-			<!--EndSectNoPlugin-->
-			
-		}, false);
-	});
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -34,34 +14,28 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
             sufdel	        : "{suffix_delete}",
 			baseUrlKC		: "{site_base_url}", 
 			previewJs		: {preview_js},
+			viewUrl			: '{view_url}',
+			previewUrl		: '{preview_url}',
             writable        : {writable},
 			sizeLimit		: {size_limit},
-			fileExt			: {file_ext},
-			multi			: {multi},
+			fileExt			: '{file_ext}',
+			model			: '{type_model}', 
 			modelThumb		: '{thumb_model}',
 			showFile		: {show_file},
-			showFilePath	: {showfile_path},
-			showFilePlugin	: {showfile_plugin},
             fullPath        : {full_path},
-            dataSrc			: "{data_src}", 
-            folder			: "{folder}", 
+            dataSrc			: "{data_src}",
             height			: "{height}", 
             width			: "{width}",
-            aviary			: {aviary},
-            icons           : {
-                                "cancel" : '{cancel_class}',
-                                "aviary" : "{aviary_class}",
-                                "upload" : "{upload_class}"
-                                
-                            }
-        });
+            aviary			: {aviary}
+		});
         <!--EndSectBinding-->
 	});
 </script>
 <!--EndSectFooters-->
+
 <!--BeginSectControl-->
-{fixed_pre_content}
-<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{browse_class}" onclick="ff.ffField.kcuploadifive.openKCFinder('{container}{id}', '/{resource_type}{base_url_kc}' );"></a> 
+<div class="uploadifive {type_model}"> 
+<a href="#{container}{id}" id="KcFinder_{container}{id}" title="File selector" class="{class}" onclick="ff.ffField.kcuploadifive.openKCFinder('/{resource_type}{base_url_kc}', '{container}{id_kc}' );"><img src="{site_path}/themes/{theme}/images/widgets/kcfinder/browse.png" alt="ShowKcFinder" /></a> 
 {control}
-{fixed_post_content}
+</div> 
 <!--EndSectControl-->

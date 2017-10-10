@@ -18,8 +18,7 @@ if (
 		|| !isset($resources[$_REQUEST["resource"]])
 	)
 {
-	http_response_code(400);
-	exit;
+	$cm->responseCode(400);
 }
 
 $resource = $resources[$_REQUEST["resource"]];
@@ -42,8 +41,6 @@ switch ($_REQUEST["resource"])
 switch (strtoupper($_SERVER['REQUEST_METHOD']))
 {
 	case "POST":
-		$bad_request = false;
-
 		$sSQL = "UPDATE " . $resource["tbl_name"] . " SET `$order_field` = " . $db->toSql(new ffData(count($positions)));
 		$db->execute($sSQL);
 
@@ -53,12 +50,6 @@ switch (strtoupper($_SERVER['REQUEST_METHOD']))
 			$db->execute($sSQL);
 		}
 		reset($positions);
-
-		if ($bad_request)
-			http_response_code(400);
-		else
-			http_response_code(200);
-		exit;
 		break;
 
 	case "GET":
@@ -81,15 +72,14 @@ switch (strtoupper($_SERVER['REQUEST_METHOD']))
 			} while ($db->nextRecord());
 		}
 
-		http_response_code(200);
 		header("Content-type: text/xml");
 		echo $tpl->rpparse("main", false);
-		exit;
+		$cm->responseCode(200);
 		break;
 
 	default:
-		http_response_code(400);
-		exit;
+		$cm->responseCode(400);
 }
 
+cm::jsonParse($cm->json_response);
 exit;

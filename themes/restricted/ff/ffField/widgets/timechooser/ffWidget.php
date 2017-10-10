@@ -15,8 +15,14 @@ class ffWidget_timechooser extends ffCommon
 	var $class			= "ffWidget_timechooser";
 
 	var $widget_deps	= array();
-    var $js_deps = array();
-    var $css_deps 		= array();
+	
+	var $libraries		= array();
+	
+    var $js_deps = array(
+                              "ff.ffField.timechooser"       => null
+						);
+    var $css_deps 		= array(
+    					);
 
 	// PRIVATE VARS
 	
@@ -63,13 +69,15 @@ class ffWidget_timechooser extends ffCommon
 	{
 
 		// THE REAL STUFF
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			$Field->parent[0]->processed_widgets[$prefix . $id] = "timechooser";
 		}
 		else
 		{
@@ -114,11 +122,6 @@ class ffWidget_timechooser extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.timechooser", "timechooser.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/timechooser");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -135,13 +138,6 @@ class ffWidget_timechooser extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.timechooser", "timechooser.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/timechooser");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

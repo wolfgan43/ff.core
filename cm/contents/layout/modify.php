@@ -4,8 +4,8 @@
  * @package ContentManager
  * @subpackage contents
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -201,52 +201,6 @@ if (strlen($res["theme"]["value"]))
 	$oField->fixed_post_content = "inherited: " . $res["theme"]["value"];
 $oRecord->addContent($oField, "general");
 
-$framework_css_multi_pairs = array();
-if(is_array($cm->oPage->framework_css_setting) && count($cm->oPage->framework_css_setting)) {
-	foreach($cm->oPage->framework_css_setting AS $framework_css => $framework_css_value) {
-		$framework_css_multi_pairs[$framework_css] = array(new ffData($framework_css), new ffData(ucfirst($framework_css)));
-		if(isset($framework_css_value["class-fluid"]))
-			$framework_css_multi_pairs[$framework_css . "~fluid"] = array(new ffData($framework_css . "-fluid"), new ffData(ucfirst($framework_css) . " Fluid"));
-
-		if(is_array($framework_css_value["theme"]) && count($framework_css_value["theme"])) {
-			foreach($framework_css_value["theme"] AS $framework_css_theme_key => $framework_css_theme_value) {
-				$framework_css_multi_pairs[$framework_css . "-" . $framework_css_theme_key] = array(new ffData($framework_css . "-" . $framework_css_theme_key), new ffData(ucfirst($framework_css) . " " . ucfirst($framework_css_theme_key)));
-				if(isset($framework_css_value["class-fluid"]))
-					$framework_css_multi_pairs[$framework_css . "~fluid-" . $framework_css_theme_key] = array(new ffData($framework_css . "-fluid-" . $framework_css_theme_key), new ffData(ucfirst($framework_css) . " Fluid " . ucfirst($framework_css_theme_key)));
-			}
-		}
-	}
-	ksort($framework_css_multi_pairs);
-}
-array_unshift($framework_css_multi_pairs, array(new ffData("no"), new ffData("Nessuno")));
-
-
-
-$oField = ffField::factory($cm->oPage);
-$oField->id = "framework_css";
-$oField->label = "framework css";
-$oField->extended_type = "Selection";
-$oField->multi_select_one_label = "Eredita";
-$oField->multi_pairs = $framework_css_multi_pairs;
-$oRecord->addContent($oField, "general");
-
-$font_icon_multi_pairs = array();
-if(is_array($cm->oPage->font_icon_setting) && count($cm->oPage->font_icon_setting)) {
-	foreach($cm->oPage->font_icon_setting AS $font_icon_key => $font_icon_value) {
-		$font_icon_multi_pairs[$font_icon_key] = array(new ffData($font_icon_key), new ffData(ucfirst($font_icon_key)));
-	}
-	ksort($font_icon_multi_pairs);
-}
-array_unshift($font_icon_multi_pairs, array(new ffData("no"), new ffData("Nessuno")));
-
-$oField = ffField::factory($cm->oPage);
-$oField->id = "font_icon";
-$oField->label = "font icon";
-$oField->extended_type = "Selection";
-$oField->multi_select_one_label = "Eredita";
-$oField->multi_pairs = $font_icon_multi_pairs;
-$oRecord->addContent($oField, "general");
-
 $oField = ffField::factory($cm->oPage);
 $oField->id = "page";
 $oField->label = "page";
@@ -415,12 +369,24 @@ $oRecord->groups["css"] = array(
                                          , "tab" => "css"
                                       );
                                       
-$oDetail = ffDetails::factory($cm->oPage);
+$oDetail = ffDetails::factory($cm->oPage, null, null, array("name" => "ffDetails_sort"));
 $oDetail->id = "DetailCss";
 $oDetail->title = "CSS";
 $oDetail->src_table = CM_TABLE_PREFIX . "layout_css";
 $oDetail->fields_relationship = array("ID_layout" => "ID");
 $oDetail->order_default = "ID";
+$oDetail->sort_order_field = "order";
+/*$oDetail->widget_deps[] = array(
+        "name" => "dragsort"
+        , "options" => array(
+              &$oDetail
+            , array(
+                "resource_id" =>  "publishing_node"
+                , "service_path" => get_path_by_rule("services", "restricted") . "/sort"
+            )
+            , "ID"
+        )
+    );*/
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "ID_css";
@@ -443,6 +409,11 @@ $oDetail->addContent($oField);
 $oField = ffField::factory($cm->oPage);
 $oField->id = "path";
 $oField->label = "Percorso";
+$oDetail->addContent($oField);
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "theme_include";
+$oField->label = "Tema";
 $oDetail->addContent($oField);
 /*
 $oField = ffField::factory($cm->oPage);
@@ -468,13 +439,24 @@ $oDetail->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "priority";
+$oField->base_type = "Number";
 $oField->label = "priority";
 $oField->extended_type = "Selection";
-$oField->multi_select_one_label = "Eredita";
-$oField->multi_pairs = array(
-	array(new ffData("top"), new ffData("Top"))
-	, array(new ffData("bottom"), new ffData("Bottom"))
-);
+$oField->multi_select_one_label = ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_DEFAULT");
+//$oField->multi_select_one = false;
+$oField->multi_pairs = ffGlobals::getInstance("__cm__")->field_layout_priority;
+$oField->default_value = new ffData(cm::LAYOUT_PRIORITY_DEFAULT, "Number");
+$oDetail->addContent($oField);
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "index";
+$oField->base_type = "Number";
+$oField->label = "Index";
+//$oField->widget = "slider";
+$oField->min_val = -100;
+$oField->max_val = 100;
+$oField->step = 1;
+$oField->default_value = new ffData(0, "Number");
 $oDetail->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
@@ -503,12 +485,24 @@ $oRecord->groups["js"] = array(
                                          , "tab" => "js"
                                       );
                                       
-$oDetail = ffDetails::factory($cm->oPage);
+$oDetail = ffDetails::factory($cm->oPage, null, null, array("name" => "ffDetails_sort"));
 $oDetail->id = "DetailJs";
 $oDetail->title = "Javascript";
 $oDetail->src_table = CM_TABLE_PREFIX . "layout_js";
 $oDetail->fields_relationship = array("ID_layout" => "ID");
 $oDetail->order_default = "ID";
+$oDetail->sort_order_field = "order";
+/*$oDetail->widget_deps[] = array(
+        "name" => "dragsort"
+        , "options" => array(
+              &$oDetail
+            , array(
+                "resource_id" =>  "publishing_node"
+                , "service_path" => get_path_by_rule("services", "restricted") . "/sort"
+            )
+            , "ID"
+        )
+    );*/
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "ID_js";
@@ -589,13 +583,23 @@ $oDetail->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "priority";
+$oField->base_type = "Number";
 $oField->label = "priority";
 $oField->extended_type = "Selection";
-$oField->multi_select_one_label = "Eredita";
-$oField->multi_pairs = array(
-	array(new ffData("top"), new ffData("Top"))
-	, array(new ffData("bottom"), new ffData("Bottom"))
-);
+$oField->multi_select_one_label = ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_DEFAULT");
+$oField->multi_pairs = ffGlobals::getInstance("__cm__")->field_layout_priority;
+//$oField->default_value = new ffData(cm::LAYOUT_PRIORITY_NORMAL, "Number");
+$oDetail->addContent($oField);
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "index";
+$oField->base_type = "Number";
+$oField->label = "Index";
+//$oField->widget = "slider";
+$oField->min_val = -100;
+$oField->max_val = 100;
+$oField->step = 1;
+$oField->default_value = new ffData(0, "Number");
 $oDetail->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);

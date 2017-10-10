@@ -17,11 +17,13 @@ class ffWidget_autocompletetoken extends ffCommon
 
 	var $widget_deps	= array();
     
+	var $libraries		= array();
+            
     var $js_deps = array(
-                              "jquery"                        => null
-                        );
-    var $css_deps         = array(
-                        );
+                              "jquery.tokeninput"       => null
+						);
+    var $css_deps 		= array(
+    					);
 
 	var $disable_dialog = false;
 	
@@ -61,7 +63,7 @@ class ffWidget_autocompletetoken extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -77,13 +79,15 @@ class ffWidget_autocompletetoken extends ffCommon
 	{
 		global $plgCfg_autocompletetoken_UseOwnSession;
         
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "autocompletetoken";
 		}
 		else
 		{
@@ -117,27 +121,16 @@ class ffWidget_autocompletetoken extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/autocompletetoken"); 
 
         if(strlen($Field->autocompletetoken_theme)) {
-        	$css_name = "token-input-" . $Field->autocompletetoken_theme . ".css";
+        	$css_file = "token-input-" . $Field->autocompletetoken_theme . ".css";
 		} else {
-			$css_name = "token-input.css";
+			$css_file = "token-input.css";
 		}
-
-		$css_deps 		= array(
-              "jquery.tokeninput"        => array(
-                      "file" => $css_name
-                    , "path" => null
-                    , "rel" => "plugins/jquery.tokeninput"
-                ) 
-    	);		
-
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"]);
-			}
-		}
+		
+		$this->oPage[0]->tplAddCss("jquery-ui.tokeninput-" . $Field->autocompletetoken_theme, array(
+			"path" => "/themes/library/plugins/jquery.tokeninput"
+			, "file" => $css_file
+			, "index" => 200
+		));
         
         $arrValue = array();
         if ($value == null || !$value->getValue($Field->get_app_type(), $Field->get_locale())) {
@@ -202,7 +195,7 @@ class ffWidget_autocompletetoken extends ffCommon
 			}
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("service", "'" . $Field->actex_service . "'");
+			$this->tpl[$tpl_id]->set_var("service", $Field->actex_service);
 
 
                 
@@ -305,7 +298,6 @@ class ffWidget_autocompletetoken extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("SectData", "");
 
-			
 		$srv_data[] = "type=autocomplete";
 		if($data_src)
 			$srv_data[] = "data_src=" . $data_src;
@@ -318,8 +310,7 @@ class ffWidget_autocompletetoken extends ffCommon
 */			
 		if(is_array($srv_data) && count($srv_data))
 			$this->tpl[$tpl_id]->set_var("srv_data", "?" . implode("&", $srv_data));
-			
-			
+		
 		$this->tpl[$tpl_id]->set_var("SectAttrResult", "");
 		$this->tpl[$tpl_id]->set_var("SectAttrToken", "");
 
@@ -349,13 +340,6 @@ class ffWidget_autocompletetoken extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("jquery.fn.tokeninput", "jquery.tokeninput.js", FF_THEME_DIR . "/library/plugins/jquery.tokeninput");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -372,15 +356,6 @@ class ffWidget_autocompletetoken extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("jquery.fn.tokeninput", "jquery.tokeninput.js", FF_THEME_DIR . "/library/plugins/jquery.tokeninput");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

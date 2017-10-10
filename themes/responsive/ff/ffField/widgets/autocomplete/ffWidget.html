@@ -1,18 +1,14 @@
 <!--BeginSectHeaders-->
 <script type="text/javascript">
-	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-		ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js",	function() {
-			ff.pluginLoad("ff.ffField.autocomplete", "{widget_path}/autocomplete.js", function () {
-				ff.ffField.autocomplete.init({
-					<!--BeginSectInnerUrl-->innerURL			: "{innerURL}",<!--EndSectInnerUrl-->
-	                "icons"                   : {
-	                    "caret"                 : "{icon_caret_down}"
-	                    , "plus"                : '{icon_plus}'
-	                    , "minus"               : '{icon_minus}'
-	                    , "loader"				: '{icon_loader}'
-	                }
-				});
-			});
+	ff.pluginLoad("ff.ffField.autocomplete", "{widget_path}/autocomplete.js", function () {
+		ff.ffField.autocomplete.init({
+			<!--BeginSectInnerUrl-->innerURL			: "{innerURL}",<!--EndSectInnerUrl-->
+	        "icons"                   : {
+	            "caret"                 : "{icon_caret_down}"
+	            , "plus"                : '{icon_plus}'
+	            , "minus"               : '{icon_minus}'
+	            , "loader"				: '{icon_loader}'
+	        }
 		});
 	});
 </script>
@@ -27,8 +23,8 @@
 	<textarea id="{prefix}{container}{id}" name="{prefix}{container}{id}" class="{class}" {properties}>{selected_value}</textarea>
 	<!--EndSectControlMulti--> 
 	<!--BeginSectControlMono--> 
-	<input type="text" id="{prefix}{container}{id}" class="{class}" value="{selected_value}" style=" position: absolute;top: 0; left: 0; z-index: 11; background: transparent; margin:0;" {properties} />
-	<input type="text" id="suggest_{container}{id}" class="{class}" disabled="disabled" value="{selected_value}" style="  z-index: 10; background: transparent; margin:0; -webkit-text-fill-color: silver; color: silver;" />
+	<input type="text" id="{prefix}{container}{id}" class="{class}" value="{selected_value}" style=" position: absolute;top: 0; left: 0;  background: transparent; margin:0;" {properties} />
+	<input type="text" id="suggest_{container}{id}" class="{class}" disabled="disabled" value="{selected_value}" style="   background: transparent; margin:0; -webkit-text-fill-color: silver; color: silver;" />
 	<!--EndSectControlMono-->
 	<!--BeginSectReadOnly-->
 	<input type="hidden" id="{container}{id}" name="{container}{id}" value="{selected_id}" />

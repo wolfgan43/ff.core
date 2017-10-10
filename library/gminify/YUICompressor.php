@@ -123,7 +123,7 @@ class Minify_YUICompressor {
                     : '';
             }
         }
-        return $cmd . ' ' . escapeshellarg($tmpFile);
+        return $cmd . ' ' . escapeshellarg($tmpFile) . " 2>&1 ";
     }
     
     private static function _prepare()

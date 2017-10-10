@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -18,8 +18,8 @@
  * @package FormsFramework
  * @subpackage base
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffData extends ffClassChecks
@@ -245,11 +245,11 @@ class ffData extends ffClassChecks
         
 	function getDateTime()
 	{
-		if ($this->data_type !== "Date")
+		if ($this->data_type === "Date")
 			return new DateTime(
 					sprintf("%'04u-%'02u-%'02uT00:00:00", $this->value_date_year, $this->value_date_month, $this->value_date_day)
 				);
-		else if ($this->data_type !== "DateTime")
+		else if ($this->data_type === "DateTime")
 			return new DateTime(
 					sprintf("%'04u-%'02u-%'02uT%'02u:%'02u:%'02u", $this->value_date_year, $this->value_date_month, $this->value_date_day, $this->value_date_hours, $this->value_date_minutes, $this->value_date_seconds)
 				);

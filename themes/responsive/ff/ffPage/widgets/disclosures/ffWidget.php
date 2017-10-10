@@ -10,18 +10,16 @@ class ffWidget_disclosures extends ffCommon
 
 	var $class			= "ffWidget_disclosures";
 
+	var $libraries		= array();
+	
 	var $widget_deps	= array();
-    var $js_deps = array(
-							  "jquery" 			=> null
-							/*, "jquery.ui" 		=> null*/
+	
+    var $js_deps		= array(
+							  "ff.ffPage.disclosures" 	=> null
 						);
+	
 	var $css_deps 		= array();
-    /*var $css_deps 		= array(
-    						  "jquery.ui"		=> array(
-    						  		"file" => "jquery.ui.all.css"
-									, "path" => null
-								)
-    					);*/
+	
 	// PRIVATE VARS
 	var $oPage			= null;
 	var $source_path	= null;
@@ -58,7 +56,7 @@ class ffWidget_disclosures extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -70,10 +68,6 @@ class ffWidget_disclosures extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			$this->oPage[0]->tplAddJs("ff.ffPage.disclosures", "disclosures.js", FF_THEME_DIR . "/responsive/ff/ffPage/widgets/disclosures"); 
-		}			
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -90,12 +84,6 @@ class ffWidget_disclosures extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			$this->oPage[0]->tplAddJs("ff.ffPage.disclosures", "disclosures.js", FF_THEME_DIR . "/responsive/ff/ffPage/widgets/disclosures");
-			
-			//return;
-		}			
-
 		if (!isset($this->tpl["main"]))
 			return;
 
@@ -109,8 +97,6 @@ class ffWidget_disclosures extends ffCommon
 
 		return $this->tpl["main"]->rpparse("SectFooters", false);
 	}
-
-
 
 	static function processButton($obj, $tpl, $widget)
 	{
@@ -130,8 +116,8 @@ class ffWidget_disclosures extends ffCommon
 
 			$widget->tpl[$obj->id]->set_var("component_id", $obj->id);
 			$tpl->set_var("discl_bt", $widget->tpl[$obj->id]->rpparse("SectIstance", false));
-            $tpl->set_var("content_wrap_start", '<div id="' . $obj->id . '_discl_sect">');
-            $tpl->set_var("content_wrap_end", '</div>');
+            //$tpl->set_var("content_wrap_start", '<div id="' . $obj->id . '_discl_sect">');
+            //$tpl->set_var("content_wrap_end", '</div>');
 
 			$widget->tpl[$obj->id]->parse("SectInitElement", true);
 

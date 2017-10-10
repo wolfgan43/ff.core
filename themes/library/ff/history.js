@@ -26,7 +26,7 @@ __ff : true, // used to recognize ff'objects
 
 "gup" : function (name, context) {
 	name = name.replace(/[\[]/g,"\\[").replace(/[\]]/g,"\\]");
-	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regexS = "[\\?&]"+name+"=([^&#\'\"]*)";
 	var regex = new RegExp( regexS );
 
 	if (context == null)

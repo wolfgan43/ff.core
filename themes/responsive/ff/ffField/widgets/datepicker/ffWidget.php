@@ -16,28 +16,18 @@ class ffWidget_datepicker extends ffCommon
 	var $class			= "ffWidget_datepicker";
 
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
-							, "jquery.ui" 		=> null
-/*							, "jquery.ui/i18n" 		=> "jquery.ui.datepicker-it.js"*/
-						);		
-    var $css_deps 		= array(/*
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.datepicker"        => array(
-                                      "file" => "jquery.ui.datepicker.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
+    						"jquery-ui" 			=> null,
+							"jquery-ui.timepicker" 	=> null
+						);
+	
+    var $css_deps 		= array(
+							"jquery-ui.datepicker" 	=> null
     					);
+    					
 	// PRIVATE VARS
 	
 	var $oPage			= null;
@@ -68,7 +58,7 @@ class ffWidget_datepicker extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -76,12 +66,15 @@ class ffWidget_datepicker extends ffCommon
 
 	function process($id, &$value, ffField_html &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "datepicker";
 		}
 		else
 		{
@@ -99,63 +92,27 @@ class ffWidget_datepicker extends ffCommon
 		//}
 		
 		$this->tpl[$tpl_id]->set_var("theme", $theme);
-
-        if(is_array($Field->framework_css["widget"]["colorpicker"])) {
-            $this->framework_css = array_replace_recursive($this->framework_css, $Field->framework_css["widget"]["colorpicker"]);
-        }
-        		
+/*
         if(strlen($Field->widget_path)) {
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
 		} else {
 			if(strlen($Field->parent_page[0]->jquery_ui_force_theme !== NULL)) {
-            	$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/library/jquery.ui/themes/" . $Field->parent_page[0]->jquery_ui_force_theme . "/images");
+            	$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/library/jquery-ui/themes/" . $Field->parent_page[0]->jquery_ui_theme . "/images");
 			} else { 
 				$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/" . $theme . "/images/jquery.ui");
 			}
-		}
-		$this->tpl[$tpl_id]->set_var("id", $id);
-		$this->tpl[$tpl_id]->set_var("lang", strtolower(substr(FF_LOCALE, 0, -1)));
-
-    	$css_deps 		= array(/* Remove jquery ui css
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.datepicker"        => array(
-                      "file" => "jquery.ui.datepicker.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )*/
-    	);
-        /*
-        if($Field->get_app_type() == "DateTime") 
-		{
-            $css_deps["jquery.ui.timepicker"] = array(
-                      "file" => "timepicker-addon.css"
-                    , "path" => FF_THEME_DIR . "/responsive/ff/ffField/widgets/datepicker" 
-                );
-
-            $css_deps["jquery.ui.slider"] = array(
-                  "file" => "jquery.ui.slider.css"
-                , "path" => null
-                , "rel" => "jquery.ui"
-            );
-        }
-		if(is_array($css_deps) && count($css_deps))
-		{
-			foreach($css_deps AS $css_key => $css_value)
-			{
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
 		}*/
+		$this->tpl[$tpl_id]->set_var("id", $id);
+		
+		$lang = ($Field->datepicker_lang ? $Field->datepicker_lang : strtolower(substr(FF_LOCALE, 0, -1)));
+		
+		$this->oPage[0]->tplAddJs("jquery-ui.datepicker-lang-" . $lang, array(
+			"path" => "/themes/library/jquery-ui"
+			, "file" => "i18n/jquery.ui.datepicker-" . $lang . ".js"
+			, "index" => 200
+		));
+		
+		$this->tpl[$tpl_id]->set_var("lang", strtolower(substr(FF_LOCALE, 0, -1)));
 		
 		if ($Field->contain_error && $Field->error_preserve) {
 			$this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->ori_value));
@@ -173,10 +130,6 @@ class ffWidget_datepicker extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("class", $this->class);
 
-        $Field->framework_css["fixed_post_content"] = array(2);         
-        $Field->fixed_post_content = '<a href="javascript:void(0);" onclick="$(\'#' . $Field->parent[0]->id . "_" . $id . '\').datepicker(\'show\');" class="' . cm_getClassByFrameworkCss("calendar", "icon") . '"></a>';
-        /*messo nel css */ //$Field->properties["style"] = "position: relative; z-index: 100000;"; //workground per far funzionare il datepicker dentro le dialog modali
-            
         if($Field->min_year)
             $this->tpl[$tpl_id]->set_var("min_year", $Field->min_year);
         else
@@ -187,18 +140,29 @@ class ffWidget_datepicker extends ffCommon
         else
             $this->tpl[$tpl_id]->set_var("max_year", "2");
 		
+		if ($Field->datepicker_showbutton)
+        {
+	        $Field->framework_css["fixed_post_content"] = array(2);         
+	        $Field->fixed_post_content = '<a href="javascript:void(0);" onclick="jQuery.fn.escapeGet(\'' . $Field->parent[0]->id . "_" . $id . '\').datepicker(\'show\');" class="' . cm_getClassByFrameworkCss("calendar", "icon") . '"></a>';
+	        /*messo nel css */ //$Field->properties["style"] = "position: relative; z-index: 100000;"; //workground per far funzionare il datepicker dentro le dialog modali
+        }
+		
+		if ($Field->datepicker_weekselector)
+			$this->tpl[$tpl_id]->parse("SectWeek", false);
+		else
+			$this->tpl[$tpl_id]->set_var("SectWeek", "");		
+		
 		if ($Field->get_app_type() == "DateTime" || $Field->datepicker_force_datetime)
 		{
-			//$this->tpl[$tpl_id]->parse("SectDateTimeHeader", false);
             $this->tpl[$tpl_id]->parse("SectDateTime", false);
 			$this->tpl[$tpl_id]->set_var("SectDate", "");
 		}
 		else
 		{
-           // $this->tpl[$tpl_id]->set_var("SectDateTimeHeader", "");
 			$this->tpl[$tpl_id]->set_var("SectDateTime", "");
 			$this->tpl[$tpl_id]->parse("SectDate", false);
 		}
+		
 		$this->tpl[$tpl_id]->parse("SectBinding", true);
         return;
 		//return $Field->fixed_pre_content . $this->tpl[$tpl_id]->rpparse("SectControl", FALSE) . $Field->fixed_post_content;
@@ -206,11 +170,6 @@ class ffWidget_datepicker extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("jquery.ui.datepicker", "jquery.ui.datepicker-" . strtolower(substr(FF_LOCALE, 0, -1)) . ".js", FF_THEME_DIR . "/library/jquery.ui/i18n");
-                $this->oPage[0]->tplAddJs("jquery.ui.timepicker", "timepicker-addon.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/datepicker");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -227,12 +186,6 @@ class ffWidget_datepicker extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddJs("jquery.ui.datepicker", "jquery.ui.datepicker-" . strtolower(substr(FF_LOCALE, 0, -1)) . ".js", FF_THEME_DIR . "/library/jquery.ui/i18n");
-			
-			//return;
-		}
-		
 		if (!isset($this->tpl["main"]))
 			return;
 

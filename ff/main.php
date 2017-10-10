@@ -5,10 +5,11 @@
  * @package FormsFramework
  * @subpackage common
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
+
 if (!defined("FF_COMPONENTS") && defined("FF_ONLY_COMPONENTS"))
 {
 	require(__FF_DIR__ . "/classes/ffTemplate." . FF_PHP_EXT);
@@ -31,8 +32,8 @@ if (!defined("FF_COMPONENTS") && defined("FF_ONLY_COMPONENTS"))
 // init framework..
 if (!defined("FF_MAIN_INIT"))
 {
-	if(version_compare(phpversion(), "5.2.4", "<"))
-		die("Forms PHP Framework, Critical Error: PHP Version >= 5.2.4 required, " . phpversion() . " detected.");
+	if(version_compare(phpversion(), "5.4", "<"))
+		die("Forms PHP Framework, Critical Error: PHP Version >= 5.4 required, " . phpversion() . " detected.");
 
 	/**
 	* get parent'dir, no matter if windows or linux
@@ -41,8 +42,21 @@ if (!defined("FF_MAIN_INIT"))
 	*/
 	function ffCommon_dirname($path) 
 	{
-		$res = dirname($path);
-		if(dirname("/") == "\\")
+		static $windows = null;
+		if ($windows === null)
+		{
+			if(dirname("/") == "\\")
+				$windows = true;
+			else
+				$windows = false;
+		}
+		
+		if (substr($path, -1) === "/")
+			$res = substr($path, 0, -1);
+		else
+			$res = dirname($path);
+		
+		if($windows)
 			$res = str_replace("\\", "/", $res);
 
 		if($res == ".")
@@ -80,6 +94,13 @@ if (!defined("FF_MAIN_INIT"))
 		else if (isset($_SERVER["ORIG_PATH_INFO"]))
 			$_SERVER["PATH_INFO"] = $_SERVER["ORIG_PATH_INFO"];
 
+		$fftmp_urlparams = false;
+		if (defined("FF_URLPARAMS"))
+		{
+			$fftmp_urlparams = explode(",", FF_URLPARAMS);
+			$fftmp_urlparams = array_flip($fftmp_urlparams);
+		}
+
 		if (strlen($_SERVER["QUERY_STRING"]))
 		{
 			$fftmp_new_querystring = "";
@@ -87,6 +108,16 @@ if (!defined("FF_MAIN_INIT"))
 			foreach ($fftmp_parts as $fftmp_value)
 			{
 				$fftmp_subparts = explode("=", $fftmp_value);
+				$fftmp = strtoupper($fftmp_subparts[0]);
+				
+				if ($fftmp_urlparams !== false && isset($fftmp_urlparams[$fftmp]))
+				{
+					define ("FF_URLPARAM_" . trim($fftmp, "_"), true);
+					unset($_REQUEST[$fftmp_subparts[0]]);
+					unset($_GET[$fftmp_subparts[0]]);
+					continue;
+				}
+				
 				if ($fftmp_subparts[0] == "_ffq_")
 					continue;
 				if (!isset($_REQUEST[$fftmp_subparts[0]]))
@@ -103,6 +134,7 @@ if (!defined("FF_MAIN_INIT"))
 			unset($fftmp_parts);
 			unset($fftmp_value);
 			unset($fftmp_subparts);
+			unset($fftmp);
 		}
 
 		// fix request_uri. can't use code above due to multiple redirects (es.: R=401 and ErrorDocument in .htaccess)
@@ -116,20 +148,28 @@ if (!defined("FF_MAIN_INIT"))
 				foreach ($fftmp_parts as $fftmp_value)
 				{
 					$fftmp_subparts = explode("=", $fftmp_value);
+					$fftmp = strtoupper($fftmp_subparts[0]);
+
+					if ($fftmp_urlparams !== false && isset($fftmp_urlparams[$fftmp]))
+						continue;
+
 					if ($fftmp_subparts[0] == "_ffq_")
 						continue;
 					$fftmp_new_querystring .= $fftmp_subparts[0] . (count($fftmp_subparts) == 2 ? "=" . $fftmp_subparts[1] : "") . "&";
 				}
 
-				$_SERVER["REQUEST_URI"] = $fftmp_requri_parts[0] . "?" . $fftmp_new_querystring;
+				$_SERVER["REQUEST_URI"] = $fftmp_requri_parts[0] . ($fftmp_requri_parts[1] !== $fftmp_new_querystring && $fftmp_new_querystring === "" ? "" : "?") . $fftmp_new_querystring;
 
 				unset($fftmp_new_querystring);
 				unset($fftmp_parts);
 				unset($fftmp_value);
 				unset($fftmp_subparts);
+				unset($fftmp);
 			}
 			unset($fftmp_requri_parts);
 		}
+		
+		unset($fftmp_urlparams);
 	}
 	
 	// set default extension for php files
@@ -141,11 +181,18 @@ if (!defined("FF_MAIN_INIT"))
 	else
 		define("__FF_DIR__", ffCommon_dirname(__FILE__));
 	define("__TOP_DIR__", ffCommon_dirname(__FF_DIR__));
+	
+	if (isset($_ENV["FF_PROJECT_DIR"]))
+		define("__PRJ_DIR__", $_ENV["FF_PROJECT_DIR"]);
+	else if (isset($_ENV["REDIRECT_FF_PROJECT_DIR"]))
+		define("__PRJ_DIR__", $_ENV["REDIRECT_FF_PROJECT_DIR"]);
+	else
+		define("__PRJ_DIR__", __TOP_DIR__);
 
 	// add ff'dirs to include path
 	set_include_path(
-			__FF_DIR__ . PATH_SEPARATOR .
-			__FF_DIR__ . "/library" . PATH_SEPARATOR .
+			__TOP_DIR__ . PATH_SEPARATOR .
+			__TOP_DIR__ . "/library" . PATH_SEPARATOR .
 			get_include_path()
 		);
 
@@ -155,8 +202,8 @@ if (!defined("FF_MAIN_INIT"))
 	// load config...
 
 	// ..base (all others depends on this one)
-	if (@is_file(__TOP_DIR__ . "/config." . FF_PHP_EXT))
-		require __TOP_DIR__ . "/config." . FF_PHP_EXT;
+	if (@is_file(__PRJ_DIR__ . "/config." . FF_PHP_EXT))
+		require __PRJ_DIR__ . "/config." . FF_PHP_EXT;
 	else if (@is_file(__FF_DIR__ . "/config." . FF_PHP_EXT))
 		require __FF_DIR__ . "/config." . FF_PHP_EXT;
 	else
@@ -209,15 +256,16 @@ if (!defined("FF_MAIN_INIT"))
 	if (!defined("FF_ORM_ENABLE")) define("FF_ORM_ENABLE", true);
 	if (!defined("FF_PREFIX")) define("FF_PREFIX", "ff_");
 	if (!defined("FF_SUPPORT_PREFIX")) define("FF_SUPPORT_PREFIX", "support_");
-	
 
+	if (!defined("FF_URLREWRITE_REMOVEHYPENS")) define("FF_URLREWRITE_REMOVEHYPENS", false);
+	
 	// Error Handling, loaded now cause need configuration
 	require(__FF_DIR__ . "/error_handling." . FF_PHP_EXT);
 
 	// Theme Management
 	// define base theme(s) location
 	if (!defined("FF_THEME_DIR"))			define ("FF_THEME_DIR", 	"/themes");
-	if (!defined("FF_THEME_DISK_PATH")) 	define ("FF_THEME_DISK_PATH", 	FF_DISK_PATH . FF_THEME_DIR);
+	if (!defined("FF_THEME_DISK_PATH")) 	define ("FF_THEME_DISK_PATH", 	__TOP_DIR__ . FF_THEME_DIR);
 	if (!defined("FF_THEME_SITE_PATH")) 	define ("FF_THEME_SITE_PATH", 	FF_SITE_PATH . FF_THEME_DIR);
 
 	if (defined("FF_DEFAULT_THEME"))
@@ -330,10 +378,9 @@ if(!defined("FF_SKIP_COMPONENTS"))
 }
 
 // Load commons..
-
 // ...base
-if (@is_file(__TOP_DIR__ . "/common." . FF_PHP_EXT))
-	require __TOP_DIR__ . "/common." . FF_PHP_EXT;
+if (@is_file(__PRJ_DIR__ . "/common." . FF_PHP_EXT))
+	require __PRJ_DIR__ . "/common." . FF_PHP_EXT;
 //elseif (is_file(ffCommon_dirname($_SERVER['SCRIPT_FILENAME']) . "/common." . FF_PHP_EXT))
 //	require (ffCommon_dirname($_SERVER['SCRIPT_FILENAME']) . "/common." . FF_PHP_EXT);
 

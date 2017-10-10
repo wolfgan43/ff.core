@@ -144,11 +144,11 @@ if(strlen(MOD_SEC_USER_AVATAR))
 	    $oField->file_normalize = true;
 	    $oField->file_show_preview = true;
 	    $oField->uploadify_model_thumb = "thumb";
-	    $oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
-	    $oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
+	    //$oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
+	    //$oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
 	    $oField->control_type = "file";
 	    $oField->file_show_delete = true;
-	    $oField->widget = "uploadify"; 
+	    $oField->widget = "uploadifive"; 
 	    $oRecord->addContent($oField, $account);
 	}
 }
@@ -168,6 +168,11 @@ if (!mod_security_is_defined_field("email"))
 	$oField->label = "E-Mail";
 	$oField->required = true;
 	$oField->addValidator("email");
+	if (MOD_SEC_CRYPT && MOD_SEC_CRYPT_EMAIL)
+	{
+		$oField->crypt = true;
+		$oField->crypt_modsec = true;
+	}
 	$oRecord->addContent($oField, $account);
 }
 
@@ -177,16 +182,24 @@ if (!mod_security_is_defined_field("password") && !$oRecord->display_values)
 	$oField->id = "password";
 	$oField->label = "Password";
 	$oField->extended_type = "Password";
-	switch (MOD_SEC_PASS_FUNC)
+	if (MOD_SEC_CRYPT)
 	{
-		case "MD5":
-			$oField->crypt_method = "MD5";
-			break;
-
-		default:
-			$oField->crypt_method = "mysql_password";
-			break;
+		$oField->store_in_db = false;
 	}
+	else
+	{
+		switch (MOD_SEC_PASS_FUNC)
+		{
+			case "MD5":
+				$oField->crypt_method = "MD5";
+				break;
+
+			default:
+				$oField->crypt_method = "mysql_password";
+				break;
+		}
+	}
+	$oField->addValidator("password");
 	$oRecord->addContent($oField, $account);
 
 	$oField = ffField::factory($cm->oPage);
@@ -273,6 +286,11 @@ if (!mod_security_is_defined_field("expiration") && mod_sec_check_acl(MOD_SEC_AC
 }
 
 mod_security_add_custom_fields($oRecord);
+if (ffIsset($cm->modules["security"], "custom_events") && ffIsset($cm->modules["security"]["custom_events"], "user_modify") && count($cm->modules["security"]["custom_events"]["user_modify"]))
+	foreach($cm->modules["security"]["custom_events"]["user_modify"] as $key => $value)
+	{
+		$oRecord->addEvent($key, $value);
+	}
 
 $cm->oPage->addContent($oRecord);
 
@@ -290,35 +308,11 @@ if (MOD_SEC_PROFILING && !mod_security_is_defined_field("profile") && mod_sec_ch
 	);
 	$detail->display_new = false;
 	$detail->display_delete = false;
-	$detail->populate_edit_SQL = "SELECT
-										cm_mod_security_rel_profiles_users.ID AS ID
-										, cm_mod_security_profiles.ID AS ID_profile
-										, cm_mod_security_rel_profiles_users.enabled AS enabled
-										, cm_mod_security_profiles.`order` AS `order`
-									FROM
-										cm_mod_security_profiles
-										LEFT JOIN cm_mod_security_rel_profiles_users ON
-											cm_mod_security_rel_profiles_users.ID_profile = cm_mod_security_profiles.ID
-											AND cm_mod_security_rel_profiles_users.ID_user = [ID_FATHER]
-									WHERE
-										cm_mod_security_profiles.enabled = '1' 
-										AND ( cm_mod_security_profiles.acl = '' OR " . get_session("UserLevel") . " IN(cm_mod_security_profiles.acl) )
-									ORDER BY
-										cm_mod_security_profiles.`order`
-		";
+	
+	$detail->populate_edit_DS = "user_multi_profiles_edit";
 	$detail->auto_populate_edit = true;
 	
-	$detail->populate_insert_SQL = "SELECT
-										cm_mod_security_profiles.ID AS ID_profile
-										, cm_mod_security_profiles.`order`
-									FROM
-										cm_mod_security_profiles
-									WHERE
-										cm_mod_security_profiles.enabled = '1' 
-										AND ( cm_mod_security_profiles.acl = '' OR " . get_session("UserLevel") . " IN(cm_mod_security_profiles.acl) )
-									ORDER BY
-										cm_mod_security_profiles.`order`
-		";
+	$detail->populate_insert_DS = "user_multi_profiles_insert";
 	$detail->auto_populate_insert = true;
 	
 	$field = ffField::factory($cm->oPage);
@@ -356,6 +350,48 @@ function ModSecUtenti_on_done_action($oRecord, $frmAction)
 	$ID = $oRecord->key_fields["ID"]->value;
 	$db = ffDb_Sql::factory();
 	
+	if (
+			MOD_SEC_CRYPT 
+			&& ($frmAction == "insert" || $frmAction == "update") 
+			&& strlen($oRecord->form_fields["password"]->value->getValue())
+		)
+	{
+		$globals_crypt = ffGlobals::getInstance("__mod_sec_crypt__");
+		
+		// generate new crypt stuff
+		
+		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+		
+		$salt = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+		$password = $oRecord->form_fields["password"]->value->getValue();
+		
+		$hash = mod_sec_mykdf($password, $salt, 1000);
+		$Vu1 = substr($hash, 0, 32);
+		$Vu2 = substr($hash, 32);
+		
+		$Eu = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $Vu2, bin2hex($globals_crypt->_crypt_Ku_) . "|" . bin2hex($globals_crypt->_crypt_KSu_), MCRYPT_MODE_CBC, $salt);
+		
+		$sSQL = "UPDATE " .  $options["table_name"] . " SET
+						`crypt_vu` = " . $db->toSql($Vu1) . "
+						, `crypt_su` = " . $db->toSql(bin2hex($salt)) . "
+						, `crypt_eu` = " . $db->toSql(bin2hex($Eu)) . "
+					WHERE
+						`ID` = " . $db->toSql($ID);
+		$db->execute($sSQL);
+		
+		if ($ID->getValue() == get_session("UserNID"))
+		{
+			$cookiehash = mod_sec_mykdf($password, $salt, 1);
+			
+			$p1 = substr($cookiehash, 0, 32);
+			$p2 = substr($cookiehash, 32);
+
+			$sessionCookie = session_get_cookie_params();
+			setcookie("__FF_VU__", $p1, $sessionCookie['lifetime'], $sessionCookie['path'], $sessionCookie['domain'], $sessionCookie['secure']);
+			set_session("__FF_VU__", $p2);
+		}
+	}
+	
 	if (isset($cm->modules["security"]["fields"]) && count($cm->modules["security"]["fields"]))
 	{
 		switch ($frmAction)
@@ -369,11 +405,11 @@ function ModSecUtenti_on_done_action($oRecord, $frmAction)
 					$sSQL = "INSERT INTO
 									" . $options["table_dett_name"] . " (ID_users, field, value)
 								VALUES
-									(
+								(
 									  " . $db->toSql($ID) . "
 									, " . $db->toSql($key) . "
 									, " . $db->toSql($oRecord->form_fields[$key]->value) . "
-									)
+								)
 							";
 					$db->execute($sSQL);
 				}
@@ -385,37 +421,40 @@ function ModSecUtenti_on_done_action($oRecord, $frmAction)
 					if (mod_security_is_default_field($key))
 						continue;
 					
-                                        $sSQL = "SELECT ID
-                                                    FROM " . $options["table_dett_name"] . "
-                                                    WHERE ID_users = " . $db->toSql($ID) . "
-                                                        AND field = " . $db->toSql($key);
-                                        $db->query($sSQL);
-                                        if($db->nextRecord()) {
-                                            $sSQL = "UPDATE 
-                                                                            " . $options["table_dett_name"] . "
-                                                                    SET
-                                                                            value = " . $db->toSql($oRecord->form_fields[$key]->value) . "
-                                                                    WHERE
-                                                                            ID_users = " . $db->toSql($ID) . "
-                                                                            AND field = " . $db->toSql($key) . "
-                                                            ";
-                                            $db->execute($sSQL);
-                                        } else {
-                                            $sSQL = "INSERT INTO
-                                                                            " . $options["table_dett_name"] . " (ID_users, field, value)
-                                                                    VALUES
-                                                                            (
-                                                                              " . $db->toSql($ID) . "
-                                                                            , " . $db->toSql($key) . "
-                                                                            , " . $db->toSql($oRecord->form_fields[$key]->value) . "
-                                                                            )
-                                                            ";
-                                            $db->execute($sSQL);
+					$sSQL = "SELECT ID
+								FROM " . $options["table_dett_name"] . "
+								WHERE ID_users = " . $db->toSql($ID) . "
+									AND field = " . $db->toSql($key);
+					$db->query($sSQL);
+					if($db->nextRecord())
+					{
+						$sSQL = "UPDATE 
+														" . $options["table_dett_name"] . "
+												SET
+														value = " . $db->toSql($oRecord->form_fields[$key]->value) . "
+												WHERE
+														ID_users = " . $db->toSql($ID) . "
+														AND field = " . $db->toSql($key) . "
+										";
+						$db->execute($sSQL);
+					} 
+					else 
+					{
+						$sSQL = "INSERT INTO
+														" . $options["table_dett_name"] . " (ID_users, field, value)
+												VALUES
+														(
+														  " . $db->toSql($ID) . "
+														, " . $db->toSql($key) . "
+														, " . $db->toSql($oRecord->form_fields[$key]->value) . "
+														)
+										";
+						$db->execute($sSQL);
 					}
 				}
 				break;
 			case "confirmdelete":
-				cm_purge_dir(FF_DISK_PATH . "/uploads/users/" . $component->key_fields["ID"]->getValue(), "/users/" . $component->key_fields["ID"]->getValue());
+				cm_purge_dir(FF_DISK_PATH . "/uploads/users/" . $oRecord->key_fields["ID"]->getValue(), "/users/" . $oRecord->key_fields["ID"]->getValue());
 				break;
 		}
 	}
@@ -451,7 +490,7 @@ function ModSecUtenti_on_do_action($oRecord, $frmAction)
 				$db->query($tmp_SQL);
 				if ($db->nextRecord())
 				{
-					$oRecord->strError = "L'username desiderato Ã¨ giÃ  in utilizzo";
+					$oRecord->strError = "L'username desiderato è già in utilizzo";
 					return true;
 				}
 			}
@@ -462,11 +501,16 @@ function ModSecUtenti_on_do_action($oRecord, $frmAction)
 				$db->query($tmp_SQL);
 				if ($db->nextRecord())
 				{
-					$oRecord->strError = "L'E-Mail inserita Ã¨ giÃ  in utilizzo";
+					$oRecord->strError = "L'E-Mail inserita è già in utilizzo";
 					return true;
 				}
 			}
 
+			if (!strlen($oRecord->form_fields["password"]->value->getValue()))
+			{
+				$oRecord->strError = "Il campo password è obbligatorio";
+				return true;
+			}
 /*			if (MOD_SECURITY_LOGON_USERID == "email" || MOD_SECURITY_REGISTER_SHOWUSERID == "email")
 				$oRecord->additional_fields["username"] = $oRecord->form_fields["email"]->value;
 */

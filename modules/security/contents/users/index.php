@@ -20,7 +20,7 @@ if (get_session("UserLevel") == 1)
 }
 
 $oGrid->force_no_field_params = true;
-if(MOD_SEC_MAXUSERS){
+if(MOD_SEC_MAXUSERS && get_session("UserLevel") < 3){
 	$db_countitems = ffDB_Sql::factory();
 	$oGridcount_SQL = "SELECT COUNT(*) AS count
                         FROM 
@@ -34,13 +34,12 @@ if(MOD_SEC_MAXUSERS){
 		}else{
 			$oGrid->display_new = false;
 			$oGrid->description = ffTemplate::_get_word_by_code("limit_users_begin") . "&nbsp;" . MOD_SEC_MAXUSERS ."&nbsp;" . ffTemplate::_get_word_by_code("limit_users_end");
-		}	
+		}
 	}
 }
 
 if (MOD_SEC_MULTIDOMAIN && MOD_SEC_MAXUSERS && mod_security_get_domain())
 {
-	
 	$options = mod_security_get_settings($cm->path_info);
 	
 	$db = ffDB_Sql::factory();
@@ -84,6 +83,11 @@ if (MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "usernam
 $oField = ffField::factory($cm->oPage);
 $oField->id = "email";
 $oField->label = "E-Mail";
+if (MOD_SEC_CRYPT && MOD_SEC_CRYPT_EMAIL)
+{
+	$oField->crypt = true;
+	$oField->crypt_modsec = true;
+}
 $oGrid->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
@@ -106,26 +110,89 @@ $oField->multi_pairs[] = array( new ffData("2"),  new ffData("Admin"));
 $oField->multi_pairs[] = array( new ffData("3"),  new ffData("Super Admin"));
 $oGrid->addContent($oField);
 	
-if (MOD_SEC_PROFILING && get_session("UserLevel") == 3)
+if (MOD_SEC_PROFILING && get_session("UserLevel") >= MOD_SEC_SHOW_PROFILE_LEVEL)
 {
 	$oField = ffField::factory($cm->oPage);
 	$oField->id = "profile";
-	$oField->label = "Profilo";
-	$oField->extended_type = "Selection";
-	$oField->source_SQL = "SELECT ID, nome FROM cm_mod_security_profiles WHERE enabled = '1' ORDER BY (`order`)";
-	$oField->multi_select_one_label = "";
+	if (MOD_SEC_PROFILING_MULTI)
+	{
+		$oField->data_source = "profiles_list";
+		$oField->label = "Profili";
+	}
+	else
+	{
+		$oField->label = "Profilo";
+		$oField->extended_type = "Selection";
+		$oField->source_SQL = "SELECT ID, nome FROM cm_mod_security_profiles WHERE enabled = '1' ORDER BY (`order`)";
+		$oField->multi_select_one_label = "";
+	}
 	$oGrid->addContent($oField);
 }
 
-$oField = ffField::factory($cm->oPage);
-$oField->id = "descrizione";
-$oField->label = "Nome Cognome / Ragione Sociale";
-$oGrid->addContent($oField);
+if (MOD_SEC_USER_FIRSTNAME || MOD_SEC_USER_LASTNAME || MOD_SEC_USER_COMPANY)
+{
+	$oField = ffField::factory($cm->oPage);
+	$oField->id = "descrizione";
+	$oField->label = "Nome Cognome / Ragione Sociale";
+	$oGrid->addContent($oField);
+}
 
-$oField = ffField::factory($cm->oPage);
-$oField->id = "telcell";
-$oField->label = "tel / cellulare";
-$oGrid->addContent($oField);
+if (isset($cm->modules["security"]["fields"]) && count($cm->modules["security"]["fields"]))
+{
+	foreach ($cm->modules["security"]["fields"] as $key => $value)
+	{
+		if (!ffIsset($value, "show_into_grid") || strtolower($value["show_into_grid"]) !== "true")
+			continue;
+
+		$oField = ffField::factory($cm->oPage);
+		$oField->id = $key;
+		
+		foreach ($value as $subkey => $subvalue)
+		{
+			switch ($subkey)
+			{
+				case "enable_acl":
+					if (!$from_domains)
+						$enable = mod_sec_check_acl($subvalue);
+					break;
+
+				case "acl":
+					if (!$from_domains && !mod_sec_check_acl($subvalue))
+					{
+						//$oField->store_in_db = false;
+						$oField->control_type = "label";
+					}
+					break;
+				case "default_value":
+					if(substr($subvalue, 0, 1) == "_")
+						$oField->default_value = new ffData(ffTemplate::_get_word_by_code($subvalue));
+					else
+						$oField->default_value = new ffData($subvalue);
+					break;
+				default:
+					if (property_exists($oField, $subkey))
+					{
+						$tmp = '$oField->' . $subkey . ' = "' . $subvalue . '";';
+						eval($tmp);
+					}
+			}
+		}
+		reset($value);		
+		
+		switch($oField->extended_type)
+		{
+			case "Boolean":
+				$oField->extended_type = "Selection";
+				$oField->multi_pairs = array(
+					array(new ffData(0, $oField->base_type), new ffData("No"))
+					, array(new ffData(1, $oField->base_type), new ffData("Si"))
+				);
+				$oField->multi_select_one_label = "No";
+				break;
+		}
+		$oGrid->addContent($oField);
+	}
+}
 
 // Campi di ricerca
 if (MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "username")

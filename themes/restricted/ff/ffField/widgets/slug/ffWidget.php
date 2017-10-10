@@ -16,10 +16,15 @@ class ffWidget_slug extends ffCommon
 	var $class			= "ffWidget_slug";
 	
 	var $widget_deps	= array();
+	
+	var $libraries		= array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
-						);		
-    var $css_deps 		= array();
+                              "ff.ffField.slug"       => null
+						);
+    var $css_deps 		= array(
+    					);
+
 	// PRIVATE VARS
 	
 	var $oPage			= null;
@@ -57,12 +62,15 @@ class ffWidget_slug extends ffCommon
 
 	function process($id, &$value, ffField_html &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "slug";
 		}
 		else
 		{
@@ -79,11 +87,11 @@ class ffWidget_slug extends ffCommon
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/restricted/ff/ffField/widgets/slug");
 		
-		$this->tpl[$tpl_id]->set_var("slug_field", str_replace("[", '\\\\[', str_replace("]", '\\\\]', $id)));
+		$this->tpl[$tpl_id]->set_var("slug_field", $id);
 		if(strpos($id, "[") === false) {
 			$this->tpl[$tpl_id]->set_var("title_field", $Field->slug_title_field);
 		} else {
-			$this->tpl[$tpl_id]->set_var("title_field", str_replace("[", '\\\\[', str_replace("]", '\\\\]', str_replace("[" . $Field->id . "]", "", $id) . "[" . $Field->slug_title_field . "]")));
+			$this->tpl[$tpl_id]->set_var("title_field", str_replace("[" . $Field->id . "]", "", $id) . "[" . $Field->slug_title_field . "]");
 		}
 		$this->tpl[$tpl_id]->parse("SectBinding", true);
 		return null;
@@ -91,11 +99,6 @@ class ffWidget_slug extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.slug", "slug.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/slug");
-		}
-		
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -112,13 +115,6 @@ class ffWidget_slug extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.slug", "slug.js", FF_THEME_DIR . "/restricted/ff/ffField/widgets/slug");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

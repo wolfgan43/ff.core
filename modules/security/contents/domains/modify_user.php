@@ -3,6 +3,7 @@ $options = mod_security_get_settings($cm->path_info);
 
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->id = "ModSecUtenti";
+$oRecord->resources[] = "ModSecUtenti";
 $oRecord->title = "Utenti";
 $oRecord->src_table = $options["table_name"];
 $oRecord->addEvent("on_done_action", "ModSecUtenti_on_done_action");
@@ -98,7 +99,7 @@ if(strlen(MOD_SEC_USER_AVATAR))
 	    $oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
 	    $oField->control_type = "file";
 	    $oField->file_show_delete = true;
-	    $oField->widget = "uploadify"; 
+	    $oField->widget = "uploadifive";
 	    $oRecord->addContent($oField, $account);
 	}
 }
@@ -267,7 +268,7 @@ function ModSecUtenti_on_done_action($oRecord, $frmAction)
 										)
 								";
 						$db->execute($sSQL);
-					}
+					}					
 				}
 				break;
 		}

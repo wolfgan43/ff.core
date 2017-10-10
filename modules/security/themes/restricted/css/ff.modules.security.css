@@ -50,3 +50,18 @@ a#modsec_googlelogin {
 	padding-top: 14px;
 	color: white;
 }
+
+a#modsec_facebooklogin {
+	background-image: url(../images/social/facebook.png);
+	box-sizing: border-box;
+	ms-box-sizing: border-box;
+	webkit-box-sizing: border-box;
+	moz-box-sizing: border-box;
+	width: 410px;
+	height: 51px;
+	display: block;
+	padding-left: 64px;
+	padding-top: 14px;
+	color: white;
+	margin-top: 10px;
+}

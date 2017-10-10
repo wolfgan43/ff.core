@@ -8,9 +8,9 @@ __ff : true, /* used to recognize ff'objects*/
 "init" : function (params) {
 	that.inst.set(params.id, params);
 	jQuery("#" + params.id).jTableOrder(params.id);
-	jQuery("#" + params.id + " table.ffDetails > tbody > tr").each(function() {
-		jQuery(this).children("td:first:not(.norec_cont)").css("background", "url(" + ff.site_path + "/themes/restricted/ff/ffDetails/widgets/dragsort/grippy.png) 4px no-repeat").css("padding", "0 0 0 14px");
-	});
+	jQuery("#" + params.id + " table").addClass("draggable");
+	/*jQuery("#" + params.id + " table tbody tr").each(function() {
+	});*/
 },
 
 "reorder" : function (id) {
@@ -21,14 +21,14 @@ __ff : true, /* used to recognize ff'objects*/
 	var position = 1;
 	if(params.service_path) 
 	{
-		$table.find("> tbody > tr").each(function () {
+		$table.find("tbody tr").each(function () {
 			toBeSent.push({"name" : "positions[]", "value" : jQuery(this).data("sort_id")});
 			position += 1;
 		});
 
 		toBeSent.push({name: "resource", value: params.resource_id});
 		
-		ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
+		ff.load("ff.ajax", function() {
 			ff.ajax.blockUI();
 			jQuery.ajax({
 				  "url"		: params.service_path

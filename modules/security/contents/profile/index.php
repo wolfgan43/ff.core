@@ -105,7 +105,7 @@ if(strlen(MOD_SEC_USER_AVATAR) && !mod_security_is_defined_field(MOD_SEC_USER_AV
 		$oField->control_type = "file";
 		$oField->file_show_delete = true;
 		
-		$oField->widget = "uploadify"; 
+		$oField->widget = "uploadifive";
 	} 
 	else 
 	{
@@ -131,6 +131,11 @@ if (!mod_security_is_defined_field("email"))
 	$oField->label = "E-Mail";
 	$oField->required = true;
 	$oField->addValidator("email");
+	if (MOD_SEC_CRYPT && MOD_SEC_CRYPT_EMAIL)
+	{
+		$oField->crypt = true;
+		$oField->crypt_modsec = true;
+	}
 	$oRecord->addContent($oField, $account);
 
 	$oField = ffField::factory($cm->oPage);
@@ -146,16 +151,24 @@ if (!mod_security_is_defined_field("password"))
 	$oField->id = "password";
 	$oField->label = "Password";
 	$oField->extended_type = "Password";
-	switch (MOD_SEC_PASS_FUNC)
+	if (MOD_SEC_CRYPT)
 	{
-		case "MD5":
-			$oField->crypt_method = "MD5";
-			break;
-
-		default:
-			$oField->crypt_method = "mysql_password";
-			break;
+		$oField->store_in_db = false;
 	}
+	else
+	{
+		switch (MOD_SEC_PASS_FUNC)
+		{
+			case "MD5":
+				$oField->crypt_method = "MD5";
+				break;
+
+			default:
+				$oField->crypt_method = "mysql_password";
+				break;
+		}
+	}
+	$oField->addValidator("password");
 	$oRecord->addContent($oField, $account);
 
 	$oField = ffField::factory($cm->oPage);
@@ -251,6 +264,7 @@ function MainRecord_on_done_action($oRecord, $frmAction)
 
 	$options = mod_security_get_settings($cm->path_info);
 	$ID = $oRecord->key_fields["ID"]->value;
+	
 	if (MOD_SEC_MULTIDOMAIN && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB && mod_security_is_admin())
 		$db = mod_security_get_main_db();
 	else
@@ -261,9 +275,51 @@ function MainRecord_on_done_action($oRecord, $frmAction)
 		switch ($frmAction)
 		{
 			case "update":
+				if (
+						MOD_SEC_CRYPT 
+						&& ($frmAction == "insert" || $frmAction == "update") 
+						&& strlen($oRecord->form_fields["password"]->value->getValue())
+					)
+				{
+					$globals_crypt = ffGlobals::getInstance("__mod_sec_crypt__");
+
+					// generate new crypt stuff
+
+					$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+
+					$salt = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+					$password = $oRecord->form_fields["password"]->value->getValue();
+
+					$hash = mod_sec_mykdf($password, $salt, 1000);
+					$Vu1 = substr($hash, 0, 32);
+					$Vu2 = substr($hash, 32);
+
+					$Eu = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $Vu2, bin2hex($globals_crypt->_crypt_Ku_) . "|" . bin2hex($globals_crypt->_crypt_KSu_), MCRYPT_MODE_CBC, $salt);
+
+					$sSQL = "UPDATE " .  $options["table_name"] . " SET
+									`crypt_vu` = " . $db->toSql($Vu1) . "
+									, `crypt_su` = " . $db->toSql(bin2hex($salt)) . "
+									, `crypt_eu` = " . $db->toSql(bin2hex($Eu)) . "
+								WHERE
+									`ID` = " . $db->toSql($ID);
+					$db->execute($sSQL);
+
+					if ($ID->getValue() == get_session("UserNID"))
+					{
+						$cookiehash = mod_sec_mykdf($password, $salt, 1);
+
+						$p1 = substr($cookiehash, 0, 32);
+						$p2 = substr($cookiehash, 32);
+
+						$sessionCookie = session_get_cookie_params();
+						setcookie("__FF_VU__", $p1, $sessionCookie['lifetime'], $sessionCookie['path'], $sessionCookie['domain'], $sessionCookie['secure']);
+						set_session("__FF_VU__", $p2);
+					}
+				}				
+				
 				foreach ($cm->modules["security"]["fields"] as $key => $value)
 				{
-					if (mod_security_is_default_field($key))
+					if (mod_security_is_default_field($key) || (ffIsset($value, "enable_acl") && !mod_sec_check_acl($value["enable_acl"])))
 						continue;
 					
                                         $sSQL = "SELECT ID

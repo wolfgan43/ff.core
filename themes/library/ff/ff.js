@@ -15,6 +15,16 @@ if(!Array.indexOf){
 }
 
 Array.prototype.each = function(func){
+	var tmp = this.clone();
+	for(var i=0; i<tmp.length; i++){
+		var rc = func(i, tmp[i]);
+		if (rc)
+			break;
+	}
+	return i;
+}
+
+Array.prototype.unbufferedEach = function(func){
 	for(var i=0; i<this.length; i++){
 		var rc = func(i, this[i]);
 		if (rc)
@@ -23,37 +33,45 @@ Array.prototype.each = function(func){
 	return i;
 }
 
+Array.prototype.unset = function(i){
+	this.splice(i, 1);
+	return this;
+}
 
+Array.prototype.clone = function(){
+	return this.slice();
+}
 
+String.prototype.trim = function (c) {
+	if (c === undefined)
+		return this.replace(/^\s+|\s+$/g, "");
+	else
+		return this.replace(new RegExp("^" + c.escapeRegExp()  + "+|" + c.escapeRegExp() + "+$", "g"), "");
+}
 
-String.prototype.capitalize = function(){
+String.prototype.rtrim = function (c) {
+	if (c === undefined)
+		return this.replace(/\s+$/g, "");
+	else
+		return this.replace(new RegExp(c.escapeRegExp() + "+$", "g"), "");
+}
+
+String.prototype.ltrim = function (c) {
+	if (c === undefined)
+		return this.replace(/^\s+/, "");
+	else
+        return this.replace(new RegExp("^" + c.escapeRegExp() + "+", "g"), "");
+}
+
+String.prototype.capitalize = function() {
     return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){
 		return p1+p2.toUpperCase();
     });
 };
 
-String.prototype.escapeRegExp = function(){
+String.prototype.escapeRegExp = function() {
     return this.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
-
-String.prototype.trim = function (c) {
-	if (c === undefined)
-		return this.replace(/^\s*|\s*$/g, "");
-	else
-		return this.replace(new RegExp("^" + c.escapeRegExp()  + "*|" + c.escapeRegExp() + "*$", "g"), "");
-}
-String.prototype.ltrim = function (c) {
-    if (c === undefined)
-        return this.replace(/^\s*/g, "");
-    else
-        return this.replace(new RegExp("^" + c.escapeRegExp() + "*", "g"), "");
-}
-String.prototype.rtrim = function (c) {
-	if (c === undefined)
-		return this.replace(/\s*$/g, "");
-	else
-		return this.replace(new RegExp(c.escapeRegExp() + "*$", "g"), "");
-}
 
 String.prototype.parseUri = function() {
 		// parseUri 1.2.2
@@ -88,11 +106,35 @@ String.prototype.parseUri.options = {
         }
 };
 
+String.prototype.escapeHtml = function() {
+        var     o   = String.prototype.escapeHtml.options,
+                m   = o.entityMap,
+                re =  o.regexp;
+
+    return String(this).replace(re, function (s) {
+      return m[s];
+    });
+};
+
+String.prototype.escapeHtml.options = {
+        "entityMap": {
+			"&": "&amp;",
+			"<": "&lt;",
+			">": "&gt;",
+			'"': '&quot;',
+			"'": '&#39;',
+			"/": '&#x2F;'
+		  },
+        "regexp": /[&<>"'\/]/g,
+};
+
 (function(arr,i,name) {
   while(name = arr[i++]) {
     Math["$"+name] = Function("a","b","return Math."+name+"(a*(b=Math.pow(10,b||0)))/b");
   }
 })(["floor","ceil","round"],0);
+
+// jQuery addons
 
 jQuery.fn.outerHTML = function(s) {
     return s
@@ -153,58 +195,61 @@ jQuery.fn.center = function (absolute) {
 
 // Forms Framework Main Object
 var ff = (function () {
+
 // private vars
-var loaded_css		= undefined;
-
-var plugins			= undefined;
-var plugins_loads	= undefined;
-var plugins_inits	= undefined;
-
 var inits_uuid		= undefined;
 
 var unique_ids		= 0;
 
-function pluginInit(id) {
-	var inits ;
+var libs = undefined;
+var libs_deps = undefined;
+//var libs_init = undefined;
+var libs_rev_deps = undefined;
+var plugins_loads	= undefined;
+var plugins_inits	= undefined;
 
-	if ((inits = plugins_inits.get(id)) !== undefined) {
-		for (var i = 0; i < inits.length; i++) {
-			inits[i]();
-		}
-		plugins_inits.set(id, []);
-	}
-}
+var getlibs_loads = undefined;
 
 function initEvents(key) {
+	var getType = {};
 	var parts = key.split(".");
 	if (parts.length > 1 && parts[0] == "ff") {
+		// skip ff, because it's initialized during initFF' time
 		var path = "ff";
+		var ref = ff;
 		for (var i = 1; i < parts.length; i++) {
 			path += "." + parts[i];
-			if (eval(path + ' === undefined'))
-				eval(path + " = {};");
-
-			if (eval('typeof(' + path + ')') === "object" && eval(path + ".events === undefined"))
-				eval('jQuery.extend(true, ' + path + ', ff.ffEvents());');
+			if (ref[parts[i]] === undefined)
+				ref[parts[i]] = {};
+			ref = ref[parts[i]];
+			
+			if (getType.toString.call(ref) === '[object Object]' && ref.events === undefined && ref.__ff === true) {
+				jQuery.extend(ref, ff.ffEvents());
+				extendLibs(ref, path);
+			}
 		}
 	}
 }
 
-function initLibs(ref, path) {
-	for (property in ref) {
-		if (typeof(ref[property]) === "object" && ref[property].__ff === true) {
-			var found = false;
-			that.libs.each(function(key,value){
-				if (value === ref[property]){
-					return found = true; // break current cycle
+function extendLibs(ref, path) {
+	var getType = {};
+	for (var property in ref) {
+		if (getType.toString.call(ref[property]) === '[object Object]' && ref[property].__ff === true) {
+			var newpath = path + "." + property;
+				if (libs.get("js").get(newpath) === undefined) {
+					(function(p){ // needed for lambda style calling
+						libs.get("js").set(p, {
+							"loaded" : false
+							, "source" : undefined
+							, "callback" : function () {that.pluginInitLoad(p);}
+							, "async" : undefined
+							, "media" : undefined
+							, "deps" : undefined
+						});
+					})(newpath);
+					that.libLoaded("js", newpath, true);
+					extendLibs(ref[property], newpath);
 				}
-			});
-			
-			if (!found) {
-				that.libs.set(path + "." + property, null);
-				that.pluginLoad(path + "." + property, undefined, undefined, false);
-				initLibs(ref[property], path + "." + property);
-			}
 		}
 	}
 }
@@ -212,6 +257,7 @@ function initLibs(ref, path) {
 var that = { // publics
 
 "site_path"		: undefined,
+"base_path"		: undefined,
 "theme"			: undefined,
 "theme_ui"		: undefined,
 "page_path"		: undefined,
@@ -222,10 +268,626 @@ var that = { // publics
 "domain"		: undefined,
 "js_path"		: undefined,
 "struct"		: undefined,
-"libs"			: undefined,
+"getlibs"		: undefined,
 "fn"			: {},
 "modules"		: {
-	"__ff" : true
+	"__ff" : true // provoca l'estensione con ffEvents
+},
+
+"initFF" : function (params) {
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+    that.site_path				= (params.site_path === undefined ? "/" : params.site_path);
+    that.base_path				= (params.base_path === undefined ? that.site_path : params.base_path);
+	that.theme					= (params.theme === undefined ? "default" : params.theme);
+	that.theme_ui				= (params.theme_ui === undefined ? "" : params.theme_ui);
+	
+	if(that.site_path.length > 0 && that.site_path != '/') {
+		that.page_path 			= window.location.pathname.substr(that.site_path.length);
+	} else {
+		that.page_path 			= window.location.pathname;
+	}
+	that.origin					= (params.origin !== undefined ? params.origin : that.httpGetOrigin());
+	that.domain 				= window.location.hostname;
+	that.language 				= getCookie("lang") || (params.language === undefined ? "ITA" : params.language);
+	that.locale 				= (params.locale === undefined ? "it_IT" : params.locale);
+	that.layer 					= (params.layer === undefined ? "empty" : params.layer);
+	that.frameworkCss 			= params.frameworkCss;
+	that.fontIcon				= params.fontIcon;
+    that.group              	= getCookie("group") || (params.group === undefined ? "" : params.group);
+	that.js_path				= (params.js_path === undefined ? that.site_path + '/themes/' + that.theme + '/javascript' : params.js_path);
+	that.getlibs				= (params.getlibs === undefined ? that.site_path + '/services/getlibs' : params.getlibs);
+
+	if(params.lazyImg) {
+            jQuery(function() {
+                ff.lazyImg();
+            });
+	}
+
+	if (params.struct !== undefined)
+		that.struct = params.struct;
+	else {
+		that.struct	= that.hash();
+	}
+	if (!that.struct.isset("fields"))
+		that.struct.set("fields", that.hash())
+	if (!that.struct.isset("comps"))
+		that.struct.set("comps", that.hash());
+	
+	// used to avoid cache bug
+	that.struct.get("comps").each(function (key, value, index) {
+		value.url = window.location.href;
+	});
+	
+	// ------------------------------------------------------------------------------------------------------
+	//  Libraries 
+
+	// add static (head) libs
+	if (params.libs !== undefined) {
+		params.libs.each(function (i, v) {
+			if (libs.get(v.type) === undefined) libs.set(v.type, ff.hash());
+			if (v.source === undefined) { // preloaded library, simply add it without loading, it will be initialized by ff.ffEvents initLoad (below)
+				libs.get(v.type).set(v.id, {
+					"loaded" : false
+					, "source" : undefined
+					, "callback" : (v.type === "js" ? function () {that.pluginInitLoad(v.id);} : undefined)
+					, "async" : undefined
+					, "media" : undefined
+					, "deps" : v.deps
+				});
+				that.libDeps(v.type, v.id, v.deps, true);
+			}
+		});
+	}
+
+	// prepare to init static libs
+	that.pluginAddInitLoad("ff.ffEvents", function () {
+		jQuery.extend(ff, ff.ffEvents());
+		jQuery.extend(ff.fn, ff.ffEvents());
+		
+		// ready to init every library
+		if (params.libs !== undefined) {
+			params.libs.each(function (i, v) {
+				if (v.source === undefined && v.deps === undefined) {
+					that.libLoaded(v.type, v.id, true);
+				} else { // to load library
+					if (v.type === "js")
+						that.pluginLoad(v.id, v.source, v.callback, v.async, v.deps);
+					else if (v.type === "css")
+						that.injectCSS(v.id, v.source, v.callback, v.media);
+					else
+						throw "unhandled lib type: " + v.type;
+				}
+			});
+		}
+	});
+	
+	// ------------------------------------------------------------------------------------------------------
+	// force main infrastructure loading at start (when not already present), because nothing will work without it
+	
+	if (jQuery === undefined)
+		throw "Forms Framework require jQuery to work";
+	
+	if (libs.get("js") === undefined) libs.set("js", ff.hash());
+	if (libs.get("css") === undefined) libs.set("css", ff.hash());
+	
+	if (!libs.get("js").isset("jquery")) {
+		libs.get("js").set("jquery", {
+			"loaded" : false
+			, "source" : undefined
+			, "callback" : function () {that.pluginInitLoad("jquery");}
+			, "async" : undefined
+			, "media" : undefined
+			, "deps" : undefined
+		});
+		that.libDeps("js", "jquery", undefined, true);
+	}
+	
+	var chk_ff = false;
+	var chk_ev = false;
+	var chk_evs = false;
+	
+	if (libs.isset("js")) {
+		if (libs.get("js").isset("ff"))
+			chk_ff = true;
+		if (libs.get("js").isset("ff.ffEvent"))
+			chk_ev = true;
+		if (libs.get("js").isset("ff.ffEvents"))
+			chk_evs = true;
+	}
+	
+	if (!chk_ff) {
+		libs.get("js").set("ff", {
+			"loaded" : false
+			, "source" : undefined
+			, "callback" : function () {that.pluginInitLoad("ff");}
+			, "async" : undefined
+			, "media" : undefined
+			, "deps" : ff.hash([{"id" : "js", "value" : ["ff.ffEvents"]}])
+		});
+		that.libDeps("js", "ff", ff.hash([{"id" : "js", "value" : ["ff.ffEvents"]}]), true);
+	}
+	if (!chk_ev)
+		that.pluginLoad("ff.ffEvent",		"/themes/library/ff/ffEvent.js",	undefined, false);
+	else
+		that.libLoaded("js", "ff.ffEvent", true);
+	if (!chk_evs)
+		that.pluginLoad("ff.ffEvents",		"/themes/library/ff/ffEvents.js",	undefined, false);
+	else
+		that.libLoaded("js", "ff.ffEvents", true);
+},
+
+"getComp" : function (id) {
+	return that.struct.get("comps").get(id);
+},
+
+"getField" : function (id, comp) {
+	if (comp !== undefined) {
+		var tmp = that.getComp(comp);
+		if (tmp === undefined)
+			return;
+		
+		return tmp.fields.get(id);
+	} else {
+		return that.struct.get("fields").get(id);
+	}
+},
+
+"libLoadStatic" : function (type, id, deps)
+{
+	if (libs.get(type) === undefined) libs.set(type, ff.hash());
+	libs.get(type).set(id, {
+		"loaded" : false
+		, "source" : undefined
+		, "callback" : (type === "js" ? function () {that.pluginInitLoad(id);} : undefined)
+		, "async" : undefined
+		, "media" : undefined
+		, "deps" : deps
+	});
+	if (that.libDeps(type, id, deps)) {
+		that.libLoaded(type, id, true);
+	}
+},
+
+"libSet" : function(type, id, source, callback, async, media, deps) {
+	libs.get(type).set(id, {
+		"loaded" : true
+		, "source" : source
+		, "callback" : callback
+		, "async" : async
+		, "media" : media
+		, "deps" : deps
+	});
+},
+
+"libLoad" : function (type, id, source, callback, async, media, deps) {
+	var getType = {};
+	if (getType.toString.call(type) === '[object Object]') {
+		id = type["id"] || ff.getUniqueID();
+		source = type["source"] || function() {throw "ff.libLoad: source is required"};
+		callback = type["callback"];
+		async = type["async"];
+		media = type["media"];
+		if (type["deps_js"] !== undefined || type["deps_css"] !== undefined) {
+			deps = ff.hash();
+			if (type["deps_js"] !== undefined)
+				deps.set("js", type["deps_js"]);
+			if (type["deps_css"] !== undefined)
+				deps.set("css", type["deps_css"]);
+		} else
+			deps = type["deps"];
+		
+		type = type["type"] || function() {throw "ff.libLoad: type is required"};
+	}
+	
+	if (libs.get(type) !== undefined && libs.get(type).get(id) !== undefined) {
+		if (libs.get(type).get(id).loaded === true && callback !== undefined) // loaded true avviene quando è pronta
+			callback(true); // vedere se spostare fuori (prima)
+		return;
+	}
+	
+	// prepara per il caricamento. loaded = false impedisce due caricamenti concorrenti
+	if (libs.get(type) === undefined) libs.set(type, ff.hash());
+	if (libs.get(type).get(id) === undefined) libs.get(type).set(id, {
+		"loaded" : false
+		, "source" : source
+		, "callback" : callback
+		, "async" : async
+		, "media" : media
+		, "deps" : deps
+	});
+	
+	var ready = that.libDeps(type, id, deps);
+	
+	/*if (callback) {
+		if (libs_init.get(type) === undefined) libs_init.set(type, ff.hash());
+		if (libs_init.get(type).get(id) === undefined) libs_init.get(type).set(id, []);
+		libs_init.get(type).get(id).push(callback);
+	}*/
+	
+	if (ready) {
+		that.libLoadFile(type, id, source, async);
+	} else {
+		// wait for, handled by that.libLoaded
+	}
+},
+
+"libDeps" : function (type, id, deps, force) {
+	var ready = true;
+	if (deps !== undefined) {
+		if (libs_deps.get(type) === undefined) libs_deps.set(type, ff.hash());
+		if (libs_deps.get(type).get(id) === undefined) libs_deps.get(type).set(id, ff.hash());
+		var tmp_deps = libs_deps.get(type).get(id);
+
+		deps.each(function(k, v, i){
+			if (libs.get(k) === undefined) libs.set(k, ff.hash());
+			var tmp = libs.get(k);
+			for (var c = 0; c < v.length; c++) {
+				if (tmp.get(v[c]) === undefined || !tmp.get(v[c]).loaded || force) {
+					ready = false;
+					if (tmp_deps.get(k) === undefined) tmp_deps.set(k, ff.hash());
+					tmp_deps.get(k).set(v[c], true);
+					
+					if (libs_rev_deps.get(k) === undefined) libs_rev_deps.set(k, ff.hash());
+					if (libs_rev_deps.get(k).get(v[c]) === undefined) libs_rev_deps.get(k).set(v[c], ff.hash());
+					if (libs_rev_deps.get(k).get(v[c]).get(type) === undefined) libs_rev_deps.get(k).get(v[c]).set(type, ff.hash());
+					libs_rev_deps.get(k).get(v[c]).get(type).set(id, true);
+				}
+			}
+		});
+		
+		if (!libs_deps.get(type).get(id).length) {
+			libs_deps.get(type).unset(id);
+			if (!libs_deps.get(type).length) {
+				libs_deps.unset(type);
+			}
+		}
+	}
+	return ready;
+},
+
+"libDump" : function () {
+	libs.dump();
+	libs_deps.dump();
+	libs_rev_deps.dump();
+},
+
+"libIsLoaded" : function (type, id) {
+	var tmp = libs.get(type).get(id);
+	if (tmp) {
+		return tmp.loaded;
+	} else {
+		return false;
+	}
+},
+
+"libLoaded" : function (type, id, force) {
+	var tmp = libs.get(type).get(id);
+	if (tmp.loaded)
+		return;
+	
+	tmp.loaded = true;
+	if (tmp.callback !== undefined)
+		tmp.callback(false);
+	
+	if (libs_rev_deps.get(type) === undefined || libs_rev_deps.get(type).get(id) === undefined) {
+		return;
+	}
+	
+	libs_rev_deps.get(type).get(id).each(function (t1, e1) {
+		e1.each(function(t2, e2) {
+			//clean rev
+			if (libs_rev_deps.get(type) !== undefined && libs_rev_deps.get(type).get(id) !== undefined && libs_rev_deps.get(type).get(id).get(t1) !== undefined) {
+				libs_rev_deps.get(type).get(id).get(t1).unset(t2);
+				if (!libs_rev_deps.get(type).get(id).get(t1).length) libs_rev_deps.get(type).get(id).unset(t1);
+				if (!libs_rev_deps.get(type).get(id).length) libs_rev_deps.get(type).unset(id);
+				if (!libs_rev_deps.get(type).length) libs_rev_deps.unset(type);
+			}
+			
+			if (libs_deps.get(t1) !== undefined && libs_deps.get(t1).get(t2) !== undefined) {
+				libs_deps.get(t1).get(t2).get(type).unset(id);
+				if (!libs_deps.get(t1).get(t2).get(type).length) libs_deps.get(t1).get(t2).unset(type);
+				if (!libs_deps.get(t1).get(t2).length) {
+					libs_deps.get(t1).unset(t2);
+					if (!libs_deps.get(t1).length) libs_deps.unset(t1);
+					var tmp = libs.get(t1).get(t2);
+					if (force || tmp.source === undefined) {
+						ff.libLoaded(t1, t2, force);
+					} else if (!tmp.loaded) {
+						ff.libLoadFile(t1, t2, tmp.source, tmp.async, tmp.media);
+					}
+				}
+			}
+		});
+	});
+	//that.libDump();
+},
+
+"libLoadFile" : function (type, id, source, async, media) {
+	if (type === "js") {
+		var getType = {};
+		if (getType.toString.call(source) === '[object Function]') {
+			source();
+			ff.libLoaded(type, id);
+		} else {
+			jQuery.ajax({
+				"async": async,
+				"url": that.fixPath(source),
+				"dataType": "script", //TOCHECK, cosi facendo tutte le request non vengono mai cachate perche jquery aggiunge ?_[microtime] . E voluto?
+				//"cache": false,
+				"success": function (data) {
+					//jQuery("head").append('<script type="text/javascript">ff.libLoaded("' + type + '", "' + id + '");</script>');
+					jQuery(function () {ff.libLoaded(type, id)});
+				}
+			});
+		}
+		/*
+		if (async || async === undefined) {
+			jQuery.getScript(
+				that.fixPath(source),
+				function (data) {
+					jQuery("head").append('<script type="text/javascript">ff.libLoaded("' + type + '", "' + id + '");</script>');
+				}
+			);
+		} else {
+			jQuery("head").append('<script type="text/javascript" src="' + that.fixPath(source) + '"></script>');
+			jQuery("head").append('<script type="text/javascript">jQuery(function() {ff.libLoaded("' + type + '", "' + id + '");});</script>');
+		}*/
+	} else if (type === "css") {
+		if (async) {
+			that.CSSload(that.fixPath(source), media, function () {ff.libLoaded(type, id);}); // indispensabile per via della callback
+		} else {
+			if ('\v' == 'v') /* ie only */ {
+				var css = document.createStyleSheet(that.fixPath(source));
+
+				if(media !== undefined) 
+					css.media = media;
+			} else {
+				var css = jQuery('<link rel="stylesheet" href="' + that.fixPath(source) + '" ' + attrMedia + ' />');
+				jQuery('head').append(css);
+			}
+			ff.libLoaded(type, id);
+		}
+			
+		/*
+		if(media !== undefined) {
+			var attrMedia = 'media="' + media + '"';
+		}
+
+		var css = jQuery('<link rel="stylesheet" href="' + that.fixPath(source) + '" ' + attrMedia + ' />');
+		jQuery('head').append(css);
+
+		CSSload(css.get(0), function () {ff.libLoaded(type, id);});
+
+		var async = true;
+		var css = document.createElement('link');
+		css.setAttribute('rel', 'stylesheet');
+		css.setAttribute('href', source);
+		css.addEventListener('load', function() { alert('foo'); }, false);
+		document.getElementsByTagName('head')[0].appendChild(css);
+
+		jQuery.ajax({
+				"async": async,
+				"url": source,
+				"dataType": "text",
+				"success": function (data) {
+	//					jQuery("head").append('<style type="text/css">' + data + '</style>');
+					if (callback !== undefined)
+						callback();
+				}
+			});*/
+	} else {
+		throw "Unhandled lib type: " + type;
+	}
+},
+
+"CSSload" : function (src, media, handler, nonblocking) {
+	/*Based on https://github.com/filamentgroup/loadCSS/blob/master/src/loadCSS.js */
+
+	var nonblocking = (nonblocking !== undefined ? nonblocking : true);
+
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+	var ref = refs[ refs.length - 1];
+
+	var sheets = doc.styleSheets;
+	ss.rel = "stylesheet";
+	ss.href = src;
+	// temporarily set media to something inapplicable to ensure it'll fetch without blocking render
+	ss.media = nonblocking ? "only x" : media;
+
+	// wait until body is defined before injecting link. This ensures a non-blocking load in IE11.
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	// Inject link
+	// Note: `insertBefore` is used instead of `appendChild`, for safety re: http://www.paulirish.com/2011/surefire-dom-element-insertion/
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ref.nextSibling );
+	});
+	// A method (exposed on return object for external use) that mimics onload by polling document.styleSheets until it includes the new sheet.
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		if (nonblocking) { 
+			ss.media = media || "all"; 
+		}
+		handler();
+	}
+
+	// once loaded, set link's media back to `all` so that the stylesheet applies once it loads
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+},
+
+"pluginLoad" : function (id, source, callback, async, deps) {
+	if (callback !== undefined)
+		that.pluginAddInitLoad(id, callback);
+	
+	that.libLoad("js", id, source, function(already_loaded) {
+		if (!already_loaded) {
+			ff.pluginInitLoad(id);
+		}
+	}, async, undefined, deps);
+},
+
+"pluginAddInitLoad" : function (id, callback, uuid) {
+	if (uuid !== undefined) {
+		if (inits_uuid.isset(uuid))
+			return;
+		else
+			inits_uuid.set(uuid);
+	}
+	
+	if (libs.get("js") === undefined || libs.get("js").get(id) === undefined || !libs.get("js").get(id).loaded) {
+		if (!plugins_loads.isset(id))
+			plugins_loads.set(id, []);
+		
+		plugins_loads.get(id).push(callback);
+	} else
+		callback();
+},
+
+"pluginAddInit" : function (id, callback, uuid) {
+	if (uuid !== undefined) {
+		if (inits_uuid.isset(uuid))
+			return;
+		else
+			inits_uuid.set(uuid);
+	}
+	
+	if (libs.get("js") === undefined || libs.get("js").get(id) === undefined || !libs.get("js").get(id).loaded) {
+		if (!plugins_inits.isset(id))
+			plugins_inits.set(id, []);
+
+		plugins_inits.get(id).push(callback);
+	} else
+		callback();
+},
+
+"pluginInitLoad" : function (id) {
+	if (id !== "ff.ffEvent" && id !== "ff.ffEvents")
+		initEvents(id);
+
+	var loads;
+	if ((loads = plugins_loads.get(id)) !== undefined) {
+		for (var i = 0; i < loads.length; i++) {
+			loads[i]();
+		}
+		plugins_loads.set(id, []);
+	}
+	that.pluginInit(id);
+},
+
+"pluginInit" : function (id) {
+	var inits ;
+
+	if ((inits = plugins_inits.get(id)) !== undefined) {
+		for (var i = 0; i < inits.length; i++) {
+			inits[i]();
+		}
+		plugins_inits.set(id, []);
+	}
+},
+
+"injectCSS" : function (id, source, callback, media, async) {
+	that.libLoad("css", id, source, function(already_loaded) {
+		if (callback !== undefined) 
+			callback();
+	}, async, media, undefined);
+},
+
+"getLibs" : function (name, object, theme, type) {
+	var uid = (name || "") + (object || "") + (theme || "") + (type || "");
+	if (getlibs_loads.isset(uid))
+		return false;
+		
+	getlibs_loads.set(uid, true);
+
+	var tmp_name = name;
+	var tmp_obj = object;
+	
+	if (object === undefined) {
+		var tmp = name.replace("ff.", "").split(".");
+		if (tmp.length > 1) {
+			tmp_name = tmp[tmp.length - 1];
+			tmp_obj = tmp[0];
+		} else {
+			tmp_obj = "ffPage";
+		}
+	}
+	
+	var tmp_url = that.getlibs + "?";
+	if (type == undefined)
+		tmp_url += "widgets";
+	else
+		tmp_url += type;
+	tmp_url += "=";
+	if (tmp_obj) {
+		tmp_url += tmp_obj + "/";
+	}
+	tmp_url += tmp_name;
+	
+	if(theme)
+		tmp_url += "&theme=" + theme;
+	
+	var tmpdiv = ff.getUniqueID();
+	jQuery("body").append('<div id="fftmp' + tmpdiv + '"></div>');
+			
+	ff.ajax.doRequest({
+		"url": tmp_url
+		, "injectid" : "#" + tmpdiv
+		, "stickycomp" : true
+		, "callback" : function () {
+			jQuery("#fftmp" + tmpdiv).remove();
+		}
+	});
+	
+	return true;
+},
+"load" : function(plugin, callback, object, uuid) {
+	var getType = {};
+	object = object || "";
+	if(getType.toString.call(plugin) === '[object Object]') {
+		for(var i = 0; i < plugin.length; i++) {
+			if (!ff.libIsLoaded("js", plugin[i]))
+				ff.getLibs(plugin[i], object);		
+		}
+	} else {
+		if (!ff.libIsLoaded("js", plugin))
+			ff.getLibs(plugin, object);
+	}
+	if(callback)
+		ff.pluginAddInit(plugin, callback, uuid);
+},
+"extend" : function (object) {
+	jQuery.extend(ff, object);
 },
 
 "coalesce" : function (value, ifnull) {
@@ -238,14 +900,28 @@ var that = { // publics
 	return unique_ids++;
 },
 
-"httpGetOrigin" : function() {
-	return window.location.protocol + "//" + window.location.hostname;
+"httpGetOrigin" : function(url) {
+	if (url === undefined)
+		return window.location.protocol + "//" + window.location.hostname;
+	
+	var tmp = url.parseUri();
+	if (tmp.host === "")
+		return window.location.protocol + "//" + window.location.hostname;
+	
+	return tmp.protocol + "://" + tmp.host;
 },
 
-"getURLParameter" : function(name) {
-    return decodeURIComponent(
-        (RegExp(name.replace(/\[/g, "\\[").replace(/\]/g, "\\]") + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-    );
+"getURLParameter" : function(name, url) {
+	var haystack = location.search;
+	if (url !== undefined) {
+		haystack = url.parseUri().query;
+	}
+    var tmp = (RegExp(name.replace(/\[/g, "\\[").replace(/\]/g, "\\]") + '=' + '(.+?)(&|$)').exec(haystack)||[,null])[1];
+    if (tmp !== null) {
+		return decodeURIComponent(tmp);
+	} else {
+		return null;
+	}
 },
 
 "encodeURI" : function (str) {
@@ -329,7 +1005,9 @@ var that = { // publics
 },
 
 "fixPath" : function(source) {
-	if(that.site_path !== undefined && that.site_path.length > 0 && source.indexOf("/") == 0 && source.indexOf(that.site_path) != 0)
+	if(that.site_path !== undefined && that.site_path.length > 0 && source.indexOf("/") == 0 && source.indexOf(that.site_path) != 0
+		&& source.indexOf(that.base_path) != 0
+	)
 		source = that.site_path + source;
 	
 	var req_origin = null;
@@ -349,298 +1027,22 @@ var that = { // publics
 		source = ff.urlAddParam(source, "__FORCE_XHR__");
 	}
 	
-	var res = ff.doEvent({
-		"event_name"	: "fixPath",
-		"event_params"	: [source, cross_xhr]
-            });
-            
-	if (res !== undefined && res[res.length - 1]) {
-		source = res[res.length - 1];
+	if (xdbg = that.getURLParameter("XDEBUG_SESSION_START")) {
+		source = ff.urlAddParam(source, "XDEBUG_SESSION_START", xdbg);
+	}
+	
+	if (source.indexOf("/ff/ffEvents.js") !== -1 && source.indexOf("/ff/ffEvent.js") !== -1) {
+		var res = ff.doEvent({
+			"event_name"	: "fixPath",
+			"event_params"	: [source, cross_xhr]
+		});
+		
+		if (res !== undefined && res[res.length - 1]) {
+			source = res[res.length - 1];
+		}
 	}
 	
 	return source;
-},
-
-"initFF" : function (params) {
-    function getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
-    that.site_path				= (params.site_path === undefined ? "/" : params.site_path);
-    that.theme					= (params.theme === undefined ? "default" : params.theme);
-    that.theme_ui				= (params.theme_ui === undefined ? "" : params.theme_ui);
-
-    if(that.site_path.length > 0 && that.site_path != '/') {
-            that.page_path 			= window.location.pathname.substr(that.site_path.length);
-    } else {
-            that.page_path 			= window.location.pathname;
-    }
-    that.origin					= (params.origin !== undefined ? params.origin : that.httpGetOrigin());
-    that.domain 				= window.location.hostname;
-    that.language 				= getCookie("lang") || (params.language === undefined ? "ITA" : params.language);
-    that.locale 				= (params.locale === undefined ? "it_IT" : params.locale);
-    that.layer 					= (params.layer === undefined ? "empty" : params.layer);
-    that.group                                  = getCookie("group") || (params.group === undefined ? "" : params.group);
-    that.js_path				= (params.js_path === undefined ? that.site_path + '/themes/' + that.theme + '/javascript' : params.js_path);
-
-    if(params.lazyImg) {
-        jQuery(function() {
-            ff.lazyImg();
-        });
-    }
-    if (params.struct !== undefined)
-            that.struct = params.struct;
-    else {
-            that.struct		= that.hash();
-    }
-    if (that.struct.fields === undefined)
-            that.struct.fields = that.hash();
-
-    if (params.libs !== undefined)
-            that.libs = params.libs;
-    else {
-            that.libs = that.hash();
-    }
-
-    // used to avoid cache bug
-    that.struct.each(function (key, value, index) {
-            value.url = window.location.href;
-    });
-
-    // ------------------------------------------------------------------------------------------------------
-    // force event's infrastructure loading at start (when not already present)
-    that.pluginLoad("ff.ffEvent",		"/themes/library/ff/ffEvent.js",	undefined, false);
-    that.pluginLoad("ff.ffEvents",		"/themes/library/ff/ffEvents.js",	undefined, false);
-    // ------------------------------------------------------------------------------------------------------
-
-    that.libs.each(function (key, value) {
-            that.pluginLoad(key, value && (that.site_path + value), undefined, false);
-    });
-
-    initLibs(that, "ff");
-},
-
-"extend" : function (object) {
-	jQuery.extend(true, ff, object);
-},
-
-"pluginLoad" : function (id, source, callback, async) {
-	if (callback !== undefined)
-		that.pluginAddInitLoad(id, callback);
-
-	if (plugins.isset(id) === undefined) {
-		plugins.set(id, false);
-		//jQuery.getScript(source, function (data, textStatus) {
-
-		var objFF = id.split(".");
-		var strFF = '';
-		var objFF_is_loaded = true;
-
-		for (var x=0; x<objFF.length; x++)
-		{
-			if(strFF == '') {
-				strFF = objFF[x];
-				if(strFF == 'jquery') {
-					strFF = 'jQuery';
-				}
-
-				strFF = 'window' + '["' + strFF  + '"]';
-			} else {
-				strFF = strFF + '["' + objFF[x] + '"]';
-			}
-
-			try {
-				if(eval(strFF) === undefined) {
-					objFF_is_loaded = false;
-					break;
-				}
-			} catch(error){
-				objFF_is_loaded = false;
-				break;
-			}
-		}
-
-		if(objFF_is_loaded) {
-			if (id === "ff.ffEvents") {
-				ff.extend(that.ffEvents());
-				jQuery.extend(true, ff.fn, ff.ffEvents());
-				ff.pluginInitLoad("ff");
-			}
-
-			ff.pluginInitLoad(id);
-		} else {
-			jQuery.ajax({
-				"async": async,
-				"url": that.fixPath(source),
-				/*"dataType": "script",*/
-	//			"cache": false,
-				"success": function (data) {
-					if (id === "ff.ffEvents") {
-						ff.extend(that.ffEvents());
-						jQuery.extend(true, ff.fn, ff.ffEvents());
-						ff.pluginInitLoad("ff");
-					}
-
-					//ff.pluginInitLoad(id);
-					jQuery("head").append('<script type="text/javascript">ff.pluginInitLoad("' + id + '");</script>');
-				}
-			});
-		}
-	}
-},
-
-"pluginAddInitLoad" : function (id, callback, uuid) {
-	if (uuid !== undefined) {
-		if (inits_uuid.isset(uuid) !== undefined)
-			return;
-		else
-			inits_uuid.set(uuid);
-	}
-	
-	if (plugins.get(id) !== true) {
-		if (plugins_loads.isset(id) === undefined)
-			plugins_loads.set(id, []);
-		
-		plugins_loads.get(id).push(callback);
-	} else
-		callback();
-},
-
-"pluginInitLoad" : function (id) {
-	if (id !== "ff.ffEvent" && id !== "ff.ffEvents")
-		initEvents(id);
-
-	var loads;
-	if ((loads = plugins_loads.get(id)) !== undefined) {
-		for (var i = 0; i < loads.length; i++) {
-			loads[i]();
-		}
-		plugins_loads.set(id, []);
-	}
-	pluginInit(id);
-	plugins.set(id, true);
-},
-
-"pluginAddInit" : function (id, callback, uuid) {
-	if (uuid !== undefined) {
-		if (inits_uuid.isset(uuid) !== undefined)
-			return;
-		else
-			inits_uuid.set(uuid);
-	}
-	
-	if (plugins.get(id) !== true) {
-		if (plugins_inits.isset(id) === undefined)
-			plugins_inits.set(id, []);
-
-		plugins_inits.get(id).push(callback);
-	} else
-		callback();
-},
-
-"CSSload" : function(link, callback) {
-    var cssLoaded = false;
-    if(!step) step = {};
-
-    try {
-        if (link.sheet && link.sheet.cssRules.length > 0 ) {
-            cssLoaded = true;
-        } else if (link.styleSheet && link.styleSheet.cssText.length > 0 ) {
-            cssLoaded = true;
-        } else if (link.innerHTML && link.innerHTML.length > 0 ) {
-            cssLoaded = true;
-        }
-    } catch(ex) { 
-    	step[link] = 10;
-	}
-	
-    if (cssLoaded) {
-    	if(callback !== undefined)
-        	callback();
-    } else {
-    	if(parseInt(step[link]) < 10) {
-    		step[link] = parseInt(step[link]) + 1;
-	        setTimeout(function () {
-	            CSSload(link, callback, step);
-	        }, 10);
-		}
-    }
-},
-"preloadCSS" : function(id) {
-	loaded_css.set(id, true);
-},
-"injectCSS" : function (id, source, callback, media) {
-	//document.styleSheets
-	if (loaded_css.get(id)) {
-		if (callback)
-			callback();
-
-		return;
-	}
-
-	loaded_css.set(id, true);
-	source = that.fixPath(source);
-	if(source) {
-		/* ie only */
-		/*if ('\v' == 'v')  {
-			var css = document.createStyleSheet(source);
-			
-			if(media) 
-				css.media = media;
-
-		} else {
-			var attrMedia = "";
-
-			if(media) {
-				attrMedia = 'media="' + media + '"';
-			}
-
-			var css = jQuery('<link rel="stylesheet" href="' + source + '" ' + attrMedia + ' />');
-			if(css)
-				jQuery('head').append(css);
-			
-			//ff.CSSload(css.get(0), callback);
-		}*/
-
-		var css = document.createElement("link");
-		css.setAttribute('rel', 'stylesheet');
-		css.setAttribute('type', 'text/css');
-		css.setAttribute('href', source);
-		if(media)
-			css.setAttribute('media', media);
-		
-		/*css.addEventListener('load', function() { 
-		    if(callback)
-		        callback();
-		});*/
-		document.getElementsByTagName('head')[0].appendChild(css);			
-		
-	}
-	
-	if(callback)
-		callback();
-    //if(callback !== undefined)
-    //	callback();
-
-	/*
-	var async = true;
-	var css = document.createElement('link');
-	css.setAttribute('rel', 'stylesheet');
-	css.setAttribute('href', source);
-	css.addEventListener('load', function() { alert('foo'); }, false);
-	document.getElementsByTagName('head')[0].appendChild(css);
-	
-	jQuery.ajax({
-			"async": async,
-			"url": source,
-			"dataType": "text",
-			"success": function (data) {
-//					jQuery("head").append('<style type="text/css">' + data + '</style>');
-				if (callback !== undefined)
-					callback();
-			}
-		});*/
 },
 
 "addLoadEvent" : function (func) {
@@ -661,28 +1063,36 @@ var that = { // publics
     if (null == e)
         e = window.event;
     if (e.keyCode == 13)  {
-    	document.getElementById(button).focus();
-        document.getElementById(button).click();
+    	if(typeof button == "object") { // semplicistico
+    		jQuery(button).focus();
+	        jQuery(button).click();
+    	} else {
+    		document.getElementById(button).focus();
+	        document.getElementById(button).click();
+    	}
         return false;
     }
 },
 
 "clearComponent" : function (component) {
-	if (ff.struct.get(component) !== undefined) {
-		if (ff.struct.get(component).type == "ffGrid")
-			if(ff.ffPageNavigator !== undefined) {
-				try {
-					ff.ffPageNavigator.deleteNavigator(component);
-				} catch (e) {};
-			}
-		ff.struct.get(component).fields.each( function (key, field) {
-			ff.doEvent({
-				"event_name"	: "onClearField",
-				"event_params"	: [component, key, field]
-			});
+	var pComp = ff.struct.get("comps").get(component);
+	if (!pComp)
+		return;
+
+	ff.doEvent({
+		"event_name"	: "onClearComponent",
+		"event_params"	: [component]
+	});
+
+	// reset delle restanti widgets processate (NB: potrebbe essere ridondante rispetto al ciclo precedente, occorre tenerne presente nella gestione dell'evento)
+	if (pComp.widgets && pComp.widgets.length) pComp.widgets.each(function (i, v) {
+		ff.doEvent({
+			"event_name"	: "onClearField",
+			"event_params"	: [component, undefined, {"widget" : v.type}, v.id]
 		});
-		ff.struct.unset(component);
-	}
+	});
+
+	ff.struct.get("comps").unset(component);
 },
 
 "utf8" : {
@@ -700,8 +1110,8 @@ var that = { // publics
 "decodeEntities" : function(s) {
 	return jQuery("<div/>").html(s).text(); 
 },
-"getFields" : function (container, dialog) {
-	that.doEvent({"event_name": "getFields", "event_params" : [container, dialog]});
+"getFields" : function (container, ctx) {
+	that.doEvent({"event_name": "getFields", "event_params" : [container, ctx]});
 
 	if (container !== undefined)
 		return jQuery(':input[name][name!=""]', container).not("input:checkbox:not(:checked)").not("input:radio:not(:checked)");
@@ -836,24 +1246,24 @@ var that = { // publics
 
     jQuery(window).unbind("scroll.lazyImg");
     jQuery(images).load(function() {
-        var placeholder = jQuery(this).prevAll(".lazyloader").get(0) || jQuery(this).parent().prevAll(".lazyloader").get(0);
+        var placeholder = jQuery(this).prev(".lazyloader").get(0) || jQuery(this).parent().prev(".lazyloader").get(0);
         if(placeholder)
             jQuery(placeholder).remove();
     });
 
     function loadImage (el, fn) {
         var src = el.getAttribute('data-src');
-	if(src) {
+		if(src) {
             el.setAttribute("src", src);
             el.removeAttribute('data-src');
 
             fn ? fn() : null;
-	}
+		}
     };
 
     var processScroll = function(){
       for (var i = 0; i < images.length; i++) {
-        var placeholder = jQuery(images[i]).prev(".lazyloader").get(0) || jQuery(images[i]).parent().prev(".lazyloader").get(0);
+        var placeholder = jQuery(images[i]).prevAll(".lazyloader").get(0) || jQuery(images[i]).parent().prevAll(".lazyloader").get(0);
         
         if (/*jQuery(images[i]).is(":hidden") ||*/ ff.inView(placeholder || images[i])) {
           loadImage(images[i], function () { 
@@ -882,8 +1292,9 @@ var that = { // publics
         processScroll();
     }
 },
+
 // *******************************
-//  Hash Table - version 1.6
+//  Hash Table - version 1.8.1
 
 "hash" : function (initdata) {
 	// privates
@@ -910,6 +1321,15 @@ var that = { // publics
 		}
 	},
 
+	"indexset" : function (index, value) {
+		if (index > -1 && index < that.length) {
+			that.values[index] = value;
+			return true;
+		} else {
+			return undefined;
+		}
+	},
+
 	"get" : function (key) {
 		var index = that.keys.indexOf(key);
 		if (index > -1)
@@ -918,19 +1338,33 @@ var that = { // publics
 			return undefined;
 	},
 
-	"indexget" : function (index) {
-		if (index > 0 && index < that.length)
-			return that.values[index];
-		else
-			return undefined;
-	},
-
-	"isset" : function (key) {
+	"getindex" : function (key) {
 		var index = that.keys.indexOf(key);
 		if (index > -1)
 			return index;
 		else
 			return undefined;
+	},
+	
+	"indexget" : function (index) {
+		if (index > -1 && index < that.length)
+			return that.values[index];
+		else
+			return undefined;
+	},
+
+	"indexgetkey" : function (index) {
+		if (index > -1 && index < that.length)
+			return that.keys[index];
+		else
+			return undefined;
+	},
+
+	"isset" : function (key) {
+		if (that.keys.indexOf(key) > -1)
+			return true;
+		else
+			return false;
 	},
 
 	"find" : function (value, offset) {
@@ -942,13 +1376,13 @@ var that = { // publics
 		}
 	},
 
-	"keyfind" : function (value, key) {
+	"keyfind" : function (value, startingkey) {
 		var index;
 
-		if (key === undefined)
+		if (startingkey === undefined)
 			index = that.values.indexOf(value);
 		else {
-			index = that.keys.indexOf(key);
+			index = that.keys.indexOf(startingkey);
 			if (index > -1)
 				index = that.values.indexOf(value, index);
 			else
@@ -986,8 +1420,8 @@ var that = { // publics
 	},
 
 	"each" : function (func) {
-		var tmp_keys	= that.keys.slice();
-		var tmp_values	= that.values.slice();
+		var tmp_keys	= that.keys.clone();
+		var tmp_values	= that.values.clone();
 		var l = tmp_keys.length;
 
 		for (var i = 0; i < l; i++) {
@@ -997,6 +1431,24 @@ var that = { // publics
 		}
 
 		return l;
+	},
+
+	"flip" : function () {
+		var tmp = ff.hash();
+
+		for (var i = 0; i < that.length; i++) {
+			tmp.set(that.values[i], that.keys[i]);
+		}
+		
+		that.clear();
+		
+		that.keys = tmp.keys.clone();
+		that.values = tmp.values.clone();
+		that.length = tmp.length;
+		
+		tmp.clear();
+		
+		return that;
 	},
 
 	"clear" : function () {
@@ -1022,32 +1474,71 @@ var that = { // publics
 		return that;
 	},
 	
-	"dump" : function (prefix) {
+	"dump" : function (prefix, document) {
 		prefix = (prefix === undefined ? "" : prefix);
 		that.each(function (key, value, index) {
-			if (prefix)
-				console.log(prefix + ">", index, key, value);
-			else
-				console.log(index, key, value);
-			if (typeof(value) == "object" && value.__class__ == "hash")
-				value.dump(prefix + "--");
+			if (prefix) {
+				if (document)
+					window.jQuery("body").append(prefix + "&gt; " + index + " " + key + " " + (Object.prototype.toString.call(value) == "[object Object]" ? (value.__class__ == "hash" ? value : JSON.stringify(value)) : value) + "<br />");
+				else
+					console.log(prefix + ">", index, key, value);
+			} else {
+				if (document)
+					window.jQuery("body").append(index + " " + key + " " + (Object.prototype.toString.call(value) == "[object Object]" ? (value.__class__ == "hash" ? value : JSON.stringify(value)) : value) + "<br />");
+				else
+					console.log(index, key, value);
+			}
+			if (Object.prototype.toString.call(value) == "[object Object]" && value.__class__ == "hash")
+				value.dump(prefix + "--", document);
 		});
-	}
-};
-
+	},
+	
+	"export" : function () {
+		var export_pairs = [];
+		
+		that.each(function (key, value, index) {
+			if (Object.prototype.toString.call(value) == "[object Object]" && value.__class__ == "hash")
+				value = value.export();
+			
+			export_pairs.push({
+				"name" : key,
+				"value" : value
+			});
+		});
+		
+		return export_pairs;
+	},
+	
+	};
+	
 // constructor
-if (typeof(initdata) == "object") {
+if (Object.prototype.toString.call(initdata) == "[object Object]") {
 	if (initdata.__class__ == "hash") {
 		that.keys	= initdata.keys;
 		that.length = initdata.length;
-		
+
 		for (var i = 0; i < initdata.values.length; i++) {
-			if (typeof(initdata.values[i] == "object") && initdata.values[i].__class__ == "hash")
+			if (Object.prototype.toString.call(initdata.values[i]) == "[object Object]" && initdata.values[i].__class__ == "hash")
 				that.values[i] = ff.hash(initdata.values[i]);
 			else
 				that.values[i] = initdata.values[i];
 		}
 	}
+} else if (Object.prototype.toString.call( initdata ) === '[object Array]') {
+	for (i = 0; i < initdata.length; i++) {
+		if (typeof(initdata[i]) === "object") {
+			if (initdata[i].__class__ === "hash")
+				that.set(that.length, ff.hash(initdata[i]));
+			else if (initdata[i].id !== undefined)
+				that.set(initdata[i].id, initdata[i].value);
+			else if (initdata[i].name !== undefined)
+				that.set(initdata[i].name, initdata[i].value);
+			else
+				that.set(that.length, initdata[i]);
+		} else {
+			that.set(that.length, initdata[i]);
+		}
+	};
 }
 
 return that;
@@ -1057,11 +1548,14 @@ return that;
 }; // publics' end
 
 // hash initializations
-loaded_css		= that.hash();
-plugins			= that.hash();
 plugins_loads	= that.hash();
 plugins_inits	= that.hash();
 inits_uuid		= that.hash();
+libs			= that.hash();
+libs_deps		= that.hash();
+//libs_init		= that.hash();
+libs_rev_deps	= that.hash();
+getlibs_loads	= that.hash();
 
 return that;
 

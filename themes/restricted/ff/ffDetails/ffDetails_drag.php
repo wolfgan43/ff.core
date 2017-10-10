@@ -12,7 +12,7 @@ function ffDetails_drag_update_order($detail, $row, $fields)
 	
 	if (strlen($fields))
 		$fields .= ", ";
-	$fields .= $detail->drag_order_field . " = " . $detail->db[0]->toSql($i);
+	$fields .= "`" . $detail->drag_order_field . "` = " . $detail->db[0]->toSql($i);
 }
 
 function ffDetails_drag_insert_order($detail, $row, $fields, $values)
@@ -31,7 +31,7 @@ function ffDetails_drag_insert_order($detail, $row, $fields, $values)
 	
 	if (strlen($fields))
 		$fields .= ", ";
-	$fields .= $detail->drag_order_field;
+	$fields .= "`" . $detail->drag_order_field . "`";
 	
 	if (strlen($values))
 		$values .= ", ";
@@ -67,11 +67,8 @@ function ffDetails_drag_on_loaded_data($detail)
 
 class ffDetails_drag extends ffDetails_base
 {
-	/**
-	 * Il prefisso di ogni oggetto nel template HTML
-	 * @var String
-	 */
-	public $prefix		= null;
+	var $id_if					= null;
+	
 	/**
 	 * L'eventuale tab in cui è inserito il dettaglio
 	 * @var String
@@ -115,6 +112,10 @@ class ffDetails_drag extends ffDetails_base
 	 */
 	var $drag_order_field		= "";
 
+	var $js_deps = array(
+		"ff.ffDetails" => null
+	);
+	
 	/**
 	 * Sovrascrive il costruttore di default aggiungendo gli eventi necessario al sorting
 	 * @param ffPage_base $page L'oggetto pagina collegato
@@ -125,10 +126,28 @@ class ffDetails_drag extends ffDetails_base
 	{
 		ffDetails_base::__construct($page, $disk_path, $theme);
 		
+		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+			$this->id_if = uniqid();
+		
 		$this->addEvent("on_before_record_update", "ffDetails_drag_update_order", ffEvent::PRIORITY_HIGH);
 		$this->addEvent("on_before_record_insert", "ffDetails_drag_insert_order", ffEvent::PRIORITY_HIGH);
 		$this->addEvent("on_loaded_data", "ffDetails_drag_on_loaded_data", ffEvent::PRIORITY_HIGH);
 
+	}
+	
+	function getIDIF()
+	{
+		if ($this->id_if !== null)
+			return $this->id_if;
+		else
+			return $this->id;
+	}
+
+	function getPrefix()
+	{
+		$tmp = $this->getIDIF();
+		if (strlen($tmp))
+			return $tmp . "_";
 	}
 	
 	/**
@@ -324,8 +343,8 @@ class ffDetails_drag extends ffDetails_base
 				
 				if ($this->display_delete && $this->buttons_options["delete"]["display"])
 				{
-					$this->getDetailButton("deleterow")->variables[$this->main_record[0]->id . "_detailaction"] = $this->id;
-					$this->getDetailButton("deleterow")->variables[$this->id . "_delete_row"] = $i;
+					$this->getDetailButton("detail_delete")->variables[$this->main_record[0]->getIDIF() . "_detailaction"] = $this->getIDIF();
+					$this->getDetailButton("detail_delete")->variables[$this->getIDIF() . "_delete_row"] = $i;
 				}
 
 				//$this->processDetailButtons($col, $display_label);
@@ -389,18 +408,7 @@ class ffDetails_drag extends ffDetails_base
 					else
 						$tmp_loc = $key;
 
-					$class = $this->form_fields[$key]->container_class;
-
-					if ($this->form_fields[$key]->required) {
-						$class = $class . (strlen($class) ? " " : "") . "required";
-					}
-					$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false));
-					if(strlen($class)) {
-						$this->tpl[0]->set_var("container_class", " " . $class);
-					} else {
-						$this->tpl[0]->set_var("container_class", "");
-					}
-					
+					$this->tpl[0]->set_var("container_class", $this->form_fields[$key]->container_class);
 					$this->tpl[0]->set_var("container_properties", $this->form_fields[$key]->getProperties($this->form_fields[$key]->container_properties));
 
 					if (!$this->use_fixed_fields) {
@@ -483,62 +491,14 @@ class ffDetails_drag extends ffDetails_base
 			$this->tpl[0]->load_file($this->template_file, "main");
 		}
 
-		if (strlen($this->id))
-			$this->prefix = $this->id . "_";
-		$this->tpl[0]->set_var("component_id", $this->id);
-
-		$this->tpl[0]->set_var("main_record_component", $this->main_record[0]->prefix);
+		$this->tpl[0]->set_var("component_id", $this->getIDIF());
+		$this->tpl[0]->set_var("main_record_component", $this->main_record[0]->getPrefix());
 
 		$this->tpl[0]->set_var("site_path", $this->site_path);
 		$this->tpl[0]->set_var("page_path", $this->page_path);
 		$this->tpl[0]->set_var("theme", $this->getTheme());
-
-        $component_class["default"] = $this->class;
-        if($this->framework_css["component"]["grid"]) {
-            if(is_array($this->framework_css["component"]["grid"]))
-                $component_class["grid"] = cm_getClassByFrameworkCss($this->framework_css["component"]["grid"], "col");
-            else {
-                $component_class["grid"] = cm_getClassByFrameworkCss("", $this->framework_css["component"]["grid"]);
-            }
-        }
-        $component_class["form"] = cm_getClassByFrameworkCss("component" . $this->framework_css["component"]["type"], "form");
-
-        $this->tpl[0]->set_var("component_class", implode(" ", array_filter($component_class)));
-
-        if(is_array($this->framework_css["component"]["col"]) && $this->framework_css["component"]["inner_wrap"] === null)
-            $this->framework_css["component"]["inner_wrap"] = "row";
-
-        if($this->framework_css["component"]["inner_wrap"]) 
-        {
-            if(is_array($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
-            } elseif(is_bool($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="innerWrap">');
-            } else {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
-            }
-            $this->tpl[0]->set_var("inner_wrap_end", '</div>');
-        }       
-           
-        if($this->framework_css["component"]["outer_wrap"]) 
-        {
-            if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->id . "Wrap outerWrap"). '">');
-            } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->id . 'Wrap outerWrap">');
-            } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->id . "Wrap outerWrap") . '">');
-            }
-            $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
-        }
-        
+		$this->tpl[0]->set_var("class", $this->class);
 		$this->tpl[0]->set_var("SectHiddden", "");
-
-        $this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
-        $this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
-        
-        $this->tpl[0]->set_var("fixed_title_content", $this->fixed_title_content);
-        $this->tpl[0]->set_var("fixed_heading_content", $this->fixed_heading_content);
 
 		$this->tpl[0]->set_var("requested_url", ffCommon_specialchars($_SERVER["REQUEST_URI"]));
 
@@ -549,7 +509,7 @@ class ffDetails_drag extends ffDetails_base
 
 		if ($this->tab)
 		{
-			$this->tpl[0]->set_var("tab_id", $this->main_record[0]->id);
+			$this->tpl[0]->set_var("tab_id", $this->main_record[0]->getIDIF());
 			$this->tpl[0]->set_var("tab_number", key($this->main_record[0]->tabs[$this->tab]) + 1);
 			$this->tpl[0]->parse("SectTabUrl", false);
 		}
@@ -558,46 +518,10 @@ class ffDetails_drag extends ffDetails_base
 			$this->tpl[0]->set_var("SectTabUrl", "");
 		}
 
-		/*if ($this->doAjax) {
-			$this->tpl[0]->set_var("submit_action", "ff.ajax.doRequest({'component' : '" . $this->id . "'});");
-		} else {
-			if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) {//code for ff.js
-				$this->main_record[0]->parent[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-				$this->main_record[0]->parent[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-			}
-			$this->tpl[0]->set_var("submit_action", "document.getElementById('frmMain').submit();");
-		}*/
-
-        if ($this->display_new === true) {
-            /*if($this->display_rowstoadd) {
-                if($this->display_new_location == "Header" || $this->display_new_location == "Both")
-                    $this->tpl[0]->parse("SectNewHeaderQta", false);
-                if($this->display_new_location == "Footer" || $this->display_new_location == "Both")
-                    $this->tpl[0]->parse("SectNewFooterQta", false);
-            } else {
-                $this->tpl[0]->set_var("hidden_name", "rowstoadd");
-                $this->tpl[0]->set_var("hidden_value", "1");
-                $this->tpl[0]->parse("SectHidden", true);
-                $this->tpl[0]->set_var("SectNewHeaderQta", "");
-                $this->tpl[0]->set_var("SectNewFooterQta", "");
-            }*/
-
-           /* if($this->display_new_location == "Header" || $this->display_new_location == "Both")
-                $this->tpl[0]->parse("SectNewHeader", false);
-            if($this->display_new_location == "Footer" || $this->display_new_location == "Both")
-                $this->tpl[0]->parse("SectNewFooter", false);
-            */
-            $this->tpl[0]->parse("SectTitle", false);
-        } else {
-            /*
-            $this->tpl[0]->set_var("SectNewHeader", "");
-            $this->tpl[0]->set_var("SectNewFooter", "");
-            */
-            if(strlen($this->title) || $this->widget_discl_enable)
-                $this->tpl[0]->parse("SectTitle", false);
-            else
-                $this->tpl[0]->set_var("SectTitle", "");
-        }
+		if(strlen($this->title) || $this->widget_discl_enable)
+			$this->tpl[0]->parse("SectTitle", false);
+		else
+			$this->tpl[0]->set_var("SectTitle", "");
 	}
 
 	/**
@@ -609,6 +533,9 @@ class ffDetails_drag extends ffDetails_base
 	{
 		$res = ffDetails::doEvent("on_tplParse", array($this, $this->tpl[0]));
 		$res = $this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
+
+		$this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
+		$this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
 
 		if ($output_result === true)
 		{
@@ -623,9 +550,6 @@ class ffDetails_drag extends ffDetails_base
 
 	function process_headers()
 	{
-		if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) //code for ff.js
-			$this->main_record[0]->parent[0]->tplAddJs("ff.ffDetails", "ffDetails.js", FF_THEME_DIR . "/library/ff");
-
 		if (!isset($this->tpl[0]))
 			return;
 
@@ -638,26 +562,7 @@ class ffDetails_drag extends ffDetails_base
 			return;
 
 		return $this->tpl[0]->rpparse("SectFooters", false);
-	}
-	/**
-	 * elabora la sezione relativa alla visualizzazione dell'errore nel template
-	 * da richiamare ogniqualvolta si aggiorna l'errore
-	 */
-	function displayError($sError = null)
-	{
-		if ($sError !== null)
-			$this->strError = $sError;
-
-		if (strlen($this->strError))
-		{
-			$this->tpl[0]->set_var("strError", $this->strError);
-			$this->tpl[0]->parse("SectError", false);
-		}
-		else
-			$this->tpl[0]->set_var("SectError", "");
-
-		return $sError;
-	}
+	}		
 	/**
 	 * Elabora l'azione. L'azione viene ereditata dall'oggetto record padre
 	 * @return Mixed Il risultato del processing
@@ -669,7 +574,14 @@ class ffDetails_drag extends ffDetails_base
 
 		return parent::process_action();
 	}
+	
 	public function structProcess($tpl)
 	{
+		if ($this->id_if !== null)
+		{
+            $tpl->set_var("prop_name",    "factory_id");
+            $tpl->set_var("prop_value",   '"' . $this->id . '"');
+            $tpl->parse("SectFFObjProperty",    true);
+		}
 	}
 }

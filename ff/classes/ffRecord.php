@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffRecord
@@ -117,59 +117,15 @@ class ffRecord
  * @package FormsFramework
  * @subpackage components
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffRecord_base extends ffCommon
 {
 	// ----------------------------------
 	//  PUBLIC VARS (used for settings)
-/*
-	var $framework_css 			= array(
-			"component" => array(
-				"inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-				, "grid" => false		//false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
-				, "type" => null		//null OR '' OR "-inline"
-			)
-			, "actions" => array(
-				"class" => "actions"
-				, "row" => "row"
-			)
-			, "record" => array(
-				"row" => true
-			)
-			, "field" => array(
-				"label" => array(
-					"col" => array(
-						"xs" => 0
-						, "sm" => 0
-						, "md" => 12
-						, "lg" => 4
-					)
-				)
-				, "control" => array(
-					"col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 8
-					)
-				)
-			)
-			, "info" => array(
-				"class" => "info"
-				, "callout" => "info"
-			)
-			, "error" => array(
-				"class" => "error"
-				, "callout" => "danger"
-			)
-	
-	
-	
-	);*/
+
 	/**
 	 * ID di ffRecord
 	 * @var String
@@ -261,6 +217,7 @@ abstract class ffRecord_base extends ffCommon
 	 * @var String
 	 */
 	var $dialog_path			= null;
+	var $url_delete = null;
 
 	/**
 	 * Link alla pagina precedente;
@@ -301,40 +258,33 @@ abstract class ffRecord_base extends ffCommon
 														  "display" => true
 														, "index" 	=> 1
 														, "obj" 	=> null
-														, "label" 	=> null
-                                                        , "aspect"  => "link"
-                                                        , "icon"	=> null
-                                                        , "activebuttons" => true
+														, "label" 	=> "Inserisci"
+                                                        , "aspect"  => "button"
 											  				)
 										  , "update" => array(
 														  "display" => true
 														, "index" 	=> 2
 														, "obj" 	=> null
-														, "label" 	=> null
-                                                        , "aspect"  => "link"
-                                                        , "icon"	=> null
-                                                        , "activebuttons" => true
+														, "label" 	=> "Aggiorna"
+                                                        , "aspect"  => "button"
 											  				)
 
 										  , "delete" => array(
 														  "display" => true
 														, "index" 	=> 1
 														, "obj" 	=> null
-														, "label" 	=> null
-                                                        , "aspect"  => "link"
-                                                        , "icon"	=> null
-                                                        , "activebuttons" => true
+														, "label" 	=> "Elimina"
+                                                        , "aspect"  => "button"
 											  				)
 
 										  , "cancel" => array(
 														  "display" => true
 														, "index" 	=> 0
 														, "obj" 	=> null
-														, "label" 	=> null
-                                                        , "aspect"  => "link"
-                                                        , "icon"	=> null
+														, "label" 	=> "Indietro"
+                                                        , "aspect"  => "button"
 											  				)
-										); 
+										);
 
 	/**
 	 * Visualizza un simbolo nel caso in cui il campo sia obbligatorio
@@ -557,6 +507,8 @@ abstract class ffRecord_base extends ffCommon
 	var $del_multi_update 		= array();
 	
 	var $label_error_required 	= "Il campo [LABEL] è obbligatorio";
+	var $label_error_range_min	= "Il campo [LABEL] è troppo piccolo";
+	var $label_error_range_max	= "Il campo [LABEL] è troppo grande";
 	var $label_error_nomatch 	= "Il campo [LABEL] non corrisponde";
 	var $label_delete_record	= "Confermi l'eliminazione del dato?<br /><span>Il dato verr&agrave; eliminato definitivamente, non potr&agrave; essere recuperato.</span>";
 
@@ -656,6 +608,10 @@ abstract class ffRecord_base extends ffCommon
 	var $resources_set = array();
 	var $resources_get = array();
 
+	var $libraries	= array();
+	var $js_deps	= array();
+	var $css_deps	= array();
+	
 	abstract protected 	function 	tplLoad				();
 	abstract public 	function 	tplParse			($output_result);
 	abstract public 	function 	tplDisplay 			();
@@ -716,7 +672,7 @@ abstract class ffRecord_base extends ffCommon
 				$this->form_fields[$id] = $content;
 				$this->form_fields[$id]->group = $group;
 			}
-
+			
 			if (is_object($content)	&& is_subclass_of($content, "ffDetails_base"))
 			{
 				$content->main_record = array(&$this);
@@ -924,7 +880,7 @@ abstract class ffRecord_base extends ffCommon
 			$this->sAddWhere = "";
 			foreach ($this->additional_key_fields as $key => $value)
 			{
-				$this->sAddWhere .= " AND " . $key . " = " . $this->db[0]->toSql($value);
+				$this->sAddWhere .= " AND `" . $key . "` = " . $this->db[0]->toSql($value);
 			}
 			reset ($this->additional_key_fields);
 		}
@@ -942,11 +898,9 @@ abstract class ffRecord_base extends ffCommon
 		if (!strlen($this->parent[0]->frmAction) || $this->frmAction == "confirmdelete")
 			$this->first_access = true;
 
-		//TODO: da rimuovere Se si rimuove non funzionano piu le mappe
 		foreach ($this->form_fields as $key => $value)
 		{
-			if ($this->form_fields[$key]->multi_preserve_field === null)
-				$this->form_fields[$key]->pre_process();
+			$this->form_fields[$key]->widget_init();
 		}
 		reset($this->form_fields);
 
@@ -961,7 +915,8 @@ abstract class ffRecord_base extends ffCommon
 		{ // retrieve fields from DB
 			if ($this->auto_populate_edit)
 			{
-				$this->db[0]->query($this->populate_edit_SQL);
+				$tmp_sql = ffProcessTags($this->populate_edit_SQL, $this->key_fields, $this->form_fields, "sql", "", "", "", "", $this->db[0]);
+				$this->db[0]->query($tmp_sql);
 				
 				if ($this->db[0]->nextRecord())
 				{
@@ -978,7 +933,7 @@ abstract class ffRecord_base extends ffCommon
 										{
 											$element = $this->form_fields[$key]->get_data_source() . "_" . $subkey;
 											if ($this->db[0]->isSetField($element))
-												$this->form_fields[$key]->multi_values[$subkey] = $this->db[0]->getField($element, $subvalue["type"]);
+												$this->form_fields[$key]->multi_values[$subkey] = ($this->form_fields[$key]->crypt ? ff_getDecryptedField($this->db[0], $element, $subvalue["type"]) : $this->db[0]->getField($element, $subvalue["type"]));
 											elseif (isset($subvalue["default"]))
 												$this->form_fields[$key]->multi_values[$subkey] = $subvalue["default"];
 											else
@@ -991,10 +946,9 @@ abstract class ffRecord_base extends ffCommon
 									{
 										if ($this->db[0]->isSetField($this->form_fields[$key]->get_data_source()))
 										{
-											$tmp = $this->db[0]->getField(
-													$this->form_fields[$key]->get_data_source(),
-													$this->form_fields[$key]->base_type
-												);
+											$tmp = ($this->form_fields[$key]->crypt ? 
+															ff_getDecryptedField($this->db[0], $this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type)
+															: $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type));
 											//$this->form_fields[$key]->value = $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type);
 											$this->form_fields[$key]->setValue($tmp->getValue($this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale()));
 										}
@@ -1010,7 +964,7 @@ abstract class ffRecord_base extends ffCommon
 								break;
 
 							case "callback":
-								$this->form_fields[$key]->value = call_user_func($this->form_fields[$key]->get_data_source(), $this->form_fields, $key, $this->first_access);
+								$this->form_fields[$key]->value = call_user_func($this->form_fields[$key]->get_data_source(), $this->form_fields, $key, $this->first_access, $this);
 								break;
 
 							case "":
@@ -1034,7 +988,7 @@ abstract class ffRecord_base extends ffCommon
 						ffErrorHandler::raise("NO RECORD FOUND", E_USER_ERROR, $this, get_defined_vars());
 					else
 					{
-						if (isset($_REQUEST["XHR_DIALOG_ID"]))
+						if (isset($_REQUEST["XHR_CTX_ID"]))
 							$this->dialog(false, "okonly", $this->error_on_norecord_title, $this->error_on_norecord_message, "", "[CLOSEDIALOG]");
 						else
 							$this->dialog(false, "okonly", $this->error_on_norecord_title, $this->error_on_norecord_message, "", $this->parent[0]->ret_url);
@@ -1063,7 +1017,7 @@ abstract class ffRecord_base extends ffCommon
 										foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
 										{
 											$element = $this->form_fields[$key]->get_data_source() . "_" . $subkey;
-											$this->form_fields[$key]->multi_values[$subkey] = $this->db[0]->getField($element, $subvalue["type"]);
+											$this->form_fields[$key]->multi_values[$subkey] = ($this->form_fields[$key]->crypt ? ff_getDecryptedField($this->db[0], $element, $subvalue["type"]) : $this->db[0]->getField($element, $subvalue["type"]));
 										}
 										reset ($this->form_fields[$key]->multi_fields);
 										$this->form_fields[$key]->value = $this->form_fields[$key]->multi_values;
@@ -1071,10 +1025,10 @@ abstract class ffRecord_base extends ffCommon
 									else
 									{
 										//$this->form_fields[$key]->value = $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type);
-										$tmp = $this->db[0]->getField(
-												$this->form_fields[$key]->get_data_source(),
-												$this->form_fields[$key]->base_type
-											);
+										$tmp = ($this->form_fields[$key]->crypt ? 
+														ff_getDecryptedField($this->db[0], $this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type)
+														: $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type));
+										
 										//$this->form_fields[$key]->value = new ffData($tmp->getValue($this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale()), $this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale());
 										$this->form_fields[$key]->setValue($tmp->getValue($this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale()));
 										//if ($this->form_fields[$key]->extended_type == "Selection")
@@ -1088,13 +1042,14 @@ abstract class ffRecord_base extends ffCommon
 									break;
 
 								case "callback":
-									$this->form_fields[$key]->value = call_user_func($this->form_fields[$key]->get_data_source(), $this->form_fields, $key, $this->first_access);
+									$this->form_fields[$key]->value = call_user_func($this->form_fields[$key]->get_data_source(), $this->form_fields, $key, $this->first_access, $this);
 									break;
 
 								case "":
 									$this->form_fields[$key]->value = $this->form_fields[$key]->getDefault(array(&$this));
 									break;
 							}
+							
 							if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 							{
 								$this->form_fields[$key]->multi_values_ori = $this->form_fields[$key]->multi_values;
@@ -1108,12 +1063,27 @@ abstract class ffRecord_base extends ffCommon
 				}
 				else
 				{
-					if (isset($_REQUEST["XHR_DIALOG_ID"]))
+					if (isset($_REQUEST["XHR_CTX_ID"]))
 						$this->dialog(false, "okonly", $this->error_on_norecord_title, $this->error_on_norecord_message, "", "[CLOSEDIALOG]");
 					else
 						$this->dialog(false, "okonly", $this->error_on_norecord_title, $this->error_on_norecord_message, "", $this->parent[0]->ret_url);
 				}
 			}
+			
+			/*foreach ($this->form_fields as $key => $ff)
+			{
+				if ($ff->crypt)
+				{
+					if (MOD_SEC_CRYPT && $ff->crypt_modsec)
+					{
+						$value = $ff->value->getValue(null, FF_SYSTEM_LOCALE);
+						$value = mod_sec_decrypt_string($value);
+
+						$this->form_fields[$key]->value->setValue($value, null, FF_SYSTEM_LOCALE);
+						$this->form_fields[$key]->value_ori->setValue($value, null, FF_SYSTEM_LOCALE);
+					}
+				}
+			}*/
 		}
 		else if ((!$this->record_exist || !$this->src_table) && $this->first_access)
 		{ // set proper default values
@@ -1173,7 +1143,7 @@ abstract class ffRecord_base extends ffCommon
 								{
 									$element = $this->form_fields[$key]->get_data_source() . "_" . $subkey;
 									if ($this->db[0]->isSetField($element))
-										$this->form_fields[$key]->multi_values[$subkey] = $this->db[0]->getField($element, $subvalue["type"]);
+										$this->form_fields[$key]->multi_values[$subkey] = ($this->form_fields[$key]->crypt ? ff_getDecryptedField($this->db[0], $element, $subvalue["type"]) : $this->db[0]->getField($element, $subvalue["type"]));
 									elseif (isset($subvalue["default"]))
 										$this->form_fields[$key]->multi_values = $subvalue["default"];
 									else
@@ -1184,7 +1154,10 @@ abstract class ffRecord_base extends ffCommon
 							}
 							elseif ($this->db[0]->isSetField($this->form_fields[$key]->get_data_source()))
 							{
-								$this->form_fields[$key]->value = $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type);
+								$tmp = ($this->form_fields[$key]->crypt ? 
+												ff_getDecryptedField($this->db[0], $this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type)
+												: $this->db[0]->getField($this->form_fields[$key]->get_data_source(), $this->form_fields[$key]->base_type));
+								$this->form_fields[$key]->setValue($tmp->getValue($this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale()));
 
 								$res = $this->form_fields[$key]->doEvent("on_get_from_db", array(&$this, $this->form_fields[$key]));
 								$rc = end($res);
@@ -1197,6 +1170,21 @@ abstract class ffRecord_base extends ffCommon
 						reset($this->form_fields);
 					}
 				}
+				
+				/*foreach ($this->form_fields as $key => $ff)
+				{
+					if ($ff->crypt)
+					{
+						if (MOD_SEC_CRYPT && $ff->crypt_modsec)
+						{
+							$value = $ff->value->getValue(null, FF_SYSTEM_LOCALE);
+							$value = mod_sec_decrypt_string($value);
+
+							$this->form_fields[$key]->value->setValue($value, null, FF_SYSTEM_LOCALE);
+							$this->form_fields[$key]->value_ori->setValue($value, null, FF_SYSTEM_LOCALE);
+						}
+					}
+				}*/
 			}
 			else
 			{
@@ -1251,7 +1239,7 @@ abstract class ffRecord_base extends ffCommon
 				switch ($this->form_fields[$key]->data_type)
 				{
 					case "callback":
-						$this->form_fields[$key]->value = call_user_func($this->form_fields[$key]->get_data_source(), $this->form_fields, $key, $this->first_access);
+						$this->form_fields[$key]->value = call_user_func($this->form_fields[$key]->get_data_source(), $this->form_fields, $key, $this->first_access, $this);
 						break;
 				}
 
@@ -1387,6 +1375,12 @@ abstract class ffRecord_base extends ffCommon
         else
             return null;
     }
+	
+	function addDefaultButton($type, $obj)
+	{
+		$this->addActionButton(	  $obj
+								, $this->buttons_options[$type]["index"]);
+	}
     
     /**
     * inizializza i pulsanti standard dell'oggetto
@@ -1394,7 +1388,7 @@ abstract class ffRecord_base extends ffCommon
     */
     function initControls()
     {
-		$this->tplSection["buttons"]["display"] = false; 
+		$this->tplSection["buttons"]["display"] = false;
 
 		if ($this->hide_all_controls)
 			return;
@@ -1409,14 +1403,10 @@ abstract class ffRecord_base extends ffCommon
 			}
 			else
 			{
-				if($this->buttons_options["cancel"]["label"] === null)
-					$this->buttons_options["cancel"]["label"] = ffTemplate::_get_word_by_code("ffRecord_cancel");
-
 				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 				$tmp->id 			= "ActionButtonCancel";
-				$tmp->label 		= $this->buttons_options["cancel"]["icon"] . $this->buttons_options["cancel"]["label"];
+				$tmp->label 		= $this->buttons_options["cancel"]["label"]; 
 				$tmp->aspect 		= $this->buttons_options["cancel"]["aspect"];
-				$tmp->activebuttons	= $this->buttons_options["cancel"]["activebuttons"];
 				
 				if ($this->buttons_options["cancel"]["jsaction"])
 				{
@@ -1429,12 +1419,11 @@ abstract class ffRecord_base extends ffCommon
 					$tmp->action_type 	= "gotourl";
 					$tmp->url			= "[RET_URL]";
 				}
-
-				$tmp->class	= $this->buttons_options["cancel"]["class"];
-                $tmp->icon  = $this->buttons_options["cancel"]["icon"]; 
-
-				$this->addActionButton(	  $tmp
-										, $this->buttons_options["cancel"]["index"]);
+				
+				if (isset($this->buttons_options["cancel"]["class"]))
+					$tmp->class			= $this->buttons_options["cancel"]["class"];
+				
+				$this->addDefaultButton("cancel", $tmp);
 			}
 		}
 
@@ -1449,14 +1438,10 @@ abstract class ffRecord_base extends ffCommon
 				}
 				else
 				{
-					if($this->buttons_options["insert"]["label"] === null)
-						$this->buttons_options["insert"]["label"] = ffTemplate::_get_word_by_code("ffRecord_insert");
-
 					$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 					$tmp->id 			= "ActionButtonInsert";
 					$tmp->label 		= $this->buttons_options["insert"]["label"];
 					$tmp->aspect 		= $this->buttons_options["insert"]["aspect"];
-					$tmp->activebuttons	= $this->buttons_options["insert"]["activebuttons"];
 					$tmp->frmAction		= ($this->buttons_options["insert"]["frmAction"] ? $this->buttons_options["insert"]["frmAction"] : "insert");
 					if ($this->buttons_options["insert"]["jsaction"])
 					{
@@ -1464,14 +1449,7 @@ abstract class ffRecord_base extends ffCommon
 					}
 					elseif($this->buttons_options["insert"]["url"])
 					{
-						if(strpos($this->buttons_options["insert"]["url"], "javascript:") === 0) 
-						{
-							$tmp->url = "javascript:void(0);";
-							$tmp->properties["onclick"] = substr($this->buttons_options["insert"]["url"],strlen("javascript:"));
-						} 
-						else 
-							$tmp->url = $this->buttons_options["insert"]["url"];
-							
+						$tmp->url = $this->buttons_options["insert"]["url"];
 						$tmp->action_type 	= "gotourl";
 					} 
 					else 
@@ -1479,12 +1457,11 @@ abstract class ffRecord_base extends ffCommon
 						$tmp->action_type 	= "submit";
 						$tmp->ajax 			= $this->ajax;
 					}
-
-					$tmp->class	= $this->buttons_options["insert"]["class"];
-                    $tmp->icon  = $this->buttons_options["insert"]["icon"]; 
-
-					$this->addActionButton(	  $tmp
-											, $this->buttons_options["insert"]["index"]);
+					
+					if (isset($this->buttons_options["insert"]["class"]))
+						$tmp->class			= $this->buttons_options["insert"]["class"];
+					
+					$this->addDefaultButton("insert", $tmp);
 				}
 			}
 		}
@@ -1499,14 +1476,10 @@ abstract class ffRecord_base extends ffCommon
 				}
 				else
 				{
-					if($this->buttons_options["delete"]["label"] === null)
-						$this->buttons_options["delete"]["label"] = ffTemplate::_get_word_by_code("ffRecord_delete");
-
 					$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 					$tmp->id 			= "ActionButtonDelete";
 					$tmp->label 		=  $this->buttons_options["delete"]["label"];
 					$tmp->aspect 		=  $this->buttons_options["delete"]["aspect"]; 
-					$tmp->activebuttons	= $this->buttons_options["delete"]["activebuttons"];
 					$tmp->frmAction		= ($this->buttons_options["delete"]["frmAction"] ? $this->buttons_options["delete"]["frmAction"] : "delete");
 					if ($this->buttons_options["delete"]["jsaction"])
 					{
@@ -1514,14 +1487,7 @@ abstract class ffRecord_base extends ffCommon
 					}
 					elseif($this->buttons_options["delete"]["url"])
 					{
-						if(strpos($this->buttons_options["delete"]["url"], "javascript:") === 0) 
-						{
-							$tmp->url = "javascript:void(0);";
-							$tmp->properties["onclick"] = substr($this->buttons_options["delete"]["url"],strlen("javascript:"));
-						} 
-						else 
-							$tmp->url = $this->buttons_options["delete"]["url"];
-
+						$tmp->url = $this->buttons_options["delete"]["url"];
 						$tmp->action_type 	= "gotourl";
 					}
 					else
@@ -1529,12 +1495,11 @@ abstract class ffRecord_base extends ffCommon
 						$tmp->action_type 	= "submit";
 						$tmp->ajax 			= $this->ajax;
 					}
-
-					$tmp->class	= $this->buttons_options["delete"]["class"];
-                    $tmp->icon  = $this->buttons_options["delete"]["icon"]; 
-                    
-					$this->addActionButton(	  $tmp
-											, $this->buttons_options["delete"]["index"]);
+					
+					if (isset($this->buttons_options["delete"]["class"]))
+						$tmp->class			= $this->buttons_options["delete"]["class"];
+					
+					$this->addDefaultButton("delete", $tmp);
 				}
 			}
 
@@ -1547,14 +1512,10 @@ abstract class ffRecord_base extends ffCommon
 				}
 				else
 				{
-					if($this->buttons_options["update"]["label"] === null)
-						$this->buttons_options["update"]["label"] = ffTemplate::_get_word_by_code("ffRecord_update");
-                        
 					$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 					$tmp->id 			= "ActionButtonUpdate";
 					$tmp->label 		= $this->buttons_options["update"]["label"];
 					$tmp->aspect 		= $this->buttons_options["update"]["aspect"];
-					$tmp->activebuttons	= $this->buttons_options["update"]["activebuttons"]; 
 					$tmp->frmAction		= ($this->buttons_options["update"]["frmAction"] ? $this->buttons_options["update"]["frmAction"] : "update");
 					if ($this->buttons_options["update"]["jsaction"])
 					{
@@ -1562,14 +1523,7 @@ abstract class ffRecord_base extends ffCommon
 					}
 					elseif($this->buttons_options["update"]["url"])
 					{
-						if(strpos($this->buttons_options["update"]["url"], "javascript:") === 0) 
-						{
-							$tmp->url = "javascript:void(0);";
-							$tmp->properties["onclick"] = substr($this->buttons_options["update"]["url"],strlen("javascript:"));
-						} 
-						else 
-							$tmp->url = $this->buttons_options["update"]["url"];
-
+						$tmp->url = $this->buttons_options["update"]["url"];
 						$tmp->action_type 	= "gotourl";
 					} 
 					else
@@ -1577,11 +1531,18 @@ abstract class ffRecord_base extends ffCommon
 						$tmp->action_type 	= "submit";
 						$tmp->ajax 			= $this->ajax;
 					}
-					$tmp->class	= $this->buttons_options["update"]["class"];
-                    $tmp->icon  = $this->buttons_options["update"]["icon"]; 
-
-					$this->addActionButton(	  $tmp
-											, $this->buttons_options["update"]["index"]);
+					
+					if (isset($this->buttons_options["update"]["class"]))
+						$tmp->class = $this->buttons_options["update"]["class"];
+					else
+					{
+						if ($tmp->class !== null)
+							$tmp->class .= ($this->cursor_dialog ? " noactivebuttons" : "");
+						else
+							$tmp->class = ($this->cursor_dialog ? " noactivebuttons" : null);
+					}
+					
+					$this->addDefaultButton("update", $tmp);
 				}
 			}
 		}
@@ -1631,27 +1592,63 @@ abstract class ffRecord_base extends ffCommon
 							$tmp_where .= " AND ";
 						$tmp_where .= " " . $key . " = " . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type);
 					}
+					
 					// required or not
-					if ($this->form_fields[$key]->required && !strlen($this->form_fields[$key]->value->ori_value) 
-						&& !($this->form_fields[$key]->extended_type == "Password" && $this->record_exist))
+					if ($this->form_fields[$key]->required)
 					{
-						$this->form_fields[$key]->contain_error = true;
-						$this->contain_error = true;
-						$this->strError = str_replace("[LABEL]", ($this->form_fields[$key]->label ? $this->form_fields[$key]->label : $this->form_fields[$key]->placeholder), $this->label_error_required);
-						break;
+						switch ($this->form_fields[$key]->extended_type)
+						{
+							case "Boolean":
+								if ($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) === $this->form_fields[$key]->unchecked_value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
+									$this->contain_error = true;
+								break;
+							
+							default:
+								if (
+									!strlen($this->form_fields[$key]->value->ori_value) &&
+									!($this->form_fields[$key]->extended_type == "Password" && $this->record_exist)
+								)
+									$this->contain_error = true;
+						}
+						
+						if ($this->contain_error)
+						{
+							$this->form_fields[$key]->contain_error = true;
+							$this->strError = str_replace("[LABEL]", ($this->form_fields[$key]->label ? $this->form_fields[$key]->label : $this->form_fields[$key]->placeholder), $this->label_error_required);
+							break;
+						}
 					}
 
-					if($this->form_fields[$key]->base_type == "Number" 
-						&& (($this->form_fields[$key]->min_val > 0 && $this->form_fields[$key]->value->ori_value < $this->form_fields[$key]->min_val)
-							|| ($this->form_fields[$key]->max_val > 0 && $this->form_fields[$key]->value->ori_value > $this->form_fields[$key]->max_val)
-						)
-					) {
-						$this->form_fields[$key]->contain_error = true;
-						$this->contain_error = true;
-						$this->strError = str_replace("[LABEL]", ($this->form_fields[$key]->label ? $this->form_fields[$key]->label : $this->form_fields[$key]->placeholder), $this->label_error_required);
-						break;
+					// range
+					switch ($this->form_fields[$key]->base_type)
+					{
+						case "Number":
+							if (
+								$this->form_fields[$key]->min_val !== null && $this->form_fields[$key]->value->ori_value < $this->form_fields[$key]->min_val
+							)
+							{
+								$this->contain_error = true;
+								$this->strError = $this->label_error_range_min;
+							}
+							else if (
+								$this->form_fields[$key]->max_val !== null && $this->form_fields[$key]->value->ori_value > $this->form_fields[$key]->max_val
+							)
+							{
+								$this->contain_error = true;
+								$this->strError = $this->label_error_range_max;
+							}
+							
+							if ($this->contain_error)
+							{
+								$this->form_fields[$key]->contain_error = true;
+								$this->strError = str_replace("[LABEL]", ($this->form_fields[$key]->label ? $this->form_fields[$key]->label : $this->form_fields[$key]->placeholder), $this->strError);
+								break;
+							}
+							break;
+
+						default:
 					}
-					
+
 					// corrispondency
 					if (
 							strlen($this->form_fields[$key]->compare) 
@@ -1664,7 +1661,8 @@ abstract class ffRecord_base extends ffCommon
 						$this->strError = str_replace("[LABEL]", ($this->form_fields[$this->form_fields[$key]->compare]->label ? $this->form_fields[$this->form_fields[$key]->compare]->label : $this->form_fields[$this->form_fields[$key]->compare]->placeholder), $this->label_error_nomatch);
 						break;
 					}
-
+					
+					// format
 					if ($this->form_fields[$key]->enable_check_format && ((!is_array($this->form_fields[$key]->value->ori_value) && strlen($this->form_fields[$key]->value->ori_value)) || $this->form_fields[$key]->required == true) && ($tmp = $this->form_fields[$key]->check_format()))
 					{
 						$this->form_fields[$key]->contain_error = true;
@@ -1673,7 +1671,7 @@ abstract class ffRecord_base extends ffCommon
 						break;
 					}
 				}
-
+				
 				if ($this->contain_error)
 					break;
 
@@ -1716,15 +1714,14 @@ abstract class ffRecord_base extends ffCommon
 				return;
 		}
 
+		// verifica degli errori sui dettagli. Se uno solo ne contiene, stoppa il processing
 		if ((isset($this->default_actions[$this->frmAction]) ? $this->default_actions[$this->frmAction] : $this->frmAction) != "cancel")
 		{
 			if (strlen($this->strError))
 				return;
 
-			// EVENT HANDLER
 			if ($this->detail !== null)
 			{
-				$detailaction = $this->parent[0]->retrieve_param($this->id, "detailaction");
 				foreach ($this->detail as $key => $value)
 				{
 					if (strlen($this->detail[$key]->strError))
@@ -1737,11 +1734,10 @@ abstract class ffRecord_base extends ffCommon
 		switch (isset($this->default_actions[$this->frmAction]) ? $this->default_actions[$this->frmAction] : $this->frmAction)
 		{
 			case "cancel":
-				$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+				$this->redirect($this->parent[0]->ret_url);
+				
 			case "detail_addrows":
+				$detailaction = $this->parent[0]->retrieve_param($this->id, "detailaction");
 				if (strlen($detailaction) && isset($this->detail[$detailaction]))
 					$this->detail[$detailaction]->process_action();
 				elseif (strlen($detailaction) && isset($this->detail[0]) && count($this->detail) == 1)
@@ -1751,6 +1747,7 @@ abstract class ffRecord_base extends ffCommon
 				break;
 
 			case "detail_delete":
+				$detailaction = $this->parent[0]->retrieve_param($this->id, "detailaction");
 				if (strlen($detailaction) && isset($this->detail[$detailaction]))
 					$rc = $this->detail[$detailaction]->process_action();
 				elseif (strlen($detailaction) && isset($this->detail[0]) && count($this->detail) == 1)
@@ -1761,10 +1758,7 @@ abstract class ffRecord_base extends ffCommon
 
 			case "insert":
 				if (!$this->allow_insert)
-					$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+					$this->redirect($this->parent[0]->ret_url);
 				
                 //INSERT DB 
                 $fields = ""; $values = "";
@@ -1792,7 +1786,7 @@ abstract class ffRecord_base extends ffCommon
                         }
                         else
                         {
-
+							$processed_sql_value = false;
 
                             if (strlen($fields))
                                 $fields .= ", ";
@@ -1801,33 +1795,51 @@ abstract class ffRecord_base extends ffCommon
                             if (strlen($values))
                                 $values .= ", ";
 
-                            if ($this->form_fields[$key]->base_type == "Text" &&
-                                    $this->form_fields[$key]->crypt_method !== null)
+							$tmp_type = $this->form_fields[$key]->base_type;
+					
+                            if ($this->form_fields[$key]->crypt_method !== null)
                             {
                                 switch ($this->form_fields[$key]->crypt_method)
                                 {
                                     case "MD5":
                                         $tmpval = new ffData(md5($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+										$tmp_type = "Text";
                                         break;
                                     case "mysql_password":
-                                        $tmpval = new ffData($this->db[0]->mysqlPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                        $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+										$processed_sql_value = true;
                                         break;
                                     case "mysql_oldpassword":
                                         $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+										$tmp_type = "Text";
                                         break;
                                     default:
                                         ffErrorHandler::raise("Crypt method not supported!", E_USER_ERROR, $this, get_defined_vars());
                                 }
                             }
+							else if ($this->form_fields[$key]->crypt)
+							{
+								if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+								{
+									$tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
+									$tmpval = mod_sec_crypt_string($tmpval);
+									$tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
+									$processed_sql_value = true;
+								}
+							}
                             else
                                 $tmpval = $this->form_fields[$key]->value;
 
                              $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
                              $rc = end($res);
                              if ($rc !== null)
+							 {
                                  $tmpval = $rc;
+								 $processed_sql_value = false;
+								 $tmp_type = $this->form_fields[$key]->base_type;
+							 }
 
-                            $values .= $this->db[0]->toSql($tmpval, $this->form_fields[$key]->base_type);
+                            $values .= ($processed_sql_value ? $tmpval : $this->db[0]->toSql($tmpval, $tmp_type));
                         }
                     }
                 }
@@ -1885,9 +1897,13 @@ abstract class ffRecord_base extends ffCommon
 
 				// MANAGE FILES
 				ffCommon_manage_files($this, $tmp_Where);
-
                 
 				$rc = false;
+				
+				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
+				if (array_search(true, $res))
+					$rc |= true;
+
 				if ($this->detail !== null)
 				{
 					foreach ($this->detail as $key => $value)
@@ -1905,19 +1921,13 @@ abstract class ffRecord_base extends ffCommon
 					$rc |= true;
 
 				if (!$rc)
-					$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+					$this->redirect($this->parent[0]->ret_url);
 				else
 					break;
 
 			case "update":
 				if (!$this->allow_update)
-					$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+					$this->redirect($this->parent[0]->ret_url);
 				
 				// MANAGE FILES
 				ffCommon_manage_files($this);
@@ -1925,6 +1935,8 @@ abstract class ffRecord_base extends ffCommon
                 $fields = "";
                 foreach ($this->form_fields as $key => $FormField)
                 {
+					$processed_sql_value = false;
+					
                     if ($this->form_fields[$key]->store_in_db == true && !strlen($this->form_fields[$key]->compare) &&
                             !($this->form_fields[$key]->extended_type == "Password" && !strlen($this->form_fields[$key]->getValue()))
                         )
@@ -1949,40 +1961,62 @@ abstract class ffRecord_base extends ffCommon
                             }
                             reset ($this->form_fields[$key]->multi_fields);
                         }
-                        elseif ($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) != $this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
+                        elseif ($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) != $this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
                         {
                             if (strlen($fields))
                                 $fields .= ", ";
 
-                            if ($this->form_fields[$key]->get_control_type() == "password" &&
-                                $this->form_fields[$key]->crypt_method !== null)
+							$tmp_type = $this->form_fields[$key]->base_type;
+					
+                            if ($this->form_fields[$key]->crypt_method !== null)
                             {
                                 switch ($this->form_fields[$key]->crypt_method)
                                 {
                                     case "MD5":
                                         $tmpval = new ffData(md5($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+										$tmp_type = "Text";
                                         break;
                                     case "mysql_password":
-                                        $tmpval = new ffData($this->db[0]->mysqlPassword($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                        $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+										$processed_sql_value = true;
                                         break;
                                     case "mysql_oldpassword":
                                         $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+										$tmp_type = "Text";
                                         break;
                                     default:
                                         die("Crypt method not supported!");
                                 }
                             }
-                            else
+                            else if ($this->form_fields[$key]->crypt)
+							{
+								if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+								{
+									$tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
+									$tmpval = mod_sec_crypt_string($tmpval);
+									$tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
+									$processed_sql_value = true;
+									$tmp_type = "Text";
+								}
+							}
+							else
                                 $tmpval = $this->form_fields[$key]->value;
 
                              $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
                              $rc = end($res);
                              if ($rc !== null)
+							 {
                                  $tmpval = $rc;
+								 $processed_sql_value = false;
+								 $tmp_type = $this->form_fields[$key]->base_type;
+							 }
 
                             $fields .= "`" . $this->src_table . "`.`" . $this->form_fields[$key]->get_data_source(false) . "`"
                                         . " = "
-                                        . $this->db[0]->toSql($tmpval, $this->form_fields[$key]->base_type);
+                                        . ($processed_sql_value ? 
+												$tmpval
+												: $this->db[0]->toSql($tmpval, $tmp_type)
+											);
                         }
                     }
                 }
@@ -2019,6 +2053,11 @@ abstract class ffRecord_base extends ffCommon
                 }
                 
 				$rc = false;
+				
+				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
+				if (array_search(true, $res))
+					$rc |= true;
+
 				if ($this->detail !== null)
 				{
 					foreach ($this->detail as $key => $value)
@@ -2036,14 +2075,16 @@ abstract class ffRecord_base extends ffCommon
 					$rc = true;
 
 				if (!$rc)
-					$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+					$this->redirect($this->parent[0]->ret_url);
 				else
 					break;
 
 			case "delete":
+				if ($this->url_delete !== null)
+				{
+					$tmp_url = ffProcessTags($this->url_delete, $this->key_fields, $this->form_fields, "normal", $this->parent[0]->get_params(), rawurlencode($_SERVER['REQUEST_URI']), $this->parent[0]->get_globals(), $this->db[0]);
+					$this->redirect($tmp_url);
+				}
 				/*if (!$this->skip_action)
 				{*/
 					$confirmurl = $_SERVER["REQUEST_URI"];
@@ -2051,7 +2092,7 @@ abstract class ffRecord_base extends ffCommon
 						$confirmurl .= "?";
 					else
 						$confirmurl .= "&";
-					$confirmurl .= $this->prefix . "frmAction=confirmdelete";
+					$confirmurl .= $this->getPrefix() . "frmAction=confirmdelete";
 					if ($_REQUEST["cancelurl"])
 						$cancelurl = $_REQUEST["cancelurl"];
 					else
@@ -2071,10 +2112,7 @@ abstract class ffRecord_base extends ffCommon
 
 			case "confirmdelete":
 				if (!$this->allow_delete)
-					$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+					$this->redirect($this->parent[0]->ret_url);
 
 				$rc = false;
 				if ($this->detail !== null)
@@ -2174,15 +2212,16 @@ abstract class ffRecord_base extends ffCommon
 						break;
 				}
 
+				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
+				if (array_search(true, $res))
+					$rc |= true;
+
 				$res = $this->doEvent("on_done_action", array($this, $this->frmAction));
 				if (array_search(true, $res))
 					$rc = true;
 
 				if (!$rc)
-					$this->redirect($this->parent[0]->ret_url
-                        ? $this->parent[0]->ret_url
-                        : $_SERVER["HTTP_REFERER"]
-                    );
+					$this->redirect($this->parent[0]->ret_url);
 				else
 					break;
 
@@ -2201,6 +2240,10 @@ abstract class ffRecord_base extends ffCommon
 
 					if (!$rc)
 					{
+						$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
+						if (array_search(true, $res))
+							$rc |= true;
+
 						$res = $this->doEvent("on_done_action", array($this, $this->frmAction));
 						if (array_search(true, $res))
 							$rc = true;
@@ -2271,9 +2314,9 @@ abstract class ffRecord_base extends ffCommon
 	 * @param string l'url
 	 * @return String
 	 */
-	function redirect($url, $response = array())
+	function redirect($url, $response = null)
 	{
-		return ffRedirect($url, null, null, $response);
+		return ffRedirect($url, null, null, ($response === null ? $this->json_result : $response));
 	}
 
 	/**
@@ -2302,16 +2345,6 @@ abstract class ffRecord_base extends ffCommon
 		else
 			$this->redirect($ret);
 	}
-	
-	function setWidthComponent($resolution_large_to_small) 
-	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
-		elseif(strlen($resolution_large_to_small))
-			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
-		else
-			$this->framework_css["component"]["grid"] = false;
-	}
 }
 
 function ffRecord_reset_cache($oRecord, $frmAction)
@@ -2325,4 +2358,3 @@ function ffRecord_reset_cache($oRecord, $frmAction)
 			);
 	}
 }
-

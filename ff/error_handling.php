@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage common
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -14,6 +14,7 @@ if (!defined("FF_ERRORS_HANDLED"))				define("FF_ERRORS_HANDLED", E_USER_ERROR |
 if (!defined("FF_ERROR_HANDLER_SUPPRESS_MASK"))	define("FF_ERROR_HANDLER_SUPPRESS_MASK", 0); // wich errors must be ignored. 0 to disable
 if (!defined("FF_ERROR_HANDLER_HIDE"))			define("FF_ERROR_HANDLER_HIDE", false);
 if (!defined("FF_ERROR_HANDLER_MINIMAL"))		define("FF_ERROR_HANDLER_MINIMAL", false);
+if (!defined("FF_ERROR_HANDLER_CUSTOM_TPL"))		define("FF_ERROR_HANDLER_CUSTOM_TPL", ""); // path relativo a FF_DISK_PATH
 if (!defined("FF_ERROR_HANDLER_500"))			define("FF_ERROR_HANDLER_500", true);
 if (!defined("FF_ERROR_HANDLER_LOG"))			define("FF_ERROR_HANDLER_LOG", false);
 if (!defined("FF_ERROR_HANDLER_LOG_PATH"))		define("FF_ERROR_HANDLER_LOG_PATH", FF_DISK_PATH . "/ff_errors");
@@ -28,8 +29,8 @@ error_reporting(error_reporting() ^ FF_ERRORS_HANDLED);
  * @package FormsFramework
  * @subpackage common
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffErrorHandler
@@ -349,9 +350,12 @@ EOD
 		
 		if (self::hideEnabled() && self::$minimal_report)
 		{
-			if(!is_bool(self::$minimal_report) && is_file(dirname(__DIR__) . self::$minimal_report)) {
-				readfile(dirname(__DIR__) . self::$minimal_report);		
-			} else {
+			if (strlen(FF_ERROR_HANDLER_CUSTOM_TPL) && is_file(FF_DISK_PATH . FF_ERROR_HANDLER_CUSTOM_TPL))
+			{
+				readfile(FF_DISK_PATH . FF_ERROR_HANDLER_CUSTOM_TPL);
+			}
+			else
+			{
 				echo "<pre>-=| FORMS FRAMEWORK |=- ERROR CATCHED";
 				if (self::logEnabled())
 				{
@@ -363,7 +367,7 @@ EOD
 				{
 					echo " #" . ($error_id + 1) . "\n\n";
 					echo self::$errors_handled[$errstr]["description"] . "\n\n";
-					echo "Please contact support and send this page. Thanks in advice for your help";
+					echo "Please contact support and report this page. Thanks in advice for your help";
 				}
 				echo "</pre>";
 			}
@@ -593,10 +597,14 @@ EOD
 				self::out("true<br />");
 			else if (is_string($value))
 			{
-				if (strpos(strtolower($key), "password") === FALSE)
-					self::out('"' . ffCommon_specialchars($value) . "\"<br />");
-				else
+				if (
+						strpos(strtolower($key), "password") !== FALSE
+						|| $key === "_crypt_Ku_"
+						|| $key === "_crypt_KSu_"
+					)
 					self::out("<b>PROTECTED</b><br />");
+				else
+					self::out('"' . ffCommon_specialchars($value) . "\"<br />");
 			}
 			else if (is_resource($value))
 				self::out("Resource <b>[type = " . get_resource_type($value) . "]</b><br />");
@@ -616,12 +624,12 @@ EOD
 	
 	static function logEnabled()
 	{
-		return self::$log /*&& !array_key_exists("__debug__", $_GET)*/;
+		return self::$log && !defined("FF_URLPARAM_DEBUG");
 	}
 	
 	static function hideEnabled()
 	{
-		return self::$hide || array_key_exists("__debug__", $_GET);
+		return self::$hide && !defined("FF_URLPARAM_DEBUG");
 	}
 
 	static function out($text)

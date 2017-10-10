@@ -32,47 +32,25 @@ THE SOFTWARE.
 	padding:0 10px;
 }
 
-div[class^="ff"] .uploadify .uploadify {
-    border:1px solid #c6c6c6;
-    padding:0.5em;
-}
-
-div[class^="ff"] .uploadify.line { border:0; padding:0; }
-
-.uploadify A,
-.uploadify .preview .cancel A {
-    display:inline-block;
-    padding:1em !important; 
-    font-size:1em !important;
-}
-
-.uploadify .top>A,
-.uploadify .preview A { padding:0 !important; }
-
-.uploadify .preview IMG { margin-right:0.5em; }
-
-
 .uploadify.default { overflow:hidden; clear:right; }
 
 .uploadifyQueueItem {
-    background:#f1f1f1 !important;
-    padding:1em !important;
-    margin-top:0.5em !important;
-    clear:both;
-    position:relative;
+	background-color: #F5F5F5;
+	border: 2px solid #E5E5E5;
+	font: 11px Verdana, Geneva, sans-serif;
+	position:relative;
+	margin-top: 5px;
 }
-
-.uploadify.default OBJECT { float:right; height:3em; }
-
-
 .uploadifyError {
 	background-color: #FDE5DD !important;
 	border: 2px solid #FBCBBC !important;
 }
 .uploadifyQueueItem .cancel {
 	position:absolute;
-	top:0;
+	top:10px;
 	right:0;
+	width:20px;
+	height:20px;
 }
 .uploadifyQueue .completed {
 	background-color: #E5E5E5;
@@ -88,6 +66,14 @@ div[class^="ff"] .uploadify.line { border:0; padding:0; }
 	width: 1px;
 }
 
+.uploadify .cancel A {
+	display:block;
+	width:20px;
+	height:20px;
+	background:url(sprite-uploadify.png) 0 0 no-repeat;
+	cursor:pointer;
+	z-index:100;
+}
 
 .uploadify.horizzontal .cancel A:hover { background-position: -26px 0; }
 

@@ -15,8 +15,14 @@ class ffWidget_colorpicker extends ffCommon
 	var $class			= "ffWidget_colorpicker";
 
 	var $widget_deps	= array();
-    var $js_deps = array();
-    var $css_deps 		= array();
+
+	var $libraries = array();
+	
+    var $js_deps = array(
+    						"ff.ffField.colorpicker" => null
+						);
+    var $css_deps 		= array(
+    					);
 
 	// PRIVATE VARS
 	
@@ -25,15 +31,8 @@ class ffWidget_colorpicker extends ffCommon
 
 	var $oPage = null;
 	var $source_path	= null;
-	var $style_path = null;
-	
-	var $framework_css		= array(
-									"container" => array(
-										"class" => null
-										, "row"	=> true
-										, "col" => null
-									)
-								);
+	var $style_path 	= null;
+
 	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
 	{
 		//$this->get_defaults();
@@ -58,7 +57,7 @@ class ffWidget_colorpicker extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -69,16 +68,15 @@ class ffWidget_colorpicker extends ffCommon
 	{
 
 		// THE REAL STUFF
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			
-			$container = $Field->parent[0]->id . "_";
-
-			$this->tpl[$tpl_id]->set_var("container", $container);
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "colorpicker";
 		}
 		else
 		{
@@ -93,10 +91,6 @@ class ffWidget_colorpicker extends ffCommon
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-		if(is_array($Field->framework_css["widget"]["colorpicker"])) {
-			$this->framework_css = array_replace_recursive($this->framework_css, $Field->framework_css["widget"]["colorpicker"]);
-		}
-		
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
@@ -122,11 +116,6 @@ class ffWidget_colorpicker extends ffCommon
 	
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.colorpicker", "colorpicker.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/colorpicker");
-		}
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -143,13 +132,6 @@ class ffWidget_colorpicker extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.colorpicker", "colorpicker.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/colorpicker");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

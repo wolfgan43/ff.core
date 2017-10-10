@@ -53,12 +53,10 @@ $actex_sql					= $ff["autocomplete"][$data_src]["sql"];
 $actex_main_db				= $ff["autocomplete"][$data_src]["main_db"];
 $hide_result_on_query_empty = $ff["autocomplete"][$data_src]["hide_result_on_query_empty"];
 $actex_field                = $ff["autocomplete"][$data_src]["field"];
-$image_field				= $ff["autocomplete"][$data_src]["image_field"];
 
 $compare					= $ff["autocomplete"][$data_src]["compare"];
 $compare_having				= $ff["autocomplete"][$data_src]["compare_having"];
 $operation					= $ff["autocomplete"][$data_src]["operation"];
-$limit						= $ff["autocomplete"][$data_src]["limit"];
 
 
 //$actex_sql = get_session("autocomplete_sql_" . $data_src);
@@ -90,10 +88,6 @@ if (!strlen($search_value) && $hide_result_on_query_empty)
 $strCompareWhere = "";
 $strCompareHaving = "";
 $sSqlWhere = "";
-$relevance = array();
-$relevance_search = array();
-if($search_value)
-	$relevance_search = explode("%", $search_value);
 
 if ($actex_main_db)
 	$db = mod_security_get_main_db();
@@ -130,22 +124,11 @@ if (is_array($compare))
 			$strCompareWhere .= " OR ";
 
 		$strCompareWhere .= $compare_value . $strOperation;
-
-        if(count($relevance_search)) {
-            foreach($relevance_search AS $relevance_term) {
-                $relevance[] = "IF(LOCATE(" . $db->toSql($relevance_term) . ", " . $compare_value . ") = 1, 0, 1)";
-            }
-        }
 	}
 } 
 elseif (strlen($compare)) 
 {
 	$strCompareWhere .= $compare . $strOperation;
-    if(count($relevance_search)) {
-        foreach($relevance_search AS $relevance_term) {
-            $relevance[] = "IF(LOCATE(" . $db->toSql($relevance_term) . ", " . $compare . ") = 1, 0, 1)";
-        }
-    }
 }
 
 if (is_array($compare_having)) 
@@ -159,26 +142,14 @@ if (is_array($compare_having))
 			$strCompareHaving .= " OR ";
 
 		$strCompareHaving .= $compare_value . $strOperation;
-
-        if(count($relevance_search)) {
-            foreach($relevance_search AS $relevance_term) {
-                $relevance[] = "IF(LOCATE(" . $db->toSql($relevance_term) . ", " . $compare_value . ") = 1, 0, 1)";
-            }
-        }
-    }
+	}
 } 
 elseif (strlen($compare_having)) 
 {
 	$strCompareHaving .= $compare_having . $strOperation;
-
-    if(count($relevance_search)) {
-        foreach($relevance_search AS $relevance_term) {
-            $relevance[] = "IF(LOCATE(" . $db->toSql($relevance_term) . ", " . $compare_having . ") = 1, 0, 1)";
-        }
-    }
 }
 
-if (!strlen($strCompareHaving) && !strlen($strCompareWhere)) 
+if (!strlen($strCompareHaving)) 
 {
 	$wizard_field = substr($actex_sql, strpos(strtoupper($actex_sql), "SELECT") + 7, strrpos(strtoupper($actex_sql), "FROM") - (strpos(strtoupper($actex_sql), "SELECT") + 7));
 
@@ -196,36 +167,31 @@ if (!strlen($strCompareHaving) && !strlen($strCompareWhere))
 				$first = false;
 				continue;
 			}
-            $field_wizard = "";
 
-			if (strrpos(ltrim($field_value, "`"), "`") !== false) 
+			if (strlen($strCompareHaving))
+				$strCompareHaving .= " OR ";
+
+			if (strrpos($field_value, "`") !== false) 
 			{
-				$field_wizard = substr(ltrim($field_value, "`"), 0, strrpos(ltrim($field_value, "`"), "`"));
+				$strCompareHaving .= substr($field_value, 0, strrpos($field_value, "`") + 1) . $strOperation;
 			} 
-			elseif (strpos(ltrim($field_value, ","), ",") !== false) 
+			elseif (strpos($field_value, ",") !== false) 
 			{
-				$field_wizard = substr(ltrim($field_value, ","), 0, strpos(ltrim($field_value, ","), ","));
+				$strCompareHaving .= substr($field_value, 0, strpos($field_value, ",")) . $strOperation;
 			} 
 			elseif (strpos(ltrim($field_value), " ") !== false) 
 			{
-				$field_wizard = substr(ltrim($field_value), 0, strpos(ltrim($field_value), " "));
+				$strCompareHaving .= substr(ltrim($field_value), 0, strpos(ltrim($field_value), " ")) . $strOperation;
 			} 
-
-            if($field_wizard) {
-                if (strlen($strCompareHaving))
-                    $strCompareHaving .= " OR ";
-
-                $strCompareHaving .= $field_wizard . $strOperation;
-
-                if(count($relevance_search)) {
-                    foreach($relevance_search AS $relevance_term) {
-                        $relevance[] = "IF(LOCATE(" . $db->toSql($relevance_term) . ", " . $field_wizard . ") = 1, 0, 1)";
-                    }
-                }
-            }
+			else 
+			{
+				$strCompareHaving .= $field_value . $strOperation;
+			}
 		}
 	}
-}
+}  
+
+
 
 if (strlen($actex_field) && strlen($father_value))
 {
@@ -286,25 +252,25 @@ if (strlen($actex_field) && strlen($father_value))
 
 if (strlen($strCompareWhere)) 
 {
-	$bFindWhereTag = preg_match("/\[WHERE\]/", $actex_sql);
-	$bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $actex_sql);
+    $bFindWhereTag = preg_match("/\[WHERE\]/", $actex_sql);
+    $bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $actex_sql);
 
-	if (!$bFindWhereOptions)
-		$sSqlWhere .= " WHERE ";
+    if (!$bFindWhereOptions)
+        $sSqlWhere .= " WHERE ";
 
-	$sSqlWhere .= " ( " . $strCompareWhere . ") ";
+    $sSqlWhere .= " ( " . $strCompareWhere . ") ";
 }
 if (strlen($strCompareHaving)) 
 {
-	$bFindHavingTag = preg_match("/\[HAVING\]/", $actex_sql);
-	$bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $actex_sql);
+    $bFindHavingTag = preg_match("/\[HAVING\]/", $actex_sql);
+    $bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $actex_sql);
 
-	if (!$bFindHavingOptions)
-		$sSqlHaving .= " HAVING ";
+    if (!$bFindHavingOptions)
+        $sSqlHaving .= " HAVING ";
 
-	$sSqlHaving .= " ( " . $strCompareHaving . ") ";
+    $sSqlHaving .= " ( " . $strCompareHaving . ") ";
 }
-
+ 
 $sSQL = $actex_sql;
 if ($sSqlWhere) 
 {
@@ -331,32 +297,15 @@ else
 	$sSQL = str_replace("[HAVING_OR]", "", $sSQL);
 	$sSQL = str_replace("[HAVING]", "", $sSQL);
 }
-
-if(count($relevance)) {
-    $sSQL = str_replace("[ORDER]", " ORDER BY " . implode(", ", $relevance), $sSQL);
-    $sSQL = str_replace("[COLON]", ", ", $sSQL);
-} else {
-	if(preg_match("/(\[COLON\])/", $sSQL))
-		$sSQL = str_replace("[ORDER]", " ORDER BY ", $sSQL); 
-	else
-		$sSQL = str_replace("[ORDER]", "", $sSQL); 
-
-    $sSQL = str_replace("[COLON]", "", $sSQL);
-}
-    
-if($limit > 0)
-	$sSQL = str_replace("[LIMIT]", " LIMIT " . $limit, $sSQL);
-else
-	$sSQL = str_replace("[LIMIT]", "", $sSQL);
-
+   
 $db->query($sSQL);
 $i = -1;
 if ($db->nextRecord()) 
 {
-	$count_field = $db->numFields();
 	do 
 	{
 		$i++;
+		$count_field = $db->numFields();
 		if ($count_field == 1) 
 		{
 			$php_array[$i]["value"] = ffCommon_charset_encode($db->getField($db->fields_names[0], "Text", true));
@@ -367,15 +316,11 @@ if ($db->nextRecord())
 
 			if ($count_field >= 2) 
 			{
-				$php_array[$i]["label"] = ffCommon_charset_encode(trim($db->getField($db->fields_names[1], "Text", true)));
+				$php_array[$i]["label"] = ffCommon_charset_encode($db->getField($db->fields_names[1], "Text", true));
 			}
-			if ($count_field >= 3 && $db->fields_names[2] != $image_field) 
+			if ($count_field >= 3) 
 			{
 				$php_array[$i]["cat"] = ffCommon_charset_encode($db->getField($db->fields_names[2], "Text", true));
-			}
-			if (isset($db->record[$image_field])) 
-			{
-				$php_array[$i]["image"] = ffCommon_charset_encode($db->record[$image_field]);
 			}
 		}
 	} while ($db->nextRecord());

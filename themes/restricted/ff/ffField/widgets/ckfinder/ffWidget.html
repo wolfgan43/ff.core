@@ -1,11 +1,4 @@
 <!--BeginSectHeaders-->
-<script type="text/javascript">
-ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
-	ff.pluginLoad("ff.lib.ckfinder", "/themes/library/ckfinder/ckfinder.js", function () {
-		ff.pluginLoad("ff.ffField.ckfinder", "{widget_path}/ckfinder.js");
-	});
-});
-</script>
 <!--EndSectHeaders-->
 
 
@@ -22,7 +15,7 @@ ff.pluginLoad("ff.ffField",	"/themes/library/ff/ffField.js", function() {
 <!--EndSectFooters-->
 
 <!--BeginSectControl-->
-<a href="#{container}{id}" id="CkFinder_{container}{id}" title="File selector" class="{browse_class}" onclick="ff.ffField.ckfinder.browseServer('{resource_type}:{base_url}', '{container}{id}' );"></a>
+<a href="#{container}{id}" id="CkFinder_{container}{id}" title="File selector" class="{class}" onclick="ff.ffField.ckfinder.browseServer('{resource_type}:{base_url}', '{container}{id}' );"><img src="{site_path}/themes/{theme}/images/widgets/ckfinder/browse.png" alt="ShowCkFinder" /></a>
 <!--BeginSectPreview-->
 <a href="{view_url}{view_query_string}" rel="{show_file}" target="_blank">
 	<img id="{container}{id}_img" src="{preview_url}{preview_query_string}" />

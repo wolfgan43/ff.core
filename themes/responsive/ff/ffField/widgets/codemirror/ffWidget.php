@@ -18,7 +18,12 @@ class ffWidget_codemirror extends ffCommon
 	var $class			= "ffWidget_codemirror";
 
 	var $widget_deps	= array();
-    var $js_deps 		= array();
+    
+	var $libraries = array();
+	
+	var $js_deps 		= array(
+							"ff.ffField.codemirror" => null
+						);
     var $css_deps 		= array();
 
 	// PRIVATE VARS
@@ -55,7 +60,7 @@ class ffWidget_codemirror extends ffCommon
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+        if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
@@ -64,13 +69,15 @@ class ffWidget_codemirror extends ffCommon
 	
 	function process($id, &$value, ffField_base &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
-			$prefix = $Field->parent[0]->id . "_";
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "codemirror";
 		}
 		else
 		{
@@ -86,7 +93,12 @@ class ffWidget_codemirror extends ffCommon
 		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
-
+		if($Field->editarea_syntax) {
+			$this->tpl[$tpl_id]->set_var("syntax", $Field->editarea_syntax);
+	        
+	        $this->oPage[0]->tplAddJs("library.codemirror.addons." . $Field->editarea_syntax);
+	        $this->oPage[0]->tplAddJs("library.codemirror.addons." . $Field->editarea_syntax . "-hint");
+		}        
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
@@ -111,23 +123,6 @@ class ffWidget_codemirror extends ffCommon
     
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) { //code for ff.js
-			$this->oPage[0]->tplAddCss("codemirror", "codemirror.css", FF_THEME_DIR . "/library/codemirror/lib", false, false, null, true);
-			$this->oPage[0]->tplAddCss("showhint", "show-hint.css", FF_THEME_DIR . "/library/codemirror/addon/hint", false, false, null, true);
-                        $this->oPage[0]->tplAddCss("Dialog", "dialog.css", FF_THEME_DIR . "/library/codemirror/addon/dialog", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("CodeMirror", "codemirror.js", FF_THEME_DIR . "/library/codemirror/lib", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.codemirror", "codemirror.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/codemirror");
-			$this->oPage[0]->tplAddJs("closebrackets", "closebrackets.js", FF_THEME_DIR . "/library/codemirror/addon/edit", false, false, null, true);
-			$this->oPage[0]->tplAddJs("active-line", "active-line.js", FF_THEME_DIR . "/library/codemirror/addon/selection", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("dialog", "dialog.js", FF_THEME_DIR . "/library/codemirror/addon/dialog", false, false, null, true);
-			$this->oPage[0]->tplAddJs("show-hint", "show-hint.js", FF_THEME_DIR . "/library/codemirror/addon/hint", false, false, null, true);
-			$this->oPage[0]->tplAddJs("javascript-hint", "javascript-hint.js", FF_THEME_DIR . "/library/codemirror/addon/hint", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("search", "search.js", FF_THEME_DIR . "/library/codemirror/addon/search", false, false, null, true);
-			$this->oPage[0]->tplAddJs("search-cursor", "searchcursor.js", FF_THEME_DIR . "/library/codemirror/addon/search", false, false, null, true);
-			$this->oPage[0]->tplAddJs("javascript", "javascript.js", FF_THEME_DIR . "/library/codemirror/mode/javascript", false, false, null, true);
-		}	
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -145,25 +140,6 @@ class ffWidget_codemirror extends ffCommon
 	
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) { //code for ff.js   
-			$this->oPage[0]->tplAddCss("codemirror", "codemirror.css", FF_THEME_DIR . "/library/codemirror/lib", false, false, null, true); 
-			$this->oPage[0]->tplAddCss("showhint", "show-hint.css", FF_THEME_DIR . "/library/codemirror/addon/hint", false, false, null, true);
-                        $this->oPage[0]->tplAddCss("Dialog", "dialog.css", FF_THEME_DIR . "/library/codemirror/addon/dialog", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("CodeMirror", "codemirror.js", FF_THEME_DIR . "/library/codemirror/lib", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("closebrackets", "closebrackets.js", FF_THEME_DIR . "/library/codemirror/addon/edit", false, false, null, true);
-			$this->oPage[0]->tplAddJs("active-line", "active-line.js", FF_THEME_DIR . "/library/codemirror/addon/selection", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("dialog", "dialog.js", FF_THEME_DIR . "/library/codemirror/addon/dialog", false, false, null, true);
-			$this->oPage[0]->tplAddJs("show-hint", "show-hint.js", FF_THEME_DIR . "/library/codemirror/addon/hint", false, false, null, true);
-			$this->oPage[0]->tplAddJs("javascript-hint", "javascript-hint.js", FF_THEME_DIR . "/library/codemirror/addon/hint", false, false, null, true);
-                        $this->oPage[0]->tplAddJs("search", "search.js", FF_THEME_DIR . "/library/codemirror/addon/search", false, false, null, true);
-			$this->oPage[0]->tplAddJs("search-cursor", "searchcursor.js", FF_THEME_DIR . "/library/codemirror/addon/search", false, false, null, true);
-			$this->oPage[0]->tplAddJs("javascript", "javascript.js", FF_THEME_DIR . "/library/codemirror/mode/javascript", false, false, null, true);
-			$this->oPage[0]->tplAddJs("ff.ffField.codemirror", "codemirror.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/codemirror");
-			
-			//return;
-		}
-
 		if (!isset($this->tpl["main"]))
 			return;
 

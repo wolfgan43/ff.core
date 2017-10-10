@@ -11,32 +11,15 @@ class ffWidget_dialog extends ffCommon
 	var $class			= "ffWidget_dialog";
 
 	var $widget_deps	= array();
-    var $js_deps = array(
-							  "jquery" 			=> null
-							, "jquery.ui" 		=> null
-						);
-    var $css_deps 		= array(/*
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.dialog"        => array(
-                                      "file" => "jquery.ui.dialog.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ),
-                              "jquery.ui.resizable"        => array(
-                                      "file" => "jquery.ui.resizable.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
-    					);
+	
+	var $libraries		= array();
+	
+    var $js_deps		= array(
+							"ff.ffPage.dialog"	=> null
+		);
+    var $css_deps 		= array(
+    	);
+	
 	// PRIVATE VARS
 
 	var $oPage			= null;
@@ -59,6 +42,9 @@ class ffWidget_dialog extends ffCommon
 			$this->source_path = $oPage->getThemePath();
 
 		$this->style_path = $style_path;
+		
+		//if ($this->libraries === null)
+		//	$this->libraries = ffTheme_restricted_get_libs($this, "theme/ff/ffPage/widgets/dialog");
 	}
 
 	function prepare_template($id)
@@ -94,59 +80,16 @@ class ffWidget_dialog extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("addjs", "");
 
-		/* Remove jquery ui css
-     	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.button"        => array(
-                      "file" => "jquery.ui.button.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ),                 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.dialog"        => array(
-                      "file" => "jquery.ui.dialog.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);*/
-
-
+		if (!ffIsset($options, "modal") || $options["modal"] === true)
+			$this->tpl[$tpl_id]->set_var("SectModal", "");
+		else
+			$this->tpl[$tpl_id]->parse("SectModal", false);
 		
-		if ($options["resizable"] === false) {
+		if ($options["resizable"] === false)
 			$this->tpl[$tpl_id]->set_var("resizable", "false");
-		} else {
-             /*  Remove jquery ui css
-             	$css_deps["jquery.ui.resizable"] = array(
-                      "file" => "jquery.ui.resizable.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                );*/
+		else 
 			$this->tpl[$tpl_id]->set_var("resizable", "true");
-		}
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $oPage->widgetResolveCss($css_key, $css_value, $oPage);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$oPage->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-
-		if ($options["resizable"] === false) { 
-			$this->tpl[$tpl_id]->set_var("SectResizeCss", "");
-		} else {
-			$this->tpl[$tpl_id]->parse("SectResizeCss", false);	
-		}
-		
 		if (is_array($options["position"])) {
 			foreach($options["position"] AS $position_value) {
 				if(strlen($strPosition))
@@ -251,13 +194,6 @@ class ffWidget_dialog extends ffCommon
 
 	function get_component_headers($id)
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("jquery.ui.ckeditor", "jquery.ui.ckeditor.fix.js", FF_THEME_DIR . "/library/jquery.ui");
-			$this->oPage[0]->tplAddJs("ff.ffPage.dialog", "dialog.js", FF_THEME_DIR . "/restricted/ff/ffPage/widgets/dialog");
-		}			
-
 		if (!isset($this->tpl[$id]))
 			return;
 
@@ -274,15 +210,6 @@ class ffWidget_dialog extends ffCommon
 
 	function process_headers()
 	{
-		if ($this->oPage !== NULL) {//code for ff.js 
-			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
-			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("jquery.ui.ckeditor", "jquery.ui.ckeditor.fix.js", FF_THEME_DIR . "/library/jquery.ui");
-			$this->oPage[0]->tplAddJs("ff.ffPage.dialog", "dialog.js", FF_THEME_DIR . "/restricted/ff/ffPage/widgets/dialog");
-			
-			//return;
-		}			
-
 		if (!isset($this->tpl["main"]))
 			return;
 

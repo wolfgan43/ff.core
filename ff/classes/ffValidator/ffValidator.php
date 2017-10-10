@@ -5,8 +5,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -16,8 +16,8 @@
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 class ffValidator
@@ -94,14 +94,18 @@ class ffValidator
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 abstract class ffValidator_base extends ffCommon
 {
+	public $error;
+	
 	protected function __construct()
 	{
+		$this->get_defaults("ffValidator");
+		$this->get_defaults();
 	}
 
 	protected function __clone()
@@ -114,4 +118,13 @@ abstract class ffValidator_base extends ffCommon
 	}
 
 	abstract public function checkValue(ffData $value, $label, $options);
+	
+	protected function get_error($type, $label)
+	{
+		$tmp = str_replace("[LABEL]", $label, $this->error[$type]);
+		if (strpos($tmp, "_") === 0)
+			$tmp = ffTemplate::_get_word_by_code($tmp);
+		
+		return $tmp;
+	}
 }

@@ -1,29 +1,24 @@
 <?php
-//$cm->oPage->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
+$cm->oPage->tplAddJs("ff.ajax");
 
-$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/ff.modules.security.js", $cm->oPage->theme);
+$filename = cm_cascadeFindTemplate("/javascript/ff.modules.security.js", "security");
+//$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/ff.modules.security.js", $cm->oPage->theme);
 $ret = cm_moduleGetCascadeAttrs($filename);
-$cm->oPage->tplAddJs("ff.modules.security", $filename, $ret["path"]);
-//$cm->oPage->tplAddJs("ff.modules.security", "", cm_getModulesExternalPath() . "/security/restricted/javascript/ff.modules.security.js"); // useful for caching purpose
 
-if(MOD_SEC_CSS_PATH !== false && isset($cm->router->matched_rules["mod_sec_login"])) {
-    $css_name = "ff.modules.security.css";
-	if(MOD_SEC_CSS_PATH)
-		$filename = MOD_SEC_CSS_PATH;
-	else
-		$filename = cm_moduleCascadeFindTemplateByPath("security", "/css/" . $css_name, $cm->oPage->theme);
-
-	$ret = cm_moduleGetCascadeAttrs($filename);
-	$cm->oPage->tplAddCSS($css_name, $filename, $ret["path"]);
-	//$cm->oPage->tplAddCSS("modules.security", "", cm_getModulesExternalPath() . "/security/restricted/css/ff.modules.security.css"); // useful for caching purpose
-}
+$cm->oPage->tplAddJs("ff.modules.security", array(
+	"file" => $filename
+	, "path" => $ret["path"]
+	, "priority" => cm::LAYOUT_PRIORITY_HIGH
+	, "index" => -1000
+));
 
 $options = mod_security_get_settings($cm->path_info);
 
 if (isset($options["session_name"]))
 	session_name($options["session_name"]);
 
-$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/init.js", $cm->oPage->theme);
+$filename = cm_cascadeFindTemplate("/javascript/init.js", "security");
+//$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/init.js", $cm->oPage->theme);
 $tpl = ffTemplate::factory(ffCommon_dirname($filename));
 $tpl->load_file(basename($filename), "main");
 
@@ -43,10 +38,17 @@ if ($mod_sec_check_session)
 
 if (MOD_SEC_OAUTH2_SERVER)
 {
-	$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/oauth2.js", $cm->oPage->theme);
+    $filename = cm_cascadeFindTemplate("/javascript/oauth2.js", "security");
+	//$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/oauth2.js", $cm->oPage->theme);
 	$ret = cm_moduleGetCascadeAttrs($filename);
-	$cm->oPage->tplAddJs("ff.modules.security.oauth2", $filename, $ret["path"]);	
-	
+
+	$cm->oPage->tplAddJs("ff.modules.security.oauth2", array(
+		"file" => $filename
+		, "path" => $ret["path"]
+		, "priority" => cm::LAYOUT_PRIORITY_HIGH
+		, "index" => -1000
+	));
+
 	$mod_sec_oauth2_service = $cm->router->getRuleById("mod_sec_oauth2_service");
 	if ($mod_sec_oauth2_service)
 	{
@@ -57,4 +59,8 @@ if (MOD_SEC_OAUTH2_SERVER)
 
 $tpl->set_var("session_name", session_name());
 
-$cm->oPage->tplAddJs("ff.modules.security.init", null, null, false, false, $tpl->rpparse("main", false)); 
+$cm->oPage->tplAddJs("ff.modules.security.init", array(
+	"embed" => $tpl->rpparse("main", false)
+	, "priority" => cm::LAYOUT_PRIORITY_HIGH
+	, "index" => -1000
+));

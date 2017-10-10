@@ -1,5 +1,6 @@
 <?php
-$filename = cm_moduleCascadeFindTemplateByPath("security", "/contents/domains/wizard/report.html", $cm->oPage->getTheme());
+$filename = cm_cascadeFindTemplate("/contents/domains/wizard/report.html", "security");
+//$filename = cm_moduleCascadeFindTemplateByPath("security", "/contents/domains/wizard/report.html", $cm->oPage->getTheme());
 $tpl = ffTemplate::factory(ffCommon_dirname($filename));
 $tpl->load_file("report.html", "main");
 $cm->oPage->addContent($tpl, null, "testo");

@@ -16,27 +16,16 @@ class ffWidget_slider extends ffCommon
 	var $class			= "ffWidget_slider";
 	
 	var $widget_deps	= array();
+	
+	var $libraries = array();
+	
     var $js_deps = array(
-							  "jquery" 			=> null
-							, "jquery.ui" 		=> null							
-						);		
-    var $css_deps 		= array(/*
-                              "jquery.ui.core"        => array(
-                                      "file" => "jquery.ui.core.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.theme"        => array(
-                                      "file" => "jquery.ui.theme.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                ), 
-                              "jquery.ui.slider"        => array(
-                                      "file" => "jquery.ui.slider.css"
-                                    , "path" => null
-                                    , "rel" => "jquery.ui"
-                                )*/
+							"jquery-ui" 		=> null
+						);
+    var $css_deps 		= array(
+							"jquery-ui.slider"        => null
     					);
+	
 	// PRIVATE VARS
 	
 	var $oPage			= null;
@@ -74,12 +63,15 @@ class ffWidget_slider extends ffCommon
 
 	function process($id, &$value, ffField_html &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->id))
+		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
-			$tpl_id = $Field->parent[0]->id;
+			$tpl_id = $Field->parent[0]->getIDIF();
+			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$this->tpl[$tpl_id]->set_var("container", $Field->parent[0]->id . "_");
+			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
+			$this->tpl[$tpl_id]->set_var("container", $prefix);
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "slider";
 		}
 		else
 		{
@@ -100,34 +92,7 @@ class ffWidget_slider extends ffCommon
 		$this->tpl[$tpl_id]->set_var("min", $Field->min_val);
 		$this->tpl[$tpl_id]->set_var("max", $Field->max_val);
 		$this->tpl[$tpl_id]->set_var("step", $Field->step);
-/* Remove jquery ui css
-    	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.slider"        => array(
-                      "file" => "jquery.ui.slider.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}		
-*/
 		if(count($Field->desc_label) > 0)
 		{			
 			foreach ($Field->desc_label as $elem)

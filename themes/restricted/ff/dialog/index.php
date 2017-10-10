@@ -4,8 +4,8 @@
  * @package theme_restricted
  * @subpackage common
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -29,8 +29,8 @@ if(strpos($message, "[") !== false) {
 	}
 }
 
-$confirmurl		= rawurldecode($_REQUEST["confirmurl"]);
-$cancelurl		= rawurldecode($_REQUEST["cancelurl"]);
+$confirmurl		= $_REQUEST["confirmurl"];
+$cancelurl		= $_REQUEST["cancelurl"];
 
 $type			= (isset($_REQUEST["type"])
 					? $_REQUEST["type"]
@@ -51,32 +51,39 @@ if (function_exists("cm_moduleCascadeFindTemplate"))
 {
 	$filename = null;
 	
-	if (isset($_REQUEST["XHR_DIALOG_ID"]))
+	if (isset($_REQUEST["XHR_CTX_ID"]))
 	{
-		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/form_dialog.html", $cm->oPage->getTheme(), false);
+        $filename = cm_cascadeFindTemplate("/ff/dialog/form_dialog.html");
+		/*$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/form_dialog.html", $cm->oPage->getTheme(), false);
 		if ($filename === null)
-			$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/ff/dialog/form_dialog.html", $cm->oPage->getTheme());
-	}
-
-	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/form.html", $cm->oPage->getTheme(), false);
-	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/ff/dialog/form.html", $cm->oPage->getTheme());
-
+			$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/ff/dialog/form_dialog.html", $cm->oPage->getTheme());*/
+	} else {
+        $filename = cm_cascadeFindTemplate("/ff/dialog/form.html");
+        /*if ($filename === null)
+            $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/form.html", $cm->oPage->getTheme(), false);
+        if ($filename === null)
+            $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/ff/dialog/form.html", $cm->oPage->getTheme());*/
+    }
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
 	
-	if (isset($_REQUEST["XHR_DIALOG_ID"]))
+	if (isset($_REQUEST["XHR_CTX_ID"]))
 	{
 		if ($confirmurl == "[CLOSEDIALOG]")
-			$confirmurl = "ff.ffPage.dialog.close('" . $_REQUEST["XHR_DIALOG_ID"] . "')";
+			$confirmurl = "ff.ffPage.dialog.close('" . $_REQUEST["XHR_CTX_ID"] . "')";
+		else if ($confirmurl == "[CLOSE_CTX]")
+			$confirmurl = "ff.ajax.ctxClose('" . $_REQUEST["XHR_CTX_ID"] . "')";
+		else if (strpos(rawurldecode($confirmurl), "javascript:") === 0)
+			$confirmurl = rawurldecode($confirmurl);
 		else
-			$confirmurl = "ff.ffPage.dialog.goToUrl('" . $_REQUEST["XHR_DIALOG_ID"] . "', '" . $confirmurl . "')";
+			$confirmurl = "ff.ajax.ctxGoToUrl('" . $_REQUEST["XHR_CTX_ID"] . "', '" . $confirmurl . "')";
 		
 		if ($cancelurl == "[CLOSEDIALOG]")
-			$cancelurl = "ff.ffPage.dialog.close('" . $_REQUEST["XHR_DIALOG_ID"] . "')";
+			$cancelurl = "ff.ffPage.dialog.close('" . $_REQUEST["XHR_CTX_ID"] . "')";
+		else if ($cancelurl == "[CLOSE_CTX]")
+			$cancelurl = "ff.ajax.ctxClose('" . $_REQUEST["XHR_CTX_ID"] . "')";
 		else
-			$cancelurl	= "ff.ffPage.dialog.goToUrl('" . $_REQUEST["XHR_DIALOG_ID"] . "', '" . $cancelurl . "')";
+			$cancelurl	= "ff.ajax.ctxGoToUrl('" . $_REQUEST["XHR_CTX_ID"] . "', '" . $cancelurl . "')";
 	}
 }
 else
@@ -85,8 +92,6 @@ else
 	$tpl->load_file("form.html", "main");
 }
 
-$tpl->set_var("message_class", cm_getClassByFrameworkCss("warning", "icon", "5x"));
-$tpl->set_var("message_icon", cm_getClassByFrameworkCss("warning", "icon-tag", "5x"));
 $tpl->set_var("site_path", FF_SITE_PATH);
 $tpl->set_var("theme", $cm->oPage->getTheme()); // TOCHECK
 

@@ -89,10 +89,10 @@ switch($frmAction) {
 */
 
 
-				if(MOD_SEC_ENABLE_TOKEN && MOD_SEC_SOCIAL_FACEBOOK) {
+				if(MOD_SEC_ENABLE_TOKEN && strlen(MOD_SEC_FB_APPSECRET)) {
 					$extendedAccessToken = file_get_contents('https://graph.facebook.com/oauth/access_token' 
-						. '?client_id=' . MOD_SEC_SOCIAL_FACEBOOK_APPID 
-						. '&client_secret=' . MOD_SEC_SOCIAL_FACEBOOK_SECRET
+						. '?client_id=' . MOD_SEC_FB_APPID 
+						. '&client_secret=' . MOD_SEC_FB_APPSECRET
 						. '&grant_type=fb_exchange_token'
 						. '&fb_exchange_token=' . $access_token
 					);
@@ -177,12 +177,10 @@ switch($frmAction) {
 				if (MOD_SEC_EXCLUDE_SQL)
 					$sSQL .= " AND `" . $options["table_name"] . "`.ID " . MOD_SEC_EXCLUDE_SQL;
 				
-				$sSQL .= " ORDER BY ID DESC";
-				
 				$db->query($sSQL);
 				if (!$db->nextRecord()) {
 					$UserParams["username_slug"] = ffCommon_url_rewrite($arrUserParams["username"]);
-					$res = $cm->modules["security"]["events"]->doEvent("fb_do_user_create", array(&$arrUserParams["username"], &$UserParams["username_slug"], &$arrUserParams["avatar"], &$arrUserParams["email"], &$ID_domain));
+					$res = $cm->modules["security"]["events"]->doEvent("on_social_do_user_create", array(&$arrUserParams["username"], &$UserParams["username_slug"], &$arrUserParams["avatar"], &$arrUserParams["email"], &$ID_domain));
 					$last_res = end($res);
 					if (!$last_res)
 					{
@@ -239,13 +237,13 @@ switch($frmAction) {
 							}
 						}
 						
-						$cm->modules["security"]["events"]->doEvent("fb_done_user_create", array($UserParams["ID"], !$arrUserParams["status"]));
+						$cm->modules["security"]["events"]->doEvent("on_social_done_user_create", array($UserParams["ID"], !$arrUserParams["status"]));
 					}
 				} else {
 					$UserParams["ID"] = $db->getField("ID", "Number", true);
 					$UserParams["username_slug"] = ffCommon_url_rewrite($db->getField("username", "Text", true));
 					
-					$res = $cm->modules["security"]["events"]->doEvent("fb_do_user_update", array(&$UserParams["ID"], &$UserParams["username_slug"], &$arrUserParams["avatar"]));
+					$res = $cm->modules["security"]["events"]->doEvent("on_social_do_user_update", array(&$UserParams["ID"], &$UserParams["username_slug"], &$arrUserParams["avatar"]));
 					$last_res = end($res);
 					if (!$last_res)
 					{
@@ -289,7 +287,7 @@ switch($frmAction) {
 							}
 						}	
 											
-						$cm->modules["security"]["events"]->doEvent("fb_done_user_update", array($UserParams["ID"]));
+						$cm->modules["security"]["events"]->doEvent("on_social_done_user_update", array($UserParams["ID"]));
 					}
 				}
 				$db->query($sSQL);
@@ -358,4 +356,3 @@ switch($frmAction) {
 	case "cancellogout":
 		ffRedirect($_REQUEST["ret_url"]);
 }
-?>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configdata>
 	<menu>
-		<!--<ds path="/ds" label="Data Storage" location="admin" acl="3" />-->
-		<admin path="/admin" label="Admin" redir="/admin/layout">
-			<layout path="/admin/layout" label="Layout" />
-			<h label="Showfiles" />
-			<showfiles path="/admin/showfiles" label="Items" />
-			<showfiles-modes path="/admin/showfiles-modes" label="Modes" />
-			<h label="Others" />
-		</admin>
+		<ds path="/restricted/ds" label="Data Storage" location="brand" acl="3" />
+		<sqlgui path="/restricted/sqlgui" label="SQL GUI" icon="database" location="brand" redir="/restricted/sqlgui/sqldirect" acl="3">
+			<sqldirect label="SQL Direct"  />
+		</sqlgui>
+
+		<layout path="/restricted/layout" label="Layout" icon="object-group" location="brand" position="footer" acl="3" />
+		<showfiles path="/restricted/showfiles" label="Showfiles" icon="image" location="brand" acl="3" />
+
 	</menu>
 	<!--<layout>
-		<layer path="/ds" name="twocols" />
+		<layer path="/restricted/ds" name="twocols" />
 	</layout>-->
 </configdata>

@@ -4,8 +4,8 @@
  * @package ContentManager
  * @subpackage contents
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
@@ -26,7 +26,7 @@ $cache_file = $cache_path . "/mod_restricted.xml";
 
 if (file_exists($cache_file))
 {
-	mod_restricted_load_config($cache_file);
+	mod_restricted_load_config_file($cache_file);
 }
 else
 {
@@ -39,7 +39,14 @@ else
 
 	foreach ($globals->tables as $table => $value)
 	{
-		mod_restricted_add_menu_sub_element("ds", $table, $reverse . "/" . $table, $table, "", null, "rightcol");
+		mod_restricted_add_menu_sub_element(array(
+		    "key"           => "ds"
+            , "subkey"      => $table
+            , "path"        => $reverse . "/" . $table
+            , "label"       => $table
+            , "location"    => "rightcol"
+        ));
+
 		fwrite($fp, '			<' . $table . ' location="rightcol" path="' . $reverse . "/" . $table . '" />' . "\n");
 	}
 	reset($globals->tables);
@@ -207,8 +214,10 @@ foreach ($globals->tables[$name]->getFields() as $dbfield)
 											ORDER BY
 												UPPER(`' . $foreign_table . '`.`' . $foreign_desc->sName . '`)
 						";');
-					$field->widget = "activecomboex";
-					cache_store(3, '$field->widget = "activecomboex";');
+					$field->widget = "actex";
+					//$field->widget = "activecomboex";
+					cache_store(3, '$field->widget = "actex";');
+					//cache_store(3, '$field->widget = "activecomboex";');
 					$field->actex_update_from_db = true;
 					cache_store(3, '$field->actex_update_from_db = true;');
 

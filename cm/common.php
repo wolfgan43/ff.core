@@ -3,18 +3,19 @@
  * @package ContentManager
  * @subpackage common
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2010, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2004-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
-function cm_getModulesExternalPath()
-{
-	if (CM_SHOWFILES_MODULES)
-		return CM_SHOWFILES . CM_MODULES_PATH;
-	else
-		return CM_MODULES_PATH;
-}
+$globals_cm = ffGlobals::getInstance("__cm__");
+$globals_cm->field_layout_priority = array(
+	array(new ffData(cm::LAYOUT_PRIORITY_TOPLEVEL, "Number"), new ffData(ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_TOPLEVEL")))
+	, array(new ffData(cm::LAYOUT_PRIORITY_HIGH, "Number"), new ffData(ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_HIGH")))
+	, array(new ffData(cm::LAYOUT_PRIORITY_NORMAL, "Number"), new ffData(ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_NORMAL")))
+	, array(new ffData(cm::LAYOUT_PRIORITY_LOW, "Number"), new ffData(ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_LOW")))
+	, array(new ffData(cm::LAYOUT_PRIORITY_FINAL, "Number"), new ffData(ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_FINAL")))
+);
 
 function cm_getAppName()
 {
@@ -174,19 +175,13 @@ function cm_parse_gzip($contents)
 }
 
 // find valid cahce files and purge old ones
-function cm_filecache_find($cache_dir, $path_dir, $group_subdir, $use_strong_cache, $last_valid, $scaledown, $now = null, $encodings = null, $purge_old = true)
+function cm_filecache_find($cache_dir, $path_dir, $group_subdir, $fixed_maxage, $last_valid, $scaledown, $now = null, $encodings = null, $purge_old = true, $reuse = false)
 {
 	// ***********************************
 	// init here to save a bit calculation
 	if ($now === null)
 		$now = time();
 	
-	// define cache indexes based on settings
-	if (!$use_strong_cache)
-		$cache_compress_idx = 3;
-	else
-		$cache_compress_idx = 2;
-
 	// ***********************************
 
 	$cache_file = null;
@@ -198,7 +193,7 @@ function cm_filecache_find($cache_dir, $path_dir, $group_subdir, $use_strong_cac
 			if($fiGroup->isDot())
 				continue;
 
-			$cache_file = cm_filecache_cycle_subgroup($fiGroup->getPathname(), $path_dir, $use_strong_cache, $last_valid, $scaledown, $now, $encodings, $purge_old, $cache_compress_idx);
+			$cache_file = cm_filecache_cycle_subgroup($fiGroup->getPathname(), $path_dir, $fixed_maxage, $last_valid, $scaledown, $now, $encodings, $purge_old, $reuse);
 			if ($cache_file !== null)
 				return $cache_file;
 		}
@@ -206,28 +201,33 @@ function cm_filecache_find($cache_dir, $path_dir, $group_subdir, $use_strong_cac
 	}
 	else
 	{
-		return cm_filecache_cycle_subgroup($cache_dir, $path_dir, $use_strong_cache, $last_valid, $scaledown, $now, $encodings, $purge_old, $cache_compress_idx);
+		return cm_filecache_cycle_subgroup($cache_dir, $path_dir, $fixed_maxage, $last_valid, $scaledown, $now, $encodings, $purge_old, $reuse);
 	}
 }
 
 // true = non expired, false = expired
 function cm_filecache_check_expiration($mtime, $ctime, $now, $last_valid)
 {
-		if ($mtime > $now && (
-				!$last_valid
-				|| $now < $last_valid
-				|| $ctime >= $last_valid
-		))
+		if (
+				(!$last_valid
+					|| $now < $last_valid
+					|| $ctime >= $last_valid
+				) && (
+					$mtime > $now
+				)
+		)
 			return true;
 	else
 		return false;
 }
 
-function cm_filecache_cycle_subgroup($subpath, $path_dir, $use_strong_cache, $last_valid, $scaledown, $now, $encodings, $purge_old, $cache_compress_idx)
+function cm_filecache_cycle_subgroup($subpath, $path_dir, $fixed_maxage, $last_valid, $scaledown, $now, $encodings, $purge_old, $reuse)
 {
 	$cache_uncompressed = null;
 	$cache_compressed = null;
 	$cache_file = null;
+	$last_uncompressed = null;
+	$last_compressed = null;
 	
 	$find_dir = $subpath . $path_dir . "/";
 	if (!file_exists($find_dir))
@@ -244,112 +244,174 @@ function cm_filecache_cycle_subgroup($subpath, $path_dir, $use_strong_cache, $la
 		$fmtime = $fiFile->getMTime();
 		$fctime = $fiFile->getCTime();
 		
-		$fexp = cm_filecache_check_expiration($fmtime, $fctime, $now, $last_valid);
+		$fexp = cm_filecache_check_expiration($fmtime, $fctime, $now, $last_valid); // normal expire time. TRUE = VALID
 		
-		if (CM_PAGECACHE_ASYNC || $fexp)
+		if ($fexp || $reuse)
 		{
 			$filename = $fiFile->getFilename();
-			$file_parts = explode(".", $filename);
-			if (count($file_parts) > 1)
+			$file_parts = explode(".", $filename); // schema: (0)ETAG.(1)MIME.(2)MAXAGE.(3)COMPRESSION
+			if (count($file_parts) > 1)  // wrong format
 			{
-				if (!$use_strong_cache)
+				if (isset($file_parts[3])) // compressed section
 				{
-					if (!isset($file_parts[2]) || !is_numeric($file_parts[2]))
+					if (is_numeric($file_parts[3])) // wrong format
 					{
 						if ($purge_old)
+						{
+							//die("errore 1");
 							@unlink($filematch);
-						continue;
+						}
 					}
-				}
-
-				if (isset($file_parts[$cache_compress_idx]))
-				{
-					if (is_numeric($file_parts[$cache_compress_idx]))
-					{
-						if ($purge_old)
-							@unlink($filematch);
-					}
-					else if (ffHTTP_encoding_isset($file_parts[$cache_compress_idx], $encodings))
+					else if (ffHTTP_encoding_isset($file_parts[3], $encodings))
 					{
 						if ($cache_compressed === null)
 						{
-							if (!$fexp)
+							if (!$fexp) // try to reuse
 							{
 								if (
 										!$last_valid
 										|| $now < $last_valid
 										|| $fctime >= $last_valid
-									)  // fix values on async cache when in not over last valid
+									)  // only when not over last valid
 								{
-									$diff = $fmtime - $fctime;
-									$fctime = $now;
-									$fmtime = $fctime + $diff;
+									if ($last_compressed !== null)
+									{
+										if ($last_compressed["fmtime"] >= $fmtime)
+											continue;
+										
+										if ($purge_old)
+										{
+											//die("errore 2");
+											@unlink($last_compressed["file"]);
+										}
+									}
+									
+									$last_compressed = array(
+											"file" => $filematch
+											, "filename" => $filename
+											, "file_parts" => $file_parts
+											, "fmtime" => $fmtime
+											, "fctime" => $fctime
+											, "compressed" => $file_parts[3]
+											, "reused" => true
+										);
 								}
 								else
 								{
 									if ($purge_old)
+									{
+										//die("errore 3");
 										@unlink($filematch);
+									}
 									
 									continue;
 								}
 							}
-							
-							$cache_compressed = array(
-									"file" => $filematch
-									, "filename" => $filename
-									, "file_parts" => $file_parts
-									, "fmtime" => $fmtime
-									, "fctime" => $fctime
-									, "compressed" => $file_parts[$cache_compress_idx]
-								);
+							else // valid!
+							{
+								$cache_compressed = array(
+										"file" => $filematch
+										, "filename" => $filename
+										, "file_parts" => $file_parts
+										, "fmtime" => $fmtime
+										, "fctime" => $fctime
+										, "compressed" => $file_parts[3]
+										, "reused" => false
+									);
+							}
 						}
 						else if ($purge_old)
+						{
+							//die("errore 5");
 							@unlink($filematch);
+						}
 					}
 				}
-				else
+				else // uncompressed section
 				{
 					if ($cache_uncompressed === null)
 					{
-						if (!$fexp)
+						if (!$fexp) // try to reuse
 						{
 							if (
 									!$last_valid
 									|| $now < $last_valid
 									|| $fctime >= $last_valid
-								)  // fix values on async cache when in not over last valid
+								)  // only when not over last valid
 							{
-								$diff = $fmtime - $fctime;
-								$fctime = $now;
-								$fmtime = $fctime + $diff;
+								if ($last_uncompressed !== null)
+								{
+									if ($last_uncompressed["fmtime"] >= $fmtime)
+										continue;
+
+									if ($purge_old)
+									{
+										//die("errore 6");
+										@unlink($last_uncompressed["file"]);
+									}
+								}
+
+								$last_uncompressed = array(
+										"file" => $filematch
+										, "filename" => $filename
+										, "file_parts" => $file_parts
+										, "fmtime" => $fmtime
+										, "fctime" => $fctime
+										, "compressed" => false
+										, "reused" => true
+									);
 							}
 							else
 							{
 								if ($purge_old)
+								{
+									//die("errore 6");
 									@unlink($filematch);
+								}
 
 								continue;
 							}
 						}
-
-						$cache_uncompressed = array(
+						else // valid!
+						{
+							$cache_uncompressed = array(
 								"file" => $filematch
 								, "filename" => $filename
 								, "file_parts" => $file_parts
 								, "fmtime" => $fmtime
 								, "fctime" => $fctime
 								, "compressed" => false
+								, "reused" => false
 							);
+						}
 					}
 					else if ($purge_old)
+					{
+						//die("errore 8");
 						@unlink($filematch);
+					}
 				}
 			}
 			else if ($purge_old)
+			{
+				//die("errore 9");
 				@unlink($filematch);
+			}
 		}
 		else if ($purge_old)
+		{
+			//die("errore 10");
 			@unlink($filematch);
+		}
+	}
+	
+	if ($reuse)
+	{
+		if (!$cache_compressed && $last_compressed)
+			$cache_compressed = $last_compressed;
+		
+		if (!$cache_uncompressed && $last_uncompressed)
+			$cache_uncompressed = $last_uncompressed;
 	}
 
 	if ($cache_compressed || $cache_uncompressed)
@@ -398,7 +460,10 @@ function cm_filecache_groupwrite($top_cache_dir, $cache_dir, $path_dir, $file, $
 	{
 		$rc_cache = @touch($cache_dir . "/" . $cache_group_dir . $path_dir . "/" . $file, $expires);
 		if (!$rc_cache)
+		{
+			//die("errore 11");
 			@unlink($cache_dir . "/" . $cache_group_dir . $path_dir . "/" . $file);
+		}
 	} 
 	else if ($cache_group_dir == $max_group_dirs)
 	{
@@ -431,18 +496,23 @@ function cm_filecache_write($path, $file, $buffer, $expires)
 		{
 			$rc_cache = @touch($path . "/" . $file, $expires);
 			if (!$rc_cache)
+			{
+				//die("errore 12");
 				@unlink($path . "/" . $file);
+			}
 		}
 	}
 	
 	return $rc_cache;
 }
 
-function cm_filecache_empty_dir($path) 
+function cm_filecache_empty_dir($path, $clean_back = false) 
 {
     if(!file_exists($path) || !is_dir($path))
 		return true;
 
+	// first, empty the selected directory
+	
 	$directoryIterator = new DirectoryIterator($path);
     foreach($directoryIterator as $fileInfo)
 	{
@@ -451,6 +521,7 @@ function cm_filecache_empty_dir($path)
 		{
             if($fileInfo->isFile())
 			{
+				//die("errore 13");
                 @unlink($filePath);
             } 
 			elseif($fileInfo->isDir())
@@ -460,5 +531,127 @@ function cm_filecache_empty_dir($path)
         }
     }
 	
-	@rmdir($filePath);
+	// second, walk recursivly backward to clean empty directories
+	
+	if (!$clean_back)
+		return;
+	
+	@rmdir($path);
+	
+	while (($path = ffCommon_dirname($path)) !== "/")
+	{
+		$empty = true;
+		
+		$directoryIterator = new DirectoryIterator($path);
+		foreach($directoryIterator as $fileInfo)
+		{
+			$filePath = $fileInfo->getPathname();
+			if($fileInfo->isDot())
+				continue;
+
+			if($fileInfo->isFile() || $fileInfo->isDir())
+			{
+				$empty = false;
+				break;
+			}
+		}
+		
+		if ($empty)
+			@rmdir($path);
+		else
+			break;
+	}
+}
+
+function cm_libsExtend(&$libs, $addon)
+{
+	if (!is_array($addon))
+		ffErrorHandler::raise("Wrong extend usage", E_USER_ERROR, null, get_defined_vars());
+		
+	foreach ($addon as $key => $elements)
+	{
+		if (!ffIsset($libs, $key))
+		{
+			$libs[$key] = $elements;
+		}
+		else
+		{
+			$default = $libs[$key]["default"];
+			foreach ($elements AS $subkey => $subelements)
+			{
+				if ($subkey === "all")
+				{
+					foreach ($libs[$key] as $src_key => $src_value)
+					{
+						if ($src_key === "default")
+							continue;
+
+						$libs[$key][$src_key] = array_merge_recursive($libs[$key][$src_key], $subelements);
+					}
+				}
+				else if ($subkey === "default")
+				{
+					$libs[$key][$default] = array_merge_recursive($libs[$key][$default], (is_array($subelements) ? $subelements : $elements[$default]));
+				}
+				else if (ffIsset($libs[$key], $subkey))
+				{
+					$libs[$key][$subkey] = array_merge_recursive($libs[$key][$subkey], $subelements);
+				}
+				else
+				{
+					foreach ($libs as $src_key => $src_value)
+					{
+						if ($src_key === "default")
+							continue;
+
+						if (preg_match($subkey, $src_key) === 1)
+							$libs[$key][$src_key] = array_merge_recursive($libs[$key][$src_key], $subelements);
+					}
+				}
+			}
+		}
+	}
+}
+
+function cm_loadlibs(&$libs, $path, $name, $prefix = "", $force_reload = false, $descend = true)
+{
+	if(!file_exists($path) || !is_dir($path))
+		return true;
+
+	if (ffIsset($libs, $prefix . "/" . $name))
+		return true;
+
+	if (file_exists($path . "/libs.json"))
+	{
+		$tmp = file_get_contents($path . "/libs.json");
+		$tmp = str_replace('"CM::LAYOUT_PRIORITY_DEFAULT"', CM::LAYOUT_PRIORITY_DEFAULT, $tmp);
+		$tmp = str_replace('"CM::LAYOUT_PRIORITY_TOPLEVEL"', CM::LAYOUT_PRIORITY_TOPLEVEL, $tmp);
+		$tmp = str_replace('"CM::LAYOUT_PRIORITY_HIGH"', CM::LAYOUT_PRIORITY_HIGH, $tmp);
+		$tmp = str_replace('"CM::LAYOUT_PRIORITY_NORMAL"', CM::LAYOUT_PRIORITY_NORMAL, $tmp);
+		$tmp = str_replace('"CM::LAYOUT_PRIORITY_LOW"', CM::LAYOUT_PRIORITY_LOW, $tmp);
+		$tmp = str_replace('"CM::LAYOUT_PRIORITY_FINAL"', CM::LAYOUT_PRIORITY_FINAL, $tmp);
+		$libs[$prefix . "/" . $name] = json_decode($tmp, true);
+	}
+	
+	if (file_exists($path . "/libs.php"))
+	{
+		$tmp = include($path . "/libs.php");
+		if (isset($libs[$prefix . "/" . $name]))
+			$libs[$prefix . "/" . $name] = array_merge_recursive($libs[$prefix . "/" . $name], $tmp);
+		else
+			$libs[$prefix . "/" . $name] = $tmp;
+	}
+	
+	if (!$descend)
+		return;
+
+	$directoryIterator = new DirectoryIterator($path);
+	foreach($directoryIterator as $fileInfo)
+	{
+		if ($fileInfo->isDot() || $fileInfo->isFile())
+			continue;
+
+		$fileName = $fileInfo->getBasename();
+		cm_loadlibs($libs, $path . "/" . $fileName, $fileName, $prefix . "/" . $name, $force_reload);
+	}
 }
