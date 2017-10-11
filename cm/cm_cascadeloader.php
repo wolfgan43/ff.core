@@ -1915,24 +1915,29 @@ function cm_moduleGetCascadeAttrs($file)
     if(dirname("/") == "\\")
         $file = str_replace("\\", "/", $file);
 
-    if (strpos($file, FF_THEME_DISK_PATH) !== 0)
+    if(strpos($file, ffCommon_dirname(__DIR__)) === 0)
+        $base_path = ffCommon_dirname(__DIR__);
+    elseif(strpos($file, FF_DISK_PATH) === 0)
+        $base_path = FF_DISK_PATH;
+
+    if (strpos($file, $base_path . FF_THEME_DIR) !== 0)
     {
         $module = true;
-        $rc = preg_match("/^" . preg_quote(CM_MODULES_ROOT, "/"). "\/([^\/]+)\/themes\/([^\/]+)\/.*/", $file, $matches);
+        $rc = preg_match("/^" . preg_quote($base_path . CM_MODULES_PATH, "/"). "\/([^\/]+)\/themes\/([^\/]+)\/.*/", $file, $matches);
         if (!$rc)
             ffErrorHandler::raise ("Unable to find proper theme in module file", E_USER_ERROR, NULL, get_defined_vars());
 
         $theme = $matches[2];
-        $path = str_replace(CM_MODULES_ROOT . "/" . $matches[1] . "/themes/", cm_getModulesExternalPath() . "/" . $matches[1] . "/", $file);
+        $path = str_replace($base_path . CM_MODULES_PATH . "/" . $matches[1] . "/themes/", cm_getModulesExternalPath() . "/" . $matches[1] . "/", $file);
     }
     else
     {
-        $rc = preg_match("/^" . preg_quote(FF_DISK_PATH, "/"). "\/themes\/([^\/]+)\/.*/", $file, $matches);
+        $rc = preg_match("/^" . preg_quote($base_path, "/"). "\/themes\/([^\/]+)\/.*/", $file, $matches);
         if (!$rc)
             ffErrorHandler::raise ("Unable to find proper theme in module file", E_USER_ERROR, NULL, get_defined_vars());
 
         $theme = $matches[1];
-        $path = str_replace(FF_THEME_DISK_PATH, FF_THEME_SITE_PATH, $file);
+        $path = str_replace($base_path . FF_THEME_DIR, FF_THEME_SITE_PATH, $file);
     }
 
     $out = array(
