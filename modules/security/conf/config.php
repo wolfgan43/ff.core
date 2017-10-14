@@ -143,3 +143,5 @@ if (!defined("MOD_SEC_CRYPT")) 		define ("MOD_SEC_CRYPT", false);
 if (!defined("MOD_SEC_CRYPT_EMAIL")) 	define ("MOD_SEC_CRYPT_EMAIL", false);
 
 if (!defined("MOD_SECURITY_LDAP_SERVER")) 	define ("MOD_SECURITY_LDAP_SERVER", false);
+
+if(!defined("MOD_SECURITY_SESSION_PERMANENT")) define("MOD_SECURITY_SESSION_PERMANENT", false);

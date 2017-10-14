@@ -673,9 +673,6 @@ function mod_security_check_session($prompt_login = true, $path = null, $just_ex
 			if (MOD_SEC_CSRF_PROTECTION)
 				cm::getInstance()->oPage->register_globals(MOD_SEC_CSRF_PROTECTION_PARAM, get_session("__FF_SESSION__"));
 			
-			if(defined("MOD_SEC_ENABLE_USER_TRACE") && MOD_SEC_ENABLE_USER_TRACE && $path !== null) 
-				mod_security_trace_user($path);
-			
 			$valid_session = true;
 		}
 		else
@@ -712,106 +709,6 @@ function mod_security_check_session($prompt_login = true, $path = null, $just_ex
 		else
 			return false;
 	}
-}
-
-function mod_security_trace_user($path, $start = false, $options = null)
-{
-	$db = ffDB_Sql::factory();
-
-	if(!$options)
-		$options = mod_security_get_settings($path);
-
-	$last_update = time();
-	$ID_user = get_session("UserNID");
-	$ID_state = get_session("UserState");
-
-	$token = md5(
-					$ID_user
-					. $ID_state
-					. $_SERVER["HTTP_USER_AGENT"]
-					. (strpos($_SERVER["HTTP_USER_AGENT"], "http") !== false
-						? ""
-						: session_id()
-					)
-			);
-	
-	if($start) {
-		$sSQL = "INSERT INTO " . $options["table_access"] . "
-				(
-					ID
-					, access
-					, ID_user
-					, ID_state
-					, sess_id
-					, remote_address
-					, remote_agent
-					, last_update
-				)
-				VALUES
-				(
-					null
-					, " . $db->toSql($token, "Text") . "
-					, " . $db->toSql($ID_user) . "
-					, " . $db->toSql($ID_state, "Number") . "
-					, " . $db->toSql(session_id(), "Text") . "
-					, " . $db->toSql($_SERVER["REMOTE_ADDR"]) . "
-					, " . $db->toSql($_SERVER["HTTP_USER_AGENT"]) . "
-					, " . $db->toSql($last_update, "Number") . "
-				)";
-		$db->execute($sSQL); 	
-	}
-
-	
-	$get = $_GET;
-	$post = $_POST;
-
-	if(isset($get["ret_url"]))
-		unset($get["ret_url"]);
-	if(isset($post["ret_url"]))
-		unset($post["ret_url"]);
-	if(isset($get["lang"]))
-		unset($get["lang"]);
-		
-	if(is_array($get) && count($get)) {
-		foreach($get AS $get_key => $get_value) {
-			if(substr_count($get_key, "__") == 2) {
-				unset($get[$get_key]);
-			} elseif(strpos($get_key, "XHR_") !== false) {
-				unset($get[$get_key]);
-			}
-		}
-	}
-	if(is_array($post) && count($post)) {
-		foreach($post AS $post_key => $post_value) {
-			if(substr_count($post_key, "__") == 2) {
-				unset($post[$post_key]);
-			} elseif(strpos($post_key, "XHR_") !== false) {
-				unset($post[$post_key]);
-			}
-		}
-	}
-	$sSQL = "INSERT INTO " . $options["table_access_tracert"] . "
-			(
-				`ID`
-				, `ID_user`
-				, `access`
-				, `path`
-				, `get`
-				, `post`
-				, `last_update`
-			)
-			VALUES
-			(
-				null
-				, " . $db->toSql($ID_user, "Number") . "
-				, " . $db->toSql($token) . "
-				, " . $db->toSql($path) . "
-				, " . $db->toSql((count($get) ? "<pre>" . print_r($get, true) . "</pre>" : "")) . "
-				, " . $db->toSql((count($post) ? "<pre>" . print_r($post, true) . "</pre>" : "")) . "
-				, " . $db->toSql($last_update, "Number") . "
-			)";
-			
-	$db->execute($sSQL); 
 }
 
 function mod_security_is_admin()
@@ -996,7 +893,7 @@ function mod_security_get_locale($lang_default = null, $nocurrent = false) {
 }
 
 // create a session with proper vars
-function mod_security_create_session($UserID = null, $UserNID = null, $Domain = "", $DomainID = "", $permanent_session = false, $path = null, $disable_events = false, $lang_default = null)
+function mod_security_create_session($UserID = null, $UserNID = null, $Domain = "", $DomainID = "", $permanent_session = MOD_SECURITY_SESSION_PERMANENT, $disable_events = false, $cookiehash = null)
 {
 	$cm = cm::getInstance();
 
@@ -1245,16 +1142,6 @@ function mod_security_create_session($UserID = null, $UserNID = null, $Domain = 
 		set_session("user_permission", $user);
 	
 	/**
-	* Trace User Alex
-	*/
-	if(defined("MOD_SEC_ENABLE_USER_TRACE") && MOD_SEC_ENABLE_USER_TRACE)
-	{
-		set_session("UserState", $user["country"]["current"]["ID"]);
-
-		mod_security_trace_user($path, true, $options);
-	}	
-	
-	/**
 	* Update LastLogin
 	*/
 	$sSQL = "UPDATE `" . $options["table_name"] . "` SET 
@@ -1360,8 +1247,6 @@ function mod_security_get_settings($path_info)
 	$options["table_groups_name"] = CM_TABLE_PREFIX . "mod_security_groups";
 	$options["table_groups_rel_user"] = CM_TABLE_PREFIX . "mod_security_users_rel_groups";
 	$options["table_groups_dett_name"] = CM_TABLE_PREFIX . "mod_security_groups_fields";
-	$options["table_access"] = CM_TABLE_PREFIX . "mod_security_users_access";
-	$options["table_access_tracert"] = CM_TABLE_PREFIX . "mod_security_users_access_tracert";
 	$options["table_token"] = CM_TABLE_PREFIX . "mod_security_token";
     $options["table_domains_fields"] = CM_TABLE_PREFIX . "mod_security_domains_fields";
     
@@ -1434,22 +1319,6 @@ function mod_security_get_settings($path_info)
 				$options["table_groups_dett_name"] = CM_TABLE_PREFIX . "mod_security_groups_fields";
 		}
 		
-		if (isset($value->table_access))
-		{
-			if (strlen((string)$value->table_access))
-				$options["table_access"] = (string)$value->table_access;
-			else
-				$options["table_access"] = CM_TABLE_PREFIX . "mod_security_users_access";
-		}
-
-		if (isset($value->table_access_tracert))
-		{
-			if (strlen((string)$value->table_access_tracert))
-				$options["table_access_tracert"] = (string)$value->table_access_tracert;
-			else
-				$options["table_access_tracert"] = CM_TABLE_PREFIX . "mod_security_users_access_tracert";
-		}
-
 		if (isset($value->table_token))
 		{
 			if (strlen((string)$value->table_token))
@@ -2439,6 +2308,8 @@ function mod_security_set_user_by_social($social, $UserParams, $UserField, $User
     if ($ID_domain === null)
         $ID_domain = mod_security_get_domain();
 
+    $permanent_session = MOD_SECURITY_SESSION_PERMANENT; //todo: da recuperare dentro i social login
+
 	$UserParams["ID_domain"] = $ID_domain;
 	$UserParams["username_slug"] = ffCommon_url_rewrite($UserParams["username"]);
 	
@@ -2612,7 +2483,7 @@ function mod_security_set_user_by_social($social, $UserParams, $UserField, $User
 				mod_security_set_accesstoken($userNID, $UserToken["token"], $UserToken["type"]);
 			}
 
-			mod_security_create_session($userID, $userNID, null, $ID_domain, false, null, $disable_events || $skip_redirect );
+			mod_security_create_session($userID, $userNID, null, $ID_domain, $permanent_session, $disable_events || $skip_redirect );
 			if(!$disable_events) 
 			{
 				$res = $cm->modules["security"]["events"]->doEvent($social . "_logging_in", array($userNID, $UserParams, $UserField));
@@ -3156,7 +3027,7 @@ function modsec_OAuth2_ResourceController($scopeRequired, $callback)
 	$ret = call_user_func_array($callback, array($scopes, $request, $response, $server));
 }
 
-function mod_sec_check_login($username, $password, $domain = null, $options = null, $permanent_session = false, $logged = false, $sError = null, $onlycheck = true)
+function mod_sec_check_login($username, $password, $domain = null, $options = null, $permanent_session = MOD_SECURITY_SESSION_PERMANENT, $logged = false, $sError = null, $onlycheck = true)
 {
 	$valid = false;
 	
@@ -3357,7 +3228,7 @@ function mod_sec_check_login($username, $password, $domain = null, $options = nu
 												";
 									$db2->execute($sSQL2);
 								}
-								mod_security_create_session($userID, $userNID, $domain, $ID_domain, null, false, null, $cookiehash, $permanent_session);
+								mod_security_create_session($userID, $userNID, $domain, $ID_domain, $permanent_session, false, $cookiehash);
 								$logged = true;
 
 								$cm->modules["security"]["events"]->doEvent("logging_in", array($cm->oPage->ret_url));

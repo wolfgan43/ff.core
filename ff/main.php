@@ -141,14 +141,13 @@ if (!defined("FF_MAIN_INIT"))
 	else
 		define("__FF_DIR__", ffCommon_dirname(__FILE__));
 
-    if(!defined("__TOP_DIR__"))
-    {
-        if (isset($_ENV["FF_TOP_DIR"]))
-            define("__TOP_DIR__", $_ENV["FF_TOP_DIR"]);
-        else
-            define("__TOP_DIR__", ffCommon_dirname(__FF_DIR__));
+	if(!defined("__TOP_DIR__"))
+	{
+        define("__TOP_DIR__", (getenv("FF_TOP_DIR") && getenv("FF_TOP_DIR") != "1"
+            ? getenv("FF_TOP_DIR")
+            : ffCommon_dirname(__FF_DIR__)
+        ));
     }
-
 	// add ff'dirs to include path
 	set_include_path(
 			__FF_DIR__ . PATH_SEPARATOR .
@@ -163,7 +162,7 @@ if (!defined("FF_MAIN_INIT"))
 
 	// ..base (all others depends on this one)
 	if (@is_file(__TOP_DIR__ . "/config." . FF_PHP_EXT))
-		require __TOP_DIR__ . "/config." . FF_PHP_EXT;
+		require_once __TOP_DIR__ . "/config." . FF_PHP_EXT;
 	else if (@is_file(__FF_DIR__ . "/config." . FF_PHP_EXT))
 		require __FF_DIR__ . "/config." . FF_PHP_EXT;
 	else
