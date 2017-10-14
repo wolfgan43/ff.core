@@ -974,7 +974,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             case "minify": // medium
                                 if (!class_exists("CSSmin"))
                                     require(FF_DISK_PATH . "/library/minify/min/lib/CSSmin.php");
-                                $str_css_buffer = CSSmin::_minify($str_css_buffer);
+                                $str_css_buffer = CSSmin::minify($str_css_buffer);
                                 break;
 
                             case "gminify": // strong
