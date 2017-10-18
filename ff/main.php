@@ -168,6 +168,10 @@ if (!defined("FF_MAIN_INIT"))
 	else
 		die("FORMS FRAMEWORK: config." . FF_PHP_EXT . " file not found. Place it under sources or root directory.");
 
+	// ..check config
+	if(!defined("FF_SYSTEM_LOCALE"))                    define("FF_SYSTEM_LOCALE", "ISO9075"); /* Default Locale */
+	if(!defined("FF_DEFAULT_CHARSET"))                  define("FF_DEFAULT_CHARSET", "UTF-8");  /* Charset Default */
+
 	// manage charsets
 	if (FF_DEFAULT_CHARSET == "UTF-8")
 	{
