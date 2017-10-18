@@ -27,6 +27,7 @@ class FF implements
 	protected $db = null;
 	protected $config = null;
 	protected $userdata = array();
+	protected $clientdata = null;
 
 
 	public function __construct(\ffDB_Sql $connection = null, $config = array())
@@ -47,11 +48,15 @@ class FF implements
             'scope_table'  => 'oauth_scopes',
             'public_key_table'  => 'oauth_public_keys',
             'grant_types_table'  => 'oauth_grant_types',
+            'user_scope_from_client'  => true,
         ), $config);
 	}
 	
     public function getClientDetails($client_id)
 	{
+		if ($this->clientdata !== null)
+			return $this->clientdata;
+			
 		$this->db->query("SELECT 
 								`" . $this->config['client_table'] . "`.* 
 								, `" . $this->config['grant_types_table'] . "`.`grant_types` AS `rel_grant_types`
@@ -68,6 +73,7 @@ class FF implements
 				$ret["grant_types"] = $ret["rel_grant_types"];
 			unset($ret["rel_grant_types"]);
 			unset($ret["ID_grant_types"]);
+			$this->clientdata = $ret;
 			return $ret;
 		}
 		else
@@ -234,7 +240,8 @@ class FF implements
 		$this->db->query("SELECT * FROM `" . $this->config['client_table'] . "` WHERE `client_id` = " . $this->db->toSql($client_id));
 		if ($this->db->nextRecord())
 		{
-			return $this->db->getField("client_secret", "Text", true) == $client_secret;
+			$tmp = $this->getClientDetails($client_id);
+			return $tmp["client_secret"] == $client_secret;
 		}
 		else
 			return false;
@@ -400,7 +407,7 @@ class FF implements
 				$defaultScope[] = $this->db->getField("scope", "Text", true);
 			} while ($this->db->nextRecord());
 			
-            return implode(' ', $defaultScope);
+            return trim(implode(' ', $defaultScope));
         }
 
         return null;
@@ -451,16 +458,16 @@ class FF implements
 	{
 		$ret = mod_sec_check_login($username, $password);
 		
-		$this->userdata[$username] = $ret["UserNID"];
+		$this->userdata[$username]["user_id"] = $ret["UserNID"];
+		if ($this->config["user_scope_from_client"])
+		$this->userdata[$username]["scope"] = $this->clientdata["scope"];
 		
 		return ($ret["valid"]);
 	}
 
 	public function getUserDetails($username)
 	{
-		return array(
-			"user_id"  => $this->userdata[$username]
-		);
+		return $this->userdata[$username];
 	}
 
 }
