@@ -1910,6 +1910,34 @@ $ffMimeTypes = array(
 , "json" => "application/json"
 );
 
+function ffCommon_crossDomains($trustDomains, $add_header = false, $domain = null)
+{
+	if($_SERVER["SERVER_ADDR"] == $_SERVER["REMOTE_ADDR"])
+		return true;
+
+	//if ($_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest") {
+	if (!$domain) {
+		$arrDomain = parse_url($_SERVER["HTTP_REFERER"]);
+		$domain = $arrDomain["host"];
+	}
+
+
+	foreach ($trustDomains AS $trustDomain) {
+		if (strpos($domain, $trustDomain) !== false) {
+			if ($add_header) {
+				header('Access-Control-Allow-Origin: *');
+				header('Access-Control-Allow-Methods: GET, POST');
+			}
+			return true;
+		}
+	}
+	//}
+
+	if($add_header) {
+		http_response_code(405);
+	}
+}
+
 if (!function_exists("http_response_code"))
 {
     function http_response_code($code = null)

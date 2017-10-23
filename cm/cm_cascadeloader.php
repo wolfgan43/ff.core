@@ -531,7 +531,18 @@ function ffPage_seo_optimize($oPage, $compact_js, $compact_css)
         }
     }
 
-    $oPage->tpl[0]->set_var("content", $content);
+	if($_SERVER["HTTPS"]) {
+		$arrHttp[] 			= 'http://' . $_SERVER["HTTP_HOST"];
+		$arrHttps[] 		= 'https://' .  $_SERVER["HTTP_HOST"];
+		if(strpos($_SERVER["HTTP_HOST"], "www.") === 0) {
+			$domain = substr($_SERVER["HTTP_HOST"], 4);
+			$arrHttp[] 		= 'http://' . $domain;
+			$arrHttps[] 	= 'https://www.' .  $domain;
+		}
+		$content = str_replace($arrHttp, $arrHttps, $content);
+	}
+
+	$oPage->tpl[0]->set_var("content", $content);
 }
 
 function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = null)

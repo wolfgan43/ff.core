@@ -46,11 +46,11 @@ abstract class ffClassChecks
 	{
  		ffErrorHandler::raise("function \"$name\" not found on class "  . get_class($this), E_USER_ERROR, $this, get_defined_vars());
 	}
-	
+	/*
 	public static function __callStatic ($name, $arguments)
 	{
  		ffErrorHandler::raise("function \"$name\" not found on class "  . get_class($this), E_USER_ERROR, $this, get_defined_vars());
-	}
+	}*/
 }
 
 /**
