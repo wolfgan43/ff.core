@@ -1444,7 +1444,7 @@ class ffPage_html extends ffPage_base
 					$this->output_buffer["html"] = $this->tpl[0]->rpparse("main", false);
 				}
 
-				$this->doEvent("on_tpl_parsed", array(&$this, $this->tpl[0]));
+				$this->doEvent("on_tpl_parsed", array(&$this));
 			}
 			
 			cm::jsonParse(array_merge($this->json_result, $this->output_buffer), $output_result);
@@ -1468,7 +1468,7 @@ class ffPage_html extends ffPage_base
 			//$debug = $this->tpl[0];
 			//ffErrorHandler::raise("ASD", E_USER_ERROR, $this, get_defined_vars());
 
-			$this->doEvent("on_tpl_parsed", array(&$this, $this->tpl[0]));
+			$this->doEvent("on_tpl_parsed", array(&$this));
 
 			if ($output_result)
 			{

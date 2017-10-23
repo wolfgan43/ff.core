@@ -2,6 +2,7 @@
 $cm->oPage->tplAddJs("ff.ajax");
 
 $filename = cm_cascadeFindTemplate("/javascript/ff.modules.security.js", "security");
+
 //$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/ff.modules.security.js", $cm->oPage->theme);
 $ret = cm_moduleGetCascadeAttrs($filename);
 

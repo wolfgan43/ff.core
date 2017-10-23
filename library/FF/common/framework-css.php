@@ -271,8 +271,8 @@ function cm_getFrameworkCss_settings($name = null) {
 	    )
 	    , "bootstrap" => array(
 	        "params" => array(
-	            "css" => "//netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"
-	            , "js" => "//netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" 
+	            "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"
+	            , "js" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"
 	            , "js_init" => ""
 	        )
 	        , "class" => array(
@@ -527,24 +527,24 @@ function cm_getFrameworkCss_settings($name = null) {
 	            )
 	        )                                            
 	        , "theme" => array(
-	            "amelia" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia/bootstrap.min.css"
-	            , "cerulean" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css"
-	            , "cosmo" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cosmo/bootstrap.min.css"
-	            , "cyborg" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cyborg/bootstrap.min.css"
-	            , "flatly" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/flatly/bootstrap.min.css"
-	            , "journal" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/journal/bootstrap.min.css"
-	            , "readable" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/readable/bootstrap.min.css"
-	            , "simplex" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/simplex/bootstrap.min.css"
-	            , "slate" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/slate/bootstrap.min.css"
-	            , "spacelab" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab/bootstrap.min.css"
-	            , "united" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
+	            "amelia" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia/bootstrap.min.css"
+	            , "cerulean" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css"
+	            , "cosmo" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cosmo/bootstrap.min.css"
+	            , "cyborg" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cyborg/bootstrap.min.css"
+	            , "flatly" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/flatly/bootstrap.min.css"
+	            , "journal" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/journal/bootstrap.min.css"
+	            , "readable" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/readable/bootstrap.min.css"
+	            , "simplex" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/simplex/bootstrap.min.css"
+	            , "slate" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/slate/bootstrap.min.css"
+	            , "spacelab" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab/bootstrap.min.css"
+	            , "united" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
 	        )
 	    )
 	    , "foundation" => array(
 	        "params" => array(
-                "css" => "//cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css" 
-                , "js" => "//cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.js" 
-	            , "js_init" => 'jQuery(function() { jQuery(document).foundation(); });'//non funziona con la cache
+                "css" 				=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css"
+                , "js" 				=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.js"
+	            , "js_init" 		=> 'jQuery(function() { jQuery(document).foundation(); });'//non funziona con la cache
 	        )
 	        , "class" => array(
 	            "container" => "container"
@@ -814,14 +814,14 @@ function cm_getFontIcon_settings($name = null) {
 	        , "append" => ""
 	    )
 	    , "glyphicons" => array(
-	         "css" => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"
+	         "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"
 	        , "prefix" => "glyphicons"
 	        , "postfix" => ""
 	        , "prepend" => ""
 	        , "append" => ""
 	    )
 	    , "fontawesome" => array(
-	         "css" => "//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css"
+	         "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css"
 	        , "prefix" => "fa" 
 	        , "postfix" => ""
 	        , "prepend" => "fa-"
@@ -899,7 +899,9 @@ function cm_getFrameworkCss($framework_name = null)
                 );
 				$framework_css = array_replace($framework_css_settings, $framework_css); 
             } elseif(strpos($framework_name, "-") !== false) {
-                $arrFrameworkCss = explode("-", $framework_name);    
+                $arrFrameworkCss = explode("-", $framework_name);
+				$framework_css_settings = cm_getFrameworkCss_settings($arrFrameworkCss[0]);
+
                 $framework_css = array(
                     "name" => $arrFrameworkCss[0]
                     , "is_fluid" => false
@@ -1507,6 +1509,7 @@ function cm_getClassColByFrameworkCss($resolution = array(), $is_fluid = null, $
 					$resolution = array_reverse($resolution);
 
 				$i = 0;
+				$prev_num = "";
 				foreach($resolution AS $res_num) 
 				{
 					if($res_num !== $prev_num || $res_num == 0) {

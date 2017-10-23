@@ -2,91 +2,60 @@
 * FF Components
 */
 .ffGrid {
-  background: #FFF; }
+  background: white;
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 0.13); }
   .ffGrid h2 {
-    color: #1e88e5; }
+    color: #00838F; }
   .ffGrid .table th {
-    /*color: $text-color-light;
-    background: $primary-color; 
-    
-    a {
-       /*color: $text-color-light;
-    }
-    
-    &:last-child {
-      border-right: 1px solid $primary-color;
-    }
-    
-    /*&.active {
-      background: $secondary-color;
-    } MIRKO*/ }
-  .ffGrid .table td {
-  /*
-&:first-child {
-  border-left: 1px solid $border-color;
-}
-  
-&:last-child {
-  border-right: 1px solid $border-color;
-}
-  MIRKO*/ }
-  .ffGrid .table tr {
-    /*
-    &:last-child {
-      border-bottom: 1px solid $border-color;
-    }
-    MIRKO*/ }
+    color: white;
+    background: #00838F; }
+    .ffGrid .table th a {
+      color: white; }
+    .ffGrid .table th:last-child {
+      border-right: 1px solid #00838F; }
+    .ffGrid .table th.active {
+      background: #0097A7; }
+  .ffGrid .table td:first-child {
+    border-left: 1px solid #e7e7e7; }
+  .ffGrid .table td:last-child {
+    border-right: 1px solid #e7e7e7; }
+  .ffGrid .table tr:last-child {
+    border-bottom: 1px solid #e7e7e7; }
 
 .ffRecord {
-  background: white; }
+  background: white;
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 0.13); }
   .ffRecord h2 {
-    color: #1e88e5; }
+    color: #00838F; }
   .ffRecord label {
-    color: #1976d2; }
-
-
+    color: #0097A7; }
 
 /*
 * FF Overlay
 */
-.modal {
-  /*===============content icon===============*/ }
-  .modal-header {
-    background: #1e88e5;
+.modal-header {
+  background: #00838F;
+  color: white; }
+.modal-tabs {
+  background: #00838F; }
+  .modal-tabs .nav-tabs li.active a {
+    border-bottom: 3px solid white;
+    background: none; }
+    .modal-tabs .nav-tabs li.active a:hover, .modal-tabs .nav-tabs li.active a:focus {
+      background: none;
+      border-bottom: 3px solid white;
+      color: white; }
+  .modal-tabs .nav-tabs li a {
+    border-bottom: 3px solid #00838F;
     color: white; }
-  .modal-tabs {
-    background: #1e88e5; }
-    .modal-tabs .nav-tabs {
-      display: table;
-      width: 100%; }
-      .modal-tabs .nav-tabs li {
-        display: table-cell; }
-        .modal-tabs .nav-tabs li.active a {
-          color: #1e88e5;
-          background: #FFF;
-          border: 0; }
-          .modal-tabs .nav-tabs li.active a:hover, .modal-tabs .nav-tabs li.active a:focus {
-            color: #1e88e5;
-            background: #FFF; }
-        .modal-tabs .nav-tabs li a {
-          color: white; }
-          .modal-tabs .nav-tabs li a:hover {
-            background: none; }
-  .modal .vg-content {
-    color: #00bcd4; }
-  .modal .vg-widget {
-    color: #8bc34a; }
-  .modal .vg-menu {
-    color: #ff9800; }
-  .modal .vg-applet {
-    color: #ffc107; }
-  .modal .vg-addon {
-    color: #9c27b0; }
+    .modal-tabs .nav-tabs li a:hover {
+      background: none;
+      border-bottom: 3px solid #00838F; }
 
 .ff-modal {
   background: rgba(0, 0, 0, 0.5); }
   .ff-modal-highlight td {
-    color: white;
+    color: #FFF;
     border: 1px solid rgba(0, 151, 167, 0.15);
     background: rgba(0, 151, 167, 0.4); }
     .ff-modal-highlight td a {
@@ -99,10 +68,10 @@
   border: 1px solid #e7e7e7;
   background: white; }
 .token-input-token {
-  border: 1px solid #e7e7e7; }
+  border: 1px solid rgba(0, 131, 143, 0.33); }
 .token-input-delete-token {
-  color: #FFF;
-  background: #1e88e5; }
+  color: white;
+  background: #00838F; }
 
 .autocompletetoken .autocomplete-wrap {
-  border-bottom: 2px solid #1e88e5; }
+  border-bottom: 2px solid #00838F; }

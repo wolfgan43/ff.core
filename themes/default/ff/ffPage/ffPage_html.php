@@ -789,7 +789,7 @@ class ffPage_html extends ffPage_base
 
 		$this->tpl[0]->set_var("content", $this->output_buffer);
         
-        $this->doEvent("on_tpl_parsed", array($this));
+        $this->doEvent("on_tpl_parsed", array(&$this));
 
 		if ($output_result)
 		{
@@ -1253,7 +1253,7 @@ class ffPage_html extends ffPage_base
 					if(!is_null($css_value["path"])) {
 						//da gestire se sara necessario un giorno
 					} else {
-                        if($this->jquery_ui_force_theme !== null && strpos($oPage->jquery_ui_force_theme, "/") === 0 && file_exists(FF_DISK_PATH . $this->jquery_ui_force_theme . "/" . $css_value["file"]))
+                        if($this->jquery_ui_force_theme !== null && strpos($this->jquery_ui_force_theme, "/") === 0 && file_exists(FF_DISK_PATH . $this->jquery_ui_force_theme . "/" . $css_value["file"]))
                             $this->tplAddCss($css_key, $css_value["file"], $this->jquery_ui_force_theme);
 						elseif($this->jquery_ui_force_theme !== null && file_exists(FF_DISK_PATH . FF_THEME_DIR ."/library/" . $css_key . "/themes/" . $this->jquery_ui_force_theme . "/" . $css_value["file"]))
 							$this->tplAddCss($css_key, $css_value["file"], FF_THEME_DIR . "/library/" . $css_key . "/themes/" . $this->jquery_ui_force_theme);
