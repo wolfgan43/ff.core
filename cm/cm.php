@@ -420,6 +420,7 @@ class cm extends ffCommon
 		
 		if (CM_ENABLE_MEM_CACHING)
 		{
+			/** @var pointer $ffcache_router_success */
 			$router_rules = $this->cache->get("__cm_router_rules__", $ffcache_router_success);
 			$router_namedrules = $this->cache->get("__cm_router_namedrules__", $ffcache_router_success);
 			if ($ffcache_router_success)
@@ -439,6 +440,7 @@ class cm extends ffCommon
 		
 		if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE)
 		{
+			/** @var pointer $ffcache_cacherouter_success */
 			$router_rules = $this->cache->get("__cm_router_cacherules__", $ffcache_cacherouter_success);
 			$router_namedrules = $this->cache->get("__cm_router_cachenamedrules__", $ffcache_cacherouter_success);
 			if ($ffcache_cacherouter_success)

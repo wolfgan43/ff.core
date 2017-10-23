@@ -30,6 +30,7 @@ if (!defined("CM_SHOWFILES_ENABLE_GZIP"))   define("CM_SHOWFILES_ENABLE_GZIP", f
 if (!defined("CM_SHOWFILES_THUMB_PATH"))	define("CM_SHOWFILES_THUMB_PATH", "_thumb");
 if (!defined("CM_SHOWFILES_THUMB_IN_CACHE"))define("CM_SHOWFILES_THUMB_IN_CACHE", true);
 if (!defined("CM_SHOWFILES_EXTEND"))		define("CM_SHOWFILES_EXTEND", false);
+if (!defined("CM_SHOWFILES_MODULES"))		define("CM_SHOWFILES_MODULES", false); // set it to false when u use .htaccess rewriting
 if (!defined("CM_SHOWFILES_OPTIMIZE"))		define("CM_SHOWFILES_OPTIMIZE", true);
 
 if (!defined("FF_ENABLE_MEM_SHOWFILES_CACHING"))		define("FF_ENABLE_MEM_SHOWFILES_CACHING", false); // set it to false when u don't use .htaccess rewriting

@@ -176,25 +176,17 @@ if (!defined("FF_MAIN_INIT"))
 	define("FF_PHP_EXT", "php");
 
 	// some preprocessing for CPU saving
-	if (__DIR__ !== "__DIR__")
-		define("__FF_DIR__", __DIR__);
-	else
-		define("__FF_DIR__", ffCommon_dirname(__FILE__));
+    define("__FF_DIR__", __DIR__);
 
-    if(!defined("__TOP_DIR__"))
-    {
-        if (isset($_ENV["FF_TOP_DIR"]))
-            define("__TOP_DIR__", $_ENV["FF_TOP_DIR"]);
-        else
-            define("__TOP_DIR__", ffCommon_dirname(__FF_DIR__));
-    }
-	
-	if (isset($_ENV["FF_PROJECT_DIR"]))
-		define("__PRJ_DIR__", $_ENV["FF_PROJECT_DIR"]);
-	else if (isset($_ENV["REDIRECT_FF_PROJECT_DIR"]))
-		define("__PRJ_DIR__", $_ENV["REDIRECT_FF_PROJECT_DIR"]);
-	else
-		define("__PRJ_DIR__", __TOP_DIR__);
+    define("__TOP_DIR__", (getenv("FF_TOP_DIR") && getenv("FF_TOP_DIR") != "1"
+        ? getenv("FF_TOP_DIR")
+        : ffCommon_dirname(__FF_DIR__)
+    ));
+
+    define("__PRJ_DIR__", (getenv("FF_PROJECT_DIR") && getenv("FF_PROJECT_DIR") != "1"
+        ? getenv("FF_PROJECT_DIR")
+        : __TOP_DIR__
+    ));
 
 	// add ff'dirs to include path
 	set_include_path(
@@ -210,18 +202,11 @@ if (!defined("FF_MAIN_INIT"))
 
 	// ..base (all others depends on this one)
 	if (@is_file(__PRJ_DIR__ . "/config." . FF_PHP_EXT))
-		require __PRJ_DIR__ . "/config." . FF_PHP_EXT;
+		require_once __PRJ_DIR__ . "/config." . FF_PHP_EXT;
 	else if (@is_file(__FF_DIR__ . "/config." . FF_PHP_EXT))
 		require __FF_DIR__ . "/config." . FF_PHP_EXT;
 	else
 		die("FORMS FRAMEWORK: config." . FF_PHP_EXT . " file not found. Place it under sources or root directory.");
-
-	// manage charsets
-	if (FF_DEFAULT_CHARSET == "UTF-8")
-	{
-		mb_regex_encoding("UTF-8");
-		mb_internal_encoding("UTF-8"); 
-	}
 
 	// now check presence of server redirect to fix something
 	if (isset($_SERVER["HTTP_HOST"]))
@@ -240,40 +225,51 @@ if (!defined("FF_MAIN_INIT"))
 	}
 	
 	// ..check config
-	/**
-	* @ignore
-	*/
-	if (!defined("FF_ENABLE_MEM_TPL_CACHING"))	define("FF_ENABLE_MEM_TPL_CACHING", false);
-	/**
-	* @ignore
-	*/
-	if (!defined("FF_ENABLE_MEM_PAGE_CACHING")) define("FF_ENABLE_MEM_PAGE_CACHING", false);
-	/**
-	* @ignore
-	*/
-	if (!defined("FF_CACHE_ADAPTER")) define("FF_CACHE_ADAPTER", "apc");
-	/**
-	* @ignore
-	*/
-	if (!defined("FF_UPDIR")) define("FF_UPDIR", "/uploads");
-	/**
-	* @ignore
-	*/
-	if (!defined("FF_DB_INTERFACE")) define("FF_DB_INTERFACE", "mysql"); // mysqli allowed too
-	if (!defined("FF_ORM_ENABLE")) define("FF_ORM_ENABLE", true);
-	if (!defined("FF_PREFIX")) define("FF_PREFIX", "ff_");
-	if (!defined("FF_SUPPORT_PREFIX")) define("FF_SUPPORT_PREFIX", "support_");
+    if(!defined("FF_SYSTEM_LOCALE"))                    define("FF_SYSTEM_LOCALE", "ISO9075"); /* Default Locale */
+    if(!defined("FF_DEFAULT_CHARSET"))                  define("FF_DEFAULT_CHARSET", "UTF-8");  /* Charset Default */
 
-	if (!defined("FF_URLREWRITE_REMOVEHYPENS")) define("FF_URLREWRITE_REMOVEHYPENS", false);
-	
+    // manage charsets
+    if (FF_DEFAULT_CHARSET == "UTF-8")
+    {
+        mb_regex_encoding("UTF-8");
+        mb_internal_encoding("UTF-8");
+    }
+
+	/**
+	* @ignore
+	*/
+	if (!defined("FF_ENABLE_MEM_TPL_CACHING"))	          define("FF_ENABLE_MEM_TPL_CACHING", false);
+	/**
+	* @ignore
+	*/
+	if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_CACHING", false);
+	/**
+	* @ignore
+	*/
+	if (!defined("FF_CACHE_ADAPTER"))                   define("FF_CACHE_ADAPTER", "apc");
+	/**
+	* @ignore
+	*/
+	if (!defined("FF_UPDIR"))                           define("FF_UPDIR", "/uploads");
+	/**
+	* @ignore
+	*/
+	if (!defined("FF_DB_INTERFACE"))                    define("FF_DB_INTERFACE", "mysql"); // mysqli allowed too
+	if (!defined("FF_ORM_ENABLE"))                      define("FF_ORM_ENABLE", true);
+	if (!defined("FF_PREFIX"))                          define("FF_PREFIX", "ff_");
+	if (!defined("FF_SUPPORT_PREFIX"))                  define("FF_SUPPORT_PREFIX", "support_");
+
+    if (!defined("FF_ERRORS_MAXRECURSION"))             define("FF_ERRORS_MAXRECURSION", NULL);
+    if (!defined("FF_URLREWRITE_REMOVEHYPENS"))         define("FF_URLREWRITE_REMOVEHYPENS", false);
+
 	// Error Handling, loaded now cause need configuration
 	require(__FF_DIR__ . "/error_handling." . FF_PHP_EXT);
 
 	// Theme Management
 	// define base theme(s) location
-	if (!defined("FF_THEME_DIR"))			define ("FF_THEME_DIR", 	"/themes");
-	if (!defined("FF_THEME_DISK_PATH")) 	define ("FF_THEME_DISK_PATH", 	__TOP_DIR__ . FF_THEME_DIR);
-	if (!defined("FF_THEME_SITE_PATH")) 	define ("FF_THEME_SITE_PATH", 	FF_SITE_PATH . FF_THEME_DIR);
+	if (!defined("FF_THEME_DIR"))			            define ("FF_THEME_DIR", 	"/themes");
+	if (!defined("FF_THEME_DISK_PATH")) 	            define ("FF_THEME_DISK_PATH", 	__TOP_DIR__ . FF_THEME_DIR);
+	if (!defined("FF_THEME_SITE_PATH")) 	            define ("FF_THEME_SITE_PATH", 	FF_SITE_PATH . FF_THEME_DIR);
 
 	if (defined("FF_DEFAULT_THEME"))
 	{

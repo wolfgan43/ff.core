@@ -2028,32 +2028,40 @@ $ffMimeTypes = array(
     , "json" => "application/json"
 );
 
-if (!function_exists("http_response_code"))
+function ffCommon_crossDomains($trustDomains, $add_header = false, $domain = null)
 {
-	if (!function_exists("http_response_code"))
-	{
-		function http_response_code($code = null)
-		{
-			//ffErrorHandler::raise("asd", E_USER_ERROR, null, get_defined_vars());
-			//$globals = ffGlobals::getInstance("__http__");
-			if ($code !== null)
-			{
-				$_GLOBALS["http_response_code"] = $code;
-				header(ffGetHTTPStatus($code));
+	if($_SERVER["SERVER_ADDR"] == $_SERVER["REMOTE_ADDR"])
+		return true;
+
+	//if ($_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest") {
+	if (!$domain) {
+		$arrDomain = parse_url($_SERVER["HTTP_REFERER"]);
+		$domain = $arrDomain["host"];
+	}
+
+
+	foreach ($trustDomains AS $trustDomain) {
+		if (strpos($domain, $trustDomain) !== false) {
+			if ($add_header) {
+				header('Access-Control-Allow-Origin: *');
+				header('Access-Control-Allow-Methods: GET, POST');
 			}
-			else
-			{
-				$code = (isset($_GLOBALS["http_response_code"]) ? $_GLOBALS["http_response_code"] : 200);
-			}
-			return $code;
+			return true;
 		}
 	}
-	// TOCHECK, probabilmente utilizzata da altre funzioni, per cui non utilizzabile con static
-	/*function http_response_code($code = null)
+	//}
+
+	if($add_header) {
+		http_response_code(405);
+	}
+}
+
+if (!function_exists("http_response_code"))
+{
+	function http_response_code($code = null)
 	{
 		static $code_sent = null;
 		//ffErrorHandler::raise("asd", E_USER_ERROR, null, get_defined_vars());
-		//$globals = ffGlobals::getInstance("__http__");
 		if ($code !== null)
 		{
 			$code_sent = $code;
@@ -2064,7 +2072,7 @@ if (!function_exists("http_response_code"))
 			$code = ($code_sent ? $code_sent : 200);
 		}
 		return $code;
-	}*/
+	}
 }
 
 /**

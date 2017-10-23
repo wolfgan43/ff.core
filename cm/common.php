@@ -17,6 +17,13 @@ $globals_cm->field_layout_priority = array(
 	, array(new ffData(cm::LAYOUT_PRIORITY_FINAL, "Number"), new ffData(ffTemplate::_get_word_by_code("cm::LAYOUT_PRIORITY_FINAL")))
 );
 
+function cm_getModulesExternalPath()
+{
+    if (CM_SHOWFILES_MODULES)
+        return CM_SHOWFILES . CM_MODULES_PATH;
+    else
+        return CM_MODULES_PATH;
+}
 function cm_getAppName()
 {
 	if (defined("CM_USER_LOCAL_APP_NAME"))

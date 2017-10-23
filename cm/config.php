@@ -15,4 +15,4 @@ define("CM_MODULES_ROOT", __TOP_DIR__ . CM_MODULES_PATH);
 
 define("CM_CONTENT_ROOT",  __PRJ_DIR__ . "/contents");
 
-define("CM_SHOWFILES", "/cm/showfiles." . FF_PHP_EXT);
+if(!defined("CM_SHOWFILES")) define("CM_SHOWFILES", "/cm/showfiles." . FF_PHP_EXT);
