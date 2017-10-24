@@ -54,7 +54,10 @@ String.prototype.rtrim = function (c) {
 	else
 		return this.replace(new RegExp(c.escapeRegExp() + "*$", "g"), "");
 }
-
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
 String.prototype.parseUri = function() {
 		// parseUri 1.2.2
 		// (c) Steven Levithan <stevenlevithan.com>
