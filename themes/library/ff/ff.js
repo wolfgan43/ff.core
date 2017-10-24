@@ -72,7 +72,10 @@ String.prototype.capitalize = function() {
 String.prototype.escapeRegExp = function() {
     return this.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
-
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
 String.prototype.parseUri = function() {
 		// parseUri 1.2.2
 		// (c) Steven Levithan <stevenlevithan.com>
