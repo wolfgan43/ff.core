@@ -22,31 +22,32 @@ define("FF_TEMPLATE_REGEXP", "/\{([\w\[\]\:\=\-\|\.]+)\}/U");
 
 class ffTemplate 
 {
-	var $root_element			= "main";
+	var $root_element						= "main";
 	
-	var $BeginTag				= "Begin";
-	var $EndTag					= "End";
+	var $BeginTag							= "Begin";
+	var $EndTag								= "End";
 	
-	var $debug_msg				= false;
-	var $display_unparsed_sect	= false;
+	var $debug_msg							= false;
+	var $display_unparsed_sect				= false;
+	var $doublevar_to_commenthtml 			= true;
 	
-	var $DBlocks = array();			// initial data: files and blocks
-	var $ParsedBlocks = array();		// result data and variables
-	var $DVars = array();
-	var $DBlockVars = array();
+	var $DBlocks 							= array();			// initial data: files and blocks
+	var $ParsedBlocks 						= array();		// result data and variables
+	var $DVars 								= array();
+	var $DBlockVars 						= array();
 
 	var $template_root;
 	var $sTemplate;
 
-	var $minify						= false; /* can be: false, strip, strong_strip, minify
+	var $minify								= false; /* can be: false, strip, strong_strip, minify
 	 											 NB: minify require /library/minify (set CM_CSSCACHE_MINIFIER and CM_JSCACHE_MINIFIER too) */
-	var $compress					= false;
+	var $compress							= false;
 	
 	// FF enabled settings (u must have FF and use ::factory()
-	var $force_mb_encoding			= "UTF-8"; // false or UTF-8 (require FF)
+	var $force_mb_encoding					= "UTF-8"; // false or UTF-8 (require FF)
 
-	public 	$events 				= null;
-	static protected $_events		= null;
+	public 	$events 						= null;
+	static protected $_events				= null;
 
 	// MultiLang SETTINGS
 	var $MultiLang							= true; // enable support (require class ffDB_Sql)
@@ -77,7 +78,7 @@ class ffTemplate
     static $_MultiLang_Insert_code_empty    = false;
 	
 	// PRIVATES
-	private $useFormsFramework		= false;
+	private $useFormsFramework				= false;
 	
 	// COMMON CHECKS
  	public function __set ($name, $value)
@@ -255,6 +256,10 @@ class ffTemplate
 	function getDVars()
 	{
 		$matches = array();
+
+		if($this->doublevar_to_commenthtml)
+			$this->DBlocks[$this->root_element]	= str_replace(array("{{", "}}"), array("<!--", "-->"), $this->DBlocks[$this->root_element]);
+
 		$rc = preg_match_all (FF_TEMPLATE_REGEXP, $this->DBlocks[$this->root_element], $matches);
 		if ($rc)
 			$this->DVars = array_flip($matches[1]);

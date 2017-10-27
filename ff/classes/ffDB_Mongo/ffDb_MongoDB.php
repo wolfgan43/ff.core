@@ -473,7 +473,7 @@ class ffDB_MongoDB
                 {
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->insert($mongoDB["insert"]);
-                    $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
                 }
                 break;
             case "update":
@@ -490,7 +490,7 @@ class ffDB_MongoDB
                     
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->update($mongoDB["where"], $mongoDB["set"], $mongoDB["options"]);
-                    $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);                
+                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
                 }
                 break;
             case "delete":
@@ -506,7 +506,7 @@ class ffDB_MongoDB
 
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->delete($mongoDB["where"], $mongoDB["options"]);
-                    $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
                 }
                 break;
             case "select":
@@ -712,19 +712,19 @@ class ffDB_MongoDB
                         //$bulk->insert(ARRAY_DI_VALORI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->insert($query);
-                        $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
                         break;
                     case "update":
                         //$bulk->update(CONDIZIONE, array('$set' => ARRAY_DI_VALORI), OPZIONI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->update($query);
-                        $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
                         break;
                     case "delete":
                         //$bulk->delete(CONDIZIONE, OPZIONI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->delete($query);
-                        $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
                         break;
                     case "select":
                     case "";

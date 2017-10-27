@@ -2912,8 +2912,8 @@ function modsec_getOauth2Server()
 	if (ffIsset($_REQUEST, "__OAUTH2DEBUG__"))
 	{
 		$parts = explode("/", $_SERVER["REQUEST_URI"]);
-		@mkdir(FF_DISK_PATH . "/cache/oauth2", 0777, true);
-		$fp = fopen(FF_DISK_PATH . "/cache/oauth2/" . end($parts) . "_" . uniqid(), "w+");
+		@mkdir(CM_CACHE_PATH . "/oauth2", 0777, true);
+		$fp = fopen(CM_CACHE_PATH . "/oauth2/" . end($parts) . "_" . uniqid(), "w+");
 		fwrite($fp, print_r($_REQUEST, true));
 		fclose($fp);
 	}

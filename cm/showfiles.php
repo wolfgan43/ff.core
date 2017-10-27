@@ -372,7 +372,7 @@ if(CM_SHOWFILES_FORCE_PATH && strlen($path_info) && !strlen($filepath))
 	        }
 
 			$file = pathinfo($filepath);
-			$file_name = ffCommon_url_rewrite($file["filename"]);
+			$file_name = $file["filename"]; //ffCommon_url_rewrite($file["filename"]);
 
 	        $final_file = cm_showfilesGetThumbPath(substr(ffCommon_dirname($filepath), strlen($base_path)), $base_path) . "/" . $file_name
 	        . ($mode_format ? "-" . $mode_format : "")
@@ -809,7 +809,7 @@ if(!strlen($filepath) && !CM_SHOWFILES_SKIP_DB)
        
 if (!$filepath)
 {
-    $res = $ff->showfiles_events->doEvent("on_warning", array($mode));
+    $res = $ff->showfiles_events->doEvent("on_warning", array($path_info, $_SERVER["HTTP_REFERER"], $mode));
     $last_res = end($res);
     if ($last_res)
     {
@@ -876,7 +876,7 @@ if($filepath && $mode)
 			if($mode_format)
 				$imgParams[$mode]["format"] = $final_ext;
 
-            $final_file = cm_showfilesGetThumbPath(substr(ffCommon_dirname($filepath), strlen($base_path)), $base_path) . "/" . ffCommon_url_rewrite(ffGetFilename($filepath))
+            $final_file = cm_showfilesGetThumbPath(substr(ffCommon_dirname($filepath), strlen($base_path)), $base_path) . "/" . ffGetFilename($filepath) // ffCommon_url_rewrite(ffGetFilename($filepath))
 							. ($mode_format ? "-" . $mode_format : "")
                             . "-" . $mode
                             . $str_wmk_file 
@@ -1151,7 +1151,7 @@ function make_image($source_file, $final_file, $params, $extend = false, $wmk = 
 function cm_showfilesGetThumbPath ($path, $base_path = null)
 {
     if(CM_SHOWFILES_THUMB_IN_CACHE)
-        return FF_DISK_PATH . "/cache/" . CM_SHOWFILES_THUMB_PATH . $path;
+        return CM_CACHE_PATH . "/" . CM_SHOWFILES_THUMB_PATH . $path;
     else
         return $base_path . $path . "/" . CM_SHOWFILES_THUMB_PATH;
 }
