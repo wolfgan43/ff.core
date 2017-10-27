@@ -21,7 +21,7 @@ if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
 if (!$ffcache_libs_success)
 {
 	// PHP VERSION
-	$cache_file = FF_DISK_PATH . "/cache/libs.php";
+	$cache_file = CM_CACHE_PATH . "/libs.php";
 	if (FF_THEME_RESTRICTED_LIBS_CACHE && file_exists($cache_file))
 	{
 		$glob_libs->libs = include($cache_file);
@@ -33,7 +33,7 @@ if (!$ffcache_libs_success)
 
 		if (FF_THEME_RESTRICTED_LIBS_CACHE && !file_exists($cache_file))
 		{
-			@mkdir(FF_DISK_PATH . "/cache", 0777, true);
+			@mkdir(CM_CACHE_PATH, 0777, true);
 			$tmp_libs_var = var_export($glob_libs->libs, true);
 			file_put_contents($cache_file, "<?php\n\nreturn $tmp_libs_var;\n\n");
 		}
@@ -46,10 +46,10 @@ if (!$ffcache_libs_success)
 	
 	// JSON VERSION
 	/*
-	$cache_file = FF_DISK_PATH . "/cache/libs.cache";
+	$cache_file = CM_CACHE_PATH . "/libs.cache";
 	if (FF_THEME_RESTRICTED_LIBS_CACHE && file_exists($cache_file))
 	{
-		$glob_libs->libs = json_decode(file_get_contents(FF_DISK_PATH . "/cache/libs.cache"), true);
+		$glob_libs->libs = json_decode(file_get_contents(CM_CACHE_PATH . "/libs.cache"), true);
 	}
 	else
 	{
@@ -59,7 +59,7 @@ if (!$ffcache_libs_success)
 
 		if (FF_THEME_RESTRICTED_LIBS_CACHE && !file_exists($cache_file))
 		{
-			@mkdir(FF_DISK_PATH . "/cache", 0777, true);
+			@mkdir(CM_CACHE_PATH, 0777, true);
 			file_put_contents($cache_file, json_encode($glob_libs->libs));
 		}
 		

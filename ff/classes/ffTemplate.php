@@ -29,6 +29,7 @@ class ffTemplate
 	
 	var $debug_msg				= false;
 	var $display_unparsed_sect	= false;
+	var $doublevar_to_commenthtml 			= true;
 	
 	var $DBlocks = array();			// initial data: files and blocks
 	var $ParsedBlocks = array();		// result data and variables
@@ -255,6 +256,10 @@ class ffTemplate
 	function getDVars()
 	{
 		$matches = array();
+
+		if($this->doublevar_to_commenthtml)
+			$this->DBlocks[$this->root_element]	= str_replace(array("{{", "}}"), array("<!--", "-->"), $this->DBlocks[$this->root_element]);
+
 		$rc = preg_match_all (FF_TEMPLATE_REGEXP, $this->DBlocks[$this->root_element], $matches);
 		if ($rc)
 			$this->DVars = array_flip($matches[1]);

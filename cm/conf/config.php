@@ -44,7 +44,7 @@ if (!defined("CM_CACHE_CSS_INLINE_TO_STYLE"))   	define("CM_CACHE_CSS_INLINE_TO_
 if (!defined("CM_CACHE_STORAGE_SAVING_MODE"))   	define("CM_CACHE_STORAGE_SAVING_MODE", false);
 
 if (!defined("CM_PAGECACHE"))					define("CM_PAGECACHE", false);
-if (!defined("CM_PAGECACHE_DIR"))				define("CM_PAGECACHE_DIR", FF_DISK_PATH . "/cache/contents");
+if (!defined("CM_PAGECACHE_DIR"))				define("CM_PAGECACHE_DIR", CM_CACHE_PATH . "/contents");
 if (!defined("CM_PAGECACHE_GROUPHASH"))			define("CM_PAGECACHE_GROUPHASH", false); // based on path
 if (!defined("CM_PAGECACHE_GROUPHASH_STRIPPATH"))		define("CM_PAGECACHE_GROUPHASH_STRIPPATH", false);
 if (!defined("CM_PAGECACHE_HASHSPLIT"))			define("CM_PAGECACHE_HASHSPLIT", 10);
@@ -72,7 +72,7 @@ if (!defined("CM_PAGECACHE_AVOIDPATTERN"))		define("CM_PAGECACHE_AVOIDPATTERN", 
 
 if (!defined("CM_CSSCACHE_MINIFIER"))			define("CM_CSSCACHE_MINIFIER", "minify"); // this setting require files too into /library. can be: minify_css, cssmin, minify, gminify
 if (!defined("CM_CSSCACHE_SHOWPATH"))			define("CM_CSSCACHE_SHOWPATH", FF_SITE_PATH . CM_SHOWFILES);
-if (!defined("CM_CSSCACHE_DIR"))				define("CM_CSSCACHE_DIR", FF_DISK_PATH . "/cache/css");
+if (!defined("CM_CSSCACHE_DIR"))				define("CM_CSSCACHE_DIR", CM_CACHE_PATH . "/css");
 if (!defined("CM_CSSCACHE_GROUPHASH"))			define("CM_CSSCACHE_GROUPHASH", false);
 if (!defined("CM_CSSCACHE_HASHSPLIT"))			define("CM_CSSCACHE_HASHSPLIT", 10);
 if (!defined("CM_CSSCACHE_GROUPDIRS"))			define("CM_CSSCACHE_GROUPDIRS", false);
@@ -90,7 +90,7 @@ if (!defined("CM_CSSCACHE_DEFERLOADING"))		define("CM_CSSCACHE_DEFERLOADING", fa
 
 if (!defined("CM_JSCACHE_MINIFIER"))			define("CM_JSCACHE_MINIFIER", "jsmin"); // this setting require files too into /library. can be: jsmin, pecl_jsmin (https://github.com/sqmk/pecl-jsmin), minify, gminify
 if (!defined("CM_JSCACHE_SHOWPATH"))			define("CM_JSCACHE_SHOWPATH", FF_SITE_PATH . CM_SHOWFILES);
-if (!defined("CM_JSCACHE_DIR"))					define("CM_JSCACHE_DIR", FF_DISK_PATH . "/cache/js");
+if (!defined("CM_JSCACHE_DIR"))					define("CM_JSCACHE_DIR", CM_CACHE_PATH . "/js");
 if (!defined("CM_JSCACHE_GROUPHASH"))			define("CM_JSCACHE_GROUPHASH", false);
 if (!defined("CM_JSCACHE_HASHSPLIT"))			define("CM_JSCACHE_HASHSPLIT", 10);
 if (!defined("CM_JSCACHE_GROUPDIRS"))			define("CM_JSCACHE_GROUPDIRS", false);

@@ -349,6 +349,10 @@ function ffPage_seo_optimize($oPage)
                         $imgNode->setAttribute("data-src", $imgNodeSrc);
                     }
                 }
+
+				if(strpos($imgNodeSrc, "/") !== 0 && strpos($imgNodeSrc, "http") !== 0)
+					continue;
+
                 if(CM_CACHE_PATH_CONVERT_SHOWFILES) {
                     if($imgNode->hasAttribute("srcset") && strlen($imgNode->getAttribute("srcset")))
                     {
@@ -594,13 +598,19 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
             $imageOrig["url"] = "/" . implode("/", $imageOrig["path"]);
             $imageOrig["dirname"] = ffCommon_dirname($imageOrig["url"]);
 
-            if(strpos($imageOrig["mode"], "-png") == strlen($imageOrig["mode"]) - 4) {
-                $imageOrig["ext"] = "png";
-                $imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"], 0, -4);
-            } elseif(strpos($imageOrig["mode"], "-jpg") == strlen($imageOrig["mode"]) - 4) {
-                $imageOrig["ext"] = "jpg";
-                $imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"],0 , -4);
-            }
+			if(strpos($imageOrig["mode"], "-png") === strlen($imageOrig["mode"]) - 4) {
+				$imageOrig["ext"] = "png";
+				$imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"], 0, -4);
+			} elseif(strpos($imageOrig["mode"], "-jpg") === strlen($imageOrig["mode"]) - 4) {
+				$imageOrig["ext"] = "jpg";
+				$imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"],0 , -4);
+			} elseif(strpos($imageOrig["mode"], "-svg") === strlen($imageOrig["mode"]) - 4) {
+				$imageOrig["ext"] = "svg";
+				$imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"],0 , -4);
+			} elseif(strpos($imageOrig["mode"], "-jpeg") === strlen($imageOrig["mode"]) - 5) {
+				$imageOrig["ext"] = "jpeg";
+				$imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"],0 , -5);
+			}
 
             $imageOrig["basename"] = ($imageOrig["ext"]
                 ? ffGetFilename($imageOrig["url"]) . "." . $imageOrig["ext"]
@@ -1012,7 +1022,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             case "minify": // medium
                                 if (!class_exists("CSSmin"))
                                     require(__TOP_DIR__ . "/library/minify/min/lib/CSSmin.php");
-                                $str_css_buffer = CSSmin::minify($str_css_buffer);
+                                $str_css_buffer = CSSmin::_minify($str_css_buffer);
                                 break;
 
                             case "yui": // strong

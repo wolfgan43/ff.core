@@ -10,6 +10,7 @@
 
 define("CM_ROOT", ffCommon_dirname(__FILE__));
 
+if(!defined("CM_CACHE_PATH")) define("CM_CACHE_PATH", FF_DISK_PATH . "/cache");
 define("CM_MODULES_PATH", "/modules");
 define("CM_MODULES_ROOT", __TOP_DIR__ . CM_MODULES_PATH);
 
