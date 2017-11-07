@@ -916,13 +916,14 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                                 {
                                     if(isset($tmp_css_link_replaced[$tmp_css_url_value]))
                                         continue;
-
+                                    
                                     if(substr($tmp_css_url_value, 0, 1) != "/"
                                         && (substr(strtolower($tmp_css_url_value), 0, 7) != "http://"
                                             && substr(strtolower($tmp_css_url_value), 0, 8) != "https://"
                                             && substr($tmp_css_url_value, 0, 2) != "//")
                                     ) {
                                         $arrBufferPath = parse_url(ffcommon_dirname($css_buffer_value["path"]) . "/" . $tmp_css_url_value);
+                                       // echo "<pre>"; print_r($arrBufferPath); 
                                         if(substr(strtolower($css_buffer_value["path"]), 0, 7) == "http://"
                                             || substr(strtolower($css_buffer_value["path"]), 0, 8) == "https://"
                                             || substr($css_buffer_value["path"], 0, 2) == "//"
@@ -930,11 +931,14 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                                             $relative_buffer_path = cm_canonicalize($arrBufferPath["scheme"] . "://" . $arrBufferPath["host"] . $arrBufferPath["path"])
                                                 . (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
                                                 . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
-                                        else
+                                        else {
                                             $relative_buffer_path = substr(realpath($arrBufferPath["path"]), strlen(FF_DISK_PATH))
                                                 . (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
                                                 . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
-
+                                            
+                                                $relative_buffer_path = str_replace("\\.rep\\ff" , "", $relative_buffer_path); // @CarmineRumma
+                                                //die($relative_buffer_path);
+                                        }
                                         if(strpos($relative_buffer_path, FF_THEME_DIR) === 0)
                                         {
                                             if(file_exists(FF_DISK_PATH . FF_THEME_DIR . "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")))))
@@ -975,7 +979,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             }
                         }
                     }
-
+                  
                     if($cm->layout_vars["compact_css"] == 2)
                     {
                         //$before = microtime();
@@ -995,7 +999,10 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             case "minify": // medium
                                 if (!class_exists("CSSmin"))
                                     require(FF_DISK_PATH . "/library/minify/min/lib/CSSmin.php");
-                                $str_css_buffer = CSSmin::minify($str_css_buffer);
+                                    
+                                //$str_css_buffer = CSSmin::minify($str_css_buffer);
+                                
+                                
                                 break;
 
                             case "gminify": // strong
@@ -1150,7 +1157,6 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
             }
         }
     }
-
     // ********************************************
     //  JS MINIFY / COMPRESSION
     if($cm->layout_vars["compact_js"])
@@ -1512,6 +1518,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
             $oPage->tpl[0]->parse("SectJSDefer", false);
         }
     }
+ 
 }
 
 /*
