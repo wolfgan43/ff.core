@@ -310,6 +310,11 @@ class ffGrid_html extends ffGrid_base
      */
     var $display_edit_bt        = false;        // display edit record button
     /**
+     * Target dell'editing sulla griglia
+     * @var Boolean
+     */
+    var $record_target = false;
+	/**
      * Se visualizzare il pulsante di cancellazione sulla griglia
      * @var Boolean
      */
@@ -1594,6 +1599,8 @@ class ffGrid_html extends ffGrid_base
                     	$row_class["editable"] = "clickable";
                     	if($this->full_ajax || $this->ajax_edit) 
                     		$row_class["editable"] .= " ajax";
+						if($this->record_target == true) 
+                    		$row_properties["data-target"] = "_blank";
 
                     	$row_properties["data-url"] = ffCommon_specialchars($modify_url["default"]);
                     } else 
