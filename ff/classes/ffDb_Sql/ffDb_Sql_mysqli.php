@@ -22,7 +22,7 @@ if (FF_DB_MYSQLI_SHUTDOWNCLEAN)
 }
  
 /**
- * ffDB_Sql Ã¨ la classe preposta alla gestione della connessione con database di tipo SQL
+ * ffDB_Sql ÃƒÂ¨ la classe preposta alla gestione della connessione con database di tipo SQL
  * 
  * @package FormsFramework
  * @subpackage utils
@@ -290,11 +290,13 @@ class ffDB_Sql
 			$tmp_pwd = FF_DATABASE_PASSWORD;
 		else
 			$tmp_pwd = $this->password;
-		
+
 		if ($Database !== null)
-			$this->database = $Database;
+			$tmp_database = $Database;
 		else if ($this->database === null)
-			$this->database = FF_DATABASE_NAME;
+			$tmp_database = FF_DATABASE_NAME;
+		else
+			$tmp_database = $this->database;
 
 		$do_connect = true;
 		
@@ -302,7 +304,7 @@ class ffDB_Sql
 		if (is_object($this->link_id))
 		{
 			if (
-					($this->host !== $tmp_host || $this->user !== $tmp_user || $this->password !== $tmp_pwd)
+					($this->host !== $tmp_host || $this->user !== $tmp_user || $this->database !== $tmp_database)
 					|| $force
 				)
 			{
@@ -316,17 +318,18 @@ class ffDB_Sql
 		$this->host = $tmp_host;
 		$this->user = $tmp_user;
 		$this->password = $tmp_pwd;
+		$this->database = $tmp_database;
 		
 		if (static::$_sharelink && !$force)
 		{
-			$dbkey = $this->host . "|" . $this->user . "|" . $this->password;
+			$dbkey = $this->host . "|" . $this->user . "|" . $this->database;
 			if (is_array(static::$_dbs) && array_key_exists($dbkey, static::$_dbs))
 			{
 				$this->link_id =& static::$_dbs[$dbkey];
 				$do_connect = false;
 			}
 		}
-			
+
 		if ($do_connect)
 		{
 			if (!$this->avoid_real_connect)
@@ -353,7 +356,7 @@ class ffDB_Sql
 					$this->link_id = @mysqli_connect("p:" . $this->host, $this->user, $this->password, $this->database);
 				else
 					$this->link_id = @mysqli_connect($this->host, $this->user, $this->password, $this->database);
-				
+
 				$rc = is_object($this->link_id);
 			}
 
@@ -404,7 +407,7 @@ class ffDB_Sql
 				if ($this->errno == 2006 /* gone away */ && !$this->reconnect_tryed)
 				{
 					$this->reconnect_tryed = true;
-					return $this->connect(null, null, null, null, true); // connect chiamerÃ  da sola selectDb
+					return $this->connect(null, null, null, null, true); // connect chiamerÃƒÂ  da sola selectDb
 				}
 			}
 			if ($this->halt_on_connect_error)
@@ -505,16 +508,24 @@ class ffDB_Sql
 		
 		return $last_ret;
 	}
-	
-	function getRecordset()
+
+	/**
+	 * @param StdClass|Object|null $obj
+	 * @return array|bool|null|object
+	 */
+	function getRecordset($obj = null)
 	{
 		if (!$this->query_id)
 		{
 			$this->errorHandler("eachAll called with no query pending");
 			return false;
 		}
+		if ($obj != null) {
+			$res = @mysqli_fetch_object($this->query_id, $obj);
+		} else {
+			$res = @mysqli_fetch_all($this->query_id, MYSQLI_ASSOC);
+		}
 
-		$res = @mysqli_fetch_all($this->query_id, MYSQLI_ASSOC);
 		if ($res === null && $this->checkError())
 		{
 			$this->errorHandler("fetch_assoc_error");
@@ -611,10 +622,10 @@ class ffDB_Sql
 
 	/* function lookup($tabella, $chiave, $valorechiave = null, $defaultvalue = null, $nomecampo = null, $tiporestituito = "Text", $bReturnPlain = false)
 
-		recupera un valore sulla base del match di una o piÃ¹ chiavi in una tabella.
+		recupera un valore sulla base del match di una o piÃƒÂ¹ chiavi in una tabella.
 		i valori possono indifferentemente essere specificati sotto forma di ffData o plain values
 
-		chiave puÃ² essere:
+		chiave puÃƒÂ² essere:
 			$chiave = array(
 								"nomecampo" => "valore"
 								[, ...]
@@ -624,7 +635,7 @@ class ffDB_Sql
 			$value = "valore"
 
 
-		nomecampo puÃ² essere:
+		nomecampo puÃƒÂ² essere:
 			$nomecampo = "nomecampo"
 
 		oppure:
@@ -632,8 +643,8 @@ class ffDB_Sql
 					"nomecampo" => "tipodato"
 				)
 
-		il valore restituito rispetterÃ  il formato di "nomecampo".
-		nel caso in cui "nomecampo" sia un array, $tiporestituito verrÃ  ignorato.
+		il valore restituito rispetterÃƒÂ  il formato di "nomecampo".
+		nel caso in cui "nomecampo" sia un array, $tiporestituito verrÃƒÂ  ignorato.
 
 		NB.: Si ricorda che, se non si utilizza Forms Framework, i tipi accettati sono solo "Number" e "Text"
 	*/
@@ -745,7 +756,7 @@ class ffDB_Sql
 	 * Sposta il puntatore al DB al record successivo (va chiamato almeno una volta)
 	 * @return boolean
 	 */
-	function nextRecord($obj = null)
+	function nextRecord()
 	{
 		if (!$this->query_id)
 		{
@@ -757,14 +768,7 @@ class ffDB_Sql
 		if ($this->row == ($this->numRows() - 1))
 			return false;
 
-		if ($obj != null) {
-            $this->record = @mysqli_fetch_object($this->query_id, $obj);
-            $this->row += 1;
-            return $this->record;
-            //dd($this->record);
-        } else {
-            $this->record = @mysqli_fetch_assoc($this->query_id);
-        }
+		$this->record = @mysqli_fetch_assoc($this->query_id);
 
 		/*if ($this->checkError())
 		{
@@ -899,11 +903,11 @@ class ffDB_Sql
 	/* ----------------------------------------
 	    FUNZIONI PER LA GESTIONE DEI RISULTATI
 
-	    Ogni volta che verrÃ  restituito un valore da una query il tipo di valore dipenderÃ 
+	    Ogni volta che verrÃƒÂ  restituito un valore da una query il tipo di valore dipenderÃƒÂ 
 	    dal settaggio globale della classe "useFormsFramework".
 
-	    Nel caso sia abilitato, verrÃ  restituito un oggetto di tipo ffData, nel caso
-	    sia disabilitato verrÃ  restituito un plain value.
+	    Nel caso sia abilitato, verrÃƒÂ  restituito un oggetto di tipo ffData, nel caso
+	    sia disabilitato verrÃƒÂ  restituito un plain value.
 	    E' possibile forzare la restituzione di un plain value usando il parametro $bReturnPlain.
 
 	    Nel caso in cui non si utilizzi Forms Framework, i data_type accettati saranno solo
@@ -972,7 +976,7 @@ class ffDB_Sql
 			return new ffData($tmp, $data_type, $this->locale);
 	}
 
-	// PERMETTE DI RECUPERARE IL VALORE DI UN CAMPO SPECIFICO DI UNA RIGA SPECIFICA. NB: Name puÃ² essere anche un indice numerico
+	// PERMETTE DI RECUPERARE IL VALORE DI UN CAMPO SPECIFICO DI UNA RIGA SPECIFICA. NB: Name puÃƒÂ² essere anche un indice numerico
 	function getResult($row, $Name, $data_type = "Text", $bReturnPlain = false)
 	{
 		if (!$this->query_id)
