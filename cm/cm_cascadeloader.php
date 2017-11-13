@@ -937,10 +937,13 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                                                 . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
                                             
                                                 $relative_buffer_path = str_replace("\\.rep\\ff" , "", $relative_buffer_path); // @CarmineRumma
-                                                //die($relative_buffer_path);
+                                                $relative_buffer_path = str_replace("\\.rep\\vgallery" , "", $relative_buffer_path); // @CarmineRumma
+                                               
                                         }
+                                        
                                         if(strpos($relative_buffer_path, FF_THEME_DIR) === 0)
                                         {
+                                            
                                             if(file_exists(FF_DISK_PATH . FF_THEME_DIR . "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")))))
                                             {
                                                 $relative_buffer_path =  "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")));
@@ -979,7 +982,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             }
                         }
                     }
-                  
+
                     if($cm->layout_vars["compact_css"] == 2)
                     {
                         //$before = microtime();
