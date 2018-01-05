@@ -756,7 +756,7 @@ class ffDB_Sql
 	 * Sposta il puntatore al DB al record successivo (va chiamato almeno una volta)
 	 * @return boolean
 	 */
-	function nextRecord()
+	function nextRecord($obj = null)
 	{
 		if (!$this->query_id)
 		{
@@ -768,7 +768,14 @@ class ffDB_Sql
 		if ($this->row == ($this->numRows() - 1))
 			return false;
 
-		$this->record = @mysqli_fetch_assoc($this->query_id);
+		if ($obj != null) {
+			$this->record = @mysqli_fetch_object($this->query_id, $obj);
+			$this->row += 1;
+			return $this->record;
+			//dd($this->record);
+		} else {
+			$this->record = @mysqli_fetch_assoc($this->query_id);
+		}
 
 		/*if ($this->checkError())
 		{

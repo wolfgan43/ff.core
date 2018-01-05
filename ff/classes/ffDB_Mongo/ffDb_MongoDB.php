@@ -70,21 +70,22 @@ class ffDB_MongoDB
 	var $query_id = false;
     var $query_params = array();
 	
-	var $fields			= null;
-	var $fields_names	= null;
+	var $fields						= null;
+	var $fields_names				= null;
 
-	private $num_rows = null;
+	private $num_rows 				= null;
 	private $useFormsFramework		= false;
+	private $keyname				= "_id";
 	public 	$events 				= null;
 	static protected $_events		= null;
 
-	static $_profile = false;
-	static $_objProfile = array();
+	static $_profile 				= false;
+	static $_objProfile 			= array();
 	
-	static $_dbs = array();
-	static $_sharelink = FF_DB_MONGO_SHARELINK;
-	var $buffered_affected_rows = null;
-	var $buffered_insert_id = null;
+	static $_dbs 					= array();
+	static $_sharelink 				= FF_DB_MONGO_SHARELINK;
+
+	private $buffered_insert_id 	= null;
 	
 	// COMMON CHECKS
 	
@@ -227,7 +228,6 @@ class ffDB_MongoDB
 		$this->num_rows                 = null;
 		$this->fields                   = null;
 		$this->fields_names             = null;
-		$this->buffered_affected_rows   = null;
 		$this->buffered_insert_id       = null;
 	}
 
@@ -250,28 +250,28 @@ class ffDB_MongoDB
 		if ($Host !== null)
 			$tmp_host                           = $Host;
 		else if ($this->host === null)
-			$tmp_host                           = FF_DATABASE_HOST;
+			$tmp_host                           = MONGO_DATABASE_HOST;
 		else
 			$tmp_host                           = $this->host;
 
 		if ($User !== null)
 			$tmp_user                           = $User;
 		else if ($this->user === null)
-			$tmp_user                           = FF_DATABASE_USER;
+			$tmp_user                           = MONGO_DATABASE_USER;
 		else
 			$tmp_user                           = $this->user;
 
 		if ($Password !== null)
 			$tmp_pwd                            = $Password;
 		else if ($this->password === null)
-			$tmp_pwd                            = FF_DATABASE_PASSWORD;
+			$tmp_pwd                            = MONGO_DATABASE_PASSWORD;
 		else
 			$tmp_pwd                            = $this->password;
 		
 		if ($Database !== null)
 			$this->database                     = $Database;
 		else if ($this->database === null)
-			$this->database                     = FF_DATABASE_NAME;
+			$this->database                     = MONGO_DATABASE_NAME;
         if ($replica !== null)
             $this->replica                      = $replica;
 
@@ -463,7 +463,10 @@ class ffDB_MongoDB
 
         $this->freeResult();
 		$this->debugMessage($mongoDB["action"] . " = " . print_r($query, true));
-        
+
+		if($mongoDB["where"][$this->keyname])
+			$mongoDB["where"][$this->keyname] = $this->id2object($mongoDB["where"][$this->keyname]);
+
         switch($mongoDB["action"]) {
             case "insert":
                 if(!$mongoDB["table"])
@@ -471,26 +474,42 @@ class ffDB_MongoDB
                 
                 if($mongoDB["table"] && $mongoDB["insert"]) 
                 {
+                	if(!$mongoDB["insert"][$this->keyname])
+                		$mongoDB["insert"][$this->keyname] = $this->createObjectID();
+
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->insert($mongoDB["insert"]);
-                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					@$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+
+					$this->buffered_insert_id = $mongoDB["insert"][$this->keyname];
                 }
                 break;
             case "update":
                 if(!$mongoDB["table"])
                     $mongoDB["table"] = $mongoDB["update"];
 
-                if($mongoDB["table"] && $mongoDB["set"]) 
+                if($mongoDB["table"] && $mongoDB["set"])
                 {
-                    $mongoDB["set"] = array('$set' => $mongoDB["set"]);
+					$set = array();
+					foreach ($mongoDB["set"] AS $key => $value) {
+						if(strpos($key, '$') === 0) {
+							$set[$key] = $value;
+						} else {
+							$set['$set'][$key] = $value;
+						}
+					}
+
                     if(!is_array($mongoDB["where"]))
                         $mongoDB["where"] = array();
-                    if(!is_array($mongoDB["options"]))
-                        $mongoDB["options"] = array();
-                    
-                    $bulk = new MongoDB\Driver\BulkWrite;
-                    $bulk->update($mongoDB["where"], $mongoDB["set"], $mongoDB["options"]);
-                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+
+					$mongoDB["options"]["multi"] = true;
+					//$mongoDB["options"]["upsert"] = true;
+
+					$bulk = new MongoDB\Driver\BulkWrite;
+                    $bulk->update($mongoDB["where"], $set, $mongoDB["options"]);
+					@$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+
+					//$this->buffered_insert_id = null;
                 }
                 break;
             case "delete":
@@ -507,6 +526,8 @@ class ffDB_MongoDB
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->delete($mongoDB["where"], $mongoDB["options"]);
                     @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+
+					//$this->buffered_insert_id = null;
                 }
                 break;
             case "select":
@@ -515,12 +536,6 @@ class ffDB_MongoDB
                 break;
             default;
         }
-
-		if (static::$_sharelink && 0)
-		{
-			$this->buffered_affected_rows = @mysqli_affected_rows($this->link_id);
-			$this->buffered_insert_id = @mysqli_insert_id($this->link_id);
-		}
 
 		return true;
 	}
@@ -582,6 +597,9 @@ class ffDB_MongoDB
         {
             $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
             $res = $cursor->toArray();
+            foreach ($res AS $key => $value) {
+				$res[$key]["_id"] = $res[$key]["_id"]->__toString();
+			}
         }        
         
 		return $res;
@@ -622,7 +640,10 @@ class ffDB_MongoDB
             elseif(!empty($mongoDB["delete"]))
                 $mongoDB["action"] = "delete";
             
-        }        
+        }
+
+		if($mongoDB["where"][$this->keyname])
+			$mongoDB["where"][$this->keyname] = $this->id2object($mongoDB["where"][$this->keyname]);
 
         switch($mongoDB["action"]) {
             case "insert":
@@ -655,7 +676,11 @@ class ffDB_MongoDB
                         $this->query_params["options"]["sort"] = $mongoDB["sort"];
                     if($mongoDB["limit"])
                         $this->query_params["options"]["limit"] = $mongoDB["limit"];
-                    
+
+                    //unset($this->query_params["where"]["uid"]);
+
+                    //print_r($this->query_params["where"]);
+                    //die();
                     $cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
                     if (!$cursor)
                     {
@@ -935,30 +960,9 @@ class ffDB_MongoDB
 
 	// -------------------------
 	//  WRAPPER PER L'API MySQL
-	
-	function affectedRows($only_changed = false)
+	function affectedRows($bReturnPlain = false)
 	{
-		if (!$this->link_id)
-		{
-			$this->errorHandler("affectedRows() called with no DB connection");
-			return false;
-		}
-		
-		
-		/*$info = mysqli_info($this->link_id);
-		list($matched, $changed, $warnings) = sscanf($info, "Rows matched: %d Changed: %d Warnings: %d");
-		
-		if ($only_changed)
-			return $changed;
-		else
-			return $matched;*/
-
-		if (static::$_sharelink)
-		{
-			return $this->buffered_affected_rows;
-		}
-		
-		return @mysqli_affected_rows($this->link_id);
+		return $this->getInsertID($bReturnPlain);
 	}
 
 	/**
@@ -1028,19 +1032,16 @@ class ffDB_MongoDB
 			$this->errorHandler("insert_id() called with no DB connection");
 			return false;
 		}
-		
-		if (static::$_sharelink)
-		{
-			if (!$this->useFormsFramework || $bReturnPlain)
-				return $this->buffered_insert_id;
-			else
-				return new ffData($this->buffered_insert_id, "Number", $this->locale);
-		}
-		
+
+		$id = ($this->buffered_insert_id instanceof \MongoDB\BSON\ObjectID
+			? $this->buffered_insert_id->__toString()
+			: null
+		);
+
 		if (!$this->useFormsFramework || $bReturnPlain)
-			return @mysqli_insert_id($this->link_id);
+			return $id;
 		else
-			return new ffData(@mysqli_insert_id($this->link_id), "Number", $this->locale);
+			return new ffData($id, "Number", $this->locale);
 	}
 
 	/**
@@ -1245,7 +1246,46 @@ class ffDB_MongoDB
 		}
 		return;
 	}
-    
+	function createObjectID()
+	{
+		return new \MongoDB\BSON\ObjectID();
+	}
+	function getObjectID($value)
+	{
+		if ($value instanceof \MongoDB\BSON\ObjectID) {
+			$res = $value;
+		} else {
+			try {
+				$res = new \MongoDB\BSON\ObjectID($value);
+			} catch (\Exception $e) {
+				return false;
+			}
+		}
+		return $res;
+	}
+	function id2object($keys) {
+		if(is_array($keys)) {
+			foreach($keys AS $subkey => $subvalue) {
+				if(is_array($subvalue)) {
+					foreach($subvalue AS $i => $key) {
+						$ID = $this->getObjectID($key);
+						if($ID)
+							$res[$subkey][] = $ID;
+					}
+				} else {
+					$ID = $this->getObjectID($subvalue);
+					if($ID)
+						$res[] = $ID;
+				}
+			}
+		} else {
+			$ID = $this->getObjectID($keys);
+			if($ID)
+				$res = $ID;
+		}
+
+		return $res;
+	}
 	### Handle where
     function equation2mg($exp) {
         # split operator

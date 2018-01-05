@@ -266,6 +266,7 @@ abstract class ffButton_base extends ffCommon
      */
     var $visible				= true;
     var $display				= true;
+	var $display_label			= true;
 
     var $fixed_vars = array();
 

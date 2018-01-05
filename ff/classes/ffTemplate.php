@@ -29,7 +29,7 @@ class ffTemplate
 	
 	var $debug_msg							= false;
 	var $display_unparsed_sect				= false;
-	var $doublevar_to_commenthtml 			= true;
+	var $doublevar_to_commenthtml 			= false;
 	
 	var $DBlocks 							= array();			// initial data: files and blocks
 	var $ParsedBlocks 						= array();		// result data and variables
@@ -168,6 +168,8 @@ class ffTemplate
 		$tmp = new ffTemplate($template_root);
 		$tmp->useFormsFramework = true;
 		$tmp->events = new ffEvents();
+		if(defined("FF_TEMPLATE_ENABLE_TPL_JS"))
+			$tmp->doublevar_to_commenthtml = FF_TEMPLATE_ENABLE_TPL_JS;
 		
 		$res = self::doEvent("on_factory_done", array($tmp));
 
@@ -258,7 +260,7 @@ class ffTemplate
 		$matches = array();
 
 		if($this->doublevar_to_commenthtml)
-			$this->DBlocks[$this->root_element]	= str_replace(array("{{", "}}"), array("<!--", "-->"), $this->DBlocks[$this->root_element]);
+			$this->DBlocks[$this->root_element]	= preg_replace('/\{\{([\w\[\]\:\=\-\|\.]+)\}\}/U', "<!--{\{$1\}\}-->", $this->DBlocks[$this->root_element]);// str_replace(array("{{", "}}"), array("<!--", "-->"), $this->DBlocks[$this->root_element]);
 
 		$rc = preg_match_all (FF_TEMPLATE_REGEXP, $this->DBlocks[$this->root_element], $matches);
 		if ($rc)
