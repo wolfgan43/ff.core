@@ -7,7 +7,7 @@
 					var $table = jQuery(".ffGrid", this);
 
 					jQuery("TR.clickable .ffField:not(.clickable)", $table).bind("click.ff.ffGrid.fullclick", function(e) {
-						if ($table.data("isDragging") || jQuery(e.srcElement).is("a") || jQuery(e.srcElement).closest("a").length) 
+						if ($table.data("isDragging") || jQuery(e.target).is("a") || jQuery(e.target).closest("a").length)
 							return;
 
 						if(jQuery(this).hasClass("custom"))
@@ -19,7 +19,7 @@
 					}).css("cursor", "pointer");
 					
 					jQuery("TR .ffField.clickable", $table).bind("click.ff.ffGrid.fullclick", function(e) {
-						if ($table.data("isDragging") || jQuery(e.srcElement).is("a") || jQuery(e.srcElement).closest("a").length) 
+						if ($table.data("isDragging") || jQuery(e.target).is("a") || jQuery(e.target).closest("a").length)
 							return;
 
 						if(jQuery(this).hasClass("custom"))

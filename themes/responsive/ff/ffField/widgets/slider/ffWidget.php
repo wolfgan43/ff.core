@@ -100,34 +100,7 @@ class ffWidget_slider extends ffCommon
 		$this->tpl[$tpl_id]->set_var("min", $Field->min_val);
 		$this->tpl[$tpl_id]->set_var("max", $Field->max_val);
 		$this->tpl[$tpl_id]->set_var("step", $Field->step);
-/* Remove jquery ui css
-    	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.slider"        => array(
-                      "file" => "jquery.ui.slider.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}		
-*/
 		if(count($Field->desc_label) > 0)
 		{			
 			foreach ($Field->desc_label as $elem)

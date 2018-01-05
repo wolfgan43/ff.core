@@ -24,6 +24,10 @@
             <path>/themes/library/ff</path>
             <file>ffEvents.js</file>
         </ff.ffEvents>
+        <ff.ffPage>
+            <path>/themes/library/ff</path>
+            <file>ffPage.js</file>
+        </ff.ffPage>
     </default_js>
     <default_cdn>
         <jquery>

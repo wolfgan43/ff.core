@@ -131,8 +131,10 @@ class ffButton_html extends ffButton_base
 		$this->tpl[0]->set_var("properties", $this->getProperties());
 
 		$this->tpl[0]->set_var("id", $this->id);
-        
-		$this->tpl[0]->set_var("label", $this->label);
+
+		if($this->display_label)
+			$this->tpl[0]->set_var("label", $this->label);
+
 		if (is_array($this->fixed_vars) && count($this->fixed_vars))
 		{
 			foreach ($this->fixed_vars as $key => $value)

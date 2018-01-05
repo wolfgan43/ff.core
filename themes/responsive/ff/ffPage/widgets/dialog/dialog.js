@@ -143,6 +143,7 @@ unique = null;
         "position"		: params.position,
         "draggable"		: params.draggable,
         "doredirects"	: params.doredirects,
+        "class"	        : params.dialogClass,
 		"need_init"		: false
     });
 
@@ -270,10 +271,10 @@ unique = null;
 		//jQuery("body").css("overflow", "hidden");
 		old_overflow.dialog = id;
 	}
-	
+
 	dialogs.get(id).instance = jQuery('<div id="ffWidget_dialog_container_' + id + '"></div>').dialog({
 		autoOpen: false
-		, dialogClass : "ff-modal-dialog"
+		, dialogClass : "ff-modal-dialog" + (that.dialog_params.get(id).class ? " " + that.dialog_params.get(id).class : "")
 		, resizable: that.dialog_params.get(id).resizable
 		, position: that.dialog_params.get(id).position
 		, modal: false

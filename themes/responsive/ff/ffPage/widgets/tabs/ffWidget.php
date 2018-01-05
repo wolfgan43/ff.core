@@ -58,7 +58,8 @@ class ffWidget_tabs extends ffCommon
 
 		$this->style_path = $style_path;
 
-		if(!$oPage->framework_css["name"])
+		$framework_css = cm_getFrameworkCss();
+		if(!$framework_css["name"])
 			$this->js_deps["jquery.ui"] = null;
 	}
 
@@ -94,6 +95,7 @@ class ffWidget_tabs extends ffCommon
 		if(isset($data["tab_mode"]))
 			$this->tab_mode = $data["tab_mode"];
 
+		$framework_css = cm_getFrameworkCss();
 		if(is_array($data["framework_css"]))
 			$this->framework_css = array_replace_recursive($this->framework_css, $data["framework_css"]);
 
@@ -101,7 +103,7 @@ class ffWidget_tabs extends ffCommon
 		$this->tpl[$tpl_id]->set_var("theme", $oPage->getTheme());
 
 		$this->tpl[$tpl_id]->set_var("component_id", $id);
-		$this->tpl[$tpl_id]->set_var("framework_css_name", $oPage->framework_css["name"]);
+		$this->tpl[$tpl_id]->set_var("framework_css_name", $framework_css["name"]);
 		
 		$this->tpl[$tpl_id]->set_var("SectHeaderTabRow", "");
 		$this->tpl[$tpl_id]->set_var("SectHeaderRowBottom", "");

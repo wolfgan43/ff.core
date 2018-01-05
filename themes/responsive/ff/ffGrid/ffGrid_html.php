@@ -1693,41 +1693,38 @@ class ffGrid_html extends ffGrid_base
 			if($field->control_type != "")
 				$label_properties["label_for"] = $this->id . "_" . $field->id;
 			
-			if(is_array($this->parent[0]->framework_css)) 
+			$label_class = array();
+			if(is_array($field->framework_css))
 			{
-				$label_class = array();
-				if(is_array($field->framework_css))
-				{
-					$arrColumnLabel = $field->framework_css["label"]["col"];
-					$arrColumnControl = $field->framework_css["control"]["col"];
-					
-					$label_class["label"] = cm_getClassByFrameworkCss("label", "form");
-				}
-				
-				if(is_array($arrColumnLabel) && count($arrColumnLabel)
-					&& is_array($arrColumnControl) && count($arrColumnControl)
-				) {
-					$label_class["align"] = cm_getClassByFrameworkCss(array("text-overflow", "text-nowrap"), "util");
-					if($field->framework_css["component"]["type"] == "inline") {
-						$label_align = "right";
-						$control_align = "left";
-					} else {
-						$label_align = "left";
-						$control_align = "right";
-					}
-					$label_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-" . $label_align, "util") . '">';
-					$label_postfix = '</div>';
+				$arrColumnLabel = $field->framework_css["label"]["col"];
+				$arrColumnControl = $field->framework_css["control"]["col"];
 
-					$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . " " . cm_getClassByFrameworkCss("text-nowrap", "util") . " " . cm_getClassByFrameworkCss("align-" . $control_align, "util") . '">';
-					$control_postfix = '</div>';
-					//$type_label = "-inline";
-
-					$label_set = true;
-				}
-				
-				$label_properties["class"] = implode(" ", array_filter($label_class));
+				$label_class["label"] = cm_getClassByFrameworkCss("label", "form");
 			}
-			
+
+			if(is_array($arrColumnLabel) && count($arrColumnLabel)
+				&& is_array($arrColumnControl) && count($arrColumnControl)
+			) {
+				$label_class["align"] = cm_getClassByFrameworkCss(array("text-overflow", "text-nowrap"), "util");
+				if($field->framework_css["component"]["type"] == "inline") {
+					$label_align = "right";
+					$control_align = "left";
+				} else {
+					$label_align = "left";
+					$control_align = "right";
+				}
+				$label_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-" . $label_align, "util") . '">';
+				$label_postfix = '</div>';
+
+				$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . " " . cm_getClassByFrameworkCss("text-nowrap", "util") . " " . cm_getClassByFrameworkCss("align-" . $control_align, "util") . '">';
+				$control_postfix = '</div>';
+				//$type_label = "-inline";
+
+				$label_set = true;
+			}
+
+			$label_properties["class"] = implode(" ", array_filter($label_class));
+
 			$buffer_label = '<label ' . $field->getProperties($label_properties) . ' title="' . $buffer_label_value . '">' . $buffer_label_value . '</label>';
 			$buffer_label_container = $label_prefix . $buffer_label . $label_postfix;
 			
@@ -1762,20 +1759,14 @@ class ffGrid_html extends ffGrid_base
 		$buffer = $buffer_label_container . $buffer_control_container;
 		if($hide_container) {
 			if($label_set) {
-				if(is_array($this->parent[0]->framework_css)) 
-					$tmp_class["grid"] = cm_getClassByFrameworkCss("row", "form");
-				else
-					$tmp_class["grid"] = "row-wrap";
-				
+				$tmp_class["grid"] = cm_getClassByFrameworkCss("row", "form");
+
 				$buffer =  '<div class="' . $tmp_class["grid"] . '">' . $buffer . '</div>';
 			}
 		} else {
 			if($label_set && is_array($field->framework_css["container"]["col"]) && count($field->framework_css["container"]["col"])) {
-				if(is_array($this->parent[0]->framework_css)) 
-					$tmp_class["grid"] = cm_getClassByFrameworkCss("row", "form");
-				else
-					$tmp_class["grid"] = "row-wrap";
-				
+				$tmp_class["grid"] = cm_getClassByFrameworkCss("row", "form");
+
 				$buffer =  '<div class="' . $tmp_class["grid"] . '">' . $buffer . '</div>';
 				
 				if(is_array($field->framework_css["container"]["col"]) 
@@ -1790,7 +1781,7 @@ class ffGrid_html extends ffGrid_base
 					$container_class["grid"] = cm_getClassByFrameworkCss("row", "form");
 				else
 					$container_class["grid"] = "row-wrap";			*/
-			} elseif(is_array($this->parent[0]->framework_css)) {
+			} else {
 				if(is_array($field->framework_css["container"]["col"]) && count($field->framework_css["container"]["col"])) {
 					$container_class["grid"] = cm_getClassByFrameworkCss($field->framework_css["container"]["col"], "col");
 				} elseif($field->framework_css["container"]["row"]) {
@@ -2024,9 +2015,9 @@ class ffGrid_html extends ffGrid_base
 					elseif($params["type"] == "button") {
 						if(isset($this->grid_buttons[$key]))
 							$res = $this->parse_button($this->grid_buttons[$key], $recordset_key, $recordset_count, $modify_url["default"], ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
-						elseif($key == "edit")
+						elseif($key == "edit" && $this->display_edit_bt)
 							$res = $this->parse_button($key, $recordset_key, $recordset_count, $modify_url["default"], ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
-						elseif($key == "delete")
+						elseif($key == "delete" && $this->display_delete_bt)
 							$res = $this->parse_button($key, $recordset_key, $recordset_count, $delete_url, ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
 					}
 					$col_class["cell"] = str_replace("[ID]", $key, $col_class["cell"]);

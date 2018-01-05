@@ -681,10 +681,7 @@ class ffRecord_dialog extends ffRecord_base
 					    $required_symbol = "";
 
 						if(($this->form_fields[$key]->get_control_type() == "checkbox" || $this->form_fields[$key]->get_control_type() == "radio") && $this->form_fields[$key]->widget == "") {
-							$control_var = (is_array($this->parent[0]->framework_css)
-												? cm_getClassByFrameworkCss("control-check-position", "form")
-												: "_pre_label"
-											);
+							$control_var = cm_getClassByFrameworkCss("control-check-position", "form");
 							$is_combine_field = true;
 						}
 					    
@@ -735,44 +732,42 @@ class ffRecord_dialog extends ffRecord_base
 						    */
 						    $this->tpl[0]->set_var("label_for", $this->id . "_" . $key);
 						    
-							if(is_array($this->parent[0]->framework_css)) 
+							$arrColumnLabel = $this->form_fields[$key]->framework_css["label"]["col"];
+							$arrColumnControl = $this->form_fields[$key]->framework_css["control"]["col"];
+							$type_label = "";
+							//if($primary_field == $key)
+							//	$type_label = "inline";
+
+							if(!strlen($control_var))
 							{
-								$arrColumnLabel = $this->form_fields[$key]->framework_css["label"]["col"];
-								$arrColumnControl = $this->form_fields[$key]->framework_css["control"]["col"];
-								$type_label = "";
-								//if($primary_field == $key)
-								//	$type_label = "inline";
+								if(is_array($arrColumnLabel) && count($arrColumnLabel)
+									&& is_array($arrColumnControl) && count($arrColumnControl)
+								) {
+									$this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") /*. " " . cm_getClassByFrameworkCss("align-right", "util") si vede male nei properties extras */. '">');
+									$this->tpl[0]->set_var("label_postfix", '</div>');
 
-								if(!strlen($control_var))
-								{
-									if(is_array($arrColumnLabel) && count($arrColumnLabel)
-										&& is_array($arrColumnControl) && count($arrColumnControl)
-									) {
-									    $this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") /*. " " . cm_getClassByFrameworkCss("align-right", "util") si vede male nei properties extras */. '">');
-									    $this->tpl[0]->set_var("label_postfix", '</div>');
-									
-									    $control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . '">';
-									    $control_postfix = '</div>';
-									  //  $type_label = "inline";
-								    }
+									$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . '">';
+									$control_postfix = '</div>';
+								  //  $type_label = "inline";
 								}
-								
-								//if($this->framework_css["component"]["type"] === null && $type_label)
-								//	$this->framework_css["component"]["type"] = $type_label;
+							}
 
-							    $label_class = cm_getClassByFrameworkCss("label" . $type_label, "form");
-							    if($this->framework_css["component"]["type"] && $is_combine_field) {
-									if($control_var == "_in_label")
-										$label_class .= ($label_class ? " " : "") . cm_getClassByFrameworkCss($arrColumnLabel, "push") . " " . cm_getClassByFrameworkCss($arrColumnControl, "col");
-									else
-										$container_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
-								}
-								
-							    if($label_class)
-								    $this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
+							//if($this->framework_css["component"]["type"] === null && $type_label)
+							//	$this->framework_css["component"]["type"] = $type_label;
+
+							$label_class = cm_getClassByFrameworkCss("label" . $type_label, "form");
+							if($this->framework_css["component"]["type"] && $is_combine_field) {
+								if($control_var == "_in_label")
+									$label_class .= ($label_class ? " " : "") . cm_getClassByFrameworkCss($arrColumnLabel, "push") . " " . cm_getClassByFrameworkCss($arrColumnControl, "col");
 								else
-									$this->tpl[0]->set_var("label_class", "");
-							}							    
+									$container_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
+							}
+
+							if($label_class)
+								$this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
+							else
+								$this->tpl[0]->set_var("label_class", "");
+
 					    } else {
 					    	$control_var = "";
 					    }

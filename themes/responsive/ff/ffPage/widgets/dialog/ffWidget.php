@@ -99,41 +99,9 @@ class ffWidget_dialog extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("addjs", "");
 
-		/* Remove jquery ui css
-     	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.button"        => array(
-                      "file" => "jquery.ui.button.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ),                 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.dialog"        => array(
-                      "file" => "jquery.ui.dialog.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);*/
-
-
-		
 		if ($options["resizable"] === false) {
 			$this->tpl[$tpl_id]->set_var("resizable", "false");
 		} else {
-             /*  Remove jquery ui css
-             	$css_deps["jquery.ui.resizable"] = array(
-                      "file" => "jquery.ui.resizable.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                );*/
 			$this->tpl[$tpl_id]->set_var("resizable", "true");
 		}
 
@@ -259,8 +227,9 @@ class ffWidget_dialog extends ffCommon
 		if ($this->oPage !== NULL) {//code for ff.js 
 			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
 			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("jquery.ui.ckeditor", "jquery.ui.ckeditor.fix.js", FF_THEME_DIR . "/library/jquery.ui");
-			$this->oPage[0]->tplAddJs("ff.ffPage.dialog", "dialog.js", FF_THEME_DIR . "/responsive/ff/ffPage/widgets/dialog"); 
+			//$this->oPage[0]->tplAddJs("jquery.ui.ckeditor", "jquery.ui.ckeditor.fix.js", FF_THEME_DIR . "/library/jquery.ui");
+			$this->oPage[0]->tplAddJs("jquery-ui", "jquery-ui.js", FF_THEME_DIR . "/library/jquery-ui");
+			$this->oPage[0]->tplAddJs("ff.ffPage.dialog", "dialog.js", FF_THEME_DIR . "/responsive/ff/ffPage/widgets/dialog");
 		}			
 
 		if (!isset($this->tpl[$id]))
@@ -282,7 +251,8 @@ class ffWidget_dialog extends ffCommon
 		if ($this->oPage !== NULL) {//code for ff.js 
 			//$this->oPage[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
 			$this->oPage[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("jquery.ui.ckeditor", "jquery.ui.ckeditor.fix.js", FF_THEME_DIR . "/library/jquery.ui");
+			//$this->oPage[0]->tplAddJs("jquery.ui.ckeditor", "jquery.ui.ckeditor.fix.js", FF_THEME_DIR . "/library/jquery.ui");
+			$this->oPage[0]->tplAddJs("jquery-ui", "jquery-ui.js", FF_THEME_DIR . "/library/jquery-ui");
 			$this->oPage[0]->tplAddJs("ff.ffPage.dialog", "dialog.js", FF_THEME_DIR . "/responsive/ff/ffPage/widgets/dialog");
 			
 			//return;

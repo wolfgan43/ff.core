@@ -77,657 +77,7 @@ class ffPage_html extends ffPage_base
                                                             , "minor" => "2"
                                                         )
                                     );
-    var $framework_css_setting        = array(
-                                        "base" => array(
-                                            "params" => array(
-                                                "css" => ""
-                                                , "js" => ""
-                                                , "js_init" => ""
-                                            )
-                                            , "class" => array(
-                                                "container" => "container"
-                                                , "wrap" => "row"
-                                                , "skip-full" => false
-                                                , "row-prefix" => "row"
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "push-"
-                                                , "push-prepend" => ""
-                                                , "pull-append" => "pull-"
-                                                , "pull-prepend" => ""
-                                                , "skip-resolution" => true
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "class-fluid" => array(
-                                                "container" => "container-fluid"
-                                                , "wrap" => "row-fluid clearfix"
-                                                , "skip-full" => false
-                                                , "row-prefix" => ""
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "push-"
-                                                , "push-prepend" => ""
-                                                , "pull-append" => "pull-"
-                                                , "pull-prepend" => ""
-                                                , "skip-resolution" => true
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "resolution" => array()
-                                            , "resolution-media" => array()
-                                            , "button" => array(
-                                                "base"              => "btn"
-                                                , "skip-default"    => false
-                                                , "width"       => array(
-                                                    "full"          => "expand"
-                                                )
-                                                , "size"        => array(
-                                                    "large"         => "large"
-                                                    , "small"       => "small"
-                                                    , "tiny"        => "tiny"
-                                                )
-                                                , "state"       => array(
-                                                    "current"       => "current"
-                                                    , "disabled"    => "disabled"
-                                                )
-                                                , "corner"      => array(
-                                                    "round"         => "round"
-                                                    , "radius"      => "radius"
-                                                )
-                                                , "color"       => array(
-                                                    "default"       => ""
-                                                    , "primary"     => "primary"
-                                                    , "success"     => "success"
-                                                    , "info"        => "info"
-                                                    , "warning"     => "warning"
-                                                    , "danger"      => "danger"
-                                                    , "link"        => "link"
-                                                )                                                
-                                            )                                            
-                                            , "form" => array(
-                                                "component" => ""
-                                                , "component-inline" => ""
-                                                , "row" => "row"
-                                                , "row-padding" => "row padding"
-                                                , "row-full" => "row"
-                                                , "group" => "row-smart"
-                                                , "group-padding" => "row-smart padding"
-                                                , "label" => ""
-                                                , "label-inline" => "inline"
-                                                , "control" => ""
-                                                , "control-exclude" => array()
-                                                , "control-check-position" => "_pre_label"
-                                                , "control-prefix" => "prefix"
-                                                , "control-postfix" => "postfix"
-                                                , "control-feedback" => "postfix-feedback"
-                                                , "wrap-addon" => false
-                                            )
-                                            , "bar" => array(
-                                                "topbar" => "topbar"
-                                                , "navbar" => "navbar"
-                                            )
-                                            , "list" => array( ///classsi bootstrap da convertire
-                                                "group" => "list-group"
-                                                , "item" => "list-group-item"
-                                                , "item-button" => "list-group-item-action"
-                                                , "item-success" => "list-group-item-success"
-                                                , "item-info" => "list-group-item-info"
-                                                , "item-warning" => "list-group-item-warning"
-                                                , "item-danger" => "list-group-item-danger"
-                                                , "badge" => "badge"
-                                                , "current" => "active"
-                                                , "disabled" => "disabled"
-                                            )
-                                            , "callout" => array(
-                                                "default"       => "callout"
-                                                , "primary"     => "callout callout-primary"
-                                                , "success"     => "callout callout-success"
-                                                , "info"        => "callout callout-info"
-                                                , "warning"     => "callout callout-warning"
-                                                , "danger"      => "callout callout-danger"
-                                            )
-                                            
-                                            /*da trovare e gestire:
-                                            show        bs
-                                            radius         fd
-                                            round        fd
-                                            active        bs
-                                            disabled        bs
-                                            img-rounded        bs
-                                            img-circle        bs
-                                            img-thumbnail        bs
-                                            
-                                            text-muted        bs
-                                            text-primary        bs
-                                            text-success        bs
-                                            text-info        bs
-                                            text-warning        bs
-                                            text-danger        bs
-                                            
-                                            bg-primary        bs
-                                            bg-success        bs
-                                            bg-info            bs
-                                            bg-warning        bs
-                                            bg-danger        bs
-                                            
-                                            center-block    bs
-                                            
-                                            clearfix        bs
-                                            invisible        bs
-                                            text-hide        bs
-                                            
-                                                
-                                            */
-                                            , "pagination" => array(
-                                                "align-left" => "text-left"
-                                                , "align-center" => "text-center"
-                                                , "align-right" => "text-right"
-                                                , "pages" => "pagination"
-                                                , "arrows" => "arrow"
-                                                , "current" => "current"
-                                            )
-											, "table" => array(
-												"container" => ""
-												, "compact" => "table-condensed"
-												, "hover" => "table-hover"
-												, "border" => "table-bordered"
-												, "oddeven" => "table-striped"
-											)
-											, "tab" => array(
-												"menu" => "nav-tab"
-												, "menu-vertical" => "nav-tab vertical"
-												, "menu-vertical-right" => "nav-tab vertical right"
-												, "menu-vertical-wrap" => false
-												, "menu-item" => ""
-												, "menu-current" => "current"
-												, "pane" => "tab-content"
-												, "pane-item" => "tab-pane"
-												, "pane-current" => ""
-												, "pane-item-effect" => "tab-pane fade"
-												, "pane-current-effect" => ""
-											)
-											, "util" => array(
-                                                "left" => "left"
-                                                , "right" => "right"
-                                                , "hide" => "hidden"
-                                                , "align-left" => "align-left"
-                                                , "align-center" => "align-center"
-                                                , "align-right" => "align-right"
-                                                , "align-justify" => "align-justify"
-                                                , "text-nowrap" => "text-nowrap"
-                                                , "text-overflow" => "text-overflow"
-                                                , "text-lowercase" => "text-lowercase"
-                                                , "text-uppercase" => "text-uppercase"
-                                                , "text-capitalize" => "text-capitalize"
-                                                , "current" => "current"
-                                                , "equalizer-row" => "data-equalizer"
-                                                , "equalizer-col" => "data-equalizer-watch"
-                                                , "corner-radius" => "radius"
-                                                , "corner-round" => "round"
-                                                , "corner-circle" => "circle"
-                                                , "corner-thumbnail" => "thumbnail"
-                                                , "clear" => "clearfix"
-												, "text-muted"                  => "text-muted"
-								                , "text-primary"                => "text-primary"
-								                , "text-success"                => "text-success"
-								                , "text-info"                   => "text-info"
-								                , "text-warning"                => "text-warning"
-								                , "text-danger"                 => "text-danger"
-								                , "bg-primary"                  => "bg-primary"
-								                , "bg-success"                  => "bg-success"
-								                , "bg-info"                     => "bg-info"
-								                , "bg-warning"                  => "bg-warning"
-								                , "bg-danger"                   => "bg-danger"
-                                            )
-                                            , "data" => array(
-                                                "tab" => array(
-                                                        "menu" => 'data-tab'
-                                                        , "menu-link" => null
-                                                        , "pane" => null
-                                                        , "pane-item" => null
-                                                )
-                                                , "tooltip" => array(
-                                                    "elem" => null
-                                                )
-                                            )                                            
-                                        )
-                                        , "bootstrap" => array(
-                                            "params" => array(
-                                                "css" => "//netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"
-                                                , "js" => "//netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" 
-                                                , "js_init" => ""
-                                            )
-                                            , "class" => array(
-                                                "container" => "container"
-                                                , "wrap" => "container"
-                                                , "skip-full" => false 
-                                                , "row-prefix" => "container"
-                                                , "col-prefix" => ""
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "col-"
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => "col-"
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "class-fluid" => array(
-                                                "container" => "container-fluid"
-                                                , "wrap" => "row"
-                                                , "skip-full" => false
-                                                , "row-prefix" => "row"
-                                                , "col-prefix" => ""
-                                                , "col-append" => "col-"
-                                                , "col-hidden" => "hidden-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => ""
-                                                , "push-append" => "col-"
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => "col-"
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "resolution" => array(
-                                                "xs"
-                                                , "sm"
-                                                , "md"
-                                                , "lg"
-                                            )
-                                            , "resolution-media" => array(
-                                            	"xs" => "(min-width:34em)"
-												, "sm" => "(min-width:48em)"
-												, "md" => "(min-width:62em)"
-												, "lg" => "(min-width:75em)"
-                                            )
-                                            , "button" => array(
-                                                "base"              => "btn"
-                                                , "skip-default"    => true
-                                                , "width"       => array(
-                                                    "full"          => "btn-block"
-                                                )
-                                                , "size"        => array(
-                                                    "large"         => "btn-lg"
-                                                    , "small"       => "btn-sm"
-                                                    , "tiny"        => "btn-xs"
-                                                )
-                                                , "state"       => array(
-                                                    "current"       => "active"
-                                                    , "disabled"    => "disabled"
-                                                )
-                                                , "corner"      => array(
-                                                    "round"         => false
-                                                    , "radius"      => false
-                                                )
-                                                , "color"       => array(
-                                                    "default"       => "btn-default"
-                                                    , "primary"     => "btn-primary"
-                                                    , "success"     => "btn-success"
-                                                    , "info"        => "btn-info"
-                                                    , "warning"     => "btn-warning"
-                                                    , "danger"      => "btn-danger"
-                                                    , "link"        => "btn-link"
-                                                )                                                
-                                            )
-                                            , "form" => array(
-                                                "component" => ""
-                                                , "component-inline" => "form-horizontal"
-                                                , "row" => "form-group clearfix"
-                                                , "row-padding" => "form-group clearfix padding"
-                                                , "row-full" => "form-group clearfix"
-                                                , "group" => "input-group"
-                                                , "group-padding" => "input-group padding"
-                                                , "label" => ""
-                                                , "label-inline" => "control-label"
-                                                , "control" => "form-control"
-                                                , "control-exclude" => array("checkbox", "radio")
-                                                , "control-check-position" => "_in_label"
-                                                , "control-prefix" => "input-group-addon"
-                                                , "control-postfix" => "input-group-addon"
-                                                , "control-feedback" => "form-control-feedback"
-                                                , "wrap-addon" => false	
-                                            )
-                                            , "bar" => array(
-                                                "topbar" => "nav navbar-nav"
-                                                , "navbar" => "nav nav-pills"
-                                            )
-                                            , "list" => array( 
-                                                "group" => "list-group"
-                                                , "item" => "list-group-item"
-                                                , "item-button" => "list-group-item-action"
-                                                , "item-success" => "list-group-item-success"
-                                                , "item-info" => "list-group-item-info"
-                                                , "item-warning" => "list-group-item-warning"
-                                                , "item-danger" => "list-group-item-danger"
-                                                , "badge" => "badge"
-                                                , "current" => "active"
-                                                , "disabled" => "disabled"
-                                            )
-                                            , "callout" => array(
-                                                "default"       => "bs-callout"
-                                                , "primary"     => "bs-callout bs-callout-primary"
-                                                , "success"     => "bs-callout bs-callout-success"
-                                                , "info"        => "bs-callout bs-callout-info"
-                                                , "warning"     => "bs-callout bs-callout-warning"
-                                                , "danger"      => "bs-callout bs-callout-danger"
-                                            )
-                                            , "pagination" => array(
-                                                "align-left" => "text-left" 
-                                                , "align-center" => "text-center" 
-                                                , "align-right" => "text-right"
-                                                , "pages" => "pagination"
-                                                , "arrows" => ""
-                                                , "current" => "active"
-                                            )          
-											, "table" => array(
-												"container" => "table"
-												, "compact" => "table-condensed"
-												, "hover" => "table-hover"
-												, "border" => "table-bordered"
-												, "oddeven" => "table-striped"
-											)
-											, "tab" => array(
-												"menu" => "nav nav-tabs"
-												, "menu-vertical" => "nav nav-tabs tabs-left"
-												, "menu-vertical-right" => "nav nav-tabs tabs-right"
-												, "menu-vertical-wrap" => true
-												, "menu-item" => ""
-												, "menu-current" => "active"
-												, "pane" => "tab-content"
-												, "pane-item" => "tab-pane"
-												, "pane-current" => "active"
-												, "pane-item-effect" => "tab-pane fade"
-												, "pane-current-effect" => "active in"
-											)
-                                            , "util" => array(
-                                                "left" => "pull-left"
-                                                , "right" => "pull-right"
-                                                , "hide" => "hidden"
-                                                , "align-left" => "text-left"
-                                                , "align-center" => "text-center"
-                                                , "align-right" => "text-right"
-                                                , "align-justify" => "text-justify"
-                                                , "text-nowrap" => "text-nowrap"
-                                                , "text-overflow" => "text-overflow"
-                                                , "text-lowercase" => "text-lowercase"
-                                                , "text-uppercase" => "text-uppercase"
-                                                , "text-capitalize" => "text-capitalize"
-                                                , "current" => "active"
-                                                , "equalizer-row" => "data-equalizer"
-                                                , "equalizer-col" => "data-equalizer-watch"
-                                                , "corner-radius" => "border-radius"
-                                                , "corner-round" => "img-rounded"
-                                                , "corner-circle" => "img-circle"
-                                                , "corner-thumbnail" => "img-thumbnail"
-                                                , "clear" => "clearfix"
-												, "text-muted"                  => "text-muted"
-								                , "text-primary"                => "text-primary"
-								                , "text-success"                => "text-success"
-								                , "text-info"                   => "text-info"
-								                , "text-warning"                => "text-warning"
-								                , "text-danger"                 => "text-danger"
-								                
-								                , "bg-primary"                  => "bg-primary"
-								                , "bg-success"                  => "bg-success"
-								                , "bg-info"                     => "bg-info"
-								                , "bg-warning"                  => "bg-warning"
-								                , "bg-danger"                   => "bg-danger"
-								               
-                                            )
-                                            , "data" => array(
-                                                "tab" => array(
-                                                    "menu" => null
-                                                    , "menu-link" => 'data-toggle="tab"'
-                                                    , "pane" => null
-                                                    , "pane-item" => null
-                                                )
-                                                , "tooltip" => array(
-                                                    "elem" => 'data-toggle="tooltip"'
-                                                )
-                                            )                                            
-                                            , "theme" => array(
-                                                "amelia" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia/bootstrap.min.css"
-                                                , "cerulean" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css"
-                                                , "cosmo" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cosmo/bootstrap.min.css"
-                                                , "cyborg" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cyborg/bootstrap.min.css"
-                                                , "flatly" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/flatly/bootstrap.min.css"
-                                                , "journal" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/journal/bootstrap.min.css"
-                                                , "readable" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/readable/bootstrap.min.css"
-                                                , "simplex" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/simplex/bootstrap.min.css"
-                                                , "slate" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/slate/bootstrap.min.css"
-                                                , "spacelab" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab/bootstrap.min.css"
-                                                , "united" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
-                                            )
-                                        )
-                                        , "foundation" => array(
-                                            "params" => array(
-                                                "css" => "//cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css" 
-                                                , "js" => "//cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.js" 
-                                                , "js_init" => 'jQuery(function() { jQuery(document).foundation(); });'//non funziona con la cache
-                                            )
-                                            , "class" => array(
-                                                "container" => "container"
-                                                , "wrap" => "row"
-                                                , "skip-full" => true
-                                                , "row-prefix" => "row"
-                                                , "col-prefix" => "columns"
-                                                , "col-hidden" => "hide-for-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => "-up"
-                                                , "push-append" => ""
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => ""
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-resolution" => false
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "class-fluid" => array(
-                                                "container" => "container-fluid"
-                                                , "wrap" => "row-fluid clearfix"
-                                                , "skip-full" => true
-                                                , "row-prefix" => ""
-                                                , "col-prefix" => "columns"
-                                                , "col-hidden" => "hide-for-"
-                                                , "col-hidden-smallest" => ""
-                                                , "col-hidden-largest" => "-up"
-                                                , "push-append" => ""
-                                                , "push-prepend" => "push-"
-                                                , "pull-append" => ""
-                                                , "pull-prepend" => "pull-"
-                                                , "skip-resolution" => false
-                                                , "skip-prepost" => "nopadding"
-                                            )
-                                            , "resolution" => array(
-                                                "small"
-                                                , "medium"
-                                                , "large"
-                                            )
-                                            , "resolution-media" => array(
-                                            	"small" => "(max-width: 40em)"
-												, "medium" => "(min-width: 40.063em)"
-												, "large" => "(min-width: 64.063em)"
-                                            )
-                                            , "button" => array(
-                                                "base"   => "button"
-                                                , "skip-default"    => true
-                                                , "width"     => array(
-                                                    "full"          => "expand"
-                                                )
-                                                , "size"    => array(
-                                                    "large"         => "large"
-                                                    , "small"       => "small"
-                                                    , "tiny"        => "tiny"
-                                                )
-                                                , "state"   => array(
-                                                    "current"       => "current"
-                                                    , "disabled"    => "disabled"
-                                                )
-                                                , "corner"  => array(
-                                                    "round"         => "round"
-                                                    , "radius"      => "radius"
-                                                )
-                                                , "color"   => array(
-                                                    "default"     => "secondary"
-                                                    , "primary"     => ""
-                                                    , "success"     => "success"
-                                                    , "info"        => "secondary"
-                                                    , "warning"     => "alert"
-                                                    , "danger"      => "alert"
-                                                    , "link"        => "secondary"
-                                                )                                                
-                                            )                                            
-                                            , "form" => array(
-                                                "component" => ""
-                                                , "component-inline" => ""
-                                                , "row" => "row"
-                                                , "row-padding" => "row padding"
-                                                , "row-full" => "columns"
-                                                , "group" => "row collapse"
-                                                , "group-padding" => "row collapse padding"
-                                                , "label" => ""
-                                                , "label-inline" => "inline right"
-                                                , "control" => ""
-                                                , "control-exclude" => array()
-                                                , "control-check-position" => "_pre_label"
-                                                , "control-prefix" => "prefix"
-                                                , "control-postfix" => "postfix"
-                                                , "control-feedback" => "postfix-feedback"
-                                                , "wrap-addon" => true
-                                            )
-                                            , "bar" => array(
-                                                "topbar" => "top-bar top-bar-section"
-                                                , "navbar" => "sub-nav"
-                                            )               
-                                            , "list" => array( ///classsi bootstrap da convertire
-                                                "group" => "list-group"
-                                                , "item" => "list-group-item"
-                                                , "item-button" => "list-group-item-action"
-                                                , "item-success" => "list-group-item-success"
-                                                , "item-info" => "list-group-item-info"
-                                                , "item-warning" => "list-group-item-warning"
-                                                , "item-danger" => "list-group-item-danger"
-                                                , "badge" => "badge"
-                                                , "current" => "active"
-                                                , "disabled" => "disabled"
-                                            )
-                                            , "callout" => array(
-                                                "default"       => "panel"
-                                                , "primary"     => "alert-box"
-                                                , "success"     => "alert-box success"
-                                                , "info"        => "panel callout"
-                                                , "warning"     => "alert-box warning"
-                                                , "danger"      => "alert-box alert"
-                                            )
-                                            , "pagination" => array(
-                                                "align-left" => "text-left" 
-                                                , "align-center" => "pagination-centered" //"text-center"
-                                                , "align-right" => "text-right"
-                                                , "pages" => "pagination"
-                                                , "arrows" => "arrow"
-                                                , "current" => "current"
-                                            )
-											, "table" => array(
-												"container" => ""
-												, "compact" => "table-condensed"
-												, "hover" => "table-hover"
-												, "border" => "table-bordered"
-												, "oddeven" => "table-striped"
-											)
-											, "tab" => array(
-												"menu" => "tabs"
-												, "menu-vertical" => "tabs vertical"
-												, "menu-vertical-right" => "tabs vertical right"
-												, "menu-vertical-wrap" => false
-												, "menu-item" => "tabs-title"
-												, "menu-current" => "is-active"
-												, "pane" => "tabs-content"
-												, "pane-item" => "tabs-panel"
-												, "pane-current" => "is-active"
-												, "pane-item-effect" => "tabs-panel fade"
-												, "pane-current-effect" => "is-active"
-											)
-                                            , "tooltip" => array(
-                                                "elem" => "has-tip"
-                                            )
-                                            , "util" => array(
-                                                "left" => "menu-left"
-                                                , "right" => "menu-right"
-                                                , "hide" => "hide"
-                                                , "align-left" => "text-left"
-                                                , "align-center" => "text-center"
-                                                , "align-right" => "text-right"
-                                                , "align-justify" => "text-justify"
-                                                , "text-nowrap" => "text-nowrap"    
-                                                , "text-overflow" => "text-overflow"         //custom
-                                                , "text-lowercase" => "text-lowercase"         //custom
-                                                , "text-uppercase" => "text-uppercase"         //custom
-                                                , "text-capitalize" => "text-capitalize"    //custom
-                                                , "current" => "active"
-                                                , "equalizer-row" => "data-equalizer"
-                                                , "equalizer-col" => "data-equalizer-watch"
-                                                , "corner-radius" => "radius"
-                                                , "corner-round" => "round"
-                                                , "corner-circle" => "img-circle"
-                                                , "corner-thumbnail" => "img-thumbnail"
-                                                , "clear" => "clearfix"
-												, "text-muted"                  => "text-muted"
-								                , "text-primary"                => "text-primary"
-								                , "text-success"                => "text-success"
-								                , "text-info"                   => "text-info"
-								                , "text-warning"                => "text-warning"
-								                , "text-danger"                 => "text-danger"
-								                
-								                , "bg-primary"                  => "bg-primary"
-								                , "bg-success"                  => "bg-success"
-								                , "bg-info"                     => "bg-info"
-								                , "bg-warning"                  => "bg-warning"
-								                , "bg-danger"                   => "bg-danger"
-								                                                               
-                                            )
-                                            , "data" => array(
-                                                "tab" => array(
-                                                    "menu" => 'data-tabs' 
-                                                    , "menu-link" => null
-                                                    , "pane" => 'data-tabs-content'
-                                                    , "pane-item" => null
-                                                ),
-                                                "tooltip" => array(
-                                                    "elem" => "data-tooltip"
-                                                )
-                                            )                                            
-                                        )
-                                    );                                    
-    var $font_icon_setting            = array(
-                                        "base" => array(
-                                             "css" => ""
-                                            , "prefix" => "icon"
-                                            , "postfix" => ""
-                                            , "prepend" => "ico-"
-                                            , "append" => ""
-                                        )
-                                        , "glyphicons" => array(
-                                             "css" => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"
-                                            , "prefix" => "glyphicons"
-                                            , "postfix" => ""
-                                            , "prepend" => ""
-                                            , "append" => ""
-                                        )
-                                        , "fontawesome" => array(
-                                             "css" => "//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css"
-                                            , "prefix" => "fa" 
-                                            , "postfix" => ""
-                                            , "prepend" => "fa-"
-                                            , "append" => ""
-                                        )
-                                    );                                    
-
-    var $framework_css              = null;
-    var $font_icon					= null;
-	/**
+    /**
 	 * Abilita o disabilita l'utilizzo del form
 	 * il default (null) lo considera abilitato
 	 * @var Boolean
@@ -833,6 +183,7 @@ class ffPage_html extends ffPage_base
 	 * @var String
 	 */
     public $class_body             = null;
+	public $properties_body        = null;
 
 	/**
 	 * Il risultato JSON della pagina
@@ -876,8 +227,6 @@ class ffPage_html extends ffPage_base
 		{
 			ffTheme_html_construct($this, cm_getMainTheme());
 		}
-
-		$this->tplAddJs("ff.ffPage", "ffPage.js", FF_THEME_DIR . "/library/ff"); 
 	}
 
 	/**
@@ -1051,6 +400,9 @@ class ffPage_html extends ffPage_base
 		static $last_top = 0;
 		static $bottom_exist = true;
         $found = false;
+
+//	print_r(debug_backtrace());
+
 
         if ($file !== null && is_array($file))
         {
@@ -1399,9 +751,14 @@ class ffPage_html extends ffPage_base
 	 */
 	protected function tplProcessVars($tpl)
 	{
+		$framework_css = cm_getFrameworkCss();
+		$font_icon = cm_getFontIcon();
+
 		$tpl[0]->set_var("site_path", $this->site_path);
 		$tpl[0]->set_var("language", FF_LOCALE);
 		$tpl[0]->set_var("locale", strtolower(substr(FF_LOCALE, 0, 2)));
+		$tpl[0]->set_var("framework_css", $framework_css["name"]);
+		$tpl[0]->set_var("font_icon", $font_icon["name"]);
 
 		$tpl[0]->set_var("theme", $this->theme);
 		if(strlen($this->jquery_ui_force_theme)) {
@@ -1411,9 +768,10 @@ class ffPage_html extends ffPage_base
 		} else {
 			$tpl[0]->set_var("theme_ui", "");
 		}
+
 		$tpl[0]->set_var("layer", $this->layer);
-        
         $tpl[0]->set_var("lazy_img", (CM_CACHE_IMG_LAZY_LOAD ? "true" : "false"));
+		$tpl[0]->set_var("showfiles", (CM_MEDIACACHE_SHOWPATH ? CM_MEDIACACHE_SHOWPATH : CM_SHOWFILES));
         
         if(MOD_SEC_GROUPS) 
 		{
@@ -1490,12 +848,11 @@ class ffPage_html extends ffPage_base
 		$this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
 
 		$this->tpl[0]->set_var("title", $this->title);
-        if($this->class_body)
-            $this->tpl[0]->set_var("class_body", " class=\"" . $this->class_body . "\"");
+		$this->tpl[0]->set_var("properties_body", $this->getProperties());
 
         if($this->use_own_js) {
         	if(!array_key_exists("ff", $this->page_js)) {
-				$this->page_js = array_merge($this->default_own_js, $this->page_js); 
+				$this->page_js = array_merge($this->default_own_js, $this->page_js);
         	}
 			$this->tpl[0]->parse("SectFFJS", false);
 		} else
@@ -1513,7 +870,7 @@ class ffPage_html extends ffPage_base
         $this->parse_js();
         $this->parse_meta();
         $this->parse_html_attr();
-			
+
         $this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));
 
 		if ($this->isXHR())
@@ -1849,7 +1206,8 @@ class ffPage_html extends ffPage_base
         $this->tpl[0]->set_var("SectAsyncCssPlugin", "");
 
 		if (is_array($this->page_css) && count($this->page_css))
-        {            
+        {
+			$preload_data = "";
         	if($this->browser === null)
         		$this->browser = $this->getBrowser();
 
@@ -2930,6 +2288,43 @@ class ffPage_html extends ffPage_base
 		else
 			return $_REQUEST["XHR_DIALOG_ID"];
 	}
-	
-	
+
+	function getProperties()
+	{
+		$buffer = "";
+		if($this->class_body) {
+			if (is_array($this->class_body))
+				$this->properties_body["class"] = implode(" ", array_filter($this->class_body));
+			else
+				$this->properties_body["class"] = $this->class_body;
+		}
+
+		if (is_array($this->properties_body) && count(properties_body))
+		{
+			foreach ($this->properties_body as $key => $value)
+			{
+				if ($key == "style")
+				{
+					if (strlen($buffer))
+						$buffer .= " ";
+					$buffer .= $key . "=\"";
+					foreach ($this->properties_body[$key] as $subkey => $subvalue)
+					{
+						$buffer .= $subkey . ": " . $subvalue . ";";
+					}
+					reset($this->properties_body[$key]);
+					$buffer .= "\"";
+				}
+				elseif(strlen($value))
+				{
+					if (strlen($buffer))
+						$buffer .= " ";
+					$buffer .= $key . "=\"" . $value . "\"";
+				}
+			}
+			reset($property_set);
+		}
+		if($buffer)
+			return " " . $buffer;
+	}
 }

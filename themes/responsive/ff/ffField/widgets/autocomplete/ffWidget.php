@@ -141,34 +141,7 @@ class ffWidget_autocomplete extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/autocomplete");
-/* Remove jquery ui css
-    	$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.autocomplete"        => array(
-                      "file" => "jquery.ui.autocomplete.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $Field->parent_page[0]->widgetResolveCss($css_key, $css_value, $Field->parent_page[0]);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$Field->parent_page[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-*/
 	    $icon = $Field->autocomplete_icon;
 		if(!$icon && $Field->autocomplete_combo)
 			$icon = "caret-down";
