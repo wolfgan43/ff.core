@@ -1499,32 +1499,32 @@ class ffGrid_html extends ffGrid_base
 			if($field->control_type != "")
 				$label_properties["label_for"] = $this->id . "_" . $field->id;
 			
-			if(is_array($this->parent[0]->framework_css)) 
+			if(0)
 			{
 				$label_class = array();
 				if(is_array($field->framework_css))
 				{
 					$arrColumnLabel = $field->framework_css["label"]["col"];
 					$arrColumnControl = $field->framework_css["control"]["col"];
-					
+
 					$label_class["align"] = cm_getClassByFrameworkCss(array("text-overflow", "text-nowrap"), "util");
 					$label_class["label"] = cm_getClassByFrameworkCss("label", "form");
 				}
-				
+
 				if(is_array($arrColumnLabel) && count($arrColumnLabel)
 					&& is_array($arrColumnControl) && count($arrColumnControl)
 				) {
 					$label_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-right", "util") . '">';
 					$label_postfix = '</div>';
-				
+
 					$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . " " . cm_getClassByFrameworkCss("text-nowrap", "util") . " " . cm_getClassByFrameworkCss("align-left", "util") . '">';
 					$control_postfix = '</div>';
 					//$type_label = "-inline";
 				}
-				
+
 				$label_properties["class"] = implode(" ", array_filter($label_class));
 			}
-			
+
 			$buffer_label = '<label ' . $field->getProperties($label_properties) . ' title="' . $buffer_label_value . '">' . $buffer_label_value . '</label>';
 			$buffer_label_container = $label_prefix . $buffer_label . $label_postfix;
 			
@@ -1559,9 +1559,9 @@ class ffGrid_html extends ffGrid_base
 		$buffer = $buffer_label_container . $buffer_control_container;
 		if($hide_container) {
 			if($label_set) {
-				if(is_array($this->parent[0]->framework_css)) 
+				if(0)
 				{
-					if(is_array($field->framework_css["container"]["col"]) 
+					if(is_array($field->framework_css["container"]["col"])
 						&& count($field->framework_css["container"]["col"])
 					) {
 						$tmp_class["grid"] = cm_getClassByFrameworkCss($field->framework_css["container"]["col"], "col");

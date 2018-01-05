@@ -3,7 +3,7 @@
 
 <!--BeginSectFooters-->
 <script type="text/javascript">
-	ff.pluginLoad("jquery.datepicker.regional.{lang}", "/themes/library/jquery.ui/i18n/jquery.ui.datepicker-{lang}.js");
+	ff.pluginLoad("jquery.datepicker.regional.{lang}", "/themes/library/jquery-ui/i18n/jquery.ui.datepicker-{lang}.js");
     
     <!--BeginSectDateTimeHeader-->
     ff.injectCSS("jqueryuitimepicker", "/themes/restricted/ff/ffField/widgets/datepicker/timepicker-addon.css", function() {
@@ -11,20 +11,6 @@
     });
     <!--EndSectDateTimeHeader-->
 
-	/* Remove jquery ui css
-	ff.injectCSS("jqueryuicore", "{jqueryuicore}", function() {
-		ff.injectCSS("jqueryuitheme", "{jqueryuitheme}", function() {
-			ff.injectCSS("jqueryuidatepicker", "{jqueryuidatepicker}", function() {
-				ff.pluginLoad("jquery.datepicker.regional.{lang}", "/themes/library/jquery.ui/i18n/jquery.ui.datepicker-{lang}.js");
-                
-                <!--BeginSectDateTimeHeader-->
-                ff.injectCSS("jqueryuitimepicker", "/themes/restricted/ff/ffField/widgets/datepicker/timepicker-addon.css", function() {
-                    ff.injectCSS("jqueryuislider", "{jqueryuislider}");
-                });
-                <!--EndSectDateTimeHeader-->
-			});
-		});
-	});*/
 	<!--BeginSectBinding-->
 	jQuery(function() {
         <!--BeginSectDate-->

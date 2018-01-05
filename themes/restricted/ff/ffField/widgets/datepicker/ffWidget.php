@@ -104,25 +104,15 @@ class ffWidget_datepicker extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
 		} else {
 			if(strlen($Field->parent_page[0]->jquery_ui_force_theme !== NULL)) {
-            	$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/library/jquery.ui/themes/" . $Field->parent_page[0]->jquery_ui_force_theme . "/images");
+            	$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/library/jquery-ui.themes/" . $Field->parent_page[0]->jquery_ui_force_theme . "/images");
 			} else { 
-				$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/" . $theme . "/images/jquery.ui");
+				$this->tpl[$tpl_id]->set_var("widget_path", FF_SITE_PATH . "/themes/" . $theme . "/images/jquery-ui");
 			}
 		}
 		$this->tpl[$tpl_id]->set_var("id", $id);
 		$this->tpl[$tpl_id]->set_var("lang", strtolower(substr(FF_LOCALE, 0, -1)));
 
-    	$css_deps 		= array(/* Remove jquery ui css
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), */
+    	$css_deps 		= array(
               "jquery.ui.datepicker"        => array(
                       "file" => "jquery.ui.datepicker.css"
                     , "path" => null

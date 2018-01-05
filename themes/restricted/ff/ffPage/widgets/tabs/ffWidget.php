@@ -91,34 +91,7 @@ class ffWidget_tabs extends ffCommon
 
 		$this->tpl[$tpl_id]->set_var("SectElementHead", "");
 		$this->tpl[$tpl_id]->set_var("SectElementBody", "");
-/* Remove jquery ui css
-		$css_deps 		= array(
-              "jquery.ui.core"        => array(
-                      "file" => "jquery.ui.core.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.theme"        => array(
-                      "file" => "jquery.ui.theme.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                ), 
-              "jquery.ui.tabs"        => array( 
-                      "file" => "jquery.ui.tabs.css"
-                    , "path" => null
-                    , "rel" => "jquery.ui"
-                )
-    	);		
 
-		if(is_array($css_deps) && count($css_deps)) {
-			foreach($css_deps AS $css_key => $css_value) {
-				$rc = $oPage->widgetResolveCss($css_key, $css_value, $oPage);
-
-				$this->tpl[$tpl_id]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-				$oPage->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-			}
-		}
-*/
 		$i = 0;
 		foreach ($data["contents"] as $subkey => $subvalue)
 		{

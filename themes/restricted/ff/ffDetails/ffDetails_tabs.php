@@ -586,36 +586,6 @@ class ffDetails_tabs extends ffDetails_base
 			$this->tpl[0]->set_var("SectTabUrl", "");
 		}
 
-		if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) {
-			/* Remove jquery ui css
-				$css_deps 		= array(
-				  "jquery.ui.core"        => array(
-					      "file" => "jquery.ui.core.css"
-					    , "path" => null
-					    , "rel" => "jquery.ui"
-					), 
-				  "jquery.ui.theme"        => array(
-					      "file" => "jquery.ui.theme.css"
-					    , "path" => null
-					    , "rel" => "jquery.ui"
-					), 
-				  "jquery.ui.tabs"        => array( 
-					      "file" => "jquery.ui.tabs.css"
-					    , "path" => null
-					    , "rel" => "jquery.ui"
-					)
-    		);		
-
-			if(is_array($css_deps) && count($css_deps)) {
-				foreach($css_deps AS $css_key => $css_value) {
-					$rc = $this->main_record[0]->parent[0]->widgetResolveCss($css_key, $css_value, $this->main_record[0]->parent[0]);
-
-					$this->tpl[0]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-					$this->main_record[0]->parent[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-				}
-			}*/
-		}
-
 		if ($this->doAjax)
 		{
 			if (isset($_REQUEST["XHR_DIALOG_ID"])) {
@@ -624,33 +594,6 @@ class ffDetails_tabs extends ffDetails_base
 				if ($this->main_record !== NULL && $this->main_record[0]->parent !== NULL) {//code for ff.js
 					//$this->main_record[0]->parent[0]->tplAddJs("jquery.blockui", "jquery.blockui.js", FF_THEME_DIR . "/library/plugins/jquery.blockui");
 					$this->main_record[0]->parent[0]->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
-					/* Remove jquery ui css
-					$css_deps 		= array(
-				          "jquery.ui.core"        => array(
-				                  "file" => "jquery.ui.core.css"
-				                , "path" => null
-				                , "rel" => "jquery.ui"
-				            ), 
-				          "jquery.ui.theme"        => array(
-				                  "file" => "jquery.ui.theme.css"
-				                , "path" => null
-				                , "rel" => "jquery.ui"
-				            ), 
-				          "jquery.ui.tabs"        => array( 
-				                  "file" => "jquery.ui.tabs.css"
-				                , "path" => null
-				                , "rel" => "jquery.ui"
-				            )
-    				);		
-
-					if(is_array($css_deps) && count($css_deps)) {
-						foreach($css_deps AS $css_key => $css_value) {
-							$rc = $this->main_record[0]->parent[0]->widgetResolveCss($css_key, $css_value, $this->main_record[0]->parent[0]);
-
-							$this->tpl[0]->set_var(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["path"] . "/" . $rc["file"]);
-							$this->main_record[0]->parent[0]->tplAddCss(preg_replace('/[^0-9a-zA-Z]+/', "", $css_key), $rc["file"], $rc["path"], "stylesheet", "text/css", false, false, null, false, "bottom");
-						}
-					}*/
 				}
 
 				$this->tpl[0]->set_var("submit_action", "ff.ajax.doRequest({'component' : '" . $this->id . "'});");

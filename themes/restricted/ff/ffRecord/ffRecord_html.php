@@ -605,7 +605,7 @@ class ffRecord_html extends ffRecord_base
 				    	$required_symbol = "";
 
 						if(($this->form_fields[$subkey]->get_control_type() == "checkbox" || $this->form_fields[$subkey]->get_control_type() == "radio") && $this->form_fields[$subkey]->widget == "") {
-							$control_var = (is_array($this->parent[0]->framework_css)
+							$control_var = (0
 												? cm_getClassByFrameworkCss("control-check-position", "form")
 												: "_pre_label"
 											);
@@ -659,7 +659,7 @@ class ffRecord_html extends ffRecord_base
 						    */
 						    $this->tpl[0]->set_var("label_for", $this->id . "_" . $subkey);
 						    
-							if(is_array($this->parent[0]->framework_css)) 
+							if(0)
 							{
 								$arrColumnLabel = $this->form_fields[$subkey]->framework_css["label"]["col"];
 								$arrColumnControl = $this->form_fields[$subkey]->framework_css["control"]["col"];

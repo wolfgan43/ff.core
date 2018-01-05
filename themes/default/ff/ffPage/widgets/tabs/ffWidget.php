@@ -16,7 +16,7 @@ class ffWidget_tabs extends ffCommon
 							, "jquery.ui" 		=> null
 						);
     var $css_deps 		= array(
-    						  "jquery.ui"		=> "/jquery.ui/ui.all.css"
+    						  "jquery.ui"		=> null
     					);
 	// PRIVATE VARS
 
