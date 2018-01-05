@@ -105,7 +105,7 @@ function common_external_oauth_error($error = null)
 	{
 		?>
 		<h1>Error: <?= $error["error"] ?></h1>
-		<h2>Error: <?= $error["error_description"] ?></h1>
+		<h2>Error: <?= $error["error_description"] ?></h2>
 		<?php
 	}
 	else

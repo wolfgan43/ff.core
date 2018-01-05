@@ -2,7 +2,6 @@
 // very simple SSO mechanism to demonstrate FF Web OAuth2 and SSO capability
 // by Samuele Diella, January 2017
 // WebAuth callback
-die("asd");
 require __DIR__ . "/common.php";
 
 if (isset($_REQUEST["error"]))
