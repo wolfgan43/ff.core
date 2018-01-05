@@ -52,17 +52,24 @@ function cm_showfiles_guessfromurl($url, $default)
 }
 
 function cm_showfiles_get_abs_url($path = null) {
-	static $res = null;
+	static $showfiles = null;
 
-	if(!$res) 
+	if(!$showfiles)
 	{
-		if(substr(strtolower(CM_SHOWFILES), 0, 7) == "http://" || substr(strtolower(CM_SHOWFILES), 0, 8) == "https://" || substr(CM_SHOWFILES, 0, 2) == "//")
-			$res = CM_SHOWFILES;
-		else 
-			$res = "http" . ($_SERVER["HTTPS"] ? "s" : "") . "://" . $_SERVER["HTTP_HOST"] . FF_SITE_PATH . CM_SHOWFILES;
+		if(CM_CACHE_PATH_CONVERT_SHOWFILES && CM_MEDIACACHE_SHOWPATH)
+			$showfiles = CM_MEDIACACHE_SHOWPATH;
+		else
+			$showfiles = CM_SHOWFILES;
+
+		if(substr(strtolower($showfiles), 0, 7) != "http://"
+			&& substr(strtolower($showfiles), 0, 8) != "https://"
+			&& substr($showfiles, 0, 2) != "//"
+		) {
+			$showfiles = "http" . ($_SERVER["HTTPS"] ? "s" : "") . "://" . $_SERVER["HTTP_HOST"] . FF_SITE_PATH . $showfiles;
+		}
 	}
-	
-	return $res . $path;
+
+	return $showfiles . $path;
 }
 
 function cm_getMainTheme()
@@ -105,6 +112,92 @@ function cm_extract_css_urls($text)
     return $urls;
 } 
 
+function cm_urls_to_abs($urls, $source)
+{
+	static $tmp_css_link_replaced = array();
+	$cm = cm::getInstance();
+	if(is_array($urls) && count($urls))
+	{
+
+		foreach($urls AS $url)
+		{
+			if(isset($tmp_css_link_replaced[$url]))
+				continue;
+
+			if(substr($url, 0, 1) != "/"
+				&& (substr(strtolower($url), 0, 7) != "http://"
+					&& substr(strtolower($url), 0, 8) != "https://"
+					&& substr($url, 0, 2) != "//")
+			) {
+				$arrBufferPath = parse_url(ffcommon_dirname($source) . "/" . $url);
+				// echo "<pre>"; print_r($arrBufferPath);
+				if(substr(strtolower($source), 0, 7) == "http://"
+					|| substr(strtolower($source), 0, 8) == "https://"
+					|| substr($source, 0, 2) == "//"
+				)
+					$relative_buffer_path = cm_canonicalize($arrBufferPath["scheme"] . "://" . $arrBufferPath["host"] . $arrBufferPath["path"])
+						. (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
+						. (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
+				else {
+					$relative_buffer_path = substr(realpath($arrBufferPath["path"]), strlen(FF_DISK_PATH))
+						. (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
+						. (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
+
+					$relative_buffer_path = str_replace("\\.rep\\ff" , "", $relative_buffer_path); // @CarmineRumma
+					$relative_buffer_path = str_replace("\\.rep\\vgallery" , "", $relative_buffer_path); // @CarmineRumma
+
+				}
+
+				if(strpos($relative_buffer_path, FF_THEME_DIR) === 0)
+				{
+
+					if(file_exists(FF_DISK_PATH . FF_THEME_DIR . "/" . $cm->oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")))))
+					{
+						$relative_buffer_path =  "/" . $cm->oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")));
+					}
+					else
+					{
+						$relative_buffer_path = substr($relative_buffer_path, strlen(FF_THEME_DIR));
+					}
+
+					$relative_buffer_path = FF_SITE_PATH . FF_THEME_DIR . $relative_buffer_path;
+				}
+				elseif(strpos($relative_buffer_path, "/uploads") === 0)
+				{
+					$relative_buffer_path = CM_MEDIACACHE_SHOWPATH . substr($relative_buffer_path, strlen("/uploads"));
+				}
+
+				$tmp_css_link_replaced[$url] = $relative_buffer_path;
+			}
+		}
+	}
+
+	return $tmp_css_link_replaced;
+}
+function cm_convert_url_in_abs_by_content($content, $source)
+{
+	$content = str_replace(array(
+		"{site_path}"
+		, "{showfiles}"
+	), array(
+		FF_SITE_PATH
+		, (CM_MEDIACACHE_SHOWPATH
+			? CM_MEDIACACHE_SHOWPATH
+			: CM_SHOWFILES
+		)
+	), $content);
+
+	$tmp_css_url = cm_extract_css_urls($content);
+	if(is_array($tmp_css_url))
+	{
+		$tmp_css_link_replaced = cm_urls_to_abs($tmp_css_url, $source);
+		$content = str_replace(array_keys($tmp_css_link_replaced), array_values($tmp_css_link_replaced), $content);
+	} elseif(strpos($source, FF_THEME_DISK_PATH) === 0) {
+		$arrBufferPath = explode("/", str_replace(FF_THEME_DISK_PATH . "/", "", $source));
+		$content = str_replace("../", FF_THEME_DIR . "/" . $arrBufferPath[0] . "/", $content);
+	}
+	return $content;
+}
 /*
 function cm_extract_css_urls($text) //original (if the url have cinna (,) the regexp failed with PREG_BACKTRACK_LIMIT_ERROR )
 {

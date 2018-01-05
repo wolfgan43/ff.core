@@ -550,7 +550,7 @@ class cm extends ffCommon
         $this->oPage->compact_js = $this->layout_vars["compact_js"];
         $this->oPage->compact_css = $this->layout_vars["compact_css"];
         $this->oPage->compress = $this->layout_vars["enable_gzip"];
-        
+
         if(is_array($this->layout_vars["cdn"]["css"]) && count($this->layout_vars["cdn"]["css"]))
             $this->oPage->override_css = array_merge($this->oPage->override_css, $this->layout_vars["cdn"]["css"]);
         if(is_array($this->layout_vars["cdn"]["js"]) && count($this->layout_vars["cdn"]["js"]))
@@ -945,12 +945,12 @@ class cm extends ffCommon
 		// LOAD SETTINGS BY COMPONENT
 		if (is_dir(FF_DISK_PATH . "/conf/ffsettings/components"))
 		{
-			foreach ($cm->oPage->components as $key => $value)
+			foreach ($this->oPage->components as $key => $value)
 			{
 				if (@is_file(FF_DISK_PATH . "/conf/ffsettings/components/" . $key . ".xml"))
 					$this->load_ffSettings(FF_DISK_PATH . "/conf/ffsettings/components/" . $key . ".xml");
 			}
-			reset($cm->oPage->components);
+			reset($this->oPage->components);
 		}
 
 		$include_script_path_tmp = FF_DISK_PATH . "/conf/contents" . $this->path_info . "/";
@@ -1564,24 +1564,30 @@ class cm extends ffCommon
 
 	function includeApplet($appletname, $applet_params, $appletid)
 	{
-		//echo "$appletname, $applet_params, $appletid<br />";
-		$this->loaded_applets[$appletid]["params"] = $applet_params;
+		$out_buffer = "";
 
-		$appletname_parts = explode("|", $appletname);
-		if (count($appletname_parts) == 2)
+		$res = $this->doEvent("on_before_include_applet", array(&$this, $appletname, $applet_params, $appletid));
+		$applet_file = end($res);
+		if (!$applet_file)
 		{
-			$this->loaded_applets[$appletid]["module"] = $appletname_parts[0];
-			$this->loaded_applets[$appletid]["name"] = $appletname_parts[1];
-			$applet_file = CM_MODULES_ROOT . "/" . $appletname_parts[0] . "/applets/" . $appletname_parts[1] . "/index." . FF_PHP_EXT;
+			//echo "$appletname, $applet_params, $appletid<br />";
+			$this->loaded_applets[$appletid]["params"] = $applet_params;
+
+			$appletname_parts = explode("|", $appletname);
+			if (count($appletname_parts) == 2)
+			{
+				$this->loaded_applets[$appletid]["module"] = $appletname_parts[0];
+				$this->loaded_applets[$appletid]["name"] = $appletname_parts[1];
+				$applet_file = CM_MODULES_ROOT . "/" . $appletname_parts[0] . "/applets/" . $appletname_parts[1] . "/index." . FF_PHP_EXT;
+			}
+			else
+			{
+				$this->loaded_applets[$appletid]["name"] = $appletname;
+				$applet_file = FF_DISK_PATH . "/applets/" . $appletname . "/index." . FF_PHP_EXT;
+			}
 		}
-		else
-		{
-			$this->loaded_applets[$appletid]["name"] = $appletname;
-			$applet_file = FF_DISK_PATH . "/applets/" . $appletname . "/index." . FF_PHP_EXT;
-		}
-		
+
 		$cm = $this;
-
 		if (file_exists($applet_file))
 			include $applet_file;
 		else
@@ -1593,6 +1599,37 @@ class cm extends ffCommon
 		return $out_buffer;
 	}
 
+	function addApplet($file, $name = null, $params = null, $module = null, $id = null)
+	{
+		$out_buffer = "";
+		if(!$name)
+			$name = ffGetFilename($file);
+
+		if(!$id) {
+			$ordered_params = "";
+			if(is_array($params) && count($params)) {
+				foreach($params AS $key => $value) {
+					$ordered_params .= ":" . $key . "=" . $value;
+				}
+			}
+
+			$id = "[" . $name . $ordered_params . "]";
+		}
+		if(!$this->loaded_applets[$id]) {
+			$this->loaded_applets[$id]["params"] = $params;
+			$this->loaded_applets[$id]["module"] = $module;
+			$this->loaded_applets[$id]["name"] = $name;
+			if (file_exists($file))
+				include $file;
+			else
+				ffErrorHandler::raise("APPLET NON TROVATA", E_USER_ERROR, $this, get_defined_vars());
+
+			$this->loaded_applets[$id]["buffer"] = $out_buffer;
+
+			$this->oPage->process_params();
+		}
+		return $this->loaded_applets[$id]["buffer"];
+	}
 	function callScript($file)
 	{
 		$ff = ffGlobals::getInstance("ff");
@@ -2068,8 +2105,8 @@ class cm extends ffCommon
 		$layout_vars["enable_gzip"] = false;
 		$layout_vars["compact_js"] = false;
 		$layout_vars["compact_css"] = false;
-        $layout_vars["framework_css"] = null;
-        $layout_vars["font_icon"] = null;
+       // $layout_vars["framework_css"] = null;
+       // $layout_vars["font_icon"] = null;
 		
 		$tmp = $layout_path;
 		$paths = "";
@@ -2166,8 +2203,8 @@ class cm extends ffCommon
 					$layout_vars["enable_gzip"] = false;
 					$layout_vars["compact_js"] = false;
 					$layout_vars["compact_css"] = false;
-                    $layout_vars["framework_css"] = null;
-                    $layout_vars["font_icon"] = null;
+                   // $layout_vars["framework_css"] = null;
+                   // $layout_vars["font_icon"] = null;
 				}
 
 				if($db->getField("ignore_defaults", "Number", true, false))
@@ -2209,11 +2246,11 @@ class cm extends ffCommon
 				if (strlen($db->getField("class_body", "Text", true)))
 					$layout_vars["class_body"] = $db->getField("class_body", "Text", true);
 
-                if (strlen($db->getField("framework_css", "Text", true, false)))
+                /*if (strlen($db->getField("framework_css", "Text", true, false)))
                     $layout_vars["framework_css"] = $db->getField("framework_css", "Text", true);
 
                 if (strlen($db->getField("font_icon", "Text", true, false)))
-                    $layout_vars["font_icon"] = $db->getField("font_icon", "Text", true);
+                    $layout_vars["font_icon"] = $db->getField("font_icon", "Text", true);*/
 
 				$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "layout_sect WHERE ID_layout = " . $db2->toSql($db->getField("ID")) . " ORDER BY ID";
 				

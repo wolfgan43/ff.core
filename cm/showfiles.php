@@ -162,36 +162,14 @@ if(CM_SHOWFILES_FORCE_PATH && strlen($path_info) && !strlen($filepath))
 	} 
 	else 
 	{
-        /*
-        * default: cerca l'immagine di origine in uploads
-        * supporta il sistema di ridimensionamento dinamico
-        */ 			
-		$file = explode("-", $image["filename"]);
-	    krsort($file);
-	    if(is_array($file) && count($file)) {
-	        foreach($file AS $file_shard) {
-                if(is_numeric($file_shard) && (!$mode || is_numeric($mode))) {
-	                $mode = $file_shard . ($mode ? "-" . $mode : "");
-	            } elseif($file_shard == "png" || $file_shard == "jpg" || $file_shard == "jpeg") {
-	                $ext = $file_shard;
-	            } elseif(!$mode) {
-	                $mode = $file_shard;
-	            } else {
-	                $source["filename"] = $file_shard . ($source["filename"] ? "-" . $source["filename"] : "");
-	            }
-	        }
-	        $image_mode = $mode . ($ext ? "-" . $ext : "");
-
-	        $source["extension"] = ($ext ? $ext : $image["extension"]);
-	        $source["basename"] = $source["filename"] . "." . $source["extension"];
-	        $source["dirname"] = ($image["dirname"] == "/" ? "" : $image["dirname"]);		
+		$res = cm_resolve_source_path($image, $cache_media["uploads"]);
+		if(!$res["filepath"]) {
+			$res = cm_resolve_source_path($image, $cache_media["theme_dir"] . "/" . $cache_media["theme"] . "/images");
 		}
 
- 		if(is_file(FF_DISK_PATH . $cache_media["uploads"] . $source["dirname"] . "/" . $source["basename"]))
-			$filepath = FF_DISK_PATH . $cache_media["uploads"] . $source["dirname"] . "/" . $source["basename"];
-		else
-			$mode = null;
-			
+		$filepath 					= $res["filepath"];
+		$mode 						= $res["mode"];
+		$source 					= $res["source"];
 	}
 	
 	/*
@@ -876,7 +854,8 @@ if($filepath && $mode)
 			if($mode_format)
 				$imgParams[$mode]["format"] = $final_ext;
 
-            $final_file = cm_showfilesGetThumbPath(substr(ffCommon_dirname($filepath), strlen($base_path)), $base_path) . "/" . ffGetFilename($filepath) // ffCommon_url_rewrite(ffGetFilename($filepath))
+            if(!$final_file)
+            	$final_file = cm_showfilesGetThumbPath(substr(ffCommon_dirname($filepath), strlen($base_path)), $base_path) . "/" . ffGetFilename($filepath) // ffCommon_url_rewrite(ffGetFilename($filepath))
 							. ($mode_format ? "-" . $mode_format : "")
                             . "-" . $mode
                             . $str_wmk_file 
@@ -1154,4 +1133,60 @@ function cm_showfilesGetThumbPath ($path, $base_path = null)
         return CM_CACHE_PATH . "/" . CM_SHOWFILES_THUMB_PATH . $path;
     else
         return $base_path . $path . "/" . CM_SHOWFILES_THUMB_PATH;
+}
+function cm_resolve_source_path($image, $base_path) {
+	$mode = null;
+
+	/*
+	* default: cerca l'immagine di origine in uploads
+	* supporta il sistema di ridimensionamento dinamico
+	*/
+	$source["dirname"] 			= ($image["dirname"] == "/" ? "" : $image["dirname"]);
+	$source["extension"] 		= $image["extension"];
+
+	if(strpos($image["filename"], "-png-") !== false) {
+		$file 					= explode("-png-", $image["filename"]);
+		$mode 					= $file[1];
+		$source["extension"] 	= "png";
+		$source["filename"] 	= $file[0];
+	} elseif(strpos($image["filename"], "-jpg-") !== false) {
+		$file 					= explode("-jpg-", $image["filename"]);
+		$mode 					= $file[1];
+		$source["extension"] 	= "jpg";
+		$source["filename"] 	= $file[0];
+	} elseif(strpos($image["filename"], "-jpeg-") !== false) {
+		$file 					= explode("-jpeg-", $image["filename"]);
+		$mode 					= $file[1];
+		$source["extension"] 	= "jpeg";
+		$source["filename"] 	= $file[0];
+	} else {
+		$file 					= explode("-", $image["filename"]);
+
+		for($i = 0; $i<=3; $i++) {
+			if(!count($file))
+				break;
+
+			$mode = array_pop($file) . ($mode ? "-" : "") . $mode;
+			$filename = implode("-", $file);
+
+			if(is_file(FF_DISK_PATH . $base_path . $source["dirname"] . "/" . $filename . "." . $source["extension"])) {
+				$source["filename"] = $filename;
+				break;
+			}
+		}
+	}
+
+	if($source["filename"] && $source["extension"]) {
+		$source["basename"] 	= $source["filename"] . "." . $source["extension"];
+
+		$filepath 				= FF_DISK_PATH . $base_path . $source["dirname"] . "/" . $source["basename"];
+	} else {
+		$mode					= null;
+	}
+
+	return array(
+		"filepath" 				=> $filepath
+	, "mode" 				=> $mode
+	, "source" 				=> $source
+	);
 }
