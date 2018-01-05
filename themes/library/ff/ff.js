@@ -265,7 +265,10 @@ var that = { // publics
 "theme_ui"		: undefined,
 "page_path"		: undefined,
 "language" 		: undefined, 
-"layer" 		: undefined, 
+"layer" 		: undefined,
+"frameworkCss"	: undefined,
+"fontIcon"		: undefined,
+"showfiles"     : undefined,
 "group"         : undefined, 
 "origin"		: undefined,
 "domain"		: undefined,
@@ -298,6 +301,7 @@ var that = { // publics
 	that.language 				= getCookie("lang") || (params.language === undefined ? "ITA" : params.language);
 	that.locale 				= (params.locale === undefined ? "it_IT" : params.locale);
 	that.layer 					= (params.layer === undefined ? "empty" : params.layer);
+    that.showfiles 				= (params.showfiles === undefined ? "/cm/showfiles.php" : params.showfiles);
 	that.frameworkCss 			= params.frameworkCss;
 	that.fontIcon				= params.fontIcon;
     that.group              	= getCookie("group") || (params.group === undefined ? "" : params.group);
@@ -465,7 +469,18 @@ var that = { // publics
 		, "deps" : deps
 	});
 },
-
+"libSets" : function(type, ids, source, callback, async, media, deps) {
+    for (var i = 0; i < ids.length; i++) {
+        libs.get(type).set(ids[i], {
+            "loaded": true
+            , "source": source
+            , "callback": callback
+            , "async": async
+            , "media": media
+            , "deps": deps
+        });
+    }
+},
 "libLoad" : function (type, id, source, callback, async, media, deps) {
 	var getType = {};
 	if (getType.toString.call(type) === '[object Object]') {
@@ -556,6 +571,10 @@ var that = { // publics
 	libs.dump();
 	libs_deps.dump();
 	libs_rev_deps.dump();
+},
+
+"libToString" : function (type) {
+	return JSON.stringify(libs.get(type).keys);
 },
 
 "libIsLoaded" : function (type, id) {
@@ -833,45 +852,52 @@ var that = { // publics
 		
 	getlibs_loads.set(uid, true);
 
-	var tmp_name = name;
-	var tmp_obj = object;
-	
-	if (object === undefined) {
-		var tmp = name.replace("ff.", "").split(".");
-		if (tmp.length > 1) {
-			tmp_name = tmp[tmp.length - 1];
-			tmp_obj = tmp[0];
-		} else {
-			tmp_obj = "ffPage";
-		}
-	}
-	
-	var tmp_url = that.getlibs + "?";
-	if (type == undefined)
-		tmp_url += "widgets";
-	else
-		tmp_url += type;
-	tmp_url += "=";
-	if (tmp_obj) {
-		tmp_url += tmp_obj + "/";
-	}
-	tmp_url += tmp_name;
-	
-	if(theme)
-		tmp_url += "&theme=" + theme;
-	
-	var tmpdiv = ff.getUniqueID();
-	jQuery("body").append('<div id="fftmp' + tmpdiv + '"></div>');
-			
-	ff.ajax.doRequest({
-		"url": tmp_url
-		, "injectid" : "#" + tmpdiv
-		, "stickycomp" : true
-		, "callback" : function () {
-			jQuery("#fftmp" + tmpdiv).remove();
-		}
-	});
-	
+    var res = ff.doEvent({
+        "event_name"	: "getLibs",
+        "event_params"	: [name, object, theme, type]
+    });
+
+    if (!res || !res[res.length - 1]) {
+        var tmp_name = name;
+        var tmp_obj = object;
+
+        if (object === undefined) {
+            var tmp = name.replace("ff.", "").split(".");
+            if (tmp.length > 1) {
+                tmp_name = tmp[tmp.length - 1];
+                tmp_obj = tmp[0];
+            } else {
+                tmp_obj = "ffPage";
+            }
+        }
+
+        var tmp_url = that.getlibs + "?";
+        if (type == undefined)
+            tmp_url += "widgets";
+        else
+            tmp_url += type;
+        tmp_url += "=";
+        if (tmp_obj) {
+            tmp_url += tmp_obj + "/";
+        }
+        tmp_url += tmp_name;
+
+        if (theme)
+            tmp_url += "&theme=" + theme;
+
+        var tmpdiv = ff.getUniqueID();
+        jQuery("body").append('<div id="fftmp' + tmpdiv + '"></div>');
+
+        ff.ajax.doRequest({
+            "url": tmp_url
+            , "injectid": "#" + tmpdiv
+            , "stickycomp": true
+            , "callback": function () {
+                jQuery("#fftmp" + tmpdiv).remove();
+            }
+        });
+    }
+
 	return true;
 },
 "load" : function(plugin, callback, object, uuid) {

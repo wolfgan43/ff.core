@@ -14,6 +14,10 @@ return array(
 									"path" => FF_THEME_DIR . "/library/plugins/jquery.calendario",
 									"file" => "calendar.css",
 								)
+								, ".custom" => array(
+									"path" => FF_THEME_DIR . "/library/plugins/jquery.calendario",
+									"file" => "custom_2.css",
+								)
 							)
 						)
 					)
