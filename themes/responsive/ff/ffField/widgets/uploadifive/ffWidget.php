@@ -245,6 +245,7 @@ class ffWidget_uploadifive extends ffCommon
                 $this->tpl[$tpl_id]->set_var("writable", "false");
             }
 		} else {
+			$this->tpl[$tpl_id]->set_var("file_normalize", "false");
 			$this->tpl[$tpl_id]->set_var("preview_js", "false");
 			$this->tpl[$tpl_id]->set_var("writable", "true");
 			$this->tpl[$tpl_id]->set_var("size_limit", 0);

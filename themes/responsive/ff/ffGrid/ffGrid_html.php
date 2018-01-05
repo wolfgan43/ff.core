@@ -2250,9 +2250,9 @@ class ffGrid_html extends ffGrid_base
 					elseif($params["type"] == "button") {
 						if(isset($this->grid_buttons[$key]))
 							$res = $this->parse_button($this->grid_buttons[$key], $recordset_key, $rrow, $modify_url["default"], ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
-						elseif($key == "edit")
+						elseif($key == "edit" && $this->display_edit_bt)
 							$res = $this->parse_button($key, $recordset_key, $rrow, $modify_url["default"], ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
-						elseif($key == "delete")
+						elseif($key == "delete" && $this->display_delete_bt)
 							$res = $this->parse_button($key, $recordset_key, $rrow, $delete_url, ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
 
 					}

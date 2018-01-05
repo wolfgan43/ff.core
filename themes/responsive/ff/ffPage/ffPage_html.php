@@ -157,6 +157,7 @@ class ffPage_html extends ffPage_base
 	 * @var String
 	 */
     public $class_body             = null;
+	public $properties_body        = null;
 
     /**
      * Abilita i tab
@@ -227,8 +228,6 @@ class ffPage_html extends ffPage_base
 		{
 			ffTheme_html_construct($this, cm_getMainTheme());
 		}
-
-		$this->tplAddJs("ff.ffPage"); 
 	}
 
 	/**
@@ -738,7 +737,7 @@ class ffPage_html extends ffPage_base
 		/*$globals = ffGlobals::getInstance();
 		if ($globals->test)
 			ffErrorHandler::raise ("ASD", E_USER_ERROR, $this, get_defined_vars ());*/
-	
+
 		if ($file !== null && is_array($file))
 		{
 			$params = $file;
@@ -756,7 +755,7 @@ class ffPage_html extends ffPage_base
 			
 		if (!$overwrite && ffIsset($this->js_loaded, $tag))
 			return $this->js_loaded[$tag];
-		
+
 		$this->js_loaded[$tag] = array(); // avoid infinite recursion
 		
 		$tmp_async = ($async !== null ? $async : (
@@ -769,7 +768,7 @@ class ffPage_html extends ffPage_base
 				"js" => array()
 				, "css" => array()
 			);
-		
+
 		$lib_parts = explode(".", $tag);
 		$lib_parts_last = array_pop($lib_parts); // exclude last (this)
 		$tmp_js_deps = array();
@@ -1353,7 +1352,6 @@ class ffPage_html extends ffPage_base
 		$tpl[0]->set_var("locale", strtolower(substr(FF_LOCALE, 0, 2)));
 		$tpl[0]->set_var("framework_css", $framework_css["name"]);
 		$tpl[0]->set_var("font_icon", $font_icon["name"]);
-		
 
 		$tpl[0]->set_var("theme", $this->theme);
 		
@@ -1365,7 +1363,8 @@ class ffPage_html extends ffPage_base
 		
 		$tpl[0]->set_var("layer", $this->layer);
         $tpl[0]->set_var("lazy_img", (CM_CACHE_IMG_LAZY_LOAD ? "true" : "false"));
-        
+		$tpl[0]->set_var("showfiles", (CM_MEDIACACHE_SHOWPATH ? CM_MEDIACACHE_SHOWPATH : CM_SHOWFILES));
+
         if (MOD_SEC_GROUPS) 
 		{
             $user_permission = get_session("user_permission");    
@@ -1462,8 +1461,7 @@ class ffPage_html extends ffPage_base
 		$this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
 
 		$this->tpl[0]->set_var("title", strip_tags($this->title));
-        if($this->class_body)
-            $this->tpl[0]->set_var("class_body", " class=\"" . $this->class_body . "\"");
+		$this->tpl[0]->set_var("properties_body", $this->getProperties());
 
 		if ($this->canonical)
 			$this->tplAddTag("canonical", array(
@@ -2008,9 +2006,7 @@ class ffPage_html extends ffPage_base
 						$value["path"] = $rc["path"];
 						$value["file"] = $rc["file"];
 					}
-if(is_array($value["path"])) {
-    print_r($value["path"]);
-					die();}
+
 					$value["path"] = rtrim($value["path"], "/");
 
 					$flag_path_file = (substr($value["path"], -4) === ".css");
@@ -3636,5 +3632,43 @@ if(is_array($value["path"])) {
 			return false;
 		else
 			return $_REQUEST["XHR_FORMAT"];
+	}
+	function getProperties()
+	{
+		$buffer = "";
+		if($this->class_body) {
+			if (is_array($this->class_body))
+				$this->properties_body["class"] = implode(" ", array_filter($this->class_body));
+			else
+				$this->properties_body["class"] = $this->class_body;
+		}
+
+		if (is_array($this->properties_body) && count(properties_body))
+		{
+			foreach ($this->properties_body as $key => $value)
+			{
+				if ($key == "style")
+				{
+					if (strlen($buffer))
+						$buffer .= " ";
+					$buffer .= $key . "=\"";
+					foreach ($this->properties_body[$key] as $subkey => $subvalue)
+					{
+						$buffer .= $subkey . ": " . $subvalue . ";";
+					}
+					reset($this->properties_body[$key]);
+					$buffer .= "\"";
+				}
+				elseif(strlen($value))
+				{
+					if (strlen($buffer))
+						$buffer .= " ";
+					$buffer .= $key . "=\"" . $value . "\"";
+				}
+			}
+			reset($property_set);
+		}
+		if($buffer)
+			return " " . $buffer;
 	}
 }

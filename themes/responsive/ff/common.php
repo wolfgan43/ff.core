@@ -8,7 +8,7 @@ require_once(ff_getAbsDir(FF_THEME_DIR . "/library/FF/common/framework-css.php")
 //        libraries cache
 $glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
 $glob_libs->libs = array();	
-	
+
 $ffcache_libs_success = false;
 if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
 {
@@ -22,7 +22,7 @@ if (!$ffcache_libs_success)
 {
 	// PHP VERSION
 	$cache_file = CM_CACHE_PATH . "/libs.php";
-	if (FF_THEME_RESTRICTED_LIBS_CACHE && file_exists($cache_file))
+	if (!isset($_REQUEST["__CLEARCACHE__"]) && file_exists($cache_file))
 	{
 		$glob_libs->libs = include($cache_file);
 	}
@@ -30,12 +30,11 @@ if (!$ffcache_libs_success)
 	{
 		cm_loadlibs($glob_libs->libs, __DIR__ . "/ffPage", "ffPage", "theme/ff");
 		cm_loadlibs($glob_libs->libs, __DIR__, "ff", "theme");
+		//cm_loadlibs($glob_libs->libs, FF_DISK_PATH . "/library/plugins", "library", "plugins");
 
-		if (FF_THEME_RESTRICTED_LIBS_CACHE && !file_exists($cache_file))
+		if (FF_THEME_RESTRICTED_LIBS_CACHE)
 		{
-			@mkdir(CM_CACHE_PATH, 0777, true);
-			$tmp_libs_var = var_export($glob_libs->libs, true);
-			file_put_contents($cache_file, "<?php\n\nreturn $tmp_libs_var;\n\n");
+			cm_loadlibs_save($glob_libs->libs);
 		}
 		
 		if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
@@ -104,6 +103,11 @@ ffPage::addEvent			("on_factory_done", "ffTheme_responsive_ffPage_set_events"		,
 ffGrid::addEvent			("on_factory_done", "ffTheme_responsive_ffGrid_set_events"		, ffEvent::PRIORITY_HIGH);
 ffRecord::addEvent			("on_factory_done", "ffTheme_responsive_ffRecord_set_events"	, ffEvent::PRIORITY_HIGH);
 ffDetails::addEvent			("on_factory_done", "ffTheme_responsive_ffDetails_set_events"	, ffEvent::PRIORITY_HIGH);
+/***
+ * FRAMEWORK CSS Load JS / CSS Base
+ */
+$cm->addEvent("on_layout_init", "ffPage_on_layout_init");
+
 
 function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 {
@@ -118,7 +122,9 @@ function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 				
 		if (strpos($tag, "jquery.plugins.") === 0)
 		{
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/library/plugins/jquery." . $tag_parts[2], "plugins/" . $tag, "jquery", false, true, true);
+			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/library/plugins/jquery." . $tag_parts[2], "plugins/" . $tag, "jquery");
+
+			//die();
 			$page->libsExtend($glob_libs->libs["jquery/plugins/" . $tag]);
 			unset($page->js_loaded[$tag]);
 			$page->tplAddJs($tag, $params);
@@ -128,11 +134,11 @@ function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 		{
 			if (!ffIsset($glob_libs->libs, "theme/" . $tag_parts[0]))
 			{
-				cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0], $tag_parts[0], "theme", false, false);
+				cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0], $tag_parts[0], "theme");
 				$page->libsExtend($glob_libs->libs["theme/" . $tag_parts[0]]);
 			}
 			
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[3], "plugins/" . $tag, $tag_parts[0] . "/jquery", false, true, true);
+			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[3], "plugins/" . $tag, $tag_parts[0] . "/jquery");
 			$page->libsExtend($glob_libs->libs[$tag_parts[0] . "/jquery/plugins/" . $tag]);
 			unset($page->js_loaded[$tag]);
 			$page->tplAddJs($tag, $params);
@@ -140,12 +146,13 @@ function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 		} 
 		elseif (strpos($tag, "library.") === 0)
 		{
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/library/" . $tag_parts[1], $tag, "library", false, true, true);
+			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/library/" . $tag_parts[1], $tag, "library", false, true);
 			$page->libsExtend($glob_libs->libs["library/" . $tag]);
 			unset($page->js_loaded[$tag]);
 			$page->tplAddJs($tag, $params);
 			return true;
 		}
+
 		/*elseif (strpos($tag, $tag_parts[0] . ".jquery.") === 0)
 		{
 			if (!ffIsset($glob_libs->libs, "theme/" . $tag_parts[0]))
@@ -162,10 +169,6 @@ function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 		} */
 	});
 }
-/***
-* FRAMEWORK CSS Load JS / CSS Base
-*/
-$cm->addEvent("on_layout_init", "ffPage_on_layout_init");
 
 function ffTheme_responsive_ffGrid_set_events(ffGrid_base $grid)
 {
@@ -255,7 +258,7 @@ function ffTheme_html_construct(ffPage_html &$page, $theme)
 		}
 	}
 	
-	if (isset($registry->themes[$theme]->default_js) && count($registry->themes[$theme]->default_js->children()))
+	if (!$cm->layout_vars["exclude_ff_js"] && isset($registry->themes[$theme]->default_js) && count($registry->themes[$theme]->default_js->children()))
 	{
 		foreach ($registry->themes[$theme]->default_js->children() as $key => $value)
 		{
@@ -308,6 +311,8 @@ function ffTheme_html_construct(ffPage_html &$page, $theme)
 				, "index" => $index
 			));
 		}
+
+		$page->tplAddJs("ff.ffPage");
 	}
 
     if (isset($registry->themes[$theme]->default_cdn) && count($registry->themes[$theme]->default_cdn->children()))
@@ -406,6 +411,10 @@ function ffTheme_html_construct(ffPage_html &$page, $theme)
     }
 }
 
+// -------------------------------------------------------------
+//  parti di codice da aggiungere solo in presenza di un dialog
+// -------------------------------------------------------------
+
 if ($cm->isXHR())
 {
 	if (!isset($_REQUEST["XHR_CTX_ID"]))
@@ -478,7 +487,6 @@ function ffRecord_dialog_on_done_action_prepare_results(ffRecord_base $record, $
 	
 	return false;
 }
-
 function ffRecord_dialog_on_done_action_output_results(ffRecord_base $record, $frmAction)
 {
 	cm::jsonParse($record->json_result);
@@ -492,14 +500,14 @@ function ffRecord_dialog_on_done_action_output_results(ffRecord_base $record, $f
 function ffPage_on_layout_init($oPage, $layout_vars) {
     $framework_css = cm_getFrameworkCss(FF_THEME_FRAMEWORK_CSS);
     $font_icon = cm_getFontIcon(FF_THEME_FONT_ICON);
-	
+
 	if(!$oPage->isXHR()) {
 		if(is_array($font_icon)) {
     		if(strlen($font_icon["css"])) {
     		 //	$oPage->tplAddCss("font." . $font_icon["name"]);
     			//$oPage->tplAddCss($font_icon["name"], basename($font_icon["css"]), ffCommon_dirname($font_icon["css"]), "stylesheet", "text/css", false, false, null, false, "top");
     		}
-		}    
+		}
 		if(is_array($framework_css)) {
     		if(strlen($framework_css["params"]["css"])) {
                 if(is_file($oPage->getThemeDir() . "/css/" . $framework_css["name"] . ".css")) {
@@ -519,7 +527,7 @@ function ffPage_on_layout_init($oPage, $layout_vars) {
                 	));*/
 				}
                 $oPage->tplAddCss($framework_css["name"] . ".core");
-            } 
+            }
             if(strlen($framework_css["theme"]["css"])) {
                 if(is_file($oPage->getThemeDir() . "/css/" . $framework_css["theme"]["name"] . ".css"))
                     $oPage->tplAddCss($framework_css["theme"]["name"]
@@ -549,7 +557,7 @@ function ffPage_on_layout_init($oPage, $layout_vars) {
                 else
     				$oPage->tplAddJs($framework_css["name"] . ".init", null, null, false, false, $framework_css["params"]["js_init"], false, "bottom");
             }*/
-		}				
+		}
 	}
 }
 
