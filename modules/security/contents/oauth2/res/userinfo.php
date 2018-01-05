@@ -2,7 +2,7 @@
 header('Access-Control-Allow-Origin: *'); // allow JS access
  
 modsec_OAuth2_UserResourceController("userinfo", function ($UserNID, $scopes, $request, $response, $server) {
-	
+	$cm = cm::getInstance();
 	$outdata = array();
 	
 	$db = mod_security_get_main_db();
@@ -39,7 +39,7 @@ modsec_OAuth2_UserResourceController("userinfo", function ($UserNID, $scopes, $r
 		if (is_array($value))
 		{
 			if ($value["mode"] === "merge")
-				$outdata = array_merge_recursive($outdata, $value[$data]);
+				$outdata = array_merge_recursive($outdata, $value["data"]);
 			else
 				$outdata = $value["data"];
 			

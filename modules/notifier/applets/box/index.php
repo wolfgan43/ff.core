@@ -18,7 +18,7 @@ if (isset($applet_params["name"]))
 {
 	if ($applet_params["name"] == "dialog")
 	{
-		$dialog = $cm->oPage->getXHRDialog();
+		$dialog = $cm->oPage->getXHRCtx();
 		if ($dialog !== false)
 		{
 			$append = $dialog;
@@ -114,7 +114,12 @@ if (!MOD_NOTIFIER_SKIP)
 
 $tpl->set_var("modules_external_path", cm_getModulesExternalPath());
 //$cm->oPage->tplAddJs("ff.ffPage.notifier", "notifier.js", cm_getModulesExternalPath() . "/notifier/javascript");
-$cm->oPage->tplAddJs("ff.ffPage.notifier", "", cm_getModulesExternalPath() . "/notifier/javascript/notifier.js"); // useful for caching purpose
+$cm->oPage->tplAddJs("ff.ffPage.notifier", array(
+	"file" => "notifier.js"
+	, "path" => cm_getModulesExternalPath() . "/notifier/themes/javascript"
+));
+
+
 
 if(MOD_NOTIFIER_DISABLE_AJAX) // by Alex
 {

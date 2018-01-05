@@ -1261,6 +1261,184 @@ function mod_security_create_session($UserID = null, $UserNID = null, $Domain = 
 	return $user;
 }
 
+function mod_security_get_user_data($user_key, $ext = null)
+{
+	$db = mod_security_get_main_db();
+	$options = mod_security_get_settings();
+
+	if ($user_key !== null && $options["table_dett_name"])
+	{
+		$query["from"] 		= $options["table_name"];
+		$query["select"] 	= array(
+			"ID" 				=> "`" . $options["table_name"] . "`.`ID`"
+		, "ID_domains" 		=> "`" . $options["table_name"] . "`.`ID_domains`"
+		, "ID_languages" 	=> "`" . $options["table_name"] . "`.`ID_languages`"
+		, "username" 		=> "`" . $options["table_name"] . "`.`username`"
+		, "username_slug" 	=> "`" . $options["table_name"] . "`.`username_slug`"
+		, "level" 			=> "`" . $options["table_name"] . "`.`level`"
+		, "email" 			=> "`" . $options["table_name"] . "`.`email`"
+		, "lastlogin" 		=> "`" . $options["table_name"] . "`.`lastlogin`"
+		, "avatar"			=> (defined("MOD_SEC_USER_AVATAR") && MOD_SEC_USER_AVATAR
+				? "`" . $options["table_name"] . "`.`avatar`"
+				: "'' AS avatar"
+			)
+		);
+
+		// defined("MOD_SEC_DEFAULT_FIELDS") && strlen(MOD_SEC_DEFAULT_FIELDS)
+		if($ext["default"]) {
+			if(is_array($ext["default"]) && count($ext["default"])) {
+				foreach($ext["default"] AS $key) {
+					if($query["select"][$key])
+						continue;
+
+					$query["select"][$key] = "`" . $options["table_name"] . "`.`" . $key. "`";
+				}
+			}
+		}
+
+		if (is_numeric($user_key) && $user_key > 0)
+			$query["where"]["ID"] = "`" . $options["table_name"] . "`.`ID` = " . $db->toSql($user_key, "Number");
+		else
+		{
+			if (MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "username")
+				$query["where"]["login"][] = "`" . $options["table_name"] . "`.`username` = " . $db->toSql($user_key);
+
+			if (strpos($user_key, "@") !== false && (MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "email"))
+				$query["where"]["login"][] = "`" . $options["table_name"] . "`.`email` = " . $db->toSql($user_key);
+
+			$query["where"]["login"] = " (" . implode(" OR ", $query["where"]["login"]) . ") ";
+		}
+
+		if (MOD_SEC_EXCLUDE_SQL)
+			$query["where"]["exclude"]  = "`" . $options["table_name"] . "`.`ID` " . MOD_SEC_EXCLUDE_SQL;
+
+		$sSQL = "SELECT
+					" . implode(",", $query["select"]) . "
+				FROM
+					" . $query["from"] . "
+				WHERE
+					" . implode(" AND ", $query["where"]) . "
+				ORDER BY ID DESC";
+		$db->query($sSQL);
+		if ($db->nextRecord()) {
+			$user = $db->record;
+		}
+	}
+
+	if ($user["ID"])
+	{
+		if($ext["geolocalization"])
+			$user = array_replace($user, mod_security_get_locale());
+
+		//$cm->modules["security"]["fields"]
+		if ($ext["custom"] && $options["table_dett_name"])
+		{
+			$arrFieldKey = null;
+			if(is_array($ext["custom"]) && count($ext["custom"])) {
+				foreach ($ext["custom"] as $key => $value) {
+					if (mod_security_is_default_field($key))
+						continue;
+
+					$arrFieldKey[] = $db->toSql($key);
+				}
+			}
+			if(is_array($arrFieldKey) && count($arrFieldKey))
+			{
+				$sSQL = "SELECT " . $options["table_dett_name"] . ".field
+							, " . $options["table_dett_name"] . ".value
+						FROM
+							" . $options["table_dett_name"] . "
+						WHERE
+							" . $options["table_dett_name"] . ".ID_users = " . $db->getField($user["ID"], "Number")
+					. (is_array($arrFieldKey) && count($arrFieldKey)
+						? " AND " . $options["table_dett_name"] . ".field IN (" . implode(", ", $arrFieldKey) . ")"
+						: ""
+					);
+				$db->query($sSQL);
+				if($db->nextRecord()) {
+					do {
+						$user[$db->getField("field", "Text", true)] = $db->getField("value", "Text", true);
+					} while($db->nextRecord());
+				}
+			}
+		}
+
+		//defined("MOD_SEC_GROUPS") && MOD_SEC_GROUPS
+		if ($ext["groups"] && $options["table_groups_name"])
+		{
+			$sSQL = "SELECT " . $options["table_groups_name"] . ".gid AS rel_gid
+							, " . $options["table_groups_name"] . ".name AS gid_name
+					 FROM " . $options["table_groups_rel_user"] . "
+						INNER JOIN " . $options["table_groups_name"] . " ON " . $options["table_groups_name"] . ".gid = " . $options["table_groups_rel_user"] . ".gid
+							OR " . $options["table_groups_name"] . ".gid = " . $db->toSql($user["primary_gid"], "Number") . "
+					 WHERE " . $options["table_groups_rel_user"] . ".uid = " . $db->toSql($user["ID"], "Number") . " 
+					 ORDER BY " . $options["table_groups_name"] . ".level DESC";
+			$db->query($sSQL);
+			if ($db->nextRecord())
+			{
+				$user["groups"] = array();
+
+				$user["primary_gid_default"] = $db->getField("rel_gid", "Number", true);
+				$user["primary_gid_default_name"] = $db->getField("gid_name", "Text", true);
+				do
+				{
+					$ID_group = $db->getField("rel_gid", "Number", true);
+					$group_name = $db->getField("gid_name", "Text", true);
+					if($ID_group > 0)
+						$user["groups"][$group_name] = $ID_group;
+
+					if($user["primary_gid"] == $ID_group) {
+						$user["primary_gid_name"] = $group_name;
+
+						$user["primary_gid_default"] = $user["primary_gid"];
+						$user["primary_gid_default_name"] = $user["primary_gid_name"];
+					}
+				} while($db->nextRecord());
+
+				if(!count($user["groups"]))
+				{
+					$user["groups"][MOD_SEC_GUEST_USER_NAME] = MOD_SEC_GUEST_USER_ID;
+					$user["primary_gid_name"] = MOD_SEC_GUEST_USER_NAME;
+				}
+
+				$sSQL = "SELECT " . $options["table_groups_dett_name"] . ".*
+						FROM " . $options["table_groups_dett_name"] . "
+						WHERE " . $options["table_groups_dett_name"] . ".ID_groups = " . $db->toSql($user["primary_gid"], "Number") . "
+						ORDER BY " . $options["table_groups_dett_name"] . ".`order`, " . $options["table_groups_dett_name"] . ".field";
+				$db->query($sSQL);
+				if($db->nextRecord())
+				{
+					do {
+						$user["permissions_custom"][$db->getField("field", "Text", true)] = $db->getField("value", "Text", true);
+					} while($db->nextRecord());
+				}
+			}
+		}
+
+		//MOD_SEC_ENABLE_TOKEN
+		if ($ext["token"] && $options["table_token"])
+		{
+			$sSQL = "SELECT 
+					" . $options["table_token"] . ".*
+                FROM 
+					" . $options["table_token"] . "
+                WHERE 
+					" . $options["table_token"] . ".ID_user = " . $db->toSql($user["ID"], "Number") . "
+                ORDER BY 
+					" . $options["table_token"] . ".`type`";
+			$db->query($sSQL);
+			if($db->nextRecord())
+			{
+				do
+				{
+					$user["token"][$db->getField("type", "Text", true)] = $db->getField("token", "Text", true);
+				} while($db->nextRecord());
+			}
+		}
+	}
+	return $user;
+}
+
 /* destroy current session.
 	With prompt_login set to true, automatically redirect to login page */
 function mod_security_destroy_session($promptlogin = false, $ret_url = null, $disable_events = false)
@@ -1337,7 +1515,7 @@ function mod_security_get_domain()
 		return null;
 }
 
-function mod_security_get_settings($path_info)
+function mod_security_get_settings($path_info = null)
 {
 	$cm = cm::getInstance();
 	
