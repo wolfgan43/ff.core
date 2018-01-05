@@ -6790,7 +6790,7 @@ var DayTableMixin = FC.DayTableMixin = {
 
 		return '<td class="' + classes.join(' ') + '"' +
 			(isDateValid ?
-				' data-date="' + date.format('YYYY-MM-DD') + '"' : // if date has a time, won't format it
+				' onclick="modifyEvent(\'\', \'' + date.format('YYYY-MM-DD') + '\');" data-date="' + date.format('YYYY-MM-DD') + '"' : // if date has a time, won't format it
 				'') +
 			(otherAttrs ?
 				' ' + otherAttrs :
@@ -7007,7 +7007,7 @@ var DayGrid = FC.DayGrid = Grid.extend(DayTableMixin, {
 
 		html += '<td class="' + classes.join(' ') + '"' +
 			(isDateValid ?
-				' data-date="' + date.format() + '"' :
+				' style="cursor:pointer;" onclick="modifyEvent(\'\', \'' + date.format() + '\');" data-date="' + date.format() + '"' :
 				''
 				) +
 			'>';
@@ -7422,8 +7422,9 @@ DayGrid.mixin({
 		// Only display a timed events time if it is the starting segment
 		if (seg.isStart) {
 			timeText = this.getEventTimeText(event);
-			if (timeText) {
-				timeHtml = '<span class="fc-time">' + htmlEscape(timeText) + '</span>';
+                        
+                if (timeText) {
+				timeHtml = '<span class="fc-time">' + event.timeStart + ' - ' + event.timeEnd + '</span>';
 			}
 		}
 
@@ -7479,7 +7480,7 @@ DayGrid.mixin({
 
 		// populates empty cells from the current column (`col`) to `endCol`
 		function emptyCellsUntil(endCol) {
-			while (col < endCol) {
+                    while (col < endCol) {
 				// try to grab a cell from the level above and extend its rowspan. otherwise, create a fresh cell
 				td = (loneCellMatrix[i - 1] || [])[col];
 				if (td) {
@@ -7487,9 +7488,14 @@ DayGrid.mixin({
 						'rowspan',
 						parseInt(td.attr('rowspan') || 1, 10) + 1
 					);
+                                /*
+                                        td.attr(
+                                                'onclick',
+                                                'var position = jQuery(this).index();jQuery(this).parents(".fc-content-skeleton").find(".fc-day-top").eq(position).click();'
+                                        );*/
 				}
 				else {
-					td = $('<td/>');
+					td = $('<td onclick="var position = jQuery(this).index();jQuery(this).parents(\'.fc-content-skeleton\').find(\'.fc-day-top\').eq(position).click();"/>');
 					tr.append(td);
 				}
 				cellMatrix[i][col] = td;
@@ -8823,21 +8829,28 @@ TimeGrid.mixin({
 				) +
 			'>' +
 				'<div class="fc-content">' +
-					(timeText ?
-						'<div class="fc-time"' +
+					(timeText && event.title 
+                                            ? '<div class="fc-time"' +
 						' data-start="' + htmlEscape(startTimeText) + '"' +
 						' data-full="' + htmlEscape(fullTimeText) + '"' +
 						'>' +
-							'<span>' + htmlEscape(timeText) + '</span>' +
-						'</div>' :
-						''
-						) +
-					(event.title ?
-						'<div class="fc-title">' +
-							htmlEscape(event.title) +
-						'</div>' :
-						''
-						) +
+							'<span>' + htmlEscape(timeText) + '</span><span class=event-title>' + htmlEscape(event.title) + "</span>" + 
+						'</div>' 
+                                            : (timeText
+                                                ? '<div class="fc-time"' +
+                                                    ' data-start="' + htmlEscape(startTimeText) + '"' +
+                                                    ' data-full="' + htmlEscape(fullTimeText) + '"' +
+                                                    '>' +
+                                                            '<span>' + htmlEscape(timeText) + '</span>' + 
+                                                    '</div>' 
+                                                : (event.title 
+                                                    ? '<div class="fc-title">' +
+                                                            htmlEscape(event.title) +
+                                                        '</div>' 
+                                                    : ''
+                                                )
+                                            )
+                                        ) +
 				'</div>' +
 				'<div class="fc-bg"/>' +
 				/* TODO: write CSS for this

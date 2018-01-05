@@ -219,8 +219,11 @@ var that = { // publics
 "theme_ui"		: undefined,
 "page_path"		: undefined,
 "language" 		: undefined, 
-"layer" 		: undefined, 
-"group"         : undefined, 
+"layer" 		: undefined,
+"frameworkCss"	: undefined,
+"fontIcon"		: undefined,
+"showfiles"     : undefined,
+"group"         : undefined,
 "origin"		: undefined,
 "domain"		: undefined,
 "js_path"		: undefined,
@@ -384,9 +387,9 @@ var that = { // publics
     that.language 				= getCookie("lang") || (params.language === undefined ? "ITA" : params.language);
     that.locale 				= (params.locale === undefined ? "it_IT" : params.locale);
     that.layer 					= (params.layer === undefined ? "empty" : params.layer);
-    that.group                                  = getCookie("group") || (params.group === undefined ? "" : params.group);
+    that.showfiles 				= (params.showfiles === undefined ? "/cm/showfiles.php" : params.showfiles);
+    that.group                  = getCookie("group") || (params.group === undefined ? "" : params.group);
     that.js_path				= (params.js_path === undefined ? that.site_path + '/themes/' + that.theme + '/javascript' : params.js_path);
-
     if(params.lazyImg) {
         jQuery(function() {
             ff.lazyImg();
@@ -846,12 +849,12 @@ var that = { // publics
 
     function loadImage (el, fn) {
         var src = el.getAttribute('data-src');
-	if(src) {
+		if(src) {
             el.setAttribute("src", src);
             el.removeAttribute('data-src');
 
             fn ? fn() : null;
-	}
+		}
     };
 
     var processScroll = function(){

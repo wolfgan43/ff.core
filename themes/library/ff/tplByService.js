@@ -658,26 +658,12 @@ ff.tplService = (function () {
         				}
 
 						ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-							ff.pluginLoad("jquery.ui", "/themes/library/jquery.ui/jquery.ui.js", function() {
+							ff.pluginLoad("jquery-ui", "/themes/library/jquery-ui/jquery-ui.js", function() {
 								ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js", function() {
 								});
 							});
 						});
-/* Remove jquery ui css
-						ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
-							ff.injectCSS("jqueryuicore", "/themes/library/jquery.ui/themes/" + ff.theme_ui + "/jquery.ui.core.css", function() {
-								ff.injectCSS("jqueryuitheme", "/themes/library/jquery.ui/themes/" + ff.theme_ui + "/jquery.ui.theme.css", function() {
-									ff.injectCSS("jqueryuidialog", "/themes/library/jquery.ui/themes/" + ff.theme_ui + "/jquery.ui.dialog.css", function() {
-										ff.injectCSS("jqueryuiresizable", "/themes/library/jquery.ui/themes/" + ff.theme_ui + "/jquery.ui.resizable.css");
-										ff.pluginLoad("jquery.ui", "/themes/library/jquery.ui/jquery.ui.js", function() {
-											ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js", function() {
-											});
-										});
-									});
-								});
-							});
-						});
-*/
+
 						ff.pluginAddInit("ff.ffPage.dialog", function () {
 							ff.ffPage.dialog.addDialog({
 								"id" : "tplServiceDialog",

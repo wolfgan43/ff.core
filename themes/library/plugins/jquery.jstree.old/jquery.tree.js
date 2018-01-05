@@ -1423,7 +1423,7 @@
 				}
 				if(tree_component.cut_copy.cut_nodes && tree_component.cut_copy.cut_nodes.size()) {
 					var ok = true;
-					obj.parents().andSelf().each(function () {
+					obj.parents().addBack().each(function () {
 						if(tree_component.cut_copy.cut_nodes.index(this) != -1) {
 							ok = false;
 							return false;

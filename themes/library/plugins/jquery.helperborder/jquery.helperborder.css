@@ -75,14 +75,3 @@ la barra non deve colorarsi in modalità compatta
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
-.hb-right-top > * {
-	width : 0px;
-	height: 0px;
-	/*margin-top: 24px;*/
-}
-
-.hb-right-bottom > * {
-	width : 0px;
-	/*margin-bottom: 24px;*/
-}
