@@ -755,7 +755,14 @@ class CSSmin
 
         return (int) $size;
     }
-	
+
+	/**
+	 * Minify Javascript.
+	 *
+	 * @param string $js Javascript to be minified
+	 *
+	 * @return string
+	 */
 	public static function minify($css = '', $linebreak_pos = FALSE, $raise_php_limits = TRUE)
 	{
 		$minifier = new CSSmin($raise_php_limits);
