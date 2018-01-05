@@ -292,11 +292,13 @@ class ffDB_Sql
 			$tmp_pwd = FF_DATABASE_PASSWORD;
 		else
 			$tmp_pwd = $this->password;
-		
+
 		if ($Database !== null)
-			$this->database = $Database;
+			$tmp_database = $Database;
 		else if ($this->database === null)
-			$this->database = FF_DATABASE_NAME;
+			$tmp_database = FF_DATABASE_NAME;
+		else
+			$tmp_database = $this->database;
 
 		$do_connect = true;
 		
@@ -304,7 +306,7 @@ class ffDB_Sql
 		if (is_object($this->link_id))
 		{
 			if (
-					($this->host !== $tmp_host || $this->user !== $tmp_user || $this->password !== $tmp_pwd)
+				($this->host !== $tmp_host || $this->user !== $tmp_user || $this->database !== $tmp_database)
 					|| $force
 				)
 			{
@@ -318,17 +320,18 @@ class ffDB_Sql
 		$this->host = $tmp_host;
 		$this->user = $tmp_user;
 		$this->password = $tmp_pwd;
+		$this->database = $tmp_database;
 		
 		if (static::$_sharelink && !$force)
 		{
-			$dbkey = $this->host . "|" . $this->user . "|" . $this->password;
+			$dbkey = $this->host . "|" . $this->user . "|" . $this->database;
 			if (is_array(static::$_dbs) && array_key_exists($dbkey, static::$_dbs))
 			{
 				$this->link_id =& static::$_dbs[$dbkey];
 				$do_connect = false;
 			}
 		}
-			
+
 		if ($do_connect)
 		{
 			if (!$this->avoid_real_connect)
@@ -348,6 +351,7 @@ class ffDB_Sql
 					$rc = @mysqli_real_connect($this->link_id, "p:" . $this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null), null, null, MYSQLI_CLIENT_FOUND_ROWS);
 				else
 					$rc = @mysqli_real_connect($this->link_id, $this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null), null, null, MYSQLI_CLIENT_FOUND_ROWS);
+
 			}
 			else
 			{
@@ -355,7 +359,7 @@ class ffDB_Sql
 					$this->link_id = @mysqli_connect("p:" . $this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null));
 				else
 					$this->link_id = @mysqli_connect($this->host, $this->user, $this->password, (FF_DB_MYSQLI_AVOID_SELECT_DB ? $this->database : null));
-				
+
 				$rc = is_object($this->link_id);
 			}
 
@@ -367,8 +371,8 @@ class ffDB_Sql
 				return false;
 			}
 
-			if ($this->charset_names !== null && $this->charset_collation !== null)
-				@mysqli_query($this->link_id, "SET NAMES '" . $this->charset_names . "' COLLATE '" . $this->charset_collation . "'");
+			//if ($this->charset_names !== null && $this->charset_collation !== null)
+			//	@mysqli_query($this->link_id, "SET NAMES '" . $this->charset_names . "' COLLATE '" . $this->charset_collation . "'");
 
 			if ($this->charset !== null)
 				@mysqli_set_charset($this->link_id, $this->charset);
@@ -379,7 +383,7 @@ class ffDB_Sql
 				$this->link_id =& static::$_dbs[$dbkey];
 			}
 		}
-		
+
 		if (FF_DB_MYSQLI_AVOID_SELECT_DB)
 			return $this->link_id;
 		else if ($this->selectDb())
@@ -508,25 +512,29 @@ class ffDB_Sql
 		
 		return $last_ret;
 	}
-	
-	function getRecordset()
+
+	function getRecordset($obj = null)
 	{
 		if (!$this->query_id)
 		{
 			$this->errorHandler("eachAll called with no query pending");
 			return false;
 		}
+		if ($obj != null) {
+			$res = @mysqli_fetch_object($this->query_id, $obj);
+		} else {
+			$res = @mysqli_fetch_all($this->query_id, MYSQLI_ASSOC);
+		}
 
-		$res = @mysqli_fetch_all($this->query_id, MYSQLI_ASSOC);
 		if ($res === null && $this->checkError())
 		{
 			$this->errorHandler("fetch_assoc_error");
 			return false;
 		}
-		
+
 		return $res;
-	}	
-	
+	}
+
 	/**
 	 * Esegue una query 
 	 * @param String La query da eseguire
@@ -542,11 +550,11 @@ class ffDB_Sql
 			if (!$this->connect())
 				return false;
 		}
-		else
+		/*else
 		{
 			if (FF_DB_MYSQLI_AVOID_SELECT_DB || !$this->selectDb())
 				return false;
-		}
+		}*/
 
 		$this->freeResult();
 
@@ -772,7 +780,7 @@ class ffDB_Sql
 	 * Sposta il puntatore al DB al record successivo (va chiamato almeno una volta)
 	 * @return boolean
 	 */
-	function nextRecord()
+	function nextRecord($obj = null)
 	{
 		if (!$this->query_id)
 		{
@@ -784,14 +792,22 @@ class ffDB_Sql
 		if ($this->row == ($this->numRows() - 1))
 			return false;
 
-		$this->record = @mysqli_fetch_assoc($this->query_id);
+		if ($obj != null) {
+			$this->record = @mysqli_fetch_object($this->query_id, $obj);
+			$this->row += 1;
+			return $this->record;
+			//dd($this->record);
+		} else {
+			$this->record = @mysqli_fetch_assoc($this->query_id);
+		}
+
 		/*if ($this->checkError())
 		{
 			$this->errorHandler("Invalid SQL: " . $Query_String);
 			return false;
 		}*/
 
-		if ($this->record !== false && $this->record !== null)
+		if ($this->record !== false)
 		{
 			$this->row += 1;
 			return true;
