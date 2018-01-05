@@ -205,12 +205,29 @@ function ffPage_seo_optimize_js($oPage, $content)
 {
     $matches = array();
     $rc_scripts = preg_match_all('#\s*<script(\b[^>]*)>([\s\S]*?)<\/script>#ims', $content, $matches);
-
-    if ($rc_scripts)
+	if ($rc_scripts)
     {
         for ($i = 0; $i < $rc_scripts; $i++)
         {
-            if (preg_match("/defer *= */i", $matches[1][$i])) // TOCHECK! ??? not needed
+			if (preg_match("/type *= *x\-/i", $matches[1][$i])
+				|| preg_match("/type *= *template/i", $matches[1][$i])
+			) {
+				$template = $matches[0][$i];
+
+				if(FF_TEMPLATE_ENABLE_TPL_JS === true) {
+					$template = str_replace(
+						array("<!--{{", "}}-->")
+						, array("{{", "}}")
+						, preg_replace('/\s+/', ' ', $template)
+					);
+				}
+				$oPage->tpl[0]->set_var("WidgetsContent", $template);
+				$oPage->tpl[0]->parse("SectWidgetsHeaders", true);
+				$content = str_replace($matches[0][$i], "", $content);
+
+				continue;
+			}
+			if (preg_match("/defer *= */i", $matches[1][$i])) // TOCHECK! ??? not needed
                 continue;
 
             $matches_src = array();
@@ -286,7 +303,7 @@ function ffPage_seo_optimize($oPage)
     if(CM_CACHE_IMG_SET_DIMENSION)
     {
         //ffErrorHandler::raise("ASD", E_USER_ERROR, null, get_defined_vars());
-        $doc = new DOMDocument;
+        $doc = new DOMDocument();
         libxml_use_internal_errors(true);
         $content = mb_convert_encoding($content, 'html-entities', 'utf-8');
 
@@ -339,15 +356,21 @@ function ffPage_seo_optimize($oPage)
                 //	continue;
                 $imgNodeClass = $imgNode->getAttribute("class");
                 $enable_lazy = CM_CACHE_IMG_LAZY_LOAD && strpos($imgNodeClass, "nolazy") === false;
-                if($imgNode->hasAttribute("data-src"))
-                    $imgNodeSrc = $imgNode->getAttribute("data-src");
-                elseif($imgNode->hasAttribute("src")) {
+                if($imgNode->hasAttribute("data-src")) {
+					$imgNodeSrc = $imgNode->getAttribute("data-src");
+					$imgNodeSrcExt = substr($imgNodeSrc, -4);
+					if($enable_lazy && $imgNodeSrcExt != ".jpg" && $imgNodeSrcExt != ".png" && $imgNodeSrcExt != ".gif") {
+						$enable_lazy = false;
+					}
+				} elseif($imgNode->hasAttribute("src")) {
                     $imgNodeSrc = $imgNode->getAttribute("src");
                     $imgNodeSrcExt = substr($imgNodeSrc, -4);
                     if($enable_lazy && ($imgNodeSrcExt == ".jpg" || $imgNodeSrcExt == ".png" || $imgNodeSrcExt == ".gif")) {
                         $imgNode->removeAttribute("src");
                         $imgNode->setAttribute("data-src", $imgNodeSrc);
-                    }
+                    } else {
+						$enable_lazy = false;
+					}
                 }
 
 				if(strpos($imgNodeSrc, "/") !== 0 && strpos($imgNodeSrc, "http") !== 0)
@@ -480,7 +503,7 @@ function ffPage_seo_optimize($oPage)
             }
         }
 
-        $newdoc = new DOMDocument;
+        $newdoc = new DOMDocument();
         $body = $doc->getElementsByTagName('body')->item(0);
         foreach ($body->childNodes as $child){
             $newdoc->appendChild($newdoc->importNode($child, true));
@@ -544,18 +567,27 @@ function ffPage_seo_optimize($oPage)
         }
     }
 
-	if($_SERVER["HTTPS"]) {
-		$arrHttp[] 			= 'http://' . $_SERVER["HTTP_HOST"];
-		$arrHttps[] 		= 'https://' . $_SERVER["HTTP_HOST"];
-		if(strpos($_SERVER["HTTP_HOST"], "www.") === 0) {
-			$domain = substr($_SERVER["HTTP_HOST"], 4);
-			$arrHttp[] 		= 'http://' . $domain;
-			$arrHttps[] 	= 'https://www.' .  $domain;
-		}
-		$content = str_replace($arrHttp, $arrHttps, $content);
-	}
+	$content = cmCache_normalizeUrl($content);
 
 	$oPage->tpl[0]->set_var("content", $content);
+}
+
+function cmCache_normalizeUrl($content) {
+	if(CM_CACHE_PATH_CONVERT_SHOWFILES && CM_MEDIACACHE_SHOWPATH) {
+//		$arrFind[] 			= CM_SHOWFILES . "/";
+//		$arrReplace[] 		= CM_MEDIACACHE_SHOWPATH . "/";
+	}
+	if($_SERVER["HTTPS"]) {
+		$arrFind[] 			= 'http://' . $_SERVER["HTTP_HOST"];
+		$arrReplace[] 		= 'https://' .  $_SERVER["HTTP_HOST"];
+		if(strpos($_SERVER["HTTP_HOST"], "www.") === 0) {
+			$domain = substr($_SERVER["HTTP_HOST"], 4);
+			$arrFind[] 		= 'http://' . $domain;
+			$arrReplace[] 	= 'https://www.' .  $domain;
+		}
+		$content = str_replace($arrFind, $arrReplace, $content);
+	}
+	return $content;
 }
 
 function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = null)
@@ -566,7 +598,10 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
     );
 
     $image = pathinfo($src);
-    if(strpos($src, FF_SITE_PATH . FF_UPDIR . '/') === 0)
+	if(strpos($src, FF_SITE_PATH . FF_THEME_DIR . '/') === 0)
+	{
+
+	} elseif(strpos($src, FF_SITE_PATH . FF_UPDIR . '/') === 0)
     {
         $mode = "";
         if($width > 0 && $height > 0)
@@ -589,6 +624,7 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
             $showfiles_orig = FF_SITE_PATH . "/cm/showfiles" . '/';
         if(strpos($src, FF_SITE_PATH . "/cm/showfiles.php" . '/') === 0)
             $showfiles_orig = FF_SITE_PATH . "/cm/showfiles.php" . '/';
+
         if($showfiles_orig)
         {
             $imageOrig["url"] 	= str_replace($showfiles_orig, "", $src);
@@ -612,19 +648,34 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
 				$imageOrig["mode"] = $imageOrig["ext"] . "-" . substr($imageOrig["mode"],0 , -5);
 			}
 
-            $imageOrig["basename"] = ($imageOrig["ext"]
-                ? ffGetFilename($imageOrig["url"]) . "." . $imageOrig["ext"]
-                : basename($imageOrig["url"])
-            );
-            if(is_file(FF_DISK_PATH . FF_UPDIR . $imageOrig["dirname"] . "/" . $imageOrig["basename"]))
-            {
-                $imageOrig["mode"] = "-" . $imageOrig["mode"];
-            }
-            else
-            {
-                $imageOrig["url"] = "/". $imageOrig["mode"] . $imageOrig["url"];
-                $imageOrig["mode"] = "";
-            }
+			$imageOrig["basename"] = ($imageOrig["ext"]
+				? ffGetFilename($imageOrig["url"]) . "." . $imageOrig["ext"]
+				: basename($imageOrig["url"])
+			);
+
+			if(strpos($imageOrig["mode"], "x") !== false) {
+				$arrMode = explode("x", $imageOrig["mode"]);
+			} elseif(strpos($imageOrig["mode"], "-") !== false) {
+				$arrMode = explode("-", $imageOrig["mode"]);
+			}
+			if(is_array($arrMode) && count($arrMode) == 2 && is_numeric($arrMode[0]) && is_numeric($arrMode[1]) ) {
+				$is_mode = true;
+			}
+
+
+			if($is_mode) // is_file(FF_DISK_PATH . FF_UPDIR . $imageOrig["dirname"] . "/" . $imageOrig["basename"])
+			{
+				$imageOrig["mode"] = "-" . $imageOrig["mode"];
+			}
+			else
+			{
+				$imageOrig["url"] = "/". $imageOrig["mode"] . $imageOrig["url"];
+				$imageOrig["mode"] = "";
+				$showfiles = CM_SHOWFILES;
+				//todo: da togliere da qui e metterlo in un evento
+				if(function_exists("cache_writeLog"))
+					cache_writeLog("SRC: " . $src . " REFERER: " . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], "resource_no_media");
+			}
 
             //if(!$imageOrig["mode"] && $width > 0 && $height > 0)
             //	$imageOrig["mode"] = "-" . $width . "x" . $height;
@@ -738,8 +789,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
             {
                 $parsed_externals = true; // avoid useless cycle
 
-                // TODO: included files must be hashed too
-                //$max_mtime = 0;
+                $max_mtime = 0;
                 foreach ($css_buffer_path AS $css_buffer_key => $css_buffer_value)
                 {
                     if (strlen($css_buffer_value["content"]))
@@ -784,9 +834,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         if (@is_file($css_buffer_path[$css_buffer_key]["path"]))
                         {
                             $css_file_key .= $css_buffer_path[$css_buffer_key]["path"];
-                            //$tmp = filemtime($css_buffer_path[$css_buffer_key]["path"]);
-                            //if ($tmp > $max_mtime)
-                            //    $max_mtime = $tmp;
+							$tmp_mtime = filemtime($css_buffer_path[$css_buffer_key]["path"]);
+                            if ($tmp_mtime > $max_mtime)
+                                $max_mtime = $tmp_mtime;
                         }
                     }
                     $css_file_key .= "_";
@@ -808,17 +858,25 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                     if(CM_CACHE_STORAGE_SAVING_MODE)
                         $cache_subdir_storing = substr($css_file_key, 0, CM_CACHE_STORAGE_SAVING_MODE) . "/";
 
-                    if ($enable_gzip_file)
-                    {
-                        $compressed = file_exists($cache_dir . "/" . $cache_subdir_storing . $css_file_key . ".css.gz");
-                        $compressed_subpath = $cache_subdir_storing;
-                    }
-                    if ($uncompressed = file_exists($cache_dir . "/" . $cache_subdir_storing . $css_file_key . ".css"))
-                    {
-                        $uncompressed_file = $cache_dir . "/" . $cache_subdir_storing . $css_file_key . ".css";
-                        $uncompressed_subpath = $cache_subdir_storing;
-                    }
-                }
+					if($enable_gzip_file)
+					{
+
+						if(file_exists($cache_dir . "/" . $cache_subdir_storing. $css_file_key . ".css.gz")
+							&& (filemtime($cache_dir . "/" . $cache_subdir_storing. $css_file_key . ".css.gz") - $css_expire) >= $max_mtime
+						) {
+							$compressed = true;
+						}
+						$compressed_subpath = $cache_subdir_storing;
+					}
+
+					if(file_exists($cache_dir . "/" . $cache_subdir_storing . $css_file_key . ".css")
+						&& (filemtime($cache_dir . "/" . $cache_subdir_storing . $css_file_key . ".css") - $css_expire) >= $max_mtime
+					) {
+						$uncompressed = true;
+						$uncompressed_file = $cache_dir . "/" . $cache_subdir_storing . $css_file_key . ".css";
+					}
+					$uncompressed_subpath = $cache_subdir_storing;
+				}
                 else if (file_exists($cache_dir))
                 {
                     $itGroup = new DirectoryIterator($cache_dir);
@@ -827,14 +885,25 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         if ($fiGroup->isDot())
                             continue;
 
-                        if ($enable_gzip_file && !$compressed && ($compressed = file_exists($fiGroup->getPathname() . "/" . $css_file_key . ".css.gz")))
-                            $compressed_subpath = $fiGroup->getBasename() . "/";
+						if ($enable_gzip_file && !$compressed) {
 
-                        if (!$uncompressed && $uncompressed = file_exists($fiGroup->getPathname() . "/" . $css_file_key . ".css"))
-                        {
-                            $uncompressed_file = $fiGroup->getPathname() . "/" . $css_file_key . ".css";
-                            $uncompressed_subpath = $fiGroup->getBasename() . "/";
-                        }
+							if(file_exists($fiGroup->getPathname() . "/" . $css_file_key . ".css.gz")
+								&& (filemtime($fiGroup->getPathname() . "/" . $css_file_key . ".css.gz") - $css_expire) >= $max_mtime
+							) {
+								$compressed = true;
+							}
+							$compressed_subpath = $fiGroup->getBasename() . "/";
+						}
+						if(!$uncompressed)
+						{
+							if(file_exists($fiGroup->getPathname() . "/" . $css_file_key . ".css")
+								&& (filemtime($fiGroup->getPathname() . "/" . $css_file_key . ".css") - $css_expire) >= $max_mtime
+							) {
+								$uncompressed = true;
+								$uncompressed_file = $fiGroup->getPathname() . "/" . $css_file_key . ".css";
+							}
+							$uncompressed_subpath = $fiGroup->getBasename() . "/";
+						}
 
                         if ($compressed && $uncompressed)
                             break;
@@ -928,7 +997,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             }
         */
 
-                            $tmp_css_data = str_replace("{site_path}", FF_SITE_PATH, $tmp_css_data);
+                            /*$tmp_css_data = str_replace("{site_path}", FF_SITE_PATH, $tmp_css_data);
                             $tmp_css_data = str_replace("{showfiles}", CM_SHOWFILES, $tmp_css_data);
                             $tmp_css_url = cm_extract_css_urls($tmp_css_data);
 
@@ -987,7 +1056,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             } elseif(strpos($css_buffer_value["path"], FF_THEME_DISK_PATH) === 0) {
                                 $arrBufferPath = explode("/", str_replace(FF_THEME_DISK_PATH . "/", "", $css_buffer_value["path"]));
                                 $tmp_css_data = str_replace("../", FF_THEME_DIR . "/" . $arrBufferPath[0] . "/", $tmp_css_data);
-                            }
+                            }*/
+
+                            $tmp_css_data = cm_convert_url_in_abs_by_content($tmp_css_data, $css_buffer_value["path"]);
 
                             if (strpos($css_buffer_value["path"], ".min.css") === false)
                             {
@@ -1003,7 +1074,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         }
                     }
 
-                    if ($oPage->compact_css == 2 && $count_include_cssmin)
+					$str_css_buffer = cmCache_normalizeUrl($str_css_buffer);
+
+					if ($oPage->compact_css == 2 && $count_include_cssmin)
                     {
                         //$before = microtime();
                         switch (CM_CSSCACHE_MINIFIER)
@@ -1022,7 +1095,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             case "minify": // medium
                                 if (!class_exists("CSSmin"))
                                     require(__TOP_DIR__ . "/library/minify/min/lib/CSSmin.php");
-                                $str_css_buffer = CSSmin::_minify($str_css_buffer);
+                                $str_css_buffer = CSSmin::minify($str_css_buffer);
                                 break;
 
                             case "yui": // strong
@@ -1054,8 +1127,8 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                     if (CM_SHOWFILES_FORCE_PATH && CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
                     { //manipolazione percorsi dei file media per avere la gestione della cache
                         $str_css_buffer = str_replace(FF_SITE_PATH . FF_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
-                        if (CM_CSSCACHE_RENDER_THEME_PATH)
-                            $str_css_buffer = str_replace(FF_SITE_PATH . THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
+                        //if (CM_CSSCACHE_RENDER_THEME_PATH)
+                        //    $str_css_buffer = str_replace(FF_SITE_PATH . THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                     }
 
                     // write it uncompressed
@@ -1082,8 +1155,8 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                     if (CM_SHOWFILES_FORCE_PATH && CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
                     { //manipolazione percorsi dei file media per avere la gestione della cache
                         $str_css_buffer = str_replace(FF_SITE_PATH . FF_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
-                        if (CM_CSSCACHE_RENDER_THEME_PATH)
-                            $str_css_buffer = str_replace(FF_FF_SITE_PATH . THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
+                        //if (CM_CSSCACHE_RENDER_THEME_PATH)
+                         //   $str_css_buffer = str_replace(FF_SITE_PATH . FF_THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                     }
 
                     if (CM_CSSCACHE_GROUPDIRS && !$css_smart)
@@ -1258,7 +1331,7 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
             else
             {
                 $parsed_externals = true; // avoid useless cycle
-                //$max_mtime = 0;
+                $max_mtime = 0;
                 foreach ($oPage->js_buffer AS $js_buffer_key => $js_buffer_value)
                 {
                     if (strlen($js_buffer_value["content"]))
@@ -1291,9 +1364,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         if (@is_file($oPage->js_buffer[$js_buffer_key]["path"]))
                         {
                             $js_file_key .= $oPage->js_buffer[$js_buffer_key]["path"];
-                            //$tmp = filemtime($oPage->js_buffer[$js_buffer_key]["path"]);
-                            //if ($tmp > $max_mtime)
-                            //    $max_mtime = $tmp;
+							$tmp_mtime = filemtime($oPage->js_buffer[$js_buffer_key]["path"]);
+							if ($tmp_mtime > $max_mtime)
+								$max_mtime = $tmp_mtime;
                         }
                     }
                     $js_file_key .= "_";
@@ -1315,17 +1388,23 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                     if(CM_CACHE_STORAGE_SAVING_MODE)
                         $cache_subdir_storing = substr($js_file_key, 0, CM_CACHE_STORAGE_SAVING_MODE) . "/";
 
-                    if ($enable_gzip_file)
-                    {
-                        $compressed = file_exists($cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js.gz");
-                        $compressed_subpath = $cache_subdir_storing;
-                    }
+					if($enable_gzip_file)
+					{
+						if(file_exists($cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js.gz")
+							&& (filemtime($cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js.gz") - $js_expire) >= $max_mtime
+						) {
+							$compressed = true;
+						}
+						$compressed_subpath = $cache_subdir_storing;
+					}
+					if(file_exists($cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js")
+						&& (filemtime($cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js") - $js_expire) >= $max_mtime
+					) {
+						$uncompressed = true;
+						$uncompressed_file = $cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js";
+					}
 
-                    if ($uncompressed = file_exists($cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js"))
-                    {
-                        $uncompressed_file = $cache_dir . "/" . $cache_subdir_storing . $js_file_key . ".js";
-                        $uncompressed_subpath = $cache_subdir_storing;
-                    }
+					$uncompressed_subpath = $cache_subdir_storing;
                 }
                 else if (file_exists($cache_dir))
                 {
@@ -1335,14 +1414,25 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         if ($fiGroup->isDot())
                             continue;
 
-                        if ($enable_gzip_file && !$compressed && ($compressed = file_exists($fiGroup->getPathname() . "/" . $js_file_key . ".js.gz")))
-                            $compressed_subpath = $fiGroup->getBasename() . "/";
+						if ($enable_gzip_file && !$compressed) {
 
-                        if (!$uncompressed && $uncompressed = file_exists($fiGroup->getPathname() . "/" . $js_file_key . ".js"))
-                        {
-                            $uncompressed_file = $fiGroup->getPathname() . "/" . $js_file_key . ".js";
-                            $uncompressed_subpath = $fiGroup->getBasename() . "/";
-                        }
+							if(file_exists($fiGroup->getPathname() . "/" . $js_file_key . ".js.gz")
+								&& (filemtime($fiGroup->getPathname() . "/" . $js_file_key . ".js.gz") - $js_expire) >= $max_mtime
+							) {
+								$compressed = true;
+							}
+							$compressed_subpath = $fiGroup->getBasename() . "/";
+						}
+						if(!$uncompressed)
+						{
+							if(file_exists($fiGroup->getPathname() . "/" . $js_file_key . ".js")
+								&& (filemtime($fiGroup->getPathname() . "/" . $js_file_key . ".js") - $js_expire) >= $max_mtime
+							) {
+								$uncompressed = true;
+								$uncompressed_file = $fiGroup->getPathname() . "/" . $js_file_key . ".js";
+							}
+							$uncompressed_subpath = $fiGroup->getBasename() . "/";
+						}
 
                         if ($compressed && $uncompressed)
                             break;
@@ -1401,6 +1491,8 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                             //ffErrorHandler::raise ("Unable to open JS file", E_USER_ERROR, null, get_defined_vars());
                         }
                     }
+
+					$str_js_buffer = cmCache_normalizeUrl($str_js_buffer);
 
                     if ($oPage->compact_js == 2 && $count_include_jsmin)
                     {
