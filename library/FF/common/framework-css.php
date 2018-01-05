@@ -930,8 +930,6 @@ function cm_getFrameworkCss($framework_name = null)
 }
   
 function cm_getClassByFrameworkCss($value, $type, $params = array(), $framework_css = null, $font_icon = null) {
-	$cm = cm::getInstance();
-
 	$res = "";
 	if($value === false)
 		return $res;
