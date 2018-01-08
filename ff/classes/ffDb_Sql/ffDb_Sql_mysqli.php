@@ -442,16 +442,17 @@ class ffDB_Sql
 			if (!$this->connect())
 				return false;
 		}
-		else
+		elseif(!FF_DB_MYSQLI_AVOID_SELECT_DB)
 		{
-			if (FF_DB_MYSQLI_AVOID_SELECT_DB || !$this->selectDb())
+			if (!$this->selectDb()) {
 				return false;
+			}
 		}
 
 		$this->freeResult();
 		
 		$this->debugMessage("Execute = " . $Query_String);
-		
+
 		$this->query_id = @mysqli_query($this->link_id, $Query_String);
 		if ($this->checkError())
 		{
