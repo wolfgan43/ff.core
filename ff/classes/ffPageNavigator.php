@@ -66,7 +66,7 @@ class ffPageNavigator
 	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null, array $variant = null)
 	{
 		if ($page === null && ($disk_path === null || $site_path === null))
-			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, $this, get_defined_vars());
+			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, null, get_defined_vars());
 		
 		if ($theme === null)
 		{
