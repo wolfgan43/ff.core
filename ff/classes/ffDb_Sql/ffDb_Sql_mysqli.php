@@ -35,17 +35,17 @@ if (FF_DB_MYSQLI_SHUTDOWNCLEAN)
  */
 class ffDB_Sql
 {
-	var $locale = "ISO9075";
+	var $locale 					= "ISO9075";
 
 	// PARAMETRI DI CONNESSIONE
-	var $database = null;
-	var $user     = null;
-	var $password = null;
-	var $host     = null;
+	var $database 					= null;
+	var $user     					= null;
+	var $password 					= null;
+	var $host     					= null;
 
-	var $charset			= "utf8"; //"utf8";
-	var $charset_names		= "utf8"; //"utf8";
-	var $charset_collation	= "utf8_unicode_ci"; //"utf8_unicode_ci";
+	var $charset					= "utf8"; //"utf8";
+	var $charset_names				= "utf8"; //"utf8";
+	var $charset_collation			= "utf8_unicode_ci"; //"utf8_unicode_ci";
 
 	// PARAMETRI DI DEBUG
 	var $halt_on_connect_error		= true;		## Setting to true will cause a HALT message on connection error
@@ -62,28 +62,28 @@ class ffDB_Sql
 	//  VARIABILI PRIVATE
 
 	// VARIABILI DI GESTIONE DEI RISULTATI
-	var $row			= -1;
-	var $record			= false;
+	var $row						= -1;
+	var $record						= false;
 
 	/* public: current error number and error text */
-	var $errno    = 0;
-	var $error    = "";
+	var $errno    					= 0;
+	var $error    					= "";
 
-	var $link_id  = false;
-	var $query_id = false;
+	var $link_id  					= false;
+	var $query_id 					= false;
 	
-	var $fields			= null;
-	var $fields_names	= null;
+	var $fields						= null;
+	var $fields_names				= null;
 
-	private $num_rows = null;
+	private $num_rows 				= null;
 	private $useFormsFramework		= false;
 	public 	$events 				= null;
 	static protected $_events		= null;
 
-	static $_profile = false;
-	static $_objProfile = array();
+	static $_profile 				= false;
+	static $_objProfile 			= array();
 	
-	var $avoid_real_connect = FF_DB_MYSQLI_AVOID_REAL_CONNECT;
+	var $avoid_real_connect 		= FF_DB_MYSQLI_AVOID_REAL_CONNECT;
 	
 	static $_dbs = array();
 	static $_sharelink = FF_DB_MYSQLI_SHARELINK;
