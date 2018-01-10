@@ -635,7 +635,13 @@ class cm extends ffCommon
             $this->oPage->override_css = array_merge($this->oPage->override_css, $this->layout_vars["cdn"]["css"]);
         if(is_array($this->layout_vars["cdn"]["js"]) && count($this->layout_vars["cdn"]["js"]))
             $this->oPage->override_js = array_merge($this->oPage->override_js, $this->layout_vars["cdn"]["js"]);
-        
+
+        //remove default jqueryui if framework_css is active
+		$this->oPage->jquery_ui_theme = ($this->layout_vars["framework_css"]
+			? false
+			: "base"
+		);
+
 		//$this->oPage->addEvent("on_tpl_load", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
 		//$this->oPage->addEvent("on_tpl_layer_loaded", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
 
