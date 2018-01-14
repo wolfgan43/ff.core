@@ -10,7 +10,7 @@
      
      ### How do I get set up? ###
      
-     * Summary of set up
+     * Summary of set up 
      * Configuration
      * Dependencies
      * Database configuration
