@@ -126,6 +126,20 @@ openLoginDialog : function (title, url, ret_url, id) {
 			ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js");
 		});
 	});
+/* Remove jquery ui css
+	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
+		ff.injectCSS("jqueryuicore", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.core.css", function() {
+			ff.injectCSS("jqueryuitheme", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.theme.css", function() {
+				ff.injectCSS("jqueryuidialog", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.dialog.css", function() {
+					ff.injectCSS("jqueryuiresizable", "/themes/library/jquery.ui/themes/smoothness/1.10.x/jquery.ui.resizable.css");
+					ff.pluginLoad("jquery.ui", "/themes/library/jquery.ui/jquery.ui.js", function() {
+						ff.pluginLoad("ff.ffPage.dialog", "/themes/restricted/ff/ffPage/widgets/dialog/dialog.js");
+					});
+				});
+			});
+		});
+	});
+*/
 
 	ff.pluginAddInit("ff.ffPage.dialog", function () {
 		ff.ffPage.dialog.addDialog({
