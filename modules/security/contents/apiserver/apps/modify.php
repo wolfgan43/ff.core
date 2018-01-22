@@ -61,7 +61,7 @@ $obj->addEvent("on_done_action", function ($obj, $action) {
 	{
 		if (
 				$obj->form_fields["scope"]->value->getValue() !== $obj->form_fields["scope"]->value_ori->getValue()
-				|| (isset($obj->form_fields["redirect_uri"]) && $obj->form_fields["redirect_uri"]->value->getValue() !== $obj->form_fields["redirect_uri"]->value_ori->getValue())
+				|| $obj->form_fields["redirect_uri"]->value->getValue() !== $obj->form_fields["redirect_uri"]->value_ori->getValue()
 			)
 		{
 			$db = ffDB_Sql::factory();

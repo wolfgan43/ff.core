@@ -26,13 +26,25 @@ if ($rc !== null)
         $ret_url = rtrim(FF_SITE_PATH, "/") . "/";    
 }
 
+
+
+if($_SERVER["SERVER_NAME"] == "unastoriachecontinua.paginemediche.it") {
+    $ret_url = $_SERVER["HTTP_REFERER"];
+
+}
+
 $cm->oPage->ret_url = $ret_url;
 
 $sError = "";
 $frmAction 	= strtolower($_REQUEST["frmAction"]);
 $domain 	= $_REQUEST["domain"];
 $username 	= $_REQUEST["username"];
+
 $permanent_session = $_REQUEST["stayconnected"];
+if($permanent_session == "on") {
+    $permanent_session = true;
+}
+
 $password 	= $_REQUEST["password"];
 if (strlen($_REQUEST["sError"]))
 	$sError = strip_tags($_REQUEST["sError"]);

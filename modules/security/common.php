@@ -1144,6 +1144,25 @@ function mod_security_create_session($UserID = null, $UserNID = null, $Domain = 
 	/**
 	* Update LastLogin
 	*/
+
+
+    /* CODICE GIORGIO */
+    $sSQL = "SELECT ID
+                    FROM anagraph
+                    WHERE `anagraph`.uid = " . $db->toSql($user["ID"], "Number") . "
+                        AND lastlogin = '0000-00-00 00:00:00'";
+    $db->query($sSQL);
+    if($db->nextRecord()) {
+        require_once(FF_DISK_PATH . "/conf/gallery/services/analytics.google.universal/ss-ga.class." . FF_PHP_EXT);
+        ga_send_pageview(DOMAIN_INSET, "/registrazione/first-login", 'Step 3 - First login ', 'UA-13065706-1');
+    }
+    $sSQL = "UPDATE `anagraph` SET 
+				lastlogin = " . $db->toSql(date("Y-m-d H:m:s", time()), "DateTime") . "
+			WHERE  `anagraph`.uid = " . $db->toSql($user["ID"], "Number");
+    $db->execute($sSQL);
+
+    /* FINE CODICE GIORGIO */
+
 	$sSQL = "UPDATE `" . $options["table_name"] . "` SET 
 				lastlogin = " . $db->toSql(date("Y-m-d H:m:s", time()), "DateTime") . "
 			WHERE  `" . $options["table_name"] . "`.ID = " . $db->toSql($user["ID"], "Number");
@@ -1158,7 +1177,7 @@ function mod_security_create_session($UserID = null, $UserNID = null, $Domain = 
 		
 	/*if (!defined("MOD_SECURITY_SESSION_STARTED")) 
 		define ("MOD_SECURITY_SESSION_STARTED", true);*/
-
+	
 	return $user;	
 }
 
@@ -1172,14 +1191,14 @@ function mod_security_get_user_data($user_key, $ext = null)
 		$query["from"] 		= $options["table_name"];
 		$query["select"] 	= array(
 			"ID" 				=> "`" . $options["table_name"] . "`.`ID`"
-			, "ID_domains" 		=> "`" . $options["table_name"] . "`.`ID_domains`"
-			, "ID_languages" 	=> "`" . $options["table_name"] . "`.`ID_languages`"
-			, "username" 		=> "`" . $options["table_name"] . "`.`username`"
-			, "username_slug" 	=> "`" . $options["table_name"] . "`.`username_slug`"
-			, "level" 			=> "`" . $options["table_name"] . "`.`level`"
-			, "email" 			=> "`" . $options["table_name"] . "`.`email`"
-			, "lastlogin" 		=> "`" . $options["table_name"] . "`.`lastlogin`"
-			, "avatar"			=> (defined("MOD_SEC_USER_AVATAR") && MOD_SEC_USER_AVATAR
+		, "ID_domains" 		=> "`" . $options["table_name"] . "`.`ID_domains`"
+		, "ID_languages" 	=> "`" . $options["table_name"] . "`.`ID_languages`"
+		, "username" 		=> "`" . $options["table_name"] . "`.`username`"
+		, "username_slug" 	=> "`" . $options["table_name"] . "`.`username_slug`"
+		, "level" 			=> "`" . $options["table_name"] . "`.`level`"
+		, "email" 			=> "`" . $options["table_name"] . "`.`email`"
+		, "lastlogin" 		=> "`" . $options["table_name"] . "`.`lastlogin`"
+		, "avatar"			=> (defined("MOD_SEC_USER_AVATAR") && MOD_SEC_USER_AVATAR
 				? "`" . $options["table_name"] . "`.`avatar`"
 				: "'' AS avatar"
 			)
@@ -1251,10 +1270,10 @@ function mod_security_get_user_data($user_key, $ext = null)
 							" . $options["table_dett_name"] . "
 						WHERE
 							" . $options["table_dett_name"] . ".ID_users = " . $db->getField($user["ID"], "Number")
-					. (is_array($arrFieldKey) && count($arrFieldKey)
-						? " AND " . $options["table_dett_name"] . ".field IN (" . implode(", ", $arrFieldKey) . ")"
-						: ""
-					);
+							. (is_array($arrFieldKey) && count($arrFieldKey)
+								? " AND " . $options["table_dett_name"] . ".field IN (" . implode(", ", $arrFieldKey) . ")"
+								: ""
+							);
 				$db->query($sSQL);
 				if($db->nextRecord()) {
 					do {
@@ -1340,7 +1359,6 @@ function mod_security_get_user_data($user_key, $ext = null)
 	return $user;
 }
 
-
 /* destroy current session.
 	With prompt_login set to true, automatically redirect to login page */
 function mod_security_destroy_session($promptlogin = false, $ret_url = null, $disable_events = false)
@@ -1414,7 +1432,7 @@ function mod_security_get_domain()
 		return null;
 }
 
-function mod_security_get_settings($path_info = null)
+function mod_security_get_settings($path_info)
 {
 	$cm = cm::getInstance();
 	
@@ -2544,7 +2562,11 @@ function mod_security_set_user_by_social($social, $UserParams, $UserField, $User
 			$res = $cm->modules["security"]["events"]->doEvent($social . "_do_user_create", array(&$UserParams["username"], &$UserParams["username_slug"], &$UserParams["avatar"], &$UserParams["email"], &$ID_domain));
 			$last_res = end($res);
 		}
-		if (!$last_res)
+        /* CODICE GIORGIO */
+        require_once(FF_DISK_PATH . "/conf/gallery/services/analytics.google.universal/ss-ga.class." . FF_PHP_EXT);
+        ga_send_pageview(DOMAIN_INSET, "/registrazione/social-login", 'Completamento Registrazione Social - completamento Light', 'UA-13065706-1');
+
+        if (!$last_res)
 		{
 			$sSQL_manage = "INSERT INTO " . $options["table_name"] . "
 							(
@@ -3282,6 +3304,7 @@ function mod_sec_check_login($username, $password, $domain = null, $options = nu
 				if (MOD_SEC_EXCLUDE_SQL)
 					$sSQL .= " AND " . $options["table_name"] . ".ID " . MOD_SEC_EXCLUDE_SQL;
 
+                $sSQL .= " ORDER BY ID DESC ";
 				$db->query($sSQL);
 				if ($db->nextRecord())
 				{
@@ -3339,6 +3362,8 @@ function mod_sec_check_login($username, $password, $domain = null, $options = nu
 
 				if (MOD_SEC_EXCLUDE_SQL)
 					$sSQL .= " AND " . $options["table_name"] . ".ID " . MOD_SEC_EXCLUDE_SQL;
+
+                $sSQL .= " ORDER BY ID DESC ";
 				$db->query($sSQL);
 				if ($db->nextRecord())
 				{
@@ -3397,20 +3422,45 @@ function mod_sec_check_login($username, $password, $domain = null, $options = nu
 											";
 								$db2->execute($sSQL2);*/
 
-								if ($db->getField("temp_password")->getValue() == $db->getField("encoded_password")->getValue())
-								{
-									$sSQL2 = "UPDATE
+
+                                if(0) {
+                                    switch($db->getField("primary_gid", "Number", true)) {
+                                        case "6":
+                                            $sSQL2 = "SELECT ID
+                                                                                            FROM anagraph
+                                                                                            WHERE uid =  " . $db2->toSql($db->getField("ID"));
+                                            $db2->query($sSQL2);
+                                            if($db2->nextRecord()) {
+                                                $ID_doctor = $db2->getField("ID", "Number", true);
+
+                                                if($ID_doctor > 0) {
+                                                    $sSQL2 = "SELECT ID FROM cm_mod_pm_doctor WHERE ID_anagraph = " . $db2->toSql($ID_doctor, "Number", true) . " AND verificato = 0";
+                                                    $db2->query($sSQL2);
+                                                    if($db2->nextRecord()) {
+                                                        $sError = ffTemplate::_get_word_by_code("login_doctor_in_attesa_approvazione");
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                if(!strlen($sError)) {
+                                    if ($db->getField("temp_password")->getValue() == $db->getField("encoded_password")->getValue()) {
+                                        $sSQL2 = "UPDATE
 												" . $options["table_name"] . "
 											SET " . $options["table_name"] . ".password_used = '1'
 
 											WHERE " . $options["table_name"] . ".ID = " . $db2->toSql($db->getField("ID")) . "
 												";
-									$db2->execute($sSQL2);
-								}
-								mod_security_create_session($userID, $userNID, $domain, $ID_domain, $permanent_session, false, $cookiehash);
-								$logged = true;
+                                        $db2->execute($sSQL2);
+                                    }
+                                    mod_security_create_session($userID, $userNID, $domain, $ID_domain, $permanent_session, false, $cookiehash);
+                                    $logged = true;
 
-								$cm->modules["security"]["events"]->doEvent("logging_in", array($cm->oPage->ret_url));
+                                    $cm->modules["security"]["events"]->doEvent("logging_in", array($cm->oPage->ret_url));
+                                }
 							}
 						}
 						else
@@ -3481,20 +3531,36 @@ function _modsec_login_redirect($ret_url, $context)
 		else
 			return;
 	}
-	
-	if($cm->isXHR())
-	{
-		if(strlen($ret_url) && !isset($cm->processed_rule["rule"]->options->noredirect))
-			ffRedirect($ret_url);
 
-		if ($cm->oPage->getXHRDialog())
-			$cm->jsonAddResponse(array(
-					"close" => true
-				));
-		cm::jsonParse($cm->json_response);
-		exit;
-	}
-	else
+    if($cm->isXHR())
+    {
+
+        if($cm->json_response["success"] && ($context == "login" && ($_SERVER["SERVER_NAME"] == "www.paginemediche.it" && ($_SERVER["HTTP_REFERER"] == "https://www.paginemediche.it/" || !(isset($_SERVER["HTTP_REFERER"])))) || ($_SERVER["SERVER_NAME"] == "pro.paginemediche.it" && ($_SERVER["HTTP_REFERER"] == "https://pro.paginemediche.it/" || !(isset($_SERVER["HTTP_REFERER"])))))) {
+            ffRedirect("/user");
+        } elseif($_SERVER['SERVER_NAME'] == "unastoriachecontinua.paginemediche.it") {
+
+            if(isset($_REQUEST["ret_url"])) {
+                ffRedirect($_REQUEST["ret_url"]);
+            }elseif(isset($_SERVER['HTTP_REFERER'])) {
+                ffRedirect($_SERVER['HTTP_REFERER']);
+            } else {
+                ffRedirect("/");
+            }
+
+        } else {
+
+            if(strlen($ret_url) && !isset($cm->processed_rule["rule"]->options->noredirect))
+                ffRedirect($ret_url);
+
+            if ($cm->oPage->getXHRDialog())
+                $cm->jsonAddResponse(array(
+                    "close" => true
+                ));
+            cm::jsonParse($cm->json_response);
+
+            exit;
+        }
+    } else
 	{
 		if (isset($cm->processed_rule["rule"]->options->noredirect))
 			ffRedirect($cm->oPage->getRequestUri());

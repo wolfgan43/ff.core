@@ -40,7 +40,7 @@ modsec_OAuth2_UserResourceController("userinfo", function ($UserNID, $scopes, $r
 		if (is_array($value))
 		{
 			if ($value["mode"] === "merge")
-				$outdata = array_merge_recursive($outdata, $value["data"]);
+				$outdata = array_merge_recursive($outdata, $value[$data]);
 			else
 				$outdata = $value["data"];
 			
