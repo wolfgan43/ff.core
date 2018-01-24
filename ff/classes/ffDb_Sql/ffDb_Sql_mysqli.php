@@ -768,13 +768,14 @@ class ffDB_Sql
 		if ($this->row == ($this->numRows() - 1))
 			return false;
 
-		if ($obj != null) {
+		if ($obj === null) {
+			$this->record = @mysqli_fetch_assoc($this->query_id);
+		} else {
 			$this->record = @mysqli_fetch_object($this->query_id, $obj);
 			$this->row += 1;
+
 			return $this->record;
 			//dd($this->record);
-		} else {
-			$this->record = @mysqli_fetch_assoc($this->query_id);
 		}
 
 		/*if ($this->checkError())
@@ -783,7 +784,7 @@ class ffDB_Sql
 			return false;
 		}*/
 
-		if ($this->record !== false)
+		if ($this->record)
 		{
 			$this->row += 1;
 			return true;

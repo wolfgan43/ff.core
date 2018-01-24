@@ -1158,7 +1158,7 @@ class ffGrid_html extends ffGrid_base
             do
             {
             	$arrGridData[] = $this->db[0]->record;
-	            if ($this->use_paging && $recordset_count >= $this->records_per_page)
+	            if ($this->use_paging && $recordset_count >= $this->records_per_page - 1)
 	                $break_while = true;   
 
 				$recordset_count++;
