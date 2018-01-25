@@ -897,7 +897,7 @@ class ffGrid_html extends ffGrid_base
     {
         if (!$this->use_search || ($this->parent[0]->getXHRComponent() == $this->id && $this->parent[0]->getXHRSection() == "GridData"))
             return;
-        
+
         if($this->display_search)
         {
             if ($this->display_search_simple)
@@ -905,7 +905,7 @@ class ffGrid_html extends ffGrid_base
 	            $wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
                 foreach ($this->search_fields AS $key => $value)
                 {
-                    if($this->open_adv_search === "never" && $this->search_fields[$key]->display && !$this->search_fields[$key]->multi_disp_as_filter)
+                    if($this->open_adv_search === false && $this->search_fields[$key]->display && !$this->search_fields[$key]->multi_disp_as_filter)
                     {
                         //$this->tpl[0]->set_var("search_more_label", ffTemplate::_get_word_by_code("ffGrid_search_more"));
                         if($wrap_addon) {
@@ -930,7 +930,7 @@ class ffGrid_html extends ffGrid_base
                 $this->tpl[0]->set_var("SearchAll", $buffer);
             }
     
-            if($this->open_adv_search === "never" || (!$this->searched && $this->open_adv_search === false))                                                                                                    
+            if(!$this->searched && $this->open_adv_search === false)
             	$this->tpl[0]->set_var("adv_class", "adv-search hidden");
         }
 
@@ -1181,7 +1181,7 @@ class ffGrid_html extends ffGrid_base
 				}
 
 				$this->tpl[0]->set_var("SearchButtons", $buffer);
-				if($this->open_adv_search === "never" || (!$this->searched && $this->open_adv_search === false)) {
+				if(!$this->searched && $this->open_adv_search === false) {
 					$this->search_buttons[0]->id = "searchadv";
 					unset($this->search_buttons[0]->framework_css["addon"]);
 					$this->tpl[0]->set_var("SearchButtonsAdv", '<div class="' . cm_getClassByFrameworkCss("align-right", "util"). '">' . $this->search_buttons[0]->process() . '</div>');
@@ -1382,7 +1382,7 @@ class ffGrid_html extends ffGrid_base
             do
             {
             	$arrGridData[] = $this->db[0]->record;
-	            if ($this->use_paging && $recordset_count >= $this->records_per_page)
+	            if ($this->use_paging && $recordset_count >= $this->records_per_page - 1)
 	                $break_while = true;   
 
 				$recordset_count++;
@@ -2749,13 +2749,13 @@ class ffGrid_html extends ffGrid_base
 
                 if (isset($_REQUEST["XHR_CTX_ID"]))
                 {
-                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "") . ($this->open_adv_search === true || $this->open_adv_search == "always" ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "',{'action'    : '" . $this->getIDIF() . "_search','component' : '" . $this->getIDIF() . "','section'    : 'GridData'});";
+                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "") . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "',{'action'    : '" . $this->getIDIF() . "_search','component' : '" . $this->getIDIF() . "','section'    : 'GridData'});";
                 } 
                 elseif ($this->full_ajax || $this->ajax_search)
                 {
                     $this->parent[0]->tplAddJs("ff.ajax");
 
-                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true || $this->open_adv_search == "always" ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
+                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
                 }
                 $this->addSearchButton(   $tmp
                                         , $this->buttons_options["search"]["index"]);
