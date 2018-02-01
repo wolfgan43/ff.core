@@ -110,7 +110,7 @@ function cm_extract_css_urls($text)
             $urls[] = preg_replace( '/\\\\(.)/u', '\\1', $match );
 
     return $urls;
-} 
+}
 
 function cm_urls_to_abs($urls, $source)
 {
@@ -118,7 +118,8 @@ function cm_urls_to_abs($urls, $source)
 	$cm = cm::getInstance();
 	if(is_array($urls) && count($urls))
 	{
-
+		$ff_dir = str_replace(FF_DISK_PATH, "", ffCommon_dirname(__FF_DIR__));
+		$cms_dir = str_replace(FF_DISK_PATH, "", __CMS_DIR__);
 		foreach($urls AS $url)
 		{
 			if(isset($tmp_css_link_replaced[$url]))
@@ -130,7 +131,7 @@ function cm_urls_to_abs($urls, $source)
 					&& substr($url, 0, 2) != "//")
 			) {
 				$arrBufferPath = parse_url(ffcommon_dirname($source) . "/" . $url);
-				// echo "<pre>"; print_r($arrBufferPath);
+
 				if(substr(strtolower($source), 0, 7) == "http://"
 					|| substr(strtolower($source), 0, 8) == "https://"
 					|| substr($source, 0, 2) == "//"
@@ -143,8 +144,8 @@ function cm_urls_to_abs($urls, $source)
 						. (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
 						. (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
 
-					$relative_buffer_path = str_replace("\\.rep\\ff" , "", $relative_buffer_path); // @CarmineRumma
-					$relative_buffer_path = str_replace("\\.rep\\vgallery" , "", $relative_buffer_path); // @CarmineRumma
+					$relative_buffer_path = str_replace($ff_dir, "", $relative_buffer_path); // @CarmineRumma
+					$relative_buffer_path = str_replace($cms_dir, "", $relative_buffer_path); // @CarmineRumma
 
 				}
 
@@ -212,20 +213,20 @@ function cm_extract_css_urls($text) //original (if the url have cinna (,) the re
     if (!preg_match_all($pattern, $text, $matches)) {
         return preg_last_error();
 	}
-	
+
     // @import '...'
     // @import "..."
     foreach ($matches[3] as $match)
         if (!empty($match))
             $urls[] = preg_replace( '/\\\\(.)/u', '\\1', $match );
- 
+
     // @import url(...)
     // @import url('...')
     // @import url("...")
     foreach ($matches[7] as $match)
         if (!empty($match))
             $urls[] = preg_replace( '/\\\\(.)/u', '\\1', $match );
- 
+
     // url(...)
     // url('...')
     // url("...")
@@ -233,10 +234,10 @@ function cm_extract_css_urls($text) //original (if the url have cinna (,) the re
         if (!empty($match))
             $urls[] = preg_replace( '/\\\\(.)/u', '\\1', $match );
 
-            
+
     return $urls;
 }
-*/ 
+*/
 function cm_canonicalize($address)
 {
     $address = explode('/', $address);
@@ -249,7 +250,7 @@ function cm_canonicalize($address)
 
     $address = implode('/', $address);
     $address = str_replace('./', '', $address);
-    
+
     return $address;
 }
 
@@ -273,7 +274,7 @@ function cm_filecache_find($cache_dir, $path_dir, $group_subdir, $use_strong_cac
 	// init here to save a bit calculation
 	if ($now === null)
 		$now = time();
-	
+
 	// define cache indexes based on settings
 	if (!$use_strong_cache)
 		$cache_compress_idx = 3;
@@ -321,7 +322,7 @@ function cm_filecache_cycle_subgroup($subpath, $path_dir, $use_strong_cache, $la
 	$cache_uncompressed = null;
 	$cache_compressed = null;
 	$cache_file = null;
-	
+
 	$find_dir = $subpath . $path_dir . "/";
 	if (!file_exists($find_dir))
 		return null;
@@ -336,9 +337,9 @@ function cm_filecache_cycle_subgroup($subpath, $path_dir, $use_strong_cache, $la
 
 		$fmtime = $fiFile->getMTime();
 		$fctime = $fiFile->getCTime();
-		
+
 		$fexp = cm_filecache_check_expiration($fmtime, $fctime, $now, $last_valid);
-		
+
 		if (CM_PAGECACHE_ASYNC || $fexp)
 		{
 			$filename = $fiFile->getFilename();
@@ -382,11 +383,11 @@ function cm_filecache_cycle_subgroup($subpath, $path_dir, $use_strong_cache, $la
 								{
 									if ($purge_old)
 										@unlink($filematch);
-									
+
 									continue;
 								}
 							}
-							
+
 							$cache_compressed = array(
 									"file" => $filematch
 									, "filename" => $filename
@@ -450,7 +451,7 @@ function cm_filecache_cycle_subgroup($subpath, $path_dir, $use_strong_cache, $la
 			"compressed" => $cache_compressed
 			, "uncompressed" => $cache_uncompressed
 		);
-	
+
 	return $cache_file;
 }
 
@@ -463,7 +464,7 @@ function cm_filecache_groupwrite($top_cache_dir, $cache_dir, $path_dir, $file, $
 		$cache_group_dir = 0;
 	else if ($cache_group_dir)
 		$cache_group_dir--;
-	
+
 	do
 	{
 		$cache_group_dir++;
@@ -492,30 +493,30 @@ function cm_filecache_groupwrite($top_cache_dir, $cache_dir, $path_dir, $file, $
 		$rc_cache = @touch($cache_dir . "/" . $cache_group_dir . $path_dir . "/" . $file, $expires);
 		if (!$rc_cache)
 			@unlink($cache_dir . "/" . $cache_group_dir . $path_dir . "/" . $file);
-	} 
+	}
 	else if ($cache_group_dir == $max_group_dirs)
 	{
 		@touch($cache_dir . "/maxgroup_limit_reached");
 		if ($cache_dir != $top_cache_dir)
 			@touch($top_cache_dir . "/maxgroup_limit_reached");
 	}
-	
+
 	if ($cache_disk_fail)
 	{
 		@touch($cache_dir . "/disk_fail");
 		if ($cache_dir != $top_cache_dir)
 			@touch($top_cache_dir . "/disk_fail");
 	}
-	
+
 	return $rc_cache;
 }
 
 function cm_filecache_write($path, $file, $buffer, $expires)
 {
 	$rc_cache = true;
-	
+
 	if (!is_dir($path))
-		$rc_cache = @mkdir($path, 0777, true);	
+		$rc_cache = @mkdir($path, 0777, true);
 	if ($rc_cache)
 	{
 		if ($rc_cache = @file_put_contents($path . "/" . $file, $buffer, LOCK_EX))
@@ -527,11 +528,11 @@ function cm_filecache_write($path, $file, $buffer, $expires)
 				@unlink($path . "/" . $file);
 		}
 	}
-	
+
 	return $rc_cache;
 }
 
-function cm_filecache_empty_dir($path) 
+function cm_filecache_empty_dir($path)
 {
     if(!file_exists($path) || !is_dir($path))
 		return true;
@@ -545,13 +546,13 @@ function cm_filecache_empty_dir($path)
             if($fileInfo->isFile())
 			{
                 @unlink($filePath);
-            } 
+            }
 			elseif($fileInfo->isDir())
 			{
 				cm_filecache_empty_dir($filePath);
             }
         }
     }
-	
+
 	@rmdir($filePath);
 }
