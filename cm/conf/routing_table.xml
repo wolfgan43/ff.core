@@ -85,6 +85,15 @@
 		</destination>
 		<reverse>/sqlgui</reverse>
 	</rule>
+    <rule id="docs">
+        <priority>NORMAL</priority>
+        <source>/restricted/docs(.*)</source>
+        <destination>
+            <url>/cm/contents/docs/$1</url>
+            <toplevel />
+        </destination>
+        <reverse>/docs  </reverse>
+    </rule>
 	<rule id="ds">
 		<priority>NORMAL</priority>
 		<source>/restricted/ds(.*)</source>

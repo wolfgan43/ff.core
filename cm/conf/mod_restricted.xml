@@ -2,6 +2,12 @@
 <configdata>
 	<menu>
 		<ds path="/restricted/ds" label="Data Storage" location="brand" acl="3" />
+		<docs path="/restricted/docs" label="Docs">
+			<grid path="/restricted/docs/grid" label="Grid"></grid>
+			<record path="/restricted/docs/record" label="Record"></record>
+			<detail path="/restricted/docs/detail" label="Detail"></detail>
+			<fields path="/restricted/docs/fields" label="Fields"></fields>
+		</docs>
 		<sqlgui path="/restricted/sqlgui" label="SQL GUI" icon="database" location="brand" redir="/restricted/sqlgui/sqldirect" acl="3">
 			<sqldirect label="SQL Direct"  />
 		</sqlgui>
