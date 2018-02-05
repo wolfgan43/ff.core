@@ -61,8 +61,8 @@ $oField->container_class = "avatar_uploadifive";
 $oField->label = ffTemplate::_get_word_by_code("uploadifive"); 
 $oField->base_type = "Text";
 $oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/doc/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/doc";
+$oField->file_storing_path = DISK_UPDIR . "/docs/record";
+$oField->file_temp_path = DISK_UPDIR . "/tmp/docs";
 $oField->file_max_size = MAX_UPLOAD;
 $oField->file_show_filename = true; 
 $oField->file_full_path = true;
@@ -73,22 +73,19 @@ $oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FIL
 $oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/avatar/[_FILENAME_]";
 $oField->control_type = "file";
 $oField->file_show_delete = true;
-$oField->widget = "uploadify";
-if(check_function("set_field_uploader")) { 
-	$oField = set_field_uploader($oField);
-}
+$oField->widget = "uploadifive";
 $oField->store_in_db = false;
 $oRecord->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
-$oField->id = "avatar_uploadify";
-$oField->label = ffTemplate::_get_word_by_code("uploadify");
+$oField->id = "avatar_uploadifive";
+$oField->label = ffTemplate::_get_word_by_code("uploadifive");
 $oField->base_type = "Text";
 $oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/doc/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/doc";
+$oField->file_storing_path = DISK_UPDIR . "/docs/record";
+$oField->file_temp_path = DISK_UPDIR . "/tmp/docs";
 $oField->file_max_size = MAX_UPLOAD;
-$oField->file_show_filename = true; 
+$oField->file_show_filename = true;
 $oField->file_full_path = true;
 $oField->file_check_exist = false;
 $oField->file_normalize = true;
@@ -98,17 +95,17 @@ $oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/av
 $oField->control_type = "file";
 $oField->file_show_delete = true;
 $oField->file_writable = true;
-$oField->widget = "uploadify"; 
+$oField->widget = "uploadifive";
 $oField->store_in_db = false;
-$oRecord->addContent($oField); 
+$oRecord->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "avatar2";
 $oField->label = ffTemplate::_get_word_by_code("kcuploadifive");
 $oField->base_type = "Text";
 $oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/doc/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/doc";
+$oField->file_storing_path = DISK_UPDIR . "/docs/record";
+$oField->file_temp_path = DISK_UPDIR . "/tmp/docs";
 $oField->file_max_size = MAX_UPLOAD;
 $oField->file_show_filename = true; 
 $oField->file_full_path = true;
@@ -120,81 +117,10 @@ $oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/av
 $oField->control_type = "file";
 $oField->file_show_delete = true;
 $oField->file_writable = true;
-$oField->widget = "kcuploadify"; 
-if(check_function("set_field_uploader")) { 
-	$oField = set_field_uploader($oField);
-}	
+$oField->widget = "kcuploadifive";
 $oField->store_in_db = false;
 $oRecord->addContent($oField); 
 
-$oField = ffField::factory($cm->oPage);
-$oField->id = "avatar_kcuploadifive";
-$oField->label = ffTemplate::_get_word_by_code("kcuploadify");
-$oField->base_type = "Text";
-$oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/doc/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/doc";
-$oField->file_max_size = MAX_UPLOAD;
-$oField->file_show_filename = true; 
-$oField->file_full_path = true;
-$oField->file_check_exist = false;
-$oField->file_normalize = true;
-$oField->file_show_preview = true;
-$oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
-$oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/avatar/[_FILENAME_]";
-$oField->control_type = "file";
-$oField->file_show_delete = true;
-$oField->file_writable = true;
-$oField->widget = "kcuploadify"; 
-$oField->store_in_db = false;
-$oRecord->addContent($oField);
-
-$oField = ffField::factory($cm->oPage);
-$oField->id = "avatar_ckuploadify";
-$oField->label = ffTemplate::_get_word_by_code("ckuploadifive");
-$oField->base_type = "Text";
-$oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/doc/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/doc";
-$oField->file_max_size = MAX_UPLOAD;
-$oField->file_show_filename = true; 
-$oField->file_full_path = true;
-$oField->file_check_exist = false;
-$oField->file_normalize = true;
-$oField->file_show_preview = true;
-$oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
-$oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/avatar/[_FILENAME_]";
-$oField->control_type = "file";
-$oField->file_show_delete = true;
-$oField->file_writable = true;
-$oField->widget = "ckuploadify"; 
-if(check_function("set_field_uploader")) { 
-//	$oField = set_field_uploader($oField);
-}	
-$oField->store_in_db = false;
-$oRecord->addContent($oField); 
-
-$oField = ffField::factory($cm->oPage);
-$oField->id = "avatar_ckuploadifive";
-$oField->label = ffTemplate::_get_word_by_code("ckuploadify");
-$oField->base_type = "Text";
-$oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/doc/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/doc";
-$oField->file_max_size = MAX_UPLOAD;
-$oField->file_show_filename = true; 
-$oField->file_full_path = true;
-$oField->file_check_exist = false;
-$oField->file_normalize = true;
-$oField->file_show_preview = true;
-$oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
-$oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/avatar/[_FILENAME_]";
-$oField->control_type = "file";
-$oField->file_show_delete = true;
-$oField->file_writable = true;
-$oField->widget = "ckuploadify"; 
-$oField->store_in_db = false;
-$oRecord->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "username";
@@ -206,14 +132,29 @@ $oField->base_type = "Text";
  */
 $oField->required = true;
 $oField->store_in_db = false;
-$oRecord->addContent($oField); 
+$oRecord->addContent($oField);
+
+
+$oRecord->addContent('<hr /><h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Campo Semplice</h2>');
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "name";
-$oField->label = ffTemplate::_get_word_by_code("utenti_name");
+$oField->label = "utenti name"; 	//ffTemplate::_get_word_by_code("utenti_name");
 $oField->base_type = "Text";
 $oField->store_in_db = false;
-$oRecord->addContent($oField); 
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage); 										<br />
+		$oField->id = "name"; 															<br />
+		$oField->label = "utenti name"; //ffTemplate::_get_word_by_code("utenti_name"); <br />
+		$oField->base_type = "Text"; 													<br />
+		$oRecord->addContent($oField);
+	</code>
+</div>';
+$oRecord->addContent($code);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "surname";
@@ -278,7 +219,7 @@ $oField->app_type = "Date";
 $oField->default_value = new ffData(time(), "Timestamp");
 $oField->store_in_db = false;
 $oRecord->addContent($oField);
-
+define("FF_LOCALE_ID", 1);
 if(!isset($_REQUEST["keys"]["ID"]))
 {
 	$oField = ffField::factory($cm->oPage);
@@ -286,15 +227,12 @@ if(!isset($_REQUEST["keys"]["ID"]))
 	$oField->label = ffTemplate::_get_word_by_code("utenti_gmap");
 	$oField->properties["style"]["width"] = "400px";
 	$oField->properties["style"]["height"] = "200px";
-	$oField->widget = "gmap";
+	$oField->widget = "gmap3";
 	$oField->gmap_draggable = true;
 	$oField->gmap_start_zoom = 10;
 	$oField->gmap_force_search = true;
 	$oField->gmap_update_class = "billaddress,billtown,billprovince,billstate";
 	$oField->gmap_update_class_prefix = "bill";
-	if(check_function("set_field_gmap")) { 
-		$oField = set_field_gmap($oField);
-	}
 	$oField->store_in_db = false;
 	$oRecord->addContent($oField);
 
@@ -388,7 +326,7 @@ if(!isset($_REQUEST["keys"]["ID"]))
 										vgallery_rel_nodes_fields.description <> ''
 										AND vgallery_rel_nodes_fields.ID_nodes = vgallery_nodes.ID 
 										AND vgallery_rel_nodes_fields.ID_fields IN (SELECT vgallery_fields.ID FROM vgallery_fields WHERE vgallery_fields.enable_in_menu > 0 OR vgallery_fields.enable_smart_url > 0)
-										AND vgallery_rel_nodes_fields.ID_lang = " . $db->toSql(LANGUAGE_INSET_ID, "Number") . "
+										AND vgallery_rel_nodes_fields.ID_lang = " . $db->toSql(FF_LOCALE_ID, "Number") . "
 								) AS name
 								" . (ECOMMERCE_DISABLE_LIMIT_STOCK
 									? ""
@@ -428,7 +366,7 @@ if(!isset($_REQUEST["keys"]["ID"]))
 																								INNER JOIN vgallery_type ON vgallery_type.ID = vgallery_fields.ID_type 
 																							WHERE vgallery_fields.name = " .  $db->toSql("visible", "Text") . " 
 																								AND vgallery_type.name = " .  $db->toSql("System", "Text") . ")
-													AND vgallery_rel_nodes_fields.ID_lang = " . $db->toSql(LANGUAGE_INSET_ID, "Number") . "
+													AND vgallery_rel_nodes_fields.ID_lang = " . $db->toSql(FF_LOCALE_ID, "Number") . "
 													AND vgallery_rel_nodes_fields.description = " . $db->toSql("0", "Text") . "
 											)
 									"
@@ -459,7 +397,7 @@ if(!isset($_REQUEST["keys"]["ID"]))
 								, " . FF_PREFIX . "international.description AS name
 							FROM " . FF_PREFIX . "international
 							WHERE " . FF_PREFIX . "international.word_code LIKE 'vat_ns%'
-								AND " . FF_PREFIX . "international.ID_lang = " . $db->toSql(LANGUAGE_INSET_ID, "Number") . "
+								AND " . FF_PREFIX . "international.ID_lang = " . $db->toSql(FF_LOCALE_ID, "Number") . "
 								AND " . FF_PREFIX . "international.is_new = 0
 							[AND] [WHERE]
 							[HAVING]
