@@ -243,7 +243,7 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
         <br />
         $oField->base_type = "Text"; <br />
         $oField->label = "Seleziona utente:"; <br />
-        $oRecord->addContent($oField, $group_field); <br />
+        $oRecord->addContent($oField); <br />
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
