@@ -670,9 +670,8 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
                 $imageOrig["url"] = "/". $imageOrig["mode"] . $imageOrig["url"];
                 $imageOrig["mode"] = "";
 				$showfiles = CM_SHOWFILES;
-				//todo: da togliere da qui e metterlo in un evento
-				if(function_exists("cache_writeLog"))
-					cache_writeLog("SRC: " . $src . " REFERER: " . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], "resource_no_media");
+
+				cmCache_writeLog("SRC: " . $src . " REFERER: " . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"], "resource_no_media");
 			}
 
             //if(!$imageOrig["mode"] && $width > 0 && $height > 0)
@@ -688,6 +687,31 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
     return $src;
 }
 
+function cmCache_writeLog($string, $filename = "log") //writeLog
+{
+	if(DEBUG_LOG === true) {
+		$log_path = FF_DISK_PATH . "/logs";
+		if(!is_dir($log_path))
+			mkdir($log_path, 0777, true);
+
+		$file = $log_path . '/' . date("Y-m-d") . "_" . $filename . '.txt';
+		if(!is_file($file)) {
+			$set_mod = true;
+		}
+
+		if($handle = @fopen($file, 'a'))
+		{
+			if(@fwrite($handle, date("Y-m-d H:i:s", time()) . " " . $string . "\n") === FALSE)
+			{
+				$i18n_error = true;
+			}
+			@fclose($handle);
+
+			if($set_mod && !$i18n_error)
+				chmod($file, 0777);
+		}
+	}
+}
 
 function ffPage_on_tpl_parsed(ffPage_base $oPage)
 {
