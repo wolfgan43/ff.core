@@ -479,8 +479,11 @@ class ffDB_MongoDB
 
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->insert($mongoDB["insert"]);
-					@$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-
+                    try {
+						$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
 					$this->buffered_insert_id = $mongoDB["insert"][$this->keyname];
                 }
                 break;
@@ -507,7 +510,12 @@ class ffDB_MongoDB
 
 					$bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->update($mongoDB["where"], $set, $mongoDB["options"]);
-					@$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+
+					try {
+						$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
 
 					//$this->buffered_insert_id = null;
                 }
@@ -525,7 +533,11 @@ class ffDB_MongoDB
 
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->delete($mongoDB["where"], $mongoDB["options"]);
-                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                    try {
+                    	$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
 
 					//$this->buffered_insert_id = null;
                 }
@@ -587,21 +599,24 @@ class ffDB_MongoDB
 			return false;
 		}
 
-        $cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
-        if (!$cursor)
-        {
-            $this->errorHandler("fetch_assoc_error");
-            return false;
-        }
-        else 
-        {
-            $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
-            $res = $cursor->toArray();
-            foreach ($res AS $key => $value) {
-				$res[$key]["_id"] = $res[$key]["_id"]->__toString();
+		try {
+			$cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
+			if (!$cursor)
+			{
+				$this->errorHandler("fetch_assoc_error");
+				return false;
 			}
-        }        
-        
+			else
+			{
+				$cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+				$res = $cursor->toArray();
+				foreach ($res AS $key => $value) {
+					$res[$key]["_id"] = $res[$key]["_id"]->__toString();
+				}
+			}
+		} catch (Exception $e) {
+			$this->errorHandler("Server Error: " . $e->getMessage());
+		}
 		return $res;
 	}
 		
@@ -681,20 +696,24 @@ class ffDB_MongoDB
 
                     //print_r($this->query_params["where"]);
                     //die();
-                    $cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
-                    if (!$cursor)
-                    {
-                        $this->errorHandler("Invalid SQL: " . print_r($query, true));
-                        return false;
-                    }
-                    else 
-                    {
-                        $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+					try {
+						$cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
+						if (!$cursor)
+						{
+							$this->errorHandler("Invalid SQL: " . print_r($query, true));
+							return false;
+						}
+						else
+						{
+							$cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
 
-                        $this->query_id = new \IteratorIterator($cursor);
-                        $this->query_id->rewind(); // Very important
-                        //$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
-                    }
+							$this->query_id = new \IteratorIterator($cursor);
+							$this->query_id->rewind(); // Very important
+							//$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
+						}
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
                 }
                 break;
             default;
@@ -737,37 +756,54 @@ class ffDB_MongoDB
                         //$bulk->insert(ARRAY_DI_VALORI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->insert($query);
-                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-                        break;
+                        try {
+                        	$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
+
+						break;
                     case "update":
                         //$bulk->update(CONDIZIONE, array('$set' => ARRAY_DI_VALORI), OPZIONI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->update($query);
-                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-                        break;
+                        try {
+							$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
+						break;
                     case "delete":
                         //$bulk->delete(CONDIZIONE, OPZIONI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->delete($query);
-                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-                        break;
+						try {
+							$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
+						break;
                     case "select":
                     case "";
-                        $cursor = $this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["sql"]));
-                        if (!$cursor)
-                        {
-                            $this->errorHandler("Invalid SQL: " . print_r($query, true));
-                            return false;
-                        }
-                        else
-                        {
-                            $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+                    	try {
+							$cursor = $this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["sql"]));
+							if (!$cursor)
+							{
+								$this->errorHandler("Invalid SQL: " . print_r($query, true));
+								return false;
+							}
+							else
+							{
+								$cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
 
-                            $this->query_id = new \IteratorIterator($cursor);
-                            $this->query_id->rewind(); // Very important
-                            $this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["select"]))));
+								$this->query_id = new \IteratorIterator($cursor);
+								$this->query_id->rewind(); // Very important
+								$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["select"]))));
 
-                        }
+							}
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
                         break;
                     default;
                 }
@@ -978,7 +1014,11 @@ class ffDB_MongoDB
 		}
 		
 		if ($this->num_rows === null) {
-            $this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
+			try {
+            	$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
+			} catch (Exception $e) {
+				$this->errorHandler("Server Error: " . $e->getMessage());
+			}
         }
         return $this->num_rows;
 	}

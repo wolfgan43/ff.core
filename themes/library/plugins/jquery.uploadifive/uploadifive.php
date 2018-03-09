@@ -40,7 +40,7 @@ define("CM_DONT_RUN", true);
 define("FF_ERROR_HANDLER_HIDE", true);
 
 require_once($disk_path . "/cm/main.php");
-
+/*
 $valid_session = false;
 if (isset($_POST[session_name()]))
 {
@@ -58,8 +58,9 @@ elseif (isset($_COOKIE[session_name()]))
 	session_id($_COOKIE[session_name()]);
 }
 
-@session_start();
-if($valid_session)
+@session_start();*/
+
+if(mod_security_check_session(false))
 {
 	$ff = get_session("ff");
 	$data_src = basename($_REQUEST['sess']);
@@ -124,7 +125,6 @@ $res = array();
 if(!empty($_FILES))
 {
 	$tempFile = $_FILES['Filedata']['tmp_name'];
-	
 	$fileExt = $_REQUEST['fileExt'];
     if(strtolower($fileExt) == "null")
         $fileExt = "";
@@ -163,7 +163,7 @@ if(!empty($_FILES))
 			$relativePath = $folder . "/";
 			$targetPath = $base_path . $folder . '/';
 		}
-		
+
 		//$relativePath = "";
 		$targetFile = str_replace('//','/',$targetPath) . $_FILES['Filedata']['name'];
 		// $fileTypes  = str_replace('*.','',$_REQUEST['fileext']);
@@ -196,9 +196,9 @@ if(!empty($_FILES))
 			if(is_file($base_path . $relativePath . $real_file))
 			{
 				@chmod($base_path . $relativePath . $real_file, 0777);
-				
+
 				$mimetype = ffMimeTypeByFilename($base_path . $relativePath . $real_file);
-				if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && strpos($mimetype, "image") === 0) 
+				if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && strpos($mimetype, "image") === 0)
 					ffImageOptimize($base_path . $relativePath . $real_file, $mimetype);
 
 				$res["name"] = basename($relativePath . $real_file); 

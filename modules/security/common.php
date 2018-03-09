@@ -631,7 +631,7 @@ function mod_security_check_session($prompt_login = true, $path = null, $just_ex
 	{
 		if ($just_exists)
 			return true;
-		
+
 		session_start();
 		$session_started = true;
 		//if (!session_isset("ADDR") || !session_isset("HOST") || !session_isset("AGENT") || !session_isset("UserID"))
