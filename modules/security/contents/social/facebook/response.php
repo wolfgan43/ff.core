@@ -235,7 +235,7 @@ try {
 				$tpl->set_var("theme", $cm->oPage->theme);
 				$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
 
-				$tpl->set_var("sError", ffCommon_specialchars($sError));
+				$tpl->set_var("sError", mod_sec_process_error(ffCommon_specialchars($sError)));
 
 				/**
 				* 	Responsive Parsing
@@ -394,7 +394,7 @@ try {
 		$tpl->set_var("theme", $cm->oPage->theme);
 		$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
 	    
-	    $tpl->set_var("sError", $_REQUEST["error_description"]);
+	    $tpl->set_var("sError", mod_sec_process_error($_REQUEST["error_description"]));
 
 		/**
 		* 	Responsive Parsing
@@ -448,7 +448,7 @@ try {
 	$tpl->set_var("theme", $cm->oPage->theme);
 	$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
     
-    $tpl->set_var("sError", ffCommon_specialchars($ex->getErrorType() . " - (" . $ex->getCode() . "/" . $ex->getSubErrorCode() . ") " . $ex->getMessage()));
+    $tpl->set_var("sError", mod_sec_process_error(ffCommon_specialchars($ex->getErrorType() . " - (" . $ex->getCode() . "/" . $ex->getSubErrorCode() . ") " . $ex->getMessage())));
 
 	/**
 	* 	Responsive Parsing
@@ -502,7 +502,7 @@ try {
 	$tpl->set_var("theme", $cm->oPage->theme);
 	$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
 
-	$tpl->set_var("sError", ffCommon_specialchars("VALIDATION FAILED"));
+	$tpl->set_var("sError", mod_sec_process_error(ffCommon_specialchars("VALIDATION FAILED")));
 
 	/**
 	* 	Responsive Parsing

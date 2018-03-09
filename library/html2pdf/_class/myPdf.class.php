@@ -8,13 +8,9 @@
  * @author    Laurent MINGUET <webmaster@html2pdf.fr>
  * @version   4.03
  */
-if (__DIR__ !== "__DIR__") {
-	require __DIR__ . '/tcpdfConfig.php';
-	require __DIR__ . '/../_tcpdf_' . HTML2PDF_USED_TCPDF_VERSION . '/tcpdf.php';
-} else {
-	require dirname(__FILE__) . '/tcpdfConfig.php';
-	require dirname(dirname(__FILE__)) . '/_tcpdf_' . HTML2PDF_USED_TCPDF_VERSION . '/tcpdf.php';
-}
+require __DIR__ . '/tcpdfConfig.php';
+require dirname(__DIR__) . '/_tcpdf_' . HTML2PDF_USED_TCPDF_VERSION . '/tcpdf.php';
+
 class HTML2PDF_myPdf extends TCPDF
 {
     protected $_footerParam = array();

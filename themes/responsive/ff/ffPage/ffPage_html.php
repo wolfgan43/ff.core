@@ -2280,15 +2280,16 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->set_var("css_path", $tmp_path);
 				else 
 				{
+					$mtime = @filemtime(ff_getAbsDir($tmp_path));
 					if (ff_getAbsDir($tmp_path, false))
 					{
 						$a = FF_DISK_PATH;
 						$b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
 						$c = substr(__TOP_DIR__, strlen($b));
-						$this->tpl[0]->set_var("css_path", $c . $tmp_path);
+						$this->tpl[0]->set_var("css_path", $c . $tmp_path . ($mtime ? "?" . $mtime : ""));
 					}
 					else
-						$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path);
+						$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path . ($mtime ? "?" . $mtime : ""));
 				}
 				
 				if (!$this->isXHR() && !$value["async"])
@@ -2807,15 +2808,16 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->set_var("js_path", $tmp_path);
 				else
 				{
-                    if (ff_getAbsDir($tmp_path, false))
+					$mtime = @filemtime(ff_getAbsDir($tmp_path));
+					if (ff_getAbsDir($tmp_path, false))
 					{
 						$a = FF_DISK_PATH;
 						$b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
 						$c = substr(__TOP_DIR__, strlen($b));
-						$this->tpl[0]->set_var("js_path", $c . $tmp_path);
+						$this->tpl[0]->set_var("js_path", $c . $tmp_path . ($mtime ? "?" . $mtime : ""));
 					}
 					else
-						$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path);
+						$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path . ($mtime ? "?" . $mtime : ""));
 				}
 				
 				if (!$this->isXHR() && !$value["async"] && $static_init)
@@ -2997,9 +2999,6 @@ class ffPage_html extends ffPage_base
 			$this->tpl[0]->set_var("tag_type", "meta");
             foreach ($this->page_meta as $key => $value)
             {
-            	$this->tpl[0]->set_var("meta_type", $value["type"]);
-                $this->tpl[0]->set_var("meta_content", $value["content"]);
-                $this->tpl[0]->set_var("meta_name", $value["name"]);
                 $this->tpl[0]->set_var("tag_properties", " " . $value["type"] . '="' . $value["name"] . '" content="' . $value["content"] . '"');
                 $this->tpl[0]->parse("SectTags", true);
             }

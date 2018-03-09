@@ -91,7 +91,7 @@ $bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $actex_sql)
 if ($actex_main_db)
 	$db = mod_security_get_main_db();
 else
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 
 $sSQL = $actex_sql;
 $sSqlWhere = "";

@@ -11,11 +11,6 @@
 
 if (!defined("FF_URLPARAMS")) define("FF_URLPARAMS", "__QUERY__,__DEBUG__,__CLEARCACHE__,__GENCACHE__,__NOCACHE__,__NOLAYOUT__,__SHOWCASCADELOADER__");
 
-if (!defined("FF_COMPONENTS") && defined("FF_ONLY_COMPONENTS"))
-{
-	require(dirname(__FILE__) . "/../ff/main.php");
-}
-
 if (!defined("CM_MAIN_INIT"))
 {
 	// DEBUG expressions
@@ -55,14 +50,9 @@ if (!defined("CM_MAIN_INIT"))
 	if (defined("CM_ONLY_INIT"))
 		return;
 }
-/*elseif (defined("CM_ONLY_INIT")) 
-{
-	require(dirname(__FILE__) . "/../ff/main.php");
-}*/
 
 // load classes
-require(ffCommon_dirname(__FILE__) . "/cmRouter." . FF_PHP_EXT);
-require(ffCommon_dirname(__FILE__) . "/cm." . FF_PHP_EXT);
+cmAutoload();
 
 // load addons
 require(ffCommon_dirname(__FILE__) . "/cm_cascadeloader." . FF_PHP_EXT);

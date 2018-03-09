@@ -36,6 +36,8 @@ $oRecord->src_table = "cm_mod_security_users";
  * Aggiunta dei tab
  */
 $oRecord->tab = true;
+
+$oRecord->auto_wrap = false;
 /** 
  * Inizializzazione dell'oggetto ffField, 
  * elemento base di tutte le sovrastrutture del framework (grid, record e detail) 

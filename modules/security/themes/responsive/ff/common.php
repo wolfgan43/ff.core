@@ -179,13 +179,13 @@ function mod_srcurity_get_logo($logo = null, $restricted = false)
     if($logo && is_file(FF_DISK_PATH . $logo))
         $logo_url = $logo;
     elseif($restricted && is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png"))
-        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png";
+        $logo_url = FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png";
     elseif(is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg"))
-        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg";
+        $logo_url = FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg";
     elseif(!$restricted &&  is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.png"))
-        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.png";
+        $logo_url = FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.png";
     elseif(is_file(FF_THEME_DISK_PATH . "/" . cm_getMainTheme() . "/images/nobrand.svg"))
-        $logo_url = ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/nobrand.svg";
+        $logo_url = FF_SITE_PATH . ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/nobrand.svg";
 
     return $logo_url;
 }
@@ -544,18 +544,22 @@ cm::getInstance()->modules["security"]["events"]->addEvent("on_retrieve_params",
 			$ret =	mod_sec_check_login($req["username"], $req["password"], $req["domain"], $options, $req["permanent_session"], $logged, $sError, false);
 			if($ret["error"])
 			{
-				$cm->jsonAddResponse(array(
-					"success" => false 
-					 , "modules" => array(
-						"security" => array(
-							"action" => "login"
-							, "error" => mod_sec_process_error($ret["error_code"])
+				if($cm->isXHR()) {
+					$cm->jsonAddResponse(array(
+						"success" => false
+						 , "modules" => array(
+							"security" => array(
+								"action" => "login"
+								, "error" => mod_sec_process_error($ret["error_code"])
+							)
 						)
-					)
-					, "doredirects" => false
-				));
-				cm::jsonParse($cm->json_response);			
-				exit;				
+						, "doredirects" => false
+					));
+					cm::jsonParse($cm->json_response);
+					exit;
+				} else {
+					ffRedirect($cm->path_info . "?username=" . $req["username"] . "&password=" . "&error=" . $ret["error_code"]);
+				}
 			}
 			elseif ($ret["logged"] === true)
 			{

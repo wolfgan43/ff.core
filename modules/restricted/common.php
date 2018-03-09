@@ -111,7 +111,7 @@ function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 		if (MOD_SEC_MULTIDOMAIN && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB && $DomainID !== null)
 			$db = mod_security_get_db_by_domain($DomainID);
 		else
-			$db = ffDb_Sql::factory();
+			$db = ffDB_Sql::factory();
 	}
 	elseif (is_array($db))
 		$db =& $db[0];
@@ -140,7 +140,7 @@ function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 function mod_restricted_get_all_setting($DomainID = null, $db = null)
 {
     if ($db === null)
-        $db = ffDb_Sql::factory();
+        $db = ffDB_Sql::factory();
     elseif (is_array($db))
         $db =& $db[0];
 
@@ -185,7 +185,7 @@ function mod_restricted_get_all_setting($DomainID = null, $db = null)
 function mod_restricted_set_setting($name, $value, $DomainID = null, $db = null)
 {
 	if ($db === null)
-		$db = ffDb_Sql::factory();
+		$db = ffDB_Sql::factory();
 	elseif (is_array($db))
 		$db =& $db[0];
 
@@ -261,7 +261,7 @@ function mod_restricted_load_config($xml, $file = null)
 		{
 			if ($key == "comment")
 				continue;
-		
+
 			if (!isset($cm->modules["restricted"]["menu"][$key]))
 			{
 				$attrs = $value->attributes();
@@ -500,12 +500,11 @@ function mod_restricted_load_config($xml, $file = null)
 
 	if (isset($xml->layout) && count($xml->layout->children()))
 	{
-	
 		foreach ($xml->layout->children() as $key => $value)
 		{
 			if ($key == "comment")
 				continue;
-			
+
 			$attrs = $value->attributes();
 			if ($key == "nolayout")
 			{
@@ -535,7 +534,7 @@ function mod_restricted_load_config($xml, $file = null)
 		{
 			if ($key == "comment")
 				continue;
-			
+
 			if (!isset($cm->modules["restricted"]["settings"][$key]))
 			{
 				$cm->modules["restricted"]["settings"][$key] = new ffSerializable($value);
@@ -544,6 +543,9 @@ function mod_restricted_load_config($xml, $file = null)
 			{
 				foreach ($value->children() as $subkey => $subvalue)
 				{
+					if ($subkey == "comment")
+						continue;
+
 					if (isset($cm->modules["restricted"]["settings"][$key]->$subkey))
 					{
 						if (count($attrs = $subvalue->attributes()))
@@ -567,7 +569,7 @@ function mod_restricted_load_config($xml, $file = null)
 		{
 			if ($key == "comment")
 				continue;
-			
+
 			$attrs = $value->attributes();
 			
 			if (!isset($cm->modules["restricted"]["sections"][$key]) || (string)$attrs->replace == "true")
@@ -578,6 +580,9 @@ function mod_restricted_load_config($xml, $file = null)
 			{
 				foreach ($value->children() as $subkey => $subvalue)
 				{
+					if ($subkey == "comment")
+						continue;
+
 					if (isset($cm->modules["restricted"]["sections"][$key]->$subkey))
 					{
 						if (count($attrs = $subvalue->attributes()))

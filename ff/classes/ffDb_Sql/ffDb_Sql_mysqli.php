@@ -1103,7 +1103,7 @@ class ffDB_Sql
 
 	function mysqlPassword($passStr)
 	{
-		$dbtemp = ffDb_Sql::factory();
+		$dbtemp = ffDB_Sql::factory();
 		$dbtemp->connect($this->database, $this->host, $this->user, $this->password);
 		$dbtemp->query("SELECT PASSWORD('" . $passStr . "') AS password");
 		$dbtemp->nextRecord();

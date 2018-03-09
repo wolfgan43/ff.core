@@ -696,7 +696,7 @@ abstract class ffDetails_base extends ffCommon
 		$this->theme = $theme;
 
 		if ($this->db === null)
-			$this->db[0] = ffDb_Sql::factory();
+			$this->db[0] = ffDB_Sql::factory();
 	}
 
 	/**
@@ -1710,7 +1710,7 @@ abstract class ffDetails_base extends ffCommon
 					if ($need_key_check && !$this->contain_error)
 					{
 						// keys unicity
-						$db = ffDb_Sql::factory();
+						$db = ffDB_Sql::factory();
 						$db[0]->query("SELECT * FROM " . $this->src_table . " WHERE " . $tmp_where);
 						if ($db[0]->nextRecord())
 						{
@@ -2547,7 +2547,7 @@ abstract class ffDetails_base extends ffCommon
 		if (strlen($this->del_auto_action))
 		{
 			$bResult = false;
-			$tmp_db = ffDb_Sql::factory();
+			$tmp_db = ffDB_Sql::factory();
 			// first of all, do all the sql for subsequent checks
 			foreach ($this->del_auto_SQL as $key => $value)
 			{

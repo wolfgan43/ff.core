@@ -692,7 +692,7 @@ class ffTemplate
 			return $rc;
 
 		if (ffTemplate::$_MultiLang_db === null)
-			ffTemplate::$_MultiLang_db = ffDb_Sql::factory();
+			ffTemplate::$_MultiLang_db = ffDB_Sql::factory();
 	
 		if ($tpl !== null && $tpl->MultiLang_database !== null)
 			$database = $tpl->MultiLang_database;

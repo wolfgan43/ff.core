@@ -642,7 +642,7 @@ abstract class ffRecord_base extends ffCommon
 		$this->theme = $theme;
 
 		if ($this->db === null)
-			$this->db[0] = ffDb_Sql::factory();
+			$this->db[0] = ffDB_Sql::factory();
 
 		if(FF_ENABLE_MEM_PAGE_CACHING)
 			$this->addEvent("on_done_action", "ffRecord_reset_cache", ffEvent::PRIORITY_HIGH);
@@ -1681,7 +1681,7 @@ abstract class ffRecord_base extends ffCommon
 			if ($need_key_check && !$this->contain_error)
 			{
 				// keys unicity
-				$db = ffDb_Sql::factory();
+				$db = ffDB_Sql::factory();
 				$db->query("SELECT * FROM `" . $this->src_table . "` WHERE " . $tmp_where);
 				if ($db->nextRecord())
 				{
@@ -2131,7 +2131,7 @@ abstract class ffRecord_base extends ffCommon
 				if (strlen($this->del_auto_action))
 				{
 					$bResult = false;
-					$tmp_db = ffDb_Sql::factory();
+					$tmp_db = ffDB_Sql::factory();
 					// first of all, do all the sql for subsequent checks
 					foreach ($this->del_auto_SQL as $key => $value)
 					{

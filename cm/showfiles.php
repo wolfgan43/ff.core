@@ -16,10 +16,7 @@ define("CM_ONLY_INIT", true);
 //define("CM_DONT_RUN", true);
 //define("FF_DB_MYSQLI_AVOID_REAL_CONNECT", true);
 
-if (__DIR__ !== "__DIR__")
-	require(__DIR__ . "/main.php");
-else
-	require(dirname(__FILE__) . "/main.php");
+require(__DIR__ . "/main.php");
 
 $path_info = $_SERVER["PATH_INFO"];
 //if(strpos($path_info, $_SERVER["SCRIPT_NAME"]) === 0) // ??? DA VERIFICARE,DA CORREGGERE ALTROVE
@@ -439,16 +436,8 @@ if(CM_SHOWFILES_FORCE_PATH && strlen($path_info) && !strlen($filepath))
      
 if(!strlen($filepath) && !CM_SHOWFILES_SKIP_DB) 
 {
-	define("FF_ONLY_COMPONENTS", true);
-	define("CM_DONT_RUN", true);
-
-	if (__DIR__ !== "__DIR__")
-		require(__DIR__ . "/main.php");
-	else
-		require(dirname(__FILE__) . "/main.php");
-
-	$db = ffDb_Sql::factory();
-	$db2 = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
+	$db2 = ffDB_Sql::factory();
 		
 	$db->query("SELECT * FROM " . CM_TABLE_PREFIX . "showfiles");
 	if ($db->nextRecord())

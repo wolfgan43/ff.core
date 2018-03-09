@@ -111,13 +111,13 @@ class ffDB_Sql
  			die("function \"$name\" not found on class " . __CLASS__);
 	}
 
-	static public function __callStatic ($name, $arguments)
+	/*static public function __callStatic ($name, $arguments)
 	{
  		if ($this->useFormsFramework)
  			ffErrorHandler::raise("function \"$name\" not found on class " . get_class($this), E_USER_ERROR, $this, get_defined_vars());
  		else
  			die("function \"$name\" not found on class " . get_class($this));
-	}
+	}*/
 
 	// STATIC EVENTS MANAGEMENT
 	static public function addEvent($event_name, $func_name, $priority = null, $index = 0, $break_when = null, $break_value = null, $additional_data = null)
@@ -155,7 +155,7 @@ class ffDB_Sql
 
 		$res = self::doEvent("on_factory", array());
 
-		$tmp = new ffDb_Sql();
+		$tmp = new ffDB_Sql();
 		$tmp->useFormsFramework = true;
 		$tmp->events = new ffEvents();
 
@@ -820,7 +820,7 @@ class ffDB_Sql
 
 	function mysqlPassword($passStr)
 	{
-		$dbtemp = ffDb_Sql::factory();
+		$dbtemp = ffDB_Sql::factory();
 		$dbtemp->connect($this->database, $this->host, $this->user, $this->password);
 		$dbtemp->query("SELECT PASSWORD('" . $passStr . "') AS password");
 		$dbtemp->nextRecord();

@@ -687,15 +687,15 @@ function cm_getFrameworkCss_settings($name = null) {
 	        )
 	        , "callout" => array(
 	            "default"       => "panel"
-	            , "primary"     => "alert-box"
-	            , "success"     => "alert-box success"
+	            , "primary"     => "callout"
+	            , "success"     => "callout success"
 	            , "info"        => "panel callout"
-	            , "warning"     => "alert-box warning"
-	            , "danger"      => "alert-box alert"
+	            , "warning"     => "callout warning"
+	            , "danger"      => "callout alert"
 	        )
 	        , "pagination" => array(
 	            "align-left" => "text-left" 
-	            , "align-center" => "pagination-centered" //"text-center"
+	            , "align-center" => "text-center"
 	            , "align-right" => "text-right"
 	            , "pages" => "pagination"
 	            , "arrows" => "arrow"

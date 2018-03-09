@@ -46,7 +46,7 @@ class ffWidget_checkgroup
 
 		$this->style_path = $style_path;
 		
-		$this->db[0] = ffDb_Sql::factory();
+		$this->db[0] = ffDB_Sql::factory();
 
 	}
 

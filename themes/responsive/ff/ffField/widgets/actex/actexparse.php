@@ -93,8 +93,18 @@ if(!strlen(trim($actex_sql)))
 	ffErrorHandler::raise("debug empty query", E_USER_ERROR, null, get_defined_vars());
 }
 
-if(!strlen($father_value) && $hide_result_on_query_empty)
-	die(cm::jsonParse(array()));
+if(strlen($father_value) && $hide_result_on_query_empty) {
+	cm::jsonParse(array(
+			"success" => true
+		, "widget" => array(
+				"actex" => array(
+					"D$data_src" => array()
+				)
+			)
+		)
+	);
+	exit;
+}
 
 //$bFindWhereTag = preg_match("/\[WHERE\]/", $actex_sql);
 $bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $actex_sql);
@@ -105,7 +115,7 @@ $bFindHavingOptions = preg_match("/(\[HAVING_AND\]|\[HAVING_OR\])/", $actex_sql)
 if ($actex_main_db)
 	$db = mod_security_get_main_db();
 else
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 
 $sSQL = $actex_sql;
 $sSqlWhere = "";

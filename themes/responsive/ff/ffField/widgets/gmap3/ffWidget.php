@@ -43,7 +43,7 @@ Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
 
 		$this->style_path = $style_path;
 		
-		$this->db[0] = ffDb_Sql::factory();
+		$this->db[0] = ffDB_Sql::factory();
 
 	}
 

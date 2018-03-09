@@ -40,7 +40,7 @@ $bFindWhereOptions = preg_match("/(\[AND\]|\[OR\])/", $actex_sql);
 if ($actex_main_db)
 	$db = mod_security_get_main_db();
 else
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 
 if (strlen($actex_field))
 {

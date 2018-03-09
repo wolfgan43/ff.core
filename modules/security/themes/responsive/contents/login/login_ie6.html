@@ -61,7 +61,13 @@
           <label for="stayconnected">{_stay_connected}</label>
         </div>
         <!--EndSectStayConnected-->
-        <div class="{actions_class}"> <a class="{login_button_class}" href="javascript:void(0);" id="btLogin" onclick="ff.load('ff.modules.security', function() { ff.modules.security.submit('login', 'ffLoginBox', this, '{url}'); });">{_login_confirm}</a> </div>
+        <div class="{actions_class}"> <a class="{login_button_class}" href="javascript:void(0);" id="btLogin" onclick="
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            if(username && password) {
+            window.location.href = '{url}?username=' + username +'&password=' + password + '&frmAction=login&ret_url={encoded_ret_url}';
+            return false;
+            }">{_login_confirm}</a> </div>
       </div>
       <!--EndSectStandardLogin-->
       <!--BeginSectSocialLoginPost-->
@@ -130,3 +136,6 @@
 </script>
 <!--EndSectJanrainJS-->
 </div>
+<style type="text/css">
+  <!-- inserire qui il css-->
+</style>

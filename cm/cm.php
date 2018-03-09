@@ -2234,7 +2234,7 @@ class cm extends ffCommon
 		if (defined("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB") && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB)
 			$db = mod_security_get_main_db();
 		else
-			$db = ffDb_Sql::factory();
+			$db = ffDB_Sql::factory();
 		
 		$layout_vars = array();
 		$layout_vars["main_theme"] = null;
@@ -2340,7 +2340,7 @@ class cm extends ffCommon
 			if (defined("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB") && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB)
 				$db2 = mod_security_get_main_db();
 			else
-				$db2 = ffDb_Sql::factory();
+				$db2 = ffDB_Sql::factory();
 			do
 			{
 				if($db->getField("path", "Text", true) == $layout_path || $db->getField("path", "Text", true) == str_replace("/index", "/", $layout_path))

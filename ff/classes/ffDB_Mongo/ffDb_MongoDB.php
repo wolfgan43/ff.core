@@ -1,7 +1,7 @@
 <?php
 /**
  * SQL database access: mysqli version
- * 
+ *
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
@@ -17,10 +17,10 @@ if (FF_DB_MONGO_SHUTDOWNCLEAN)
 {
 	register_shutdown_function("ffDB_MongoDB::free_all");
 }
- 
+
 /**
  * ffDB_MongoDB è la classe preposta alla gestione della connessione con database di tipo SQL
- * 
+ *
  * @package FormsFramework
  * @subpackage utils
  * @author Samuele Diella <samuele.diella@gmail.com>
@@ -28,7 +28,7 @@ if (FF_DB_MONGO_SHUTDOWNCLEAN)
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
-class ffDB_MongoDB 
+class ffDB_MongoDB
 {
 	var $locale = "ISO9075";
 
@@ -38,7 +38,7 @@ class ffDB_MongoDB
 	var $password = null;
 	var $host     = null;
     var $replica  = null;
-    var $auth     = null; 
+    var $auth     = null;
 
 	//var $charset			= "utf8"; //"utf8";
 	//var $charset_names		= "utf8"; //"utf8";
@@ -52,7 +52,7 @@ class ffDB_MongoDB
 
 	// PARAMETRI SPECIFICI DI MYSQL
 	//var $persistent					= false;	## Setting to true will cause use of mysql_pconnect instead of mysql_connect
-	
+
 	var $transform_null				= true;
 
 	// -------------------
@@ -69,7 +69,7 @@ class ffDB_MongoDB
 	var $link_id  = false;
 	var $query_id = false;
     var $query_params = array();
-	
+
 	var $fields						= null;
 	var $fields_names				= null;
 
@@ -81,14 +81,14 @@ class ffDB_MongoDB
 
 	static $_profile 				= false;
 	static $_objProfile 			= array();
-	
+
 	static $_dbs 					= array();
 	static $_sharelink 				= FF_DB_MONGO_SHARELINK;
 
 	private $buffered_insert_id 	= null;
-	
+
 	// COMMON CHECKS
-	
+
  	public function __set ($name, $value)
  	{
  		if ($this->useFormsFramework)
@@ -138,7 +138,7 @@ class ffDB_MongoDB
 	}*/
 
 	// STATIC EVENTS MANAGEMENT
-	
+
 	static public function addEvent($event_name, $func_name, $priority = null, $index = 0, $break_when = null, $break_value = null, $additional_data = null)
 	{
 		if (!class_exists("ffCommon", false))
@@ -187,7 +187,7 @@ class ffDB_MongoDB
 	{
         static::$_dbs = array();
 	}
-			
+
 	// CONSTRUCTOR
 	function __construct()
 	{
@@ -197,7 +197,7 @@ class ffDB_MongoDB
 
 	// -------------------------------------------------
 	//  FUNZIONI GENERICHE PER LA GESTIONE DELLA CLASSE
-	
+
 	// LIBERA LA CONNESSIONE E LA QUERY
 	function cleanup($force = false)
 	{
@@ -220,7 +220,7 @@ class ffDB_MongoDB
 
 	// LIBERA LA RISORSA DELLA QUERY SENZA CHIUDERE LA CONNESSIONE
 	function freeResult()
-	{ 
+	{
 		$this->query_id                 = false;
         $this->query_params             = array();
 		$this->row                      = -1;
@@ -233,7 +233,7 @@ class ffDB_MongoDB
 
 	// -----------------------------------------------
 	//  FUNZIONI PER LA GESTIONE DELLA CONNESSIONE/DB
-	
+
 	// GESTIONE DELLA CONNESSIONE
 
 	/**
@@ -267,7 +267,7 @@ class ffDB_MongoDB
 			$tmp_pwd                            = MONGO_DATABASE_PASSWORD;
 		else
 			$tmp_pwd                            = $this->password;
-		
+
 		if ($Database !== null)
 			$this->database                     = $Database;
 		else if ($this->database === null)
@@ -276,7 +276,7 @@ class ffDB_MongoDB
             $this->replica                      = $replica;
 
 		$do_connect = true;
-		
+
 		// SOVRASCRIVE I VALORI DI DEFAULT
 		$this->host                             = (is_array($tmp_host)
                                                     ? implode(",", $tmp_host)
@@ -299,7 +299,7 @@ class ffDB_MongoDB
 				$do_connect = false;
 			}
 		}
-			
+
 		if ($do_connect)
 		{   if(class_exists("MongoDB\Driver\Manager"))
 		    {
@@ -318,7 +318,7 @@ class ffDB_MongoDB
 			{
 				if ($this->halt_on_connect_error)
 					$this->errorHandler("Connection failed to host " . $this->host);
-				
+
                 $this->cleanup();
 				return false;
 			}
@@ -329,17 +329,17 @@ class ffDB_MongoDB
 				$this->link_id =& static::$_dbs[$dbkey];
 			}
 		}
-		
+
         return $this->link_id;
-        
+
 	}
-	
+
 	/**
 	 * Seleziona il DB su cui effettuare le operazioni
 	 * @param String Nome del DB
 	 * @return Boolean
 	 */
-    
+
 	function selectDb($Database = "")
 	{
 		if ($Database == "")
@@ -350,24 +350,24 @@ class ffDB_MongoDB
 
 	// -------------------------------------------
 	//  FUNZIONI PER LA GESTIONE DELLE OPERAZIONI
-	
+
 	/**
 	 * Esegue una query senza restituire un recordset
 	 * @param String La query da eseguire
-	 * @return boolean 
+	 * @return boolean
 	 */
-    
+
     function insert($query, $table = null)
 	{
         if(is_array($query) && !empty($query[0]))
         {
-            foreach($query AS $mongoDB) 
+            foreach($query AS $mongoDB)
             {
                 $mongoDB["action"] = "insert";
                 if($table)
                     $mongoDB["table"] = $table;
 
-                $this->execute($mongoDB);                
+                $this->execute($mongoDB);
             }
         } else {
             if(is_array($query))
@@ -379,60 +379,60 @@ class ffDB_MongoDB
                 $mongoDB["table"] = $table;
 
             $mongoDB["action"] = "insert";
-            $this->execute($mongoDB);            
+            $this->execute($mongoDB);
         }
     }
     function update($query, $table = null)
 	{
         if(is_array($query) && !empty($query[0]))
         {
-            foreach($query AS $mongoDB) 
+            foreach($query AS $mongoDB)
             {
                 $mongoDB["action"] = "update";
                 if($table)
                     $mongoDB["table"] = $table;
 
-                $this->execute($mongoDB);                
+                $this->execute($mongoDB);
             }
         } else {
             if(is_array($query))
                 $mongoDB = $query;
             else
                 $mongoDB = $this->sql2mongoDB($query);
-            
+
             if($table)
                 $mongoDB["table"] = $table;
-            
+
             $mongoDB["action"] = "update";
-            $this->execute($mongoDB);            
+            $this->execute($mongoDB);
         }
     }
     function delete($query, $table = null)
 	{
         if(is_array($query) && !empty($query[0]))
         {
-            foreach($query AS $mongoDB) 
+            foreach($query AS $mongoDB)
             {
                 $mongoDB["action"] = "delete";
                 if($table)
                     $mongoDB["table"] = $table;
 
-                $this->execute($mongoDB);                
+                $this->execute($mongoDB);
             }
         } else {
             if(is_array($query))
                 $mongoDB["where"] = $query;
             else
                 $mongoDB = $this->sql2mongoDB($query);
-            
+
             if($table)
                 $mongoDB["table"] = $table;
 
             $mongoDB["action"] = "delete";
-            $this->execute($mongoDB);            
+            $this->execute($mongoDB);
         }
     }
-    
+
 	function execute($query)
 	{
 		if (empty($query))
@@ -448,7 +448,7 @@ class ffDB_MongoDB
             $mongoDB = $query;
         else
             $mongoDB = $this->sql2mongoDB($query);
-        
+
         if(!$mongoDB["action"])
         {
             if(!empty($mongoDB["insert"]))
@@ -471,16 +471,19 @@ class ffDB_MongoDB
             case "insert":
                 if(!$mongoDB["table"])
                     $mongoDB["table"] = $mongoDB["into"];
-                
-                if($mongoDB["table"] && $mongoDB["insert"]) 
+
+                if($mongoDB["table"] && $mongoDB["insert"])
                 {
                 	if(!$mongoDB["insert"][$this->keyname])
                 		$mongoDB["insert"][$this->keyname] = $this->createObjectID();
 
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->insert($mongoDB["insert"]);
-					@$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-
+                    try {
+						$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
 					$this->buffered_insert_id = $mongoDB["insert"][$this->keyname];
                 }
                 break;
@@ -507,7 +510,12 @@ class ffDB_MongoDB
 
 					$bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->update($mongoDB["where"], $set, $mongoDB["options"]);
-					@$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+
+					try {
+						$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
 
 					//$this->buffered_insert_id = null;
                 }
@@ -515,8 +523,8 @@ class ffDB_MongoDB
             case "delete":
                 if(!$mongoDB["table"])
                     $mongoDB["table"] = $mongoDB["delete"];
-                
-                if($mongoDB["table"] && $mongoDB["where"]) 
+
+                if($mongoDB["table"] && $mongoDB["where"])
                 {
                     if(!is_array($mongoDB["where"]))
                         $mongoDB["where"] = array();
@@ -525,7 +533,11 @@ class ffDB_MongoDB
 
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->delete($mongoDB["where"], $mongoDB["options"]);
-                    @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                    try {
+                    	$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
 
 					//$this->buffered_insert_id = null;
                 }
@@ -549,16 +561,16 @@ class ffDB_MongoDB
 		}
 
 		$res = $this->getRecordset();
-		
+
 		$last_ret = null;
 		foreach ($res as $row => $record)
 		{
 			$last_ret = $callback($row, $record, $last_ret);
 		}
-		
+
 		return $last_ret;
 	}
-	
+
 	function eachNext($callback)
 	{
 		if (!$this->query_id)
@@ -575,10 +587,10 @@ class ffDB_MongoDB
 				$last_ret = $callback($this->row, $this->record, $last_ret);
 			} while ($this->nextRecord());
 		}
-		
+
 		return $last_ret;
 	}
-	
+
 	function getRecordset()
 	{
 		if (!$this->query_id)
@@ -587,28 +599,31 @@ class ffDB_MongoDB
 			return false;
 		}
 
-        $cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
-        if (!$cursor)
-        {
-            $this->errorHandler("fetch_assoc_error");
-            return false;
-        }
-        else 
-        {
-            $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
-            $res = $cursor->toArray();
-            foreach ($res AS $key => $value) {
-				$res[$key]["_id"] = $res[$key]["_id"]->__toString();
+		try {
+			$cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
+			if (!$cursor)
+			{
+				$this->errorHandler("fetch_assoc_error");
+				return false;
 			}
-        }        
-        
+			else
+			{
+				$cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+				$res = $cursor->toArray();
+				foreach ($res AS $key => $value) {
+					$res[$key]["_id"] = $res[$key]["_id"]->__toString();
+				}
+			}
+		} catch (Exception $e) {
+			$this->errorHandler("Server Error: " . $e->getMessage());
+		}
 		return $res;
 	}
-		
+
 	/**
-	 * Esegue una query 
+	 * Esegue una query
 	 * @param String La query da eseguire
-	 * @return L'id della query eseguita 
+	 * @return L'id della query eseguita
 	 */
 	function query($query)
 	{
@@ -628,7 +643,7 @@ class ffDB_MongoDB
             $mongoDB = $query;
         else
             $mongoDB = $this->sql2mongoDB($query);
-        
+
         if(!$mongoDB["action"])
         {
             if(!empty($mongoDB["from"]))
@@ -639,7 +654,7 @@ class ffDB_MongoDB
                 $mongoDB["action"] = "update";
             elseif(!empty($mongoDB["delete"]))
                 $mongoDB["action"] = "delete";
-            
+
         }
 
 		if($mongoDB["where"][$this->keyname])
@@ -656,7 +671,7 @@ class ffDB_MongoDB
                 if(!$mongoDB["table"])
                     $mongoDB["table"] = $mongoDB["from"];
 
-                if($mongoDB["table"]) 
+                if($mongoDB["table"])
                 {
                     $this->query_params = array(
                         "table" => $mongoDB["table"]
@@ -681,20 +696,24 @@ class ffDB_MongoDB
 
                     //print_r($this->query_params["where"]);
                     //die();
-                    $cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
-                    if (!$cursor)
-                    {
-                        $this->errorHandler("Invalid SQL: " . print_r($query, true));
-                        return false;
-                    }
-                    else 
-                    {
-                        $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+					try {
+						$cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
+						if (!$cursor)
+						{
+							$this->errorHandler("Invalid SQL: " . print_r($query, true));
+							return false;
+						}
+						else
+						{
+							$cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
 
-                        $this->query_id = new \IteratorIterator($cursor);
-                        $this->query_id->rewind(); // Very important
-                        //$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
-                    }
+							$this->query_id = new \IteratorIterator($cursor);
+							$this->query_id->rewind(); // Very important
+							//$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
+						}
+					} catch (Exception $e) {
+						$this->errorHandler("Server Error: " . $e->getMessage());
+					}
                 }
                 break;
             default;
@@ -703,8 +722,8 @@ class ffDB_MongoDB
         return $this->query_id;
 	}
 
-    
-    
+
+
 	function multiQuery($queries)
 	{
 	    if(iis_array($queries) && count($queries))
@@ -737,37 +756,54 @@ class ffDB_MongoDB
                         //$bulk->insert(ARRAY_DI_VALORI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->insert($query);
-                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-                        break;
+                        try {
+                        	$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
+
+						break;
                     case "update":
                         //$bulk->update(CONDIZIONE, array('$set' => ARRAY_DI_VALORI), OPZIONI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->update($query);
-                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-                        break;
+                        try {
+							$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
+						break;
                     case "delete":
                         //$bulk->delete(CONDIZIONE, OPZIONI);
                         $bulk = new MongoDB\Driver\BulkWrite;
                         $bulk->delete($query);
-                        @$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
-                        break;
+						try {
+							$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
+						break;
                     case "select":
                     case "";
-                        $cursor = $this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["sql"]));
-                        if (!$cursor)
-                        {
-                            $this->errorHandler("Invalid SQL: " . print_r($query, true));
-                            return false;
-                        }
-                        else
-                        {
-                            $cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
+                    	try {
+							$cursor = $this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["sql"]));
+							if (!$cursor)
+							{
+								$this->errorHandler("Invalid SQL: " . print_r($query, true));
+								return false;
+							}
+							else
+							{
+								$cursor->setTypeMap(['root' => 'array', 'document' => 'array', 'array' => 'array']);
 
-                            $this->query_id = new \IteratorIterator($cursor);
-                            $this->query_id->rewind(); // Very important
-                            $this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["select"]))));
+								$this->query_id = new \IteratorIterator($cursor);
+								$this->query_id->rewind(); // Very important
+								$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $mongoDB["table"], new MongoDB\Driver\Query($mongoDB["select"]))));
 
-                        }
+							}
+						} catch (Exception $e) {
+							$this->errorHandler("Server Error: " . $e->getMessage());
+						}
                         break;
                     default;
                 }
@@ -798,7 +834,7 @@ class ffDB_MongoDB
 		if (strpos(strtolower(trim($tabella)), "select") !== 0)
 		{
 			$listacampi = "";
-			
+
 			if(is_array($nomecampo))
 			{
 				$valori = array();
@@ -819,7 +855,7 @@ class ffDB_MongoDB
 			}
 			else
 				$listacampi = "*";
-			
+
 			$sSql = "SELECT " . $listacampi . " FROM " . $tabella . " WHERE 1 ";
 		}
 		else
@@ -833,7 +869,7 @@ class ffDB_MongoDB
 			{
 				if (is_object($value) && get_class($value) != "ffData")
 						$this->errorHandler("lookup: Il valore delle chiavi dev'essere di tipo ffData od un plain value", E_USER_ERROR, $this, get_defined_vars());
-						
+
 				$sSql .= " AND `" . $key . "` = " . $this->toSql($value);
 			}
 			reset($chiave);
@@ -882,7 +918,7 @@ class ffDB_MongoDB
 				return $defaultvalue;
 		}
 	}
-	
+
 	/**
 	 * Sposta il puntatore al DB al record successivo (va chiamato almeno una volta)
 	 * @return boolean
@@ -892,14 +928,14 @@ class ffDB_MongoDB
         if($this->record) {
             $this->record["_id"]        = $this->record["_id"]->__toString();
 			$this->fields_names         = array_keys($this->record);
-			$this->fields               = array_fill_keys($this->fields_names, "");            
+			$this->fields               = array_fill_keys($this->fields_names, "");
         } else {
 			$this->fields_names         = null;
-			$this->fields               = null;            
+			$this->fields               = null;
         }
         return $this->record;
     }
-    
+
 	function nextRecord()
 	{
 		if (!$this->query_id)
@@ -907,7 +943,7 @@ class ffDB_MongoDB
 			$this->errorHandler("nextRecord called with no query pending");
 			return false;
 		}
-        
+
 		if ($this->getRecord())
 		{
 			$this->row += 1;
@@ -976,9 +1012,13 @@ class ffDB_MongoDB
 			$this->errorHandler("numRows() called with no query pending");
 			return false;
 		}
-		
+
 		if ($this->num_rows === null) {
-            $this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
+			try {
+            	$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
+			} catch (Exception $e) {
+				$this->errorHandler("Server Error: " . $e->getMessage());
+			}
         }
         return $this->num_rows;
 	}
@@ -1049,7 +1089,7 @@ class ffDB_MongoDB
 	 * @param String Nome del campo
 	 * @param String Tipo di dato inserito
 	 * @param <type> $bReturnPlain
-	 * @return ffData Dato recuperato dal DB 
+	 * @return ffData Dato recuperato dal DB
 	 */
 	function getField($Name, $data_type = "Text", $bReturnPlain = false, $return_error = true)
 	{
@@ -1095,20 +1135,20 @@ class ffDB_MongoDB
 
 		if ($row === null)
 			$row = $this->row;
-		
+
 		if ($row !== $this->row)
 		{
 			$rc = $this->seek($row);
 			if (!$rc)
 				return false;
 		}
-		
+
 		return $this->getField((is_numeric($Name) ? $this->fields_names[$Name] : $Name), $data_type, $bReturnPlain);
 	}
 
 	// ----------------------------------------
 	//  FUNZIONI PER LA FORMATTAZIONE DEI DATI
-	
+
 	function toSql($cDataValue, $data_type = null, $enclose_field = true, $transform_null = null)
 	{
 		if (!$this->link_id)
@@ -1137,7 +1177,7 @@ class ffDB_MongoDB
 					$tmp = new ffData($cDataValue, "Date");
 					$value = $tmp->getValue($data_type, $this->locale);
 					break;
-				
+
 				case "DateTime":
 				default:
 					$data_type = "DateTime";
@@ -1147,7 +1187,7 @@ class ffDB_MongoDB
 		}
 		else
 			$this->errorHandler("toSql: Wrong parameter, unmanaged datatype");
-		
+
 		if ($transform_null === null)
 			$transform_null = $this->transform_null;
 
@@ -1167,7 +1207,7 @@ class ffDB_MongoDB
 			default:
 				if (!strlen($value) && !$transform_null)
 					return "null";
-				
+
 				if (!strlen($value) && ($data_type == "Date" || $data_type == "DateTime"))
 					$value = ffData::getEmpty($data_type, $this->locale);
 
@@ -1180,7 +1220,7 @@ class ffDB_MongoDB
 
 	// ----------------------------------------
 	//  GESTIONE ERRORI
-	
+
 	function debugMessage($msg)
 	{
 		if ($this->debug)
@@ -1293,7 +1333,7 @@ class ffDB_MongoDB
         if (!$exp) { return(''); }
 
 
-        ### check for normal 
+        ### check for normal
         if (preg_match ('/(\w+).*?([<>=!]+)(.*)/i',$exp,$matches)) {
             $operator = $matches[2];
 
@@ -1339,7 +1379,7 @@ class ffDB_MongoDB
             #$this->errorHandler ("unsupported");
             #$mg_equation = "{  " . $matches[1] . " : { '\$ne' : null } ";
         } else {
-            $this->errorHandler("Unknown operator '$operator' :  $exp");	
+            $this->errorHandler("Unknown operator '$operator' :  $exp");
         }
 
         return ($mg_equation);
@@ -1361,26 +1401,26 @@ class ffDB_MongoDB
             #echo "'$val'\n<br/>";
             switch (strtolower($val)) {
 
-                case 'not' : 
+                case 'not' :
                     #while ((sizeof($stack) > 0) && ($stack[sizeof($stack) - 1] != 'and' || $stack[sizeof($stack) - 1] != 'or') ) {
                     #	$e = array_pop($stack);
                     #	$polish[] = $e;
-                    #} 
+                    #}
                     $stack[]= strtolower($val);
                     break;
-                case 'or' : 
+                case 'or' :
                     while ((sizeof($stack) > 0) && ( $stack[sizeof($stack) - 1] == 'and' ) ) {
                         $e = array_pop($stack);
                         $polish[] = $e;
-                    } 
+                    }
                     $stack[]= strtolower($val);
                     break;
 
-                case 'and' : 
+                case 'and' :
                     $stack[]= strtolower($val);
                     break;
 
-                case '(' : 
+                case '(' :
                     $stack[]= $val;
                     break;
 
@@ -1388,11 +1428,11 @@ class ffDB_MongoDB
                     while ((sizeof($stack) > 0) && ($stack[sizeof($stack) - 1] != '(') ) {
                         $e = array_pop($stack);
                         $polish[] = $e;
-                    } 
+                    }
                     $null .= array_pop($stack);
 
                     break;
-                default : 
+                default :
                     ### handle not
                     $polish[] = $val;
                     if (1) {
@@ -1420,7 +1460,7 @@ class ffDB_MongoDB
         #echo "<br/>";
 
 
-        #### Polish stuff to mongo  
+        #### Polish stuff to mongo
         $tmpval = array();
         $cnt=0;
         $nextoper = '';
@@ -1437,30 +1477,30 @@ class ffDB_MongoDB
 
                     if ($val == 'or') { $mgoper = '$or'; }
                     if ($val == 'and') { $mgoper = '$and'; }
-                    if ($val == 'not') { 
+                    if ($val == 'not') {
                         #echo "not found";
-                        $mgoper = '$not'; 
+                        $mgoper = '$not';
                         $popcount = 1;
                     }
 
-                    if ($val == $polish[$cnt] && $popcount > 1 ) { 
+                    if ($val == $polish[$cnt] && $popcount > 1 ) {
                         $popcount++;
-                        #echo "same oper $val\n"; 
-                        continue; 
+                        #echo "same oper $val\n";
+                        continue;
                     }
 
                     $tmparr2 = array();
                     for ($i = 1; $i<=$popcount; $i++) {
                         $tmparr2[]=array_pop($tmparr);
                     }
-                    $operstring = join(", ",array_reverse($tmparr2));	
+                    $operstring = join(", ",array_reverse($tmparr2));
 
                     if ($popcount==1) {
                         $e = $operstring;
                         ### Rewrite 'not' stuff
                         if ($val == 'not') {
                             # fx { b : { $ne : 5 } } = { b : 5 }
-                                $e = preg_replace ('/{ (\w+) : ([\w\'"]+) }/','{ $1 : { $ne : $2 } }',$e);	
+                                $e = preg_replace ('/{ (\w+) : ([\w\'"]+) }/','{ $1 : { $ne : $2 } }',$e);
                             # fx:  { a : 5 }  = { a : { $ne : 5 } };
                             ### if no change
                             if ($e == $operstring) {
@@ -1468,20 +1508,20 @@ class ffDB_MongoDB
                             }
                             echo $e;
                         } else {
-                            $e = " { $mgoper : $operstring } .."; 	
+                            $e = " { $mgoper : $operstring } ..";
                         }
                         $tmparr[] = $e;
                         $popcount=2;
                         continue;
 
                     } else {
-                        $e = " { $mgoper : [  $operstring ] } "; 	
-                    } 
+                        $e = " { $mgoper : [  $operstring ] } ";
+                    }
 
                     $popcount=2;
 
                     if (isset($polish[$cnt])) { # if stuff is still left
-                        # push it back	
+                        # push it back
                         $tmparr[] = $e;
                     } else {
                         # only called once
@@ -1502,14 +1542,14 @@ class ffDB_MongoDB
 
         return ($rs);
 
-    }    
+    }
     function sql2mongoDB($sql) {
 		# make as oneline
 		$sql = stripslashes(trim($sql));
 		$sql = preg_replace ('/\r\n?/',' ', ($sql));
 		# remove ending ;'s
 		$sql = preg_replace ('/;+$/','', ($sql));
-		
+
 
 
 		preg_match('/^(\w+) /i',$sql,$querytype);
@@ -1518,17 +1558,17 @@ class ffDB_MongoDB
 		### If select
 		if ($query['querytype'] == "insert") {
             $query['action'] = "insert";
-            $this->errorHandler("insert not supported yet");            
+            $this->errorHandler("insert not supported yet");
         } else if ($query['querytype'] == "update") {
             $query['action'] = "update";
-            $this->errorHandler("update not supported yet");            
+            $this->errorHandler("update not supported yet");
         } else if ($query['querytype'] == "delete") {
             $query['action'] = "delete";
-            $this->errorHandler("delete not supported yet");            
+            $this->errorHandler("delete not supported yet");
 		} else if ($query['querytype'] == "select") {
             $query['action'] = "select";
-			$findcommand = "find";	
-		
+			$findcommand = "find";
+
 			preg_match('/select *?(.*?)from/i',$sql,$fields);
 			preg_match('/select.*?from(.*?)($|where|group.*?by|order.*?by|limit|$)/i',$sql,$tables);
 			preg_match('/select.*?from.*?where(.*?)(group.*?by|order.*?by|limit|$)/i',$sql,$where);
@@ -1551,7 +1591,7 @@ class ffDB_MongoDB
 			foreach ($query['fields'] as $key => $value) {
 				if (preg_match ('/count\((.*?)\)/i',$value,$countmatch)) {
 					# Special fields
-					$mg_count .= ".count()";	
+					$mg_count .= ".count()";
 					$countfield = $countmatch[1];
 					if ($countfield != "*") {
 						$mg_where .= " { $countfield : { '\$exists' : true } } ";
@@ -1559,7 +1599,7 @@ class ffDB_MongoDB
 				} elseif (preg_match ('/distinct (.*?) *$/i',$value,$distinctmatch)) {
 					$distinctfield = $distinctmatch[1];
 					$mg_distinct .= ".distinct('$distinctfield') (not working)";
-			
+
 				} else {
 					# normal fields
 					$query['fields'][$key] = trim ($value);
@@ -1577,11 +1617,11 @@ class ffDB_MongoDB
 			### Handle table
 
 			if (sizeof($query['tables']) > 1) {
-				$this->errorHandler ("only one table for now");	
+				$this->errorHandler ("only one table for now");
 			} else {
 				$mg_collection = trim($query['tables'][0]);
 			}
-			
+
 
 			### Handle where
 			if (is_array($query['where'])) {
@@ -1598,7 +1638,7 @@ class ffDB_MongoDB
 				$arr = preg_split("/ +/",$orderby);
 				$orderfield = $arr[0];
 				$ordersort = strtolower($arr[1]);
-				$mg_sort = '.sort( { ' . $orderfield . ' : ';	
+				$mg_sort = '.sort( { ' . $orderfield . ' : ';
 
 				if ($ordersort == 'asc') {
 					$mg_sort .= "1";
@@ -1631,9 +1671,9 @@ class ffDB_MongoDB
 					}
 				}
 				if ($rowstofind==1) {
-					$findcommand = "findOne";	
+					$findcommand = "findOne";
 				} else {
-					$findcommand = "find";	
+					$findcommand = "find";
 				}
 			}
             $query["table"] = $mg_collection;
@@ -1642,8 +1682,8 @@ class ffDB_MongoDB
             $query['action'] = $query['querytype'];
 			$this->errorHandler ("unsupported querytype for the time being: " . $query['querytype']);
 		}
-        
+
         return $query;
     }
-    
+
 }

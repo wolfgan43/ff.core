@@ -46,6 +46,7 @@ $arrReferer = explode("/", $referer);
 if($arrReferer[1] == "domains")
     $domain_path = "/domains/" . $arrReferer[2];
 
+/*
 $valid_session = false;
 if (isset($_POST[session_name()]))
 {
@@ -63,8 +64,9 @@ elseif (isset($_COOKIE[session_name()]))
 	session_id($_COOKIE[session_name()]);
 }
 
-@session_start();
-if($valid_session)
+@session_start();*/
+
+if(mod_security_check_session(false))
 {
 	$ff = get_session("ff");
 	$data_src = basename($_REQUEST['sess']);

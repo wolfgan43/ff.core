@@ -586,7 +586,7 @@ abstract class ffGrid_base extends ffCommon
 		$this->theme = $theme;
 
 		if ($this->db === null)
-			$this->db[0] = ffDb_Sql::factory();
+			$this->db[0] = ffDB_Sql::factory();
 
 		if ($this->use_paging && $this->navigator === null)
 			$this->navigator[0] = ffPageNavigator::factory($page, $this->disk_path, $this->site_path, $this->page_path, $this->theme);

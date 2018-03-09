@@ -205,7 +205,7 @@ if (isset($_GET['code']))
         $tpl->set_var("theme", $cm->oPage->theme);
         $tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
         
-        $tpl->set_var("sError", ffCommon_specialchars($sError));
+        $tpl->set_var("sError", mod_sec_process_error(ffCommon_specialchars($sError)));
 
 		/**
 		* 	Responsive Parsing
@@ -324,7 +324,7 @@ else
 	$tpl->set_var("theme", $cm->oPage->theme);
 	$tpl->set_var("domain", $_SERVER["HTTP_HOST"]);
 
-	$tpl->set_var("sError", ffCommon_specialchars("Unable to find code"));
+	$tpl->set_var("sError", mod_sec_process_error(ffCommon_specialchars("Unable to find code")));
 
 	$tpl->set_var("login_url", $dashboard_ret_url);
 

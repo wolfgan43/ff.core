@@ -9,7 +9,86 @@
  * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
+function ffAutoload() {
+	static $loaded = false;
+	if(!$loaded) {
+		spl_autoload_register(function ($class) {
+			switch ($class) {
+				case "ffDB_Sql":
+				case "ffDb_Sql":
+					require(__DIR__ . "/classes/ffDb_Sql/ffDb_Sql_" . FF_DB_INTERFACE . "." . FF_PHP_EXT);
 
+					break;
+				case "ffDB_MongoDB":
+				case "ffDb_MongoDB":
+					require(__DIR__ . "/classes/ffDB_Mongo/ffDb_MongoDB." . FF_PHP_EXT);
+					break;
+				case "ffEvent":
+					require(__DIR__ . "/classes/ffEvents/ffEvent." . FF_PHP_EXT);
+					break;
+				case "ffEvents":
+					require(__DIR__ . "/classes/ffEvents/ffEvents." . FF_PHP_EXT);
+					break;
+				case "ffData":
+					require(__DIR__ . "/classes/ffData/ffData." . FF_PHP_EXT);
+					break;
+				case "ffValidator":
+					require(__DIR__ . "/classes/ffValidator/ffValidator." . FF_PHP_EXT);
+					break;
+				case "ffCache":
+					require(__DIR__ . "/classes/ffCache/ffCacheAdapter." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffCache/ffCache." . FF_PHP_EXT);
+					break;
+				case "ffImage":
+				case "ffCanvas":
+				case "ffText":
+				case "ffThumb":
+					require(__DIR__ . "/classes/ffImage/ffImage." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffImage/ffCanvas." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffImage/ffText." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffImage/ffThumb." . FF_PHP_EXT);
+					break;
+				case "ffErrorHandler":
+					require(__DIR__ . "/error_handling." . FF_PHP_EXT);
+					break;
+				case "ffDBAdapter":
+				case "ffDBConnection":
+				case "ffDBField":
+				case "ffDBIndex":
+				case "ffDBRecord":
+				case "ffDBRecordset":
+				case "ffDBSource":
+				case "ffDBTable":
+				case "ffDBQuery":
+					require(__DIR__ . "/classes/ffDB/ffDBAdapter." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/ffDBConnection." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/ffDBField." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/ffDBIndex." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/ffDBRecord." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/ffDBRecordset." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/ffDBSource." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/sources/ffDBTable." . FF_PHP_EXT);
+					require(__DIR__ . "/classes/ffDB/sources/ffDBQuery." . FF_PHP_EXT);
+					break;
+				case "PHPSQLCreator":
+				case "PHPSQLParser":
+					require(__DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLParser." . FF_PHP_EXT);
+					require(__DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLCreator." . FF_PHP_EXT);
+					break;
+				case "ffXmlElement":
+				case "ffXmlParser":
+					require(__DIR__ . "/classes/ffXml/ffXmlParser." . FF_PHP_EXT); // UNDER DEVELOPMENT
+					require(__DIR__ . "/classes/ffXml/ffXmlElement." . FF_PHP_EXT); // UNDER DEVELOPMENT
+					break;
+				default:
+					if (strpos($class, "ff") === 0) {
+						require(__FF_DIR__ . '/classes/' . $class . '.' . FF_PHP_EXT);
+					}
+			}
+		});
+		$loaded = true;
+	}
+}
 //------------------------------------------------------------------------------------
 // http header "location" wrapper
 //------------------------------------------------------------------------------------
@@ -361,7 +440,7 @@ function ffProcessTags($haystack, $Keys, $Data, $mode = "normal", $page_params =
 
 function FormsProcessSQL($sSQL, $FormFields, $bEnclose = true)
 {
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 	
 	$sSQL = str_replace(	"[DATE]", 
 							$db->toSql(new ffData(date("%d/%m/%Y"), "Date", "ITA"),
@@ -2846,7 +2925,7 @@ function ffCommon_get_image_params($mode = null) {
 		{
 			$imgParams = array();
 
-            $db = ffDb_Sql::factory();
+            $db = ffDB_Sql::factory();
 			$db->query("SELECT * FROM " . CM_TABLE_PREFIX . "showfiles_modes WHERE 1");
 			if ($db->nextRecord())
 			{
@@ -2938,49 +3017,49 @@ function ffCommon_get_image_params($mode = null) {
 		return $imgParams["thumb"][$mode];
 	else
 		return $imgParams["thumb"];
-}	
+}
 
 
-function ffImageOptimize($filename, $mimetype = null, $params = array()) 
+function ffImageOptimize($filename, $mimetype = null, $params = array())
 {
 	$optiBin = array(
 		"image/jpeg" => array(
 			"convert" => null
-            , "JpegTran" => array(
-				"path" 		=> "/usr/local/bin/jpegtran"
-				, "cmd" 	=> ' -optimize -progressive -copy none '
+		, "JpegTran" => array(
+				"path" 		=> "/usr/bin/jpegtran"
+			, "cmd" 	=> ' -optimize -progressive -copy none '
 			)
-			, "JpegOptim" => array(
+		, "JpegOptim" => array(
 				"path" 		=> "/usr/bin/jpegoptim"
-				, "cmd" 	=> ' --strip-all --all-progressive '
+			, "cmd" 	=> ' --strip-all --all-progressive '
 			)
 		)
-		, "image/png" => array(
+	, "image/png" => array(
 			"OptiPng" => array(
-				"path" 		=> '/usr/bin/optipng' 
-				, "cmd" 	=> ' -i0 -o7 -zm1-9 '
+				"path" 		=> '/usr/bin/optipng'
+			, "cmd" 	=> ' -i0 -o2 '
 			)
-			, "PngOut" => array(
-				"path" 		=> '/usr/local/bin/pngout'
-				, "cmd" 	=> ' -s0 -q -y '
+		, "PngOut" => array(
+				"path" 		=> '/usr/bin/pngout'
+			, "cmd" 	=> ' -s0 -q -y '
 			)
-			, "AdvPng" => array(
+		, "AdvPng" => array(
 				"path" 		=> ''
-				, "cmd" 	=> ' -z -4 -i20 -- '
+			, "cmd" 	=> ' -z -4 -i20 -- '
 			)
-			, "PngCrush" => array(
+		, "PngCrush" => array(
 				"path" 		=> ''
-				, "cmd" 	=> ' -rem gAMA -rem cHRM -rem iCCP -rem sRGB -brute -l 9 -max -reduce -m 0 -q '
+			, "cmd" 	=> ' -rem gAMA -rem cHRM -rem iCCP -rem sRGB -brute -l 9 -max -reduce -m 0 -q '
 			)
-			, "PngQuant" => array(
+		, "PngQuant" => array(
 				"path" 		=> ''
-				, "cmd" 	=> ' --speed 1 --ext=.png --force '
+			, "cmd" 	=> ' --speed 1 --ext=.png --force '
 			)
 		)
-		, "image/gif" => array(
+	, "image/gif" => array(
 			"Gifsicle" => array(
 				"path" 		=> ''
-				, "cmd" 	=> ' -b -O2 '
+			, "cmd" 	=> ' -b -O2 '
 			)
 		)
 	);
@@ -2990,17 +3069,22 @@ function ffImageOptimize($filename, $mimetype = null, $params = array())
 		$mimetype = ffMimeTypeByFilename($filename);
 
 	if(isset($optiBin[$mimetype])) {
-        if($optiBin[$mimetype]["convert"])
-            $shell_cmd = 'convert -strip -quality ' . $optiBin[$mimetype]["convert"] . '% ' . $filename . " " . $filename . ";";
+		if($optiBin[$mimetype]["convert"])
+			$cmd[] = 'convert -strip -quality ' . $optiBin[$mimetype]["convert"] . '% ' . $filename . " " . $filename . ";";
 
-		foreach($optiBin[$mimetype] AS $optim) { 
+		foreach($optiBin[$mimetype] AS $optim) {
 			if($optim["path"])
-				$shell_cmd .= $optim["path"] . $optim["cmd"] . $filename . "; ";
+				$cmd[] = $optim["path"] . $optim["cmd"] . $filename;
 		}
-		
-		//@shell_exec($shell_cmd);
-		@shell_exec("(" . $shell_cmd . ") > /dev/null 2>/dev/null &"); //serve per far andare la procedura in modo asincrono
-	}	
+
+		$shell_cmd = 'nice -n 13 ' . implode(' || ', $cmd) . ' > /dev/null 2>/dev/null & ';
+
+		@shell_exec($shell_cmd);
+		//@shell_exec("(" . $shell_cmd . ") > /dev/null 2>/dev/null &");
+//echo $shell_cmd;
+//exit;
+		//@shell_exec("nohup nice -n 13 " . $shell_cmd . " > /dev/null 2>&1");
+	}
 }
 
 function ff_datetime_add_month($date)

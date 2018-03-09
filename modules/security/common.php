@@ -455,7 +455,7 @@ function getUserInfo($ID_user, $field, $db = null, $destroy_session = true)
 {
 	$cm = cm::getInstance();
 	if ($db === null)
-		$db = ffDb_Sql::factory();
+		$db = ffDB_Sql::factory();
 
 	$options = mod_security_get_settings($cm->path_info);
 	$sSQL = "SELECT 1 ";
@@ -510,7 +510,7 @@ function setUserInfo($ID_user, $field, $value, $db = null)
 {
 	$cm = cm::getInstance();
 	if ($db === null)
-		$db = ffDb_Sql::factory();
+		$db = ffDB_Sql::factory();
 	
 	if (!isset($cm->modules["security"]["fields"]) || !count($cm->modules["security"]["fields"]) || !isset($cm->modules["security"]["fields"][$field]))
 		ffErrorHandler::raise("mod_security: Field don't exists", E_USER_ERROR, null, get_defined_vars());
@@ -2717,7 +2717,7 @@ function mod_security_get_domain_field($field, $ID_domain = null, $db = null)
     $cm = cm::getInstance();
 
     if ($db === null)
-        $db = ffDb_Sql::factory();
+        $db = ffDB_Sql::factory();
     elseif (is_array($db))
         $db =& $db[0];
 
@@ -2752,7 +2752,7 @@ function mod_security_set_domain_field($field, $value, $ID_domain = null, $db = 
     $cm = cm::getInstance();
 
     if ($db === null)
-        $db = ffDb_Sql::factory();
+        $db = ffDB_Sql::factory();
     elseif (is_array($db))
         $db =& $db[0];
 
@@ -3388,21 +3388,21 @@ function mod_sec_get_avatar($avatar, $mode = null, $theme = null, $svg = false)
         elseif(is_file(ff_getAbsDir(FF_THEME_DIR . "/" . $cm->oPage->getTheme()) . FF_THEME_DIR . "/" . $cm->oPage->getTheme() . "/images/noavatar.png"))
             $res = ($mode
                     ? CM_SHOWFILES . "/" . $mode
-                    : ff_getThemePath($cm->oPage->getTheme())
+                    : FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme())
                 ) . "/" . $cm->oPage->getTheme() . "/images/noavatar.png";
         elseif($theme && !$svg && is_file(ff_getAbsDir(FF_THEME_DIR . "/" . $theme) . FF_THEME_DIR . "/" . $theme . "/images/noavatar.svg"))
-            $res = ff_getThemePath($theme) . "/" . $theme . "/images/noavatar.svg";
+            $res = FF_SITE_PATH . ff_getThemePath($theme) . "/" . $theme . "/images/noavatar.svg";
         elseif($theme && is_file(ff_getAbsDir(FF_THEME_DIR . "/" . $theme) . FF_THEME_DIR . "/" . $theme . "/images/noavatar.png"))
             $res = ($mode
                     ? CM_SHOWFILES . "/" .$mode
-                    : ff_getThemePath($theme)
+                    : FF_SITE_PATH .  ff_getThemePath($theme)
                 ) . "/" . $theme . "/images/noavatar.png";
         elseif(!$svg && is_file(ff_getAbsDir(FF_THEME_DIR . "/" . cm_getMainTheme()) . FF_THEME_DIR . "/" . cm_getMainTheme() . "/images/noavatar.svg"))
-            $res = ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/noavatar.svg";
+            $res = FF_SITE_PATH . ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/noavatar.svg";
         elseif(is_file(ff_getAbsDir(FF_THEME_DIR . "/" . cm_getMainTheme()) . FF_THEME_DIR . "/" . cm_getMainTheme() . "/images/noavatar.png"))
             $res = ($mode
                     ? CM_SHOWFILES . "/" . $mode
-                    : ff_getThemePath(cm_getMainTheme())
+                    : FF_SITE_PATH . ff_getThemePath(cm_getMainTheme())
                 ) . "/" . cm_getMainTheme() . "/images/noavatar.png";
     }
 
@@ -3860,31 +3860,38 @@ function _modsec_login_redirect($ret_url, $context)
 function mod_sec_login_getTemplate($logged)
 {
 	$cm = cm::getInstance();
+	$browser = $cm->getBrowser();
+	if($browser["name"] == "MSIE" && $browser["majorver"] <= 6)
+		$postfix = "_ie6";
+
 	if ($logged)
 	{
 		if ($cm->modules["security"]["overrides"]["logout"]["tpl_file"])
 			$template_file = $cm->modules["security"]["overrides"]["logout"]["tpl_file"];
 		else
-			$template_file = "logout.html";
+			$template_file = "logout" . $postfix . ".html";
 	}
 	else
 	{
 		if ($cm->modules["security"]["overrides"]["login"]["tpl_file"])
 			$template_file = $cm->modules["security"]["overrides"]["login"]["tpl_file"];
 		else
-			$template_file = "login.html";
+			$template_file = "login" . $postfix . ".html";
 	}
-	
+
 	return $template_file;
 }
 
 function mod_sec_login_tpl_load($logged, $template_file = null) {
 	$cm = cm::getInstance();
-	
+
 	if($template_file === null)
 		$template_file = mod_sec_login_getTemplate($logged);
 
     $filename = cm_cascadeFindTemplate("/contents/login/" . $template_file, "security");
+
+
+
 	/*$filename = null;
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . rtrim($cm->path_info, "/") . "/" . $template_file, $cm->oPage->theme, false);

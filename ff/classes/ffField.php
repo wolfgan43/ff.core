@@ -1205,7 +1205,7 @@ abstract class ffField_base extends ffCommon
 					$this->recordset = array();
 
 					if ($this->db === null)
-						$this->db[0] = ffDb_Sql::factory();
+						$this->db[0] = ffDB_Sql::factory();
 
 					$tmp_SQL = ffProcessTags($tmp_SQL, $this->getKeysArray(), $this->getDataArray(), "sql");
 					

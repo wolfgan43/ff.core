@@ -220,8 +220,8 @@ class ffRecord_dialog extends ffRecord_base
 							)
 		);*/
 
-	var $disable_mod_notifier_on_error = false;	
-	
+	var $disable_mod_notifier_on_error = false;
+	var $auto_wrap 				= true;
 	var $js_deps = array(
 		"ff.ffRecord" => null
 	);
@@ -833,14 +833,14 @@ class ffRecord_dialog extends ffRecord_base
 					    
 					    if ($this->form_fields[$key]->description !== null) 
 					    {       
-						    $this->tpl[0]->set_var("field_description", $this->form_fields[$key]->description);
+						    $this->tpl[0]->set_var("fielDescription", $this->form_fields[$key]->description);
 						    $this->tpl[0]->parse("SectDescriptionLabel", false);
 	                        
 	                        $label_set = true;
 					    }	
 					    else
 					    {
-						    $this->tpl[0]->set_var("field_description", "");
+						    $this->tpl[0]->set_var("fielDescription", "");
 						    $this->tpl[0]->set_var("SectDescriptionLabel", "");
 					    }
 	                    
@@ -1192,10 +1192,10 @@ class ffRecord_dialog extends ffRecord_base
 			{
 				$this->tpl[0]->set_var("error", $this->strError);
 			}
-			elseif (function_exists("mod_notifier_add_message_to_queue") && !MOD_NOTIFIER_DISABLE_AJAX && !$this->disable_mod_notifier_on_error)
+			/*elseif (function_exists("mod_notifier_add_message_to_queue") && !MOD_NOTIFIER_DISABLE_AJAX && !$this->disable_mod_notifier_on_error)
 			{
 				mod_notifier_add_message_to_queue($this->strError, MOD_NOTIFIER_ERROR);
-			}
+			}*/
 			else
 			{
 				$this->tpl[0]->set_var("error_class", cm_getClassByDef($this->framework_css["error"]));

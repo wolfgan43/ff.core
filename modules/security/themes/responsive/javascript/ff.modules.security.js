@@ -205,12 +205,16 @@ onSubmit : function(containerSuccess) {
 						//});
 					} else {
 						jQuery(injectid + " .secError").remove();
-	                    jQuery(injectid + " .disabled").css({'opacity': '', 'pointer-events': ''}).removeClass("disabled"); 
-	                    jQuery(injectid).find("input:first").parent().prepend(data.modules.security.error).children(":first").addClass("secError");
+						jQuery(injectid + " .disabled").css({'opacity': '', 'pointer-events': ''}).removeClass("disabled");
+						var $error = (jQuery(injectid + " .error-container").length
+								? jQuery(injectid + " .error-container")
+								: jQuery(injectid).find("input:first").parent()
+						);
+						$error.prepend(data.modules.security.error).children(":first").addClass("secError");
 					}
 				}
 
-                ev.remove();
+				ev.remove();
 			}
 		});
 	});

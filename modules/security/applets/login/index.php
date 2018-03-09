@@ -27,7 +27,7 @@ if (!$logged)
 }
 else
 {
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 	$tpl->set_var("firstname", ffCommon_specialchars(mod_security_getUserInfo("firstname")->getValue()));
 	$tpl->set_var("lastname", ffCommon_specialchars(mod_security_getUserInfo("lastname")->getValue()));
 

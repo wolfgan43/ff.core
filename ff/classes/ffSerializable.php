@@ -46,6 +46,9 @@ class ffSerializable
 		{
 			foreach ($obj_vars as $key => $var)
 			{
+				if ($key == "comment") // simpleXML compatibility
+					continue;
+
 				if ($key != "@attributes") // simpleXML compatibility
 					$this->$key = $this->__process_var($var);
 			}

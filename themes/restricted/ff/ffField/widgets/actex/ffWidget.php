@@ -70,7 +70,7 @@ class ffWidget_actex extends ffCommon
 
 		$this->style_path = $style_path;
 		
-		$this->db[0] = ffDb_Sql::factory();
+		$this->db[0] = ffDB_Sql::factory();
 		
 		//if ($this->libraries === null)
 		//	$this->libraries = ffTheme_restricted_get_libs($this, "theme/ff/ffField/widgets/actex");

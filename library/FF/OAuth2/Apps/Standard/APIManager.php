@@ -53,7 +53,7 @@ class APIManager {
 			
 			case "ffDb_Sql":
 				if ($this->options["ref_sessions"] === null) {
-					$this->backend_sessions = \ffDb_Sql::factory();
+					$this->backend_sessions = \ffDB_Sql::factory();
 				} else {
 					$this->backend_sessions = $this->options["ref_sessions"];
 				}
@@ -64,7 +64,7 @@ class APIManager {
 		{
 			case "ffDb_Sql":
 				if ($this->options["ref_accounts"] === null) {
-					$this->backend_accounts = \ffDb_Sql::factory();
+					$this->backend_accounts = \ffDB_Sql::factory();
 				} elseif (!is_object($this->options["ref_accounts"]) || !is_a($this->options["ref_accounts"], "ffDb_Sql")) {
 					throw new \InvalidArgumentException("with backend_accounts set to 'ffDb_Sql, you must pass a ffDb_Sql object in 'ref_accounts'");
 				} else {

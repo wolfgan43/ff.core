@@ -92,7 +92,7 @@
             <url>/cm/contents/docs/$1</url>
             <toplevel />
         </destination>
-        <reverse>/docs  </reverse>
+        <reverse>/docs</reverse>
     </rule>
 	<rule id="ds">
 		<priority>NORMAL</priority>

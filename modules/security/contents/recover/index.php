@@ -84,7 +84,7 @@ if($frmAction == "recover")
 	
 	if (strlen($sError))
 	{
-		$tpl->set_var("sError", ffCommon_specialchars($sError));
+		$tpl->set_var("sError", mod_sec_process_error(ffCommon_specialchars($sError)));
 		$tpl->parse("SectError", false);
 		return;
 	}
@@ -116,7 +116,7 @@ if($frmAction == "recover")
 	if ($db2->numRows() > 1)
 	{
 		$sError = "&Egrave; stato riscontrato un problema con i dati dell'utenza selezionata, contattare l'amministratore del sito";
-		$tpl->set_var("sError", $sError);
+		$tpl->set_var("sError", mod_sec_process_error($sError));
 		$tpl->parse("SectError", false);
 		return;
 	}
@@ -219,7 +219,7 @@ if($frmAction == "recover")
 			$remaining_time = floor((MOD_SEC_PASSWORD_RECOVER_INTERVAL - $time_elapsed) / 60);
 
 			$sError = "Devi attendere " . $remaining_time . " minuti prima di chiedere una nuova password";
-			$tpl->set_var("sError", $sError);
+			$tpl->set_var("sError", mod_sec_process_error($sError));
 			$tpl->parse("SectError", false);
 			return;
 		}

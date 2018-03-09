@@ -750,7 +750,7 @@ function ModSecDomains_on_done_action($oRecord, $frmAction)
 {
 	$cm = cm::getInstance();
 	$ID = $oRecord->key_fields["ID"]->value;
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 
 	if (isset($cm->modules["security"]["domains_fields"]) && count($cm->modules["security"]["domains_fields"]))
 	{

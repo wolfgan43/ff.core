@@ -1211,7 +1211,8 @@ class ffGrid_html extends ffGrid_base
     {    
         if ($this->display_grid == "never" || ($this->display_grid == "search" && !strlen($this->searched)))
         {
-            $this->tpl[0]->set_var("SectGrid", "");
+            $this->tpl[0]->set_var("SectGridTable", "");
+			$this->tpl[0]->parse("SectGrid", false);
             return;
         }
          
@@ -1799,6 +1800,7 @@ class ffGrid_html extends ffGrid_base
         	$this->component_properties["data-record"] = $this->record_id;
 
             $this->tpl[0]->parse("SectGridData", false);
+			$this->tpl[0]->parse("SectGridTable", false);
             $this->tpl[0]->parse("SectGrid", false);
             $this->tpl[0]->set_var("SectNoRecords", "");
         } 
@@ -1807,6 +1809,7 @@ class ffGrid_html extends ffGrid_base
         	$component_class["empty"] = "padding " . cm_getClassByFrameworkCss("clear", "util");
         	$this->tpl[0]->set_var("norecord_class", cm_getClassByDef($this->framework_css["norecord"]));
             $this->tpl[0]->set_var("SectGridData", "");
+			$this->tpl[0]->set_var("SectGridTable", "");
             $this->tpl[0]->set_var("SectGrid", "");
             //$this->tpl[0]->set_var("SectAlpha", "");
             //$this->tpl[0]->set_var("SectFilter", "");

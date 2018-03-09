@@ -102,7 +102,7 @@ function ModSecChangePassword_on_done_action($oRecord, $frmAction)
 			$globals = ffGlobals::getInstance("mod_security");
 
 			$ID = $oRecord->key_fields["ID"]->value;
-			$db = ffDb_Sql::factory();
+			$db = ffDB_Sql::factory();
 
 			if (
 					MOD_SEC_CRYPT 

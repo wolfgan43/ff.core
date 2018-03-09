@@ -260,7 +260,7 @@ if (!strlen($sError) && strlen($sErrorCode))
 
 if (strlen($sError))
 {
-	$tpl->set_var("sError", $sError);
+	$tpl->set_var("sError", mod_sec_process_error($sError));
 	$tpl->parse("SectError", false);
 }
 

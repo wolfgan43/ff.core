@@ -348,7 +348,7 @@ function ModSecUtenti_on_done_action($oRecord, $frmAction)
 
 	$options = mod_security_get_settings($cm->path_info);
 	$ID = $oRecord->key_fields["ID"]->value;
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 	
 	if (
 			MOD_SEC_CRYPT 

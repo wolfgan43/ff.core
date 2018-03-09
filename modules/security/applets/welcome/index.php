@@ -15,7 +15,7 @@ if(mod_security_check_session(false))	{
 	$tpl->set_var("ret_url", rawurlencode($_SERVER["REQUEST_URI"]));
 	$tpl->set_var("CM_LOCAL_APP_NAME", ffCommon_specialchars(cm_getAppName()));
 
-	$db = ffDb_Sql::factory();
+	$db = ffDB_Sql::factory();
 	$tpl->set_var("firstname", ffCommon_specialchars(mod_security_getUserInfo("firstname")->getValue()));
 	$tpl->set_var("lastname", ffCommon_specialchars(mod_security_getUserInfo("lastname")->getValue()));
 	if(defined("MOD_SEC_USER_AVATAR") && MOD_SEC_USER_AVATAR) {

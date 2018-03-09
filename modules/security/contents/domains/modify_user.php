@@ -215,7 +215,7 @@ function ModSecUtenti_on_done_action($oRecord, $frmAction)
 	if (MOD_SEC_MULTIDOMAIN_EXTERNAL_DB)
 		$db = mod_security_get_db_by_domain($_REQUEST["keys"]["ID"]);
 	else
-		$db = ffDb_Sql::factory();
+		$db = ffDB_Sql::factory();
 	
 	if (isset($cm->modules["security"]["fields"]) && count($cm->modules["security"]["fields"]))
 	{
