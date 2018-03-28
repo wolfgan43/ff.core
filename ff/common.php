@@ -3115,7 +3115,7 @@ function ff_getThemeDir($theme)
 function ff_getModuleDir($module)
 {
     if ($module === "restricted" || $module === "security")
-        return __FF_DIR__ . CM_MODULES_PATH . "/" . $module;
+        return dirname(__FF_DIR__) . CM_MODULES_PATH . "/" . $module;
     else
         return CM_MODULES_ROOT . "/" . $module;
 }
@@ -3375,4 +3375,8 @@ function ffArrIsset()
 	}
 	
 	return true;
+}
+
+function ffCommon_start_abs_path($n = 1) {
+    return substr(FF_DISK_PATH, 0, $n);
 }

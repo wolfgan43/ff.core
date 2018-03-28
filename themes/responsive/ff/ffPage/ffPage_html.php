@@ -2016,7 +2016,7 @@ class ffPage_html extends ffPage_base
 										|| substr(strtolower($value["path"]), 0, 2) === "//"
 									);
 					$flag_path_abs = (
-										$flag_path_ext || substr(strtolower($value["path"]), 0, 1) === "/"
+										$flag_path_ext || substr($value["path"], 0, 1) === "/"
 									);
 					$flag_file_ext = (
 										substr(strtolower($value["file"]), 0, 7) === "http://"
@@ -2024,7 +2024,7 @@ class ffPage_html extends ffPage_base
 										|| substr(strtolower($value["file"]), 0, 2) === "//"
 									);
                     $flag_file_abs = (
-                                        strlen($value["file"]) && ($flag_file_ext || substr(strtolower($value["file"]), 0, 1) === "/" || strpos(realpath($value["file"]), realpath(ff_getAbsDir($value["path"]))) === 0)
+                                        strlen($value["file"]) && ($flag_file_ext || substr($value["file"], 0, 1) === ffCommon_start_abs_path() || strpos(realpath($value["file"]), realpath(ff_getAbsDir($value["path"]))) === 0)
                                     );
 
 					$variants = array();
@@ -2554,7 +2554,7 @@ class ffPage_html extends ffPage_base
 										|| substr(strtolower($value["path"]), 0, 2) === "//"
 									);
 					$flag_path_abs = (
-										$flag_path_ext || substr(strtolower($value["path"]), 0, 1) === "/"
+										$flag_path_ext || substr($value["path"], 0, 1) === "/"
 									);
 					$flag_file_ext = (
 										substr(strtolower($value["file"]), 0, 7) === "http://"
@@ -2563,7 +2563,7 @@ class ffPage_html extends ffPage_base
 									);
 
                     $flag_file_abs = (
-                                        strlen($value["file"]) && ($flag_file_ext || substr(strtolower($value["file"]), 0, 1) === "/" || strpos(realpath($value["file"]), realpath(ff_getAbsDir($value["path"]))) === 0)
+                                        strlen($value["file"]) && ($flag_file_ext || substr($value["file"], 0, 1) === ffCommon_start_abs_path() || strpos(realpath($value["file"]), realpath(ff_getAbsDir($value["path"]))) === 0)
                                     );
 
                     $variants = array();
