@@ -122,11 +122,12 @@
     </rule>
 	<rule>
 		<priority>BOTTOM</priority>
+        <index>100</index><!--questo non cera prima -->
 		<source>(.*)</source>
 		<destination>
 			<url>$0</url>
 			<content_root>/contents</content_root>
 		</destination>
-		<process_next />
+		<!--<process_next />-->
 	</rule>
 </ffxml>

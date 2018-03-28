@@ -3112,7 +3112,13 @@ function ff_getThemeDir($theme)
 	else
 		return __PRJ_DIR__;
 }
-
+function ff_getModuleDir($module)
+{
+    if ($module === "restricted" || $module === "security")
+        return __FF_DIR__ . CM_MODULES_PATH . "/" . $module;
+    else
+        return CM_MODULES_ROOT . "/" . $module;
+}
 function ff_getThemePath($theme)
 {
 	if ($theme === "responsive" || $theme === "restricted")
@@ -3122,7 +3128,9 @@ function ff_getThemePath($theme)
             $a = FF_DISK_PATH;
             $b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
             $c = substr(__TOP_DIR__, strlen($b));
-        }
+        } else
+            $c = FF_SITE_PATH;
+
 		return $c . FF_THEME_DIR;
 	}
 	else

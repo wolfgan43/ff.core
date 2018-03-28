@@ -12,6 +12,9 @@ RewriteEngine On
 # ----------------------------------------------
 #                 Development
 
+#If you use symlink only in local stage you need set DOCUMENT_ROOT with env var
+#SetEnvIf Host "localhost" "FF_TOP_DIR=[DOCUMENT_ROOT]"
+
 # modules rewrite in order to expose themes dir  (you can pass through showfiles.php with /modules subpath)
 RewriteCond   %{HTTP_HOST}  	localhost$
 RewriteCond   %{REQUEST_URI} ^/modules

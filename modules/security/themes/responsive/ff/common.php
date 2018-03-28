@@ -179,13 +179,13 @@ function mod_srcurity_get_logo($logo = null, $restricted = false)
     if($logo && is_file(FF_DISK_PATH . $logo))
         $logo_url = $logo;
     elseif($restricted && is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png"))
-        $logo_url = FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png";
+        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png";
     elseif(is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg"))
-        $logo_url = FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg";
+        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg";
     elseif(!$restricted &&  is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.png"))
-        $logo_url = FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.png";
+        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.png";
     elseif(is_file(FF_THEME_DISK_PATH . "/" . cm_getMainTheme() . "/images/nobrand.svg"))
-        $logo_url = FF_SITE_PATH . ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/nobrand.svg";
+        $logo_url = ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/nobrand.svg";
 
     return $logo_url;
 }
@@ -209,7 +209,7 @@ function mod_security_cm_on_load_brand($page, $tpl)
 
     $logo_url = mod_srcurity_get_logo(MOD_RESTRICTED_LOGO_PATH, true);
 
-	if(get_session("UserLevel") == 3) {
+	if(get_session("UserLevel") >= MOD_SEC_BRAND_ACL) {
 	    if($logo_url) {
 			$tpl->set_var("logo_url", $logo_url);
 			$tpl->set_var("logo_name", $host_name);
@@ -558,7 +558,7 @@ cm::getInstance()->modules["security"]["events"]->addEvent("on_retrieve_params",
 					cm::jsonParse($cm->json_response);
 					exit;
 				} else {
-					ffRedirect($cm->path_info . "?username=" . $req["username"] . "&password=" . "&error=" . $ret["error_code"]);
+					ffRedirect(FF_SITE_PATH . $cm->path_info . "?username=" . $req["username"] . "&password=" . "&error=" . $ret["error_code"]);
 				}
 			}
 			elseif ($ret["logged"] === true)
@@ -821,7 +821,7 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 			$tpl->set_var("focus_target", "username");
 		}
 	
-		$tpl->set_var("username", ffCommon_specialchars($_POST["username"]));
+		$tpl->set_var("username", ffCommon_specialchars($_REQUEST["username"]));
 		
 		$tpl->set_var("url", $cm->oPage->site_path . $cm->oPage->page_path);
 		

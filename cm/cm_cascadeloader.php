@@ -689,10 +689,10 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
     return $src;
 }
 
-function cmCache_writeLog($string, $filename = "log") //writeLog
+function cmCache_writeLog($data, $filename = "log") //writeLog
 {
 	if(DEBUG_LOG === true) {
-		$log_path = FF_DISK_PATH . "/logs";
+		$log_path = CM_CACHE_PATH . "/logs";
 		if(!is_dir($log_path))
 			mkdir($log_path, 0777, true);
 
@@ -703,6 +703,12 @@ function cmCache_writeLog($string, $filename = "log") //writeLog
 
 		if($handle = @fopen($file, 'a'))
 		{
+            if(is_array($data)) {
+                $string = print_r($data, true);
+            } else {
+                $string = $data;
+            }
+
 			if(@fwrite($handle, date("Y-m-d H:i:s", time()) . " " . $string . "\n") === FALSE)
 			{
 				$i18n_error = true;
@@ -1992,13 +1998,13 @@ function cm_cascadeFindTemplate($path, $module = false, $raise_error = false)
     if ($module && $filename === null)
         $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(CM_MODULES_ROOT . "/" . $module . "/themes", $path, $cm->oPage->theme, $raise_error);
+        $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $cm->oPage->theme, $raise_error);
     if ($filename === null)
         $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $cm->oPage->theme, $raise_error);
     if ($filename === null)
         $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(CM_MODULES_ROOT . "/" . $module . "/themes", $path, $cm->oPage->theme, $raise_error);
+        $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $cm->oPage->theme, $raise_error);
     if (!$module && $filename === null)
         $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, $path, $cm->oPage->theme, $raise_error);
 

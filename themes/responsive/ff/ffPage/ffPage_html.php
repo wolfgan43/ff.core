@@ -2052,8 +2052,8 @@ class ffPage_html extends ffPage_base
 								if ($flag_file_ext)
 									$tmp_file = $value["file"];
 								else
-								{
-                                    if (strpos(realpath($value["file"]), realpath(ff_getAbsDir($tmp_path))) !== 0)
+								{ //con i link simbolici va in bomba todo: da verificare
+                                    if (0 && strpos(realpath($value["file"]), realpath(ff_getAbsDir($tmp_path))) !== 0)
                                         $tmp_file = ff_getAbsDir($tmp_path) . $value["file"];
                                     else
                                         $tmp_file = $value["file"];
@@ -2591,8 +2591,8 @@ class ffPage_html extends ffPage_base
 								if ($flag_file_ext)
 									$tmp_file = $value["file"];
 								else
-								{
-                                    if (strpos(realpath($value["file"]), realpath(ff_getAbsDir($tmp_path))) !== 0)
+								{ //con i link simbolici va in bomba todo: da verificare
+                                    if (0 && strpos(realpath($value["file"]), realpath(ff_getAbsDir($tmp_path))) !== 0)
                                         $tmp_file = ff_getAbsDir($tmp_path) . $value["file"];
                                     else
                                         $tmp_file = $value["file"];

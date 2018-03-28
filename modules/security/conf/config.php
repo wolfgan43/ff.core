@@ -5,6 +5,7 @@ if (!defined("MOD_SEC_GROUPS")) define ("MOD_SEC_GROUPS", false);
 if (!defined("MOD_SEC_LOGO")) define ("MOD_SEC_LOGO", "Pre");   // Pre o Post
 if (!defined("MOD_SEC_LOGO_PATH")) define ("MOD_SEC_LOGO_PATH", null); //relative path
 
+if (!defined("MOD_SEC_BRAND_ACL")) define ("MOD_SEC_BRAND_ACL", "3"); //relative path
 
 if (!defined("MOD_SEC_GUEST_USER_ID")) 		define ("MOD_SEC_GUEST_USER_ID", null);
 if (!defined("MOD_SEC_GUEST_USER_NAME")) 	define ("MOD_SEC_GUEST_USER_NAME", "guest");

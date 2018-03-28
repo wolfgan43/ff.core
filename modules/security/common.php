@@ -3388,21 +3388,21 @@ function mod_sec_get_avatar($avatar, $mode = null, $theme = null, $svg = false)
         elseif(is_file(ff_getAbsDir(FF_THEME_DIR . "/" . $cm->oPage->getTheme()) . FF_THEME_DIR . "/" . $cm->oPage->getTheme() . "/images/noavatar.png"))
             $res = ($mode
                     ? CM_SHOWFILES . "/" . $mode
-                    : FF_SITE_PATH . ff_getThemePath($cm->oPage->getTheme())
+                    : ff_getThemePath($cm->oPage->getTheme())
                 ) . "/" . $cm->oPage->getTheme() . "/images/noavatar.png";
         elseif($theme && !$svg && is_file(ff_getAbsDir(FF_THEME_DIR . "/" . $theme) . FF_THEME_DIR . "/" . $theme . "/images/noavatar.svg"))
-            $res = FF_SITE_PATH . ff_getThemePath($theme) . "/" . $theme . "/images/noavatar.svg";
+            $res = ff_getThemePath($theme) . "/" . $theme . "/images/noavatar.svg";
         elseif($theme && is_file(ff_getAbsDir(FF_THEME_DIR . "/" . $theme) . FF_THEME_DIR . "/" . $theme . "/images/noavatar.png"))
             $res = ($mode
                     ? CM_SHOWFILES . "/" .$mode
-                    : FF_SITE_PATH .  ff_getThemePath($theme)
+                    : ff_getThemePath($theme)
                 ) . "/" . $theme . "/images/noavatar.png";
         elseif(!$svg && is_file(ff_getAbsDir(FF_THEME_DIR . "/" . cm_getMainTheme()) . FF_THEME_DIR . "/" . cm_getMainTheme() . "/images/noavatar.svg"))
-            $res = FF_SITE_PATH . ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/noavatar.svg";
+            $res = ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/noavatar.svg";
         elseif(is_file(ff_getAbsDir(FF_THEME_DIR . "/" . cm_getMainTheme()) . FF_THEME_DIR . "/" . cm_getMainTheme() . "/images/noavatar.png"))
             $res = ($mode
                     ? CM_SHOWFILES . "/" . $mode
-                    : FF_SITE_PATH . ff_getThemePath(cm_getMainTheme())
+                    : ff_getThemePath(cm_getMainTheme())
                 ) . "/" . cm_getMainTheme() . "/images/noavatar.png";
     }
 
