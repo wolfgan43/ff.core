@@ -20,7 +20,7 @@
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
-class ffValidator_cf extends ffValidator_base
+class ffValidator_cfpiva extends ffValidator_base
 {
 	static $_singleton = null;
 
