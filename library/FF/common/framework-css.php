@@ -64,13 +64,14 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "color"       => array(
 	                "default"       => ""
 	                , "primary"     => "primary"
+                    , "secondary"   => ""
 	                , "success"     => "success"
 	                , "info"        => "info"
 	                , "warning"     => "warning"
 	                , "danger"      => "danger"
 	                , "link"        => "link"
-	            )                                                
-	        )                                            
+	            )
+	        )
 	        , "form" => array(
 	            "component" => ""
 	            , "component-inline" => ""
@@ -111,8 +112,8 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "container-fixed-bottom" => "navbar navbar-default navbar-fixed-bottom"
 	            , "header" => "navbar-header"
 	            , "nav-brand" => "navbar-brand"
-	            , "nav-form" => "navbar-form navbar-left" 
-	            , "nav-right" => "navbar-right" 
+	            , "nav-form" => "navbar-form navbar-left"
+	            , "nav-right" => "navbar-right"
 	            , "dropdown" => "dropdown-toggle"
 	            , "dropdown-menu" => "dropdown-menu"
 	            , "current" => "active"
@@ -137,7 +138,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "heading" => "panel-heading"
 	            , "body" => "panel-body"
 	            , "footer" => "panel-footer"
-	        
+
 	        )
 	        , "callout" => array(
 	            "default"       => "callout"
@@ -147,7 +148,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "warning"     => "callout callout-warning"
 	            , "danger"      => "callout callout-danger"
 	        )
-	        
+
 	        /*da trovare e gestire:
 	        show        bs
 	        radius         fd
@@ -157,14 +158,14 @@ function cm_getFrameworkCss_settings($name = null) {
 	        img-rounded        bs
 	        img-circle        bs
 	        img-thumbnail        bs
-	        
+
 	        center-block    bs
-	        
+
 	        clearfix        bs
 	        invisible        bs
 	        text-hide        bs
-	        
-	            
+
+
 	        */
 	        , "pagination" => array(
 	            "align-left" => "text-left"
@@ -231,20 +232,20 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "text-lowercase"              => "text-lowercase"
 	            , "text-uppercase"              => "text-uppercase"
 	            , "text-capitalize"             => "text-capitalize"
-                
+
                 , "text-muted"                  => "text-muted"
                 , "text-primary"                => "text-primary"
                 , "text-success"                => "text-success"
                 , "text-info"                   => "text-info"
                 , "text-warning"                => "text-warning"
                 , "text-danger"                 => "text-danger"
-                
+
                 , "bg-primary"                  => "bg-primary"
                 , "bg-success"                  => "bg-success"
                 , "bg-info"                     => "bg-info"
                 , "bg-warning"                  => "bg-warning"
                 , "bg-danger"                   => "bg-danger"
-               
+
 	            , "current" => "current"
 	            , "equalizer-row" => "data-equalizer"
 	            , "equalizer-col" => "data-equalizer-watch"
@@ -267,7 +268,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "collapse" => array(
 	                "link" => 'data-toggle'
 	            )
-	        )                                            
+	        )
 	    )
 	    , "bootstrap" => array(
 	        "params" => array(
@@ -278,7 +279,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	        , "class" => array(
 	            "container" => "container"
 	            , "wrap" => "container"
-	            , "skip-full" => false 
+	            , "skip-full" => false
 	            , "row-prefix" => "container"
 	            , "col-prefix" => ""
 	            , "col-append" => "col-"
@@ -341,12 +342,13 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "color"       => array(
 	                "default"       => "btn-default"
 	                , "primary"     => "btn-primary"
+                    , "secondary"   => "btn-default"
 	                , "success"     => "btn-success"
 	                , "info"        => "btn-info"
 	                , "warning"     => "btn-warning"
 	                , "danger"      => "btn-danger"
 	                , "link"        => "btn-link"
-	            )                                                
+	            )
 	        )
 	        , "form" => array(
 	            "component" => ""
@@ -364,13 +366,13 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "control-prefix" => "input-group-addon"
 	            , "control-postfix" => "input-group-addon"
 	            , "control-feedback" => "form-control-feedback"
-	            , "wrap-addon" => false	
+	            , "wrap-addon" => false
 	        )
 	        , "bar" => array(
 	            "topbar" => "nav navbar-nav"
 	            , "navbar" => "nav nav-pills nav-stacked"
 	        )
-	        , "list" => array( 
+	        , "list" => array(
 	            "group" => "list-group"
 	            , "item" => "list-group-item"
 	            , "item-button" => "list-group-item-action"
@@ -388,8 +390,8 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "container-fixed-bottom" => "navbar navbar-default navbar-fixed-bottom"
 	            , "header" => "navbar-header"
 	            , "nav-brand" => "navbar-brand"
-	            , "nav-form" => "navbar-form navbar-left" 
-	            , "nav-right" => "navbar-right" 
+	            , "nav-form" => "navbar-form navbar-left"
+	            , "nav-right" => "navbar-right"
 	            , "dropdown" => "dropdown-toggle"
 	            , "dropdown-menu" => "dropdown-menu"
 	            , "current" => "active"
@@ -404,7 +406,7 @@ function cm_getFrameworkCss_settings($name = null) {
                 , "opened"		=> "open"
                 , "current" 	=> "active"
             )
-	        , "panel" => array( 
+	        , "panel" => array(
 	            "container" => "panel panel-default"
 	            , "container-primary" => "panel-primary"
 	            , "container-success" => "panel-success"
@@ -414,7 +416,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "heading" => "panel-heading"
 	            , "body" => "panel-body"
 	            , "footer" => "panel-footer"
-	        
+
 	        )
 	        , "callout" => array(
 	            "default"       => "bs-callout"
@@ -425,13 +427,13 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "danger"      => "bs-callout bs-callout-danger"
 	        )
 	        , "pagination" => array(
-	            "align-left" => "text-left" 
-	            , "align-center" => "text-center" 
+	            "align-left" => "text-left"
+	            , "align-center" => "text-center"
 	            , "align-right" => "text-right"
 	            , "pages" => "pagination"
 	            , "arrows" => ""
 	            , "current" => "active"
-	        )          
+	        )
 			, "table" => array(
 				"container" => "table"
 				, "compact" => "table-condensed"
@@ -475,7 +477,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "footer" => "modal-footer"
 	            , "button" => "close"
 	            , "effect" => "fade"
-	        )                                            
+	        )
 	        , "util" => array(
 	            "left" => "pull-left"
 	            , "right" => "pull-right"
@@ -489,20 +491,20 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "text-lowercase" => "text-lowercase"
 	            , "text-uppercase" => "text-uppercase"
 	            , "text-capitalize" => "text-capitalize"
-                
+
                 , "text-muted"                  => "text-muted"
                 , "text-primary"                => "text-primary"
                 , "text-success"                => "text-success"
                 , "text-info"                   => "text-info"
                 , "text-warning"                => "text-warning"
                 , "text-danger"                 => "text-danger"
-                
+
                 , "bg-primary"                  => "bg-primary"
                 , "bg-success"                  => "bg-success"
                 , "bg-info"                     => "bg-info"
                 , "bg-warning"                  => "bg-warning"
                 , "bg-danger"                   => "bg-danger"
-                
+
 	            , "current" => "active"
 	            , "equalizer-row" => "data-equalizer"
 	            , "equalizer-col" => "data-equalizer-watch"
@@ -525,7 +527,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "collapse" => array(
 	                "link" => 'data-toggle="collapse"'
 	            )
-	        )                                            
+	        )
 	        , "theme" => array(
 	            "amelia" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia/bootstrap.min.css"
 	            , "cerulean" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css"
@@ -608,15 +610,16 @@ function cm_getFrameworkCss_settings($name = null) {
 	                , "radius"      => "radius"
 	            )
 	            , "color"   => array(
-	                "default"     => "secondary"
-	                , "primary"     => ""
+	                "default"       => "secondary"
+	                , "primary"     => "primary"
+                    , "secondary"   => "primary"
 	                , "success"     => "success"
 	                , "info"        => "secondary"
 	                , "warning"     => "alert"
 	                , "danger"      => "alert"
 	                , "link"        => "secondary"
-	            )                                                
-	        )                                            
+	            )
+	        )
 	        , "form" => array(
 	            "component" => ""
 	            , "component-inline" => ""
@@ -638,7 +641,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	        , "bar" => array(
 	            "topbar" => "top-bar top-bar-section"
 	            , "navbar" => "side-nav"
-	        )             
+	        )
             , "list" => array( ///classsi bootstrap da convertire
                 "group" => "list-group"
                 , "item" => "list-group-item"
@@ -657,8 +660,8 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "container-fixed-bottom" => "navbar navbar-default navbar-fixed-bottom"
 	            , "header" => "navbar-header"
 	            , "nav-brand" => "navbar-brand"
-	            , "nav-form" => "navbar-form navbar-left" 
-	            , "nav-right" => "navbar-right" 
+	            , "nav-form" => "navbar-form navbar-left"
+	            , "nav-right" => "navbar-right"
 	            , "dropdown" => "dropdown-toggle"
 	            , "dropdown-menu" => "dropdown-menu"
 	            , "current" => "active"
@@ -683,19 +686,19 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "heading" => "panel-heading"
 	            , "body" => "panel-body"
 	            , "footer" => "panel-footer"
-	        
+
 	        )
 	        , "callout" => array(
 	            "default"       => "panel"
-	            , "primary"     => "callout"
-	            , "success"     => "callout success"
+	            , "primary"     => "alert-box"
+	            , "success"     => "alert-box success"
 	            , "info"        => "panel callout"
-	            , "warning"     => "callout warning"
-	            , "danger"      => "callout alert"
+	            , "warning"     => "alert-box warning"
+	            , "danger"      => "alert-box alert"
 	        )
 	        , "pagination" => array(
-	            "align-left" => "text-left" 
-	            , "align-center" => "text-center"
+	            "align-left" => "text-left"
+	            , "align-center" => "pagination-centered" //"text-center"
 	            , "align-right" => "text-right"
 	            , "pages" => "pagination"
 	            , "arrows" => "arrow"
@@ -744,7 +747,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "footer" => "modal-footer"
 	            , "button" => "close"
 	            , "effect" => "fade"
-	        ) 	                                            
+	        )
 	        , "util" => array(
 	            "left" => "float-left"
 	            , "right" => "float-right"
@@ -753,7 +756,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "align-center" => "text-center"
 	            , "align-right" => "text-right"
 	            , "align-justify" => "text-justify"
-	            , "text-nowrap" => "text-nowrap"    
+	            , "text-nowrap" => "text-nowrap"
 	            , "text-overflow" => "text-overflow"         //custom
 	            , "text-lowercase" => "text-lowercase"         //custom
 	            , "text-uppercase" => "text-uppercase"         //custom
@@ -765,13 +768,13 @@ function cm_getFrameworkCss_settings($name = null) {
                 , "text-info"                   => "text-info" //custom
                 , "text-warning"                => "text-warning" //custom
                 , "text-danger"                 => "text-danger" //custom
-                
+
                 , "bg-primary"                  => "bg-primary" //custom
                 , "bg-success"                  => "bg-success" //custom
                 , "bg-info"                     => "bg-info" //custom
                 , "bg-warning"                  => "bg-warning" //custom
                 , "bg-danger"                   => "bg-danger" //custom
-                
+
 	            , "current" => "active"
 	            , "equalizer-row" => "data-equalizer"
 	            , "equalizer-col" => "data-equalizer-watch"
@@ -783,7 +786,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	        )
             , "data" => array(
                 "tab" => array(
-                    "menu" => 'data-tabs' 
+                    "menu" => 'data-tabs'
                     , "menu-link" => null
                     , "pane" => 'data-tabs-content'
                     , "pane-item" => null
@@ -794,13 +797,13 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "collapse" => array(
 	                "link" => 'data-toggle' // da trovare analogo per foundation
 	            )
-	        )                                            
+	        )
 	    )
-	);                                    
-	
+	);
+
 	if($name)
 		return $framework_css_setting[$name];
-	else 
+	else
 		return $framework_css_setting;
 }
 
@@ -822,22 +825,22 @@ function cm_getFontIcon_settings($name = null) {
 	    )
 	    , "fontawesome" => array(
 	         "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css"
-	        , "prefix" => "fa" 
+	        , "prefix" => "fa"
 	        , "postfix" => ""
 	        , "prepend" => "fa-"
 	        , "append" => ""
 	    )
-	);   
-	
+	);
+
 	if($name)
 		return $font_icon_setting[$name];
-	else 
+	else
 		return $font_icon_setting;
 }
 
-function ffCommon_setClassByFrameworkCss($resolution) 
+function ffCommon_setClassByFrameworkCss($resolution)
 {
-	if($resolution) 
+	if($resolution)
 	{
 		if(is_array($resolution)) {
 			$res = $resolution;
@@ -859,9 +862,9 @@ function ffCommon_setClassByFrameworkCss($resolution)
 		, "sm" => $res[2]
 		, "md" => $res[1]
 		, "lg" => $res[0]
-	);		
-}	
-function cm_getFontIcon($font_icon_name = null) 
+	);
+}
+function cm_getFontIcon($font_icon_name = null)
 {
 	static $font_icon = null;
 
