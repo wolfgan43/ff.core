@@ -9,24 +9,6 @@
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
-if (!defined("FF_COMPONENTS") && defined("FF_ONLY_COMPONENTS"))
-{
-	require(__FF_DIR__ . "/classes/ffTemplate." . FF_PHP_EXT);
-	
-	require(__FF_DIR__ . "/classes/ffValidator/ffValidator." . FF_PHP_EXT);
-	
-	require(__FF_DIR__ . "/classes/ffButton." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffField." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffPageNavigator." . FF_PHP_EXT);
-
-	require(__FF_DIR__ . "/classes/ffPage." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffGrid." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffRecord." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDetails." . FF_PHP_EXT);
-	
-	define("FF_COMPONENTS", true);
-	return;
-}
 
 // init framework..
 if (!defined("FF_MAIN_INIT"))
@@ -136,10 +118,7 @@ if (!defined("FF_MAIN_INIT"))
 	define("FF_PHP_EXT", "php");
 
 	// some preprocessing for CPU saving
-	if (__DIR__ !== "__DIR__")
-		define("__FF_DIR__", __DIR__);
-	else
-		define("__FF_DIR__", ffCommon_dirname(__FILE__));
+	define("__FF_DIR__", __DIR__);
 
 	if(!defined("__TOP_DIR__"))
 	{
@@ -255,6 +234,10 @@ if (!defined("FF_MAIN_INIT"))
 		$i++;
 	}
 	*/
+
+	// Framework Classes
+	ffAutoload();
+
 	define("FF_MAIN_INIT", true);
 	if (defined("FF_ONLY_INIT"))
 		return;
@@ -270,73 +253,9 @@ if (!defined("FF_MAIN_BASE"))
 {
 	if (!defined("FF_CACHE_DEFAULT_TBLREL")) define("FF_CACHE_DEFAULT_TBLREL", false);
 
-	require(__FF_DIR__ . "/classes/ffSerializable." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffCommon." . FF_PHP_EXT);
-	//require(__FF_DIR__ . "/classes/ffMemCache." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffCache/ffCacheAdapter." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffCache/ffCache." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffGlobals." . FF_PHP_EXT);
-	//require(__FF_DIR__ . "/classes/ffXml/ffXmlParser." . FF_PHP_EXT); // UNDER DEVELOPMENT
-	//require(__FF_DIR__ . "/classes/ffXml/ffXmlElement." . FF_PHP_EXT); // UNDER DEVELOPMENT
-	
 	define("FF_MAIN_BASE", true);
 	if (defined("FF_MAIN_ONLY_BASE"))
 		return;
-}
-
-// Framework Classes
-require(__FF_DIR__ . "/classes/ffEvents/ffEvent." . FF_PHP_EXT);
-require(__FF_DIR__ . "/classes/ffEvents/ffEvents." . FF_PHP_EXT);
-
-if(!defined("FF_SKIP_COMPONENTS"))
-{
-	require(__FF_DIR__ . "/classes/ffTemplate." . FF_PHP_EXT);
-	define("FF_COMPONENTS", true);
-}
-
-require(__FF_DIR__ . "/classes/ffData/ffData." . FF_PHP_EXT);
-
-require(__FF_DIR__ . "/classes/ffDb_Sql/ffDb_Sql_" . FF_DB_INTERFACE . "." . FF_PHP_EXT);
-
-if (FF_ORM_ENABLE)
-{
-	$fftmp_old_strict = error_reporting() & E_STRICT;
-	error_reporting(error_reporting() ^ E_STRICT);
-	require(__FF_DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLParser." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLCreator." . FF_PHP_EXT);
-	error_reporting(error_reporting() | $fftmp_old_strict);
-	unset($fftmp_old_strict);
-
-	require(__FF_DIR__ . "/classes/ffDB/ffDBAdapter." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/ffDBConnection." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/ffDBField." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/ffDBIndex." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/ffDBRecord." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/ffDBRecordset." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/ffDBSource." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/sources/ffDBTable." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDB/sources/ffDBQuery." . FF_PHP_EXT);
-}
-
-if(!defined("FF_SKIP_COMPONENTS"))
-	require(__FF_DIR__ . "/classes/ffValidator/ffValidator." . FF_PHP_EXT);
-
-require(__FF_DIR__ . "/classes/ffImage/ffImage." . FF_PHP_EXT);
-require(__FF_DIR__ . "/classes/ffImage/ffCanvas." . FF_PHP_EXT);
-require(__FF_DIR__ . "/classes/ffImage/ffText." . FF_PHP_EXT);
-require(__FF_DIR__ . "/classes/ffImage/ffThumb." . FF_PHP_EXT);
-
-if(!defined("FF_SKIP_COMPONENTS"))
-{
-	require(__FF_DIR__ . "/classes/ffButton." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffField." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffPageNavigator." . FF_PHP_EXT);
-
-	require(__FF_DIR__ . "/classes/ffPage." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffGrid." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffRecord." . FF_PHP_EXT);
-	require(__FF_DIR__ . "/classes/ffDetails." . FF_PHP_EXT);
-	//require("ffCalendar." . FF_PHP_EXT); // UNDER DEVELOPMENT
 }
 
 // Load commons..
@@ -347,10 +266,10 @@ if (@is_file(__TOP_DIR__ . "/common." . FF_PHP_EXT))
 //elseif (is_file(ffCommon_dirname($_SERVER['SCRIPT_FILENAME']) . "/common." . FF_PHP_EXT))
 //	require (ffCommon_dirname($_SERVER['SCRIPT_FILENAME']) . "/common." . FF_PHP_EXT);
 
-// ..theme 
+// ..theme
 if (defined("FF_DEFAULT_THEME"))
 	ffCommon_theme_init(FF_DEFAULT_THEME); // load commons
-	
+
 // ...local
 /*
 $script_path = substr(ffCommon_dirname($_SERVER['SCRIPT_FILENAME']), strlen(FF_DISK_PATH));
