@@ -386,6 +386,8 @@ var that = { // publics
     that.domain 				= window.location.hostname;
     that.language 				= getCookie("lang") || (params.language === undefined ? "ITA" : params.language);
     that.locale 				= (params.locale === undefined ? "it_IT" : params.locale);
+    that.frameworkCss 			= params.framework_css;
+    that.fontIcon 				= params.font_icon;
     that.layer 					= (params.layer === undefined ? "empty" : params.layer);
     that.showfiles 				= (params.showfiles === undefined ? "/cm/showfiles.php" : params.showfiles);
     that.group                  = getCookie("group") || (params.group === undefined ? "" : params.group);
