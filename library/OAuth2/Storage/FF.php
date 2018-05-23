@@ -380,6 +380,7 @@ class FF implements
     /* ScopeInterface */
     public function scopeExists($scope)
     {
+        $whereIn = "";
         $scope = explode(' ', $scope);
 		foreach ($scope as $val)
 			$whereIn .= $this->db->toSql($val) . ",";
