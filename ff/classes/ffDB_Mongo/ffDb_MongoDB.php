@@ -367,7 +367,7 @@ class ffDB_MongoDB
                 if($table)
                     $mongoDB["table"] = $table;
 
-                $this->execute($mongoDB);
+                $res = $this->execute($mongoDB);
             }
         } else {
             if(is_array($query))
@@ -379,8 +379,10 @@ class ffDB_MongoDB
                 $mongoDB["table"] = $table;
 
             $mongoDB["action"] = "insert";
-            $this->execute($mongoDB);
+            $res = $this->execute($mongoDB);
         }
+
+        return $res;
     }
     function update($query, $table = null)
 	{
@@ -392,7 +394,7 @@ class ffDB_MongoDB
                 if($table)
                     $mongoDB["table"] = $table;
 
-                $this->execute($mongoDB);
+                $res = $this->execute($mongoDB);
             }
         } else {
             if(is_array($query))
@@ -404,8 +406,10 @@ class ffDB_MongoDB
                 $mongoDB["table"] = $table;
 
             $mongoDB["action"] = "update";
-            $this->execute($mongoDB);
+            $res = $this->execute($mongoDB);
         }
+
+        return $res;
     }
     function delete($query, $table = null)
 	{
@@ -417,7 +421,7 @@ class ffDB_MongoDB
                 if($table)
                     $mongoDB["table"] = $table;
 
-                $this->execute($mongoDB);
+                $res = $this->execute($mongoDB);
             }
         } else {
             if(is_array($query))
@@ -429,8 +433,10 @@ class ffDB_MongoDB
                 $mongoDB["table"] = $table;
 
             $mongoDB["action"] = "delete";
-            $this->execute($mongoDB);
+            $res = $this->execute($mongoDB);
         }
+
+        return $res;
     }
 
 	function execute($query)
@@ -693,7 +699,6 @@ class ffDB_MongoDB
                         $this->query_params["options"]["limit"] = $mongoDB["limit"];
 
                     //unset($this->query_params["where"]["uid"]);
-
                     //print_r($this->query_params["where"]);
                     //die();
 					try {
