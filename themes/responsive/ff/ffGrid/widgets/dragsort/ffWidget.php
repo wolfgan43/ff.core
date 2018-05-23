@@ -73,6 +73,7 @@ class ffWidget_dragsort extends ffCommon
 		$this->tpl[$tpl_id]->set_var("component_id", $grid->getIDIF());
 		$this->tpl[$tpl_id]->set_var("resource_id", $options["resource_id"]);
 		$this->tpl[$tpl_id]->set_var("service_path", $options["service_path"]);
+        $this->tpl[$tpl_id]->set_var("service_params", $options["service_params"]);
 		
 		$this->tpl[$tpl_id]->parse("SectIstance", true);
 	}

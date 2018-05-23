@@ -27,7 +27,18 @@ __ff : true, /* used to recognize ff'objects*/
 		});
 
 		toBeSent.push({name: "resource", value: params.resource_id});
-		
+
+        if(params.service_params) {
+            var serviceParams = params.service_params.split("&");
+            serviceParams.each(function(key, value) {
+                var arrValue = value.split("=");
+				if(arrValue.length === 2) {
+                    toBeSent.push({"name": arrValue[0], "value": arrValue[1]});
+                }
+            })
+        }
+
+
 		ff.load("ff.ajax", function() {
 			ff.ajax.blockUI();
 			jQuery.ajax({
