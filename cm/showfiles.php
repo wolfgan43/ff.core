@@ -14,10 +14,7 @@ define("FF_SKIP_COMPONENTS", true);
 define("CM_ONLY_INIT", true);
 //define("CM_DONT_RUN", true);
 
-if (__DIR__ !== "__DIR__")
-    require(__DIR__ . "/main.php");
-else
-    require(dirname(__FILE__) . "/main.php");
+require(__DIR__ . "/main.php");
 
 $path_info = $_SERVER["PATH_INFO"];
 //if(strpos($path_info, $_SERVER["SCRIPT_NAME"]) === 0)
