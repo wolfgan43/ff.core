@@ -28,11 +28,12 @@ class ffField_html extends ffField_base
 												, "col" => null
 												
 											)
-											, "fixed_pre_content" => false // false OR array(xs,sm,md,lg)
-											, "fixed_post_content" => false // false OR array(xs,sm,md,lg)
 											*/
-	
-	);
+                                            , "fixed_pre_content" => true // false OR array(xs,sm,md,lg)
+                                            , "fixed_post_content" => true // false OR array(xs,sm,md,lg)
+
+
+    );
 	var $url = null;
 	var $url_ajax = false;
 	var $url_parsed = null;
@@ -509,14 +510,15 @@ class ffField_html extends ffField_base
 		$buffer = $this->tpl[0]->rpparse("main", false);
 		
 		$wrap_addon = null;
-		if($this->framework_css["fixed_pre_content"] || $this->framework_css["fixed_post_content"])
-		{
+        if(($fixed_pre_content && $this->framework_css["fixed_pre_content"])
+            || ($fixed_post_content && $this->framework_css["fixed_post_content"]))
+        {
 			$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
 			$arrFieldCol = ($wrap_addon
 							? array(12,12,12,12)
 							: null
 						);
-			if($this->framework_css["fixed_pre_content"]) {
+			if($fixed_pre_content && $this->framework_css["fixed_pre_content"]) {
 				$prefix_class = cm_getClassByFrameworkCss("control-prefix", "form");
 				if(strlen($prefix_class))
 					$fixed_pre_content = '<span class="' . $prefix_class . '">' . $fixed_pre_content . '</span>';
@@ -545,7 +547,7 @@ class ffField_html extends ffField_base
 				}
 			}
 
-			if($this->framework_css["fixed_post_content"]) {
+			if($fixed_post_content && $this->framework_css["fixed_post_content"]) {
 				$postfix_class = cm_getClassByFrameworkCss("control-postfix", "form");
 				if(strlen($postfix_class))
 					$fixed_post_content = '<span class="' . $postfix_class . '">' . $fixed_post_content . '</span>';
