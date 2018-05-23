@@ -1560,28 +1560,23 @@ function ffCommon_jsonenc_object($data, $add_newline = false)
 	
 	$buffer = "{";
 
-	foreach ($data as $key => $value)
-	{
-		$buffer .= '"' . $key . '" : ';
+    if(is_array($data) && count($data)) {
+        foreach ($data as $key => $value) {
+            $buffer .= '"' . $key . '" : ';
 
-		if (is_array($value))
-		{
-			if (ffCommon_jsonenc_is_array($value))
-			{
-				$buffer .= ffCommon_jsonenc_array($value, $add_newline);
-			}
-			else
-			{
-				$buffer .= ffCommon_jsonenc_object($value, $add_newline);
-			}
-		}
-		else
-		{
-			$buffer .= ffCommon_jsonenc_getValue($value, $add_newline);
-		}
+            if (is_array($value)) {
+                if (ffCommon_jsonenc_is_array($value)) {
+                    $buffer .= ffCommon_jsonenc_array($value, $add_newline);
+                } else {
+                    $buffer .= ffCommon_jsonenc_object($value, $add_newline);
+                }
+            } else {
+                $buffer .= ffCommon_jsonenc_getValue($value, $add_newline);
+            }
 
-		$buffer .= ",";
-	}
+            $buffer .= ",";
+        }
+    }
 	reset($data);
 
 	$buffer = rtrim(trim($buffer), ",");
@@ -1593,8 +1588,16 @@ function ffCommon_jsonenc_object($data, $add_newline = false)
 
 function ffCommon_jsonenc_is_array($data)
 {
-	$keystring = implode("", array_keys($data));
-	return preg_match("/^\d+$/", $keystring);
+    if(is_array($data))
+    {
+        if(!count($data))
+            return true;
+        else
+        {
+            $keystring = implode("", array_keys($data));
+            return preg_match("/^\d+$/", $keystring);
+        }
+    }
 }
 
 function ffCommon_jsonenc_getValue($value, $add_newline = false)
