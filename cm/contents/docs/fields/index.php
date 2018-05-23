@@ -71,6 +71,7 @@ $oRecord->groups[$group_field] = array(
 
 $oRecord->addContent('<hr /><h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Campo Semplice</h2>', $group_field);
 
+/******************************************************************************************/
 $oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
@@ -93,8 +94,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "name2";
@@ -114,8 +116,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "name5";
@@ -137,8 +140,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "name6";
@@ -160,8 +164,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "name7";
@@ -185,7 +190,6 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
 $oRecord->addContent('</div>', $group_field);
 
 /**
@@ -223,8 +227,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "number";
@@ -246,8 +251,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "price";
@@ -267,14 +273,15 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 		$oField->id = "price";<br />
 		$oField->label = "Prezzo";<br />
 		$oField->base_type = "Currency";<br />
-        $oField->fixed_post_content = "&euro;"; 
+        $oField->fixed_post_content = "&euro;";<br /> 
         $oField->default_value = new ffData("10.10", "Number");<br />
 		$oRecord->addContent($oField);
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "dataText";
@@ -296,8 +303,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "timeText";
@@ -319,13 +327,14 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "dataTimeText";
 $oField->base_type = "DateTime";
-$oField->default_value = new ffData("2018-02-27 14:00:00", "Date");
+$oField->default_value = new ffData("2018-02-27 14:00:00", "DateTime");
 $oField->label = "Data";
 $oField->store_in_db = false;
 $oField->setWidthComponent(6);
@@ -342,8 +351,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "dataTimestamp";
@@ -369,8 +379,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "textarea";
@@ -394,8 +405,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "password";
@@ -417,8 +429,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "boolean";
@@ -448,8 +461,9 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "booleanSelezionato";
@@ -479,12 +493,12 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
-$oRecord->addContent('</div><div class="single-field">', $group_field);
-
-
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
 
 
+
+/*
 $oField = ffField::factory($cm->oPage);
 $oField->id = "title";
 $oField->label = ffTemplate::_get_word_by_code("module_question_title") . "*";
@@ -513,7 +527,7 @@ $oField->placeholder = true;
 $oField->fixed_post_content = '<div class="label-helper">' . ffTemplate::_get_word_by_code("new_question_text_helper") . '</div>';
 $oField->store_in_db = false;
 $oField->setWidthComponent(6);
-$oRecord->addContent($oField);
+$oRecord->addContent($oField);+/
 
 /**
  * Campi upload
@@ -525,6 +539,8 @@ $oRecord->groups[$group_field] = array(
 );
 
 $oRecord->addContent('<hr /><h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice</h2>', $group_field);
+
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "avatar";
@@ -555,7 +571,8 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
-
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
 
 /**
  * Campi combo
@@ -567,6 +584,8 @@ $oRecord->groups[$group_field] = array(
 	"title" => ucfirst($group_field)
 );
 $oRecord->addContent('<hr /><h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Campo di selezione (Selection)</h2>', $group_field);
+
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
 $oField->id="utenti";
@@ -602,6 +621,7 @@ $oField->multi_select_one_val = new ffData(0);
 
 $oField->base_type = "Text";
 $oField->label = "Seleziona utente:";
+$oField->setWidthComponent(6);
 $oRecord->addContent($oField, $group_field);
 
 $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
@@ -646,6 +666,8 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 	</code>
 </div>';
 $oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
 
 /**
  * Campi con widget
@@ -655,94 +677,169 @@ $oRecord->addContent(null, true, $group_field);
 $oRecord->groups[$group_field] = array(
 	"title" => ucfirst($group_field)
 );
+$oRecord->addContent('<hr /><h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Widgets</h2>', $group_field);
+
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
-$oField->id = "actionTypeId";
-$oField->label = ffTemplate::_get_word_by_code("module_agenda_pricelist_name");
+$oField->id = "actexSimple";
+$oField->label = "Combo Async (actex)";
 $oField->base_type = "Number";
 $oField->widget = "actex";
-$oField->source_SQL = "SELECT cm_mod_agenda_action_type.ID
-                                    , cm_mod_agenda_action_type.name
-                                FROM cm_mod_agenda_action_type
-                                WHERE cm_mod_agenda_action_type.default_price > 0
-                                ORDER BY cm_mod_agenda_action_type.name";
-$oField->required = true;
-$oRecord->addContent($oField);
+$oField->source_SQL = "SELECT cm_mod_security_users.ID
+                        , cm_mod_security_users.username
+                    FROM cm_mod_security_users
+                    WHERE 1
+                    ORDER BY cm_mod_security_users.username
+                    [LIMIT]";
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField, $group_field);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage);<br />
+        $oField->id = "actexSimple";<br />
+        $oField->label = "actexSimple";<br />
+        $oField->base_type = "Number";<br />
+        $oField->widget = "actex";<br />
+        $oField->source_SQL = "SELECT cm_mod_security_users.ID<br />
+                                , cm_mod_security_users.username<br />
+                            FROM cm_mod_security_users<br />
+                            WHERE 1<br />
+                            ORDER BY cm_mod_security_users.username<br />
+                            [LIMIT]";<br />
+		$oRecord->addContent($oField);<br />
+	</code>
+</div>';
+$oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
-$oField->id = "date";
-$oField->label = ffTemplate::_get_word_by_code("module_agenda_activity_date");
+$oField->id = "datePicker";
+$oField->label = "Date Picker";
 $oField->base_type = "Date";
 $oField->extended_type = "Date";
 $oField->widget = "datepicker";
-$oField->label = "";
-$oField->placeholder = ffTemplate::_get_word_by_code("module_agenda_activity_date_start");
-$oField->required = true;
-$oRecord->addContent($oField);
+$oField->default_value = new ffData("2017-02-27", "Date");
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField, $group_field);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage);<br />
+        $oField->id = "datePicker";<br />
+        $oField->label = "Date Picker";<br />
+        $oField->base_type = "Date";<br />
+        $oField->extended_type = "Date";<br />
+        $oField->widget = "datepicker";<br />
+        $oField->default_value = new ffData("2017-02-27", "Date");<br />
+		$oRecord->addContent($oField);<br />
+	</code>
+</div>';
+$oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
-$oField->id = "date_publishing";
+$oField->id = "dateChooser";
 $oField->base_type = "Timestamp";
-$oField->label = ffTemplate::_get_word_by_code("module_blog_date_publishing");
+$oField->label = "Date Chooser";
 $oField->widget = "datechooser";
 $oField->datechooser_type_date = array("min" => - 1, "max" => 2);
 $oField->extended_type = "Date";
 $oField->app_type = "Date";
-$oRecord->addContent($oField);
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField, $group_field);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage);<br />
+        $oField->id = "dateChooser";<br />
+        $oField->base_type = "Timestamp";<br />
+        $oField->label = "Date Chooser";<br />
+        $oField->widget = "datechooser";<br />
+        $oField->datechooser_type_date = array("min" => - 1, "max" => 2);<br />
+        $oField->extended_type = "Date";<br />
+        $oField->app_type = "Date";<br />
+		$oRecord->addContent($oField);<br />
+	</code>
+</div>';
+$oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
-$oField->id = "ID_doctor";
-$oField->label = ffTemplate::_get_word_by_code("module_blog_doctor_name");
-$oField->extended_type = "Selection";
+$oField->id = "actexAutocomplete";
+$oField->label = "Autocomplete";
 $oField->widget = "actex";
 $oField->actex_autocomp = true;
 $oField->autocomplete_minLength = 0;
 $oField->autocomplete_combo = true;
-$oField->autocomplete_compare = "CONCAT(anagraph.name, ' ', anagraph.surname)";
+$oField->autocomplete_compare = "CONCAT(cm_mod_security_users.username, ' (', cm_mod_security_users.email, ')')";
 $oField->autocomplete_operation = "LIKE [%[VALUE]%]";
-$oField->source_SQL = "SELECT anagraph.ID, CONCAT(anagraph.name, ' ', anagraph.surname) AS name_surname
-                        FROM anagraph
-                        WHERE anagraph.ID_type = 1
+$oField->source_SQL = "SELECT cm_mod_security_users.ID
+                          , CONCAT(cm_mod_security_users.username, ' (', cm_mod_security_users.email, ')') AS name_surname
+                        FROM cm_mod_security_users
+                        WHERE 1
                         [AND][WHERE][HAVING]
                         ORDER BY name_surname";
 $oField->actex_update_from_db = true;
-$oField->required = true;
-$oRecord->addContent($oField);
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField, $group_field);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage);<br />
+        $oField->id = "actexAutocomplete";<br />
+        $oField->label = "Autocomplete";<br />
+        $oField->widget = "actex";<br />
+        $oField->actex_autocomp = true;<br />
+        $oField->autocomplete_minLength = 0;<br />
+        $oField->autocomplete_combo = true;<br />
+        $oField->autocomplete_compare = "CONCAT(cm_mod_security_users.username, \' (\', cm_mod_security_users.email, \')\')";<br />
+        $oField->autocomplete_operation = "LIKE [%[VALUE]%]";<br />
+        $oField->source_SQL = "SELECT cm_mod_security_users.ID<br />
+                                  , CONCAT(cm_mod_security_users.username, \' (\', cm_mod_security_users.email, \')\') AS name_surname<br />
+                                FROM cm_mod_security_users<br />
+                                WHERE 1<br />
+                                [AND][WHERE][HAVING]<br />
+                                ORDER BY name_surname";<br />
+        $oField->actex_update_from_db = true;<br />
+		$oRecord->addContent($oField);<br />
+	</code>
+</div>';
+$oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
 
 $oField = ffField::factory($cm->oPage);
-$oField->id = "tags";
-$oField->label = ffTemplate::_get_word_by_code("module_agenda_action_type_tags");
-$oField->extended_type = "Selection";
-$oField->widget = "autocompletetoken";
-$oField->autocompletetoken_minLength = 0;
-$oField->autocompletetoken_theme = "";
-$oField->autocompletetoken_not_found_label = ffTemplate::_get_word_by_code("autocompletetoken_not_found");
-$oField->autocompletetoken_init_label = ffTemplate::_get_word_by_code("autocompletetoken_init");
-$oField->autocompletetoken_searching_label = ffTemplate::_get_word_by_code("autocompletetoken_searching");
-$oField->autocompletetoken_label = ffTemplate::_get_word_by_code("autocompletetoken_label");
-$oField->autocompletetoken_combo = true;
-$oField->autocompletetoken_compare_having = "name";
-$oField->source_SQL = "SELECT search_tags.code
-	                        , IFNULL(
-	                            (
-	                                SELECT search_tags_by_lang.name
-	                                FROM search_tags AS search_tags_by_lang
-	                                WHERE search_tags_by_lang.code = search_tags.code
-	                                    AND search_tags_by_lang.ID_lang = " . $db->toSql(LANGUAGE_INSET_ID, "Number") . " 
-	                                LIMIT 1
-	                            ), search_tags.name
-	                        ) AS name
-	                    FROM search_tags
-	                    WHERE 
-							" . ($limit_tag
-        ? " FIND_IN_SET(" . $db->toSql($limit_tag, "Number") . ", search_tags.categories)"
-        : "1"
-    ) . "	                                    	
-	                        AND search_tags.ID_lang = " . $db->toSql(LANGUAGE_DEFAULT_ID, "Number") . " 
-	                        [AND] [WHERE] 
-	                    [ORDER] [COLON] search_tags.name
-	                    [LIMIT]";
-$oRecord->addContent($oField);
+$oField->id = "ckeditor";
+$oField->label = "ckEditor"; 	//ffTemplate::_get_word_by_code("name");
+$oField->base_type = "Text";
+$oField->widget = "ckeditor";
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField, $group_field);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage);<br />
+		$oField->id = "ckeditor";<br />
+		$oField->label = "ckEditor";<br />
+		$oField->base_type = "Text";<br />
+		$oField->widget = "ckeditor";<br />
+		$oRecord->addContent($oField);<br />
+	</code>
+</div>';
+$oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+
+
 
 
 /** 
