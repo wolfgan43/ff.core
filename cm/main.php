@@ -8,11 +8,6 @@
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
-if (!defined("FF_COMPONENTS") && defined("FF_ONLY_COMPONENTS"))
-{
-	require(dirname(__FILE__) . "/../ff/main.php");
-}
-
 if (!defined("CM_MAIN_INIT"))
 {
 	// DEBUG expressions
@@ -22,12 +17,12 @@ if (!defined("CM_MAIN_INIT"))
 	// load forms php framework
 /*	if (defined("CM_ONLY_INIT") && !defined("FF_ONLY_INIT"))
 		define("FF_ONLY_INIT" , true);
-*/	require(dirname(__FILE__) . "/../ff/main.php");
+*/	require(__DIR__ . "/../ff/main.php");
 
 	// load configs..
 
 	// ..main
-	require(ffCommon_dirname(__FILE__) . "/config." . FF_PHP_EXT);
+	require(__DIR__ . "/config." . FF_PHP_EXT);
 
 	// ..check
 	if (!is_dir(CM_MODULES_ROOT))
@@ -42,7 +37,7 @@ if (!defined("CM_MAIN_INIT"))
 	// ..from conf
 	if (@is_file(FF_DISK_PATH . "/conf/cm/config." . FF_PHP_EXT))
 		require FF_DISK_PATH . "/conf/cm/config." . FF_PHP_EXT;
-	require(ffCommon_dirname(__FILE__) . "/conf/config." . FF_PHP_EXT);
+	require(__DIR__ . "/conf/config." . FF_PHP_EXT);
 
 	// global config
 	if (@is_file(FF_DISK_PATH . "/conf/config." . FF_PHP_EXT))
@@ -54,20 +49,35 @@ if (!defined("CM_MAIN_INIT"))
 }
 /*elseif (defined("CM_ONLY_INIT")) 
 {
-	require(dirname(__FILE__) . "/../ff/main.php");
+	require(__DIR__ . "/../ff/main.php");
 }*/
+spl_autoload_register(function ($class) {
+    switch ($class) {
+        case "PHPMailer":
+            require(__TOP_DIR__ . "/library/phpmailer/class.phpmailer." . FF_PHP_EXT);
+            break;
+        case "PHPExcel":
+            require(__TOP_DIR__ . "/library/PHPexcel/class.PHPexcel." . FF_PHP_EXT);
+            break;
+        default:
+            if (strpos($class, "cm") === 0) {
+                require(__DIR__ . '/' . $class . '.' . FF_PHP_EXT);
+            }
+    }
+
+});
 
 // load classes
-require(ffCommon_dirname(__FILE__) . "/cmRouter." . FF_PHP_EXT);
-require(ffCommon_dirname(__FILE__) . "/cm." . FF_PHP_EXT);
+//require(__DIR__ . "/cmRouter." . FF_PHP_EXT);
+//require(__DIR__ . "/cm." . FF_PHP_EXT);
 
 // load addons
-require(ffCommon_dirname(__FILE__) . "/cm_cascadeloader." . FF_PHP_EXT);
+require(__DIR__ . "/cm_cascadeloader." . FF_PHP_EXT);
 
 // load commons..
 
 // ..main
-require(ffCommon_dirname(__FILE__) . "/common." . FF_PHP_EXT);
+require(__DIR__ . "/common." . FF_PHP_EXT);
 
 // ..from conf
 if (@is_file(FF_DISK_PATH . "/conf/common." . FF_PHP_EXT))
