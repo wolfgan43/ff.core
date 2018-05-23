@@ -1,220 +1,553 @@
 ff.modal = (function () {
     //privates var and functions
-    var __ff        = false;
-    var dialogs		= ff.hash(); //contenitore dei tutte le modali
-    var framework_css_conversion = {
-        "base" : {
+    var __ff                                    = false;
+    var prefix                                  = "ffm-";
+    var frameworkCss                            = "bootstrap";
+    var fontIcon                                = "fontawesome";
+    var dialogs		                            = {}; //contenitore dei tutte le modali
+    var dialogs_rev                             = {};
+    var models                                  = {
+                                                    "default" : {
 
-        },
-        "bootstrap" : {
-            "overlay"       : "modal",
-            "window"        : "modal-dialog",
-            "window-small"  : "modal-sm",
-            "window-medium" : "modal-md",
-            "window-large"  : "modal-lg",
-            "window-huge"   : "modal-full",
-            "inner-wrap"    : "modal-content",
-            "header"        : "modal-header",
-            "header-title"  : "modal-header",
-            "content"       : "modal-body",
-            "footer"        : "modal-footer",
-            "button"        : "close",
-            "effect"        : "fade"
-        },
-        "foundation" : {
-            "overlay"       : "xxx", //da trovare il corrispettivo in foundation
-            "window"        : "xxx", //da trovare il corrispettivo in foundation
-            "window-small"  : "xxx", //da trovare il corrispettivo in foundation
-            "window-medium" : "xxx", //da trovare il corrispettivo in foundation
-            "window-large"  : "xxx", //da trovare il corrispettivo in foundation
-            "window-huge"   : "xxx", //da trovare il corrispettivo in foundation
-            "inner-wrap"    : "xxx", //da trovare il corrispettivo in foundation
-            "header"        : "xxx", //da trovare il corrispettivo in foundation
-            "header-title"  : "xxx", //da trovare il corrispettivo in foundation
-            "content"       : "xxx", //da trovare il corrispettivo in foundation
-            "footer"        : "xxx", //da trovare il corrispettivo in foundation
-            "button"        : "xxx", //da trovare il corrispettivo in foundation
-            "effect"        : "xxx"  //da trovare il corrispettivo in foundation
+                                                    },
+
+                                                    "yesno" : {
+
+                                                    },
+                                                    "callToAction" : {
+                                                        "footer" : {
+                                                            "buttonsContainerClass" : "text-right"
+                                                        }
+                                                    }
+    };
+    var defs                                    = {
+                                                    "animation" : {
+                                                        "coming" : {
+                                                            "animation" : {
+                                                                in: 'comingIn',
+                                                                out: 'bounceOutDown'
+                                                            }
+                                                        }
+                                                    },
+                                                    "skin" : {
+                                                        "blue" : {
+                                                            "header" : {
+                                                                "class" : "blue--gradient white"
+                                                            }
+                                                        }
+                                                    },
+                                                    "width" : "baseClass",
+                                                    "description" : "subtitle",
+                                                    "close" : "showClose",
+                                                    "exclude" : "excludeElements",
+                                                    "header" : "headerBlockSelector",
+                                                    "footer" : "footerBlockSelector",
+                                                    "buttons" : {
+                                                        "label": "text",
+                                                        "close": "dismissOnClick",
+                                                        "class" : "class",
+                                                        "callback": "callback",
+                                                        "url" : "url",
+                                                        "type": null,
+                                                        "icon": null
+
+                                                    }
+
+
+                                                };
+    var defaults                                = {};/* {
+        debug                                   : true,
+        type                                    : '',
+        animation                               : {
+                                                    in                      : 'fadeIn',
+                                                    out                     : 'fadeOut',
+                                                    delay                   : 0
+                                                },
+        position                                : "center center",
+        header                                  : {
+                                                    class                   : '',
+                                                    buttons                 : []
+                                                },
+        title                                   : "",
+        subtitle                                : "",
+        icon                                    : "",
+        width                                   : 380, // max = 640
+        height                                  : 280, // max = 350
+        scroll                                  : false,
+        maxHeight                               : 0,
+        responsive                              : { //todo:che serve?
+
+                                                },
+        globalContainerSelector                 : "body",
+        showClose                               : true,
+        showCloseText                           : 'Chiudi',
+        closeByEscape                           : true,
+        closeByDocument                         : true,
+        wrapperClass                            : '',
+        baseClass                               : '', //tiny | small | medium
+        holderClass                             : '',
+        overlayClass                            : '',
+        hideTitle                               : false,
+        enableStackAnimation                    : false,
+
+        openOnEvent                             : true,
+        setEvent                                : 'click',
+        headerBlockSelector                     : '',
+        footerBlockSelector                     : '',
+        excludeElements                         : [],
+        ///onRender: function(response){             /todo:serve dichiararlo nel default?
+        //    if (options.excludeElements.length > 0) {
+        //        $("<div class='hidden' id='hui--temp'>"+response+"</div>").appendTo($('body'))
+        //        $("#hui--temp").find(options.excludeElements.join(',')).remove();
+        //        var $newHtml = $("#hui--temp").html();
+       //         $("#hui--temp").remove();
+       //         return $newHtml;
+        //    }
+        //    return response;
+        //},
+        onBlurContainer                       : '', //todo: cosa e questo? una funzione?
+        onOpening                             : function(){},
+        onClosing                             : function(){},
+        onOpened                              : function (){},
+        onClosed                              : function (){},
+        url                                     : '',                // AJAX Url
+        ajax                                    : {
+                                                    type                    : "html",
+                                                    loader                  : false,      // AJAX Loader
+                                                    data                    : {},           // AJAX Data
+                                                },
+        template                                : '', //<p>This is test popup content!</p>',
+        footer                                  : {
+                                                    class                   : '',
+                                                    buttonsContainerClass   : '',
+                                                    buttons                 : [
+
+                                                       // {
+                                                       //   text      : "Procedi",
+                                                       //   class     : 'primary',
+                                                       //   callback  : function (){
+                                                      //      alert('callback');
+                                                      //    }
+                                                      //  }
+
+                                                    ]
+                                                },
+        mobile                                  : {
+                                                    hideSubtitle            : false,
+                                                    headerSticky            : false,
+                                                    footerSticky            : false
+                                                }
+    };*/
+    var isUrl = function(url) {
+        return (url.indexOf("/") < 0
+            ? false
+            : /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$|^((\\(\\[^\s\\]+)+|([A-Za-z]:(\\)?|[A-z]:(\\[^\s\\]+)+))(\\)?)$/.test(url)
+        );
+    }
+    var getID = function() {
+        return prefix + Date.now();
+    }
+
+    var clone = function(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
+
+    var hashCode = function(s) {
+        if(s) {
+            var h = 0, l = s.length, i = 0;
+            if (l > 0)
+                while (i < l)
+                    h = (h << 5) - h + s.charCodeAt(i++) | 0;
+            return h;
         }
     };
-    var font_icon_conversion = {
-        "fontawesome" : {
-            "resize"        : "expand"
-            , "close"       : "fa fa-times"
-        }
+    var getIcon = function(icon, params) {
+        return (isUrl(icon)
+                ? getImageIcon(icon)
+                : getClassByFrameworkCss(icon, "icon-tag", params)
+        );
+    };
+    var getImageIcon = function(src) {
+        return '<img src="' + src + '" />';
     };
 
+    var getFontIconSettings = function(name) {
 
-    var framework_css = {
-        "overlay" : {
-            "class"         : null,
-            "dialog"        : ["overlay", "effect"]
-        },
-        "window" : {
-            "class"         : null,
-            "dialog"        : ["window", "window-medium"]
-        },
-        "inner-wrap" : {
-            "class"         : null,
-            "dialog"        : "inner-wrap"
-        },
-        "header" : {
-            "class"         : null,
-            "dialog"        : "header"
-        },
-        "header-title" : {
-            "class"         : null,
-            "dialog"        : "header-title"
-        },
-        "content" : {
-            "class"         : null,
-            "dialog"        : "content"
-        },
-        "footer" : {
-            "class"         : null,
-            "dialog"        : "footer"
-        }
     };
-    /**
-     @effect (String or false)
-     Slide, Fade, ecc or false
 
-     set By params or by response
-     */
-    var effect              = false;
-    /**
-     @width (Object Or Number Or null)
-     Object: Basato sul grid system
-     {
-        "xs" : [0-12]
-        , "sm" : [0-12]
-        , "md" : [0-12]
-        , "lg" : [0-12]
-     }
-     Number : in pixel
+    var getFrameworkCss = function(key) { //provvisorio
+        var framework_name = ff.frameworkCss || frameworkCss; //;
 
-     set By params or by response
-     */
-    var width               =  null;
-    /**
-     @blockUI (Boolean or null)
-     Block user iteraction with overlay in background.
-
-     set By params or by response
-     */
-    var blockUI             = true;
-    /**
-     @title (String or null)
-     The title display in the head of modal.
-
-     set By params or by response
-     */
-    var title               = null;
-    /**
-     @description (String or null)
-     Optional description
-
-     set By params or by response
-     */
-    var description         = null;
-    /**
-     @tabs (String or null)
-     Optional Tabs for switch panels inside dialog.
-
-     set By params or by response
-     */
-    var tabs = {};
-
-    var buttons = {
-        "header" : {
-            "close" : {
-                "label"             : ""
-                , "placeholder"     : "Chiudi"
-                , "icon"            : "close"
-                , "display"         : true
-                , "class"           : {
-                    "util"          : ["align-right"]
-                }
-                , "fixed"           : false //override che permette di posizionare un bottone al di fuori della dialog. Valori possibili: top-left top-right bottom-left bottom-right
+        var framework_css = {
+            "base" : {
+                "name" : "base"
             },
-            "resize" : {
-                "label"             : ""
-                , "placeholder"     : "Ridimensiona"
-                , "icon"            : "close"
-                , "display"         : false
-                , "class"           : {
-                    "util"          : ["align-right"]
-                }
-                , "fixed"           : false //override che permette di posizionare un bottone al di fuori della dialog. Valori possibili: top-left top-right bottom-left bottom-right
+            "bootstrap" : {
+                "name" : "bootstrap"
+            },
+            "foundation" : {
+                "name" : "foundation"
             }
-        },
-        "footer" : {
-            "insert" : {
-                //[...] Bottoni di azione defninibili da parametri o anche da response
+        };
+
+        return (key
+                ? framework_css[framework_name][key]
+                : framework_css[framework_name]
+        )
+    };
+
+    var getFontIconSettings = function(name) {
+        var font_icon_setting = {
+            "base": {
+                "css": "",
+                "prefix": "icon",
+                "postfix": "",
+                "prepend": "ico-",
+                "append": ""
+            }
+            , "glyphicons": {
+                "css": window.location.protocol + "://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css",
+                "prefix": "glyphicons",
+                "postfix": "",
+                "prepend": "",
+                "append": ""
+            }
+            , "fontawesome": {
+                "css": window.location.protocol + "://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css",
+                "prefix": "fa",
+                "postfix": "",
+                "prepend": "fa-",
+                "append": ""
+            }
+        };
+
+        return (name
+            ? font_icon_setting[name]
+            : font_icon_setting
+        );
+    };
+    var getFontIcon = function(icon, params) {
+        var res                         = [];
+        var fonticon_name               = ff.fontIcon || fontIcon;
+        var fontIcon                    = getFontIconSettings(fonticon_name);
+
+        res.push(fontIcon["prefix"]);
+        res.push(fontIcon["prepend"] + icon + fontIcon["append"]);
+
+        if(Array.isArray(params)) {
+            params.each(function(i, param) {
+                res.push(fontIcon["prepend"] + param + fontIcon["append"]);
+            });
+        } else if(params) {
+            res.push(fontIcon["prepend"] + params + fontIcon["append"]);
+        }
+        res.push(fontIcon["postfix"]);
+        //todo: da implementare ff.getFontIcon
+        return res.join(" ").trim(" ");
+    };
+    var getFontIconTag = function(icon, size) {
+        return '<i class="' + getFontIcon(icon, size) + '"></i>';
+    };
+
+    var getClassByFrameworkCss = function(name, type, params) {
+        switch(type) {
+            case "button":
+                res = getButtonByFrameworkCss(name, params);
+                break;
+            case "icon":
+            case "icon-tag":
+                res = getFontIconTag(name, params);
+            default:
+        }
+
+        return res;
+    };
+
+    var getButtonByFrameworkCss = function(name, params) {
+        var res                                         = [];
+        var framework_name                              = getFrameworkCss("name");
+
+        var framework_css = {
+            "base" : {
+                "base"                                  : "btn",
+	            "skip-default"                          : false,
+	            "width"                                 : {
+                                                            "full"          : "expand"
+                                                        },
+	            "size"                                  : {
+                                                            "large"         : "large",
+                                                            "small"         : "small",
+                                                            "tiny"          : "tiny"
+                                                        },
+	            "state"                                 : {
+                                                            "current"       : "current"
+                                                            , "disabled"    : "disabled"
+                                                        },
+	            "corner"                                : {
+                                                            "round"         : "round"
+                                                            , "radius"      : "radius"
+                                                        },
+	            "color"                                 : {
+                                                            "default"       : "",
+                                                            "primary"       : "primary",
+                                                            "secondary"     : "",
+                                                            "success"       : "success",
+                                                            "info"          : "info",
+                                                            "warning"       : "warning",
+                                                            "danger"        : "danger",
+                                                            "link"          : "link"
+                                                        }
             },
-            "update" : {
-                //[...] Bottoni di azione defninibili da parametri o anche da response
+            "bootstrap" : {
+                "base"                                  : "btn",
+	            "skip-default"                          : true,
+	            "width"                                 : {
+                                                            "full"          : "btn-block"
+                                                        },
+	            "size"                                  : {
+                                                            "large"         : "btn-lg",
+                                                            "small"         : "btn-sm",
+                                                            "tiny"          : "btn-xs"
+                                                        },
+	            "state"                                 : {
+                                                            "current"       : "active"
+                                                            , "disabled"    : "disabled"
+                                                        },
+	            "corner"                                : {
+                                                            "round"         : false
+                                                            , "radius"      : false
+                                                        },
+	            "color"                                 : {
+                                                            "default"       : "btn-default",
+                                                            "primary"       : "btn-primary",
+                                                            "secondary"     : "btn-default",
+                                                            "success"       : "btn-success",
+                                                            "info"          : "btn-info",
+                                                            "warning"       : "btn-warning",
+                                                            "danger"        : "btn-danger",
+                                                            "link"          : "btn-link"
+                                                        }
             },
-            "delete" : {
-                //[...] Bottoni di azione defninibili da parametri o anche da response
-            },
-            "close" : {
-                //[...] Bottoni di azione defninibili da parametri o anche da response
+            "foundation" : {
+                "base"                                  : "button",
+	            "skip-default"                          : true,
+	            "width"                                 : {
+                                                            "full"          : "expand"
+                                                        },
+	            "size"                                  : {
+                                                            "large"         : "large",
+                                                            "small"         : "small",
+                                                            "tiny"          : "tiny"
+                                                        },
+	            "state"                                 : {
+                                                            "current"       : "current"
+                                                            , "disabled"    : "disabled"
+                                                        },
+	            "corner"                                : {
+                                                            "round"         : "round"
+                                                            , "radius"      : "radius"
+                                                        },
+	            "color"                                 : {
+                                                            "default"       : "secondary",
+                                                            "primary"       : "primary",
+                                                            "secondary"     : "secondary",
+                                                            "success"       : "success",
+                                                            "info"          : "secondary",
+                                                            "warning"       : "alert",
+                                                            "danger"        : "alert",
+                                                            "link"          : "secondary"
+                                                        }
+            }
+
+        };
+
+        res.push(framework_css[framework_name]["base"]);
+        res.push(framework_css[framework_name]["color"][name]);
+
+        if(typeof params == "object") {
+            for (var property in params) {
+                if (params.hasOwnProperty(property)
+                    && params[property] !== undefined
+                    && framework_css[getFrameworkCss("name")][property][params[property]]
+                ) {
+                    res.push(framework_css[getFrameworkCss("name")][property][params[property]]);
+                } else if(property == "class") {
+                    res.push(params[property]);
+                }
+            }
+        } else if(params) {
+            res.push(params);
+        }
+
+        return res.join(" ").trim(" ");
+    };
+    var paramsToModel = function(params) {
+        var model                                       = clone(params["type"] && models[params["type"]]
+                                                            ? models[params["type"]]
+                                                            : models["default"]
+                                                        );
+
+        if(params["icon"]) {
+            model["icon"] = getIcon(params["icon"], "2x");
+        }
+
+        for (var property in params) {
+            if (params.hasOwnProperty(property)
+                && params[property] !== undefined
+                && property != "icon"
+                && property != "type"
+                && property != "class"
+            ) {
+                var value                               = params[property];
+
+                if(Array.isArray(value)) {
+                    var buttons                             = [];
+                    value.each(function(i, button) {
+                        if(typeof button != "object") {
+                            model[defs[property]]           = value;
+                            return;
+                        }
+                        var btn = {};
+
+                        for (var key in button) {
+                            if (button.hasOwnProperty(key)
+                                && button[key] !== undefined
+                                && key != "icon"
+                                && key != "type"
+                            ) {
+
+                                if (defs["buttons"][key]) {
+                                    btn[defs["buttons"][key]] = button[key];
+                                }
+                            }
+                        }
+
+                        if(button["type"]) {
+                            btn["class"] = getClassByFrameworkCss(button["type"], "button", button["class"]);
+                        }
+                        if(button["icon"]) {
+                            btn["icon"] =  getIcon(params["icon"]);
+                        }
+
+                        buttons.push(btn);
+                    });
+                    if(buttons.length) {
+                        if(!model[property])
+                            model[property] = {};
+
+                        model[property]["buttons"] = buttons;
+                    }
+                } else if(defs[property]) {
+                    if(typeof defs[property] == "object") {
+                        model                           = Object.assign(model, defs[property][value]);
+                    } else {
+                        model[defs[property]]           = value;
+                    }
+                } else {
+                    model[property]                     = value;
+                }
             }
         }
+
+        return model;
     };
+    var add = function (data, params, callback) {
+        var limitHash                                   = 30;
+        var key                                         = hashCode(params);
+        var url                                         = undefined;
+        var ajax                                        = undefined;
+        var template                                    = undefined;
 
+        if(isUrl(data)) {
+            url                                         = data;
+            ajax                                        = {
+                                                            "data"                  : params,
+                                                            "type"                  : "json",
+                                                            "loader"                : true
+                                                        };
+            key                                         = url + "?" + key;
+        } else {
+            template                                    = data;
+            key                                         = hashCode(data.substr(0, limitHash)) + "?" + key;
 
-    var template = '<div id="ffWidget_dialog_[id]" class="[overlay]" role="dialog">'
-        +  '<div class="[window]">'
-        +    '<div class="[inner-wrap]">'
-        +      '<div class="[header]">'
-        +           '{buttons.header}'
-        +        '<div class="[header-title]">{title}{description}</div>'
-        +           '{tabs}'
-        +      '</div>'
-        +      '<div id="ffWidget_dialog_container_[id]" class="[content]">{content}</div>'
-        +      '<div class="[footer]">{footer}{buttons.footer}</div>'
-        +    '</div>'
-        +  '</div>'
-        + '</div>';
-
-    var display = {
-        "modal" : function() {
-            //richiama tutti il css di riferimento  con ff.injectCss definisce e processa la struttura html necessaria
-        },
-        "sidebar" : function () {
-            //richiama tutti il css di riferimento  con ff.injectCss definisce e processa la struttura html necessaria
         }
+
+        if(!dialogs[key]) {
+            var model                                   = (typeof params == "object"
+                                                            ? paramsToModel(params)
+                                                            : clone(typeof params != "object" && models[params]
+                                                                ? models[params]
+                                                                : model["default"]
+                                                            )
+                                                        );
+
+            if(params["header"] === false)
+                model["hideTitle"]                       = true;
+
+            var source                                  = {
+                                                            "id"                    : getID(),
+                                                            "url"                   : url,
+                                                            "ajax"                  : ajax,
+                                                            "template"              : template,
+                                                            type                    : getFrameworkCss("name"),
+                                                            openOnEvent             : false,
+                                                            headerBlockSelector     : "dialogTitle",
+                                                            footerBlockSelector     : "dialogActionsPanel",
+                                                            "onOpened"              : callback
+                                                        };
+
+            dialogs[key]                                = Object.assign(defaults, source, model);
+
+            dialogs_rev[dialogs[key]["id"]]             = key;
+        }
+
+        return dialogs[key];
     };
 
-    var processTabs = function() {
-
-    };
-    var processButtons = function() {
-
-    };
-    var makeInstance = function(id) {
-        return template
-            .replace("[overlay]", "")
-            .replace("[window]", "")
-            //[...]
-    };
 
     var that = { // publics var and functions
-        "init" : function(component) {
-        },
         "get" : function (id) {
-            return dialogs.get(id);
+            return dialogs[dialogs_rev[id]];
         },
-        "addDialog" : function (params) {
+        "open" : function(url, params, callback) {
+            var dialog = add(url, params, callback);
+
+/*dialog = {
+    type: "foundation",
+    title: "Simple Modal title",
+    baseClass: 'large', //tiny | small | medium
+    globalContainerSelector: "#example_frame_foundation",
+    template: "Modal content"
+};*/
+            ff.injectCSS("jquery.hui.modal", "/themes/library/plugins/jquery.hui/modal/hui.modal.css");
+            ff.pluginLoad("jquery.hui.modal", "/themes/library/plugins/jquery.hui/modal/hui.modal.js", function() {
+                jQuery(document).huiModal(dialog); //todo:: non funziona
+            });
             /*
-            dialogs[params.id] = {
-                "title" : params.title || "",
-                "description" : params.description || "",
-                "display" : params.display || "modal",
-                [...]
-            }*/
+            url: https://dev.paginemediche.it/pro/strutture/gestione come ippocrate
+
+jQuery(document).huiModal({
+    type: "foundation",
+    title: "Simple Modal title",
+    baseClass: 'large',
+    globalContainerSelector: "#example_frame_foundation",
+    template: "Modal content"
+});
+
+ff.pluginLoad("ff.modal", "/themes/library/ff/modal.js")
+
+ff.modal.open("/srv/strutture-modifica/save-answer", {
+        id_struttura: id_struttura
+        , id_anagraph: id_anagraph
+        , action: action
+        , text: message
+        , struttura_smart_url: struttura_smart_url
+    }, function (data) {
+        alert("entro");
+    });
+
+             */
+
         },
         "addTabs": function (id, tabs) {
             var tab = { //example di params
@@ -239,54 +572,11 @@ ff.modal = (function () {
             };
         },
         "doOpen": function (id, url, params) {
-            //example usage class ff.ajax
-            /*
-            ff.ajax.doRequest({
-                "url"                : that.parseUrl(id, url),
-                "component"        : params.component,
-                "section"            : params.section,
-                "fields"            : fields,
-                "callback"            : that.onSuccess,
-                "customdata"        : {
-                    "id"            : id
-                    , "callback"    : params.callback
-                    , "caller" : {
-                        "func" : ff.ffPage.dialog.doRequest
-                        , "args" : ff.argsAsArray(arguments)
-                    }
-                },
-                "injectid"            : params.injectid,
-                "dialog"            : id,
-                "chainupdate"        : params.chainupdate,
-                "doredirects"        : dialogs.get(id).params.doredirects
-            });*/
 
 
         },
         "goToUrl" : function (id, url) {
-            initsReset(id);
 
-            dialogs.get(id).params.current_url = url;
-
-            var fields = [
-                {name: "XHR_DIALOG_ID", value: id}
-            ];
-            ff.ajax.doRequest({
-                "url"                : that.parseUrl(id, dialogs.get(id).params.current_url),
-                "type"                : "GET",
-                "fields"            : fields,
-                "callback"            : that.onSuccess,
-                "customdata"        : {
-                    "id" : id
-                    , "caller" : {
-                        "func" : ff.ffPage.dialog.goToUrl
-                        , "args" : ff.argsAsArray(arguments)
-                    }
-                },
-                "injectid"            : dialogs.get(id).instance,
-                "dialog"            : id,
-                "doredirects"        : dialogs.get(id).params.doredirects
-            });
         },
         "onSuccess" : function (data, customdata) {
 
@@ -299,33 +589,6 @@ ff.modal = (function () {
         },
         "doAction" : function (id, action) {
 
-        },
-        "parseUrl" : function (id, url) {
-            var parsedurl = url;
-
-            var regTags = /\[\[([a-zA-Z0-9_\-\[\](?!\]))]+)\]\]/g;
-            var ret;
-            while ((ret = regTags.exec(url)) !== null) {
-                var tmp = ret[1].replace(/\[/g, "\\[").replace(/\]/g, "\\]");
-                var encodeTmp = false;
-
-                if(tmp.indexOf("_ENCODE") > 0) {
-                    tmp = tmp.replace("_ENCODE", "");
-                    encodeTmp = true;
-                }
-
-                if(tmp.indexOf("_TEXT") > 0) {
-                    if(jQuery("#" + tmp.replace("_TEXT", "")).is("select")) {
-                        parsedurl = parsedurl.replace(ret[0], (encodeTmp ? encodeURIComponent(jQuery("#" + tmp.replace("_TEXT", "") + " option:selected").text()) : jQuery("#" + tmp.replace("_TEXT", "") + " option:selected").text()), "g");
-                    } else {
-                        parsedurl = parsedurl.replace(ret[0], (encodeTmp ? encodeURIComponent(jQuery("#" + tmp.replace("_TEXT", "")).text()) : jQuery("#" + tmp.replace("_TEXT", "")).text()), "g");
-                    }
-                } else {
-                    parsedurl = parsedurl.replace(ret[0], (encodeTmp ? encodeURIComponent(jQuery("#" + tmp).val()) : jQuery("#" + tmp).val()), "g");
-                }
-            }
-
-            return parsedurl;
         }
     }; // publics' end
     return that;
