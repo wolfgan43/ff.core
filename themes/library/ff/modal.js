@@ -481,6 +481,7 @@ ff.modal = (function () {
         var url                                         = undefined;
         var ajax                                        = undefined;
         var template                                    = undefined;
+        var animation                                   = {};
 
         if(isUrl(data)) {
             url                                         = data;
@@ -512,6 +513,7 @@ ff.modal = (function () {
                                                             "id"                    : getID(),
                                                             "url"                   : url,
                                                             "ajax"                  : ajax,
+                                                            "animation"             : (typeof params["animation"] !== undefined ? params["animation"] : {}),
                                                             "template"              : template,
                                                             type                    : getFrameworkCss("name"),
                                                             openOnEvent             : false,
