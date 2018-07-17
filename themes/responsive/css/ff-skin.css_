@@ -1,0 +1,77 @@
+/*
+* FF Components
+*/
+.ffGrid {
+  background: white;
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 0.13); }
+  .ffGrid h2 {
+    color: #00838F; }
+  .ffGrid .table th {
+    color: white;
+    background: #00838F; }
+    .ffGrid .table th a {
+      color: white; }
+    .ffGrid .table th:last-child {
+      border-right: 1px solid #00838F; }
+    .ffGrid .table th.active {
+      background: #0097A7; }
+  .ffGrid .table td:first-child {
+    border-left: 1px solid #e7e7e7; }
+  .ffGrid .table td:last-child {
+    border-right: 1px solid #e7e7e7; }
+  .ffGrid .table tr:last-child {
+    border-bottom: 1px solid #e7e7e7; }
+
+.ffRecord {
+  background: white;
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 0.13); }
+  .ffRecord h2 {
+    color: #00838F; }
+  .ffRecord label {
+    color: #0097A7; }
+
+/*
+* FF Overlay
+*/
+.modal-header {
+  background: #00838F;
+  color: white; }
+.modal-tabs {
+  background: #00838F; }
+  .modal-tabs .nav-tabs li.active a {
+    border-bottom: 3px solid white;
+    background: none; }
+    .modal-tabs .nav-tabs li.active a:hover, .modal-tabs .nav-tabs li.active a:focus {
+      background: none;
+      border-bottom: 3px solid white;
+      color: white; }
+  .modal-tabs .nav-tabs li a {
+    border-bottom: 3px solid #00838F;
+    color: white; }
+    .modal-tabs .nav-tabs li a:hover {
+      background: none;
+      border-bottom: 3px solid #00838F; }
+
+.ff-modal {
+  background: rgba(0, 0, 0, 0.5); }
+  .ff-modal-highlight td {
+    color: #FFF;
+    border: 1px solid rgba(0, 151, 167, 0.15);
+    background: rgba(0, 151, 167, 0.4); }
+    .ff-modal-highlight td a {
+      color: white; }
+
+/*
+* Widgets
+*/
+.token-input-dropdown {
+  border: 1px solid #e7e7e7;
+  background: white; }
+.token-input-token {
+  border: 1px solid rgba(0, 131, 143, 0.33); }
+.token-input-delete-token {
+  color: white;
+  background: #00838F; }
+
+.autocompletetoken .autocomplete-wrap {
+  border-bottom: 2px solid #00838F; }
