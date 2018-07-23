@@ -1,0 +1,68 @@
+RewriteEngine On
+
+#AddDefaultCharset UTF-8
+
+#php_flag magic_quotes_gpc off
+#php_value request_order "EGPCS"
+#php_value session.save_path /tmp
+#php_flag session.use_only_cookies "0"
+#php_flag session.bug_compat_42 "1"
+#php_flag session.bug_compat_warn "1"
+
+
+
+
+#############
+# ENV
+#------------
+
+#Symbolic Link
+SetEnvIf Host "localhost:8888" "FF_TOP_DIR=/Users/romolo.scarpato/Library/Mobile Documents/com~apple~CloudDocs/PHPSTORM_PROJECTS/my_developments/dev.mypage.centrolazio.eu"
+
+# ----------------------------------------------
+#                 Development
+
+RewriteCond   %{HTTP_HOST}  	localhost:8888$
+RewriteCond   %{REQUEST_URI}	^/my_developments/dev.mypage.centrolazio.eu/modules
+RewriteCond   %{REQUEST_URI}	!^/my_developments/dev.mypage.centrolazio.eu/modules/([^/]+)/themes(.+)
+RewriteRule   ^modules/([^/]+)(.+) /my_developments/dev.mypage.centrolazio.eu/modules/$1/themes$2?_ffq_=/$0 [L,QSA]
+
+RewriteCond   %{HTTP_HOST}  	localhost:8888$
+RewriteCond   %{REQUEST_URI}  	!^/my_developments/dev.mypage.centrolazio.eu/cm/main\.php
+RewriteCond   %{REQUEST_URI}  	!^/my_developments/dev.mypage.centrolazio.eu/cm/showfiles\.php
+RewriteCond   %{REQUEST_URI}  	!^/my_developments/dev.mypage.centrolazio.eu/themes
+RewriteCond   %{REQUEST_URI}  	!^/my_developments/dev.mypage.centrolazio.eu/ffsetup
+RewriteCond   %{REQUEST_URI}  	!^/my_developments/dev.mypage.centrolazio.eu/modules/([^/]+)/themes(.+)
+RewriteRule   ^(.*)    /my_developments/dev.mypage.centrolazio.eu/cm/main\.php?_ffq_=/$0 [L,QSA]
+
+
+# ----------------------------------------------
+#                 Staging
+#
+#RewriteCond   %{HTTP_HOST}  	HOSTNAME$
+#RewriteCond   %{REQUEST_URI}	^SITEPATH/modules
+#RewriteCond   %{REQUEST_URI}	!^SITEPATH/modules/([^/]+)/themes(.+)
+#RewriteRule   ^modules/([^/]+)(.+) SITEPATH/modules/$1/themes$2 [L,QSA]
+#
+#RewriteCond   %{HTTP_HOST}  	HOSTNAME$
+#RewriteCond   %{REQUEST_URI}  	!^SITEPATH/cm/main\.php
+#RewriteCond   %{REQUEST_URI}  	!^SITEPATH/cm/showfiles\.php
+#RewriteCond   %{REQUEST_URI}  	!^SITEPATH/themes
+#RewriteCond   %{REQUEST_URI}  	!^SITEPATH/modules/([^/]+)/themes(.+)
+#RewriteRule   ^(.*)    SITEPATH/cm/main\.php?q=/$0 [L,QSA]
+
+# ----------------------------------------------
+#                 Production
+#
+RewriteCond   %{HTTP_HOST}  	dev\.mypage\.centrolazio\.eu$
+RewriteCond   %{REQUEST_URI}	^/modules
+RewriteCond   %{REQUEST_URI}	!^/modules/([^/]+)/themes(.+)
+RewriteRule   ^modules/([^/]+)(.+) /modules/$1/themes$2 [L,QSA]
+
+RewriteCond   %{HTTP_HOST}  	dev\.mypage\.centrolazio\.eu$
+RewriteCond   %{REQUEST_URI}  	!^/cm/main\.php
+RewriteCond   %{REQUEST_URI}  	!^/cm/showfiles\.php
+RewriteCond   %{REQUEST_URI}  	!^/themes
+RewriteCond   %{REQUEST_URI}  	!^/modules/([^/]+)/themes(.+)
+RewriteRule   ^(.*)    /cm/main\.php?q=/$0 [L,QSA]
+
