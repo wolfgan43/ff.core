@@ -35,6 +35,8 @@ RewriteRule (.*)                            https://%{HTTP_HOST}%{REQUEST_URI} [
 # ENV
 #------------
 SetEnvIf Host "[DOMAIN_SUB].[DOMAIN_NAME].[DOMAIN_EXT]" FF_PROJECT_DIR=[FF_DISK_PATH]/domains/[PROJECT_NAME]
+#Symbolic Link
+#SetEnvIf Host "[DOMAIN_SUB].[DOMAIN_NAME].[DOMAIN_EXT]" "FF_TOP_DIR=[FF_DISK_PATH]"
 
 
 #############
