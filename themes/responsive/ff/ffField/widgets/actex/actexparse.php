@@ -152,6 +152,7 @@ if (strlen($actex_field) && (strlen($father_value) || !$actex_skip_empty))
 	switch($actex_operation)
 	{
 		case "IN":
+
 			if(strlen($father_value)) 
 			{
 				$sSqlWhere .= " $actex_field IN(" . $db->toSql(new ffData($father_value), "Text", false) . ")"; 

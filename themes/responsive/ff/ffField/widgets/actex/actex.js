@@ -96,11 +96,11 @@ var activecombo = function(params) {
             return cmp_uri_parts.protocol + "://" + cmp_uri_parts.host + port + "/" + tmp.ltrim("/");
 		}
 
-		, "getCacheDataSrc" : function () {
+		, "getCacheDataSrc" : function (key) {
             return (that.options.data_src 
             		? that.options.data_src 
-            		: (that.options.service 
-                        ? that.options.name
+            		: (that.options.service
+                        ? that.options.name + (key ? "-" + key : "")
                         : (innerURL 
                             ? innerURL 
                             : __id
@@ -596,7 +596,7 @@ var activecombo = function(params) {
 		, "async_refill" : function (retData, selected_value, father_value, response, fullsearch) {
 			var node = that.getNode();
 			var buffer = "";
-			
+
 			if (retData === null) {
 				that.child_error_display();
 				return;
@@ -709,14 +709,17 @@ var activecombo = function(params) {
 						
 					}
 				
-					if(response) {
+					if(dataAutocomplete.length) {
 						dataAutocomplete.sort(function(a, b) {
 						    return selected_value && a.label.trim().toLowerCase().indexOf(selected_value) === 0 ? -1 : a.label.trim().toLowerCase().localeCompare(b.label.trim().toLowerCase());
 						});				
-						response(dataAutocomplete);
+
 					}
 				}
-				
+                if(response) {
+                    response(dataAutocomplete);
+                }
+
 				if(!jQuery.fn.escapeGet(__id).length) {
 					//jQuery.fn.escapeGet(__id + "_label").autocomplete("destroy");
 					buffer += ' />';
@@ -812,7 +815,7 @@ var activecombo = function(params) {
 
 		if(that.options.use_cache && !force_refresh) {
 			var fValue = father_value || "null";
-			var id_data_src = that.getCacheDataSrc();
+			var id_data_src = that.getCacheDataSrc(selected_value);
 
 			if (sources.isset(id_data_src) && sources.get(id_data_src).isset(fValue)) {
 				if (sources.get(id_data_src).get(fValue) === true) {
@@ -844,6 +847,7 @@ var activecombo = function(params) {
 			, "response" : response
 		};
 
+//alert("S");
 		jQuery.ajax({
 			  url		: url
 			, async		: true
@@ -867,13 +871,13 @@ var activecombo = function(params) {
 		var response = this.mydata.response;
 		var fullsearch = this.mydata.fullsearch;
 		var fValue = this.mydata.father_value;
-		var id_data_src = that.getCacheDataSrc();
+		var id_data_src = that.getCacheDataSrc(selected_value);
         var id_source = (that.options.data_src
             ? id_data_src
             : ""
         );        
-		if(!that.options.data_src)
-			console.log("non dovrebbe essere vuoto. da verificare");
+		//if(!that.options.data_src)
+		//	console.log("non dovrebbe essere vuoto. da verificare");
 
 		if (!(retData.widget && retData.widget.actex && retData.widget.actex["D" + id_source]))
 			return async_error();
@@ -1006,13 +1010,12 @@ var activecombo = function(params) {
 	//jQuery("#calendar-modify_ID_customer_label").data("ui-autocomplete")._trigger("change");	
 		jQuery.fn.escapeGet(__id + "_label").autocomplete({
 			source: function( request, response ) {
-				if(data) {
+                if(data) {
 					response(data);
 				} else {
 					/*cascade_disable(true);   disable fathers*/
 					/*cascade_disable(false);  disable childs*/
 					display_loading();
-
 					/* get ancestor's data */
 					var ancest_data = "";
 					var tmp_father = that.getFather();
@@ -1091,9 +1094,8 @@ var activecombo = function(params) {
 						|| event.keyCode == jQuery.ui.keyCode.HOME
 						|| event.keyCode == jQuery.ui.keyCode.END
 					)) {
-
 					//jQuery(this).autocomplete('search');
-					return false;
+					//return false;
 				}
 			}
 		}).keydown(function (event) {
