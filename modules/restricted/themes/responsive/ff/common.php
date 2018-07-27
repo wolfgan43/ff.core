@@ -324,23 +324,24 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
     $is_default = ($attr["default"] == "true" ? true : false);
     $hide_label = ($attr["label"] == "false" ? true : false);
 
-    $success = false;
 	if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
 	{
-		$hash = "__mod_restricted_" . $location . "_" . mod_res_get_hash();
-        /** @var reference $success */
-        $res = $cm->cache->get($hash, $success);
+        $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+            ? $cm->path_info
+            : "default"
+        );
+
+        $res = $cm->cache->get($cache_key, "/cm/mod/restricted/template/topbar");
 	}
-	if ($success)
+	if ($res)
 	{
-		$tmp = unserialize($res);
-		$access = $tmp["access"];
-		$tpl->ParsedBlocks = $tmp["ParsedBlock"];
+        $globals_mod->access    = $res["access"];
+		$tpl->ParsedBlocks      = $res["ParsedBlock"];
 	}
 	else
 	{
 		$framework_css = mod_restricted_get_framework_css();
-		
+
         $count = 0;
         $count_icon = 0;
 
@@ -348,9 +349,9 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 		foreach ($cm->modules["restricted"]["menu"] as $key => $value)
 		{
 			$profile_check = MOD_SEC_PROFILING && (MOD_SEC_PROFILING_SKIPSYSTEM !== "*") && !in_array($key, $toskip) && !$value["profiling_skip"];
-			
+
 			if (
-					!mod_restricted_checkacl_bylevel($value["acl"]) 
+					!mod_restricted_checkacl_bylevel($value["acl"])
 					|| ($profile_check && !mod_sec_checkprofile_bypath($value["path"]))
 					|| ($is_default && isset($value["location"]) && $value["location"] != $location)
 					|| (!$is_default && (!isset($value["location"]) || $value["location"] != $location))
@@ -365,10 +366,10 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 
 			if(!$value["hide"] && !$hide)
 			{
-				$item_tag = ($value["readonly"] 
+				$item_tag = ($value["readonly"]
 					? ($value["readonly"] === true
 						? "div"
-						: $value["readonly"] 
+						: $value["readonly"]
 					)
 					: "a"
 				);
@@ -377,7 +378,7 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 				$item_properties = null;
 				$item_actions = null;
 				$description = "";
-				
+
 				$tpl->set_var("name", $key);
 
 				if ($value["description"])
@@ -387,9 +388,9 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 	                else
                 		$description = $value["description"];
 
-					$description =  '<p class="' . $framework_css["description"] . '">' . $description . '</p>';	                 
-				} 				
-				
+					$description =  '<p class="' . $framework_css["description"] . '">' . $description . '</p>';
+				}
+
 				$tpl->set_var("item_description", $description);
 
 				if($value["actions"]) {
@@ -408,67 +409,65 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 								$action_path = $action_data;
 								if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"])
 									$action_icon = cm_getClassByFrameworkCss($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
-									
+
 								$action_label = $cm->modules["restricted"]["menu_bypath"][$action_data][0]["label"];
 							}
 
 					        if(strpos($action_label, "_") === 0)
 					            $action_label = ffTemplate::_get_word_by_code(substr($action_label, 1));
-							
+
 							$action_path = str_replace(array("[rel]", "[key]"), array($value["rel"], $key), $action_path);
 							if($action_data["dialog"] !== false)
 								$action_path = 'javascript:ff.ffPage.dialog.doOpen(\'dialogResponsive\',\'' . $action_path . '\');';
-								
-							$item_actions[] = '<a href="' . $action_path . '" class="' . $action_icon . '" title="' . $action_label . '"></a>';						
+
+							$item_actions[] = '<a href="' . $action_path . '" class="' . $action_icon . '" title="' . $action_label . '"></a>';
 						}
 					}
 				}
 
-                if(MOD_RES_FULLBAR || array_key_exists("fullbar", $cm->modules["restricted"]))
-				{
-					if($location == "topbar") {
-						$child_class = null;
-						
-						$res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "Child", null, true, $framework_css);
-	                    if($res_navbar["count"]) 
-	                    {	
-	                    	if($value["collapse"] !== false) 
-	                    	{
-								if(!$value["readonly"]) {
-									$item_properties["url"] = 'href="#nav-' . $key . '"';
-                    				$item_properties["collapse"] = $framework_css["collapse"]["action"];
-								}
-                    			$child_class["collapse"] = $framework_css["collapse"]["pane"];
-                    			$item_actions["dropdown"] = '<a href="#nav-' . $key . '" class="' . ($res_navbar["opened"] ? $framework_css["icons"]["caret"] : $framework_css["icons"]["caret-collapsed"] . " " . $framework_css["collapse"]["menu"]) . '" ' . $framework_css["collapse"]["action"] . '></a>';
-		                        if($res_navbar["opened"] || $value["collapse"]) {
-                        			$item_class["current"] = $framework_css["current"];
-                        			$child_class["current"] = $framework_css["collapse"]["current"];
-								}
-							}
+                //fullbar
+                if($location == "topbar") {
+                    $child_class = null;
 
-							$tpl->set_var("child_id", "nav-" . $key);
-							if($child_class)
-								$tpl->set_var("child_class", implode(" ", $child_class));
-	                        $tpl->parse("SectChild", false);
-						}
-					} else {
-						//mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "", $location, $is_default, $framework_css);
-					}
+                    $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "Child", null, true, $framework_css);
+                    if($res_navbar["count"])
+                    {
+                        if($value["collapse"] !== false)
+                        {
+                            if(!$value["readonly"]) {
+                                $item_properties["url"] = 'href="#nav-' . $key . '"';
+                                $item_properties["collapse"] = $framework_css["collapse"]["action"];
+                            }
+                            $child_class["collapse"] = $framework_css["collapse"]["pane"];
+                            $item_actions["dropdown"] = '<a href="#nav-' . $key . '" class="' . ($res_navbar["opened"] ? $framework_css["icons"]["caret"] : $framework_css["icons"]["caret-collapsed"] . " " . $framework_css["collapse"]["menu"]) . '" ' . $framework_css["collapse"]["action"] . '></a>';
+                            if($res_navbar["opened"] || $value["collapse"]) {
+                                $item_class["current"] = $framework_css["current"];
+                                $child_class["current"] = $framework_css["collapse"]["current"];
+                            }
+                        }
+
+                        $tpl->set_var("child_id", "nav-" . $key);
+                        if($child_class)
+                            $tpl->set_var("child_class", implode(" ", $child_class));
+                        $tpl->parse("SectChild", false);
+                    }
+                } else {
+                    //mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "", $location, $is_default, $framework_css);
                 }
-				
+
 				if(!$value["path"] && !$value["label"])
 					continue;
-				
+
 				if(strpos($value["label"], "_") === 0) {
 					$label = ffTemplate::_get_word_by_code(substr($value["label"], 1));
 				} else {
 					$label = $value["label"];
-				}	
+				}
 
-				
+
 				if(!$item_properties["url"]) {
 					$globals = "";
-					$params = "";	
+					$params = "";
 					if ($value["globals_exclude"])
 					{
 						$globals =  $cm->oPage->get_globals($value["globals_exclude"]);
@@ -491,7 +490,7 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 						$item_properties["url"] = 'href="' . "javascript:ff.ffPage.dialog.doOpen('dialogResponsive','" . $path . "');"  . '"';
 					else
 						$item_properties["url"] = 'href="' . $path . '"';
-						
+
 					if($value["rel"])
 						$item_properties["rel"] = 'rel="' . $value["rel"] . '"';
 				}
@@ -518,7 +517,7 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 
                 if($item_properties)
                 	$item_properties = implode(" ", $item_properties);
-                	
+
                 if($item_actions)
                 	$item_actions = '<span class="nav-controls">' . implode(" " , $item_actions) . '</span>';
 
@@ -529,7 +528,7 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 
                 if($count)
                 	$tpl->parse("SectSeparator", false);
-                
+
 				$tpl->parse("SectElement" . ($value["position"] ? ucfirst($value["position"]) : ""), true);
 				$tpl->set_var("SectChild", "");
 
@@ -548,18 +547,24 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 
 		if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
 		{
+            $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                ? $cm->path_info
+                : "default"
+            );
+
             /** @var reference $access */
             $tmp = array(
-				"ParsedBlock" => $tpl->ParsedBlocks
-				, "access" => $globals_mod->access
-			);
-			$res = $cm->cache->set($hash, null, serialize($tmp), "__mod_restricted__");
+                "ParsedBlock" => $tpl->ParsedBlocks
+                , "access" => $globals_mod->access
+            );
+
+            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/topbar");
 		}
 	}
 }
 
 function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
-{      
+{
 	$cm = cm::getInstance();
     $globals_mod = ffGlobals::getInstance("__mod_restricted__");
     $is_default = ($attr["default"] == "true" ? true : false);
@@ -573,39 +578,39 @@ function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
 		if(strpos($cm->modules["restricted"]["sel_topbar"]["label"], "_") === 0)
 		{
 			$tpl->set_var("navbar_label", ffTemplate::_get_word_by_code(substr($cm->modules["restricted"]["sel_topbar"]["label"], 1)));
-		} 
-		else 
+		}
+		else
 		{
 			$tpl->set_var("navbar_label", $cm->modules["restricted"]["sel_topbar"]["label"]);
 		}
 		$tpl->parse("SectNavbarTitle", false);
-	} 
-	else 
+	}
+	else
 	{
 		$tpl->set_var("SectNavbarTitle", "");
 	}
-	
+
 	$tpl->set_var("navbar_class", $cm->modules["restricted"]["sel_topbar"]["name"]);
 	// ---
 	//if (!is_array($cm->modules["restricted"]["sel_topbar"]["elements"]) || !count($cm->modules["restricted"]["sel_topbar"]["elements"]))
 	//	return;
 
-    $success = false;
-	if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
-	{
-		$hash = "__mod_restricted_" . $location . "_" . mod_res_get_hash();
-        /** @var reference $success */
-        $res = $cm->cache->get($hash, $success);
-	}
-	
-	if ($success)
-	{
-		$tmp = unserialize($res);
-		$access = $tmp["access"];
-		$tpl->ParsedBlocks = $tmp["ParsedBlock"];
-	}
-	else
-	{
+    if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+    {
+        $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                ? $cm->path_info
+                : "default"
+            );
+
+        $res = $cm->cache->get($cache_key, "/cm/mod/restricted/template/navbar");
+    }
+    if ($res)
+    {
+        $globals_mod->access    = $res["access"];
+        $tpl->ParsedBlocks      = $res["ParsedBlock"];
+    }
+    else
+    {
 
 	//die($location);
 		// modifica di ALEX
@@ -620,15 +625,21 @@ function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
         if($res_navbar["count"]) 
             $tpl->parse("SectMenu", false);
 
-		if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
-		{
+        if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+        {
+            $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                    ? $cm->path_info
+                    : "default"
+                );
+
             /** @var reference $access */
             $tmp = array(
-				"ParsedBlock" => $tpl->ParsedBlocks
-				, "access" => $globals_mod->access
-			);
-			$res = $cm->cache->set($hash, null, serialize($tmp), "__mod_restricted__");
-		}
+                "ParsedBlock" => $tpl->ParsedBlocks
+                , "access" => $globals_mod->access
+            );
+
+            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/navbar");
+        }
 	}
 }
 
