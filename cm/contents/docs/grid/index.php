@@ -15,7 +15,7 @@ $oGrid = ffGrid::factory($cm->oPage);
  * ID della griglia, deve essere univoco nella pagina 
  */
 $oGrid->id = "utenti_semplice";
-/** 
+/**
  * La query utilizzata per recuperare i dati da visualizzare. 
  * Possono essere anche più tabelle in join.
  * [AND] [WHERE] [HAVING] [ORDER]) devono essere lasciati,
@@ -124,7 +124,6 @@ $oField->id = "avatar";
  */
 $oField->display_label = false;
 $oField->label = ffTemplate::_get_word_by_code("utenti_avatar");
-$oField->base_type = "Text";
 $oField->extended_type = "File";
 /**
  * Percorso in cui verrà salvato il file
@@ -134,15 +133,8 @@ $oField->file_storing_path = FF_DISK_UPDIR . "/anagraph/[ID_VALUE]";
  * Percorso in cui verrà salvato il file temporaneo
  */
 $oField->file_temp_path = FF_DISK_UPDIR . "/anagraph";
-$oField->file_full_path = true;
-$oField->file_check_exist = true;
-$oField->file_normalize = true;
-$oField->file_show_preview = true;
-$oField->uploadify_model = $avatar_model;
-$oField->uploadify_model_thumb = ($avatar_model == "default" ? "avatar" : "avatar" . $avatar_model);
-$oField->file_saved_view_url = CM_SHOWFILES . "/[_FILENAME_]";
-$oField->file_saved_preview_url = CM_SHOWFILES . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
-$oField->control_type = "picture_no_link";
+$oField->file_thumb = $avatar_model;
+$oField->control_type = "picture";
 $oGrid->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
@@ -186,19 +178,11 @@ $oField = ffField::factory($cm->oPage);
 $oField->id = "avatar";
 $oField->display_label = false;
 $oField->label = ffTemplate::_get_word_by_code("utenti_avatar");
-$oField->base_type = "Text";
 $oField->extended_type = "File";
 $oField->file_storing_path = FF_DISK_UPDIR . "/anagraph/[ID_VALUE]";
 $oField->file_temp_path = FF_DISK_UPDIR . "/anagraph";
-$oField->file_full_path = true;
-$oField->file_check_exist = true;
-$oField->file_normalize = true;
-$oField->file_show_preview = true;
-$oField->uploadify_model = $avatar_model;
-$oField->uploadify_model_thumb = ($avatar_model == "default" ? "avatar" : "avatar" . $avatar_model);
-$oField->file_saved_view_url = CM_SHOWFILES . "/[_FILENAME_]";
-$oField->file_saved_preview_url = CM_SHOWFILES . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
-$oField->control_type = "picture_no_link";
+$oField->file_thumb = $avatar_model;
+$oField->control_type = "picture";
 $oGrid->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
@@ -251,19 +235,9 @@ $oField->id = "avatar";
 $oField->display_label = false;
 $oField->label = ffTemplate::_get_word_by_code("utenti_avatar");
 $oField->extended_type = "File";
-/*
-$oField->base_type = "Text";
 $oField->file_storing_path = FF_DISK_UPDIR . "/anagraph/[ID_VALUE]";
 $oField->file_temp_path = FF_DISK_UPDIR . "/anagraph";
-$oField->file_full_path = true;
-$oField->file_check_exist = true;
-$oField->file_normalize = true;
-$oField->file_show_preview = true;
-$oField->uploadify_model = $avatar_model;
-$oField->uploadify_model_thumb = ($avatar_model == "default" ? "avatar" : "avatar" . $avatar_model);
-$oField->file_saved_view_url = CM_SHOWFILES . "/[_FILENAME_]";
-$oField->file_saved_preview_url = CM_SHOWFILES . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
-$oField->control_type = "picture_no_link";*/
+$oField->control_type = "picture";
 $oGrid->addContent($oField);
 
 $oField = ffField::factory($cm->oPage);
