@@ -69,7 +69,7 @@ $oRecord->groups[$group_field] = array(
 	"title" => ucfirst($group_field)
 );
 
-$oRecord->addContent('<hr /><h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Campo Semplice</h2>', $group_field);
+$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Campo Semplice</h2>', $group_field);
 
 /******************************************************************************************/
 $oRecord->addContent('<div class="single-field">', $group_field);
@@ -134,6 +134,32 @@ $code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "name5";<br />
 		$oField->label = "Placeholder con label";<br />
+		$oField->placeholder = "Placeholder con label";	<br />
+		$oField->base_type = "Text";<br />
+		$oRecord->addContent($oField);<br />
+	</code>
+</div>';
+$oRecord->addContent($code, $group_field);
+$oRecord->addContent('</div>', $group_field);
+/******************************************************************************************/
+$oRecord->addContent('<div class="single-field">', $group_field);
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "name5bis";
+$oField->label = "Placeholder con label";
+$oField->description = " e descrizione aggiuntiva";
+$oField->placeholder = "Placeholder con label";
+$oField->base_type = "Text";
+$oField->store_in_db = false;
+$oField->setWidthComponent(6);
+$oRecord->addContent($oField, $group_field);
+
+$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+	<code>
+		$oField = ffField::factory($cm->oPage);<br />
+		$oField->id = "name5bis";<br />
+		$oField->label = "Placeholder con label";<br />
+		$oField->description = " e descrizione aggiuntiva";<br />
 		$oField->placeholder = "Placeholder con label";	<br />
 		$oField->base_type = "Text";<br />
 		$oRecord->addContent($oField);<br />
@@ -548,16 +574,16 @@ $oField->container_class = "avatar_uploadifive";
 $oField->label = ffTemplate::_get_word_by_code("uploadifive");
 $oField->base_type = "Text";
 $oField->extended_type = "File";
-$oField->file_storing_path = DISK_UPDIR . "/docs/record";
-$oField->file_temp_path = DISK_UPDIR . "/tmp/docs";
+$oField->file_storing_path = FF_DISK_UPDIR . "/docs/record";
+$oField->file_temp_path = FF_DISK_UPDIR . "/tmp/docs";
 $oField->file_max_size = 1000000;
 $oField->file_show_filename = true;
 $oField->file_full_path = true;
 $oField->file_check_exist = true;
 $oField->file_normalize = true;
 $oField->file_show_preview = true;
-$oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
-$oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/avatar/[_FILENAME_]";
+$oField->file_saved_view_url = CM_SHOWFILES . "/[_FILENAME_]";
+$oField->file_saved_preview_url = CM_SHOWFILES . "/avatar/[_FILENAME_]";
 $oField->control_type = "file";
 $oField->file_show_delete = true;
 $oField->widget = "uploadifive";
