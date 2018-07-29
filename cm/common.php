@@ -67,7 +67,7 @@ function cm_showfiles_get_abs_url($path = null) {
 		if(substr(strtolower(CM_SHOWFILES), 0, 7) == "http://" || substr(strtolower(CM_SHOWFILES), 0, 8) == "https://" || substr(CM_SHOWFILES, 0, 2) == "//")
 			$res = CM_SHOWFILES;
 		else 
-			$res = "http" . ($_SERVER["HTTPS"] ? "s" : "") . "://" . $_SERVER["HTTP_HOST"] . FF_SITE_PATH . CM_SHOWFILES;
+			$res = "http" . ($_SERVER["HTTPS"] ? "s" : "") . "://" . $_SERVER["HTTP_HOST"] . CM_SHOWFILES;
 	}
 	
 	return $res . $path;
@@ -75,14 +75,8 @@ function cm_showfiles_get_abs_url($path = null) {
 
 function cm_getMainTheme()
 {
-	/*if (defined("CM_LOADED_THEME"))
-		return CM_LOADED_THEME;
-	else if (defined("CM_DEFAULT_THEME"))
-		return CM_DEFAULT_THEME;
-	else*/ if (defined("FF_LOADED_THEME"))
-		return FF_LOADED_THEME;
-	/*else if (defined("FF_DEFAULT_THEME"))
-		return FF_DEFAULT_THEME;*/
+    if(defined("CM_DEFAULT_THEME"))
+        return CM_DEFAULT_THEME;
 	else
 		ffErrorHandler::raise("CM API: can't guess Main Theme", E_USER_ERROR, null, get_defined_vars());
 }
@@ -750,9 +744,9 @@ function cm_loadlibs(&$libs, $path, $name, $prefix = "", $force_reload = false, 
 }
 
 function cm_loadlibs_save($libs, $override = false) {
-	$cache_file = CM_CACHE_PATH . "/libs.php";
+	$cache_file = CM_CACHE_DISK_PATH . "/libs.php";
 	if($override || !file_exists($cache_file)) {
-		@mkdir(CM_CACHE_PATH, 0777, true);
+		@mkdir(CM_CACHE_DISK_PATH, 0777, true);
 		$tmp_libs_var = var_export($libs, true);
 		file_put_contents($cache_file, "<?php\n\nreturn $tmp_libs_var;\n\n", LOCK_EX);
 	}
