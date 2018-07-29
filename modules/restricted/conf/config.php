@@ -6,7 +6,7 @@ if (!defined("MOD_RES_MEM_CACHING_BYUSER"))			define ("MOD_RES_MEM_CACHING_BYUSE
 if (!defined("MOD_RES_MEM_CACHING_BYUSERLEVEL"))	define ("MOD_RES_MEM_CACHING_BYUSERLEVEL", true); // only when session started
 if (!defined("MOD_RES_MEM_CACHING_BYPROFILE"))		define ("MOD_RES_MEM_CACHING_BYPROFILE", true); // depends ON MOD_SEC_PROFILING
 
-if (!defined("MOD_RES_FULLBAR"))					define ("MOD_RES_FULLBAR", true);
+if (!defined("MOD_RES_FULLBAR"))					define ("MOD_RES_FULLBAR", false);
 if (!defined("MOD_RES_FULLBAR_EXTENDED"))			define ("MOD_RES_FULLBAR_EXTENDED", false);
 if (!defined("MOD_RES_NAVTABS"))					define ("MOD_RES_NAVTABS", false);
 
