@@ -123,7 +123,7 @@ body,
 #frmMain {
   min-height: 100%;
   min-height: 100vh;
-  font-family: "Roboto", sans-serif; }
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"; }
 
 a {
   color: #1976d2;
@@ -183,7 +183,7 @@ a.-floating {
   border: 1px solid yellow !important; }
 
 .actions a.btn.fa {
-  font-family: "Roboto", sans-serif; }
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"; }
   .actions a.btn.fa:before {
     font-family: FontAwesome; }
 
@@ -452,7 +452,7 @@ a.-floating {
     .sidemenu ul.-withicons li a, .sidemenu ul.-withicons li div {
       color: #FFF;
       font-weight: 300;
-      opacity: 0.8;
+      opacity: 1;
       transition: all 0.25s ease-in;
       padding: 15px 18px 15px 54px; }
       .sidemenu ul.-withicons li a i.fa, .sidemenu ul.-withicons li div i.fa {
@@ -464,7 +464,7 @@ a.-floating {
     .sidemenu ul.-withicons li ul.nav-pills li a, .sidemenu ul.-withicons li ul.nav-pills li div, .sidemenu ul.-withicons li ul.nav-pills li p {
       color: #FFF;
       font-weight: 300;
-      opacity: 0.8;
+      opacity: 0.6;
       transition: all 0.25s ease-in;
       padding: 15px 18px 15px 60px;
       background-position: 30px 10px; }
@@ -605,6 +605,7 @@ a.-floating {
     height: auto; }
     .sidemenu__head .input-group {
       display: none; } }
+/* COMMENTO MIRKO
 @media (min-width: 768px) and (max-width: 992px) {
   .sidemenu .adminmenu ul li {
     display: block; }
@@ -653,6 +654,7 @@ a.-floating {
   @media (min-width: 768px) {
     .cmppanel {
       right: -25%; } }
+*/
   @media (min-width: 1200px) {
     .cmppanel {
       right: -16.333%; } }
@@ -778,7 +780,7 @@ a.-floating {
     margin-left: 10px !important; }
 
 .pagecontent {
-  margin-top: 108px; }
+  /*margin-top: 108px;*/ }
   .pagecontent.-notab {
     margin-top: 68px; }
   .pagecontent .page-preview {
@@ -866,6 +868,10 @@ tbody > tr:hover {
 .sidemenu__head .brand-logo{
   filter: brightness(0);
   padding:7px 0;
+}
+
+.sidemenu ul li a.active, .sidemenu.-inverse ul.-withicons li ul.nav-pills li a.active{
+    opacity:1;
 }
 
 .sidemenu.-inverse .sidemenu__head .brand-logo{
@@ -988,24 +994,32 @@ tbody > tr:hover {
 .wrapper {
   display: flex;
   align-items: stretch;
-  perspective: 1500px;
+  //perspective: 1500px;
 }
 
 #content {
   padding: 0 40px 40px 40px;
   min-height: 100vh;
   transition: all 0.3s;
+  width: calc(100% - 250px);
+  margin-left:250px;
+}
+
+#content.active {
   width: 100%;
+  margin-left:0;
 }
 
 #mainmenu {
   min-width: 250px;
   max-width: 250px;
   transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+  //transition: all 0.6s linear;
   transform-origin: center left;
-  height: auto;
-  position: static;
+  height: 100%;
+  position: fixed;
   left: 0;
+  top:0;
 }
 
 .sidemenu .navbar-nav{
@@ -1073,6 +1087,74 @@ tbody > tr:hover {
   padding: 6px 20px;
 }
 
+.nav-tabs.tabs-right li {
+    float: none;
+    width: 100%;
+}
+
+/* LAYOUT CON BARRA TOP */
+.header__fixed-top{
+    position:fixed;
+    top:0;
+    left:0;
+    background:#1976d2;
+    height:70px;
+    z-index:100;
+}
+.wrapper.-fixedtop{
+    padding-top:70px;
+}
+
+.header__fixed-top img.brand-logo{
+    display: block;
+    padding: 9px 0;
+    float: left;
+    max-height:70px;
+}
+
+.header__fixed-top .panel-account{
+    display: block;
+    padding: 15px 0;
+}
+
+.header__fixed-top a.domain{
+    font-size:27px;
+    color:#fff;
+    display: block;
+    padding: 15px 18px;
+    float: left;
+}
+
+.header__fixed-top .header__menutoggler {
+    width: 30px;
+    height: 30px;
+    float:left;
+    padding: 0;
+    margin-top:18px;
+    margin-left:0;
+    color:#fff;
+    background: none;
+    display:block;
+}
+
+.header__fixed-top .header__menutoggler span {
+    background: #FFF;
+}
+
+.wrapper.-fixedtop #mainmenu {
+    height: calc(100% - 70px);
+    top: 70px;
+}
+
+.nopadding-lr{
+    padding-left:0!important;
+    padding-right:0!important;
+}
+
+.div-right{
+    float:right;
+}
+
 
 /* MEDIA QUERY */
 @media (max-width: 768px) {
@@ -1084,6 +1166,20 @@ tbody > tr:hover {
     margin-left: 0;
     transform: none;
   }
+
+  #content {
+      padding: 0 40px 40px 40px;
+      min-height: 100vh;
+      transition: all 0.3s;
+      width: 100%;
+      margin-left:0;
+    }
+
+    #content.active {
+      width: calc(100% - 250px);
+      margin-left:250px;
+    }
+
 
   .header__menutoggler span:first-of-type,
   .header__menutoggler span:nth-of-type(2),
