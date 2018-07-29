@@ -1,27 +1,21 @@
 <?php
-if (!class_exists("cm"))
-	ffErrorHandler::raise("Theme responsive can be used only with CM. Change or Remove FF_DEFAULT_THEME from /config.php", E_USER_ERROR, null, get_defined_vars());
-
-require_once(ff_getAbsDir(FF_THEME_DIR . "/library/FF/common/framework-css.php") . "/library/FF/common/framework-css.php");
+require_once(__FF_DIR__ . "/library/FF/common/framework-css.php");
 
 // --------------------------------------
 //        libraries cache
 $glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
-$glob_libs->libs = array();	
+$glob_libs->libs = array();
 
-$ffcache_libs_success = false;
 if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
 {
-	$cache = ffCache::getInstance(CM_CACHE_ADAPTER);
-	$libs = $cache->get("__ffTheme_libs_responsive__", $ffcache_libs_success);
-	if ($ffcache_router_success)
-		$glob_libs->libs = unserialize($libs);
+	$cache = ffCache::getInstance();
+    $glob_libs->libs = $cache->get("/ff/libs");
 }
 
-if (!$ffcache_libs_success)
+if (!$glob_libs->libs)
 {
 	// PHP VERSION
-	$cache_file = CM_CACHE_PATH . "/libs.php";
+	$cache_file = CM_CACHE_DISK_PATH . "/libs.php";
 	if (!isset($_REQUEST["__CLEARCACHE__"]) && file_exists($cache_file))
 	{
 		$glob_libs->libs = include($cache_file);
@@ -39,60 +33,11 @@ if (!$ffcache_libs_success)
 		
 		if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
 		{
-			$this->cache->set("__ffTheme_libs_responsive__", null, serialize($glob_libs->libs));
+            $cache = ffCache::getInstance();
+            $cache->set("/ff/libs", $glob_libs->libs);
 		}
-	}
-	
-	// JSON VERSION
-	/*
-	$cache_file = CM_CACHE_PATH . "/libs.cache";
-	if (FF_THEME_RESTRICTED_LIBS_CACHE && file_exists($cache_file))
-	{
-		$glob_libs->libs = json_decode(file_get_contents(CM_CACHE_PATH . "/libs.cache"), true);
-	}
-	else
-	{
-		cm_loadlibs($glob_libs->libs, __DIR__ . "/ffPage", "ffPage", "theme/ff");
-		cm_loadlibs($glob_libs->libs, __DIR__, "ff", "theme");
-
-
-		if (FF_THEME_RESTRICTED_LIBS_CACHE && !file_exists($cache_file))
-		{
-			@mkdir(CM_CACHE_PATH, 0777, true);
-			file_put_contents($cache_file, json_encode($glob_libs->libs));
-		}
-		
-		if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
-		{
-			$this->cache->set("__ffTheme_libs_responsive__", null, serialize($glob_libs->libs));
-		}
-	}
-	*/
-}
-
-/*echo "<pre>";
-print_r($glob_libs->libs["theme/ff/ffPage"]);
-exit;*/
-
-/*
-trait ffTheme_restricted_libs
-{
-    function loadlibs($obj_path) 
-	{
 	}
 }
-
-da vedere: decorator
-*/
-/*
-function ffTheme_restricted_get_libs($obj, $obj_path)
-{
-	$glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
-	if (ffIsset($glob_libs->libs, $obj_path))
-		return $glob_libs->libs[$obj_path];
-	else
-		return null;
-}*/
 
 // --------------------------------------	
 

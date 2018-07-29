@@ -9,7 +9,14 @@
  * @link http://www.formsphpframework.com
  */
 
-if (!defined("FF_URLPARAMS")) define("FF_URLPARAMS", "__QUERY__,__DEBUG__,__CLEARCACHE__,__GENCACHE__,__NOCACHE__,__NOLAYOUT__,__SHOWCASCADELOADER__");
+if (isset($_REQUEST["__QUERY__"]))                  define("FF_URLPARAM_QUERY", $_REQUEST["__QUERY__"]);
+if (isset($_REQUEST["__DEBUG__"]))                  define("FF_URLPARAM_DEBUG", $_REQUEST["__DEBUG__"]);
+if (isset($_REQUEST["__CLEARCACHE__"]))             define("FF_URLPARAM_CLEARCACHE", $_REQUEST["__CLEARCACHE__"]);
+if (isset($_REQUEST["__GENCACHE__"]))               define("FF_URLPARAM_GENCACHE", $_REQUEST["__GENCACHE__"]);
+if (isset($_REQUEST["__NOCACHE__"]))                define("FF_URLPARAM_NOCACHE", $_REQUEST["__NOCACHE__"]);
+if (isset($_REQUEST["__NOLAYOUT__"]))               define("FF_URLPARAM_NOLAYOUT", $_REQUEST["__NOLAYOUT__"]);
+if (isset($_REQUEST["__SHOWCASCADELOADER__"]))      define("FF_URLPARAM_SHOWCASCADELOADER", $_REQUEST["__SHOWCASCADELOADER__"]);
+
 
 if (!defined("CM_MAIN_INIT"))
 {
@@ -20,12 +27,12 @@ if (!defined("CM_MAIN_INIT"))
 	// load forms php framework
 /*	if (defined("CM_ONLY_INIT") && !defined("FF_ONLY_INIT"))
 		define("FF_ONLY_INIT" , true);
-*/	require(dirname(__FILE__) . "/../ff/main.php");
+*/	require(__DIR__ . "/../ff/main.php");
 
 	// load configs..
 
 	// ..main
-	require(ffCommon_dirname(__FILE__) . "/config." . FF_PHP_EXT);
+	require(__DIR__ . "/config." . FF_PHP_EXT);
 
 	// ..check
 	if (!is_dir(CM_MODULES_ROOT))
@@ -33,14 +40,11 @@ if (!defined("CM_MAIN_INIT"))
 
 	if (!is_dir(CM_CONTENT_ROOT))
 		ffErrorHandler::raise("CM: missing content dir: " . CM_CONTENT_ROOT, E_USER_ERROR, null, get_defined_vars());
-	
-	if (defined("FF_DEFAULT_THEME"))
-		ffErrorHandler::raise("CM: avoid set FF_DEFAULT_THEME in config.php, use CM_DEFAULT_THEME in /conf/cm/config.php", E_USER_ERROR, null, get_defined_vars());
 
 	// ..from conf
 	if (@is_file(FF_DISK_PATH . "/conf/cm/config." . FF_PHP_EXT))
 		require FF_DISK_PATH . "/conf/cm/config." . FF_PHP_EXT;
-	require(ffCommon_dirname(__FILE__) . "/conf/config." . FF_PHP_EXT);
+	require(__DIR__ . "/conf/config." . FF_PHP_EXT);
 
 	// global config
 	if (@is_file(FF_DISK_PATH . "/conf/config." . FF_PHP_EXT))
@@ -52,15 +56,15 @@ if (!defined("CM_MAIN_INIT"))
 }
 
 // load classes
-cmAutoload();
+require_once (__DIR__ . "/autoload." . FF_PHP_EXT);
 
 // load addons
-require(ffCommon_dirname(__FILE__) . "/cm_cascadeloader." . FF_PHP_EXT);
+require(__DIR__ . "/cm_cascadeloader." . FF_PHP_EXT);
 
 // load commons..
 
 // ..main
-require(ffCommon_dirname(__FILE__) . "/common." . FF_PHP_EXT);
+require(__DIR__ . "/common." . FF_PHP_EXT);
 
 // ..from conf
 if (@is_file(FF_DISK_PATH . "/conf/common." . FF_PHP_EXT))
