@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS `cm_mod_security_users` (
   `lastlogin` datetime NOT NULL,
   `profile` int(11) NOT NULL,
   `special` varchar(255) NOT NULL,
+  `avatar` varchar(255) NOT NULL,
+  `firstname` varchar(255) NOT NULL,
+  `lastname` varchar(255) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `ID_packages` (`ID_packages`),
   KEY `profile` (`profile`)
