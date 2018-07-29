@@ -2075,7 +2075,7 @@ function ff_getThemePath($theme)
 
 function ff_getAbsDir($path, $return_abs = true)
 {
-    if (__TOP_DIR__ != __PRJ_DIR__
+    if (__FF_DIR__ != __PRJ_DIR__
         && (strpos($path, "/themes/library") === 0
             || strpos($path, "/themes/restricted") === 0
             || strpos($path, "/themes/responsive") === 0
@@ -2083,7 +2083,7 @@ function ff_getAbsDir($path, $return_abs = true)
         )
     )
         if($return_abs)
-            return __TOP_DIR__;
+            return __FF_DIR__;
         else
             return true;
     else
