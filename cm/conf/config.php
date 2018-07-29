@@ -24,7 +24,7 @@ if (!defined("CM_CACHE_ADAPTER"))			define("CM_CACHE_ADAPTER", FF_CACHE_ADAPTER)
 if (!defined("CM_SHOWFILES_ENABLE_DEBUG"))	define("CM_SHOWFILES_ENABLE_DEBUG", true);
 if (!defined("CM_SHOWFILES_FORCE_PATH"))	define("CM_SHOWFILES_FORCE_PATH", true);
 if (!defined("CM_SHOWFILES_SKIP_DB"))		define("CM_SHOWFILES_SKIP_DB", false);
-if (!defined("CM_SHOWFILES_THEME"))			define("CM_SHOWFILES_THEME", "restricted");
+if (!defined("CM_SHOWFILES_THEME"))			define("CM_SHOWFILES_THEME", "responsive");
 if (!defined("CM_SHOWFILES_ICON_PATH"))		define("CM_SHOWFILES_ICON_PATH", "/images/icons");
 if (!defined("CM_SHOWFILES_ENABLE_GZIP"))   define("CM_SHOWFILES_ENABLE_GZIP", false);
 if (!defined("CM_SHOWFILES_THUMB_PATH"))	define("CM_SHOWFILES_THUMB_PATH", "_thumb");
