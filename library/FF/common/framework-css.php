@@ -505,7 +505,7 @@ function cm_getFrameworkCss_settings($name = null) {
                 , "bg-warning"                  => "bg-warning"
                 , "bg-danger"                   => "bg-danger"
 
-	            , "current" => "active"
+	            , "current"                     => "active"
 	            , "equalizer-row" => "data-equalizer"
 	            , "equalizer-col" => "data-equalizer-watch"
 	            , "corner-radius" => "border-radius"
@@ -1332,12 +1332,19 @@ function cm_getClassByFrameworkCss($value, $type, $params = array(), $framework_
                 $res = array_fill_keys($params, true);
             else
                 $res = array();
-			
-			if(is_array($framework_css)) {
-				if(strlen($framework_css[$type][$value]))
-					$res[$framework_css[$type][$value]] = true;
-			}	
 
+			if(is_array($framework_css)) {
+			    if(is_array($value)) {
+			        foreach ($value AS $subvalue) {
+			            if(strlen($framework_css[$type][$subvalue])) {
+                            $res[$framework_css[$type][$subvalue]] = true;
+                        }
+                    }
+                } elseif(strlen($framework_css[$type][$value])) {
+                    $res[$framework_css[$type][$value]] = true;
+                }
+
+			}	
             $res = implode(" ", array_keys($res));
 			break;
 		case "util":
