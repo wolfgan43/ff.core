@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS `cm_mod_security_users` (
 
 INSERT INTO `cm_mod_security_users` (`ID`, `ID_domains`, `username`, `password`, `level`, `status`, `expiration`, `email`, `time_zone`, `role`, `created`, `modified`, `password_generated_at`, `temp_password`, `password_used`, `ID_packages`, `lastlogin`, `profile`, `special`, `avatar`, `firstname`, `lastname`) VALUES
 (1, 0, 'admin', '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19', '3', '1', '0000-00-00 00:00:00', '', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', '', 0, '0000-00-00 00:00:00', 0, '', '', 'John', 'Doe');
+
+-- --------------------------------------------------------
+
 -- --------------------------------------------------------
 
 --
