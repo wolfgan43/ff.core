@@ -238,9 +238,9 @@ CREATE TABLE IF NOT EXISTS `ff_international` (
 --
 
 INSERT INTO `ff_international` (`ID`, `ID_lang`, `word_code`, `description`, `is_new`, `last_update`) VALUES
-(1, 1, 'login_username', 'nome utente', 0, '0000-00-00 00:00:00'),
-(2, 1, 'login_password', 'password', 0, '0000-00-00 00:00:00'),
-(3, 1, 'login_confirm', 'accedi', 0, '0000-00-00 00:00:00'),
+(1, 1, 'login_username', 'Nome utente', 0, '0000-00-00 00:00:00'),
+(2, 1, 'login_password', 'Password', 0, '0000-00-00 00:00:00'),
+(3, 1, 'login_confirm', 'Accedi', 0, '0000-00-00 00:00:00'),
 (4, 1, 'login_text_logout', 'Logout', 0, '0000-00-00 00:00:00'),
 (5, 1, 'nav_profile', 'Profilo', 0, '0000-00-00 00:00:00'),
 (6, 1, 'logout_title', 'Sei sicuro di voler effettuare il Logout?', 0, '0000-00-00 00:00:00'),
