@@ -22,6 +22,17 @@
 					});
 
 					$table.find("> tbody > tr :first-child").not("tr tr td").bind("mousedown.ff.dragsort", function (e) {
+                        var target = e.target || e.srcElement;
+                        if (jQuery(target).is("a")
+                            || jQuery(target).closest("a").length
+                            || jQuery(target).is("input")
+                            || jQuery(target).is("select")
+                            || jQuery(target).is("textarea")
+                            || jQuery(target).is("[onclick]")
+                            || jQuery(target).parent().is("[onclick]")
+                        )
+                            return;
+
 						var $tr = jQuery(this).parent();
 						lastY = e.clientY;
 
@@ -79,7 +90,18 @@
 						return false;
 					});
 					$table.find("> tbody > tr :first-child").not("tr tr td").bind("mouseup.ff.dragsort", function (e) {
-						var $tr = jQuery(this).parent();
+                        var target = e.target || e.srcElement;
+                        if (jQuery(target).is("a")
+                            || jQuery(target).closest("a").length
+                            || jQuery(target).is("input")
+                            || jQuery(target).is("select")
+                            || jQuery(target).is("textarea")
+                            || jQuery(target).is("[onclick]")
+                            || jQuery(target).parent().is("[onclick]")
+                        )
+                            return;
+
+                        var $tr = jQuery(this).parent();
 						lastY = e.clientY;
 						//if(jQuery(e.target).is("input,select,a"))
 						//	return;
