@@ -1,14 +1,17 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.3/jquery.nicescroll.min.js" ></script>
 <script>
     $(document).ready(function () {
+        $("#mainmenu").niceScroll({
+            cursorcolor:"#1976d2",
+            cursorborder:"0",
+            cursorwidth:"5px"
+        });
         $('.mainmenu_toggle').on('click', function () {
             $('#mainmenu, #content').toggleClass('active');
             $(this).toggleClass('active');
         });
-        $(".sidemenu").niceScroll({
-            cursorcolor:"#1976d2",
-            cursorborder:"0",
-            cursorwidth:"5px"
+        $('#mainmenu a').on('click', function () {
+            $("#mainmenu").getNiceScroll().resize();
         });
     });
 </script>
