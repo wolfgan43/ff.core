@@ -2,7 +2,7 @@
 <configdata>
 	<menu>
 		<ds path="/restricted/ds" label="Data Storage" location="brand" acl="3" />
-		<docs path="/restricted/docs" label="Docs">
+		<docs path="/restricted/docs" label="Docs (under development)">
 			<grid path="/restricted/docs/grid" label="Grid"></grid>
 			<grid_widget path="/restricted/docs/grid/widget.php" label="Grid - Widget"></grid_widget>
 			<record path="/restricted/docs/record" label="Record"></record>
