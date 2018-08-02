@@ -278,7 +278,7 @@ if(!$dialog_loaded) { //todo: da sistemare
         , $cm->oPage
     );
 }
-$oField->file_sortable = true;
+//$oField->file_sortable = true;
 $oField->file_show_edit = true;
 //todo: da fare con mimetype e uploads max impostati
 

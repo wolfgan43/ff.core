@@ -15,27 +15,22 @@
         });
     });
 </script>
-<div class="wrapper">
+<div class="wrapper -fixedtop">
+    <div class="col-xs-12 header__fixed-top"><div class="col-xs-12">{brand} <a href="javascript:void(0);" class="mainmenu_toggle header__menutoggler navbar-btn" >
+        <span></span>
+        <span></span>
+        <span></span>
+    </a> <div class="col-xs-4 div-right" align="right">{favorite}</div> <div class="col-xs-4 div-right" align="right">{lang}</div>
+        <div class="col-xs-4 div-right panel-account" align="right">{accountpanel}</div></div>
+    </div>
     <nav id="mainmenu" class="sidemenu -inverse">
-        <div class="sidemenu__head">
-            <div class="text-center"> {brand} </div>
-            <div class="adminmenu"> {admin} </div>
-            {account}
-            {search}
-        </div>
+
         {topbar} </nav>
     <section id="content">
         <header class="header {fullbar_class}">
             <div class="row header__top">
-                <div class="col-xs-8 col-sm-10 header__left">
-                    <a href="javascript:void(0);" class="mainmenu_toggle header__menutoggler navbar-btn" >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </a>
+                <div class="col-xs-12 col-sm-12 header__left">
                     <h1>{page-title}</h1>
-                </div>
-                <div class="col-xs-4 col-sm-2 header__right"> {favorite} {lang}
                 </div>
             </div>
             <div class="row header__bar">

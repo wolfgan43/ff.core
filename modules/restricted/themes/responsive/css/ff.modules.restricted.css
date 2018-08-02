@@ -1026,8 +1026,10 @@ tbody > tr:hover {
 .sidemenu .navbar-nav{
   height: auto;
 }
-
-.sidemenu.-inverse ul li a.active {
+.sidemenu.-inverse .nav-controls a{
+  background:none!important;
+}
+.sidemenu.-inverse ul li a.active, .sidemenu.-inverse ul li a.active a[aria-expanded="true"]{
   background:#1976d2;
   color:#fff;
 }
