@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ VGallery: CMS based on FormsFramework
+  ~ Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~  @package VGallery
+  ~  @subpackage core
+  ~  @author Alessandro Stucchi <wolfgan@gmail.com>
+  ~  @copyright Copyright (c) 2004, Alessandro Stucchi
+  ~  @license http://opensource.org/licenses/gpl-3.0.html
+  ~  @link https://github.com/wolfgan43/vgallery
+  -->
+
+<configdata>
+	<rule>
+		<priority>VERY_HIGH</priority>
+		<source>^/restricted(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/session$0</url>
+		</destination>
+		<process_next />
+		<accept_path_info />
+		<reverse>/restricted</reverse>
+		<index>999</index>
+	</rule>
+	<rule id="mod_auth_login">
+		<priority>VERY_HIGH</priority>
+		<source>/login$</source>
+		<destination>
+			<module>auth</module>
+			<url>/login$1</url>
+		</destination>
+		<reverse>/login</reverse>
+	</rule>
+	<rule id="mod_auth_logout">
+		<priority>VERY_HIGH</priority>
+		<source>/logout$</source>
+		<destination>
+			<module>auth</module>
+			<url>/logout$1</url>
+		</destination>
+		<reverse>/logout</reverse>
+	</rule>
+    <rule id="mod_auth_social">
+        <priority>VERY_HIGH</priority>
+		<source>^/login/social(/[^/]*)?(/[^/]*)?$</source>
+        <destination>
+			<module>auth</module>
+            <url>/social$1$2</url>
+        </destination>
+        <reverse>/login/social</reverse>
+    </rule> 
+	<rule id="mod_auth_recover">
+		<priority>NORMAL</priority>
+		<source>/recover(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/recover$1</url>
+		</destination>
+		<reverse>/recover</reverse>
+	</rule>
+	<rule id="mod_auth_users">
+		<priority>NORMAL</priority>
+		<source>^/restricted/users(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/users$1</url>
+		</destination>
+		<reverse>/restricted/users</reverse>
+	</rule>
+	<rule id="mod_auth_profiling">
+		<priority>NORMAL</priority>
+		<source>^/restricted/profiling(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/profiling$1</url>
+		</destination>
+		<reverse>/restricted/profiling</reverse>
+	</rule>
+	<rule id="mod_auth_domains">
+		<priority>NORMAL</priority>
+		<source>^/restricted/domains(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/domains$1</url>
+		</destination>
+		<reverse>/restricted/domains</reverse>
+	</rule>
+	<rule id="mod_auth_registration">
+		<priority>NORMAL</priority>
+		<source>^/registration(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/registration$1</url>
+		</destination>
+		<reverse>/registration</reverse>
+	</rule>
+	<!--<rule>
+		<priority>NORMAL</priority>
+		<source>^/oauth2/(.+)</source>
+		<destination>
+			<module>auth</module>
+			<url>/oauth2/$1</url>
+		</destination>
+	</rule>
+	<rule>
+		<priority>NORMAL</priority>
+		<source>^/apiserver/(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/apiserver/$1</url>
+		</destination>
+	</rule>
+	<rule id="mod_sec_oauth2_service">
+		<priority>NORMAL</priority>
+		<source>^/services/oauth2/(.+)</source>
+		<destination>
+			<module>auth</module>
+			<url>/services/oauth2/$1</url>
+		</destination>
+		<reverse>/services/oauth2</reverse>
+	</rule>-->	
+</configdata>
