@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ VGallery: CMS based on FormsFramework
+  ~ Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~  @package VGallery
+  ~  @subpackage core
+  ~  @author Alessandro Stucchi <wolfgan@gmail.com>
+  ~  @copyright Copyright (c) 2004, Alessandro Stucchi
+  ~  @license http://opensource.org/licenses/gpl-3.0.html
+  ~  @link https://github.com/wolfgan43/vgallery
+  -->
+
+<configdata>
+	<auth>
+		<noauth path="/login" />
+		<noauth path="/recover" />
+		<noauth path="/registration" />
+		<!--<noauth path="/services/security/check_session" />-->
+		<!--<noauth path="/services/security/checkaccounts" />-->
+		<!--<noauth path="/oauth2" />-->
+	</auth>
+	<fields>
+		<firstname label="Nome" db="anagraph_person.name" group="userinfo" required="true" />
+		<lastname label="Cognome" db="anagraph_person.surname" group="userinfo" required="true" />
+		<company label="Società" db="anagraph_person.company" group="userinfo" />
+		<piva label="Partita IVA" db="anagraph_person.piva" group="userinfo" />
+		<cf label="Codice Fiscale" db="anagraph_person.cf" group="userinfo" validators="cf" />
+		<address label="Indirizzo" db="anagraph_place.billaddress" group="userinfo" />
+		<city label="Città" db="anagraph_place.billcity" group="userinfo" />
+		<prov label="Provincia" db="anagraph_place.billprovince" group="userinfo" extended_type="Selection" source_SQL="SELECT support_province.CarAbbreviation, support_province.Name FROM support_province ORDER BY support_province.Name" />
+		<cap label="CAP" db="anagraph_place.billcap" group="userinfo" />
+		<tel label="Telefono" db="anagraph_tel.*" group="userinfo" />
+		<cell label="Cellulare" db="anagraph_tel" group="userinfo" />
+		<fax label="FAX" db="anagraph_tel" group="userinfo" />
+	</fields>
+	<env>
+		<MOD_SEC_ENABLE_GEOLOCALIZATION value="false" />
+		<MOD_SEC_USER_AVATAR_MODE value="100x100" />
+		<MOD_SEC_MULTIDOMAIN value="false" />
+		<MOD_SEC_USERNAME_RECOVER_USERNAME value="false" />
+		<MOD_SEC_PASSWORD_RECOVER value="false" />
+		<MOD_SEC_SOCIAL_FACEBOOK value="true" />
+		<MOD_SEC_SOCIAL_GPLUS value="false" />
+		<MOD_SEC_SOCIAL_TWITTER value="false" />
+		<MOD_SEC_SOCIAL_LINKEDIN value="false" />
+		<MOD_SEC_SOCIAL_DRIBBLE value="false" />
+		<MOD_SEC_SOCIAL_FF value="false" />
+		<MOD_SECURITY_SESSION_PERMANENT value="false" />
+		<MOD_SEC_REGISTRATION value="false" />
+	</env>
+</configdata>
