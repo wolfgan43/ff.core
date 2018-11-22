@@ -94,6 +94,16 @@
         </destination>
         <reverse>/docs</reverse>
     </rule>
+    <rule id="media">
+        <priority>NORMAL</priority>
+        <source>/restricted/media(.*)</source>
+        <destination>
+            <url>/cm/contents/media/$1</url>
+            <toplevel />
+        </destination>
+        <accept_path_info />
+        <reverse>/restricted/media</reverse>
+    </rule>
 	<rule id="ds">
 		<priority>NORMAL</priority>
 		<source>/restricted/ds(.*)</source>

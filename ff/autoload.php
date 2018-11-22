@@ -118,14 +118,19 @@ function ffRewritePathInfo($env = "_ffq_") {
                 unset($tmp_request);
             }
         }
-        if (isset($_REQUEST[$env])) // used to manage .htaccess [QSA] option, this overwhelm other options
+        if ($_REQUEST[$env]) // used to manage .htaccess [QSA] option, this overwhelm other options
         {
             $fftmp_ffq = true;
             $_SERVER["PATH_INFO"] = $_REQUEST[$env];
             $_SERVER["ORIG_PATH_INFO"] = $_REQUEST[$env];
+        } elseif($_SERVER["PATH_INFO"] == "" && $_SERVER["REQUEST_URI"]) {
+            $_SERVER["PATH_INFO"] = rtrim($_SERVER["QUERY_STRING"]
+                ? rtrim($_SERVER["REQUEST_URI"],  $_SERVER["QUERY_STRING"])
+                : $_SERVER["REQUEST_URI"]
+                , "?");
         }
-        else if (isset($_SERVER["ORIG_PATH_INFO"]))
-            $_SERVER["PATH_INFO"] = $_SERVER["ORIG_PATH_INFO"];
+        //else if (isset($_SERVER["ORIG_PATH_INFO"]))
+        //    $_SERVER["PATH_INFO"] = $_SERVER["ORIG_PATH_INFO"];
 
         if (strlen($_SERVER["QUERY_STRING"]))
         {

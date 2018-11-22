@@ -133,38 +133,50 @@ ff.ffField.uploadifive = (function () {
 			if(thisData["showFileSort"]) {
 				ff.pluginAddInit("jquery-ui", function() {
 					jQuery("#uploadifive_" + thisData["idComponent"] + "_preview").sortable({
-						"stop" : function() {
-							var $container = jQuery("#uploadifive_" + thisData["idComponent"] + "_preview");
-							var destFolder = thisData["folder"].replace("/tmp/", "/");
-							var toBeSent = [];
-							var position = 1;
-							$container.find("> DIV").each(function () {
-								toBeSent.push({"name" : "positions[]", "value" : jQuery(this).data("url").replace(destFolder, '').trim("/") });
-								position += 1;
-							});
+						"stop": function () {
+                            if(thisData["showFileSort"] === true) {
+                                var inputThumb = [];
+                                jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function () {
+                                    inputThumb.push(jQuery(this).data("url"));
+                                });
 
-							toBeSent.push({name: "resource", value: 'uploadifive'});
+                                jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
+                            } else {
+                                var $container = jQuery("#uploadifive_" + thisData["idComponent"] + "_preview");
+                                var destFolder = thisData["folder"].replace("/tmp/", "/");
+                                var toBeSent = [];
+                                var position = 1;
+                                $container.find("> DIV").each(function () {
+                                    toBeSent.push({
+                                        "name": "positions[]",
+                                        "value": jQuery(this).data("url").replace(destFolder, '').trim("/")
+                                    });
+                                    position += 1;
+                                });
 
-							ff.load("ff.ajax", function() {
-								ff.ajax.blockUI();
-								jQuery.ajax({
-									  "url"		: thisData["showFileSort"] + destFolder
-									, "async"	: true
-									, "type"	: "POST"
-									, "data"	: toBeSent
-									, "success" : function (data) {
-										var inputThumb = [];
-										jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function() {
-											inputThumb.push(jQuery(this).data("url"));
-										});
-										
-										jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
-									
-									
-										ff.ajax.unblockUI();
-									}
+                                toBeSent.push({name: "resource", value: 'uploadifive'});
+
+								ff.load("ff.ajax", function () {
+									ff.ajax.blockUI();
+									jQuery.ajax({
+										"url": thisData["showFileSort"] + destFolder
+										, "async": true
+										, "type": "POST"
+										, "data": toBeSent
+										, "success": function (data) {
+											var inputThumb = [];
+											jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function () {
+												inputThumb.push(jQuery(this).data("url"));
+											});
+
+											jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
+
+
+											ff.ajax.unblockUI();
+										}
+									});
 								});
-							});
+                            }
 						}
 					});
 				});
@@ -188,7 +200,7 @@ ff.ffField.uploadifive = (function () {
 				if(plugins[thisData["showFilePlugin"]]) {
 					switch(thisData["showFilePlugin"]) {
 						case "fancybox": 
-							ff.load("jquery.plugins.fancybox", function() {
+							ff.load("jquery.fancybox", function() {
 								jQuery(".fancybox").fancybox({
 									"parent" : (jQuery("#" + thisData["idComponent"]).closest(".ui-widget-overlay").length ? ".ui-widget-overlay:last" : "body")
 								});
@@ -386,7 +398,7 @@ ff.ffField.uploadifive = (function () {
 					showFileDetail = thisData["showFilePath"] + '/' + fileValue.trim("/tmp/", "").trim("/"); 
 					if(thisData["showFileDialog"]) {
 						showFileClass = " dialog.ajax";       
-						showFileAjaxDetail = "onclick=\"ff.ffPage.dialog.doOpen('" + thisData["showFileDialog"] + "', '" + showFileDetail + "', undefined, undefined, jQuery(this).closest('.uploaded-thumb'));\"";
+						showFileAjaxDetail = "onclick=\"ff.ffPage.dialog.doOpen('" + thisData["showFileDialog"] + "', '" + showFileDetail + "');\"";
                         showFileDetail = "javascript:void(0);";
 					}
 				} else {

@@ -163,7 +163,7 @@ class ffDetails_sort extends ffDetails_base
 	var $libraries	= array();
 	
 	var $js_deps = array(
-		"ff.ffDetails.sortable" => null
+	    "ff.ffDetails.sortable" => null
 	);
 	
 	/**

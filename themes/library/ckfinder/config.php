@@ -85,7 +85,7 @@ if($user_path == "")
     $user_path = "/";
 
 //if(function_exists("check_function") && check_function("check_fs"))
-//  check_fs(DISK_UPDIR, "/");
+//  check_fs(FF_DISK_UPDIR, "/");
 
 //$config = get_session("ckfinderConfig");    
 
@@ -110,7 +110,7 @@ if($user_path == "")
 
 	ATTENTION: The trailing slash is required.
 */
-	$baseUrl = SITE_UPDIR . "/";
+	$baseUrl = FF_SITE_UPDIR . "/";
 
 /*
 	$baseDir : the path to the local directory (in the server) which points to the
@@ -128,7 +128,7 @@ if($user_path == "")
 	ATTENTION: The trailing slash is required.
 */
 
-	$baseDir = DISK_UPDIR . "/";
+	$baseDir = FF_DISK_UPDIR . "/";
 
 /*
 	 * ### Advanced Settings
@@ -140,8 +140,8 @@ if($user_path == "")
 */
 
 	$config['Thumbnails'] = Array(
-			'url' => (CM_SHOWFILES_THUMB_IN_CACHE ? "/cache/" . CM_SHOWFILES_THUMB_PATH : basename(SITE_UPDIR) . "/" . CM_SHOWFILES_THUMB_PATH),
-			'directory' => FF_DISK_PATH . (CM_SHOWFILES_THUMB_IN_CACHE ? "/cache/" . CM_SHOWFILES_THUMB_PATH : basename(SITE_UPDIR) . "/" . CM_SHOWFILES_THUMB_PATH),
+			'url' => ffMedia::STORING_SITE_PATH,
+			'directory' => ffMedia::STORING_BASE_PATH,
 			'enabled' => true,
 			'directAccess' => false,
 			'maxWidth' => 100,
@@ -231,7 +231,7 @@ if($user_path == "")
 	$config['DefaultResourceTypes'] = '';
 
 	$config['ResourceType'][] = Array(
-			'name' => basename(SITE_UPDIR),
+			'name' => basename(FF_SITE_UPDIR),
 			'url' => stripslash($baseUrl),
 			'directory' => stripslash($baseDir),
 			'maxSize' => MAX_UPLOAD,
@@ -319,7 +319,7 @@ if($user_path == "")
 	No paths are accepted, only the folder name.
 	The * and ? wildcards are accepted.
 */
-	$config['HideFolders'] = Array(".svn", "CVS", CM_SHOWFILES_THUMB_PATH); //GALLERY_TPL_PATH
+	$config['HideFolders'] = Array(".svn", "CVS", ffMedia::STORING_BASE_NAME); //GALLERY_TPL_PATH
 
 /*
 	Files to not display in CKFinder, no matter their location.

@@ -191,17 +191,16 @@ function mod_srcurity_get_logo($logo = null, $restricted = false)
 }
 
 
-function mod_security_cm_on_load_brand($page, $tpl)
+function on_load_section_brand($page, $tpl)
 {
-	if (!mod_security_check_session(false))
-		return;
-
-	$cm = cm::getInstance();
+    $cm = cm::getInstance();
 
 	$framework_css = mod_restricted_get_framework_css(); 
 	$ID_domain = mod_security_get_domain();
-	
-	$tpl->set_var("logo_class", cm_getClassByDef($framework_css["logo"]));
+    $attr["layout_default"] = "brand";
+
+
+    $tpl->set_var("logo_class", cm_getClassByDef($framework_css["logo"]));
 	if($ID_domain)
 		$host_name = get_session("Domain");
 	else
@@ -230,6 +229,11 @@ function mod_security_cm_on_load_brand($page, $tpl)
 		$tpl->set_var("panel_links_class", cm_getClassByDef($framework_css["dropdown"]["body"]["links"]));
 		$tpl->set_var("panel_footer_class", cm_getClassByDef($framework_css["dropdown"]["footer"]));
 
+        $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
+        $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
+        $tpl->set_var("list_group_item_class", $framework_css["list"]["item"]);
+
+
 		/*$mod_sec_domains = $cm->router->getRuleById("mod_sec_domains");
 		if($mod_sec_domains->reverse) {
 			$tpl->set_var("manage_domains", FF_SITE_PATH . $mod_sec_domains->reverse);
@@ -249,70 +253,74 @@ function mod_security_cm_on_load_brand($page, $tpl)
             $tpl->parse("SectSettings", false);
         }*/
 
-	    if($page->sections["admin"]) {
-			if($page->tpl_layer[0]->isset_var("brand") && !$page->tpl_layer[0]->isset_var("admin")) {
+        if($page->sections["admin"] && $page->tpl_layer[0]->isset_var("brand") && !$page->tpl_layer[0]->isset_var("admin")) {
+            $tpl->set_var("admin", $page->sections["admin"]["tpl"]->rpparse("SectMenu", false));
+            $tpl->parse("SectBody", false);
+        }
 
-				$tpl->set_var("admin", $page->sections["admin"]["tpl"]->rpparse("SectMenu", false));
-			}
-		}    
-	    
 		$tpl->parse("SectBrandName", false);
 
-		if(MOD_SEC_MULTIDOMAIN && !defined("MOD_SEC_NOACCOUNTSCOMBO"))
-		{
-			if (mod_security_is_admin())
-			{
-				//if(!$ID_domain)
-				//	$host_class = " hidden";
-					
-				//$tpl->set_var("host_class", cm_getClassByDef($framework_css["fullbar"]["nav"]["left"]) . $host_class);
-				//$tpl->set_var("host_name", get_session("Domain"));
-				//$tpl->set_var("host_icon", cm_getClassByFrameworkCss("external-link", "icon-tag"));
-				
-				$field = ffField::factory($page);
-				$field->id = "accounts";
-				$field->base_type = "Number";
-				$field->widget = "actex";
-				$field->actex_update_from_db = true;
-				$field->multi_select_one_label = ffTemplate::_get_word_by_code("master_domain");
-				$field->source_SQL = "SELECT ID, nome FROM " . CM_TABLE_PREFIX . "mod_security_domains ORDER BY nome";
-				$mod_sec_setparams = $cm->router->getRuleById("mod_sec_setparams");
-				if($mod_sec_setparams->reverse) {
-					$field->actex_on_change  = "function(obj, old_value, action) {
-						if(action == 'change') {
-							jQuery.get('" . $mod_sec_setparams->reverse . "?accounts=' + obj.value, function(data) {
-								if(data['id'] > 0) {
-									jQuery('#domain-title').text(data['name']);
-									jQuery('#domain-title').attr('href', 'http://' + data['name']);
-									jQuery('#domain-title').parent().removeClass('hidden');
-								} else {
-									jQuery('#domain-title').parent().addClass('hidden');
-								}
-								jQuery('body').addClass('loading');
-								window.location.reload();
-							});
-						}
-					}";
-				} else {
-					$field->actex_on_change  = "function(obj, old_value, action) {
-						if(action == 'change') {
-							if(obj.value > 0) {
-								window.location.href = ff.urlAddParam(window.location.href, 'accounts', obj.value);
-							} else {
-								window.location.href = ff.urlAddParam(window.location.href, 'accounts').replace('accounts&', '');
-							}
-						}					
-					}";
-				}
-				$field->value = new ffData($ID_domain, "Number");
-				$field->parent_page = array(&$page);
-				$field->db = array(mod_security_get_main_db());
-				$tpl->set_var("domain_switch", $field->process());
-				
-				$tpl->parse("SectMultiDomain", false);
-			}
-			
-		}	
+		if(MOD_SEC_MULTIDOMAIN && !defined("MOD_SEC_NOACCOUNTSCOMBO") && mod_security_is_admin()) {
+            //if(!$ID_domain)
+            //	$host_class = " hidden";
+
+            //$tpl->set_var("host_class", cm_getClassByDef($framework_css["fullbar"]["nav"]["left"]) . $host_class);
+            //$tpl->set_var("host_name", get_session("Domain"));
+            //$tpl->set_var("host_icon", cm_getClassByFrameworkCss("external-link", "icon-tag"));
+
+            $field = ffField::factory($page);
+            $field->id = "accounts";
+            $field->base_type = "Number";
+            $field->widget = "actex";
+            $field->actex_update_from_db = true;
+            $field->multi_select_one_label = ffTemplate::_get_word_by_code("master_domain");
+            $field->source_SQL = "SELECT ID, nome FROM " . CM_TABLE_PREFIX . "mod_security_domains ORDER BY nome";
+            $mod_sec_setparams = $cm->router->getRuleById("mod_sec_setparams");
+            if($mod_sec_setparams->reverse) {
+                $field->actex_on_change  = "function(obj, old_value, action) {
+                    if(action == 'change') {
+                        jQuery.get('" . $mod_sec_setparams->reverse . "?accounts=' + obj.value, function(data) {
+                            if(data['id'] > 0) {
+                                jQuery('#domain-title').text(data['name']);
+                                jQuery('#domain-title').attr('href', 'http://' + data['name']);
+                                jQuery('#domain-title').parent().removeClass('hidden');
+                            } else {
+                                jQuery('#domain-title').parent().addClass('hidden');
+                            }
+                            jQuery('body').addClass('loading');
+                            window.location.reload();
+                        });
+                    }
+                }";
+            } else {
+                $field->actex_on_change  = "function(obj, old_value, action) {
+                    if(action == 'change') {
+                        if(obj.value > 0) {
+                            window.location.href = ff.urlAddParam(window.location.href, 'accounts', obj.value);
+                        } else {
+                            window.location.href = ff.urlAddParam(window.location.href, 'accounts').replace('accounts&', '');
+                        }
+                    }					
+                }";
+            }
+            $field->value = new ffData($ID_domain, "Number");
+            $field->parent_page = array(&$page);
+            $field->db = array(mod_security_get_main_db());
+            $tpl->set_var("domain_switch", $field->process());
+
+            $tpl->parse("SectMultiDomain", false);
+            $tpl->parse("SectHeader", false);
+        }
+
+        if(is_array($cm->modules["restricted"]["sections"]["brand"]["elements"])) {
+            $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sections"]["brand"]);
+            if(is_array($res_navbar["count_position"]) && count($res_navbar["count_position"])) {
+                foreach($res_navbar["count_position"] AS $position_name => $position_count) {
+                    $tpl->parse("Sect" . $position_name, false);
+                }
+            }
+        }
+
 		$tpl->parse("SectBrandInfo", false);
 	    $tpl->parse("SectBrandPanel", false);
 	} elseif($logo_url) {
@@ -321,16 +329,14 @@ function mod_security_cm_on_load_brand($page, $tpl)
 	}
 }
 
-function mod_security_cm_on_load_lang($page, $tpl)
+function on_load_section_lang($page, $tpl, $attr)
 {
-	if (!mod_security_check_session(false))
-		return;
+    $cm = cm::getInstance();
 
-	$cm = cm::getInstance();
+	$framework_css = mod_restricted_get_framework_css();
+    $attr["layout_default"] = "lang";
 
-	$framework_css = mod_restricted_get_framework_css(); 
-	
-	$flag_dim = "16";
+    $flag_dim = "16";
 	if(MOD_SEC_GROUPS) {
 		$user_permission = get_session("user_permission");
 		$locale["lang"] = $user_permission["lang"];
@@ -351,6 +357,11 @@ function mod_security_cm_on_load_lang($page, $tpl)
 		$tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
 		$tpl->set_var("panel_class", cm_getClassByDef($framework_css["dropdown"]["container"]));
 		$tpl->set_var("panel_body_class", cm_getClassByDef($framework_css["dropdown"]["body"]["def"]));
+
+        $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
+        $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
+        $tpl->set_var("list_group_item_class", $framework_css["list"]["item"]);
+
 		foreach($locale["lang"] AS $code => $params) {
 			if($code == "current")
 				continue;
@@ -382,15 +393,19 @@ function mod_security_cm_on_load_lang($page, $tpl)
 		}
 	}
 }
-
-function mod_security_cm_on_load_account($page, $tpl)
+function on_load_section_accountpanel($page, $tpl, $attr)
 {
-	if (!mod_security_check_session(false))
-		return;
-
-	$cm = cm::getInstance();
+    $attr["location_default"] = "accountpanel";
+    on_load_section_account($page, $tpl, $attr);
+}
+function on_load_section_account($page, $tpl, $attr)
+{
+    $cm = cm::getInstance();
 	$username = "";
-	$framework_css = mod_restricted_get_framework_css(); 
+	$framework_css = mod_restricted_get_framework_css();
+    if(!$attr["location_default"]) {
+        $attr["location_default"] = "account";
+    }
 
 	if (MOD_SEC_MULTIDOMAIN)
 		$ID_domain = mod_security_get_domain();	
@@ -408,6 +423,11 @@ function mod_security_cm_on_load_account($page, $tpl)
 	$tpl->set_var("panel_desc_class", cm_getClassByDef($framework_css["dropdown"]["body"]["desc"]));
 	$tpl->set_var("panel_links_class", cm_getClassByDef($framework_css["dropdown"]["body"]["links"]));
 	$tpl->set_var("panel_footer_class", cm_getClassByDef($framework_css["dropdown"]["footer"]));
+
+    $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
+    $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
+    $tpl->set_var("list_group_item_class", $framework_css["list"]["item"]);
+
 	$tpl->set_var("profile_class", cm_getClassByDef($framework_css["dropdown"]["actions"]["profile"]));
 	$tpl->set_var("users_class", cm_getClassByDef($framework_css["dropdown"]["actions"]["users"]));
 	$tpl->set_var("logout_class", cm_getClassByDef($framework_css["dropdown"]["actions"]["logout"]));
@@ -415,7 +435,7 @@ function mod_security_cm_on_load_account($page, $tpl)
 	if(MOD_SEC_GROUPS) {
 		$user_permission = get_session("user_permission");
 
-		if(MOD_SEC_USER_AVATAR) 
+		if(MOD_SEC_USER_AVATAR)
 			$avatar = $user_permission["avatar"];
 
 		$username = $user_permission["name"] . " " . $user_permission["surname"] . "(" . $user_permission["username"] . ")";
@@ -465,8 +485,8 @@ function mod_security_cm_on_load_account($page, $tpl)
 	
 	$tpl->set_var("account", ffCommon_specialchars($username));
 	
-	$mod_sec_profile = $cm->router->getRuleById("mod_sec_profile");	
-	if($mod_sec_profile->reverse) {
+	$mod_sec_profile = $cm->router->getRuleById("mod_sec_profile");
+	if($mod_sec_profile && $mod_sec_profile->reverse) {
 		$tpl->set_var("user_profile", FF_SITE_PATH . $mod_sec_profile->reverse . "?ret_url=" . ($_REQUEST["ret_url"]
 			? rawurldecode($_REQUEST["ret_url"])
 			: ($cm->path_info != $mod_sec_profile->reverse
@@ -476,12 +496,21 @@ function mod_security_cm_on_load_account($page, $tpl)
 		));
 		$tpl->parse("SectProfile", false);
 	}
-	
+	/*
 	$mod_sec_users = $cm->router->getRuleById("mod_sec_users");	
-	if($user_permission["permissions"]["AREA_USERS_SHOW_MODIFY"] && $mod_sec_users->reverse) {
+	if($mod_sec_users && $mod_sec_users->reverse) {
 		$tpl->set_var("manage_users", FF_SITE_PATH . $mod_sec_users->reverse);
 		$tpl->parse("SectUsers", false);
-	}
+	}*/
+
+    if(is_array($cm->modules["restricted"]["sections"][$attr["location_default"]]["elements"])) {
+        $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sections"][$attr["location_default"]]);
+        if(is_array($res_navbar["count_position"]) && count($res_navbar["count_position"])) {
+            foreach($res_navbar["count_position"] AS $position_name => $position_count) {
+                $tpl->parse("Sect" . $position_name, false);
+            }
+        }
+    }
 	
 }
 

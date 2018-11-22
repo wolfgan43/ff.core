@@ -2592,15 +2592,15 @@ class PHPExcel_Calculation {
 			//	Trap for mismatched braces and trigger an appropriate error
 			if ($openCount < $closeCount) {
 				if ($openCount > 0) {
-					return self::_raiseFormulaError("Formula Error: Mismatched matrix braces '}'");
+					return $this->_raiseFormulaError("Formula Error: Mismatched matrix braces '}'");
 				} else {
-					return self::_raiseFormulaError("Formula Error: Unexpected '}' encountered");
+					return $this->_raiseFormulaError("Formula Error: Unexpected '}' encountered");
 				}
 			} elseif ($openCount > $closeCount) {
 				if ($closeCount > 0) {
-					return self::_raiseFormulaError("Formula Error: Mismatched matrix braces '{'");
+					return $this->_raiseFormulaError("Formula Error: Mismatched matrix braces '{'");
 				} else {
-					return self::_raiseFormulaError("Formula Error: Unexpected '{' encountered");
+					return $this->_raiseFormulaError("Formula Error: Unexpected '{' encountered");
 				}
 			}
 		}

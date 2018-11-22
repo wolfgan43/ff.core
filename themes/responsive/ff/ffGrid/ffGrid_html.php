@@ -920,7 +920,7 @@ class ffGrid_html extends ffGrid_base
                 }
                 reset($this->search_fields);
     			
-    			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "javascript:ff.submitProcessKey(event, jQuery(this).next());";
+    			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "ff.submitProcessKey(event, jQuery(this).nextAll('.search'));";
 				$buffer = $this->search_fields[$this->search_simple_field_options["id"]]->process($this->search_simple_field_options["id"] . "_src");
 
 				if($wrap_addon) {
@@ -930,7 +930,7 @@ class ffGrid_html extends ffGrid_base
                 $this->tpl[0]->set_var("SearchAll", $buffer);
             }
     
-            if(!$this->searched && $this->open_adv_search === false)
+            if(/*!$this->searched &&*/ $this->open_adv_search === false)
             	$this->tpl[0]->set_var("adv_class", "adv-search hidden");
         }
 
@@ -1229,10 +1229,10 @@ class ffGrid_html extends ffGrid_base
         	);*/
 
         if ($this->display_edit_bt)
-        	$this->addGridDisposition("edit", "button", $this->buttons_options["edit"]["disposition"]["col"], $this->buttons_options["edit"]["disposition"]["row"]); 
+        	$this->addGridDisposition("edit", "button", $this->buttons_options["edit"]["disposition"]["col"], $this->buttons_options["edit"]["disposition"]["row"]);
         if ($this->display_delete_bt)
         	$this->addGridDisposition("delete", "button", $this->buttons_options["delete"]["disposition"]["col"], $this->buttons_options["delete"]["disposition"]["row"]);
-        	
+
         	
         	//echo $this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1]) - 1]["button"];
         parent::process_grid();
@@ -1258,7 +1258,7 @@ class ffGrid_html extends ffGrid_base
                             $this->parent[0]->get_globals() . $this->addit_insert_record_param;
 
                 $addnew_url_ajax = ffProcessTags($addnew_url_ajax, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
-				$addnew_url_noajax = $addnew_url_ajax . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
+				$addnew_url_noajax = $addnew_url_ajax; //. "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
 
 				/*if($this->full_ajax || $this->ajax_addnew)
                     $addnew_url = $addnew_url_ajax;
@@ -1315,10 +1315,10 @@ class ffGrid_html extends ffGrid_base
             }
             else
             {
-                $this->tpl[0]->set_var("addnew_url", ffCommon_specialchars($addnew_url_noajax));
+                $this->tpl[0]->set_var("addnew_url", "javascript:ff.ffPage.goToWithRetUrl('" . ffCommon_specialchars($addnew_url_noajax) . "');");
                 $this->tpl[0]->set_var("addnew_label", $this->buttons_options["addnew"]["label"]);
                 if(strlen($this->buttons_options["addnew"]["class"]))
-                    $this->tpl[0]->set_var("addnew_class", ' class="' . $this->buttons_options["addnew"]["class"] . '"');
+                    $this->tpl[0]->set_var("addnew_class", ' class="' . $this->buttons_options["addnew"]["class"] . ' noajax"');
                 $this->tpl[0]->set_var("addnew_icon", $this->buttons_options["addnew"]["icon"]);
                 $this->tpl[0]->parse("SectAddNewUrl", false);
                 $this->tpl[0]->set_var("SectAddNewBt", "");
@@ -1506,6 +1506,8 @@ class ffGrid_html extends ffGrid_base
 
                 if ($rc === null)
                 {
+
+
 					/**
 	                * Set Modify Delete And Confirm Delete Url
 	                */
@@ -1528,7 +1530,7 @@ class ffGrid_html extends ffGrid_base
 													. "cursor[rows]=" . rawurlencode($rows) . "&";
 	  					}                  
 
-	                    $modify_url["noajax"] = $modify_url["ajax"] . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
+	                    $modify_url["noajax"] = $modify_url["ajax"]; // . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
 	                    
 	                    if($this->full_ajax || $this->ajax_edit)
                     		$modify_url["default"] = $modify_url["ajax"];
@@ -1547,10 +1549,10 @@ class ffGrid_html extends ffGrid_base
 	                                    $this->parent[0]->get_globals() .
 	                                    $this->addit_record_param .
 	                                    $this->record_id . "_frmAction=confirmdelete"
-	                                    . ($this->full_ajax || $this->ajax_delete
+	                                    /*. ($this->full_ajax || $this->ajax_delete
                                     		? ""
                                     		: "&ret_url=" . rawurlencode($this->parent[0]->getRequestUri())
-	                                    );
+	                                    )*/;
 	                
 	                    $confirmurl = ffProcessTags($confirmurl, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
 
@@ -1559,7 +1561,7 @@ class ffGrid_html extends ffGrid_base
 	                                    , "yesno"
 	                                    , $this->parent[0]->title
 	                                    , $this->label_delete
-	                                    , ($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : $cancelurl)
+	                                    , null// ($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : "" /*$cancelurl*/)
 	                                    , $confirmurl
 	                                    );
 	                }
@@ -1575,10 +1577,10 @@ class ffGrid_html extends ffGrid_base
 	                                    $this->parent[0]->get_globals() .
 	                                    $this->addit_record_param .
 	                                    $this->record_id . "_frmAction=confirmdelete"
-	                                    . ($this->full_ajax || $this->ajax_delete
+	                                    /*. ($this->full_ajax || $this->ajax_delete
                                     		? ""
                                     		: "&ret_url=" . rawurlencode($this->parent[0]->getRequestUri())
-	                                    );
+	                                    )*/;
 	                    }
 	                    $confirmurl = ffProcessTags($confirmurl, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
 
@@ -1587,7 +1589,7 @@ class ffGrid_html extends ffGrid_base
 	                                                , "yesno"
 	                                                , $this->parent[0]->title
 	                                                , $this->label_delete
-	                                                , ($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : $cancelurl)
+	                                                , null //($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : "" /*$cancelurl*/)
 	                                                , $confirmurl
 	                                                );
 	                }                 
@@ -1648,7 +1650,7 @@ class ffGrid_html extends ffGrid_base
                     		{
                     			foreach($cols AS $col => $grid_contents)
                     			{
-				                    $this->parse_col($grid_contents, $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col + 1, count($cols), $row + 1);
+                                    $this->parse_col($grid_contents, $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col + 1, count($cols), $row + 1);
                     			}
                     		}
 
@@ -1669,7 +1671,7 @@ class ffGrid_html extends ffGrid_base
 
 							$this->tpl[0]->set_var("row_init_end", "</tbody></table></td>" . $buffer_col);
 						}
-                    	
+
                     }
                     else 
                     {
@@ -1741,7 +1743,7 @@ class ffGrid_html extends ffGrid_base
             //$this->tpl[0]->set_var("SectActionButtonsHeader", "");
             $this->tpl[0]->set_var("SectRecord", "");
         }
-		
+
 		$this->process_labels($col_count);
         // store value of fields in hidden section, but only for not displayed records
 
@@ -1810,7 +1812,7 @@ class ffGrid_html extends ffGrid_base
         	$this->tpl[0]->set_var("norecord_class", cm_getClassByDef($this->framework_css["norecord"]));
             $this->tpl[0]->set_var("SectGridData", "");
 			$this->tpl[0]->set_var("SectGridTable", "");
-            $this->tpl[0]->set_var("SectGrid", "");
+            $this->tpl[0]->parse("SectGrid", false);
             //$this->tpl[0]->set_var("SectAlpha", "");
             //$this->tpl[0]->set_var("SectFilter", "");
             //$this->tpl[0]->set_var("SectSearch", "");
@@ -2104,8 +2106,8 @@ class ffGrid_html extends ffGrid_base
 								$this->parent[0]->get_globals() .
 								$this->addit_record_param;
 
-				if(!$oField->url_ajax)
-					$field_url .= "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
+				//if(!$oField->url_ajax)
+				//	$field_url .= "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
 			} else {
 				if($oField->url_ajax)
 					$field_url = $modify_url["ajax"];
@@ -2115,7 +2117,7 @@ class ffGrid_html extends ffGrid_base
 
 			if($oField->url_ajax) {
 				$this->load_dialog($this->record_id, $this->dialog_options["edit"]);
-				$field_url = "javascript:ff.ffPage.dialog.doOpen('" . $this->record_id . "', '" . ffCommon_specialchars($field_url) . "');";
+				$field_url = "javascript:ff.ffPage.dialog.doOp0en('" . $this->record_id . "', '" . ffCommon_specialchars($field_url) . "');";
 			} else {
 				$field_url = ffCommon_specialchars($field_url);					    
 			}
@@ -2190,9 +2192,10 @@ class ffGrid_html extends ffGrid_base
 				$buffer = "<a " . (strlen($this->buttons_options[$button]["class"]) 
 		                                                    ? "class=\"" . $this->buttons_options[$button]["class"] . "\" " 
 		                                                    : ""
-		                                                ) 
-		                                                . "href=\"" . $url . "\">" 
-		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"] 
+		                                                )
+                                                        . "href=\"javascript:ff.ffPage.goToWithRetUrl('" . rawurlencode($url) . "');\">"
+		                                               // . "href=\"" . $url . "\">"
+		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"]
 		                                            . "</a>";						
 			}    
 		}
@@ -2586,7 +2589,7 @@ class ffGrid_html extends ffGrid_base
                 {
                     foreach($cols AS $col => $grid_contents)
                     {
-				        $this->parse_col_label($grid_contents, $col + 1, count($cols), $row + 1);
+                        $this->parse_col_label($grid_contents, $col + 1, count($cols), $row + 1);
                     }
                 }
             
@@ -2758,7 +2761,7 @@ class ffGrid_html extends ffGrid_base
                 {
                     $this->parent[0]->tplAddJs("ff.ajax");
 
-                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
+                    $tmp->jsaction = "ff.ffGrid.searchHistoryPush('" . $this->getIDIF() . "_" . $this->search_simple_field_options["id"] . "'); " . ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
                 }
                 $this->addSearchButton(   $tmp
                                         , $this->buttons_options["search"]["index"]);

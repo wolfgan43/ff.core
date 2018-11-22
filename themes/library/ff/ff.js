@@ -984,7 +984,27 @@ var that = { // publics
 "doubleEncodeURIComponent" : function (str) {
 	return encodeURIComponent(ff.encodeURIComponent(str));
 },
+"updateQueryString" : function (uri, key, value, st) {
+	if(!st)
+		st = "?";
 
+	var re = new RegExp("([" + st + "&])" + key + "=.*?(&|#|$)", "i");
+	if (uri.match(re)) {
+		if(value) {
+			uri = uri.replace(re, '$1' + key + "=" + value + '$2');
+		} else {
+			uri = uri.replace(re, '$1' + '$2').replace("&&", "&").replace("?&", "?").trim("&");
+		}
+	} else {
+		if(value) {
+			var separator = uri.indexOf(st) !== -1 ? "&" : st;
+			uri = uri + (uri.substr(uri.length - 1) == separator ? "" : separator) + key + "=" + value;
+		} else {
+			uri = uri.trim("&");
+		}
+	}
+	return (uri == st ? "" : uri);
+},
 "urlAddParam" : function(url, name, value) {
 	var parts = url.split("#");
 
@@ -1026,7 +1046,7 @@ var that = { // publics
 
 "argsAsArray" : function (args) {
 	var arrArgs = [];
-	for (p in args) {
+	for (var p in args) {
 		if (args.hasOwnProperty(p))
 			arrArgs.push(args[p]);
 	}
@@ -1055,7 +1075,8 @@ var that = { // publics
 		
 		source = ff.urlAddParam(source, "__FORCE_XHR__");
 	}
-	
+
+	var xdbg = undefined;
 	if (xdbg = that.getURLParameter("XDEBUG_SESSION_START")) {
 		source = ff.urlAddParam(source, "XDEBUG_SESSION_START", xdbg);
 	}
@@ -1169,17 +1190,23 @@ var that = { // publics
     switch(type) {
 		case "Android":
 			res = navigator.userAgent.match(/Android/i);
+			break;
 		case "BlackBerry":
 			res = navigator.userAgent.match(/BlackBerry/i);
+            break;
 		case "iOS":
 			res = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            break;
 		case "iPad":
 			res = navigator.userAgent.match(/iPad/i);
+            break;
 		case "Opera":
 			res = navigator.userAgent.match(/Opera Mini/i);
+			break;
 		case "Windows":
 			res = navigator.userAgent.match(/IEMobile/i);
-		default:		
+            break;
+		default:
 			res = navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i);	
     }
     return res;
@@ -1454,7 +1481,7 @@ var that = { // publics
 		var l = tmp_keys.length;
 
 		for (var i = 0; i < l; i++) {
-			$rc = func(tmp_keys[i], tmp_values[i], i);
+			var $rc = func(tmp_keys[i], tmp_values[i], i);
 			if ($rc)
 				break;
 		}

@@ -52,7 +52,7 @@ class ffWidget_kcfinder extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -224,7 +224,7 @@ class ffWidget_kcfinder extends ffCommon
             }
 		} else {
 			if($Field->ckfinder_base_path === null)
-				$Field->ckfinder_base_path = FF_DISK_PATH . "/uploads";
+				$Field->ckfinder_base_path = FF_DISK_UPDIR;
 			
 			$base_path = $Field->ckfinder_base_path;
 
@@ -281,8 +281,12 @@ class ffWidget_kcfinder extends ffCommon
         $this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("deleterow", "icon"));
         $this->tpl[$tpl_id]->set_var("aviary_class", cm_getClassByFrameworkCss("editrow", "icon"));
 
-		$this->tpl[$tpl_id]->set_var("type_model", $Field->uploadifive_model);
-		$this->tpl[$tpl_id]->set_var("thumb_model", $Field->uploadifive_model_thumb);
+        if(is_array($Field->file_thumb)) {
+            $this->tpl[$tpl_id]->set_var("width", $Field->file_thumb["width"]);
+            $this->tpl[$tpl_id]->set_var("height", $Field->file_thumb["height"]);
+        } elseif(strlen($Field->file_thumb)) {
+            $this->tpl[$tpl_id]->set_var("thumb_model", $Field->file_thumb);
+        }
 
 		if($Field->file_show_filename) {
 			$this->tpl[$tpl_id]->set_var("show_file", "true");

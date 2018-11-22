@@ -37,6 +37,14 @@ if(strpos($message, "[") !== false) {
 
 $confirmurl		= $_REQUEST["confirmurl"];
 $cancelurl		= $_REQUEST["cancelurl"];
+$ret_url        = $_REQUEST["ret_url"];
+if(!$cancelurl) {
+    $confirmurl .= "&ret_url=" . rawurlencode($ret_url);
+    $cancelurl = (isset($_REQUEST["XHR_CTX_ID"])
+                    ? "[CLOSEDIALOG]"
+                    : $ret_url
+                );
+}
 
 $type			= (isset($_REQUEST["type"])
 					? $_REQUEST["type"]
@@ -94,7 +102,7 @@ if (function_exists("cm_moduleCascadeFindTemplate"))
 }
 else
 {
-	$tpl = ffTemplate::factory(ffCommon_dirname(__FILE__));
+	$tpl = ffTemplate::factory(__DIR__);
 	$tpl->load_file("form.html", "main");
 }
  

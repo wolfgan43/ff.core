@@ -159,7 +159,7 @@ function cm_urls_to_abs($urls, $source)
 				}
 				elseif(strpos($relative_buffer_path, "/uploads") === 0)
 				{
-					$relative_buffer_path = CM_MEDIACACHE_SHOWPATH . substr($relative_buffer_path, strlen("/uploads"));
+					$relative_buffer_path = CM_SHOWFILES . substr($relative_buffer_path, strlen("/uploads"));
 				}
 
 				$tmp_css_link_replaced[$url] = $relative_buffer_path;
@@ -176,10 +176,7 @@ function cm_convert_url_in_abs_by_content($content, $source)
 	, "{showfiles}"
 	), array(
 		FF_SITE_PATH
-	, (CM_MEDIACACHE_SHOWPATH
-			? CM_MEDIACACHE_SHOWPATH
-			: CM_SHOWFILES
-		)
+	    , CM_SHOWFILES
 	), $content);
 
 	$tmp_css_url = cm_extract_css_urls($content);

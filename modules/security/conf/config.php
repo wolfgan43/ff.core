@@ -72,7 +72,7 @@ if (!defined("MOD_SECURITY_LOGON_USERID"))				define ("MOD_SECURITY_LOGON_USERID
 
 if (!defined("MOD_SEC_USERNAME_RECOVER_USERNAME"))    define ("MOD_SEC_USERNAME_RECOVER_USERNAME", false);   //se definito non funziona piu 
 
-if (!defined("MOD_SEC_PASSWORD_RECOVER"))				define ("MOD_SEC_PASSWORD_RECOVER", true);   //se definito non funziona piu
+if (!defined("MOD_SEC_PASSWORD_RECOVER"))				define ("MOD_SEC_PASSWORD_RECOVER", true);   //se definito non funziona piu 
 if (!defined("MOD_SEC_PASSWORD_RECOVER_INTERVAL"))		define ("MOD_SEC_PASSWORD_RECOVER_INTERVAL", "3600"); // secondi entro i quali non è possibile generare una nuova password
 if (!defined("MOD_SEC_PASSWORD_RECOVER_SUCCESS"))		define ("MOD_SEC_PASSWORD_RECOVER_SUCCESS", false); // se true, visualizza un messaggio di completamento dell'operazione, se false esegue un redirect al login
 

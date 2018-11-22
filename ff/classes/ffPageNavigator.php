@@ -73,7 +73,7 @@ class ffPageNavigator
 			if ($page !== null)
 				$theme = $page->theme;
 			else
-				$theme = FF_LOADED_THEME;
+				$theme = FF_DEFAULT_THEME;
 		}
 			
 		if ($disk_path === null)

@@ -16,8 +16,8 @@ $tpl->load_file(basename($filename), "main");
 $tpl->set_var("site_path", FF_SITE_PATH);
 $tpl->set_var("theme", $cm->oPage->theme);
 
-$cm->preloadApplets($tpl);
-$cm->parseApplets($tpl);
+//$cm->preloadApplets($tpl);
+//$cm->parseApplets($tpl);
 
 $ret_url 	= $_REQUEST["ret_url"];
 if (!strlen($ret_url))

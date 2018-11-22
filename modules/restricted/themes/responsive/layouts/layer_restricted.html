@@ -1,29 +1,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.3/jquery.nicescroll.min.js" ></script>
 <script>
-    $(document).ready(function () {
-        $("#mainmenu").niceScroll({
-            cursorcolor:"#1976d2",
-            cursorborder:"0",
-            cursorwidth:"5px"
-        });
-        $('.mainmenu_toggle').on('click', function () {
-            $('#mainmenu, #content').toggleClass('active');
-            $(this).toggleClass('active');
-        });
-        $('#mainmenu a').on('click', function () {
-            $("#mainmenu").getNiceScroll().resize();
-        });
-    });
+
 </script>
 <div class="wrapper">
-    <nav id="mainmenu" class="sidemenu -inverse">
+    <nav id="mainmenu" class="sidemenu -inverse -scrollable">
         <div class="sidemenu__head">
             <div class="text-center"> {brand} </div>
-            <div class="adminmenu"> {admin} </div>
             {account}
             {search}
         </div>
-        {topbar} </nav>
+            {sidebar} </nav>
     <section id="content">
         <header class="header {fullbar_class}">
             <div class="row header__top">
@@ -47,7 +33,7 @@
         <!--BeginSectFooter-->
         <footer class="row footer">
             <div class="footer__copy">
-                <p>{_developer_label} <a href="{_developer_url}">{_developer_name}</a></p>
+                <p>{_developer_label} <a href="{_developer_url}" target="_blank">{_developer_name}</a></p>
             </div>
         </footer>
         <!--EndSectFooter-->

@@ -53,7 +53,7 @@ class ffWidget_ckfinder extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -176,7 +176,7 @@ class ffWidget_ckfinder extends ffCommon
 			}						
 		} else {
 			if($Field->ckfinder_base_path === null)
-				$Field->ckfinder_base_path = FF_DISK_PATH . "/uploads";
+				$Field->ckfinder_base_path = FF_DISK_UPDIR;
 			
 			$base_path = $Field->ckfinder_base_path;
 

@@ -14,21 +14,38 @@ jQuery.fn.selectText = function(){
 };
 
 ff.modules.restricted = (function () {
-  	var tme, tml;
-  	var dragSelector = ".-draggable";
-  	var dropSelector = ".-droppable";
-  	var menuSelector = ".-rightview .sidemenu";
+    const MOBILE_WIDTH 		= 768;
+    const SCROLL_PARAMS		= {
+							  cursorcolor:"#1976d2",
+							  cursorborder:"0",
+							  cursorwidth:"5px"
+							};
+	var tscroll;
+  	var dragSelector 		= ".-draggable";
+  	var dropSelector 		= ".-droppable";
+  	var menuSelector 		= ".sidemenu";
+  	var menuActiveSelector 	= ".active";
+    var menuToggleSelector 	= ".mainmenu_toggle";
+    var scrollSelector 		= ".-scrollable";
+    var contentSelector     = "#content";
+
+
   	
 
 	var that = { // publics
 		__ff : true, // used to recognize ff'objects
 		"init" : function(params) {
 			if(params) {
-				if(params["menu"]) menuSelector = params["menu"];
-				if(params["drag"]) dragSelector = params["drag"];
-				if(params["drop"]) dropSelector = params["drop"];
+				if(params["menu"]) 		menuSelector = params["menu"];
+				if(params["active"]) 	menuActiveSelector = params["active"];
+				if(params["toggle"]) 	menuToggleSelector = params["toggle"];
+				if(params["drag"]) 		dragSelector = params["drag"];
+				if(params["drop"]) 		dropSelector = params["drop"];
+				if(params["scroll"]) 	scrollSelector = params["scroll"];
+				if(params["content"]) 	contentSelector = params["content"];
 			}
 			this.menu();
+			this.scroll();
 		},
 		"drag" : function(callback) {
 			jQuery(dragSelector).mousedown(function() {
@@ -74,8 +91,9 @@ ff.modules.restricted = (function () {
 				);
 				if(dropZone.hasClass("-dragover")) {
 					dropZone.removeClass("-dragover");
-				    if(callback)
-						callback("ondragleave", e, dropZone);
+				    if(callback) {
+                        callback("ondragleave", e, dropZone);
+                    }
 				}
 			});		
 			jQuery(dropSelector).on("drop", function(e) {
@@ -92,47 +110,81 @@ ff.modules.restricted = (function () {
 			
 		},
 		"menu" : function () {
-			jQuery(".-floating").each(function() {
+            var that = this;
+			jQuery(menuSelector + " .-floating").each(function() {
 				jQuery(this).appendTo(jQuery(this).closest("UL").parent()).fadeIn();
 			});
 		
-			jQuery("a[data-toggle='collapse']").click(function() {
-				var target = jQuery(this);
-				if(jQuery(this).next().hasClass("nav-controls")) {
-					 target = jQuery(this).next().find("a[data-toggle=collapse]");
-				}
+			jQuery(menuSelector + " a[data-toggle='collapse']").click(function() {
+                jQuery(this).parent().find(".menu-caret").toggleClass("fa-rotate-90");
 
-				if(target.attr("class")) {
-					if(target.hasClass("collapsed")) {
-						target.attr("class", target.attr("class").replace("right", "down"));
-					} else {
-						target.attr("class", target.attr("class").replace("down", "right"));
-					}
-				}
+                if(!jQuery(jQuery(this).attr("href")).hasClass("in")) {
+                    jQuery(menuSelector + " a[aria-expanded='true']").click();
+                    //jQuery(menuSelector + " a[data-toggle='collapse']").addClass("collapsed").attr("aria-expanded", 'false');
+                    //jQuery(menuSelector + " .fa-rotate-90").removeClass("fa-rotate-90");
+
+
+                }
+
+            });
+
+			jQuery(menuToggleSelector).click(function() {
+			    that.menuToggle(this);
+            })
+
+		},
+		"menuToggle": function(elem) {
+		    var active = menuActiveSelector.ltrim(".");
+
+            jQuery(menuSelector + ', ' + contentSelector).toggleClass(active);
+            jQuery(elem).toggleClass(active);
+
+            this.scrollDisplay(scrollSelector);
+		},
+		"scroll" : function() {
+			var that = this;
+            jQuery(scrollSelector).niceScroll(SCROLL_PARAMS);
+
+
+            jQuery(scrollSelector + " a[data-toggle='collapse']").click(function() {
+				that.scrollResize(scrollSelector);
+            });
+            jQuery(window).on('resize', function() {
+            	that.scrollResize(scrollSelector);
 			});
-		
-			jQuery(document).on("mouseenter", menuSelector, function() {
-				clearTimeout(tml);
-				var elem = this
-				tme = setTimeout(function() {
-					jQuery(elem).css({
-						"z-index" : "9999999"
-						, "left": "0"
-					});
-				}, 300);
-			});
-			
-			jQuery(document).on("mouseleave", menuSelector, function() {
-				clearTimeout(tme);
-				var elem = this
-				tml = setTimeout(function() {
-					jQuery(elem).css({
-						"left": ""
-						, "z-index" : ""	
-					});
-				}, 400);
-			});
-		}
+		},
+		"scrollResize" : function(elem) {
+			clearTimeout(tscroll);
+			tscroll = setTimeout(function() {
+				elem = elem || scrollSelector;
+
+                jQuery(elem).getNiceScroll().resize();
+                jQuery(elem).getNiceScroll().show();
+				jQuery(elem).one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function(event) {
+					jQuery(elem).getNiceScroll().resize();
+				});
+            }, 100);
+		},
+        "scrollDisplay" : function(elem) {
+            var active = menuActiveSelector.ltrim(".");
+
+            elem = elem || scrollSelector;
+            jQuery(elem).getNiceScroll().hide();
+            if(jQuery(window).width() > MOBILE_WIDTH && jQuery(elem).hasClass(active)) {
+                console.log("diaplay hide1");
+                jQuery(elem).one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function (event) {
+                    jQuery(elem).getNiceScroll().hide();
+                });
+            } else if(jQuery(window).width() <= MOBILE_WIDTH && !jQuery(elem).hasClass(active)) {
+                console.log("diaplay hide2");
+                jQuery(elem).one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function (event) {
+                    jQuery(elem).getNiceScroll().hide();
+                });
+            } else {
+            	console.log("diaplay show");
+                that.scrollResize(elem);
+            }
+        }
 	};
 	
 	jQuery(function() {
@@ -140,5 +192,5 @@ ff.modules.restricted = (function () {
 	});
 	
 	return that;
-	
+
 })();

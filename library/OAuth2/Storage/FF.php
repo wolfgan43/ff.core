@@ -5,20 +5,16 @@
  * @package FormsFramework
  * @subpackage OAUTH2
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright &copy; 2000-2015, Samuele Diella
- * @license http://opensource.org/licenses/gpl-3.0.html
+ * @copyright Copyright &copy; 2015-2017, Samuele Diella
+ * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
 
 namespace OAuth2\Storage;
 
 class FF implements
-    AuthorizationCodeInterface,
     AccessTokenInterface,
-    ClientCredentialsInterface,
-	ScopeInterface,
-    RefreshTokenInterface,
-	UserCredentialsInterface
+    ClientCredentialsInterface
 {
 	/**
 	 *
@@ -26,11 +22,8 @@ class FF implements
 	 */
 	protected $db = null;
 	protected $config = null;
-	protected $userdata = array();
-	protected $clientdata = null;
-
-
-	public function __construct(\ffDB_Sql $connection = null, $config = array())
+	
+    public function __construct(\ffDB_Sql $connection = null, $config = array())
     {
 		if ($connection === null)
 			$this->db = \ffDB_Sql::factory();
@@ -47,35 +40,14 @@ class FF implements
             'jti_table'  => 'oauth_jti',
             'scope_table'  => 'oauth_scopes',
             'public_key_table'  => 'oauth_public_keys',
-            'grant_types_table'  => 'oauth_grant_types',
-            'user_scope_from_client'  => true,
         ), $config);
 	}
 	
     public function getClientDetails($client_id)
 	{
-		if ($this->clientdata !== null)
-			return $this->clientdata;
-			
-		$this->db->query("SELECT 
-								`" . $this->config['client_table'] . "`.* 
-								, `" . $this->config['grant_types_table'] . "`.`grant_types` AS `rel_grant_types`
-							FROM 
-								`" . $this->config['client_table'] . "`
-								INNER JOIN `" . $this->config['grant_types_table'] . "` ON
-									`" . $this->config['client_table'] . "`.`ID_grant_types` = `" . $this->config['grant_types_table'] . "`.`ID`
-							WHERE 
-								`client_id` = " . $this->db->toSql($client_id));
+		$this->db->query("SELECT * FROM `" . $this->config['client_table'] . "` WHERE `client_id` = " . $this->db->toSql($client_id));
 		if ($this->db->nextRecord())
-		{
-			$ret = $this->db->record;
-			if (strlen($ret["rel_grant_types"]))
-				$ret["grant_types"] = $ret["rel_grant_types"];
-			unset($ret["rel_grant_types"]);
-			unset($ret["ID_grant_types"]);
-			$this->clientdata = $ret;
-			return $ret;
-		}
+			return $this->db->record;
 		else
 			return false;
 	}
@@ -240,8 +212,7 @@ class FF implements
 		$this->db->query("SELECT * FROM `" . $this->config['client_table'] . "` WHERE `client_id` = " . $this->db->toSql($client_id));
 		if ($this->db->nextRecord())
 		{
-			$tmp = $this->getClientDetails($client_id);
-			return $tmp["client_secret"] == $client_secret;
+			return $this->db->getField("client_secret", "Text", true) == $client_secret;
 		}
 		else
 			return false;
@@ -268,207 +239,9 @@ class FF implements
 		$this->db->query("SELECT * FROM `" . $this->config['client_table'] . "` WHERE `client_id` = " . $this->db->toSql($client_id));
 		if ($this->db->nextRecord())
 		{
-			return strlen($this->db->getField("client_secret", "Text", true)) === 0;
+			return strlen($this->db->getField("client_secret", "Text", true));
 		}
 		else
 			return false;
 	}
-
-	/* OAuth2\Storage\AuthorizationCodeInterface */
-    public function getAuthorizationCode($code)
-    {
-        $sSQL = "SELECT * from `" . $this->config['code_table'] . "` WHERE `authorization_code` = " . $this->db->toSql($code);
-		if (isset($_REQUEST["sso_state"]))
-			$sSQL .= " AND `sso_state` = " . $this->db->toSql ($_REQUEST["sso_state"]);
-			
-		$this->db->query($sSQL);
-			
-		if ($this->db->nextRecord())
-		{
-			$token = $this->db->record;
-			$token["expires"] = strtotime($token["expires"]);
-            // convert date string back to timestamp
-			return $token;
-		}
-		else
-			return false;
-    }
-
-    public function setAuthorizationCode($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null)
-    {
-        if (func_num_args() > 6) {
-            // we are calling with an id token
-            return call_user_func_array(array($this, 'setAuthorizationCodeWithIdToken'), func_get_args());
-        }
-
-        // convert expires to datestring
-        $expires = date('Y-m-d H:i:s', $expires);
-		
-		if (isset($_REQUEST["sso_state"]))
-		{
-			$addInsert = ", `sso_state` = " . $this->db->toSql($_REQUEST["sso_state"]);
-			$addUpdateFields = ", `sso_state` ";
-			$addUpdateVals = ", " . $this->db->toSql($_REQUEST["sso_state"]);
-		}
-
-        // if it exists, update it.
-        if ($this->getAuthorizationCode($code)) {
-			$sSQL = "UPDATE `" . $this->config['code_table'] . "` SET 
-							client_id = " . $this->db->toSql($client_id) . "
-							, user_id = " . $this->db->toSql($user_id) . "
-							, redirect_uri = " . $this->db->toSql($redirect_uri) . "
-							, expires = " . $this->db->toSql($expires) . "
-							, scope = " . $this->db->toSql($scope) . "
-							$addInsert
-						WHERE 
-							authorization_code = " . $this->db->toSql($code) . "
-				";
-        } else {
-			$sSQL = "INSERT INTO `" . $this->config['code_table'] . "` (authorization_code, client_id, user_id, redirect_uri, expires, scope $addUpdateFields) VALUES (
-							" . $this->db->toSql($code) . "
-							, " . $this->db->toSql($client_id) . "
-							, " . $this->db->toSql($user_id) . "
-							, " . $this->db->toSql($redirect_uri) . "
-							, " . $this->db->toSql($expires) . "
-							, " . $this->db->toSql($scope) . "
-							$addUpdateVals
-						)";
-        }
-
-        return $this->db->execute($sSQL);
-    }
-
-    private function setAuthorizationCodeWithIdToken($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null)
-    {
-        // convert expires to datestring
-        $expires = date('Y-m-d H:i:s', $expires);
-
-        // if it exists, update it.
-        if ($this->getAuthorizationCode($code)) {
-			$sSQL = "UPDATE `" . $this->config['code_table'] . "` SET 
-							client_id = " . $this->db->toSql($client_id) . "
-							, user_id = " . $this->db->toSql($user_id) . "
-							, redirect_uri = " . $this->db->toSql($redirect_uri) . "
-							, expires = " . $this->db->toSql($expires) . "
-							, scope = " . $this->db->toSql($scope) . "
-							, id_token = " . $this->db->toSql($id_token) . "
-						WHERE 
-							authorization_code = " . $this->db->toSql($code) . "
-				";
-        } else {
-			$sSQL = "INSERT INTO `" . $this->config['code_table'] . "` (authorization_code, client_id, user_id, redirect_uri, expires, scope, id_token) VALUES (
-							" . $this->db->toSql($code) . "
-							, " . $this->db->toSql($client_id) . "
-							, " . $this->db->toSql($user_id) . "
-							, " . $this->db->toSql($redirect_uri) . "
-							, " . $this->db->toSql($expires) . "
-							, " . $this->db->toSql($scope) . "
-							, " . $this->db->toSql($id_token) . "
-						)";
-        }
-
-        return $this->db->execute($sSQL);
-    }
-
-    public function expireAuthorizationCode($code)
-    {
-        $sSQL = "DELETE FROM `" . $this->config['code_table'] . "` WHERE `authorization_code` = " . $this->db->toSql($code);
-
-        return $this->db->execute($sSQL);
-    }
-
-    /* ScopeInterface */
-    public function scopeExists($scope)
-    {
-        $whereIn = "";
-        $scope = explode(' ', $scope);
-		foreach ($scope as $val)
-			$whereIn .= $this->db->toSql($val) . ",";
-        $whereIn = rtrim($whereIn, ",");
-		
-		$sSQL = "SELECT count(scope) as count FROM `" . $this->config['scope_table'] . "` WHERE scope IN (" . $whereIn . ")";
-		$this->db->query($sSQL);
-		if ($this->db->nextRecord())
-		{
-            return $this->db->record["count"] == count($scope);
-		}
-		
-        return false;
-    }
-
-    public function getDefaultScope($client_id = null)
-    {
-		$sSQL = "SELECT `scope` FROM `" . $this->config['scope_table'] . "` WHERE `is_default` = 1 ";
-		$this->db->query($sSQL);
-		if ($this->db->numRows())
-		{
-			$defaultScope = array();
-			do
-			{
-				$defaultScope[] = $this->db->getField("scope", "Text", true);
-			} while ($this->db->nextRecord());
-			
-            return trim(implode(' ', $defaultScope));
-        }
-
-        return null;
-    }
-	
-    /* OAuth2\Storage\RefreshTokenInterface */
-    public function getRefreshToken($refresh_token)
-    {
-		$token = null;
-		
-        $sSQL = "SELECT * FROM `" . $this->config['refresh_token_table'] . "` WHERE `refresh_token` = " . $this->db->toSql($refresh_token);
-		$this->db->query($sSQL);
-		if ($this->db->nextRecord())
-		{
-            $token = $this->db->record;
-            // convert expires to epoch time
-            $token['expires'] = strtotime($token['expires']);
-		}
-
-        return $token;
-    }
-
-    public function setRefreshToken($refresh_token, $client_id, $user_id, $expires, $scope = null)
-    {
-        // convert expires to datestring
-        $expires = date('Y-m-d H:i:s', $expires);
-
-        $sSQL = "INSERT INTO `" . $this->config['refresh_token_table'] . "` (`refresh_token`, `client_id`, `user_id`, `expires`, `scope`) VALUES (
-			" . $this->db->toSql($refresh_token) . "
-			, " . $this->db->toSql($client_id) . "
-			, " . $this->db->toSql($user_id) . "
-			, " . $this->db->toSql($expires) . "
-			, " . $this->db->toSql($scope) . "
-		)";
-
-        return $this->db->execute($sSQL);
-    }
-
-    public function unsetRefreshToken($refresh_token)
-    {
-        $sSQL = "DELETE FROM `" . $this->config['refresh_token_table'] . "` WHERE 
-					`refresh_token` = " . $this->db->toSql($refresh_token);
-		
-        return $this->db->execute($sSQL);
-    }
-	
-	public function checkUserCredentials($username, $password)
-	{
-		$ret = mod_sec_check_login($username, $password);
-		
-		$this->userdata[$username]["user_id"] = $ret["UserNID"];
-		if ($this->config["user_scope_from_client"])
-		$this->userdata[$username]["scope"] = $this->clientdata["scope"];
-		
-		return ($ret["valid"]);
-	}
-
-	public function getUserDetails($username)
-	{
-		return $this->userdata[$username];
-	}
-
 }

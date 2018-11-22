@@ -284,9 +284,11 @@ var activecombo = function(params) {
 			}
 
             if(that.options.control_type == "checkbox") {
-                if(jQuery(".draggable", that.getNode()).length)
-                    jQuery(".draggable", that.getNode()).sortable();
-
+                if(jQuery(".draggable", that.getNode()).length) {
+                    ff.pluginAddInit("jquery-ui", function() {
+                        jQuery(".draggable", that.getNode()).sortable();
+                    });
+                }
                 if(jQuery.fn.escapeGet(__id).closest(".ui-dialog").length)
                     ff.ffPage.dialog.adjSize();
             }            
@@ -352,6 +354,7 @@ var activecombo = function(params) {
 
 				var opt_value = "";
 				var opt_text = "";
+				var opt_grp = "";
 				var found_value = false;
 				//displayed_value = null;
 				
@@ -606,6 +609,7 @@ var activecombo = function(params) {
 
 			var opt_value = "";
 			var opt_text = "";
+			var opt_grp = "";
 			var found_value = false;
 			var new_value = selected_value;
 			//displayed_value = null;
@@ -1006,7 +1010,7 @@ var activecombo = function(params) {
 			father_value = that.getFatherValue();
 
 		var autocomp_fullsearch = false;
-
+		var minLength = that.options.autocomplete.limit || 0;
 	//jQuery("#calendar-modify_ID_customer_label").data("ui-autocomplete")._trigger("change");	
 		jQuery.fn.escapeGet(__id + "_label").autocomplete({
 			source: function( request, response ) {
@@ -1042,7 +1046,7 @@ var activecombo = function(params) {
 					autocomp_fullsearch = false;
 				}
 			}
-			, minLength: 0
+			, minLength: minLength
 			, select: function( event, ui ) {
 				if(multi) {
 					that.add(ui.item);
@@ -1057,11 +1061,11 @@ var activecombo = function(params) {
 			, open: function( event, ui ) {
 				var dialogTop = 0;
 				
-				$this = jQuery(this);
-				$widget = $this.autocomplete("widget");
-				$menu = $widget.menu();
+				var $this = jQuery(this);
+				var $widget = $this.autocomplete("widget");
+				var $menu = $widget.menu();
 				
-				$dialog = $this.closest(".ui-dialog");
+				var $dialog = $this.closest(".ui-dialog");
 				if($dialog.length)
 					dialogTop = $dialog.offset().top;
 				$menu
@@ -1127,7 +1131,7 @@ var activecombo = function(params) {
 			}
 
 			if(!multi) {
-				$this = jQuery(this);
+				var $this = jQuery(this);
 				
 				var itm_found = null;
 				var tmp_compare = $this.val().toLowerCase();

@@ -65,8 +65,8 @@ if (!$granted && !strlen($frmAction))
 	$tpl->set_var("theme", $cm->oPage->theme);
 	$tpl->set_var("http_domain", $_SERVER["HTTP_HOST"]);
 
-	$cm->preloadApplets($tpl);
-	$cm->parseApplets($tpl);
+	//$cm->preloadApplets($tpl);
+	//$cm->parseApplets($tpl);
 
 	$tpl->set_var("ret_url",			$_REQUEST["ret_url"]);
 	$tpl->set_var("encoded_ret_url",	rawurlencode($_REQUEST["ret_url"]));

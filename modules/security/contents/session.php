@@ -1,17 +1,25 @@
 <?php
 if(!$cm->isXHR()) {
-	$cm->oPage->tplAddJs("ff.ajax");
-	$filename = cm_cascadeFindTemplate("/javascript/ff.modules.security.js", "security");
+    $cm->oPage->tplAddJs("ff.ajax");
 
-	//$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/ff.modules.security.js", $cm->oPage->theme);
-	$ret = cm_moduleGetCascadeAttrs($filename);
+    //$cm->oPage->tplAddJs("ff.ajax", "ajax.js", FF_THEME_DIR . "/library/ff");
 
-	$cm->oPage->tplAddJs("ff.modules.security", array(
-		"file" => $filename
-	, "path" => $ret["path"]
-	, "priority" => cm::LAYOUT_PRIORITY_HIGH
-	, "index" => -1000
-	));
+    /*	$filename = cm_moduleCascadeFindTemplateByPath("security", "/javascript/ff.modules.security.js", $cm->oPage->theme);
+        $ret = cm_moduleGetCascadeAttrs($filename);
+        $cm->oPage->tplAddJs("ff.modules.security", array(
+            "file" => $filename
+        , "path" => $ret["path"]
+        , "priority" => cm::LAYOUT_PRIORITY_HIGH
+        , "index" => -1000
+        ));
+    */
+    $filename = "/modules/security/themes/" . cm_getMainTheme() . "/javascript/ff.modules.security.js";
+
+    $cm->oPage->tplAddJs("ff.modules.security", array(
+        "file" =>  basename($filename)
+        , "path" => ffCommon_dirname($filename)
+    ));
+    //$cm->oPage->tplAddJs("ff.modules.security", "", cm_getModulesExternalPath() . "/security/restricted/javascript/ff.modules.security.js"); // useful for caching purpose
 
 	$options = mod_security_get_settings($cm->path_info);
 

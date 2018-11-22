@@ -2,25 +2,26 @@
 <configdata>
 	<menu>
 		<default path="/" hide="true" />
-		<admin path="/restricted" redir="/restricted/layout"  hide="true" label="Admin" />
+		<admin path="/restricted" redir="/restricted/dashboard"  hide="true" label="Admin" />
 
 
 		<!--<dashboard path="/restricted/dashboard" label="Dashboard" location="brand" />-->
-		<settings path="/restricted/settings" label="Settings" location="brand" position="footer" icon="cogs"  acl="3" />
+		<settings path="/restricted/settings" label="Settings" location="brand"  icon="cogs"  acl="3" />
 	</menu>
+	<layout>
+		<layer path="/restricted/ds" name="twocols" />
+		<nolayout path="/restricted/login" />
+	</layout>
 	<sections>
-		<top>
-			<topbar default="true"  />
-			<account />
-			<accountpanel />
-			<admin label="false" />
-			<favorite label="false" />
-			<brand />
-			<breadcrumb />
-		</top>
-		<nav>
-			<rightcol />
-		</nav>
+		<topbar default="true" submenu="true" icons="submenu" />
+		<navbar />
+		<sidebar icons="true" default="true" />
+		<account />
+		<accountpanel />
+		<favorite />
+		<brand />
+		<breadcrumb />
+		<rightcol />
 	</sections>
 	<!--<settings>
 		<nomegruppo label="NOME GRUPPO">

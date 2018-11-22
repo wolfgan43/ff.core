@@ -146,7 +146,6 @@ function process_element($key, $value, $lastpath, $toskip_system)
 
 	if (
 			$value["hide"] 
-			|| $value["is_heading"] 
 			|| $value["profiling_skip"]
 			|| (isset($value["profiling_acl"]) && !mod_sec_check_acl($value["profiling_acl"]))
 		)

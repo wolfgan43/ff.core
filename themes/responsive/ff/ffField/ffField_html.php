@@ -407,7 +407,7 @@ class ffField_html extends ffField_base
     var $ckfinder_show_file = "";		// percorso assoluto della chiamata a show_files per la preview del thumb
     									// (omettendo la porzione descritta nel db)
     var $ckfinder_base_path = null;		// percorso assoluto della cartella degli uploads es: /var/www/miosito/uploads
-										// se omesso verra generato come segue: FF_DISK_PATH . "/uploads"
+										// se omesso verra generato come segue: FF_DISK_UPDIR
     var $ckfinder_storing_path = "";	// percorso assoluto di dove verra salvato il file
 
     
@@ -417,15 +417,12 @@ class ffField_html extends ffField_base
     
 	//uploadify
 	var $uploadify_use_own_session = false;
-    var $uploadify_model = "default";		//Abilita la preview dell'immagine
-    var $uploadify_model_thumb = "";
-    									// (se ckfinder_show_file non e valorizzato la preview sara disabilitata)
+
+
 
 	//uploadifive
-    var $uploadifive_model = "default";		//deprecata
-    var $uploadifive_showfile_plugin = "fancybox";
-    var $uploadifive_model_thumb = "";
-    var $uploadifive_sort_path = "";
+    var $file_showfile_plugin = "fancybox";
+    var $file_sortable = false;
    
     									// (se ckfinder_show_file non e valorizzato la preview sara disabilitata)
     

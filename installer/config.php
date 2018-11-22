@@ -52,8 +52,8 @@ switch (true)
 		break;
 		
 	case (substr($_SERVER["HTTP_HOST"], (strlen(FF_ENV_PRODUCTION) * -1)) == FF_ENV_PRODUCTION):
-		define("FF_DISK_PATH", $disk_path);
-		define("FF_SITE_PATH", $site_path);
+		define("FF_DISK_PATH", "");
+		define("FF_SITE_PATH", "");
 
 		// DEFAULT DB CONNECTION 
 		define("FF_DATABASE_HOST", "localhost");
@@ -70,6 +70,7 @@ define("APPID", "691C9185-C34B-494Or4Z3-9450-FE374g3r");
 
 // session name
 session_name("PHPSESSFF");
+session_save_path("/tmp");
 
 
 

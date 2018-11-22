@@ -22,10 +22,8 @@
  */
 class ffText extends ffImage
 {
-	var $template_dir					= NULL;
-	var $disk_path						= "";
-	var $theme							= NULL;
 	var $parent							= NULL;
+	var $font_path                      = NULL;
 
 	var $src_res_dim_x					= NULL;
 	var $src_res_dim_y					= NULL;
@@ -90,8 +88,7 @@ class ffText extends ffImage
 
 			do 
 			{
-				//die($this->get_template_dir() . "/fonts/" . $this->src_res_font_type);
-				$bbox = imagettfbbox($src_res_font_size, 0, $this->get_template_dir() . "/fonts/" . $this->src_res_font_type, $this->src_res_font_caption);
+				$bbox = imagettfbbox($src_res_font_size, 0, $this->get_template_dir($this->src_res_font_type), $this->src_res_font_caption);
 
 				$text_width_top = abs($bbox[6]) + abs($bbox[4]);
 				$text_width_bottom = abs($bbox[0]) + abs($bbox[2]);
@@ -155,7 +152,7 @@ class ffText extends ffImage
 						  , $src_res_font_x_start 
 						  , $src_res_font_y_start
 						  , $color_font
-						  , $this->get_template_dir() . "/fonts/" . $this->src_res_font_type
+						  , $this->get_template_dir($this->src_res_font_type)
 						  , $this->src_res_font_caption
 						);
 		}
@@ -172,11 +169,14 @@ class ffText extends ffImage
 			return "default";
 	}
 
-	function get_template_dir()
-	{
-		if ($this->template_dir !== NULL)
-			return $this->template_dir;
-		else
-			return $this->disk_path . "/themes/" . $this->get_theme();
-	}
+    function get_template_dir($file)
+    {
+        if($this->font_path && is_file($this->font_path . "/" . $file)) {
+            return $this->font_path . "/" . $file;
+        } elseif(is_file(__DIR__ . "/fonts/" . $file)) {
+            return __DIR__ . "/fonts/" . $file;
+        } else {
+            return false;
+        }
+    }
 }

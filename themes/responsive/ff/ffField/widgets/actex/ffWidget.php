@@ -73,7 +73,7 @@ class ffWidget_actex extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -792,13 +792,42 @@ class ffWidget_actex extends ffCommon
             	{
                     $sSqlWhere = "";
                     $sSqlHaving = "";
+                    $strOperation = "";
+                    $strOperationHaving = "";
 
             		$condition = 0;
 					$field_key = ($Field->actex_compare_field ? $Field->actex_compare_field : "`" . $db->fields_names[0] . "`"); //se tolto lo 0 && da enormi problemi con il recupero del default valorizzato vedi vgallery extras modify campo ID_extended_type quando e ti tipo string gia valorizzato nel db
 					$field_key_having = ($Field->actex_having_field ? $Field->actex_having_field : $field_key);
-				
-					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
-					$strOperationHaving = $field_key_having . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
+
+
+
+                    switch($Field->actex_operation_field)
+                    {
+                        case "IN":
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                            break;
+                        case "FIND_IN_SET":
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                            break;
+                        case "LIKE":
+                            $strOperation .= " $field_key LIKE '%" . $db->toSql(str_replace(" " , "%", $strCompare), "Text", false) . "%'";
+                            $strOperationHaving .= " $field_key_having LIKE '%" . $db->toSql(str_replace(" " , "%", $strCompare), "Text", false) . "%'";
+                            break;
+                        case "<>":
+                            $strOperation .= " $field_key <> " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having <> " . $db->toSql($strCompare);
+                            break;
+                        case "=":
+                        default:
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                    }
+
+
+//					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
+//					$strOperationHaving = $field_key_having . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
 
 					$sSQL = $Field->source_SQL;
 					if(strpos($sSQL, "[HAVING]") !== false) 

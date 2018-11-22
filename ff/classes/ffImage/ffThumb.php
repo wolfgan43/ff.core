@@ -10,28 +10,15 @@
  * @link http://www.formsphpframework.com
  */
 
-/**
- * thumb from file layer
- *
- * @package FormsFramework
- * @subpackage utils
- * @author Samuele Diella <samuele.diella@gmail.com>, Alessandro Stucchi <wolfgan@blueocarina.com>
- * @copyright Copyright (c) 2004-2017, Samuele Diella
- * @license https://opensource.org/licenses/LGPL-3.0
- * @link http://www.formsphpframework.com
- */
 class ffThumb extends ffImage
 {
-
 	var $template_dir		= NULL;
-	var $disk_path			= "";
-	var $theme				= NULL;
 	var $parent				= NULL;
     var $watermark          = NULL;
     
 	var $src_res_path		= "";
 	
-	var $icon_path 			= "/";
+	var $icon_path 			= null;
 	var $icons = 
 			array (
 				"text/plain" 					=> "txt.png",
@@ -40,14 +27,14 @@ class ffThumb extends ffImage
                 "application/x-shockwave-flash" => "swf.png",
                 "application/msword"			=> "doc.png",
                 "application/octet-stream"		=> "exe.png",
-                "video/quicktime"				=> "mov.png",
-                "audio/mpeg3" 					=> "mp3.png",
-                "audio/mpeg" 					=> "mp3.png",
-                "audio/x-wav" 					=> "wav.png",
+                "video/quicktime"				=> "video.png",
+                "audio/mpeg3" 					=> "audio.png",
+                "audio/mpeg" 					=> "audio.png",
+                "audio/x-wav" 					=> "audio.png",
                 "application/mspowerpoint"		=> "ppt.png",
-                "application/octet-stream"		=> "psd.png",
+                //"application/octet-stream"		=> "psd.png",
                 "application/excel"				=> "xls.png",
-                "application/x-compressed" 		=> "zip.png",
+                "application/x-compressed" 		=> "archive.png",
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation" 	=> "ppt.png",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 			=> "xls.png",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document" 		=> "doc.png",
@@ -56,8 +43,9 @@ class ffThumb extends ffImage
 				"image/png" 					=> "[IMAGEPATH]",
 				"directory" 					=> "dir.png",
 				"unknown" 						=> "unknown.png",
-				"noicon" 						=> "noicon.png",
-				"error"  						=> "error.png"
+				"empty" 						=> "empty.png",
+				"error"  						=> "error.png",
+                "error-img"  				    => "noimg.png"
 			);
 
 
@@ -83,20 +71,21 @@ class ffThumb extends ffImage
 	 */
 	function load_image($src_res_path)
 	{
-//		$mime = ffMimeType($src_res_path);
-		$mime = ffMimeTypeByFilename($src_res_path);
+		$mime = ffMedia::getMimeTypeByFilename($src_res_path);
 
 		if (is_dir($src_res_path))
 			$src_res_path_tmp = $this->icons["directory"];
 		elseif (is_file($src_res_path))
-			$src_res_path_tmp = (isset($this->icons[$mime]) ? $this->icons[$mime] : $this->icons["noicon"]);
+			$src_res_path_tmp = (isset($this->icons[$mime]) ? $this->icons[$mime] : $this->icons["unknown"]);
 		elseif (!strlen($src_res_path))
-			$src_res_path_tmp = $this->icons["unknow"];
+			$src_res_path_tmp = $this->icons["empty"];
 
+		$error_icon = "error";
 		switch ($src_res_path_tmp)
 		{
 			case "[IMAGEPATH]":
 				$src_res_path_tmp = $src_res_path;
+                $error_icon = "error-img";
 				break;
 
 			case "[CONVERT]":
@@ -113,42 +102,38 @@ class ffThumb extends ffImage
                 if(!is_file($src_res_path_tmp)) {
                     $src_res_path_tmp = $this->get_template_dir("pdf.png");
                 }
-
-               // $mime = ffMimeType($src_res_path); 
 				break;
-
 			default:
 				$src_res_path_tmp = $this->get_template_dir($src_res_path_tmp);
 				if(!is_file($src_res_path_tmp))
 					$src_res_path_tmp = $this->get_template_dir($this->icons["error"]);
-				//$mime = ffMimeType($src_res_path_tmp);
 		}
 
-        $mime = ffMimeType($src_res_path_tmp);
-		if (!function_exists(str_replace("/","", $mime))) 
-            $src_res_path_tmp = $this->get_template_dir($this->icons["unknow"]);
-		
-		$src_res = false;
-        switch ($mime)
-        {
-            case "image/jpeg":
-                $src_res = @imagecreatefromjpeg($src_res_path_tmp);
-                /*if($src_res === false)
-                	$src_res = @imagecreatefrompng($src_res_path_tmp);*/
-                break;
-            case "image/png":
-                $src_res = @imagecreatefrompng($src_res_path_tmp);
-                /*if($src_res === false)
-                	$src_res = @imagecreatefromjpeg($src_res_path_tmp);*/
-                break;
-            case "image/gif":
-                $src_res = @imagecreatefromgif($src_res_path_tmp);
-                break;
+        if($src_res_path_tmp) {
+            $mime = ffMedia::getMimeTypeByFilename($src_res_path_tmp);
+            if (!function_exists(str_replace("/", "", $mime)))
+                $src_res_path_tmp = $this->get_template_dir($this->icons["unknown"]);
+
+            switch ($mime) {
+                case "image/jpeg":
+                    $src_res = @imagecreatefromjpeg($src_res_path_tmp);
+                    /*if($src_res === false)
+                        $src_res = @imagecreatefrompng($src_res_path_tmp);*/
+                    break;
+                case "image/png":
+                    $src_res = @imagecreatefrompng($src_res_path_tmp);
+                    /*if($src_res === false)
+                        $src_res = @imagecreatefromjpeg($src_res_path_tmp);*/
+                    break;
+                case "image/gif":
+                    $src_res = @imagecreatefromgif($src_res_path_tmp);
+                    break;
+            }
         }
 
-		if($src_res === false) {
-			$src_res_path_tmp = $this->get_template_dir($this->icons["error"]);
-			$mime = ffMimeType($src_res_path_tmp);
+		if(!$src_res) {
+			$src_res_path_tmp = $this->get_template_dir($this->icons[$error_icon]);
+			$mime = ffMedia::getMimeTypeByFilename($src_res_path_tmp);
 
 	        switch ($mime) 
 	        {
@@ -163,7 +148,8 @@ class ffThumb extends ffImage
 	                break;
 	        }
 		}
-		if($src_res !== false) {
+
+		if($src_res) {
 	        imagealphablending($src_res, true);
 	        imagesavealpha($src_res, true);
 	        
@@ -195,24 +181,12 @@ class ffThumb extends ffImage
 	 */
 	function get_template_dir($file)
 	{
-		if(is_file($this->disk_path . "/themes/" . $this->get_theme() . rtrim($this->icon_path, "/") . "/" . $file)) {
-			return $this->disk_path . "/themes/" . $this->get_theme() . rtrim($this->icon_path, "/") . "/" . $file;
-		} else if ($this->template_dir !== NULL && is_file($this->template_dir . "/" . $file)) {
-			return $this->template_dir . "/" . $file;
-		} else {
-			return false;
-		}			
-
-/*
-		if ($this->template_dir !== NULL && $this->icon_path == "/") {
-			return $this->template_dir . "/" . $file;
-		} else {
-			if(file_exists($this->disk_path . "/themes/" . $this->get_theme() . rtrim($this->icon_path, "/") . "/" . $file)) {
-				return $this->disk_path . "/themes/" . $this->get_theme() . rtrim($this->icon_path, "/") . "/" . $file;
-			} else {
-				return false;
-			}			
-		}
-*/
+	    if($this->icon_path && is_file($this->icon_path . "/" . $file)) {
+            return $this->icon_path . "/" . $file;
+        } elseif(is_file(__DIR__ . "/icons/" . $file)) {
+	        return __DIR__ . "/icons/" . $file;
+        } else {
+	        return false;
+        }
 	}
 }

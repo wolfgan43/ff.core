@@ -447,61 +447,30 @@ function ffPage_on_layout_init($oPage, $layout_vars) {
     $font_icon = cm_getFontIcon(FF_THEME_FONT_ICON);
 
 	if(!$oPage->isXHR()) {
-		if(is_array($font_icon)) {
-    		if(strlen($font_icon["css"])) {
-    		 //	$oPage->tplAddCss("font." . $font_icon["name"]);
-    			//$oPage->tplAddCss($font_icon["name"], basename($font_icon["css"]), ffCommon_dirname($font_icon["css"]), "stylesheet", "text/css", false, false, null, false, "top");
-    		}
-		}
-		if(is_array($framework_css)) {
-    		if(strlen($framework_css["params"]["css"])) {
-                if(is_file($oPage->getThemeDir() . "/css/" . $framework_css["name"] . ".css")) {
-                	$oPage->libraries[$framework_css["name"]]["latest"]["css_defs"]["core"]["path"] = $oPage->getThemePath(false) . "/css";
-                	$oPage->libraries[$framework_css["name"]]["latest"]["css_defs"]["core"]["file"] = $framework_css["name"] . ".css";
-                	/*$oPage->libsExtend(array(
-                		$framework_css["name"] => array(
-                			"all" => array(
-								"css_defs" => array(
-									"core" => array(
-										"path" => $oPage->getThemePath(false) . "/css"
-										, "file" => $framework_css["name"] . ".css"
-									)
-								)
-                			)
-                		)
-                	));*/
-				}
-                $oPage->tplAddCss($framework_css["name"] . ".core");
+        if(is_array($font_icon)) {
+            $oPage->tplAddCss("fonticons." . $font_icon["name"]);
+        }
+
+        if(defined("FF_THEME_ADMIN") && FF_THEME_ADMIN && is_file(FF_THEME_DISK_PATH . "/" . FF_THEME_ADMIN . "/css/app.css")) {
+            $oPage->libraries["ff"]["latest"]["css_defs"]["theme"]["path"] = FF_THEME_DIR . "/" . FF_THEME_ADMIN . "/css";
+            $oPage->libraries["ff"]["latest"]["css_defs"]["theme"]["file"] = "app.css";
+            unset($oPage->libraries["ff"]["latest"]["css_defs"]["core"]["path"]);
+            unset($oPage->libraries["ff"]["latest"]["css_defs"]["core"]["file"]);
+            $oPage->libraries["ff"]["latest"]["css_defs"]["core"]["css_loads"] = array();
+
+            if(is_file(FF_THEME_DISK_PATH . "/" . FF_THEME_ADMIN . "/javascript/app.js")) {
+                $oPage->tplAddJs("app", array(
+                        "path" => FF_THEME_DIR . "/" . FF_THEME_ADMIN . "/javascript"
+                        , "file" => "app.js"
+                    )
+                );
             }
-            if(strlen($framework_css["theme"]["css"])) {
-                if(is_file($oPage->getThemeDir() . "/css/" . $framework_css["theme"]["name"] . ".css"))
-                    $oPage->tplAddCss($framework_css["theme"]["name"]
-                        , array(
-                            "file" => $framework_css["theme"]["name"] . ".css"
-                            , "path" => $oPage->getThemePath(false) . "/css"
-                            , "priority" => cm::LAYOUT_PRIORITY_HIGH
-                    ));
-                else
-                    $oPage->tplAddCss($framework_css["theme"]["name"]
-                        , array(
-                            "file" => basename($framework_css["theme"]["css"])
-                        , "path" => ffCommon_dirname($framework_css["theme"]["css"])
-                        , "priority" => cm::LAYOUT_PRIORITY_HIGH
-                        ));
-           }
-            /*
-            if(strlen($framework_css["params"]["js"])) {
-                if(is_file($oPage->getThemeDir() . "/javascript/" . $framework_css["name"] . ".js"))
-                    $oPage->tplAddJs($framework_css["name"], $framework_css["name"] . ".js", $oPage->getThemePath(false) . "/javascript", false, false, null, false, "top");
-                else
-    				$oPage->tplAddJs($framework_css["name"], basename($framework_css["params"]["js"]), ffCommon_dirname($framework_css["params"]["js"]), false, false, null, false, "top");
+        } else if(is_array($framework_css)) {
+            if(is_file($oPage->getThemeDir() . "/css/" . $framework_css["name"] . ".css")) {
+                $oPage->libraries[$framework_css["name"]]["latest"]["css_defs"]["core"]["path"] = $oPage->getThemePath(false) . "/css";
+                $oPage->libraries[$framework_css["name"]]["latest"]["css_defs"]["core"]["file"] = $framework_css["name"] . ".css";
             }
-            if(strlen($framework_css["params"]["js_init"])) {
-                if(is_file($oPage->getThemeDir() . "/javascript/" . $framework_css["name"] . "-init.js"))
-                    $oPage->tplAddJs($framework_css["name"], $framework_css["name"] . "-init.js", $oPage->getThemePath(false) . "/javascript", false, false, null, false, "bottom");
-                else
-    				$oPage->tplAddJs($framework_css["name"] . ".init", null, null, false, false, $framework_css["params"]["js_init"], false, "bottom");
-            }*/
+            $oPage->tplAddCss($framework_css["name"] . ".core");
 		}
 	}
 }

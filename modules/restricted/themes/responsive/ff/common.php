@@ -1,13 +1,9 @@
 <?php
   function mod_restricted_get_framework_css() {
   	$framework_css = array(
-  		"fullbar" => array(
+  		"layer" => array(
   			"component" => array(
   				"class" => null
-  			)
-  			, "inner-wrap" => array(
-  				"class" => null
-  				, "col" => "row-fluid"
   			)
   			, "nav" => array(
   				"left" => array(
@@ -30,10 +26,99 @@
   				)
   			)
   		)
+        , "variant" => array(
+            "-inverse" => array(
+                "sidemenu"
+                , "rightmenu"
+                , "header__top"
+                , "header__bar"
+                , "pagecontent"
+                , "footer"
+            )
+            , "-fixed" => array(
+                "sidemenu"
+                , "rightcol"
+                , "header__top"
+                , "header__bar"
+                , "footer"
+            )
+            , "-noicon" => array(
+                "sidemenu"
+                , "header__top"
+                , "header__bar"
+                , "pagecontent"
+                , "footer"
+            )
+            , "-closed" => array(
+                "sidemenu"
+                , "rightcol"
+            )
+            , "-rightview" => array(
+                "rightcol"
+            )
+            , "-notab" => array(
+                "header__bar"
+            )
+            , "-floating" => array(
+                "sidemenu"
+                , "rightcol"
+                , "button"
+            )
+            , "-sortable" => array(
+
+            )
+            , "-draggable" => array(
+
+            )
+            , "-dragging" => array(
+
+            )
+            , "-dragover" => array(
+
+            )
+            , "-active" => array(
+
+            )
+            , "-pad1" => array(
+
+            )
+            , "-pad2" => array(
+
+            )
+            , "-pad3" => array(
+
+            )
+            , "-pad4" => array(
+
+            )
+            , "-pad5" => array(
+
+            )
+            , "-pad6" => array(
+
+            )
+            , "-pad7" => array(
+
+            )
+            , "-pad8" => array(
+
+            )
+            , "-pad9" => array(
+
+            )
+
+
+        )
 		, "menu" => array(
 			"topbar" => cm_getClassByFrameworkCss("topbar", "bar")
 			, "navbar" => cm_getClassByFrameworkCss("navbar", "bar")
+            //todo: da inserire la sidenav
 		)
+        , "list" => array(
+            "container" => cm_getClassByFrameworkCss("group", "list")
+            , "horizontal" => cm_getClassByFrameworkCss("group-horizontal", "list")
+            , "item" => cm_getClassByFrameworkCss("item", "list")
+        )
 		, "dropdown" => array(
 			"container" => array(
 				"class" => null
@@ -133,8 +218,8 @@
 		)
 		, "current" => cm_getClassByFrameworkCss("current", "util")
 		, "icons" => array(
-			"caret-collapsed" => cm_getClassByFrameworkCss("chevron-right", "icon")
-			, "caret" => cm_getClassByFrameworkCss("chevron-down", "icon")
+			"caret-collapsed" => "menu-caret " . cm_getClassByFrameworkCss("chevron-right", "icon")
+			, "caret" => "menu-caret " . cm_getClassByFrameworkCss("chevron-right", "icon", array("rotate-90"))
 			, "settings" => cm_getClassByFrameworkCss("cog", "icon")
 		)
 		, "logo" => array(
@@ -148,29 +233,17 @@
   
  // if (isset($cm->modules["restricted"]["events"])) 
   	$cm->modules["restricted"]["events"]->addEvent("on_layout_process", "mod_restricted_cm_on_layout_process");
-  	$cm->modules["restricted"]["events"]->addEvent("on_select", "mod_restricted_on_select");
-  	
-function mod_restricted_on_select($mod_restricted) {
-	$cm = cm::getInstance();
-
-    $filename = cm_cascadeFindTemplate("/javascript/ff.modules.restricted.js", "restricted");
-	//$filename = cm_moduleCascadeFindTemplateByPath("restricted", "/javascript/ff.modules.restricted.js", $cm->oPage->theme);
-	$ret = cm_moduleGetCascadeAttrs($filename);
-	$cm->oPage->tplAddJS("ff.modules.restricted.js", array(
-		"file" => $filename
-		, "path" => $ret["path"]
-	));
-}
 
   	
 function mod_restricted_cm_on_layout_process()
 {
 	$cm = cm::getInstance();
-	if (isset($cm->oPage->sections["favorite"]))
-		$cm->oPage->sections["favorite"]["events"]->addEvent("on_process", "mod_restricted_cm_on_load_favorite");
 
-	if (isset($cm->oPage->sections["breadcrumb"]))
-		$cm->oPage->sections["breadcrumb"]["events"]->addEvent("on_process", "mod_restricted_cm_on_load_breadcrumb");
+	//if (isset($cm->oPage->sections["favorite"]))
+	//	$cm->oPage->sections["favorite"]["events"]->addEvent("on_process", "mod_restricted_cm_on_load_favorite");
+
+	//if (isset($cm->oPage->sections["breadcrumb"]))
+	//	$cm->oPage->sections["breadcrumb"]["events"]->addEvent("on_process", "mod_restricted_cm_on_load_breadcrumb");
 
 	$cm->oPage->widgetLoad("dialog");
     $cm->oPage->widgets["dialog"]->process(
@@ -197,12 +270,11 @@ function mod_restricted_cm_on_layout_process()
 }
   
 
-function mod_restricted_cm_on_load_breadcrumb($page, $tpl)
+function on_load_section_breadcrumb($page, $tpl, $attr)
 {
-	if (!mod_security_check_session(false))
-		return;
-
 	$cm = cm::getInstance();
+    $attr["layout_default"] = "breadcrumb";
+
 	if($page->sections["brand"]) {
 		if(!$page->tpl_layer[0]->isset_var("brand")) {
             $framework_css = mod_restricted_get_framework_css();
@@ -254,42 +326,75 @@ function mod_restricted_cm_on_load_breadcrumb($page, $tpl)
 	));
 	
 }
-  
-function mod_restricted_cm_on_load_favorite($page, $tpl)
+
+function on_load_section_admin($page, $tpl, $attr) {
+    $cm = cm::getInstance();
+    $attr["layout_default"] = "admin";
+    $attr["label"] = false;
+    $attr["description_skip"] = true;
+    $attr["readonly_skip"] = true;
+
+    $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sections"]["admin"], $attr);
+    if($res_navbar["count"])
+    {
+        $tpl->parse("SectMenu", false);
+    }
+}
+
+function on_load_section_rightcol($page, $tpl, $attr) {
+    $cm = cm::getInstance();
+    $attr["layout_default"] = "admin";
+
+    $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sections"]["rightcol"], $attr);
+    if($res_navbar["count"])
+    {
+        $tpl->parse("SectMenu", false);
+    }
+}
+function on_load_section_favorite($page, $tpl, $attr)
 {
-	if (!mod_security_check_session(false))
-		return;
-
 	$cm = cm::getInstance();
-	if(isset($cm->modules["restricted"]["sections"]["favorite"]))
+    $attr["layout_default"] = "favorite";
+
+	if(isset($cm->modules["restricted"]["sections"]["favorite"]) && is_array($cm->modules["restricted"]["sections"]["favorite"]["elements"]))
 	{
-		foreach ($cm->modules["restricted"]["sections"]["favorite"] as $key => $value)
+		foreach ($cm->modules["restricted"]["sections"]["favorite"]["elements"] as $key => $value)
 		{
-			if (strpos($key, "__") === 0)
+			if($value["path"] != "/" && strpos($cm->path_info, $value["path"]) === 0)
 				continue;
 
-			if(is_array($value)) {
-			    $path = $value["path"];
-				$label = $value["label"];
-				$icon = $value["icon"];
-			} else {
-				$path = (string) $value->path;
-				$label = (string) $value->label;
-				$icon = (string) $value->icon;
+            if (mod_restricted_check_no_permission($value)) {
+                continue;
+            }
+
+			if(strpos($value["label"], "_") === 0) {
+                $value["label"] = ffTemplate::_get_word_by_code(substr($value["label"], 1));
 			}
-			if($path != "/" && strpos($cm->path_info, $path) === 0)
-				continue;
+			if($value["icon"]) {
+                $tpl->set_var("icon", cm_getClassByFrameworkCss($value["icon"], "icon-tag", "lg"));
+            }
 
-			if(strpos($label, "_") === 0) {
-				$label = ffTemplate::_get_word_by_code(substr($label, 1));
-			}
+            if($attr["label"] === false) {
+                $item_properties["title"] = 'title="' . $value["label"] . '"';
+                if($value["icon"]) {
+                    $tpl->set_var("label", "");
+                } else {
+                    $tpl->set_var("label", '<span>' . ucfirst(substr($value["label"], 0, 1)) . '</span>');
+                }
+            } else {
+                if(strpos($value["label"], "_") === 0) {
+                    $tpl->set_var("label", '<span>' . ffTemplate::_get_word_by_code(substr($value["label"], 1)) . '</span>');
+                } else {
+                    $tpl->set_var("label", '<span>' . $value["label"] . '</span>');
+                }
+            }
 
-			if($icon)
-				$tpl->set_var("icon", cm_getClassByFrameworkCss($icon, "icon-tag", "lg")); 
+            if($item_properties) {
+                $item_properties = implode(" ", $item_properties);
+            }
 
-
-			$tpl->set_var("label", $label);
-			$tpl->set_var("path", $path);
+            $tpl->set_var("item_properties", $item_properties);
+            $tpl->set_var("path", $cm->oPage->site_path . $value["path"]);
 			$tpl->parse("SectFavorite", true);
 		}
 	}
@@ -302,12 +407,11 @@ function mod_restricted_on_tpl_layer_loaded($page, $tpl)
 
   	$framework_css = mod_restricted_get_framework_css();
 
-  	$tpl->set_var("fullbar_class", cm_getClassByDef($framework_css["fullbar"]["component"]));
-  	$tpl->set_var("toggle_class", cm_getClassByDef($framework_css["fullbar"]["action"]["toggle"]));
+  	$tpl->set_var("toggle_class", cm_getClassByDef($framework_css["layer"]["action"]["toggle"]));
   	$tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-  	$tpl->set_var("nav_left_class", cm_getClassByDef($framework_css["fullbar"]["nav"]["left"]));
-  	$tpl->set_var("nav_right_class", cm_getClassByDef($framework_css["fullbar"]["nav"]["right"]));
-  	
+  	$tpl->set_var("nav_left_class", cm_getClassByDef($framework_css["layer"]["nav"]["left"]));
+  	$tpl->set_var("nav_right_class", cm_getClassByDef($framework_css["layer"]["nav"]["right"]));
+
   	$tpl->set_var("page-title", ($page->title == cm_getAppName()
 		? ucwords(str_replace("-", " ", basename($cm->path_info)))
 		: str_replace(" - " . cm_getAppName(), "", $page->title)
@@ -317,237 +421,275 @@ function mod_restricted_on_tpl_layer_loaded($page, $tpl)
 		$tpl->parse("SectFooter", false);
 }	
 
-function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
+function on_load_section_topbar($page, $tpl, $attr)
 {
 	$cm = cm::getInstance();
 	$globals_mod = ffGlobals::getInstance("__mod_restricted__");
-    $is_default = ($attr["default"] == "true" ? true : false);
-    $hide_label = ($attr["label"] == "false" ? true : false);
+    $attr["location_default"] = "topbar";
 
 	if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
 	{
-        $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+        $cache_key = "/" . $attr["location_default"] . (MOD_RES_MEM_CACHING_BYPATH
             ? $cm->path_info
             : "default"
         );
 
-        $res = $cm->cache->get($cache_key, "/cm/mod/restricted/template/topbar");
+        $cache = $cm->cache->get($cache_key, "/cm/mod/restricted/template/" . $attr["location_default"]);
 	}
-	if ($res)
+	if ($cache)
 	{
-        $globals_mod->access    = $res["access"];
-		$tpl->ParsedBlocks      = $res["ParsedBlock"];
+        $globals_mod->access    = $cache["access"];
+		$tpl->ParsedBlocks      = $cache["ParsedBlock"];
 	}
 	else
 	{
 		$framework_css = mod_restricted_get_framework_css();
 
-        $count = 0;
-        $count_icon = 0;
+		$res = array(
+		    "count" => 0
+            , "count_icon" => 0
+            , "count_position" => null
+        );
 
-		$toskip = explode(",", MOD_SEC_PROFILING_SKIPSYSTEM);
 		foreach ($cm->modules["restricted"]["menu"] as $key => $value)
 		{
-			$profile_check = MOD_SEC_PROFILING && (MOD_SEC_PROFILING_SKIPSYSTEM !== "*") && !in_array($key, $toskip) && !$value["profiling_skip"];
+			if (mod_restricted_check_no_permission($value)) {
+                continue;
+            }
+			if($attr["readonly_skip"] && $value["readonly"]) {
+                continue;
+            }
+            if($value["hide"]) {
+                continue;
+            }
+			$location = ($attr["default"] && !$value["location"]
+                ? $attr["location_default"]
+                : $value["location"]
+            );
 
-			if (
-					!mod_restricted_checkacl_bylevel($value["acl"])
-					|| ($profile_check && !mod_sec_checkprofile_bypath($value["path"]))
-					|| ($is_default && isset($value["location"]) && $value["location"] != $location)
-					|| (!$is_default && (!isset($value["location"]) || $value["location"] != $location))
-				)
-				continue;
+            if($location != $attr["location_default"]) {
+                continue;
+            }
 
 			$globals_mod->access |= true;
 //			ffErrorHandler::raise("ASD", E_USER_ERROR, null, get_defined_vars());
 
-            if($value["settings"] && defined($value["settings"]))
-                $hide = !constant($value["settings"]);
+            $item_tag = ($value["readonly"]
+                ? ($value["readonly"] === true
+                    ? "div"
+                    : $value["readonly"]
+                )
+                : "a"
+            );
+            $item_class = array("key" => $key);
+            $item_icon = null;
+            $item_properties = null;
+            $item_actions = null;
+            $description = "";
 
-			if(!$value["hide"] && !$hide)
-			{
-				$item_tag = ($value["readonly"]
-					? ($value["readonly"] === true
-						? "div"
-						: $value["readonly"]
-					)
-					: "a"
-				);
-				$item_class = array("key" => $key);
-				$item_icon = null;
-				$item_properties = null;
-				$item_actions = null;
-				$description = "";
+            $tpl->set_var("name", $key);
 
-				$tpl->set_var("name", $key);
+            if ($value["description"] && !$attr["description_skip"])
+            {
+                if(strpos($value["description"], "_") === 0)
+                    $description = ffTemplate::_get_word_by_code(substr($value["description"], 1));
+                else
+                    $description = $value["description"];
 
-				if ($value["description"])
-	            {
-	                if(strpos($value["description"], "_") === 0)
-                		$description = ffTemplate::_get_word_by_code(substr($value["description"], 1));
-	                else
-                		$description = $value["description"];
+                $description =  '<p class="' . $framework_css["description"] . '">' . $description . '</p>';
+            }
 
-					$description =  '<p class="' . $framework_css["description"] . '">' . $description . '</p>';
-				}
+            $tpl->set_var("item_description", $description);
 
-				$tpl->set_var("item_description", $description);
+            if($value["actions"]) {
+                if(is_array($value["actions"]) && count($value["actions"])) {
+                    foreach($value["actions"] AS $action_data) {
+                        $action_path = "";
+                        $action_label = "";
+                        $action_icon = $framework_css["icons"]["settings"];
+                        if(is_array($action_data)) {
+                            $action_path = $action_data["path"];
+                            if($action_data["icon"])
+                                $action_icon = cm_getClassByFrameworkCss($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
 
-				if($value["actions"]) {
-					if(is_array($value["actions"]) && count($value["actions"])) {
-						foreach($value["actions"] AS $action_data) {
-							$action_path = "";
-							$action_label = "";
-							$action_icon = $framework_css["icons"]["settings"];
-							if(is_array($action_data)) {
-								$action_path = $action_data["path"];
-								if($action_data["icon"])
-									$action_icon = cm_getClassByFrameworkCss($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
+                            $action_label = $action_data["label"];
+                        } elseif($cm->modules["restricted"]["menu_bypath"][$action_data]) {
+                            $action_path = $action_data;
+                            if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"])
+                                $action_icon = cm_getClassByFrameworkCss($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
 
-								$action_label = $action_data["label"];
-							} elseif($cm->modules["restricted"]["menu_bypath"][$action_data]) {
-								$action_path = $action_data;
-								if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"])
-									$action_icon = cm_getClassByFrameworkCss($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
-
-								$action_label = $cm->modules["restricted"]["menu_bypath"][$action_data][0]["label"];
-							}
-
-					        if(strpos($action_label, "_") === 0)
-					            $action_label = ffTemplate::_get_word_by_code(substr($action_label, 1));
-
-							$action_path = str_replace(array("[rel]", "[key]"), array($value["rel"], $key), $action_path);
-							if($action_data["dialog"] !== false)
-								$action_path = 'javascript:ff.ffPage.dialog.doOpen(\'dialogResponsive\',\'' . $action_path . '\');';
-
-							$item_actions[] = '<a href="' . $action_path . '" class="' . $action_icon . '" title="' . $action_label . '"></a>';
-						}
-					}
-				}
-
-                //fullbar
-                if($location == "topbar") {
-                    $child_class = null;
-
-                    $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "Child", null, true, $framework_css);
-                    if($res_navbar["count"])
-                    {
-                        if($value["collapse"] !== false)
-                        {
-                            if(!$value["readonly"]) {
-                                $item_properties["url"] = 'href="#nav-' . $key . '"';
-                                $item_properties["collapse"] = $framework_css["collapse"]["action"];
-                            }
-                            $child_class["collapse"] = $framework_css["collapse"]["pane"];
-                            $item_actions["dropdown"] = '<a href="#nav-' . $key . '" class="' . ($res_navbar["opened"] ? $framework_css["icons"]["caret"] : $framework_css["icons"]["caret-collapsed"] . " " . $framework_css["collapse"]["menu"]) . '" ' . $framework_css["collapse"]["action"] . '></a>';
-                            if($res_navbar["opened"] || $value["collapse"]) {
-                                $item_class["current"] = $framework_css["current"];
-                                $child_class["current"] = $framework_css["collapse"]["current"];
-                            }
+                            $action_label = $cm->modules["restricted"]["menu_bypath"][$action_data][0]["label"];
                         }
 
-                        $tpl->set_var("child_id", "nav-" . $key);
-                        if($child_class)
-                            $tpl->set_var("child_class", implode(" ", $child_class));
-                        $tpl->parse("SectChild", false);
+                        if(strpos($action_label, "_") === 0)
+                            $action_label = ffTemplate::_get_word_by_code(substr($action_label, 1));
+
+                        $action_path = str_replace(array("[rel]", "[key]"), array($value["rel"], $key), $action_path);
+                        if($action_data["dialog"] !== false)
+                            $action_path = 'javascript:ff.ffPage.dialog.doOpen(\'dialogResponsive\',\'' . $action_path . '\');';
+
+                        $item_actions[] = '<a href="' . $action_path . '" class="' . $action_icon . '" title="' . $action_label . '"></a>';
                     }
-                } else {
-                    //mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "", $location, $is_default, $framework_css);
+                }
+            }
+
+            if($attr["submenu"]) {
+                $child_class = null;
+                $params = $attr;
+                $params["prefix"] = "Child";
+
+                $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], $params);
+                if($res_navbar["count"])
+                {
+                    if($value["collapse"] !== false)
+                    {
+                        $aria = ' aria-expanded="false"';
+                        if($res_navbar["is_opened"] || $value["collapse"]) {
+                            $item_class["current"] = $framework_css["current"];
+                            $aria = ' aria-expanded="true"';
+                            //      $child_class["current"] = $framework_css["collapse"]["current"];
+                        }
+                        if(!$value["readonly"]) {
+                            $item_properties["url"] = 'href="#topnav-' . $key . '"';
+                            $item_properties["collapse"] = $framework_css["collapse"]["action"] . $aria;
+                        }
+                        $child_class["collapse"] = $framework_css["collapse"]["pane"];
+                        //$item_actions["dropdown"] = '<a href="#topnav-' . $key . '" class="' . ($res_navbar["is_opened"] ? $framework_css["icons"]["caret"] : $framework_css["icons"]["caret-collapsed"] . " " . $framework_css["collapse"]["menu"]) . '" ' . $framework_css["collapse"]["action"] . '></a>';
+                        $item_actions["dropdown"] = '<a href="#topnav-' . $key . '" class="' . $framework_css["icons"]["caret-collapsed"] . " " . $framework_css["collapse"]["menu"] . '" ' . '></a>';
+
+                    }
+
+                    $tpl->set_var("child_id", "topnav-" . $key);
+                    if($child_class)
+                        $tpl->set_var("child_class", implode(" ", $child_class));
+
+                    $tpl->set_var("menu_class", $framework_css["menu"]["navbar"]);
+
+                    if(is_array($res_navbar["count_position"]) && count($res_navbar["count_position"])) {
+                        foreach($res_navbar["count_position"] AS $position_name => $position_count) {
+                            $tpl->parse("SectChild" . $position_name, false);
+                        }
+                    }
+
+                    $tpl->parse("SectChild", false);
+                }
+            }
+
+            if(!$value["path"] && !$value["label"]) {
+                continue;
+            }
+
+            if(!$item_properties["url"]) {
+                if ($value["globals_exclude"])
+                {
+                    $globals =  $cm->oPage->get_globals($value["globals_exclude"]);
+                    $params = ffProcessTags($value["params"], null, null, "normal", $cm->oPage->get_params(), $cm->oPage->ret_url, $cm->oPage->get_globals($value["globals_exclude"]));
+                }
+                else
+                {
+                    $globals = $cm->oPage->get_globals();
+                    $params = ffProcessTags($value["params"], null, null, "normal", $cm->oPage->get_params(), $cm->oPage->ret_url, $cm->oPage->get_globals());
                 }
 
-				if(!$value["path"] && !$value["label"])
-					continue;
+                if ($value["jsaction"]) {
+                    $path = $value["jsaction"];
+                } elseif($value["redir"]) {
+                    $path = $cm->oPage->site_path . $value["redir"];
+                } else {
+                    $path = $cm->oPage->site_path . $value["path"] . ($globals . $params ? "?" . $globals . $params : "");
+                }
 
-				if(strpos($value["label"], "_") === 0) {
-					$label = ffTemplate::_get_word_by_code(substr($value["label"], 1));
-				} else {
-					$label = $value["label"];
-				}
+                if($value["readonly"]) {
+                    $item_properties["url"] = 'data-url="' . $path . '"';
+                } else {
+                    if($value["dialog"])
+                        $item_properties["url"] = 'href="' . "javascript:ff.ffPage.dialog.doOpen('dialogResponsive','" . $path . "');"  . '"';
+                    else
+                        $item_properties["url"] = 'href="' . $path . '"';
 
+                    if($value["rel"])
+                        $item_properties["rel"] = 'rel="' . $value["rel"] . '"';
+                }
 
-				if(!$item_properties["url"]) {
-					$globals = "";
-					$params = "";
-					if ($value["globals_exclude"])
-					{
-						$globals =  $cm->oPage->get_globals($value["globals_exclude"]);
-						$params = ffProcessTags($value["params"], null, null, "normal", $cm->oPage->get_params(), $cm->oPage->ret_url, $cm->oPage->get_globals($value["globals_exclude"]));
-					}
-					else
-					{
-						$globals = $cm->oPage->get_globals();
-						$params = ffProcessTags($value["params"], null, null, "normal", $cm->oPage->get_params(), $cm->oPage->ret_url, $cm->oPage->get_globals());
-					}
+            }
 
-					if ($value["jsaction"])
-						$path = $value["jsaction"];
-					elseif($value["redir"])
-                        $path = $cm->oPage->site_path . $value["redir"];
-					else
-						$path = $cm->oPage->site_path . $value["path"] . ($globals . $params ? "?" . $globals . $params : "");
+            if(($attr["icons"] === true || $attr["icons"] == "all" || $attr["icons"] == "mainmenu") && $value["icon"])
+                $item_icon = cm_getClassByFrameworkCss($value["icon"], "icon-tag", "lg");
 
-					if($value["dialog"])
-						$item_properties["url"] = 'href="' . "javascript:ff.ffPage.dialog.doOpen('dialogResponsive','" . $path . "');"  . '"';
-					else
-						$item_properties["url"] = 'href="' . $path . '"';
+            if($attr["label"] === false) {
+                $item_properties["title"] = 'title="' . $value["label"] . '"';
+                if($item_icon) {
+                    $tpl->set_var("label", "");
+                } else {
+                    $tpl->set_var("label", '<span>' . ucfirst(substr($value["label"], 0, 1)) . '</span>');
+                }
+            } else {
+                if(strpos($value["label"], "_") === 0) {
+                    $tpl->set_var("label", '<span>' . ffTemplate::_get_word_by_code(substr($value["label"], 1)) . '</span>');
+                } else {
+                    $tpl->set_var("label", '<span>' . $value["label"] . '</span>');
+                }
+            }
 
-					if($value["rel"])
-						$item_properties["rel"] = 'rel="' . $value["rel"] . '"';
-				}
+            if($value["position"]) {
+                $item_class["grid"] = cm_getClassByDef($framework_css["dropdown"]["actions"][$value["position"]]);
+            }
+            if($value["class"]) {
+                $item_class["custom"] = $value["class"];
+            }
+            if($item_class) {
+                $item_properties["class"] = 'class="' . implode(" ", $item_class) . '"';
+            }
+            if($item_properties) {
+                $item_properties = implode(" ", $item_properties);
+            }
+            if($value["badge"]) {
+                $item_actions[] = '<span class="' . cm_getClassByFrameworkCss("default", "badge") . '">' . $value["badge"] . '</span>';
+            }
 
-                if($value["icon"])
-                	$item_icon = cm_getClassByFrameworkCss($value["icon"], "icon-tag", "lg");
+            if($item_actions) {
+                $item_actions = '<span class="nav-controls">' . implode(" ", $item_actions) . '</span>';
+            }
+            $tpl->set_var("actions", $item_actions);
+            $tpl->set_var("item_properties", $item_properties);
+            $tpl->set_var("item_icon", $item_icon);
+            $tpl->set_var("item_tag", $item_tag);
 
+            /*if($res["count"]) {
+                $tpl->parse("SectSeparator", false);
+            }*/
 
+            $parse_key = "Sect" . $attr["prefix"] . "Element";
+            if($value["position"]) {
+                $position = ucfirst($value["position"]);
+                $parse_key .= $position;
+                $res["count_position"][$position]++;
+            }
+            $tpl->parse($parse_key, true);
+            $tpl->set_var("SectChild", "");
 
-				if($hide_label && $item_icon) {
-					$item_properties["title"] = 'title="' . $label . '"';
-					$tpl->set_var("label", "");
-				} else {
-					$tpl->set_var("label", '<span>' . $label . '</span>');
-				}
-				if($value["position"])
-                    $item_class["grid"] = cm_getClassByDef($framework_css["dropdown"]["actions"][$value["position"]]);
+            if($item_icon) {
+                $res["count_icon"]++;
+            }
+            $res["count"]++;
+        }
 
-	            if($value["class"])
-	               $item_class["custom"] = $value["class"];
+		//reset($cm->modules["restricted"]["menu"]);
 
-                if($item_class)
-                    $item_properties["class"] = 'class="' . implode(" ", $item_class) . '"';
+        if($res["count"]) {
+			$tpl->set_var("menu_class", $framework_css["menu"][$attr["location_default"]] . ($res["count_icon"] ? " -withicons" : ""));
 
-                if($item_properties)
-                	$item_properties = implode(" ", $item_properties);
-
-                if($item_actions)
-                	$item_actions = '<span class="nav-controls">' . implode(" " , $item_actions) . '</span>';
-
-                $tpl->set_var("actions", $item_actions);
-                $tpl->set_var("item_properties", $item_properties);
-				$tpl->set_var("item_icon", $item_icon);
-                $tpl->set_var("item_tag", $item_tag);
-
-                if($count)
-                	$tpl->parse("SectSeparator", false);
-
-				$tpl->parse("SectElement" . ($value["position"] ? ucfirst($value["position"]) : ""), true);
-				$tpl->set_var("SectChild", "");
-
-                if($location == "topbar" && $item_icon)
-                    $count_icon++;
-
-                $count++;
-			}
-		}
-		reset($cm->modules["restricted"]["menu"]);
-
-        if($count) {
-			$tpl->set_var("menu_class", $framework_css["menu"]["topbar"] . ($count_icon ? " -withicons" : ""));
+            if(is_array($res["count_position"]) && count($res["count_position"])) {
+                foreach($res["count_position"] AS $position_name => $position_count) {
+                    $tpl->parse("Sect" . $position_name, false);
+                }
+            }
             $tpl->parse("SectMenu", false);
         }
 
 		if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
 		{
-            $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+            $cache_key = "/" . $attr["location_default"] . (MOD_RES_MEM_CACHING_BYPATH
                 ? $cm->path_info
                 : "default"
             );
@@ -558,76 +700,54 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
                 , "access" => $globals_mod->access
             );
 
-            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/topbar");
+            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/" . $attr["location_default"]);
 		}
 	}
 }
 
-function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
+function on_load_section_navbar($page, $tpl, $attr)
 {
 	$cm = cm::getInstance();
     $globals_mod = ffGlobals::getInstance("__mod_restricted__");
-    $is_default = ($attr["default"] == "true" ? true : false);
-
-    //if ($cm->modules["restricted"]["sel_topbar"] === null)
-		//return;
-
-	// --- codice di ALEX
-	if(strlen($cm->modules["restricted"]["sel_topbar"]["label"]))
-	{
-		if(strpos($cm->modules["restricted"]["sel_topbar"]["label"], "_") === 0)
-		{
-			$tpl->set_var("navbar_label", ffTemplate::_get_word_by_code(substr($cm->modules["restricted"]["sel_topbar"]["label"], 1)));
-		}
-		else
-		{
-			$tpl->set_var("navbar_label", $cm->modules["restricted"]["sel_topbar"]["label"]);
-		}
-		$tpl->parse("SectNavbarTitle", false);
-	}
-	else
-	{
-		$tpl->set_var("SectNavbarTitle", "");
-	}
-
-	$tpl->set_var("navbar_class", $cm->modules["restricted"]["sel_topbar"]["name"]);
-	// ---
-	//if (!is_array($cm->modules["restricted"]["sel_topbar"]["elements"]) || !count($cm->modules["restricted"]["sel_topbar"]["elements"]))
-	//	return;
+    $attr["layout_default"] = "navbar";
+    if(!isset($attr["readonly_skip"])) {
+        $attr["readonly_skip"] = true;
+    }
 
     if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
     {
-        $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+        $cache_key = "/navbar" . (MOD_RES_MEM_CACHING_BYPATH
                 ? $cm->path_info
                 : "default"
             );
 
-        $res = $cm->cache->get($cache_key, "/cm/mod/restricted/template/navbar");
+        $cache = $cm->cache->get($cache_key, "/cm/mod/restricted/template/navbar");
     }
-    if ($res)
+    if ($cache)
     {
-        $globals_mod->access    = $res["access"];
-        $tpl->ParsedBlocks      = $res["ParsedBlock"];
+        $globals_mod->access    = $cache["access"];
+        $tpl->ParsedBlocks      = $cache["ParsedBlock"];
     }
     else
     {
+        $framework_css = mod_restricted_get_framework_css();
 
-	//die($location);
-		// modifica di ALEX
-		if($is_default) {
-			$res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sel_topbar"], "", $location, $is_default);
-		} elseif($location && $cm->modules["restricted"]["sections"][$location]) {
-			$res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sections"][$location], "", $location, $is_default);
-		}
+        $tpl->set_var("navbar_class", $cm->modules["restricted"]["sel_topbar"]["name"]);
 
         $globals_mod->access |= true;
 
-        if($res_navbar["count"]) 
+        $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sel_topbar"], $attr);
+        if($res_navbar["count"])
+        {
+
+            $tpl->set_var("menu_class", $framework_css["menu"]["topbar"]);
+
             $tpl->parse("SectMenu", false);
+        }
 
         if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
         {
-            $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+            $cache_key = "/navbar" . (MOD_RES_MEM_CACHING_BYPATH
                     ? $cm->path_info
                     : "default"
                 );
@@ -643,38 +763,325 @@ function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
 	}
 }
 
-// funzione di ALEX
-function mod_restricted_process_navbar(&$tpl, $sel_topbar, $prefix = "", $location = "navbar", $default = true, $framework_css = null)
+function on_load_section_sidebar($page, $tpl, $attr)
 {
     $cm = cm::getInstance();
-    $count = 0;
-    $is_opened = false;
+    $globals_mod = ffGlobals::getInstance("__mod_restricted__");
+    $attr["location_default"] = "sidebar";
 
-    if(strlen($prefix))
-        $tpl->set_var("Sect" . $prefix . "Element", "");
+    if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+    {
+        $cache_key = "/" . $attr["location_default"] . (MOD_RES_MEM_CACHING_BYPATH
+                ? $cm->path_info
+                : "default"
+            );
 
+        $cache = $cm->cache->get($cache_key, "/cm/mod/restricted/template/" . $attr["location_default"]);
+    }
+    if ($cache)
+    {
+        $globals_mod->access    = $cache["access"];
+        $tpl->ParsedBlocks      = $cache["ParsedBlock"];
+    }
+    else
+    {
+        $framework_css = mod_restricted_get_framework_css();
+
+        $res = array(
+            "count" => 0
+            , "count_icon" => 0
+            , "count_position" => null
+        );
+
+        foreach ($cm->modules["restricted"]["menu"] as $key => $value)
+        {
+            if (mod_restricted_check_no_permission($value)) {
+                continue;
+            }
+            if($attr["readonly_skip"] && $value["readonly"]) {
+                continue;
+            }
+            if($value["hide"]) {
+                continue;
+            }
+            $location = ($attr["default"] && !$value["location"]
+                ? $attr["location_default"]
+                : $value["location"]
+            );
+
+            if($location != $attr["location_default"]) {
+                continue;
+            }
+
+            $globals_mod->access |= true;
+//			ffErrorHandler::raise("ASD", E_USER_ERROR, null, get_defined_vars());
+
+            $item_tag = ($value["readonly"]
+                ? ($value["readonly"] === true
+                    ? "div"
+                    : $value["readonly"]
+                )
+                : "a"
+            );
+            $item_class = array("key" => $key);
+            $item_icon = null;
+            $item_properties = null;
+            $item_actions = null;
+            $description = "";
+
+            $tpl->set_var("name", $key);
+
+            if ($value["description"] && !$attr["description_skip"])
+            {
+                if(strpos($value["description"], "_") === 0) {
+                    $description = ffTemplate::_get_word_by_code(substr($value["description"], 1));
+                } else {
+                    $description = $value["description"];
+                }
+                $description =  '<p class="' . $framework_css["description"] . '">' . $description . '</p>';
+            }
+
+            $tpl->set_var("item_description", $description);
+
+            if($value["actions"]) {
+                if(is_array($value["actions"]) && count($value["actions"])) {
+                    foreach($value["actions"] AS $action_data) {
+                        $action_path = "";
+                        $action_label = "";
+                        $action_icon = $framework_css["icons"]["settings"];
+                        if(is_array($action_data)) {
+                            $action_path = $action_data["path"];
+                            if($action_data["icon"]) {
+                                $action_icon = cm_getClassByFrameworkCss($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
+                            }
+                            $action_label = $action_data["label"];
+                        } elseif($cm->modules["restricted"]["menu_bypath"][$action_data]) {
+                            $action_path = $action_data;
+                            if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"]) {
+                                $action_icon = cm_getClassByFrameworkCss($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
+                            }
+                            $action_label = $cm->modules["restricted"]["menu_bypath"][$action_data][0]["label"];
+                        }
+
+                        if(strpos($action_label, "_") === 0) {
+                            $action_label = ffTemplate::_get_word_by_code(substr($action_label, 1));
+                        }
+                        $action_path = str_replace(array("[rel]", "[key]"), array($value["rel"], $key), $action_path);
+                        if($action_data["dialog"] !== false) {
+                            $action_path = 'javascript:ff.ffPage.dialog.doOpen(\'dialogResponsive\',\'' . $action_path . '\');';
+                        }
+                        $item_actions[] = '<a href="' . $action_path . '" class="' . $action_icon . '" title="' . $action_label . '"></a>';
+                    }
+                }
+            }
+
+            if($attr["submenu"] !== false) {
+                $child_class = null;
+
+                $params = $attr;
+                $params["prefix"] = "Child";
+                $res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], $params);
+                if($res_navbar["count"])
+                {
+                    if($value["collapse"] !== false)
+                    {
+                        if($value["selected"]) {
+                            $res_navbar["is_opened"] = true;
+                        }
+                        $aria = ' aria-expanded="false"';
+                        if($res_navbar["is_opened"] || $value["collapse"]) {
+                            $item_class["current"] = $framework_css["current"];
+                            $child_class["current"] = $framework_css["collapse"]["current"];
+
+                            $aria = ' aria-expanded="true"';
+                        }
+                        if(!$value["readonly"]) {
+                            $item_properties["url"] = 'href="#sidenav-' . $key . '"';
+                            $item_properties["collapse"] = $framework_css["collapse"]["action"] . $aria;
+                        }
+                        $child_class["collapse"] = $framework_css["collapse"]["pane"];
+                        $item_actions["dropdown"] = '<a href="#sidenav-' . $key . '" class="' . ($res_navbar["is_opened"] ? $framework_css["icons"]["caret"] : $framework_css["icons"]["caret-collapsed"] . " " . $framework_css["collapse"]["menu"]) . '" ' . '></a>';
+
+                    }
+
+                    $tpl->set_var("child_id", "sidenav-" . $key);
+                    if($child_class) {
+                        $tpl->set_var("child_class", implode(" ", $child_class));
+                    }
+                    $tpl->set_var("menu_class", $framework_css["menu"]["navbar"]);
+
+                    $tpl->parse("SectChild", false);
+                }
+            }
+
+            if(!$value["path"] && !$value["label"]) {
+                continue;
+            }
+
+            if(!$item_properties["url"]) {
+                $globals = "";
+                $params = "";
+                if ($value["globals_exclude"])
+                {
+                    $globals =  $cm->oPage->get_globals($value["globals_exclude"]);
+                    $params = ffProcessTags($value["params"], null, null, "normal", $cm->oPage->get_params(), $cm->oPage->ret_url, $cm->oPage->get_globals($value["globals_exclude"]));
+                }
+                else
+                {
+                    $globals = $cm->oPage->get_globals();
+                    $params = ffProcessTags($value["params"], null, null, "normal", $cm->oPage->get_params(), $cm->oPage->ret_url, $cm->oPage->get_globals());
+                }
+
+                if ($value["jsaction"]) {
+                    $path = $value["jsaction"];
+                } elseif($value["redir"]) {
+                    $path = $cm->oPage->site_path . $value["redir"];
+                } else {
+                    $path = $cm->oPage->site_path . $value["path"] . ($globals . $params ? "?" . $globals . $params : "");
+                }
+                if($value["readonly"]) {
+                    $item_properties["url"] = 'data-url="' . $path . '"';
+                } else {
+                    if($value["dialog"]) {
+                        $item_properties["url"] = 'href="' . "javascript:ff.ffPage.dialog.doOpen('dialogResponsive','" . $path . "');" . '"';
+                    } else {
+                        $item_properties["url"] = 'href="' . $path . '"';
+                    }
+                    if($value["rel"]) {
+                        $item_properties["rel"] = 'rel="' . $value["rel"] . '"';
+                    }
+                }
+
+            }
+
+            if(($attr["icons"] === true || $attr["icons"] == "all" || $attr["icons"] == "mainmenu") && $value["icon"]) {
+                $item_icon = cm_getClassByFrameworkCss($value["icon"], "icon-tag", "lg");
+            }
+
+            if($attr["label"] === false) {
+                $item_properties["title"] = 'title="' . $value["label"] . '"';
+                if($item_icon) {
+                    $tpl->set_var("label", "");
+                } else {
+                    $tpl->set_var("label", '<span>' . ucfirst(substr($value["label"], 0, 1)) . '</span>');
+                }
+            } else {
+                if(strpos($value["label"], "_") === 0) {
+                    $tpl->set_var("label", '<span>' . ffTemplate::_get_word_by_code(substr($value["label"], 1)) . '</span>');
+                } else {
+                    $tpl->set_var("label", '<span>' . $value["label"] . '</span>');
+                }
+            }
+
+            if($value["position"]) {
+                $item_class["grid"] = cm_getClassByDef($framework_css["dropdown"]["actions"][$value["position"]]);
+            }
+            if($value["class"]) {
+                $item_class["custom"] = $value["class"];
+            }
+
+            if($item_class) {
+                $item_properties["class"] = 'class="' . implode(" ", $item_class) . '"';
+            }
+            if($item_properties) {
+                $item_properties = implode(" ", $item_properties);
+            }
+            if($value["badge"]) {
+                $item_actions[] = '<span class="' . cm_getClassByFrameworkCss("default", "badge") . '">' . $value["badge"] . '</span>';
+            }
+
+            if($item_actions)
+                $item_actions = '<span class="nav-controls">' . implode(" " , $item_actions) . '</span>';
+
+            $tpl->set_var("actions", $item_actions);
+            $tpl->set_var("item_properties", $item_properties);
+            $tpl->set_var("item_icon", $item_icon);
+            $tpl->set_var("item_tag", $item_tag);
+
+            //if($res["count"])
+            //    $tpl->parse("SectSeparator", false);
+
+            $parse_key = "Sect" . $attr["prefix"] . "Element";
+            if($value["position"]) {
+                $position = ucfirst($value["position"]);
+                $parse_key .= $position;
+                $res["count_position"][$position]++;
+            }
+            $tpl->parse($parse_key, true);
+            $tpl->set_var("SectChild", "");
+
+            if($item_icon) {
+                $res["count_icon"]++;
+            }
+            $res["count"]++;
+        }
+        reset($cm->modules["restricted"]["menu"]);
+
+        if($res["count"]) {
+            $tpl->set_var("menu_class", $framework_css["menu"]["topbar"] . ($res["count_icon"] ? " -withicons" : ""));
+
+            if(is_array($res["count_position"]) && count($res["count_position"])) {
+                foreach($res["count_position"] AS $position_name => $position_count) {
+                    $tpl->parse("Sect" . $position_name, false);
+                }
+            }
+            $tpl->parse("SectMenu", false);
+        }
+
+        if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+        {
+            $cache_key = "/" . $attr["location_default"] . (MOD_RES_MEM_CACHING_BYPATH
+                    ? $cm->path_info
+                    : "default"
+                );
+
+            /** @var reference $access */
+            $tmp = array(
+                "ParsedBlock" => $tpl->ParsedBlocks
+            , "access" => $globals_mod->access
+            );
+
+            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/" . $attr["location_default"]);
+        }
+    }
+
+    return $res;
+}
+
+// funzione di ALEX
+function mod_restricted_process_navbar(&$tpl, $sel_topbar, $attr = array())
+{
+    $cm = cm::getInstance();
+    $res = array(
+        "count" => 0
+        , "is_opened" => false
+        , "count_position" => null
+    );
+
+    $framework_css = mod_restricted_get_framework_css();
+    if($attr["prefix"]) {
+        $tpl->set_var("Sect" . $attr["prefix"] . "Element", "");
+    }
 	//$tpl->set_var("navbar_class", preg_replace("/[^[:alnum:]]+/", "", $sel_topbar["label"]));
-	if(!$framework_css)
-    	$framework_css = mod_restricted_get_framework_css();
-
+    //var_dump(count($sel_topbar["elements"]));
+//print_r(count($sel_topbar["elements"]));
     if(is_array($sel_topbar) && array_key_exists("elements", $sel_topbar) && count($sel_topbar["elements"]))
 	{
+       // echo "CCCC  ";
+
         foreach ($sel_topbar["elements"] as $key => $value)
         {
-            if (
-                    !mod_restricted_checkacl_bylevel($value["acl"]) 
-					|| (
-							!$value["profiling_skip"]
-							&& !mod_sec_checkprofile_bypath($value["path"])
-						)
-                    || (isset($value["hide"]) && $value["hide"])
-					|| ($default && isset($value["location"]) && $value["location"] != $location)
-					|| (!$default && (!isset($value["location"]) || $value["location"] != $location))
-                )
+            if (mod_restricted_check_no_permission($value)) {
                 continue;
-
-           // $tpl->set_var("Sect" . $prefix . "Link", "");
-           // $tpl->set_var("Sect" . $prefix . "Heading", "");
+            }
+            if($attr["readonly_skip"] && $value["readonly"]) {
+                continue;
+            }
+            if($value["hide"]) {
+                continue;
+            }
+           // $tpl->set_var("Sect" . $attr["prefix"] . "Link", "");
+           // $tpl->set_var("Sect" . $attr["prefix"] . "Heading", "");
 			$item_tag = ($value["readonly"] 
 				? ($value["readonly"] === true
 					? "div"
@@ -688,12 +1095,7 @@ function mod_restricted_process_navbar(&$tpl, $sel_topbar, $prefix = "", $locati
 			$item_actions = null;
 			$description = "";
 
-            if(strpos($value["label"], "_") === 0)
-                $tpl->set_var("label", '<span>' . ffTemplate::_get_word_by_code(substr($value["label"], 1)) . '</span>');
-            else
-                $tpl->set_var("label", '<span>' . $value["label"] . '</span>');
-
-            if ($value["description"])
+            if ($value["description"] && !$attr["description_skip"])
             {
                 if(strpos($value["description"], "_") === 0)
                 	$description = ffTemplate::_get_word_by_code(substr($value["description"], 1));
@@ -711,12 +1113,15 @@ function mod_restricted_process_navbar(&$tpl, $sel_topbar, $prefix = "", $locati
 						$action_path = "";
 						$action_label = "";
 						$action_icon = $framework_css["icons"]["settings"];
+                        $action_data_dialog = true;
 						if(is_array($action_data)) {
 							$action_path = $action_data["path"];
 							if($action_data["icon"])
 								$action_icon = cm_getClassByFrameworkCss($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
 
 							$action_label = $action_data["label"];
+                            if($action_data["dialog"] !== false)
+                                $action_data_dialog = false;
 						} elseif($cm->modules["restricted"]["menu_bypath"][$action_data]) {
 							$action_path = $action_data;
 							if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"])
@@ -729,7 +1134,7 @@ function mod_restricted_process_navbar(&$tpl, $sel_topbar, $prefix = "", $locati
 				            $action_label = ffTemplate::_get_word_by_code(substr($action_label, 1));
 						
 						$action_path = str_replace(array("[rel]", "[key]"), array($value["rel"], $key), $action_path);
-						if($action_data["dialog"] !== false)
+                        if($action_data_dialog)
 							$action_path = 'javascript:ff.ffPage.dialog.doOpen(\'dialogResponsive\',\'' . $action_path . '\');';
 						
 						$item_actions[] = '<a href="' . $action_path . '" class="' . $action_icon . '" title="' . $action_label . '"></a>';
@@ -759,54 +1164,85 @@ function mod_restricted_process_navbar(&$tpl, $sel_topbar, $prefix = "", $locati
 			else
 				$path = $cm->oPage->site_path . $value["path"] . ($globals . $params ? "?" . $globals . $params : "");
 
-			if($value["dialog"])
-				$item_properties["url"] = 'href="' . "javascript:ff.ffPage.dialog.doOpen('dialogResponsive','" . $path . "');"  . '"';
-			else
-				$item_properties["url"] = 'href="' . $path . '"';
-
+            if($value["readonly"]) {
+                $item_properties["url"] = 'data-url="' . $path . '"';
+            } else {
+                if ($value["dialog"])
+                    $item_properties["url"] = 'href="' . "javascript:ff.ffPage.dialog.doOpen('dialogResponsive','" . $path . "');" . '"';
+                else
+                    $item_properties["url"] = 'href="' . $path . '"';
+            }
 			if($value["rel"])
 				$item_properties["rel"] = 'rel="' . $value["rel"] . '"';
-				
-			if($value["icon"])
-				$item_icon = cm_getClassByFrameworkCss($value["icon"], "icon-tag", "lg");
-            
-            if($value["class"])
-               $item_class["custom"] = $value["class"];
 
+			if(($attr["icons"] == "all" || $attr["icons"] == "submenu") && $value["icon"])
+				$item_icon = cm_getClassByFrameworkCss($value["icon"], "icon-tag", "lg");
+
+            if($attr["label"] === false) {
+                $item_properties["title"] = 'title="' . $value["label"] . '"';
+                if($item_icon) {
+                    $tpl->set_var("label", "");
+                } else {
+                    $tpl->set_var("label", '<span>' . ucfirst(substr($value["label"], 0, 1)) . '</span>');
+                }
+            } else {
+                if(strpos($value["label"], "_") === 0) {
+                    $tpl->set_var("label", '<span>' . ffTemplate::_get_word_by_code(substr($value["label"], 1)) . '</span>');
+                } else {
+                    $tpl->set_var("label", '<span>' . $value["label"] . '</span>');
+                }
+            }
+
+            if($value["class"]) {
+                $item_class["custom"] = $value["class"];
+            }
             if ($value["selected"])
 			{
 				$item_class["current"] = $framework_css["current"];
-                $is_opened = true;
+                $res["is_opened"] = true;
 			}
 
-			if($item_class)
-				$item_properties["class"] = 'class="' . implode(" ", $item_class). '"';
-
-            if($item_properties)
+			if($item_class) {
+                $item_properties["class"] = 'class="' . implode(" ", $item_class) . '"';
+            }
+            if($item_properties) {
                 $item_properties = implode(" ", $item_properties);
+            }
+            if($value["badge"]) {
+                $item_actions[] = '<span class="' . cm_getClassByFrameworkCss("default", "badge") . '">' . $value["badge"] . '</span>';
+            }
 
-            if($item_actions)
-                $item_actions = '<span class="nav-controls">' . implode(" " , $item_actions) . '</span>';
-			
+            if($item_actions) {
+                $item_actions = '<span class="nav-controls">' . implode(" ", $item_actions) . '</span>';
+            }
 			$tpl->set_var("actions", $item_actions);
 			$tpl->set_var("item_properties", $item_properties);
 			$tpl->set_var("item_icon", $item_icon);
 			$tpl->set_var("item_tag", $item_tag);
+//echo "Sect" . $attr["prefix"] . "Element";
 
-            $tpl->parse("Sect" . $prefix . "Element", true);
-            $count++;
+            $parse_key = "Sect" . $attr["prefix"] . "Element";
+            if($value["position"]) {
+                $position = ucfirst($value["position"]);
+                $parse_key .= $position;
+                $res["count_position"][$position]++;
+            }
+            $tpl->parse($parse_key, true);
+
+            $res["count"]++;
         }
     }
-    
+
+    /*
     if($count) {
     	if($location == "navbar")
         	$tpl->set_var("menu_class", $framework_css["menu"]["topbar"]);
         else 
         	$tpl->set_var("menu_class", $framework_css["menu"]["navbar"]);
         $tpl->parse("SectMenu", false);
-    }
+    }*/
     
-    reset($sel_topbar);
+   // reset($sel_topbar);
 
-    return array("count" => $count, "opened" => $is_opened);
+    return $res;
 }

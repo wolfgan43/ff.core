@@ -60,7 +60,7 @@ THE SOFTWARE.
 $fileArray = array();
 foreach ($_POST as $key => $value) {
 	if ($key != 'folder') {
-		if (file_exists(FF_DISK_PATH . FF_UPDIR . $_POST['folder'] . '/' . $value)) {
+		if (file_exists(FF_DISK_UPDIR . $_POST['folder'] . '/' . $value)) {
 			$fileArray[$key] = $value;
 		}
 	}

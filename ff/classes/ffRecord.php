@@ -20,6 +20,8 @@
  * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
+if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_CACHING", false);
+
 class ffRecord
 {
 	static protected $events = null;
@@ -583,9 +585,11 @@ abstract class ffRecord_base extends ffCommon
 	 * URL completo della pagina ffRecord
 	 * @var String
 	 */
-	var $url					= "";					
+	var $url					= "";
 
-	var $record_exist 			= false;
+    var $use_cache              = FF_ENABLE_MEM_PAGE_CACHING;
+
+    var $record_exist 			= false;
 	var $first_access 			= false;
 
 	var $detail					= null;
@@ -644,7 +648,7 @@ abstract class ffRecord_base extends ffCommon
 		if ($this->db === null)
 			$this->db[0] = ffDB_Sql::factory();
 
-		if(FF_ENABLE_MEM_PAGE_CACHING)
+		if($this->use_cache)
 			$this->addEvent("on_done_action", "ffRecord_reset_cache", ffEvent::PRIORITY_HIGH);
 	}
 
@@ -1735,7 +1739,7 @@ abstract class ffRecord_base extends ffCommon
 		{
 			case "cancel":
 				$this->redirect($this->parent[0]->ret_url);
-				
+
 			case "detail_addrows":
 				$detailaction = $this->parent[0]->retrieve_param($this->id, "detailaction");
 				if (strlen($detailaction) && isset($this->detail[$detailaction]))
@@ -1759,147 +1763,148 @@ abstract class ffRecord_base extends ffCommon
 			case "insert":
 				if (!$this->allow_insert)
 					$this->redirect($this->parent[0]->ret_url);
-				
-                //INSERT DB 
-                $fields = ""; $values = "";
-                foreach ($this->form_fields as $key => $FormField)
-                {
-                    if ($this->form_fields[$key]->store_in_db == true && !strlen($this->form_fields[$key]->compare))
+
+                //INSERT DB
+                if($this->src_table) {
+                    $fields = ""; $values = "";
+                    foreach ($this->form_fields as $key => $FormField)
                     {
-                        if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
+                        if ($this->form_fields[$key]->store_in_db == true && !strlen($this->form_fields[$key]->compare))
                         {
-                            foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
+                            if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
                             {
-                                $element = $this->form_fields[$key]->get_data_source(false) . "_" . $subkey;
+                                foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
+                                {
+                                    $element = $this->form_fields[$key]->get_data_source(false) . "_" . $subkey;
+
+                                    if (strlen($fields))
+                                        $fields .= ", ";
+                                    $fields .= "`" . $element . "`";
+
+                                    if (strlen($values))
+                                        $values .= ", ";
+
+                                    $tmpval = $this->form_fields[$key]->multi_values[$subkey];
+                                    $values .= $this->db[0]->toSql($tmpval, $this->form_fields[$key]->base_type);
+                                }
+                                reset ($this->form_fields[$key]->multi_fields);
+                            }
+                            else
+                            {
+                                $processed_sql_value = false;
 
                                 if (strlen($fields))
                                     $fields .= ", ";
-                                $fields .= "`" . $element . "`";
+                                $fields .= "`" . $this->form_fields[$key]->get_data_source(false) . "`";
 
                                 if (strlen($values))
                                     $values .= ", ";
 
-                                $tmpval = $this->form_fields[$key]->multi_values[$subkey];
-                                $values .= $this->db[0]->toSql($tmpval, $this->form_fields[$key]->base_type);
-                            }
-                            reset ($this->form_fields[$key]->multi_fields);
-                        }
-                        else
-                        {
-							$processed_sql_value = false;
+                                $tmp_type = $this->form_fields[$key]->base_type;
 
+                                if ($this->form_fields[$key]->crypt_method !== null)
+                                {
+                                    switch ($this->form_fields[$key]->crypt_method)
+                                    {
+                                        case "MD5":
+                                            $tmpval = new ffData(md5($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                            $tmp_type = "Text";
+                                            break;
+                                        case "mysql_password":
+                                            $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+                                            $processed_sql_value = true;
+                                            break;
+                                        case "mysql_oldpassword":
+                                            $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                            $tmp_type = "Text";
+                                            break;
+                                        default:
+                                            ffErrorHandler::raise("Crypt method not supported!", E_USER_ERROR, $this, get_defined_vars());
+                                    }
+                                }
+                                else if ($this->form_fields[$key]->crypt)
+                                {
+                                    if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+                                    {
+                                        $tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
+                                        $tmpval = mod_sec_crypt_string($tmpval);
+                                        $tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
+                                        $processed_sql_value = true;
+                                    }
+                                }
+                                else
+                                    $tmpval = $this->form_fields[$key]->value;
+
+                                 $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
+                                 $rc = end($res);
+                                 if ($rc !== null)
+                                 {
+                                     $tmpval = $rc;
+                                     $processed_sql_value = false;
+                                     $tmp_type = $this->form_fields[$key]->base_type;
+                                 }
+
+                                $values .= ($processed_sql_value ? $tmpval : $this->db[0]->toSql($tmpval, $tmp_type));
+                            }
+                        }
+                    }
+                    reset($this->form_fields);
+
+                    if (is_array($this->additional_fields) && count($this->additional_fields))
+                    {
+                        foreach ($this->additional_fields as $key => $value)
+                        {
                             if (strlen($fields))
                                 $fields .= ", ";
-                            $fields .= "`" . $this->form_fields[$key]->get_data_source(false) . "`";
+                            $fields .= "`" . $key . "`";
 
                             if (strlen($values))
                                 $values .= ", ";
+                            $values .= $this->db[0]->toSql($value);
+                        }
+                        reset($this->additional_fields);
+                    }
 
-							$tmp_type = $this->form_fields[$key]->base_type;
-					
-                            if ($this->form_fields[$key]->crypt_method !== null)
+                    if (is_array($this->insert_additional_fields) && count($this->insert_additional_fields))
+                    {
+                        foreach ($this->insert_additional_fields as $key => $value)
+                        {
+                            if (strlen($fields))
+                                $fields .= ", ";
+                            $fields .= "`" . $key . "`";
+
+                            if (strlen($values))
+                                $values .= ", ";
+                            $values .= $this->db[0]->toSql($value);
+                        }
+                        reset($this->insert_additional_fields);
+                    }
+
+                    if (!$this->skip_insert_if_empty || ($this->skip_insert_if_empty && strlen($fields)))
+                    {
+                        $sSQL = "INSERT INTO `" . $this->src_table . "` ( " . $fields . " ) VALUES ( " . $values . " ) ";
+                        if (!$this->skip_action)
+                        {
+                            $this->db[0]->execute($sSQL);
+
+                            foreach ($this->key_fields as $key => $value)
                             {
-                                switch ($this->form_fields[$key]->crypt_method)
+                                if ($this->key_fields[$key]->auto_key)
                                 {
-                                    case "MD5":
-                                        $tmpval = new ffData(md5($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
-										$tmp_type = "Text";
-                                        break;
-                                    case "mysql_password":
-                                        $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
-										$processed_sql_value = true;
-                                        break;
-                                    case "mysql_oldpassword":
-                                        $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
-										$tmp_type = "Text";
-                                        break;
-                                    default:
-                                        ffErrorHandler::raise("Crypt method not supported!", E_USER_ERROR, $this, get_defined_vars());
+                                    $this->key_fields[$key]->value = $this->db[0]->getInsertID();
+                                    $tmp_Where = "`" . $this->key_fields[$key]->get_data_source(false) . "` = " . $this->db[0]->toSql($this->key_fields[$key]->value, $this->key_fields[$key]->base_type);
+                                    break;
                                 }
                             }
-							else if ($this->form_fields[$key]->crypt)
-							{
-								if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
-								{
-									$tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
-									$tmpval = mod_sec_crypt_string($tmpval);
-									$tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
-									$processed_sql_value = true;
-								}
-							}
-                            else
-                                $tmpval = $this->form_fields[$key]->value;
-
-                             $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
-                             $rc = end($res);
-                             if ($rc !== null)
-							 {
-                                 $tmpval = $rc;
-								 $processed_sql_value = false;
-								 $tmp_type = $this->form_fields[$key]->base_type;
-							 }
-
-                            $values .= ($processed_sql_value ? $tmpval : $this->db[0]->toSql($tmpval, $tmp_type));
+                            reset($this->key_fields);
                         }
                     }
                 }
-                reset($this->form_fields);
-
-                if (is_array($this->additional_fields) && count($this->additional_fields))
-                {
-                    foreach ($this->additional_fields as $key => $value)
-                    {
-                        if (strlen($fields))
-                            $fields .= ", ";
-                        $fields .= "`" . $key . "`";
-
-                        if (strlen($values))
-                            $values .= ", ";
-                        $values .= $this->db[0]->toSql($value);
-                    }
-                    reset($this->additional_fields);
-                }
-
-                if (is_array($this->insert_additional_fields) && count($this->insert_additional_fields))
-                {
-                    foreach ($this->insert_additional_fields as $key => $value)
-                    {
-                        if (strlen($fields))
-                            $fields .= ", ";
-                        $fields .= "`" . $key . "`";
-
-                        if (strlen($values))
-                            $values .= ", ";
-                        $values .= $this->db[0]->toSql($value);
-                    }
-                    reset($this->insert_additional_fields);
-                }
-
-                if (!$this->skip_insert_if_empty || ($this->skip_insert_if_empty && strlen($fields)))
-				{
-					$sSQL = "INSERT INTO `" . $this->src_table . "` ( " . $fields . " ) VALUES ( " . $values . " ) ";
-					if (!$this->skip_action)
-					{
-						$this->db[0]->execute($sSQL);
-
-						foreach ($this->key_fields as $key => $value)
-						{
-							if ($this->key_fields[$key]->auto_key)
-							{
-								$this->key_fields[$key]->value = $this->db[0]->getInsertID();
-								$tmp_Where = "`" . $this->key_fields[$key]->get_data_source(false) . "` = " . $this->db[0]->toSql($this->key_fields[$key]->value, $this->key_fields[$key]->base_type);
-								break;
-							}
-						}
-						reset($this->key_fields);
-					}
-				}
-
 				// MANAGE FILES
 				ffCommon_manage_files($this, $tmp_Where);
-                
+
 				$rc = false;
-				
+
 				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
 				if (array_search(true, $res))
 					$rc |= true;
@@ -1928,130 +1933,131 @@ abstract class ffRecord_base extends ffCommon
 			case "update":
 				if (!$this->allow_update)
 					$this->redirect($this->parent[0]->ret_url);
-				
+
 				// MANAGE FILES
 				ffCommon_manage_files($this);
-					
-                $fields = "";
-                foreach ($this->form_fields as $key => $FormField)
-                {
-					$processed_sql_value = false;
-					
-                    if ($this->form_fields[$key]->store_in_db == true && !strlen($this->form_fields[$key]->compare) &&
-                            !($this->form_fields[$key]->extended_type == "Password" && !strlen($this->form_fields[$key]->getValue()))
-                        )
+
+				if($this->src_table) {
+                    $fields = "";
+                    foreach ($this->form_fields as $key => $FormField)
                     {
-                        if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
+                        $processed_sql_value = false;
+
+                        if ($this->form_fields[$key]->store_in_db == true && !strlen($this->form_fields[$key]->compare) &&
+                                !($this->form_fields[$key]->extended_type == "Password" && !strlen($this->form_fields[$key]->getValue()))
+                            )
                         {
-                            foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
+                            if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
                             {
-                                if ($this->form_fields[$key]->multi_values[$subkey]->ori_value != $this->form_fields[$key]->multi_values_ori[$subkey]->ori_value)
+                                foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
                                 {
-                                    $element = $this->form_fields[$key]->get_data_source(false) . "_" . $subkey;
+                                    if ($this->form_fields[$key]->multi_values[$subkey]->ori_value != $this->form_fields[$key]->multi_values_ori[$subkey]->ori_value)
+                                    {
+                                        $element = $this->form_fields[$key]->get_data_source(false) . "_" . $subkey;
 
-                                    if (strlen($fields))
-                                        $fields .= ", ";
+                                        if (strlen($fields))
+                                            $fields .= ", ";
 
-                                    $tmpval = $this->form_fields[$key]->multi_values[$subkey];
+                                        $tmpval = $this->form_fields[$key]->multi_values[$subkey];
 
-                                    $fields .= "`" . $this->src_table . "`.`" . $element . "`"
-                                                . " = "
-                                                . $this->db[0]->toSql($tmpval);
+                                        $fields .= "`" . $this->src_table . "`.`" . $element . "`"
+                                                    . " = "
+                                                    . $this->db[0]->toSql($tmpval);
+                                    }
                                 }
+                                reset ($this->form_fields[$key]->multi_fields);
                             }
-                            reset ($this->form_fields[$key]->multi_fields);
+                            elseif ($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) != $this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
+                            {
+                                if (strlen($fields))
+                                    $fields .= ", ";
+
+                                $tmp_type = $this->form_fields[$key]->base_type;
+
+                                if ($this->form_fields[$key]->crypt_method !== null)
+                                {
+                                    switch ($this->form_fields[$key]->crypt_method)
+                                    {
+                                        case "MD5":
+                                            $tmpval = new ffData(md5($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                            $tmp_type = "Text";
+                                            break;
+                                        case "mysql_password":
+                                            $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+                                            $processed_sql_value = true;
+                                            break;
+                                        case "mysql_oldpassword":
+                                            $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                            $tmp_type = "Text";
+                                            break;
+                                        default:
+                                            die("Crypt method not supported!");
+                                    }
+                                }
+                                else if ($this->form_fields[$key]->crypt)
+                                {
+                                    if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
+                                    {
+                                        $tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
+                                        $tmpval = mod_sec_crypt_string($tmpval);
+                                        $tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
+                                        $processed_sql_value = true;
+                                        $tmp_type = "Text";
+                                    }
+                                }
+                                else
+                                    $tmpval = $this->form_fields[$key]->value;
+
+                                 $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
+                                 $rc = end($res);
+                                 if ($rc !== null)
+                                 {
+                                     $tmpval = $rc;
+                                     $processed_sql_value = false;
+                                     $tmp_type = $this->form_fields[$key]->base_type;
+                                 }
+
+                                $fields .= "`" . $this->src_table . "`.`" . $this->form_fields[$key]->get_data_source(false) . "`"
+                                            . " = "
+                                            . ($processed_sql_value ?
+                                                    $tmpval
+                                                    : $this->db[0]->toSql($tmpval, $tmp_type)
+                                                );
+                            }
                         }
-                        elseif ($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) != $this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
+                    }
+                    reset($this->form_fields);
+
+                    //UPDATE DB
+                    if (is_array($this->additional_fields) && count($this->additional_fields))
+                    {
+                        foreach ($this->additional_fields as $key => $value)
                         {
                             if (strlen($fields))
                                 $fields .= ", ";
-
-							$tmp_type = $this->form_fields[$key]->base_type;
-					
-                            if ($this->form_fields[$key]->crypt_method !== null)
-                            {
-                                switch ($this->form_fields[$key]->crypt_method)
-                                {
-                                    case "MD5":
-                                        $tmpval = new ffData(md5($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
-										$tmp_type = "Text";
-                                        break;
-                                    case "mysql_password":
-                                        $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
-										$processed_sql_value = true;
-                                        break;
-                                    case "mysql_oldpassword":
-                                        $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
-										$tmp_type = "Text";
-                                        break;
-                                    default:
-                                        die("Crypt method not supported!");
-                                }
-                            }
-                            else if ($this->form_fields[$key]->crypt)
-							{
-								if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
-								{
-									$tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
-									$tmpval = mod_sec_crypt_string($tmpval);
-									$tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
-									$processed_sql_value = true;
-									$tmp_type = "Text";
-								}
-							}
-							else
-                                $tmpval = $this->form_fields[$key]->value;
-
-                             $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
-                             $rc = end($res);
-                             if ($rc !== null)
-							 {
-                                 $tmpval = $rc;
-								 $processed_sql_value = false;
-								 $tmp_type = $this->form_fields[$key]->base_type;
-							 }
-
-                            $fields .= "`" . $this->src_table . "`.`" . $this->form_fields[$key]->get_data_source(false) . "`"
-                                        . " = "
-                                        . ($processed_sql_value ? 
-												$tmpval
-												: $this->db[0]->toSql($tmpval, $tmp_type)
-											);
+                            $fields .= "`" . $key . "` = " . $this->db[0]->toSql($value);
                         }
+                        reset($this->additional_fields);
                     }
-                }
-                reset($this->form_fields);
-				
-                //UPDATE DB
-                if (is_array($this->additional_fields) && count($this->additional_fields))
-                {
-                    foreach ($this->additional_fields as $key => $value)
-                    {
-                        if (strlen($fields))
-                            $fields .= ", ";
-                        $fields .= "`" . $key . "` = " . $this->db[0]->toSql($value);
-                    }
-                    reset($this->additional_fields);
-                }
 
-                if (is_array($this->update_additional_fields) && count($this->update_additional_fields))
-                {
-                    foreach ($this->update_additional_fields as $key => $value)
+                    if (is_array($this->update_additional_fields) && count($this->update_additional_fields))
                     {
-                        if (strlen($fields))
-                            $fields .= ", ";
-                        $fields .= "`" . $key . "` = " . $this->db[0]->toSql($value);
+                        foreach ($this->update_additional_fields as $key => $value)
+                        {
+                            if (strlen($fields))
+                                $fields .= ", ";
+                            $fields .= "`" . $key . "` = " . $this->db[0]->toSql($value);
+                        }
+                        reset($this->update_additional_fields);
                     }
-                    reset($this->update_additional_fields);
-                }
 
-                if (strlen($fields))
-                {
-                    $sSQL = "UPDATE `" . $this->src_table . "` SET " . $fields . " WHERE " . $this->sWhere . $this->sAddWhere;
-                    if (!$this->skip_action)
-                        $this->db[0]->execute($sSQL);
+                    if (strlen($fields))
+                    {
+                        $sSQL = "UPDATE `" . $this->src_table . "` SET " . $fields . " WHERE " . $this->sWhere . $this->sAddWhere;
+                        if (!$this->skip_action)
+                            $this->db[0]->execute($sSQL);
+                    }
                 }
-                
 				$rc = false;
 				
 				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
@@ -2127,90 +2133,92 @@ abstract class ffRecord_base extends ffCommon
 				if ($rc)
 					return;
 
-				$tmp_action = $this->del_action;
-				if (strlen($this->del_auto_action))
-				{
-					$bResult = false;
-					$tmp_db = ffDB_Sql::factory();
-					// first of all, do all the sql for subsequent checks
-					foreach ($this->del_auto_SQL as $key => $value)
-					{
-						$tmp_db->query($this->process_SQL($value));
-						if ($tmp_db->nextRecord())
-							$bResult = true;
-					}
-					reset($this->del_auto_SQL);
+                if($this->src_table) {
+                    $tmp_action = $this->del_action;
+                    if (strlen($this->del_auto_action))
+                    {
+                        $bResult = false;
+                        $tmp_db = ffDB_Sql::factory();
+                        // first of all, do all the sql for subsequent checks
+                        foreach ($this->del_auto_SQL as $key => $value)
+                        {
+                            $tmp_db->query($this->process_SQL($value));
+                            if ($tmp_db->nextRecord())
+                                $bResult = true;
+                        }
+                        reset($this->del_auto_SQL);
 
-					switch ($this->del_auto_action)
-					{
-						case "single":
-							if ($bResult)
-								$tmp_action = "update";
-							else
-								$tmp_action = "delete";
-							break;
+                        switch ($this->del_auto_action)
+                        {
+                            case "single":
+                                if ($bResult)
+                                    $tmp_action = "update";
+                                else
+                                    $tmp_action = "delete";
+                                break;
 
-						case "multi":
-							if ($bResult)
-								$tmp_action = "multi_update";
-							else
-								$tmp_action = "multi_delete";
-							break;
+                            case "multi":
+                                if ($bResult)
+                                    $tmp_action = "multi_update";
+                                else
+                                    $tmp_action = "multi_delete";
+                                break;
 
-						case "error":
-							if ($bResult)
-							{
-								$this->frmAction = "";
-								$this->strError = "Esistono record correlati, impossibile procedere all'eliminazione.";
-								return;
-							}
-					}
-				}
+                            case "error":
+                                if ($bResult)
+                                {
+                                    $this->frmAction = "";
+                                    $this->strError = "Esistono record correlati, impossibile procedere all'eliminazione.";
+                                    return;
+                                }
+                        }
+                    }
 
-				switch ($tmp_action)
-				{
-					case "delete":
-						if (!$this->skip_action)
-							$this->delete_files();
-						$sSQL = "DELETE FROM `" . $this->src_table . "` WHERE " . $this->sWhere  . $this->sAddWhere;
-						if (!$this->skip_action)
-							$this->db[0]->execute($sSQL);
-						break;
+                    switch ($tmp_action)
+                    {
+                        case "delete":
+                            if (!$this->skip_action)
+                                $this->delete_files();
+                            $sSQL = "DELETE FROM `" . $this->src_table . "` WHERE " . $this->sWhere  . $this->sAddWhere;
+                            if (!$this->skip_action)
+                                $this->db[0]->execute($sSQL);
+                            break;
 
-					case "multi_delete":
-						if (!$this->skip_action)
-							$this->delete_files();
-						$sSQL = "DELETE FROM `" . $this->src_table . "` WHERE " . $this->sWhere . $this->sAddWhere;
-						if (!$this->skip_action)
-							$this->db[0]->execute($sSQL);
+                        case "multi_delete":
+                            if (!$this->skip_action)
+                                $this->delete_files();
+                            $sSQL = "DELETE FROM `" . $this->src_table . "` WHERE " . $this->sWhere . $this->sAddWhere;
+                            if (!$this->skip_action)
+                                $this->db[0]->execute($sSQL);
 
-						foreach ($this->del_multi_delete as $key => $value)
-						{
-							if (!$this->skip_action)
-								$this->db[0]->execute($this->process_SQL($value));
-						}
-						reset($this->del_multi_delete);
-						break;
+                            foreach ($this->del_multi_delete as $key => $value)
+                            {
+                                if (!$this->skip_action)
+                                    $this->db[0]->execute($this->process_SQL($value));
+                            }
+                            reset($this->del_multi_delete);
+                            break;
 
-					case "update":
-						$sSQL = "UPDATE `" . $this->src_table . "` SET " . $this->process_SQL($this->del_update) . " WHERE " . $this->sWhere . $this->sAddWhere;
-						if (!$this->skip_action)
-							$this->db[0]->execute($sSQL);
-						break;
+                        case "update":
+                            $sSQL = "UPDATE `" . $this->src_table . "` SET " . $this->process_SQL($this->del_update) . " WHERE " . $this->sWhere . $this->sAddWhere;
+                            if (!$this->skip_action)
+                                $this->db[0]->execute($sSQL);
+                            break;
 
-					case "multi_update":
-						$sSQL = "UPDATE `" . $this->src_table . "` SET " . $this->process_SQL($this->del_update) . " WHERE " . $this->sWhere . $this->sAddWhere;
-						if (!$this->skip_action)
-							$this->db[0]->execute($sSQL);
+                        case "multi_update":
+                            $sSQL = "UPDATE `" . $this->src_table . "` SET " . $this->process_SQL($this->del_update) . " WHERE " . $this->sWhere . $this->sAddWhere;
+                            if (!$this->skip_action)
+                                $this->db[0]->execute($sSQL);
 
-						foreach ($this->del_multi_update as $key => $value)
-						{
-							if (!$this->skip_action)
-								$this->db[0]->execute($this->process_SQL($value));
-						}
-						reset($this->del_multi_update);
-						break;
-				}
+                            foreach ($this->del_multi_update as $key => $value)
+                            {
+                                if (!$this->skip_action)
+                                    $this->db[0]->execute($this->process_SQL($value));
+                            }
+                            reset($this->del_multi_update);
+                            break;
+                    }
+                }
 
 				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));
 				if (array_search(true, $res))
@@ -2351,10 +2359,15 @@ function ffRecord_reset_cache($oRecord, $frmAction)
 {
 	if (strlen($frmAction) && count($oRecord->cache_clear_resources))
 	{
-		$cache = ffCache::getInstance(FF_CACHE_ADAPTER);
+		$cache = ffCache::getInstance();
+        foreach ($oRecord->cache_clear_resources as $cache_clear_resource) {
+            $cache->clear($cache_clear_resource);
+		}
+/*
 		call_user_func_array(
 				array($cache, "clear")
 				, $oRecord->cache_clear_resources
 			);
+*/
 	}
 }

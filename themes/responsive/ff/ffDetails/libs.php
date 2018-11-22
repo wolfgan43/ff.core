@@ -16,7 +16,8 @@
 								, "file" => "ff.ffDetails.sortable.js"
 								, "index" => 100
 								, "js_deps" => array(
-									"ff.ajax" => null
+								    "jquery.ui" => null
+									, "ff.ajax" => null
 								)
 							)
 						)

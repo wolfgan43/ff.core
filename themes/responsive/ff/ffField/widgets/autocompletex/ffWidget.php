@@ -80,12 +80,12 @@ class ffWidget_autocompletex extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
 
-		if ($style_path !== null)
+		if ($this->style_path !== null)
 			$this->tpl[$id]->set_var("style_path", $this->style_path);
 		elseif ($this->oPage !== null)
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());

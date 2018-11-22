@@ -986,8 +986,8 @@ function cm_getLayoutDepsByPath($layout_path)
 	return $layout_vars;
 }
 
-function MainRecord_on_done_action(ffRecord_base $oRecord, $frmAction)
+function MainRecord_on_done_action($component, $action)
 {
-	if (CM_ENABLE_MEM_CACHING)
-		ffCache::getInstance(CM_CACHE_ADAPTER)->clear("__cm_layout__");
+	if ($action && CM_ENABLE_MEM_CACHING)
+		ffCache::getInstance()->clear("/cm/layout");
 }

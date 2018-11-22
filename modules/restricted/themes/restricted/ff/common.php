@@ -14,20 +14,22 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 	$globals_mod = ffGlobals::getInstance("__mod_restricted__");
     $is_default = ($attr["default"] == "true" ? true : false);
 
-	$success = false;
-	if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
-	{
-		$hash = "__mod_restricted_" . $location . "_" . mod_res_get_hash();
-		$res = $cm->cache->get($hash, $success);
-	}
-	if ($success)
-	{
-		$tmp = unserialize($res);
-		$access = $tmp["access"];
-		$tpl->ParsedBlocks = $tmp["ParsedBlock"];
-	}
-	else
-	{
+    if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+    {
+        $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                ? $cm->path_info
+                : "default"
+            );
+
+        $res = $cm->cache->get($cache_key, "/cm/mod/restricted/template/topbar");
+    }
+    if ($res)
+    {
+        $globals_mod->access    = $res["access"];
+        $tpl->ParsedBlocks      = $res["ParsedBlock"];
+    }
+    else
+    {
         $count = 0;
 		$toskip = explode(",", MOD_SEC_PROFILING_SKIPSYSTEM);
 		foreach ($cm->modules["restricted"]["menu"] as $key => $value)
@@ -67,21 +69,7 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
 				$tpl->set_var("description", $description);
 					
 				$add_class = "";
-				// modifica di ALEX
-                if (MOD_RES_FULLBAR || array_key_exists("fullbar", $cm->modules["restricted"]) /*&& $location == "topbar"*/)
-				{
-					
-					if (!(MOD_RES_FULLBAR_EXTENDED || ffIsset($cm->modules["restricted"], "fullbar_extended")))
-						$tpl->set_var("SectChild", "");
-					
-					$res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["menu"][$key], "Child");
-                    if($res_navbar["count"]) 
-                    {
-                        $tpl->parse("SectChild", true);
-                        if($res_navbar["opened"])
-                        	$add_class = " active opened";
-					}
-                }
+
 				
 				$globals = "";
 				$params = "";
@@ -152,14 +140,21 @@ function mod_restricted_cm_on_load_topbar($page, $tpl, $location, $attr)
             $tpl->set_var("SectMenu", "");
         }
 
-		if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
-		{
-			$tmp = array(
-				"ParsedBlock" => $tpl->ParsedBlocks
-				, "access" => $globals_mod->access
-			);
-			$res = $cm->cache->set($hash, null, serialize($tmp), "__mod_restricted__");
-		}
+        if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+        {
+            $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                    ? $cm->path_info
+                    : "default"
+                );
+
+            /** @var reference $access */
+            $tmp = array(
+                "ParsedBlock" => $tpl->ParsedBlocks
+            , "access" => $globals_mod->access
+            );
+
+            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/topbar");
+        }
 	}
 }
 
@@ -196,20 +191,22 @@ function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
 	if (!is_array($cm->modules["restricted"]["sel_topbar"]["elements"]) || !count($cm->modules["restricted"]["sel_topbar"]["elements"]))
 		return;
 
-	$success = false;
-	if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
-	{
-		$hash = "__mod_restricted_" . $location . "_" . mod_res_get_hash();
-		$res = $cm->cache->get($hash, $success);
-	}
-	if ($success)
-	{
-		$tmp = unserialize($res);
-		$access = $tmp["access"];
-		$tpl->ParsedBlocks = $tmp["ParsedBlock"];
-	}
-	else
-	{
+    if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+    {
+        $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                ? $cm->path_info
+                : "default"
+            );
+
+        $res = $cm->cache->get($cache_key, "/cm/mod/restricted/template/navbar");
+    }
+    if ($res)
+    {
+        $globals_mod->access    = $res["access"];
+        $tpl->ParsedBlocks      = $res["ParsedBlock"];
+    }
+    else
+    {
 		// modifica di ALEX
 		$res_navbar = mod_restricted_process_navbar($tpl, $cm->modules["restricted"]["sel_topbar"], "", $location, $is_default);
 
@@ -220,14 +217,21 @@ function mod_restricted_cm_on_load_navbar($page, $tpl, $location, $attr)
 		else 
             $tpl->set_var("SectMenu", "");
 
-		if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
-		{
-			$tmp = array(
-				"ParsedBlock" => $tpl->ParsedBlocks
-				, "access" => $globals_mod->access
-			);
-			$res = $cm->cache->set($hash, null, serialize($tmp), "__mod_restricted__");
-		}
+        if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
+        {
+            $cache_key = "/" . $location . (MOD_RES_MEM_CACHING_BYPATH
+                    ? $cm->path_info
+                    : "default"
+                );
+
+            /** @var reference $access */
+            $tmp = array(
+                "ParsedBlock" => $tpl->ParsedBlocks
+            , "access" => $globals_mod->access
+            );
+
+            $res = $cm->cache->set($cache_key, $tmp, "/cm/mod/restricted/template/navbar");
+        }
 	}
 }
 

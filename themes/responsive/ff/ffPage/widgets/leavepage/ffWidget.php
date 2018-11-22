@@ -34,7 +34,7 @@ class ffWidget_leavepage extends ffCommon
 
 		$this->oPage = array(&$oPage);
 		
-		$this->tpl[0] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[0] = ffTemplate::factory(__DIR__);
 		$this->tpl[0]->load_file($this->template_file, "main");
 
 		if ($source_path !== null)

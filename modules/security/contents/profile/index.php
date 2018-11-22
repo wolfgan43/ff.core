@@ -86,25 +86,13 @@ if(strlen(MOD_SEC_USER_AVATAR) && !mod_security_is_defined_field(MOD_SEC_USER_AV
 	$oField = ffField::factory($cm->oPage);
 	$oField->id = MOD_SEC_USER_AVATAR;
 	$oField->label = "Avatar";
-	$oField->base_type = "Text";
 	$oField->extended_type = "File";
-	$oField->file_storing_path = FF_DISK_PATH . FF_UPDIR . "/users/" . $uid;
-	$oField->file_temp_path = FF_DISK_PATH . FF_UPDIR . "/users";
-	$oField->file_max_size = 5000000;
-	$oField->file_show_filename = true; 
-	$oField->file_full_path = true;
-	$oField->file_check_exist = false;
-	$oField->file_normalize = true;
-	$oField->file_show_preview = true;
-	$oField->uploadify_model_thumb = "thumb";
-	$oField->file_saved_view_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/[_FILENAME_]";
-	$oField->file_saved_preview_url = FF_SITE_PATH . constant("CM_SHOWFILES") . "/" . $oField->uploadify_model_thumb . "/[_FILENAME_]";
-
+	$oField->file_storing_path = FF_DISK_UPDIR . "/users/" . $uid;
+	$oField->file_temp_path = FF_DISK_UPDIR . "/users";
+    $oField->file_max_size = 5000000;
+    $oField->file_full_path = true;
 	if(get_session("UserLevel") > 1)
 	{
-		$oField->control_type = "file";
-		$oField->file_show_delete = true;
-		
 		$oField->widget = "uploadifive";
 	} 
 	else 

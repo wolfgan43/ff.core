@@ -20,7 +20,7 @@
  * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
-abstract class ffImage extends ffClassChecks
+abstract class ffImage
 {
 	// PUBLIC
 	var $new_res_max_x						= NULL;
@@ -87,10 +87,12 @@ abstract class ffImage extends ffClassChecks
 	{
 		if ($this->src_res === NULL)
 			$this->src_res = $this->load_image($this->src_res_path);
-			
-		$this->calc_dim();
-	
-		$this->pre_processed = true;
+
+		if($this->src_res) {
+            $this->calc_dim();
+
+            $this->pre_processed = true;
+        }
 	}
 	
 	function calc_dim() 
@@ -409,8 +411,7 @@ abstract class ffImage extends ffClassChecks
 		
 		do 
 		{
-			//die($this->get_template_dir() . "/fonts/" . $this->src_res_font_type);
-			$bbox = imagettfbbox($this->new_res_font["size"], 0, $this->get_template_dir() . "/fonts/" . $this->new_res_font["type"], $this->new_res_font["caption"]);
+			$bbox = imagettfbbox($this->new_res_font["size"], 0, __DIR__ . "/fonts/" . $this->new_res_font["type"], $this->new_res_font["caption"]);
 
 			$text_width_top = abs($bbox[6]) + abs($bbox[4]);
 			$text_width_bottom = abs($bbox[0]) + abs($bbox[2]);
@@ -474,7 +475,7 @@ abstract class ffImage extends ffClassChecks
 						, $src_res_font_x_start 
 						, $src_res_font_y_start
 						, $color_font
-						, $this->get_template_dir() . "/fonts/" . $this->new_res_font["type"]
+						, __DIR__ . "/fonts/" . $this->new_res_font["type"]
 						, $this->new_res_font["caption"]
 					);
 	}
@@ -483,7 +484,10 @@ abstract class ffImage extends ffClassChecks
 	{
 		if ($this->src_res === NULL && !$this->pre_processed)
 			$this->pre_process();
-         
+
+		if(!$this->src_res)
+		    return;
+
 		$tmp_res = imagecreatetruecolor(
 											intval($this->new_res_dim_x), intval($this->new_res_dim_y)
 										);
@@ -502,15 +506,15 @@ abstract class ffImage extends ffClassChecks
 		}
 		else
 		{
-			$tmp_transparent = imagecolortransparent($this->src_res);
-			if ($transparent != -1)
-				$tmp_transparent = imagecolortransparent($tmp_res, $tmp_transparent);
+            $tmp_color_transparent = imagecolortransparent($this->src_res);
+			if ($tmp_color_transparent != -1)
+				$tmp_transparent = imagecolortransparent($tmp_res, $tmp_color_transparent);
 		}
 			
 		if (strlen($this->new_res_background_color_hex) == 6)
 		{
 			if ($this->new_res_transparent_color_hex == $this->new_res_background_color_hex)
-				$color_background = $color_transparent;
+				$color_background = $tmp_transparent;
 			else
 				$color_background = imagecolorallocatealpha($tmp_res 
 																, hexdec(substr($this->new_res_background_color_hex, 0, 2))

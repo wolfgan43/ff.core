@@ -114,7 +114,7 @@ if (MOD_SEC_PROFILING_SKIPSYSTEM !== "*")
 		$path = $key;
 		foreach ($value as $subkey => $subvalue)
 		{
-			if ($subvalue["hide"] || $subvalue["is_heading"] || $subvalue["profiling_skip"])
+			if ($subvalue["hide"] || $subvalue["profiling_skip"])
 				continue;
 
 			$level = count(explode("/", $path)) - 2;

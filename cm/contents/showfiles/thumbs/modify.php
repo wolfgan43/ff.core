@@ -222,24 +222,7 @@ $oField->multi_pairs = array (
                        );
 $oField->default_value = new ffData($file_properties["format"], "Text");
 $oField->required = true;
-if(!CM_SHOWFILES_OPTIMIZE)
-	$oField->setWidthComponent(6);
-$oRecord->addContent($oField, "image");   
-
-if(!CM_SHOWFILES_OPTIMIZE) {
-	$oField = ffField::factory($cm->oPage);
-	$oField->id = "format_jpg_quality";
-	$oField->label = ffTemplate::_get_word_by_code("extras_image_modify_jpg_quality");
-	$oField->base_type = "Number";
-	$oField->default_value = new ffData($file_properties["format_jpg_quality"], "Number");
-	$oField->required = true;
-	$oField->widget = "slider";
-	$oField->min_val = "0";
-	$oField->max_val = "100";
-	$oField->step = "5";
-	$oField->setWidthComponent(6);
-	$oRecord->addContent($oField, "image");
-}
+$oRecord->addContent($oField, "image");
 
 $oRecord->addTab("watermarkimage");
 $oRecord->setTabTitle("watermarkimage", ffTemplate::_get_word_by_code("extras_image_modify_watermarkimage"));
@@ -257,8 +240,8 @@ $oField->label = ffTemplate::_get_word_by_code("extras_image_modify_image_cover"
 $oField->base_type = "Text";
 $oField->extended_type = "File";
 $oField->control_type = "file";
-$oField->file_storing_path = DISK_UPDIR . "/watermarks";
-$oField->file_temp_path = DISK_UPDIR . "/watermarks";
+$oField->file_storing_path = FF_DISK_UPDIR . "/watermarks";
+$oField->file_temp_path = FF_DISK_UPDIR . "/watermarks";
 $oField->file_show_filename = true;
 $oField->file_full_path = false;
 $oField->file_check_exist = false;
@@ -453,9 +436,9 @@ $oField->default_value = new ffData("0", "Number");
 $oField->widget = "spinner";
 $oRecord->addContent($oField, "advanced");
 
-$item_value[] = array(new ffData(FF_THEME_DIR . "/" . CM_DEFAULT_THEME . "/images/spacer.gif"), new ffData("spacer"));
+//$item_value[] = array(new ffData(FF_THEME_DIR . "/" . CM_DEFAULT_THEME . "/images/spacer.gif"), new ffData("spacer"));
 
-$icon_file = glob(FF_DISK_PATH . FF_THEME_DIR . "/" . CM_DEFAULT_THEME . "/images/icons/" . THEME_ICO . "/thumb/*");
+$icon_file = glob(ffMedia::getIconPath(false) . "/*");
 if(is_array($icon_file) && count($icon_file)) {
     foreach($icon_file AS $real_file) {
         if(is_file($real_file)) {
@@ -491,7 +474,7 @@ $cm->oPage->tplAddJs("ff.cm-showfiles-thumbs", array(
 
 function Thumbs_on_done_action($component, $action) {
     if (strlen($action) && CM_ENABLE_MEM_CACHING)
-        ffCache::getInstance(CM_CACHE_ADAPTER)->clear("__showfiles_modes__");
+        ffCache::getInstance()->clear("/cm/showfiles/modes");
 }
 
 function get_image_default() {
@@ -504,7 +487,6 @@ function get_image_default() {
     $default_image["max_y"] 						= 0;
     $default_image["bgcolor"]               		= "FFFFFF";
     $default_image["format"]              			= "jpg";
-    $default_image["format_jpg_quality"]            = 77;
     $default_image["transparent"]              		= false;
     $default_image["alpha"]                    		= 0;
     $default_image["alignment"]                    	= "center";

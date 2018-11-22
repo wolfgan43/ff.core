@@ -37,6 +37,19 @@ class CSSmin
     private $raise_php_limits;
 
     /**
+     * Minify Javascript.
+     *
+     * @param string $js Javascript to be minified
+     *
+     * @return string
+     */
+    public static function _minify($css, $raise_php_limits = TRUE, $linebreak_pos = false)
+    {
+        $cssmin = new CSSmin($raise_php_limits);
+        return $cssmin->run($css, $linebreak_pos);
+    }
+
+	/**
      * @param bool|int $raise_php_limits
      * If true, PHP settings will be raised if needed
      */
@@ -213,7 +226,7 @@ class CSSmin
      * @param int|bool $linebreak_pos
      * @return string
      */
-    private function _minify($css, $linebreak_pos)
+    private function minify($css, $linebreak_pos)
     {
         // strings are safe, now wrestle the comments
         for ($i = 0, $max = count($this->comments); $i < $max; $i++) {
@@ -772,17 +785,4 @@ class CSSmin
 
         return (int) $size;
     }
-
-	/**
-	 * Minify Javascript.
-	 *
-	 * @param string $js Javascript to be minified
-	 *
-	 * @return string
-	 */
-    public static function minify($css = '', $linebreak_pos = FALSE, $raise_php_limits = TRUE)
-	{
-		$minifier = new CSSmin($raise_php_limits);
-		return $minifier->run($css, $linebreak_pos);
-	}
 }

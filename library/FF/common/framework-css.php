@@ -94,15 +94,23 @@ function cm_getFrameworkCss_settings($name = null) {
 	            "topbar" => "topbar"
 	            , "navbar" => "navbar"
 	        )
+            , "sidenav" => array( ///classsi bootstrap da convertire
+                "container" => "side-nav in"
+                , "item" => "side-nav-item"
+                , "link" => "side-nav-link"
+                , "secondlevelmenu" => "side-nav-second-level"
+                , "thirdlevelmenu" => "side-nav-third-level"
+                , "header" => "side-nav-title side-nav-item"
+             )
 	        , "list" => array( ///classsi bootstrap da convertire
 	            "group" => "list-group"
+                , "group-horizontal" => "list-group list-group-horizontal"
 	            , "item" => "list-group-item"
 	            , "item-button" => "list-group-item-action"
 	            , "item-success" => "list-group-item-success"
 	            , "item-info" => "list-group-item-info"
 	            , "item-warning" => "list-group-item-warning"
 	            , "item-danger" => "list-group-item-danger"
-	            , "badge" => "badge"
 	            , "current" => "active"
 	            , "disabled" => "disabled"
 	        )
@@ -140,6 +148,14 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "footer" => "panel-footer"
 
 	        )
+            , "badge" => array(  // DA FARE CORRISPINDENZA QUESTO E BOOTSTRAP
+                "default"       => "badge"
+                , "primary"     => "badge badge-primary"
+                , "success"     => "badge badge-success"
+                , "info"        => "badge badge-info"
+                , "warning"     => "badge badge-warning"
+                , "danger"      => "badge badge-danger"
+            )
 	        , "callout" => array(
 	            "default"       => "callout"
 	            , "primary"     => "callout callout-primary"
@@ -271,12 +287,7 @@ function cm_getFrameworkCss_settings($name = null) {
 	        )
 	    )
 	    , "bootstrap" => array(
-	        "params" => array(
-	            "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"
-	            , "js" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"
-	            , "js_init" => ""
-	        )
-	        , "class" => array(
+	         "class" => array(
 	            "container" => "container"
 	            , "wrap" => "container"
 	            , "skip-full" => false
@@ -371,16 +382,27 @@ function cm_getFrameworkCss_settings($name = null) {
 	        , "bar" => array(
 	            "topbar" => "nav navbar-nav"
 	            , "navbar" => "nav nav-pills nav-stacked"
+                , "sidebar" => array(
+                    ///todo: da fare il merge con il tema custom
+                )
 	        )
+            , "sidenav" => array( ///classsi bootstrap da convertire
+                "container" => "side-nav in"
+                , "item" => "side-nav-item"
+                , "link" => "side-nav-link"
+                , "secondlevelmenu" => "side-nav-second-level"
+                , "thirdlevelmenu" => "side-nav-third-level"
+                , "header" => "side-nav-title side-nav-item"
+             )
 	        , "list" => array(
 	            "group" => "list-group"
+                , "group-horizontal" => "list-group list-group-horizontal"
 	            , "item" => "list-group-item"
 	            , "item-button" => "list-group-item-action"
 	            , "item-success" => "list-group-item-success"
 	            , "item-info" => "list-group-item-info"
 	            , "item-warning" => "list-group-item-warning"
 	            , "item-danger" => "list-group-item-danger"
-	            , "badge" => "badge"
 	            , "current" => "active"
 	            , "disabled" => "disabled"
 	        )
@@ -418,6 +440,14 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "footer" => "panel-footer"
 
 	        )
+            , "badge" => array(
+                "default"       => "badge"
+                , "primary"     => "badge badge-primary"
+                , "success"     => "badge badge-success"
+                , "info"        => "badge badge-info"
+                , "warning"     => "badge badge-warning"
+                , "danger"      => "badge badge-danger"
+            )
 	        , "callout" => array(
 	            "default"       => "bs-callout"
 	            , "primary"     => "bs-callout bs-callout-primary"
@@ -528,27 +558,9 @@ function cm_getFrameworkCss_settings($name = null) {
 	                "link" => 'data-toggle="collapse"'
 	            )
 	        )
-	        , "theme" => array(
-	            "amelia" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia/bootstrap.min.css"
-	            , "cerulean" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean/bootstrap.min.css"
-	            , "cosmo" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cosmo/bootstrap.min.css"
-	            , "cyborg" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/cyborg/bootstrap.min.css"
-	            , "flatly" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/flatly/bootstrap.min.css"
-	            , "journal" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/journal/bootstrap.min.css"
-	            , "readable" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/readable/bootstrap.min.css"
-	            , "simplex" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/simplex/bootstrap.min.css"
-	            , "slate" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/slate/bootstrap.min.css"
-	            , "spacelab" 		=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab/bootstrap.min.css"
-	            , "united" 			=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
-	        )
 	    )
 	    , "foundation" => array(
-	        "params" => array(
-                "css" 				=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css"
-                , "js" 				=> "http" . ($_SERVER["HTTPS"] ? "s": "") . "://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.js"
-	            , "js_init" 		=> 'jQuery(function() { jQuery(document).foundation(); });'//non funziona con la cache
-	        )
-	        , "class" => array(
+	         "class" => array(
 	            "container" => "container"
 	            , "wrap" => "row"
 	            , "skip-full" => true
@@ -642,15 +654,23 @@ function cm_getFrameworkCss_settings($name = null) {
 	            "topbar" => "top-bar top-bar-section"
 	            , "navbar" => "side-nav"
 	        )
+            , "sidenav" => array( ///classsi bootstrap da convertire
+                "container" => "side-nav in"
+                , "item" => "side-nav-item"
+                , "link" => "side-nav-link"
+                , "secondlevelmenu" => "side-nav-second-level"
+                , "thirdlevelmenu" => "side-nav-third-level"
+                , "header" => "side-nav-title side-nav-item"
+             )
             , "list" => array( ///classsi bootstrap da convertire
                 "group" => "list-group"
+                , "group-horizontal" => "list-group list-group-horizontal"
                 , "item" => "list-group-item"
                 , "item-button" => "list-group-item-action"
                 , "item-success" => "list-group-item-success"
                 , "item-info" => "list-group-item-info"
                 , "item-warning" => "list-group-item-warning"
                 , "item-danger" => "list-group-item-danger"
-                , "badge" => "badge"
                 , "current" => "active"
                 , "disabled" => "disabled"
             )
@@ -688,6 +708,14 @@ function cm_getFrameworkCss_settings($name = null) {
 	            , "footer" => "panel-footer"
 
 	        )
+            , "badge" => array(
+                "default"       => "badge"
+                , "primary"     => "badge primary"
+                , "success"     => "badge success"
+                , "info"        => "badge info"
+                , "warning"     => "badge warning"
+                , "danger"      => "badge danger"
+            )
 	        , "callout" => array(
 	            "default"       => "panel"
 	            , "primary"     => "alert-box"
@@ -817,15 +845,13 @@ function cm_getFontIcon_settings($name = null) {
 	        , "append" => ""
 	    )
 	    , "glyphicons" => array(
-	         "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"
-	        , "prefix" => "glyphicons"
+	        "prefix" => "glyphicons"
 	        , "postfix" => ""
 	        , "prepend" => ""
 	        , "append" => ""
 	    )
 	    , "fontawesome" => array(
-	         "css" => "http" . ($_SERVER["HTTPS"] ? "s": "") . "://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css"
-	        , "prefix" => "fa"
+	        "prefix" => "fa"
 	        , "postfix" => ""
 	        , "prepend" => "fa-"
 	        , "append" => ""
@@ -1352,7 +1378,8 @@ function cm_getClassByFrameworkCss($value, $type, $params = array(), $framework_
 		case "tab": 
 		case "collapse": 
 		case "topbar": 
-		case "panel": 
+		case "panel":
+        case "badge":
 		case "dialog": 
             if(is_array($params) && count($params))
                 $res = array_fill_keys($params, true);

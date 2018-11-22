@@ -93,32 +93,30 @@ if($valid_session && $data_src)
 	else
 	{
 		$fullpath = "";
-		$base_path = FF_DISK_PATH . FF_UPDIR;
+		$base_path = FF_DISK_UPDIR;
 	}
 }
 else
 {
-	$fullpath = str_replace(((strpos(CM_SHOWFILES, "://") !== false) ? "" : FF_SITE_PATH) . CM_SHOWFILES, FF_UPDIR, $file);
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$fullpath = str_replace(((strpos(CM_SHOWFILES, "://") !== false) ? "" : FF_SITE_PATH) . CM_SHOWFILES, FF_SITE_UPDIR, $file);
+	$base_path = FF_DISK_UPDIR;
 }
 
-if(strpos($fullpath, FF_UPDIR) === 0)
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+if(strpos($fullpath, FF_SITE_UPDIR) === 0)
+	$base_path = FF_DISK_UPDIR;
 elseif(strpos($fullpath, FF_THEME_DIR) === 0)
 	$base_path = FF_DISK_PATH . FF_THEME_DIR;
 
 if(!strlen($fullpath))
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = FF_DISK_UPDIR;
 
 $res = array();
 
 if(strlen($fullpath) && is_file($base_path . $fullpath) && strlen($_REQUEST['url'])) { 
 	$image_data = file_get_contents($_REQUEST['url']);
 
-	$error = file_put_contents($base_path . $fullpath ,$image_data);
-	
-	if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && $error) 
-		ffImageOptimize($base_path . $fullpath);
+    if(file_put_contents($base_path . $fullpath ,$image_data))
+        ffMedia::optimize($base_path . $fullpath);
 
 	$res["status"] = true;
 } else {

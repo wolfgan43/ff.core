@@ -24,9 +24,6 @@ CREATE TABLE IF NOT EXISTS `cm_mod_security_users` (
   `lastlogin` datetime NOT NULL,
   `profile` int(11) NOT NULL,
   `special` varchar(255) NOT NULL,
-  `avatar` varchar(255) NOT NULL,
-  `firstname` varchar(255) NOT NULL,
-  `lastname` varchar(255) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `ID_packages` (`ID_packages`),
   KEY `profile` (`profile`)
@@ -36,10 +33,8 @@ CREATE TABLE IF NOT EXISTS `cm_mod_security_users` (
 -- Dump dei dati per la tabella `cm_mod_security_users`
 --
 
-INSERT INTO `cm_mod_security_users` (`ID`, `ID_domains`, `username`, `password`, `level`, `status`, `expiration`, `email`, `time_zone`, `role`, `created`, `modified`, `password_generated_at`, `temp_password`, `password_used`, `ID_packages`, `lastlogin`, `profile`, `special`, `avatar`, `firstname`, `lastname`) VALUES
-(1, 0, 'admin', '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19', '3', '1', '0000-00-00 00:00:00', '', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', '', 0, '0000-00-00 00:00:00', 0, '', '', 'John', 'Doe');
-
--- --------------------------------------------------------
+INSERT INTO `cm_mod_security_users` (`ID`, `ID_domains`, `username`, `password`, `level`, `status`, `expiration`, `email`, `time_zone`, `role`, `created`, `password_generated_at`, `temp_password`, `password_used`, `ID_packages`, `lastlogin`, `profile`) VALUES
+(1, 0, 'admin', '*2470C0C06DEE42FD1618BB99005ADCA2EC9D1E19', '3', '1', '0000-00-00 00:00:00', '', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', 0, '2012-01-23 17:26:51', 0);
 
 -- --------------------------------------------------------
 

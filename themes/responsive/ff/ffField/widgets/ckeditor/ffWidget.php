@@ -108,7 +108,7 @@ class ffWidget_ckeditor extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -167,10 +167,11 @@ class ffWidget_ckeditor extends ffCommon
             $this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->getValue($Field->get_app_type(), $Field->get_locale())));
         $this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-        if($Field->ckeditor_group_by_auth && MOD_SEC_GROUPS) {
-            $user_permission = get_session("user_permission");
-            $ckeditor_group = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($user_permission["primary_gid_name"]));
-        } else {
+        if(class_exists("Auth") && $Field->ckeditor_group_by_auth) {
+            $user = Auth::get("user");
+            $ckeditor_group = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($user->acl_primary));
+        }
+        if(!$ckeditor_group) {
         	$ckeditor_group = $Field->ckeditor_group;
         }
 // var_dump($this->ckeditor_toolbar, $ckeditor_group);

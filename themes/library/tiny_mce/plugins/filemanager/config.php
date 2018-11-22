@@ -71,13 +71,11 @@
 	} else {
 		if(!defined("MAX_UPLOAD"))
 			define("MAX_UPLOAD", 10000000);
-		if(!defined("DISK_UPDIR"))
-			define("DISK_UPDIR", $disk_path . "/upload");
+		if(!defined("FF_DISK_UPDIR"))
+			define("FF_DISK_UPDIR", $disk_path . "/upload");
 		if(!defined("AREA_GALLERY_SHOW_ADDNEW"))
 			define("AREA_GALLERY_SHOW_ADDNEW", true);
-		if(!defined("THUMB_CACHE_PATH"))
-			define("THUMB_CACHE_PATH", "_thumb");
-		
+
 		if(!function_exists("stripslash")) {
 			function stripslash($temp) {
 				if (substr($temp,-1) == "/")
@@ -91,10 +89,10 @@
     if($mcFileManagerConfig == "" || strlen($src_page_url)) {
         //FormsTriggerError("E_USER_ERROR", E_USER_ERROR, NULL, get_defined_vars());
          
-        if(is_dir(DISK_UPDIR . $user_path)) {
-            $actual_path = DISK_UPDIR . $user_path;
+        if(is_dir(FF_DISK_UPDIR . $user_path)) {
+            $actual_path = FF_DISK_UPDIR . $user_path;
         } else {
-            $actual_path = DISK_UPDIR;
+            $actual_path = FF_DISK_UPDIR;
         }        
         
         $general_tools = "refresh,copy,paste,selectall,unselectall,view,download,addfavorite,removefavorite";
@@ -132,10 +130,10 @@
 	    // General file system options
 	    $mcFileManagerConfig['filesystem'] = "Moxiecode_LocalFileImpl";
 	    $mcFileManagerConfig['filesystem.path'] =  stripslash($actual_path); // 'files'; // absolute or relative from this script path.
-	    $mcFileManagerConfig['filesystem.rootpath'] = stripslash(DISK_UPDIR . ROOT_PATH); //'files'; // absolute or relative from this script path.
+	    $mcFileManagerConfig['filesystem.rootpath'] = stripslash(FF_DISK_UPDIR . ROOT_PATH); //'files'; // absolute or relative from this script path.
 	    $mcFileManagerConfig['filesystem.datefmt'] = "Y-m-d H:i";
 	    $mcFileManagerConfig['filesystem.include_directory_pattern'] = '';
-	    $mcFileManagerConfig['filesystem.exclude_directory_pattern'] = '/^' . THUMB_CACHE_PATH . '$/i'; //|^' . GALLERY_TPL_PATH . '$
+	    $mcFileManagerConfig['filesystem.exclude_directory_pattern'] = '/^' . preg_quote(ffMedia::STORING_BASE_NAME) . '$/i'; //|^' . GALLERY_TPL_PATH . '$
 	    $mcFileManagerConfig['filesystem.invalid_directory_name_msg'] = "";
 	    $mcFileManagerConfig['filesystem.include_file_pattern'] = '';
 	    $mcFileManagerConfig['filesystem.exclude_file_pattern'] = '/^\.|mcic_/i';

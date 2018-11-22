@@ -66,7 +66,7 @@ elseif (isset($_COOKIE[session_name()]))
 
 @session_start();*/
 
-if(mod_security_check_session(false))
+if(0)
 {
 	$ff = get_session("ff");
 	$data_src = basename($_REQUEST['sess']);
@@ -84,22 +84,22 @@ if(mod_security_check_session(false))
 	else
 	{
 		$folder = $_REQUEST['folder'];
-		$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
+		$base_path = FF_DISK_UPDIR . $domain_path;
 	}
 }
 else
 {
 	$folder = $_REQUEST['folder'];
-	$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
+	$base_path = FF_DISK_UPDIR . $domain_path;
 }
 
-if(strpos($folder, FF_UPDIR) === 0)
-	$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
+if(strpos($folder, FF_SITE_UPDIR) === 0)
+	$base_path = FF_DISK_UPDIR . $domain_path;
 elseif(strpos($folder, FF_THEME_DIR) === 0)
-	$base_path = ff_getAbsDir(FF_THEME_DIR) . $domain_path . FF_THEME_DIR;
+	$base_path = FF_DISK_PATH . FF_THEME_DIR . $domain_path;
 
 if(!strlen($base_path))
-	$base_path = ff_getAbsDir(FF_UPDIR) . $domain_path . FF_UPDIR;
+	$base_path = FF_DISK_UPDIR . $domain_path;
 
 if(!function_exists("ffGetFilename")) {
 	function ffGetFilename($path, $return_name = true)
@@ -131,19 +131,22 @@ $res = array();
 if(!empty($_FILES))
 {
 	$tempFile = $_FILES['Filedata']['tmp_name'];
-	
+    $mimetype = ($_FILES['Filedata']['type']
+            ? $_FILES['Filedata']['type']
+            : ffMedia::getMimeTypeByFilename($_FILES['Filedata']['name'])
+    );
 	$fileExt = $_REQUEST['fileExt'];
     if(strtolower($fileExt) == "null")
         $fileExt = "";
-    
-	if(strlen($fileExt)) 
+
+	if(strlen($fileExt))
 	{
 		$arrFileExt = explode(",", $fileExt);
 		if(is_array($arrFileExt) && count($arrFileExt)) 
 		{
-			foreach($arrFileExt AS $arrFileExt_value) 
+			foreach($arrFileExt AS $arrFileExt_value)
 			{
-				if(strlen($arrFileExt_value) && strpos(ffMimeType($tempFile), trim($arrFileExt_value, "*")) !== false) 
+				if(strlen($arrFileExt_value) && strpos($mimetype, trim($arrFileExt_value, "*")) !== false)
 				{
 					$check_ext = true;
 					break;
@@ -203,10 +206,8 @@ if(!empty($_FILES))
 			if(is_file($base_path . $relativePath . $real_file))
 			{
 				@chmod($base_path . $relativePath . $real_file, 0777);
-				
-				$mimetype = ffMimeTypeByFilename($base_path . $relativePath . $real_file);
-				if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && strpos($mimetype, "image") === 0) 
-					ffImageOptimize($base_path . $relativePath . $real_file, $mimetype);
+
+                ffMedia::optimize($base_path . $relativePath . $real_file, array("wait" => true));
 
 				$res["name"] = basename($relativePath . $real_file); 
 				$res["path"] = ffCommon_dirname($relativePath . $real_file); 

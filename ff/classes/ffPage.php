@@ -21,6 +21,9 @@
  * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
+
+if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_CACHING", false);
+
 class ffPage
 {
     static protected $events = null;
@@ -66,7 +69,7 @@ class ffPage
     public static function factory($disk_path, $site_path, $page_path, $theme = null, $variant = null)
     {
         if ($theme === null)
-            $theme = FF_LOADED_THEME;
+            $theme = FF_DEFAULT_THEME;
 
         $res = self::doEvent("on_factory", array($disk_path, $site_path, $page_path, $theme, $variant));
         $last_res = end($res);
@@ -308,6 +311,7 @@ abstract class ffPage_base extends ffCommon
      * @var ffMemCache
      */
     var $cache					= null;
+    var $use_cache              = FF_ENABLE_MEM_PAGE_CACHING;
 
     var $force_no_xhr			= false;
 
@@ -347,9 +351,9 @@ abstract class ffPage_base extends ffCommon
         $this->page_path = $page_path;
         $this->theme = $theme;
 
-        if (FF_ENABLE_MEM_PAGE_CACHING === true)
+        if ($this->use_cache)
         {
-            $this->cache = ffCache::getInstance(FF_CACHE_ADAPTER);
+            $this->cache = ffCache::getInstance();
             $this->request_key = sha1($_SERVER["REQUEST_URI"] . "_" . serialize($_REQUEST));
         }
     }
@@ -423,6 +427,16 @@ abstract class ffPage_base extends ffCommon
 
                 if ($content->use_own_location || !$content->display)
                     return;
+            } elseif(is_string($content)) {
+                if(strpos($content, "/") === 0 && is_file($content)) {
+                    $content = file_get_contents($content);
+                }
+
+                $content = ffTranslator::process($content);
+
+                if(is_array($options["vars"]) && count($options["vars"])) {
+                    $content = str_replace(array_keys($options["vars"]), array_values($options["vars"]), $content);
+                }
             }
 
             if ($id === null)
@@ -450,10 +464,12 @@ abstract class ffPage_base extends ffCommon
             $this->contents[$id]["group"] = true;
             if (isset($options["title"]))
                 $this->groups[$id]["title"] = $options["title"];
-            if (isset($options["cols"]))
-                $this->groups[$id]["cols"] = $options["cols"];
+            //if (isset($options["cols"]))
+            //    $this->groups[$id]["cols"] = $options["cols"];
             if (isset($options["tab_mode"]))
                 $this->groups[$id]["tab_mode"] = $options["tab_mode"];
+            if (isset($options["vars"]))
+                $this->groups[$id]["vars"] = $options["vars"];
         }
         else
             ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
@@ -1016,15 +1032,16 @@ abstract class ffPage_base extends ffCommon
             $source_path	= $last_res["source_path"];
         }
 
-        if ( (substr($realpath, 0, strlen(FF_DISK_PATH)) != FF_DISK_PATH) && (substr($realpath, 0, strlen(__TOP_DIR__)) != __TOP_DIR__))
+       /* if ( (substr($realpath, 0, strlen(FF_DISK_PATH)) != FF_DISK_PATH) && (substr($realpath, 0, strlen(__TOP_DIR__)) != __TOP_DIR__))
             ffErrorHandler::raise("ffPage: widget path must be within FF_DISK_PATH", E_USER_ERROR, $this, get_defined_vars());
-        elseif (!is_dir($realpath) || !is_file($realpath . "/ffWidget." . FF_PHP_EXT))
+        else*/if (!is_dir($realpath) || !is_file($realpath . "/ffWidget." . FF_PHP_EXT))
             ffErrorHandler::raise("ffPage: widget not found", E_USER_ERROR, $this, get_defined_vars());
 
         require_once($realpath . "/ffWidget." . FF_PHP_EXT);
 
-        $temp = "";
-        eval("\$temp = new ffWidget_$name(\$this, \$source_path);");
+        $widget_name = "ffWidget_" . $name;
+        $temp = new $widget_name($this, $source_path);
+
         $this->widgets[$name] = $temp;
         if (is_array($this->widgets[$name]->widget_deps) && count($this->widgets[$name]->widget_deps))
         {

@@ -20,7 +20,12 @@ return array(
 						)
 					)
 				)
-				
+                , "theme" => array(
+                    "path" => "/modules/restricted/themes/responsive/css"
+                    , "file" => "ff.modules.restricted.css"
+                    , "priority" => cm::LAYOUT_PRIORITY_HIGH
+                    , "index" => 100
+                )
 			)
 			, "js_deps" => array(
 				"jquery" => null
@@ -46,7 +51,7 @@ return array(
 					"path" => "/themes/library/ff"
 					, "file" => "history.js"
 					, "index" => 100
-				)				
+				)
 				, "ajax" => array(
 					"path" => "/themes/library/ff"
 					, "file" => "ajax.js"
@@ -112,12 +117,12 @@ return array(
 					"file" => "base/button.css"
 					, "path" => "/themes/library/jquery-ui.themes"
 					, "index" => 200
-				)                 
+				)
 				, "core" => array(
 					"file" => "base/core.css"
 					, "path" => "/themes/library/jquery-ui.themes"
 					, "index" => 200
-				) 
+				)
 				, "datepicker" => array(
 					"file" => "base/datepicker.css"
 					, "path" => "/themes/library/jquery-ui.themes"
@@ -192,13 +197,13 @@ return array(
 			"empty" => true
 			, "css_defs" => array(
 				"fontawesome" => array(
-					"path" => "/themes/responsive/css"
+					"path" => "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css"
 					, "file" => "font-awesome.min.css"
 					, "index" => 175
                     , "css_loads" => array(
                         ".ff" => array(
                             "path" => FF_THEME_DIR . "/" . CM_LOADED_THEME . "/css"
-                        , "file" => "ff-fontawesome.css"
+                            , "file" => "ff-fontawesome.css"
                         )
                     )
 				)
@@ -206,7 +211,7 @@ return array(
 					"path" => "/themes/responsive/css"
 					, "file" => "bootstrap-glyphicons.min.css"
 					, "index" => 175
-				
+
 				)
 			)
 		)
@@ -217,7 +222,7 @@ return array(
 			"empty" => true
 			, "js_defs" => array(
 				"core" => array(
-					"path" => "/themes/responsive/javascript"
+					"path" => "https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js"
 					, "file" => "bootstrap.min.js"
 					, "index" => 150
 					, "js_deps" => array(
@@ -227,14 +232,14 @@ return array(
 			)
 			, "css_defs" => array(
 				"core" => array(
-					"path" => "/themes/responsive/css"
+					"path" => "https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css"
 					, "file" => "bootstrap.min.css"
 					, "index" => 150
 					, "js_loads" => array(
 						"bootstrap.core" => null
 					)
 					, "css_deps" => array(
-						"fonticons.fontawesome" => null
+						//"fonticons.fontawesome" => null
 					)
 					, "css_loads" => array(
 						".ff" => array(
@@ -243,98 +248,16 @@ return array(
 						)
 					)
 				)
-				, "themes" => array(
-					"empty" => true
-					, "css_defs" => array(
-						"amelia" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/amelia"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "cerulean" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cerulean"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "cosmo" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cosmo"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "cyborg" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/cyborg"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "flatly" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/flatly"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "journal" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/journal"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "readable" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/readable"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "simplex" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/simplex"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "slate" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/slate"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "spacelab" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/spacelab"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-						, "united" => array(
-							"path" => "//netdna.bootstrapcdn.com/bootswatch/2.3.2/united"
-							, "file" => "bootstrap.min.css"
-							, "css_deps" => array(
-								"bootstrap.core" => null
-							)
-						)
-	               	)
-				)
 			)
 		)
-	)	
+	)
 	, "foundation" => array(
 		"default" => "latest"
 		, "latest" => array(
 			"empty" => true
 			, "js_defs" => array(
 				"core" => array(
-					"path" => "/themes/responsive/javascript" //6.1.1
+					"path" => "https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/js"
 					, "file" => "foundation.min.js"
 					, "index" => 150
 					, "js_deps" => array(
@@ -347,20 +270,20 @@ return array(
 									jQuery(document).foundation();
 								});
 							"
-						)					
+						)
 					)
 				)
 			)
 			, "css_defs" => array(
 				"core" => array(
-					"path" => "/themes/responsive/css" //6.1.1
+					"path" => "https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/css"
 					, "file" => "foundation.min.css"
 					, "index" => 150
 					, "js_loads" => array(
 						"foundation.core" => null
 					)
 					, "css_deps" => array(
-						"fonticons.fontawesome" => null 
+						//"fonticons.fontawesome" => null
 					)
 					, "css_loads" => array(
 						".ff" =>  array(

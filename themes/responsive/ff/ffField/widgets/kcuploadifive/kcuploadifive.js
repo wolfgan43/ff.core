@@ -137,38 +137,49 @@ ff.ffField.kcuploadifive = (function () {
 			if(thisData["showFileSort"]) {
 				ff.pluginAddInit("jquery-ui", function() {
 					jQuery("#uploadifive_" + thisData["idComponent"] + "_preview").sortable({
-						"stop" : function() {
-							var $container = jQuery("#uploadifive_" + thisData["idComponent"] + "_preview");
-							var destFolder = thisData["folder"].replace("/tmp/", "/");
-							var toBeSent = [];
-							var position = 1;
-							$container.find("> DIV").each(function () {
-								toBeSent.push({"name" : "positions[]", "value" : jQuery(this).data("url").replace(destFolder, '').trim("/") });
-								position += 1;
-							});
+						"stop": function () {
+                            if(thisData["showFileSort"] === true) {
+                                var inputThumb = [];
+                                jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function () {
+                                    inputThumb.push(jQuery(this).data("url"));
+                                });
 
-							toBeSent.push({name: "resource", value: 'uploadifive'});
-
-							ff.load("ff.ajax", function() {
-								ff.ajax.blockUI();
-								jQuery.ajax({
-									  "url"		: thisData["showFileSort"] + destFolder
-									, "async"	: true
-									, "type"	: "POST"
-									, "data"	: toBeSent
-									, "success" : function (data) {
-										var inputThumb = [];
-										jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function() {
-											inputThumb.push(jQuery(this).data("url"));
-										});
-										
-										jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
-									
-									
-										ff.ajax.unblockUI();
-									}
+                                jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
+                            } else {
+								var $container = jQuery("#uploadifive_" + thisData["idComponent"] + "_preview");
+								var destFolder = thisData["folder"].replace("/tmp/", "/");
+								var toBeSent = [];
+								var position = 1;
+								$container.find("> DIV").each(function () {
+									toBeSent.push({
+										"name": "positions[]",
+										"value": jQuery(this).data("url").replace(destFolder, '').trim("/")
+									});
+									position += 1;
 								});
-							});
+
+								toBeSent.push({name: "resource", value: 'uploadifive'});
+
+								ff.load("ff.ajax", function () {
+									ff.ajax.blockUI();
+									jQuery.ajax({
+										"url": thisData["showFileSort"] + destFolder
+										, "async": true
+										, "type": "POST"
+										, "data": toBeSent
+										, "success": function (data) {
+											var inputThumb = [];
+											jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function () {
+												inputThumb.push(jQuery(this).data("url"));
+											});
+
+											jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
+
+											ff.ajax.unblockUI();
+										}
+									});
+								});
+                            }
 						}
 					});
 				});

@@ -828,8 +828,8 @@ class ffRecord_html extends ffRecord_base
 							$is_combine_field = true;
 						}
 
-					    if ($this->form_fields[$key]->description !== null) 
-					    {       
+					    if ($this->form_fields[$key]->description !== null)
+					    {
 						    $this->tpl[0]->set_var("fielDescription", $this->form_fields[$key]->description);
 						    $this->tpl[0]->parse("SectDescriptionLabel", false);
 	                        
@@ -978,12 +978,12 @@ class ffRecord_html extends ffRecord_base
                         {
                             foreach ($this->form_fields[$key]->multi_fields as $mul_subkey => $mul_subvalue)
                             {
-                                $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" value="' . $this->form_fields[$key]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE) . '" />';
+                                $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)) . '" />';
                                 if($this->record_exist)
-                                    $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" value="' . $this->form_fields[$key]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE) . '" />';
+                                    $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)) . '" />';
                             }
                         } else {
-                            $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . '" name="' . $this->id . "_". $key . "_ori" . '" value="' . $this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) . '" />';
+                            $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . '" name="' . $this->id . "_". $key . "_ori" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)) . '" />';
                         }
 
                         $rc |= $this->tpl[0]->set_var($key, $buffer_field);

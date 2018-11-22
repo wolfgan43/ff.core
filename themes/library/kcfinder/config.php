@@ -24,8 +24,8 @@ $cache_path                 = "/cache";
 $thumb_path                 = "/_thumb";
 $updir_path                 = "/uploads";
 
-$site_updir                 = $site_path . $updir_path;
-$disk_updir                 = $disk_path . $updir_path;
+$FF_SITE_UPDIR                 = $site_path . $updir_path;
+$FF_DISK_UPDIR                 = $disk_path . $updir_path;
 
 if(is_dir($disk_path . "/library/gallery/models/auth")) {
     require_once($disk_path . "/library/gallery/models/vgCommon.php");

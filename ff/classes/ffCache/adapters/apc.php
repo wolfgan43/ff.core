@@ -20,113 +20,73 @@
  * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
-class ffCache_apc extends ffCacheAdapter
+class ffCache_apc extends ffCacheAdapterAdapter
 {
-	private $bNoTblRel = false;
-	
-	function __construct($bNoTblRel)
+	function __construct($auth = null)
 	{
-		$this->bNoTblRel = $bNoTblRel;
-		
-		if ($this->bNoTblRel)
-			return;
-		
-		$res = apc_fetch(APPID . "__relation_table__", $success);
-		if ($success)
-		{
-			//ffErrorHandler::raise("asd", E_USER_ERROR, $this, get_defined_vars());
-			$this->relation_table = unserialize($res);
-		}
-		else
-			$this->relation_table[APPID] = array();
 	}
 	
 	/**
 	 * Inserisce un elemento nella cache
 	 * Oltre ai parametri indicati, accetta un numero indefinito di chiavi per relazione i valori memorizzati
 	 * @param String $name il nome dell'elemento
-	 * @param int $ttl il numero di secondi in cui la variabile dev'essere memorizzata, se null rimane fino al clear
 	 * @param Mixed $value l'elemento
-	 * @return bool if storing both value and rel table will success
+     * @param String $bucket il name space
+     * @return bool if storing both value and rel table will success
 	 */
-	function set($name, $ttl, $value)
+	function set($name, $value = null, $bucket = ffCache::APPID)
 	{
-		if ($value === null)
-		{
-			@apc_delete(APPID . $name);
-			$res = true;
-		}
-		else
-			$res = @apc_store(APPID . $name, $value, $ttl);
-		
-		if (!$this->bNoTblRel && $res)
-		{
-			if (func_num_args() > 3)
-			{
-				$args = func_get_args();
-				for ($i = 3; $i < count($args); $i++)
-				{
-					if ($value === null)
-						unset($this->relation_table[$args[$i]][APPID . $name]);
-					else
-						$this->relation_table[$args[$i]][APPID . $name] = true;
-				}
-			}
-
-			if ($value === null)
-				unset($this->relation_table[APPID][$name]);
-			else
-				$this->relation_table[APPID][$name] = true;
-
-			$res = @apc_store(APPID . "__relation_table__", serialize($this->relation_table), null);
-		}
-		
-		return $res;
+		return ($value === null
+            ? $this->del($name, $bucket)
+            : @apc_store($this->getKey($name, $bucket), $this->setValue($value), $this->getTTL())
+        );
 	}
 
 	/**
 	 * Recupera un elemento dalla cache
-	 * @param <type> $name il nome dell'elemento
-	 * @param <type> $success un puntatore ad una variabile che indica il successo dell'operazione
-	 * @return Mixed l'elemento 
+	 * @param String $name il nome dell'elemento
+     * @param String $bucket il name space
+     * @return Mixed l'elemento
 	 */
-	function get($name, &$success)
+	function get($name, $bucket = ffCache::APPID)
 	{
-		return apc_fetch(APPID . $name, $success);
+        if($this::DISABLE_CACHE)
+            return;
+
+        if($name) {
+            $success = null;
+            $res = apc_fetch($this->getKey($name, $bucket), $success);
+            $res = ($success
+                ? $this->getValue($res)
+                : false
+            );
+        } else {
+	        $prefix = $this->getBucket($bucket);
+            foreach (new APCIterator('user', '#^' . preg_quote($prefix) . '\.#') as $item) {
+                $res[$item["key"]] = $item["value"];
+            }
+	    }
+        return $res;
 	}
 
+    /**
+     * Cancella una variabile
+     * @param String $name il nome dell'elemento
+     * @param String $bucket il name space
+     * @return bool
+     */
+    function del($name, $bucket = ffCache::APPID)
+    {
+        return @apc_delete($this->getKey($name, $bucket));
+    }
 	/**
 	 * Pulisce la cache
 	 * Accetta un numero indefinito di parametri che possono essere utilizzati per cancellare i dati basandosi sulle relazioni
 	 * Se non si specificano le relazioni, verrà cancellata l'intera cache
 	 */
-	function clear()
+	function clear($bucket = ffCache::APPID)
 	{
-		// global reset
-		if ($this->bNoTblRel || !func_num_args())
-		{
-			apc_clear_cache("user");
-			foreach ($this->relation_table[APPID] as $key => $value)
-			{
-				@apc_delete(APPID . $value);
-			}
-			$this->relation_table = array(APPID => array());
-			apc_store(APPID . "__relation_table__", serialize($this->relation_table));
-			return;
-		}
-		
-		$args = func_get_args();
-		foreach ($args as $key => $value)
-		{
-			if (count($this->relation_table[$value]))
-			{
-				foreach ($this->relation_table[$value] as $subkey => $subvalue)
-				{
-					@apc_delete($subkey);
-				}
-			}
-			unset($this->relation_table[$value]);
-		}
-		apc_store(APPID . "__relation_table__", serialize( $this->relation_table));
+        // global reset
+        apc_clear_cache("user");
 	}
 }

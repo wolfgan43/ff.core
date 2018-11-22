@@ -8,7 +8,7 @@
  * @link http://www.formsphpframework.com
  */
 
-if (!defined("CM_URL_NORMALIZE"))			define("CM_URL_NORMALIZE", true);
+if (!defined("CM_URL_NORMALIZE"))			define("CM_URL_NORMALIZE", false);
 
 if (!defined("CM_MIME_FORCE"))				define("CM_MIME_FORCE", false);
 if (!defined("CM_MULTIDOMAIN_ROUTING"))     define("CM_MULTIDOMAIN_ROUTING", true);

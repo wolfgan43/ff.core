@@ -18,7 +18,7 @@ $reverse = (string)$cm->router->getRuleById("ds")->reverse;
 
 $globals->tables = $db->queryStructure(ffDBAdapter::TYPE_DB);
 
-$cache_path = CM_CACHE_PATH . "/ds";
+$cache_path = CM_CACHE_DISK_PATH . "/ds";
 if (!is_dir($cache_path))
 	@mkdir($cache_path, 0777, true);
 
@@ -71,7 +71,7 @@ $mode = $path_parts[1];
 
 $cm->modules["restricted"]["sel_topbar"]["elements"][$name]["selected"] = true;
 
-$cache_path = CM_CACHE_PATH . "/ds/" . $name;
+$cache_path = CM_CACHE_DISK_PATH . "/ds/" . $name;
 if (!is_dir($cache_path))
 	@mkdir($cache_path, 0777, true);
 

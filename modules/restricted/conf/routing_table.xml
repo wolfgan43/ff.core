@@ -14,7 +14,7 @@
 		<source>^/restricted(.*)</source>
 		<destination>
 			<module>restricted</module>
-			<url>/layout$0</url>
+			<url>/layout$1</url>
 		</destination>
 		<process_next />
 		<accept_path_info />

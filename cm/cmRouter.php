@@ -18,7 +18,7 @@
  */
 class cmRouter extends ffCommon
 {
-	private static $instances = null;
+	private static $instances   = array();
 	
 	const PRIORITY_TOP 			= 0;
 	const PRIORITY_VERY_HIGH	= 1;
@@ -29,31 +29,28 @@ class cmRouter extends ffCommon
 	const PRIORITY_BOTTOM 		= 6;
 	const PRIORITY_DEFAULT 		= cmRouter::PRIORITY_NORMAL;
 	
-	public $rules 			= array();
-	public $named_rules 	= array();
-	public $matched_rules 	= null;
-	public $counter			= 0;
+	public $rules 			    = array();
+	public $named_rules 	    = array();
+	public $matched_rules 	    = null;
+	public $counter			    = 0;
 	
-	public $ordered		= false;
+	public $ordered		        = false;
+
+	private $bucket             = null;
 	
-	private function __construct()
+	private function __construct($name = null)
 	{
+	    $this->bucket = ($name ? $name : "router");
 	}
 	
 	private function __clone()
 	{
 	}
-	
-	public static function getInstance($name = null)
+
+	public static function getInstance($name = "router")
 	{
-		if ($name == null)
-			$name = "default";
-		
-		if (self::$instances === null)
-			self::$instances = array();
-		
 		if (!isset(cmRouter::$instances[$name]))
-			cmRouter::$instances[$name] = new cmRouter();
+			cmRouter::$instances[$name] = new cmRouter($name);
 			
 		return cmRouter::$instances[$name];
 	}
@@ -196,21 +193,33 @@ class cmRouter extends ffCommon
 
 		$this->addElementRule($rule);
 	}
-	
+	public function loadMem() {
+        $router                             = false;
+	    $cache                              = ffCache::getInstance();
+
+	    $router                             = $cache->get("cm/" . $this->bucket ."/rules");
+	    if($router !== false) {
+            $this->router->rules            = $router;
+            $this->router->named_rules      = $this->cache->get("cm/" . $this->bucket . "/named_rules");
+            $this->router->ordered          = true;
+        }
+
+        return (bool) $router;
+    }
 	public function loadFile($file)
 	{
-		$xml = new SimpleXMLElement("file://" . $file, null, true);
-		
-		if (count($xml->rule))
-		{
-			foreach ($xml->rule as $key => $rule)
-			{
-				if ($key == "comment")
-					continue;
-				
-				$this->addElementRule($rule);
-			}
-		}
+	    if(is_file($file)) {
+            $xml = new SimpleXMLElement("file://" . $file, null, true);
+
+            if (count($xml->rule)) {
+                foreach ($xml->rule as $key => $rule) {
+                    if ($key == "comment")
+                        continue;
+
+                    $this->addElementRule($rule);
+                }
+            }
+        }
 		return;
 	}
 	

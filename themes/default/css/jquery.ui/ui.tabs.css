@@ -1,9 +1,0 @@
-/* Tabs
-----------------------------------*/
-.ui-tabs {padding: .2em;}
-.ui-tabs-nav { padding:0 3px;  position: relative; }
-.ui-tabs-nav li { float: left; border-bottom: 0 !important; margin: 0 3px -1px 0; padding: 0; }
-.ui-tabs-nav li a { display:block; text-decoration: none; padding: 0 9px; }
-.ui-tabs-nav li.ui-tabs-selected {  padding-bottom: .1em; border-bottom: 0; }
-.ui-tabs-panel { padding: 1em 1.4em;  display: block; border: 0; background: none; }
-.ui-tabs-hide { display: none !important; }

@@ -20,7 +20,7 @@
  * @license https://opensource.org/licenses/LGPL-3.0
  * @link http://www.formsphpframework.com
  */
-class ffCanvas extends ffClassChecks
+class ffCanvas
 {
 	var $cvs_res 						= NULL;
 	var $cvs_res_dim_x 					= NULL;
@@ -33,62 +33,13 @@ class ffCanvas extends ffClassChecks
 
 	var $tmb_res						= array();
 
-	var $format							= "png"; /*
+	var $format							= "jpg"; /*
 	 * can be:
 	 *			png
 	 *			jpg
 	 */
 
-	var $format_jpg_quality				= 77;        
-		
-		
-	
-	var $optimize						= false;
-	var $optiBin						= array(
-											"jpg" => array(
-                                            	"convert" => 77
-                                                , "JpegTran" => array(
-													"path" 		=> "/usr/local/bin/jpegtran"
-													, "cmd" 	=> ' -optimize -progressive -copy none '
-												)
-												, "JpegOptim" => array(
-													"path" 		=> "/usr/bin/jpegoptim"
-													, "cmd" 	=> ' --strip-all --all-progressive '
-												)
-											)
-											, "png" => array(
-                                            	"convert" => true
-												, "OptiPng" => array(
-													"path" 		=> '/usr/bin/optipng'
-													, "cmd" 	=> ' -i0 -o7 -zm1-9 '
-												)
-												, "PngOut" => array(
-													"path" 		=> '/usr/local/bin/pngout'
-													, "cmd" 	=> ' -s0 -q -y '
-												)
-												, "AdvPng" => array(
-													"path" 		=> ''
-													, "cmd" 	=> ' -z -4 -i20 -- '
-												)
-												, "PngCrush" => array(
-													"path" 		=> ''
-													, "cmd" 	=> ' -rem gAMA -rem cHRM -rem iCCP -rem sRGB -brute -l 9 -max -reduce -m 0 -q '
-												)
-												, "PngQuant" => array(
-													"path" 		=> ''
-													, "cmd" 	=> ' --speed 1 --ext=.png --force '
-												)
-											)
-											, "gif" => array(
-												"Gifsicle" => array(
-													"path" 		=> ''
-													, "cmd" 	=> ' -b -O2 '
-												)
-											)
-	
-										);
-
-	function ffCanvas($dim_x = NULL, $dim_y = NULL) 
+	function ffCanvas($dim_x = NULL, $dim_y = NULL)
 	{
 		$this->cvs_res_dim_x = $dim_x;
 		$this->cvs_res_dim_y = $dim_y;
@@ -218,80 +169,80 @@ class ffCanvas extends ffClassChecks
 				{
 					$ref = $this->tmb_res[$zkey][$key];
 					$src_res = $ref["obj"]->process($ref["max_x"], $ref["max_y"]);
+                    if($src_res) {
+                        imagecopy($this->cvs_res
+                                            , $src_res
+                                            , $ref["dim_x_start"]
+                                            , $ref["dim_y_start"]
+                                            , 0
+                                            , 0
+                                            , $ref["obj"]->new_res_dim_real_x
+                                            , $ref["obj"]->new_res_dim_real_y
+                                            );
 
-					imagecopy($this->cvs_res
-										, $src_res
-										, $ref["dim_x_start"]
-										, $ref["dim_y_start"]
-										, 0
-										, 0
-										, $ref["obj"]->new_res_dim_real_x
-										, $ref["obj"]->new_res_dim_real_y
-										);
+                        @imagedestroy($src_res);
 
-					@imagedestroy($src_res);
+                        if($ref["obj"]->watermark !== null)
+                        {
+                            if(is_array($ref["obj"]->watermark) && count($ref["obj"]->watermark)) {
+                                foreach($ref["obj"]->watermark AS $watermark_key => $watermark_value) {
+                                    $watermark_obj[$watermark_key] = $watermark_value;
 
-                    if($ref["obj"]->watermark !== null) 
-                    {
-                    	if(is_array($ref["obj"]->watermark) && count($ref["obj"]->watermark)) {
-							foreach($ref["obj"]->watermark AS $watermark_key => $watermark_value) {
-								$watermark_obj[$watermark_key] = $watermark_value;
+                                    if(($this->cvs_res_dim_x - $watermark_obj[$watermark_key]->new_res_dim_real_x) > 0) {
+                                        $watermark_x_start = ($this->cvs_res_dim_x - $watermark_obj[$watermark_key]->new_res_dim_real_x);
+                                    } else {
+                                        $watermark_x_start = 0;
+                                    }
+                                    if(($this->cvs_res_dim_y - $watermark_obj[$watermark_key]->new_res_dim_real_y) > 0) {
+                                        $watermark_y_start = ($this->cvs_res_dim_y - $watermark_obj[$watermark_key]->new_res_dim_real_y);
+                                    } else {
+                                        $watermark_y_start = 0;
+                                    }
 
-		                        if(($this->cvs_res_dim_x - $watermark_obj[$watermark_key]->new_res_dim_real_x) > 0) {
-                        			$watermark_x_start = ($this->cvs_res_dim_x - $watermark_obj[$watermark_key]->new_res_dim_real_x);
-								} else {
-                        			$watermark_x_start = 0;
-								}
-		                        if(($this->cvs_res_dim_y - $watermark_obj[$watermark_key]->new_res_dim_real_y) > 0) {
-                        			$watermark_y_start = ($this->cvs_res_dim_y - $watermark_obj[$watermark_key]->new_res_dim_real_y);
-								} else {
-                        			$watermark_y_start = 0;
-								}
+                                    $src_res = $watermark_obj[$watermark_key]->process();
 
-		                        $src_res = $watermark_obj[$watermark_key]->process();
+                                    imagecopy($this->cvs_res
+                                                        , $src_res
+                                                        , $watermark_x_start
+                                                        , $watermark_y_start
+                                                        , 0
+                                                        , 0
+                                                        , $watermark_obj[$watermark_key]->new_res_dim_real_x
+                                                        , $watermark_obj[$watermark_key]->new_res_dim_real_y
+                                                        );
 
-		                        imagecopy($this->cvs_res
-		                                            , $src_res
-		                                            , $watermark_x_start
-		                                            , $watermark_y_start
-		                                            , 0
-		                                            , 0
-		                                            , $watermark_obj[$watermark_key]->new_res_dim_real_x
-		                                            , $watermark_obj[$watermark_key]->new_res_dim_real_y
-		                                            );
+                                    @imagedestroy($src_res);
+                                }
+                            } else {
+                                $watermark_obj = $ref["obj"]->watermark;
 
-		                        @imagedestroy($src_res);
-							}
-						} else {
-                    		$watermark_obj = $ref["obj"]->watermark;
+                                if(($this->cvs_res_dim_x - $watermark_obj->new_res_dim_real_x) > 0) {
+                                    $watermark_x_start = ($this->cvs_res_dim_x - $watermark_obj->new_res_dim_real_x);
+                                } else {
+                                    $watermark_x_start = 0;
+                                }
+                                if(($this->cvs_res_dim_y - $watermark_obj->new_res_dim_real_y) > 0) {
+                                    $watermark_y_start = ($this->cvs_res_dim_y - $watermark_obj->new_res_dim_real_y);
+                                } else {
+                                    $watermark_y_start = 0;
+                                }
 
-	                        if(($this->cvs_res_dim_x - $watermark_obj->new_res_dim_real_x) > 0) {
-                        		$watermark_x_start = ($this->cvs_res_dim_x - $watermark_obj->new_res_dim_real_x);
-							} else {
-                        		$watermark_x_start = 0;
-							}
-	                        if(($this->cvs_res_dim_y - $watermark_obj->new_res_dim_real_y) > 0) {
-                        		$watermark_y_start = ($this->cvs_res_dim_y - $watermark_obj->new_res_dim_real_y);
-							} else {
-                        		$watermark_y_start = 0;
-							}
+                                $src_res = $watermark_obj->process();
 
-	                        $src_res = $watermark_obj->process();
+                                imagecopy($this->cvs_res
+                                                    , $src_res
+                                                    , $watermark_x_start
+                                                    , $watermark_y_start
+                                                    , 0
+                                                    , 0
+                                                    , $watermark_obj->new_res_dim_real_x
+                                                    , $watermark_obj->new_res_dim_real_y
+                                                    );
 
-	                        imagecopy($this->cvs_res
-	                                            , $src_res
-	                                            , $watermark_x_start
-	                                            , $watermark_y_start
-	                                            , 0
-	                                            , 0
-	                                            , $watermark_obj->new_res_dim_real_x
-	                                            , $watermark_obj->new_res_dim_real_y
-	                                            );
-
-	                        @imagedestroy($src_res);
-						}
+                                @imagedestroy($src_res);
+                            }
+                        }
                     }
-                    
 				}
 				reset($this->tmb_res[$zkey]);
 			}
@@ -304,7 +255,7 @@ class ffCanvas extends ffClassChecks
 				if ($filename === NULL)
 					header("Content-Type: image/jpg");
 				
-				if(@imagejpeg($this->cvs_res, $filename, ($this->optimize ? 100 : $this->format_jpg_quality)) === false) {
+				if(@imagejpeg($this->cvs_res, $filename) === false) {
 					die("Permission Denied: " . $filename);
 				}
 				break;
@@ -313,23 +264,14 @@ class ffCanvas extends ffClassChecks
 			default:
 				if ($filename === NULL)
 					header("Content-Type: image/png");
-				
+
 				if(@imagepng($this->cvs_res, $filename) === false) {
 					die("Permission Denied: " . $filename);
 				}
 		}
 
-		if($filename && $this->optimize && isset($this->optiBin[$this->format])) {
-        	if($this->optiBin[$this->format]["convert"])
-            	$shell_cmd = 'convert -strip -quality ' . $this->optiBin[$this->format]["convert"] . '% ' . $filename . " " . $filename . ";";
-
-			foreach($this->optiBin[$this->format] AS $optim) { 
-				if($optim["path"])
-					$shell_cmd .= $optim["path"] . $optim["cmd"] . $filename . "; ";
-			}
-			//@shell_exec($shell_cmd);
-			@shell_exec("(" . $shell_cmd . ") > /dev/null 2>/dev/null &"); //serve per far andare la procedura in modo asincrono
-                        //die($shell_cmd);
-		}
+		//if($filename) {
+		 //   ffMedia::optimize($filename);
+		//}
 	}
 }

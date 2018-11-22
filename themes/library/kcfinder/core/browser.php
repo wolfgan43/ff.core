@@ -222,7 +222,7 @@ class browser extends uploader {
 
 		//FF framework nesting            
 		if(function_exists("check_function") && check_function("check_fs") && function_exists("check_fs"))
-            check_fs($dir, str_replace(DISK_UPDIR, "", $dir));
+            check_fs($dir, str_replace(FF_DISK_UPDIR, "", $dir));
 
         $thumbDir = "$this->thumbsTypeDir/{$this->post['dir']}";
         if (is_dir($thumbDir))
@@ -277,7 +277,7 @@ class browser extends uploader {
 
 		//FF framework nesting            
 		if(function_exists("check_function") && check_function("check_fs") && function_exists("check_fs"))
-            check_fs($dir, str_replace(DISK_UPDIR, "", $dir));
+            check_fs($dir, str_replace(FF_DISK_UPDIR, "", $dir));
 
         $this->makeThumb($target);
         return "/" . basename($target);
@@ -333,7 +333,7 @@ class browser extends uploader {
 
 		//FF framework nesting            
 		if(function_exists("check_function") && check_function("check_fs") && function_exists("check_fs"))
-            check_fs($dir, str_replace(DISK_UPDIR, "", $dir));
+            check_fs($dir, str_replace(FF_DISK_UPDIR, "", $dir));
 
         $thumbDir = "{$this->thumbsTypeDir}/{$this->post['dir']}";
         $thumbFile = "$thumbDir/{$this->post['file']}";

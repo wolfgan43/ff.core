@@ -35,7 +35,7 @@ ff.ffField.aviary = (function () {
 						var postData = {};
 						postData["url"] = newURL;
 						postData["img"] = imgPath;
-						postData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
+						//postData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
 						postData["ref"] = imgHash;
 
 						jQuery.post(postUrl, postData, function() {

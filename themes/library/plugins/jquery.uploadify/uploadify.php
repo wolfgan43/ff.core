@@ -118,13 +118,13 @@ if(is_array($res))
 	exit;
 }
 
-if(strpos($folder, FF_UPDIR) === 0)
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+if(strpos($folder, FF_SITE_UPDIR) === 0)
+	$base_path = FF_DISK_UPDIR;
 elseif(strpos($folder, FF_THEME_DIR) === 0)
 	$base_path = FF_DISK_PATH . FF_THEME_DIR;
 
 if(!strlen($base_path))
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = FF_DISK_UPDIR;
 
 
 //ffErrorHandler::raise("as", E_USER_ERROR, null, get_defined_vars());
@@ -170,11 +170,9 @@ if(!empty($_FILES))
 	if(is_file($targetFile))
 	{
 		@chmod($targetFile, 0777);
-		$mimetype = ffMimeTypeByFilename($targetFile);
-		if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && strpos($mimetype, "image") === 0) 
-			ffImageOptimize($targetFile, $mimetype);
+        ffMedia::optimize($targetFile);
 
-		$res["name"] = basename($targetFile); 
+		$res["name"] = basename($targetFile);
 		$res["path"] = ffCommon_dirname($targetFile); 
 		$res["fullpath"] = $real_file;
 		$res["status"] = true;			

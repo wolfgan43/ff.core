@@ -214,6 +214,8 @@ class ffDB_Sql
 	{
 		if (!static::$_sharelink)
 			static::$_dbs[] = $this;
+
+
 	}
 
 	// -------------------------------------------------
