@@ -29,9 +29,85 @@ class ffPage_html extends ffPage_base
 	 * Se deve essere utilizzato il framework Javascript
 	 * @var Boolean
 	 */
-	var $use_own_js				= true;
+	var $use_own_js				= false;
 
-	
+	var $favicons               = array(
+        "favicon" => array(
+	        "rel"       => "shortcut icon"
+            , "sizes"   => "16x16"
+            , "href"    => null
+        )
+	    , "apple-touch-icon-57x57" => array(
+	        "rel"       => "apple-touch-icon"
+            , "sizes"   => "57x57"
+            , "href"    => null
+        )
+        , "apple-touch-icon-60x60" => array(
+	        "rel"       => "apple-touch-icon"
+            , "sizes"   => "60x60"
+            , "href"    => null
+        )
+        , "apple-touch-icon-72x72" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "72x72"
+            , "href"    => null
+        )
+        , "apple-touch-icon-76x76" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "76x76"
+            , "href"    => null
+        )
+        , "apple-touch-icon-114x114" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "114x114"
+            , "href"    => null
+        )
+        , "apple-touch-icon-120x120" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "120x120"
+            , "href"    => null
+        )
+        , "apple-touch-icon-144x144" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "144x144"
+            , "href"    => null
+        )
+        , "apple-touch-icon-152x152" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "152x152"
+            , "href"    => null
+        )
+        , "apple-touch-icon-180x180" => array(
+            "rel"       => "apple-touch-icon"
+            , "sizes"   => "180x180"
+            , "href"    => null
+        )
+        , "icon-192x192" => array(
+            "rel"       => "icon"
+            , "type"    => "image/png"
+            , "sizes"   => "192x192"
+            , "href"    => null
+        )
+        , "icon-32x32" => array(
+            "rel"       => "icon"
+            , "type"    => "image/png"
+            , "sizes"   => "32x32"
+            , "href"    => null
+        )
+        , "icon-96x96" => array(
+            "rel"       => "icon"
+            , "type"    => "image/png"
+            , "sizes"   => "96x96"
+            , "href"    => null
+        )
+        , "icon-16x16" => array(
+            "rel"       => "icon"
+            , "type"    => "image/png"
+            , "sizes"   => "16x16"
+            , "href"    => null
+        )
+    );
+
 	/**
 	 * Javascript di default del framework
 	 * @var Boolean
@@ -44,8 +120,10 @@ class ffPage_html extends ffPage_base
 	var $widget_tabs_context = null;
 	
 	// loaded with libs.json
-    var $libraries = null;
-	
+    var $libraries                  = null;
+    public $resources               = null;
+    public $frameworkCSS            = null;
+
 	var $default_css	= array(
 		);
 	
@@ -59,7 +137,7 @@ class ffPage_html extends ffPage_base
 	 * il default (null) lo considera abilitato
 	 * @var Boolean
 	 */
-	var $use_own_form			= null;
+	var $use_own_form			= false;
 
     /**
 	 * L'id del form di default
@@ -96,7 +174,7 @@ class ffPage_html extends ffPage_base
 	 * Il tema di jquery.ui
 	 * @var String
 	 */
-	var $jquery_ui_theme 		= "base";
+	var $jquery_ui_theme 		= "";
 	
 	/**
 	 * Il nome del template da caricare per l'utilizzo con ffPage
@@ -169,7 +247,7 @@ class ffPage_html extends ffPage_base
 	 * @var Array
 	 */
 	var $json_result = array();
-	
+
 	// ---------------------------------------------------------------
 	//  PRIVATE VARS (used by code, don't touch or may be explode! :-)
 
@@ -178,10 +256,10 @@ class ffPage_html extends ffPage_base
 	 * @var Array
 	 */
 	var $tpl_layer				= null;
-	
-	
+
+
 	var $browser = null;
-	
+
 	var $canonical = null;
 
 	var $js_counter = 0;
@@ -189,70 +267,32 @@ class ffPage_html extends ffPage_base
 	var $css_counter = 0;
 	var $css_loaded = array();
 	var $above_the_fold = null;
-		
-	/**
-	 * Il costruttore, istanzia un nuovo oggetto ffPage
-	 * @param String $site_path
-	 * @param String $disk_path
-	 * @param String $page_path
-	 * @param String $theme
-	 */
-	public function __construct($site_path, $disk_path, $page_path, $theme)
-	{
-		parent::__construct($site_path, $disk_path, $page_path, $theme);
-
-		//if ($this->libraries === null)
-		//	$this->libraries = ffTheme_restricted_get_libs($this, "theme/ff/ffPage");
-		
-		$glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
-
-		if (ffIsset($glob_libs->libs, "theme/ff/ffPage"))
-			$this->libsExtend($glob_libs->libs["theme/ff/ffPage"]);
-
-		foreach ($glob_libs->libs as $key => $value)
-		{
-			if ($key === "theme/ff/ffPage")
-				continue;
-
-			$this->libsExtend($value);
-		}
-		
-		$registry = ffGlobals::getInstance("_registry_");
-
-		if (isset($registry->themes[$this->theme]))
-		{
-			ffTheme_html_construct($this, $this->theme);
-		}
-
-		if ($this->theme !== cm_getMainTheme() && (!isset($registry->themes[$this->theme]) || !isset($registry->themes[$this->theme]->exclude_main_theme_defaults)))
-		{
-			ffTheme_html_construct($this, cm_getMainTheme());
-		}
-	}
 
 	/**
 	 * Recupera la directory in cui è contenuto il layer
 	 * @param String $layer_file Permette di specificare un nome file aggiuntivo da passare all'evento getLayerDir
 	 * @return String
 	 */
+	/*
 	function getLayerDir($layer_file = null)
 	{
 		if ($this->layer_dir !== null)
 			return $this->layer_dir;
-		
+
 		$res = $this->doEvent("getLayerDir", array(&$this, $layer_file));
 		$last_res = end($res);
 		if ($last_res !== null)
 			return $last_res;
 		else
 			return $this->disk_path . "/themes/" . $this->getTheme() . "/layouts";
-	}
+	}*/
 
 	/**
 	 * Recupera la directory da cui caricare tutti gli elementi di layout
 	 * @param String $layout_file Permette di specificare un nome file aggiuntivo da passare all'evento getLayoutDir
 	 * @return String
 	 */
+	/*
 	function getLayoutDir($layout_file = null)
 	{
 		$res = $this->doEvent("getLayoutDir", array(&$this, $layout_file));
@@ -260,9 +300,46 @@ class ffPage_html extends ffPage_base
 		if ($last_res !== null)
 			return $last_res;
 		else
-			return $this->disk_path . "/themes/" . $this->getTheme() . "/layouts";
-	}
+			return $this->getLayerDir($layout_file);
+	}*/
+    public function loadResources($patterns) {
+        $patterns["/themes/" . $this->getTheme()] = array(
+            "filter"                    => array("css", "js", "html", "jpg", "svg", "png")
+            , "rules"                   => array(
+                "/layouts/"             => "layouts"
+                , "/common/"            => "common"
+                , "/contents/"          => "components"
+                , "/widgets/"           => "widgets"
+                , "/css/"               => "css"
+                , "/javascript/"        => "js"
+                , "/images/"            => "images"
+                , "/fonts/"             => "fonts"
+                , "/ff/"                => "components"
+            )
+        );
 
+        $this->resources = Filemanager::scan($patterns);
+    }
+
+    public function loadLibrary($path = null) {
+        if($path) {
+            $this->libraries = array_merge_recursive($this->libraries, Filemanager::getInstance("php")->read($path . "/libs.php"));
+            Filemanager::getInstance("php")->write($this->libraries, CM_CACHE_DISK_PATH . "/libs.php");
+        } else {
+            $this->libraries = array();
+
+            $cache_file = CM_CACHE_DISK_PATH . "/libs.php";
+            if (!isset($_REQUEST["__CLEARCACHE__"]) && file_exists($cache_file)) {
+                $this->libraries = include($cache_file);
+            } else {
+                Filemanager::scan(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff", array("name" => array("libs.php")), function ($file) {
+                    $this->libraries = array_merge_recursive($this->libraries, Filemanager::getInstance("php")->read($file));
+                });
+
+                Filemanager::getInstance("php")->write($this->libraries, CM_CACHE_DISK_PATH . "/libs.php");
+            }
+        }
+    }
 	public function libsExtend($addon)
 	{
 		cm_libsExtend($this->libraries, $addon);
@@ -275,7 +352,7 @@ class ffPage_html extends ffPage_base
 		$this->css_counter = 0;
 		$this->css_loaded = array();
 	}
-	
+
 	public function tplAddMultiCss($elements, $priority = null)
 	{
 		if ($priority === null)
@@ -332,7 +409,7 @@ class ffPage_html extends ffPage_base
         $index = 0;
         $version = null;
 
-        if ($params !== null && is_array($params))
+        if (is_array($params))
         {
             if (ffIsset($params, "file"))				$file = $params["file"];
             if (ffIsset($params, "path"))				$path = $params["path"];
@@ -349,31 +426,34 @@ class ffPage_html extends ffPage_base
             if (ffIsset($params, "embed"))				$embed = $params["embed"];
             if (ffIsset($params, "index"))				$index = $params["index"];
             if (ffIsset($params, "version"))			$version = $params["version"];
+        } elseif($params) {
+            $path                                       = dirname($params);
+            $file                                       = basename($params);
         }
 
 		/*if ($file === "jquery.css")
 			ffErrorHandler::raise("DEBUG CSS", E_USER_ERROR, $this, get_defined_vars());
 		if ($file === "jquery-ui.css")
 			ffErrorHandler::raise("DEBUG CSS", E_USER_ERROR, $this, get_defined_vars());
-		*/	
+		*/
 		if(!$this->jquery_ui_theme && strpos($tag, "jquery-ui.") === 0) {
 			return true;
 		}
-		
+
 		if (!$overwrite && ffIsset($this->css_loaded, $tag))
 			return true;
-		
+
 		$tmp_async = ($async !== null ? $async : (
 							$this->isXHR() ? true : false
 						)
 				);
-		
+
 		// before, check for libraries
 		$deps = array(
 				"js" => array()
 				, "css" => array()
 			);
-		
+
 		// before, check for libraries
 		$lib_parts = explode(".", $tag);
 		$lib_parts_last = array_pop($lib_parts); // exclude last (this)
@@ -382,7 +462,7 @@ class ffPage_html extends ffPage_base
 		$is_css_defs = false;
 		for ($i = 0; $i < count($lib_parts); $i++)
 		{
-			$name = $lib_parts[$i];		
+			$name = $lib_parts[$i];
 			$tmp_found = ffIsset($last_ref, $name);
 			if (!$tmp_found)
 			{
@@ -391,14 +471,14 @@ class ffPage_html extends ffPage_base
 				if ($rc)
 					return;
 			}
-			
+
 			if ($tmp_found)
 			{
 				if ($i === 0) // primo livello, controllo di versione
 				{
 					if (!ffIsset($last_ref[$name], "default"))
 						ffErrorHandler::raise ("Malformed Libraries Structure", E_USER_ERROR, null, get_defined_vars());
-					
+
 					$lib_version = (is_null($version) ? $last_ref[$name]["default"] : $version);
 					if (!ffIsset($last_ref[$name], $lib_version))
 						ffErrorHandler::raise ("Version not found", E_USER_ERROR, null, get_defined_vars());
@@ -407,7 +487,7 @@ class ffPage_html extends ffPage_base
 				}
 				else
 					$last_ref = $last_ref[$name];
-				
+
 				$tmp_css_deps[] = $name;
 				if (!ffIsset($last_ref, "empty") || !$last_ref["empty"])
 					$deps[($is_css_defs ? "css" : "js")][0] = implode(".", $tmp_css_deps);
@@ -423,13 +503,13 @@ class ffPage_html extends ffPage_base
 			else
 				break;
 		}
-		
+
 		if ($i > 0 && $i < count($lib_parts))
 		{
 			$last_ref = $this->libraries;
 			$i = 0;
 		}
-		
+
 		if ($i > 0)
 		{
 			$tmp_found = ffIsset($last_ref, $lib_parts_last);
@@ -441,7 +521,7 @@ class ffPage_html extends ffPage_base
 				if ($rc)
 					return;
 			}
-				
+
 			if (!$tmp_found)
 			{
 				$last_ref = $this->libraries[$lib_parts_last];
@@ -453,7 +533,7 @@ class ffPage_html extends ffPage_base
 				$lib_data = $last_ref[$lib_parts_last];
 			}
 		}
-		
+
 		if ($i === 0 && ffIsset($last_ref, $tag))
 		{
 			if (!ffIsset($last_ref[$tag], "default"))
@@ -486,7 +566,7 @@ class ffPage_html extends ffPage_base
 				//$deps["js"] = array_merge($deps["js"], $ret);
 			}*/
 		}
-		
+
 		// got library! we can replace defaults
 		if ($found)
 		{
@@ -496,7 +576,7 @@ class ffPage_html extends ffPage_base
 				{
 					if ($js_key === "_//_")
 						continue;
-					
+
 					if ($js_value !== false && !ffIsset($js_value, "embed"))
 						$deps["js"][] = (strpos($js_key, ".") === 0 ? $tag : "") . $js_key;
 
@@ -507,7 +587,7 @@ class ffPage_html extends ffPage_base
 					//$deps["js"] = array_merge($deps["js"], $ret);
 				}
 			}
-			
+
 			if (ffIsset($lib_data, "css_deps"))
 			{
 				foreach ($lib_data["css_deps"] as $css_key => $css_value)
@@ -522,7 +602,7 @@ class ffPage_html extends ffPage_base
 					}
 				}
 			}
-			
+
 			if (!ffIsset($lib_data, "empty") || !$lib_data["empty"])
 			{
                 if (!ffIsset($params, "file")) $file = (ffIsset($lib_data, "file") ? $lib_data["file"] : null);
@@ -535,8 +615,16 @@ class ffPage_html extends ffPage_base
                 if (!ffIsset($params, "index")) $index = (ffIsset($lib_data, "index") ? $lib_data["index"] : 0);
 			}
 		}
-				
+
 		$this->css_loaded[$tag] = true;
+        //insert reference by resources
+        if(!$found && !$path && !$file && !$embed) {
+            $css = $this->getAsset($tag, "css");
+            if ($css) {
+                $file = basename($css);
+                $path = str_replace(FF_DISK_PATH, "", dirname($css));
+            }
+        }
 
         if (
             (!ffIsset($lib_data, "empty") || !$lib_data["empty"])
@@ -564,7 +652,7 @@ class ffPage_html extends ffPage_base
 					}
 				}
 			}
-			
+
 			if ($found_tag)
 			{
 				if ($overwrite)
@@ -573,18 +661,19 @@ class ffPage_html extends ffPage_base
 					return true;
 					//ffErrorHandler::raise ("Duplicated Element", E_USER_ERROR, null, get_defined_vars());
 			}
-			
+
 			if (!$found || $file !== null && $path !== null)
 			{
 				if ($priority === CM::LAYOUT_PRIORITY_TOPLEVEL && count($this->page_css[CM::LAYOUT_PRIORITY_TOPLEVEL]))
 						ffErrorHandler::raise("TOPLEVEL CSS already exsts", E_USER_ERROR, null, get_defined_vars());
-				
+
 				if ($priority === CM::LAYOUT_PRIORITY_FINAL && count($this->page_css[CM::LAYOUT_PRIORITY_FINAL]))
 						ffErrorHandler::raise("FINAL CSS already exsts", E_USER_ERROR, null, get_defined_vars());
-				
+
 				$this->css_counter++;
 				//if ($file == "ff.js") ffErrorHandler::raise("asd", E_USER_ERROR, $this, get_defined_vars());
-				
+
+
 				$this->page_css[$priority][$tag] = array(
 						"path" => $path
 						, "file" => $file
@@ -600,7 +689,7 @@ class ffPage_html extends ffPage_base
 					);
 			}
 		}
-		
+
 		if ($tag === "jquery-ui.core")
 		{
 			$this->tplAddCss(
@@ -616,7 +705,7 @@ class ffPage_html extends ffPage_base
 				)
 			);
 		}
-		
+
 		if ($found)
 		{
 			if (ffIsset($lib_data, "js_loads"))
@@ -625,19 +714,19 @@ class ffPage_html extends ffPage_base
 				{
 					if ($js_key === "_//_")
 						continue;
-					
+
 					$tmp_values = array(
 						"async" => $tmp_async
 					);
 					$tmp_key = $js_key;
-					
+
 					if (strpos($js_key, ".") === 0)
 					{
 						$tmp_values["priority"] = $priority;
 						$tmp_values["index"] = $index;
 						$tmp_key = $tag . $js_key;
 					}
-					
+
 					//$deps["js"][] = $js_key;
 					$ret = $this->tplAddJs(
 							$tmp_key
@@ -657,14 +746,14 @@ class ffPage_html extends ffPage_base
 						"async" => $tmp_async
 					);
 					$tmp_key = $css_key;
-					
+
 					if (strpos($css_key, ".") === 0)
 					{
 						$tmp_values["priority"] = $priority;
 						$tmp_values["index"] = $index;
 						$tmp_key = $tag . $css_key;
 					}
-					
+
 					$ret = $this->tplAddCss(
 							$tmp_key
 							, ffParamsMerge($tmp_values, $css_value)
@@ -672,10 +761,10 @@ class ffPage_html extends ffPage_base
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public function resetJS()
 	{
 		$this->page_js = array();
@@ -683,21 +772,21 @@ class ffPage_html extends ffPage_base
 		$this->js_counter = 0;
 		$this->js_loaded = array();
 	}
-	
+
 	public function tplAddMultiJS($elements, $priority = null)
 	{
 		if ($priority === null)
 		{
 			if (!is_array($elements))
 				ffErrorHandler::raise ("Wrong elements", E_USER_ERROR, $this, get_defined_vars());
-			
+
 			foreach ($elements as $js_queue_key => $js_queue)
 			{
 				foreach ($js_queue AS $js_key => $js_value)
 				{
 					if ($js_key === "_//_")
 						continue;
-					
+
 					$this->tplAddJs(
 							$js_key
 							, ffParamsMerge(array("priority" => $js_queue_key), $js_value)
@@ -713,7 +802,7 @@ class ffPage_html extends ffPage_base
 			{
 				if ($js_key === "_//_")
 					continue;
-				
+
 				$this->tplAddJs(
 						$js_key
 						, ffParamsMerge(array("priority" => $priority), $js_value)
@@ -721,7 +810,7 @@ class ffPage_html extends ffPage_base
 			}
 		}
 	}
-	
+
     /**
 	 * Aggiunge un Javascript alla pagina
 	 * @param String $tag un nome univoco
@@ -732,16 +821,14 @@ class ffPage_html extends ffPage_base
 	 * @param Boolean $embed specifica l'attributo EMBED
 	 * @return Boolean l'esito dell'operazione
 	 */
-    public function tplAddJs($tag, $file = null, $path = null, $overwrite = false, $async = null, $embed = null, $exclude_compact = false, $priority = cm::LAYOUT_PRIORITY_DEFAULT, $index = 0, $version = null)
+    public function tplAddJs($tag, $params = null/*, $path = null, $overwrite = false, $async = null, $embed = null, $exclude_compact = false, $priority = cm::LAYOUT_PRIORITY_DEFAULT, $index = 0, $version = null*/)
     {
 		/*$globals = ffGlobals::getInstance();
 		if ($globals->test)
 			ffErrorHandler::raise ("ASD", E_USER_ERROR, $this, get_defined_vars ());*/
 
-		if ($file !== null && is_array($file))
+		if (is_array($params))
 		{
-			$params = $file;
-			$file = null;
 			if (ffIsset($params, "file"))				$file = $params["file"];
 			if (ffIsset($params, "path"))				$path = $params["path"];
 			if (ffIsset($params, "overwrite"))			$overwrite = $params["overwrite"];
@@ -751,15 +838,22 @@ class ffPage_html extends ffPage_base
 			if (ffIsset($params, "priority"))			$priority = $params["priority"];
 			if (ffIsset($params, "index"))				$index = $params["index"];
 			if (ffIsset($params, "version"))			$version = $params["version"];
-		}
-			
+        } elseif($params) {
+            $path                                       = dirname($params);
+            $file                                       = basename($params);
+        }
+
+        if(strpos($tag, "ff") === 0) {
+            $this->use_own_js = true;
+        }
+
 		if (!$overwrite && ffIsset($this->js_loaded, $tag))
 			return $this->js_loaded[$tag];
 
 		$this->js_loaded[$tag] = array(); // avoid infinite recursion
-		
+
 		$tmp_async = ($async !== null ? $async : (
-							$this->isXHR() ? true : false
+							$this->isXHR() ? true : true //false
 						)
 				);
 
@@ -777,22 +871,22 @@ class ffPage_html extends ffPage_base
 		{
 			$name = $lib_parts[$i];
 			$tmp_found = ffIsset($last_ref, $name);
-			
+
 			if (!$tmp_found)
 			{
 				$ret = $this->doEvent("tplAddJs_not_found", array($this, $tag, $params));
 				$rc = end($ret);
 				if ($rc)
-					return;				
+					return;
 			}
-			
+
 			if ($tmp_found)
 			{
 				if ($i === 0) // primo livello, controllo di versione
 				{
 					if (!ffIsset($last_ref[$name], "default"))
 						ffErrorHandler::raise ("Malformed Libraries Structure", E_USER_ERROR, null, get_defined_vars());
-					
+
 					$lib_version = (is_null($version) ? $last_ref[$name]["default"] : $version);
 					if (!ffIsset($last_ref[$name], $lib_version))
 						ffErrorHandler::raise ("Version not found", E_USER_ERROR, null, get_defined_vars());
@@ -802,7 +896,7 @@ class ffPage_html extends ffPage_base
 				}
 				else
 					$last_ref = $last_ref[$name];
-				
+
 				$tmp_js_deps[] = $name;
 				//$deps["js"][] = implode(".", $tmp_js_deps);
 				if (!ffIsset($last_ref, "empty") || !$last_ref["empty"])
@@ -816,13 +910,13 @@ class ffPage_html extends ffPage_base
 			else
 				break;
 		}
-		
+
 		if (!$tmp_found)
 		{
 			$last_ref = $this->libraries;
 			$i = 0;
 		}
-		
+
 		if ($embed === null && $file === null && $path === null)
 		{
 			if ($tmp_found)
@@ -835,7 +929,7 @@ class ffPage_html extends ffPage_base
 					if ($rc)
 						return;
 				}
-					
+
 				if (!$tmp_found)
 				{
 					$last_ref = $this->libraries[$lib_parts_last];
@@ -848,7 +942,7 @@ class ffPage_html extends ffPage_base
 				}
 			}
 		}
-				
+
 		if ($i === 0 && !$tmp_found && ffIsset($last_ref, $tag))
 		{
 			if (!ffIsset($last_ref[$tag], "default"))
@@ -865,7 +959,7 @@ class ffPage_html extends ffPage_base
 		// eliminate parents
 		/*if (count($deps["js"]))
 			$deps["js"] = array(end($deps["js"]));*/
-		
+
 		// load base deps
 		if (count($deps["js"]))
 		{
@@ -876,7 +970,7 @@ class ffPage_html extends ffPage_base
 				//$deps["js"] = array_merge($deps["js"], $ret);
 			}*/
 		}
-		
+
 		// got library! we can load deps and replace defaults
 		if ($found)
 		{
@@ -886,10 +980,10 @@ class ffPage_html extends ffPage_base
 				{
 					if ($js_key === "_//_")
 						continue;
-					
+
 					if ($js_value !== false && !ffIsset($js_value, "embed"))
 						$deps["js"][] = (strpos($js_key, ".") === 0 ? $tag : "") . $js_key;
-						
+
 					$ret = $this->tplAddJs(
 							(strpos($js_key, ".") === 0 ? $tag : "") . $js_key
 							, ffParamsMerge(array("async" => $tmp_async), ($js_value === false ? null : $js_value))
@@ -897,7 +991,7 @@ class ffPage_html extends ffPage_base
 					//$deps["js"] = array_merge($deps["js"], $ret);
 				}
 			}
-			
+
 			if (ffIsset($lib_data, "css_deps"))
 			{
 				foreach ($lib_data["css_deps"] as $css_key => $css_value)
@@ -912,7 +1006,7 @@ class ffPage_html extends ffPage_base
 					}
 				}
 			}
-			
+
 			if (!ffIsset($lib_data, "empty") || !$lib_data["empty"])
 			{
 				$file = (ffIsset($lib_data, "file") ? $lib_data["file"] : null);
@@ -925,10 +1019,19 @@ class ffPage_html extends ffPage_base
 				$index = (ffIsset($lib_data, "index") ? $lib_data["index"] : 0);
 			}
 		}
-		
+
 		$deps["js"] = array_unique($deps["js"]);
 		$this->js_loaded[$tag] = $deps;
-		
+
+        //insert reference by resources
+        if(!$found && !$path && !$file && !$embed) {
+            $js = $this->getAsset($tag, "js");
+            if ($js) {
+                $file = basename($js);
+                $path = str_replace(FF_DISK_PATH, "", dirname($js));
+            }
+        }
+
 		if (($found && (!ffIsset($lib_data, "empty") || !$lib_data["empty"])) || (!$found && ($embed !== null || $file !== null || $path !== null)))
 		{
 			foreach ($this->page_js AS $js_queue_key => $js_queue)
@@ -962,7 +1065,7 @@ class ffPage_html extends ffPage_base
 
 			$this->js_counter++;
 
-			$this->page_js[$priority][$tag] = array(
+            $this->page_js[$priority][$tag] = array(
 					"path" => $path
 					, "file" => $file
 					, "async" => $tmp_async
@@ -974,7 +1077,7 @@ class ffPage_html extends ffPage_base
 					, "deps" => $deps
 				);
 		}
-		
+
 		if ($found)
 		{
 			if (ffIsset($lib_data, "js_loads"))
@@ -983,19 +1086,19 @@ class ffPage_html extends ffPage_base
 				{
 					if ($js_key === "_//_")
 						continue;
-					
+
 					$tmp_values = array(
 						"async" => $tmp_async
 					);
 					$tmp_key = $js_key;
-					
+
 					if (strpos($js_key, ".") === 0)
 					{
 						$tmp_values["priority"] = $priority;
 						$tmp_values["index"] = $index;
 						$tmp_key = $tag . $js_key;
 					}
-					
+
 					$ret = $this->tplAddJs(
 							$tmp_key
 							, ffParamsMerge($tmp_values, $js_value)
@@ -1014,14 +1117,14 @@ class ffPage_html extends ffPage_base
 						"async" => $tmp_async
 					);
 					$tmp_key = $css_key;
-					
+
 					if (strpos($css_key, ".") === 0)
 					{
 						$tmp_values["priority"] = $priority;
 						$tmp_values["index"] = $index;
 						$tmp_key = $tag . $css_key;
 					}
-					
+
 					$ret = $this->tplAddCss(
 							$tmp_key
 							, ffParamsMerge($tmp_values, $css_value)
@@ -1029,7 +1132,7 @@ class ffPage_html extends ffPage_base
 				}
 			}
 		}
-			
+
 		return $deps;
     }
 
@@ -1041,24 +1144,21 @@ class ffPage_html extends ffPage_base
 	 * @param String $type l'attribugo type del meta, di default "name"
 	 * @return Boolean l'esito dell'azione
 	 */
-	public function tplAddMeta($name, $content, $overwrite = false, $type = "name")
+	public function tplAddMeta($params)
     {
-		if (!isset($this->page_meta[$name]) || $overwrite)
-		{
-			$this->page_meta[$name] = array(
-										"name" => $name
-										, "content" => $content
-										, "type" => $type
-									);
-			return true;
-		}
-		else
-			return false;
+        if(is_array($params)) {
+            $key = ($params["name"]
+                ? $params["name"]
+                : microtime()
+            );
+            $params["content"] = preg_replace('/(\r|\n|\")/', " ", $params["content"]);
+            $this->page_meta[$key] = $params;
+        }
     }
 
 	public function tplAddTag($type, $params = array())
 	{
-		switch($type) 
+		switch($type)
 		{
 			case "canonical":
 				$params["rel"] = "canonical";
@@ -1078,17 +1178,19 @@ class ffPage_html extends ffPage_base
 				break;
 			case "favicon":
 			case "icon":
-				$params["rel"] = "icon";
+			    if(!$params["rel"]) {
+                    $params["rel"] = "icon";
+                }
 				$tag = "link";
 				break;
 			default:
 				$tag = $type;
-		}			
+		}
 
 		$this->page_tags[$tag][] = $params;
 		return true;
 	}
-	    
+
     /**
 	 * Aggiunge un Attributo al TAG html
 	 * @param String $name il nome dell'attributo
@@ -1097,25 +1199,16 @@ class ffPage_html extends ffPage_base
 	 * @param String $type l'attribugo type del meta, di default "name"
 	 * @return Boolean l'esito dell'azione
 	 */
-	public function tplAddHtmlAttr($content, $overwrite = false, $type = "xmlns")
+	public function tplAddHtmlAttr($key, $value)
     {
-		if (!isset($this->page_html_attr[$content]) || $overwrite)
-		{
-			$this->page_html_attr[$content] = array(
-										"content" => $content
-										, "type" => $type
-									);
-			return true;
-		}
-		else
-			return false;
+        $this->page_html_attr[$key] = $value;
     }
-    
+
 	public function tplLoad($tpl = null)
 	{
 		if ($this->template_loaded)
 			return;
-		
+
 		$this->template_loaded = true;
 		if ($tpl === null)
 		{
@@ -1133,7 +1226,7 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->load_file($this->template_file, "main");
 				}
 			}
-			else 
+			else
 			{
 				$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
 				$this->tpl[0]->load_file($this->template_file, "main");
@@ -1146,7 +1239,7 @@ class ffPage_html extends ffPage_base
 		$this->tpl[0]->minify = $this->minify;
 
 		// ff.js
-		$this->doEvent("on_tpl_load", array($this, $this->tpl));		
+		$this->doEvent("on_tpl_load", array($this, $this->tpl));
 
 		$this->tplProcessVars($this->tpl);
 
@@ -1169,21 +1262,27 @@ class ffPage_html extends ffPage_base
 
 		$this->doEvent("on_tpl_loaded", array(&$this, $this->tpl));
 	}
-	
+
 	function tplLoadLayer($tpl = null)
 	{
 		// LAYER SECTION
 		if ($this->template_layer_loaded)
 			return;
-		
+
 		$this->template_layer_loaded = true;
 		if (strlen($this->layer) && (!$this->isXHR() || $this->layer_dialog))
 		{
-			$this->tpl_layer[0] = ffTemplate::factory($this->getLayerDir("layer_" . $this->layer  . ".html"));
+
+            $this->tpl_layer[0] = ($tpl
+                ? $tpl
+                : $this->loadTemplate($this->layer, "layouts")
+            );
+
+			/*$this->tpl_layer[0] = ffTemplate::factory($this->getLayerDir("layer_" . $this->layer  . ".html"));
 			if ($tpl === null)
 				$this->tpl_layer[0]->load_file("layer_" . $this->layer  . ".html", "main");
 			else
-				$this->tpl_layer[0] = $tpl;
+				$this->tpl_layer[0] = $tpl;*/
 
 			//$this->tpl_layer[0]->strip_extra_newlines = $this->strip_extra_newlines;
 
@@ -1209,45 +1308,45 @@ class ffPage_html extends ffPage_base
 
 				if (is_array($this->sections) && count($this->sections))
 				{
-					foreach ($this->sections as $key => $value)
+					foreach ($this->sections AS $key => $value)
 					{
-						if (strlen($value["name"]))
-						{
-							if ($value["is_php"])
-							{
-								ob_start();
-								require($value["name"]);
-								$this->tpl[0]->set_var($key, ob_get_contents());
-								$this->tpl_layer[0]->set_var($key, ob_get_contents());
-								ob_end_clean();
-							}
-							else
-							{
-								if ($value["dir"] === null)
-									$this->sections[$key]["tpl"] = ffTemplate::factory($this->getLayoutDir($key . "_" . $value["name"] . ".html"));
-								else
-									$this->sections[$key]["tpl"] = ffTemplate::factory($value["dir"]);
+					    switch($value["type"]) {
+                            case "php":
+                                ob_start();
+                                require($value["path"]);
+                                $this->sections[$key]["tpl"] = ffTemplate::factory();
+                                $this->sections[$key]["tpl"]->load_content(ob_get_contents(), "main");
+                                ob_end_clean();
+                                break;
+                            case "tpl":
+                                $this->sections[$key]["tpl"] = ffTemplate::factory(dirname($value["path"]));
+                                $this->sections[$key]["tpl"]->load_file(basename($value["path"]), true);
+                                break;
+                            case "url":
+                                $this->sections[$key]["tpl"] = ffTemplate::factory();
+                                $this->sections[$key]["tpl"]->load_content('<iframe src="' . $value["path"] . '" />', "main");
+                                break;
+                            case "embed":
+                                $this->sections[$key]["tpl"] = ffTemplate::factory();
+                                $this->sections[$key]["tpl"]->load_content($value["content"], "main");
+                                break;
+                            default:
+                                $this->sections[$key]["tpl"] = $this->loadTemplate($key, "common");
 
-								$this->sections[$key]["tpl"]->load_file($key . "_" . $value["name"] . ".html", "main");
+                        }
 
-								//$this->sections[$key]["tpl"]->strip_extra_newlines = $this->strip_extra_newlines;
+                        $this->tplProcessVars(array(&$this->sections[$key]["tpl"]));
+                        $this->tplSetGlobals(array(&$this->sections[$key]["tpl"]));
 
-								$this->tplProcessVars(array(&$this->sections[$key]["tpl"]));
-								$this->tplSetGlobals(array(&$this->sections[$key]["tpl"]));
+                        $this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
 
-								if ($this->sections[$key]["events"] === null)
-									$this->sections[$key]["events"] = new ffEvents();
-								else
-									$this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"]));
-							}
-						}
 					}
 					reset($this->sections);
 				}
 			}
 		}
 	}
-	
+
 	public function tplParseHidden()
 	{
 		$this->tpl[0]->set_var("SectFormHidden", "");
@@ -1264,7 +1363,7 @@ class ffPage_html extends ffPage_base
 						case "ffData":
 							$this->tpl[0]->set_var("varvalue", $value["field"]->getValue($value["type"], $value["locale"]));
 							break;
-							
+
 						default:
 							$this->tpl[0]->set_var("varvalue", $value["field"]);
 					}
@@ -1311,7 +1410,7 @@ class ffPage_html extends ffPage_base
 		}
 		return;
 	}
-		
+
 	/**
 	 * Elabora gli array di transizione per i bounce componente, funzione ricorsiva di supporto
 	 */
@@ -1332,15 +1431,15 @@ class ffPage_html extends ffPage_base
 		}
 		reset($array);
 	}
-		
+
 	/**
 	 * Processa le variabili standard in un template associato alla pagina
 	 * @param Array $tpl l'oggetto template
 	 */
 	protected function tplProcessVars($tpl)
 	{
-		$framework_css = cm_getFrameworkCss();
-		$font_icon = cm_getFontIcon();
+		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
+		$font_icon = Cms::getInstance("frameworkcss")->getFontIcon();
 
         if(__TOP_DIR__ != __PRJ_DIR__)
             $tpl[0]->set_var("base_path", substr($this->site_path, 0, strpos($this->site_path, "/domains/")));
@@ -1354,27 +1453,23 @@ class ffPage_html extends ffPage_base
 		$tpl[0]->set_var("font_icon", $font_icon["name"]);
 
 		$tpl[0]->set_var("theme", $this->theme);
-		
+
 		if (strlen($this->jquery_ui_theme)) {
 			$tpl[0]->set_var("theme_ui", $this->jquery_ui_theme);
 		} else {
 			$tpl[0]->set_var("theme_ui", "");
 		}
-		
+
 		$tpl[0]->set_var("layer", $this->layer);
         $tpl[0]->set_var("lazy_img", (CM_CACHE_IMG_LAZY_LOAD ? "true" : "false"));
-		$tpl[0]->set_var("showfiles", (CM_MEDIACACHE_SHOWPATH ? CM_MEDIACACHE_SHOWPATH : CM_SHOWFILES));
+		$tpl[0]->set_var("showfiles", CM_SHOWFILES);
 
-        if (MOD_SEC_GROUPS) 
-		{
-            $user_permission = get_session("user_permission");    
-            if (strlen($user_permission["primary_gid_name"]))
-            {
-                $tpl[0]->set_var("group", $user_permission["primary_gid_name"]);
-                $tpl[0]->parse("SectGroup", false);
-            }
-        }    
-        
+		if(class_exists("Auth")) {
+            $user = Auth::get("user");
+            $tpl[0]->set_var("group", $user->acl_primary);
+            $tpl[0]->parse("SectGroup", false);
+        }
+
 		$tpl[0]->set_var("encoded_this_url", rawurlencode($_SERVER['REQUEST_URI']));
 
 		foreach ($this->global_params as $key => $value)
@@ -1403,7 +1498,7 @@ class ffPage_html extends ffPage_base
 		reset($this->global_params);
 
 		$tpl[0]->set_var("query_string", $this->get_script_params());
-		
+
 		if (is_array($this->keys) && count($this->keys))
 		{
 			foreach ($this->keys as $key => $value)
@@ -1431,7 +1526,7 @@ class ffPage_html extends ffPage_base
 
 	protected function parse_tags()
 	{
-		if(is_array($this->page_tags) && count($this->page_tags)) 
+		if(is_array($this->page_tags) && count($this->page_tags))
 		{
 			foreach($this->page_tags AS $type => $tags)
 			{
@@ -1439,17 +1534,17 @@ class ffPage_html extends ffPage_base
 				foreach($tags AS $attr)
 				{
 					$tag_properties = "";
-					foreach($attr AS $attr_name => $attr_value) 
+					foreach($attr AS $attr_name => $attr_value)
 					{
 						$tag_properties .= ' ' . $attr_name . '="' . $attr_value . '"';
 					}
 					$this->tpl[0]->set_var("tag_properties", $tag_properties);
 					$this->tpl[0]->parse("SectTags", true);
 				}
-			}		
+			}
 		}
 	}
-	
+
 	/**
 	 * Elabora i template e restituisce il risultato
 	 * il risultato dipende dal formato (XHR, normale, etc)
@@ -1468,6 +1563,15 @@ class ffPage_html extends ffPage_base
 				"href" => $this->canonical
 			));
 
+		$favicon = $this->getAsset("favicon", "images");
+		if($favicon) {
+		    foreach ($this->favicons AS $key => $value) {
+                $value["href"] = ffMedia::getUrl($favicon, $value["sizes"], "url");
+                $this->tplAddTag("favicon", $value);
+            }
+        }
+
+
 		if ($this->use_own_js)
 		{
 			$this->tplAddMultiJS($this->default_js, cm::LAYOUT_PRIORITY_HIGH);
@@ -1479,7 +1583,7 @@ class ffPage_html extends ffPage_base
 					, "index" => -1000
 				));
 		}
-		
+
 		$this->parse_css();
 		$this->parse_tags();
         $this->parse_js();
@@ -1499,9 +1603,9 @@ class ffPage_html extends ffPage_base
 				}
 			}
 		}
-		$this->tpl[0]->set_var("SectFFJS", "");	
+		$this->tpl[0]->set_var("SectFFJS", "");
 
-		$this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));		
+		$this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));
 		if ($this->isXHR())
 		{
 			if ($this->getXHRFormat() === false)
@@ -1525,14 +1629,14 @@ class ffPage_html extends ffPage_base
 		else
 		{
 			$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
-			
-			if (strlen($this->output_buffer["headers"])) 
+
+			if (strlen($this->output_buffer["headers"]))
 			{
 				$this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["headers"]);
 				$this->tpl[0]->parse("SectWidgetsHeaders", true);
 			}
-			
-			if (strlen($this->output_buffer["footers"])) 
+
+			if (strlen($this->output_buffer["footers"]))
 			{
 				$this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["footers"]);
 				$this->tpl[0]->parse("SectWidgetsFooters", true);
@@ -1546,8 +1650,8 @@ class ffPage_html extends ffPage_base
 			if ($output_result)
 			{
 				$this->tpl[0]->pparse("main", false);
-			} 
-			else 
+			}
+			else
 			{
 				return $this->tpl[0]->rpparse("main", false);
 			}
@@ -1576,7 +1680,7 @@ class ffPage_html extends ffPage_base
 
 	private function tplProcessData($data)
     {
-        if (
+        /*if (
             is_object($data)
             && (
                 is_subclass_of($data, "ffGrid_base")
@@ -1600,7 +1704,7 @@ class ffPage_html extends ffPage_base
 
             if ($tmp_found)
                 return;
-        }
+        }*/
 
         $tmp = $this->getContentData($data);
 
@@ -1643,7 +1747,7 @@ class ffPage_html extends ffPage_base
 				$this->tpl[0]->set_var("form_action", ' action="' . $this->form_action . '"');
 
 			$this->tpl[0]->set_var("script_name", $this->get_script_name() . "?" . $this->get_script_params());
-			
+
 			$this->tpl[0]->parse("SectFormHeader", false);
 			$this->tpl[0]->parse("SectFormFooter", false);
 		}
@@ -1695,10 +1799,10 @@ class ffPage_html extends ffPage_base
 						else
 							$this->json_result[$key][$subkey]		=	$subvalue;
 					}
-					
+
 					continue;
 				}
-				
+
 				if ($content["group"] === true)
 				{
 					if($this->tab)
@@ -1744,7 +1848,7 @@ class ffPage_html extends ffPage_base
 
 			if (strlen($this->layer) && (!$this->isXHR() || $this->layer_dialog))
 			{
-				$this->tpl_layer[0]->set_var("content", $this->output_buffer["html"]);
+				$this->tpl_layer[0]->set_var("content", $this->tpl_layer[0]->ParsedBlocks["content"] . $this->output_buffer["html"]);
 				$this->output_buffer["html"] = $this->tpl_layer[0]->rpparse("main", false);
 			}
 		}
@@ -1753,7 +1857,7 @@ class ffPage_html extends ffPage_base
 	/**
 	 * In base al contenuto, recupera di dati d'elaborazione ad esso associati
 	 * @param Mixed $content
-	 * @return Mixed 
+	 * @return Mixed
 	 */
 	public function getContentData($content)
 	{
@@ -1793,7 +1897,7 @@ class ffPage_html extends ffPage_base
 					&& get_class($content) == "ffTemplate"
 			)
 		{
-			cm::getInstance()->parseApplets($content);
+			//cm::getInstance()->parseApplets($content);
 
 			foreach($this->components as $key => $item)
 			{
@@ -1811,7 +1915,7 @@ class ffPage_html extends ffPage_base
 					$this->components_buffer[$key]["html"] = "";
 			}
 			reset($this->components);
-			
+
 			return $content->rpparse("main", false);
 		}
 		elseif (is_string($content))
@@ -1821,24 +1925,40 @@ class ffPage_html extends ffPage_base
 		else
 			ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
 	}
-	
+
 	/**
 	 * Aggiunge una sezione all'array sections
 	 * @param String $sName Il nome della sezione
 	 */
-	function addSection($sName)
+	function addSection($sName, $params = null)
 	{
-		if (!isset($this->sections[$sName]))
-		{
-			$this->sections[$sName] = array(
-											  "dir" => null
-											, "name" => ""
-											, "tpl" => null
-											, "is_php" => false
-											, "events" => new ffEvents()
-										);
-			//$this->sections[$sName]["events"]->addEvent("on_load_template", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
-		}
+	    if(is_array($sName) && !$params) {
+            $params = $sName;
+            $sName = $params["name"];
+            unset($params["name"]);
+        }
+	    if($sName) {
+            if ($params["content"]) {
+                $params["type"] = "embed";
+            } elseif ($params["path"]) {
+                if (Util::isUrl($params["path"])) {
+                    $params["type"] = "url";
+                } elseif (pathinfo($params["path"], PATHINFO_EXTENSION) == FF_PHP_EXT) {
+                    $params["type"] = "php";
+                } else {
+                    $params["type"] = "tpl";
+                }
+            }
+            $events = new ffEvents();
+            if (is_array($params["events"]) && count($params["events"])) {
+                foreach ($params["events"] AS $key => $value) {
+                    $events->addEvent($key, $value);
+                }
+            }
+            $params["events"] = $events;
+
+            $this->sections[$sName] = $params;
+        }
 	}
 
 	/**
@@ -1852,7 +1972,7 @@ class ffPage_html extends ffPage_base
 		foreach($this->components as $key => $item)
 		{
 			$rc = false;
-			
+
 			if (/*$this->components[$key]->use_own_location &&*/ $this->components[$key]->display !== false)
 			{
 				if ($this->components[$key]->location_name === null)
@@ -1860,26 +1980,26 @@ class ffPage_html extends ffPage_base
 				else
 					$rc = $this->tpl_layer[0]->set_var($this->components[$key]->location_name, $this->components_buffer[$key]["html"]);
 			}
-			
+
 			if ($rc)
 				$this->components_buffer[$key]["html"] = "";
-				
+
 			if (get_class($this->components[$key]) == "ffGrid_html" && $this->components[$key]->search_container !== null)
 			{
 				$this->sections[$this->components[$key]->search_container]["content"] .= $this->components[$key]->search_container_buffer;
 			}
 		}
 		reset($this->components);
-		
+
 		if (is_array($this->sections) && count($this->sections))
 		{
 			foreach ($this->sections as $key => $value)
 			{
 				if ($value["tpl"] === null)
 					continue;
-		
-				$this->sections[$key]["events"]->doEvent("on_process", array(&$this, $this->sections[$key]["tpl"]));
-				
+
+				$this->sections[$key]["events"]->doEvent("on_process", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
+
 				// process components buffer
 				foreach ($this->components as $subkey => $item)
 				{
@@ -1904,6 +2024,15 @@ class ffPage_html extends ffPage_base
 			}
 			reset($this->sections);
 		}
+
+        if(is_array($this->tpl_layer[0]->DVars) && count($this->tpl_layer[0]->DVars)) {
+            $vars = array_diff_key($this->tpl_layer[0]->DVars, $this->tpl_layer[0]->ParsedBlocks);
+            foreach($vars AS $var => $index) {
+                if(strpos($var, ".html") > 0) {
+                    $this->tpl_layer[0]->set_var($var, $this->loadTemplate(basename($var, ".html"), "common")->rpparse("main", false));
+                }
+            }
+        }
 	}
 
    /**
@@ -1915,16 +2044,16 @@ class ffPage_html extends ffPage_base
         $this->tpl[0]->set_var("SectCssEmbed", "");
         $this->tpl[0]->set_var("SectCssLink", "");
         $this->tpl[0]->set_var("SectCss", "");
-		
+
 		$this->css_buffer = array();
-		
+
 		cm::_layoutOrderElements($this->page_css);
 
 		if ($this->browser === null)
 			$this->browser = $this->getBrowser();
 
 		//ffErrorHandler::raise("ASD", E_USER_ERROR, $this, get_defined_vars());
-			
+
 		foreach ($this->page_css as $css_queue_key => $css_queue)
 		{
 			foreach ($css_queue as $key => $value)
@@ -1941,11 +2070,11 @@ class ffPage_html extends ffPage_base
 				$tmp_add_file = null;
 				*/
 				$tmp_file_version = $value["version"];
-				
+
 				if ($value["embed"])
 				{
 					if (
-							$this->compact_css 
+							$this->compact_css
 							&& !$value["exclude_compact"]
 						)
 					{
@@ -1955,7 +2084,7 @@ class ffPage_html extends ffPage_base
 							$tmp_media = $value["media"];
 
 						$this->css_buffer[$tmp_media][]["content"] = $value["embed"];
-					} 
+					}
 					else
 					{
 						$link_properties = "";
@@ -1968,12 +2097,12 @@ class ffPage_html extends ffPage_base
 						$this->tpl[0]->parse("SectLibs", false);
 
 						$this->tpl[0]->set_var("css_embed", $value["embed"]);
-						
+
 						$link_properties .= ' id="' . $key .'"';
 
 						if($value["type"])
 							$link_properties .= ' type="' . $value["type"] .'"';
-							
+
 						if ($value["exclude_compact"])
 							$link_properties .= " inline";
 
@@ -1984,20 +2113,20 @@ class ffPage_html extends ffPage_base
 						} elseif ($value["media"] && $value["media"] !== "default") {
 							$link_properties .= ' media="' . $value["media"] .'"';
 						}
-						$this->tpl[0]->set_var("link_properties", $link_properties);	
-							
+						$this->tpl[0]->set_var("link_properties", $link_properties);
+
 						$this->tpl[0]->parse("SectCssEmbed", true);
 						$this->tpl[0]->parse("SectCss", true);
 					}
 					continue;
-				} 
+				}
 
 				if (isset($this->override_css[$key]))
 				{
 					$tmp_path = $this->override_css[$key]["path"];
 					$tmp_file = $this->override_css[$key]["file"];
-				} 
-				else 
+				}
+				else
 				{
 					$res = $this->doEvent("on_css_parse", array($this, $key, $value["path"], $value["file"]));
 					$rc = end($res);
@@ -2098,7 +2227,7 @@ class ffPage_html extends ffPage_base
 							elseif (!strlen($value["file"] && $flag_path_ext))
 							{
 								$tmp_file = $tmp_path;
-							}							
+							}
 							else
 								ffErrorHandler::raise ("Impossibile determinare il file fisico", E_USER_ERROR, null, get_defined_vars());
 						}
@@ -2126,7 +2255,7 @@ class ffPage_html extends ffPage_base
 							}
 
 						}
-					} 
+					}
 				}
 
 				if (count($variants))
@@ -2136,8 +2265,8 @@ class ffPage_html extends ffPage_base
 					{
 						$tmp_path = $variants["paths"][$i];
 						$tmp_file = $variants["files"][$i];
-						
-						
+
+
 						/*if (
 								substr($tmp_path, -3) !== ".css"
 								|| substr($tmp_file, -3) !== ".css"
@@ -2165,7 +2294,7 @@ class ffPage_html extends ffPage_base
 							break;
 						}
 					}
-					
+
 					if (!$found)
 						ffErrorHandler::raise ("DEBUG: File CSS non esistente", E_USER_ERROR, null, get_defined_vars());
 				}
@@ -2260,7 +2389,7 @@ class ffPage_html extends ffPage_base
 				}
 
 				$link_properties = "";
-				
+
 				// static libs in normal load (not XHR)
 				$this->tpl[0]->set_var("lib_tag", $key);
 				$this->tpl[0]->set_var("lib_type", "css");
@@ -2269,16 +2398,16 @@ class ffPage_html extends ffPage_base
 
 				// load plugin in XHR loads
 				$this->tpl[0]->set_var("css_tag", $key);
-				
+
 				if($value["rel"])
 					$link_properties .= ' rel="' . $value["rel"] .'"';
-				
+
 				if($value["type"])
 					$link_properties .= ' type="' . $value["type"] .'"';
-				
+
 				if ($flag_path_ext)
 					$this->tpl[0]->set_var("css_path", $tmp_path);
-				else 
+				else
 				{
 					$mtime = @filemtime(ff_getAbsDir($tmp_path));
 					if (ff_getAbsDir($tmp_path, false))
@@ -2291,15 +2420,15 @@ class ffPage_html extends ffPage_base
 					else
 						$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path . ($mtime ? "?" . $mtime : ""));
 				}
-				
+
 				if (!$this->isXHR() && !$value["async"])
 				{
 					$this->tpl[0]->parse("SectLib", true);
 					$this->tpl[0]->parse("SectLibs", false);
 				}
-				
+
 				if (
-						$this->compact_css 
+						$this->compact_css
 						&& !$value["exclude_compact"]
 						&& $value["rel"] == "stylesheet"
 						&& $value["type"] == "text/css"
@@ -2316,7 +2445,7 @@ class ffPage_html extends ffPage_base
 				{
 					if ($this->isXHR())
 					{
-						$this->tpl[0]->set_var("link_properties", $link_properties);	
+						$this->tpl[0]->set_var("link_properties", $link_properties);
 						$this->tpl[0]->parse("SectCss", true);
 					}
 					else
@@ -2337,8 +2466,8 @@ class ffPage_html extends ffPage_base
 							} elseif ($value["media"] && $value["media"] !== "default") {
 								$link_properties .= ' media="' . $value["media"] .'"';
 							}
-							$this->tpl[0]->set_var("link_properties", $link_properties);	
-						
+							$this->tpl[0]->set_var("link_properties", $link_properties);
+
 							$this->tpl[0]->set_var("SectCssEmbed", "");
 							$this->tpl[0]->set_var("SectAsyncCssPlugin", "");
 							$this->tpl[0]->parse("SectCssLink", false);
@@ -2350,7 +2479,7 @@ class ffPage_html extends ffPage_base
 				// --------------------------------------------------------------------------------------------------
 				// add browser customization as additional CSS
 				/* Deprecato ADD CSS Custom Browser
-				if ($this->css_browser_detection && $tmp_add_tag !== null) 
+				if ($this->css_browser_detection && $tmp_add_tag !== null)
 				{
 					if ($value["async"])
 					{
@@ -2361,33 +2490,33 @@ class ffPage_html extends ffPage_base
 					{
 						$this->tpl[0]->set_var("lib_async", "false");
 						$this->tpl[0]->set_var("css_async", "false");
-					}				
-					
+					}
+
 					// static libs in normal load (not XHR)
 					$this->tpl[0]->set_var("lib_tag", $tmp_add_tag);
 					$this->tpl[0]->set_var("lib_type", "css");
 					$this->tpl[0]->set_var("lib_deps", "undefined");
 					$this->tpl[0]->set_var("lib_media", (strlen($value["media"]) ? $value["media"] : "undefined"));
-					
+
 					// load plugin in XHR loads
 					$this->tpl[0]->set_var("css_tag", $tmp_add_tag);
-					
+
 					if($value["rel"])
 					$link_properties .= ' rel="' . $value["rel"] .'"';
-				
+
 					if($value["type"])
-						$link_properties .= ' type="' . $value["type"] .'"';					
-						
+						$link_properties .= ' type="' . $value["type"] .'"';
+
 					$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_add_path);
-					
+
 					if (!$this->isXHR() && !$value["async"])
 					{
 						$this->tpl[0]->parse("SectLib", true);
 						$this->tpl[0]->parse("SectLibs", false);
-					}					
-					
+					}
+
 					if (
-							$this->compact_css 
+							$this->compact_css
 							&& !$value["exclude_compact"]
 							&& $value["rel"] == "stylesheet"
 							&& $value["type"] == "text/css"
@@ -2396,15 +2525,15 @@ class ffPage_html extends ffPage_base
 						if ($value["media"] === null)
 							$tmp_media = "default";
 						else
-							$tmp_media = $value["media"];					
-							
+							$tmp_media = $value["media"];
+
 						$this->css_buffer[$tmp_media][]["path"] = $tmp_add_file;
 					}
 					else
 					{
 						if ($this->isXHR())
 						{
-							$this->tpl[0]->set_var("link_properties", $link_properties);	
+							$this->tpl[0]->set_var("link_properties", $link_properties);
 							$this->tpl[0]->parse("SectCss", true);
 						}
 						else
@@ -2425,8 +2554,8 @@ class ffPage_html extends ffPage_base
 								} elseif ($value["media"] && $value["media"] !== "default") {
 									$link_properties .= ' media="' . $value["media"] .'"';
 								}
-								$this->tpl[0]->set_var("link_properties", $link_properties);	
-								
+								$this->tpl[0]->set_var("link_properties", $link_properties);
+
 								$this->tpl[0]->set_var("SectCssEmbed", "");
 								$this->tpl[0]->set_var("SectAsyncCssPlugin", "");
 								$this->tpl[0]->parse("SectCssLink", false);
@@ -2439,25 +2568,25 @@ class ffPage_html extends ffPage_base
 		}
 		reset($this->page_css);
     }
-    
+
    /**
 	 * Elabora i Javascript
 	 * Da richiamare ad ogni aggiunta di Javascript se si aggiungono Javascript dinamicamente post-elaborazione
 	 */
-    public function parse_js() 
+    public function parse_js()
     {
-        $this->tpl[0]->set_var("SectJs", ""); 
+        $this->tpl[0]->set_var("SectJs", "");
         $this->tpl[0]->set_var("SectAsyncJsPlugin", "");
 
         $this->js_buffer = array();
-        
+
 		$this->parse_js_fix();
-        
+
         cm::_layoutOrderElements($this->page_js);
 
 		if ($this->browser === null)
-			$this->browser = $this->getBrowser();        
-        
+			$this->browser = $this->getBrowser();
+
 		$ffjs_queue = null;
 		$ffjs_index = null;
 
@@ -2470,7 +2599,7 @@ class ffPage_html extends ffPage_base
 			}
 		}
 		$alldeps = array_flip($alldeps);
-		        
+
         foreach ($this->page_js as $js_queue_key => $js_queue)
 		{
 			foreach ($js_queue as $key => $value)
@@ -2486,9 +2615,9 @@ class ffPage_html extends ffPage_base
 				$tmp_add_file = null;
 				*/
 				$tmp_file_version = $value["version"];
-				
+
 				$static_init = true;
-				
+
 				if ($key === "ff.init")
 				{
 					$ffjs_queue = $js_queue_key;
@@ -2499,17 +2628,17 @@ class ffPage_html extends ffPage_base
 								|| ($js_queue_key === $ffjs_queue && $value["index"] < $ffjs_index)
 						))
 						$static_init = false;
-				
+
 				if ($value["embed"])
 				{
 					if (
-							$this->compact_js 
+							$this->compact_js
 							&& !$value["exclude_compact"]
 						)
 					{
 						$this->js_buffer[]["content"] = $value["embed"];
 					}
-					else 
+					else
 					{
 						$this->tpl[0]->set_var("lib_tag", $key);
 						$this->tpl[0]->set_var("lib_type", "js");
@@ -2530,12 +2659,12 @@ class ffPage_html extends ffPage_base
 				}
 
 
-				if (isset($this->override_js[$key]) && strlen($this->override_js[$key])) 
+				if (isset($this->override_js[$key]) && strlen($this->override_js[$key]))
 				{
 					$tmp_path = $this->override_js[$key];
 					$tmp_file = $tmp_path;
-				} 
-				else 
+				}
+				else
 				{
 					$res = $this->doEvent("on_js_parse", array($this, $key, $value["path"], $value["file"]));
 					$rc = end($res);
@@ -2661,7 +2790,7 @@ class ffPage_html extends ffPage_base
 							}
 
 						}
-					} 
+					}
 				}
 
 				if (count($variants))
@@ -2671,8 +2800,8 @@ class ffPage_html extends ffPage_base
 					{
 						$tmp_path = $variants["paths"][$i];
 						$tmp_file = $variants["files"][$i];
-						
-						
+
+
 						/*if (
 								substr($tmp_path, -3) !== ".js"
 								|| substr($tmp_file, -3) !== ".js"
@@ -2700,7 +2829,7 @@ class ffPage_html extends ffPage_base
 							break;
 						}
 					}
-					
+
 					if (!$found)
 						ffErrorHandler::raise ("DEBUG: File JS non esistente", E_USER_ERROR, null, get_defined_vars());
 				}
@@ -2730,7 +2859,7 @@ class ffPage_html extends ffPage_base
 					if (!$flag_file_ext && !$flag_path_ext && !is_file($tmp_file))
 						ffErrorHandler::raise ("DEBUG: File JS non esistente", E_USER_ERROR, null, get_defined_vars());
 				}
-				
+
 				/* Deprecato ADD JS Custom Browser
 				if ($this->js_browser_detection && !$flag_file_ext && !$flag_path_ext)
 				{
@@ -2781,9 +2910,9 @@ class ffPage_html extends ffPage_base
 						}
 					}
 				}*/
-				
+
 				$tmp_lib_deps = $this->libDepsToString($value["deps"]);
-					
+
 				if ($value["async"])
 				{
 					$this->tpl[0]->set_var("lib_async", "true");
@@ -2794,13 +2923,13 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->set_var("lib_async", "false");
 					$this->tpl[0]->set_var("js_async", "false");
 				}
-				
+
 				// static libs in normal load (not XHR)
 				$this->tpl[0]->set_var("lib_tag", $key);
 				$this->tpl[0]->set_var("lib_type", "js");
 				$this->tpl[0]->set_var("lib_deps", $tmp_lib_deps);
 				$this->tpl[0]->set_var("lib_media", "undefined");
-				
+
 				// load plugin in XHR loads
 				$this->tpl[0]->set_var("js_tag", $key);
 				$this->tpl[0]->set_var("js_deps", $tmp_lib_deps);
@@ -2819,7 +2948,7 @@ class ffPage_html extends ffPage_base
 					else
 						$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path . ($mtime ? "?" . $mtime : ""));
 				}
-				
+
 				if (!$this->isXHR() && !$value["async"] && $static_init)
 				{
 					$this->tpl[0]->parse("SectLib", true);
@@ -2829,7 +2958,7 @@ class ffPage_html extends ffPage_base
 				if (
 					$this->compact_js
 					&& !$value["exclude_compact"]
-				) 
+				)
 				{
 					$this->js_buffer[]["path"] = $tmp_file;
 					if (!$this->isXHR() && !$value["async"] && !$static_init/* && ffIsset($alldeps, $key)*/)
@@ -2847,13 +2976,16 @@ class ffPage_html extends ffPage_base
 					}
 					else
 					{
-						if ($value["async"])
+						if (0 && $value["async"])
 						{
 							$this->tpl[0]->parse("SectAsyncJsPlugin", true);
 						}
 						else
 						{
 							$this->tpl[0]->parse("SectJsSrc", false);
+							if($value["async"]) {
+                                $this->tpl[0]->parse("SectJSAsync", false);
+                            }
 							$this->tpl[0]->set_var("SectJsEmbed", "");
 							$this->tpl[0]->parse("SectJs", true);
 							if (!$static_init/* && ffIsset($alldeps, $key)*/)
@@ -2873,7 +3005,7 @@ class ffPage_html extends ffPage_base
 				if ($this->js_browser_detection && $tmp_add_tag !== null)
 				{
 					$tmp_lib_deps = $this->libDepsToString(array("js" => array($key)));
-					
+
 					// static libs in normal load (not XHR)
 					$this->tpl[0]->set_var("lib_tag", $tmp_add_tag);
 					$this->tpl[0]->set_var("lib_deps", $tmp_lib_deps);
@@ -2882,15 +3014,15 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->set_var("js_tag", $tmp_add_tag);
 					$this->tpl[0]->set_var("js_deps", $tmp_lib_deps);
 					$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_add_path);
-					
+
 					if (
-							$this->compact_js 
+							$this->compact_js
 							&& !$value["exclude_compact"]
-						) 
+						)
 					{
 						$this->js_buffer[]["path"] = $tmp_add_file;
-					} 
-					else 
+					}
+					else
 					{
 						if ($this->isXHR())
 						{
@@ -2923,7 +3055,7 @@ class ffPage_html extends ffPage_base
 		}
 		reset($this->page_js);
 	}
-	
+
 	function libDepsToString($deps)
 	{
 		$sub = "";
@@ -2935,7 +3067,7 @@ class ffPage_html extends ffPage_base
 				if (strlen($libs)) $libs .= ", ";
 				$libs .= "'" . $lib  . "'";
 			}
-			
+
 			if (strlen($libs))
 			{
 				if (strlen($sub)) $sub .= ", ";
@@ -2955,12 +3087,12 @@ class ffPage_html extends ffPage_base
 		else
 			return "undefined";
 	}
-	
-	function parse_js_fix() 
+
+	function parse_js_fix()
 	{
 		if (!is_array($this->libraries) || !count($this->libraries))
 			return;
-		
+
 		foreach ($this->page_js as $js_queue_key => $js_queue)
 		{
 			foreach ($js_queue as $key => $value)
@@ -2968,7 +3100,7 @@ class ffPage_html extends ffPage_base
 				if (ffIsset($this->libraries, $key) && ffIsset($this->libraries[$key], "version"))
 				{
 					$version_value = $this->libraries[$key]["version"];
-					
+
 					$tmp_file = FF_DISK_PATH . FF_THEME_DIR . "/library/" . $key . "/" . $key . ".fix." . $version_value . ".js";
 					$tmp_path = FF_THEME_DIR . "/library/" . $key . "/" . $key . ".fix." . $version_value . ".js";
 					if (is_file($tmp_file))
@@ -2987,19 +3119,19 @@ class ffPage_html extends ffPage_base
 			}
 		}
 	}
-	
+
    /**
 	 * Elabora i Meta Tag
 	 * Da richiamare ad ogni aggiunta di Meta se si aggiungono Meta dinamicamente post-elaborazione
 	 */
-    public function parse_meta() 
-    {   
+    public function parse_meta()
+    {
         if (is_array($this->page_meta) && count($this->page_meta))
         {
 			$this->tpl[0]->set_var("tag_type", "meta");
             foreach ($this->page_meta as $key => $value)
             {
-                $this->tpl[0]->set_var("tag_properties", " " . $value["type"] . '="' . $value["name"] . '" content="' . $value["content"] . '"');
+                $this->tpl[0]->set_var("tag_properties", " " . urldecode(str_replace(array("=", '&'), array('="', '" '), http_build_query($value))) . '"');
                 $this->tpl[0]->parse("SectTags", true);
             }
             reset($this->page_meta);
@@ -3010,15 +3142,18 @@ class ffPage_html extends ffPage_base
 	 * Elabora gli attributi del tag html
 	 * Da richiamare ad ogni aggiunta di Meta se si aggiungono Meta dinamicamente post-elaborazione
 	 */
-    public function parse_html_attr() 
-    {   
+    public function parse_html_attr()
+    {
         $this->tpl[0]->set_var("SectHtmlAttr", "");
+        if(!$this->page_html_attr["lang"]) {
+            $this->page_html_attr["lang"] = strtolower(substr(FF_LOCALE, 0,2));
+        }
         if (is_array($this->page_html_attr) && count($this->page_html_attr))
         {
             foreach ($this->page_html_attr as $key => $value)
             {
-            	$this->tpl[0]->set_var("attr_type", $value["type"]);
-                $this->tpl[0]->set_var("attr_content", $value["content"]);
+            	$this->tpl[0]->set_var("attr_type", $key);
+                $this->tpl[0]->set_var("attr_content", $value);
                 $this->tpl[0]->parse("SectHtmlAttr", true);
             }
             reset($this->page_html_attr);
@@ -3036,16 +3171,16 @@ class ffPage_html extends ffPage_base
 	{
 		if (!parent::widgetLoad($name, $path, $ref))
 			return;
-		
+
 		if (count($this->widgets[$name]->libraries))
 		{
 			$this->libsExtend($this->widgets[$name]->libraries);
 		}
-		
+
 		$this->tplAddMultiJS($this->widgets[$name]->js_deps, cm::LAYOUT_PRIORITY_HIGH);
 		$this->tplAddMultiCss($this->widgets[$name]->css_deps, cm::LAYOUT_PRIORITY_HIGH);
 	}
-	
+
 	/**
 	 *
 	 * @param Mixed $content il contenuto da aggiungere. Se null si sta aggiungendo un gruppo
@@ -3055,14 +3190,22 @@ class ffPage_html extends ffPage_base
 	 */
 	public function addContent($content, $group = null, $id = null, $options = array())
 	{
-		if ($this->tab && $content === null && $group === true)
+	    if(is_array($id) && !$options) {
+	       $options = $id;
+	       $id = null;
+        }
+
+        if($this->tab && $group === "tabs" && !$this->groups["tabs"]) {
+            $this->widgetLoad("tabs");
+            parent::addContent(null, true, "tabs");
+        } elseif ($this->tab && $content === null && $group === true)
 		{
             //$options["tab_mode"] = $this->tab;
             $this->widgetLoad("tabs");
         }
 		parent::addContent($content, $group, $id, $options);
 
-		if ($content !== null)	
+		if ($content !== null)
 		{
 			if (
 					is_object($content)
@@ -3086,11 +3229,11 @@ class ffPage_html extends ffPage_base
 					&& get_class($content) == "ffTemplate"
 				)
 			{
-				cm::getInstance()->preloadApplets($content);
+				//cm::getInstance()->preloadApplets($content);
 			}
 		}
 	}
-	
+
 	function process_params()
 	{
 		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID && count($this->components))
@@ -3111,9 +3254,9 @@ class ffPage_html extends ffPage_base
 								)
 							)
 						{
-							
+
 							$this->components[$comp_key]->id_if = $struct_item->id;
-							
+
 							if (ffIsset($_REQUEST, "XHR_COMPONENT") && $_REQUEST["XHR_COMPONENT"] === $struct_item->id)
 							{
 								$_REQUEST["XHR_COMPONENT"] = $struct_item->factory_id;
@@ -3122,7 +3265,7 @@ class ffPage_html extends ffPage_base
 								if (ffIsset($_POST, "XHR_COMPONENT"))
 									$_POST["XHR_COMPONENT"] = $_REQUEST["XHR_COMPONENT"];
 							}
-							
+
 							if (ffIsset($_REQUEST, "frmAction") && strpos($_REQUEST["frmAction"], $struct_item->id . "_") === 0)
 							{
 								$_REQUEST["frmAction"] = $struct_item->factory_id . substr($_REQUEST["frmAction"], strpos($_REQUEST["frmAction"], "_"));
@@ -3131,23 +3274,23 @@ class ffPage_html extends ffPage_base
 								if (ffIsset($_POST, "frmAction"))
 									$_POST["frmAction"] = $_REQUEST["frmAction"];
 							}
-							
+
 							$tmp_req_key = array_keys($_REQUEST);
 							foreach ($tmp_req_key as $key)
 							{
 								if (strpos($key, $struct_item->id . "_") === 0)
 								{
 									$newkey = $struct_item->factory_id . substr($key, strpos($key, "_"));
-									
+
 									$_REQUEST[$newkey] = $_REQUEST[$key];
 									unset($_REQUEST[$key]);
-									
+
 									if (ffIsset($_GET, $key))
 									{
 										unset($_GET[$key]);
 										$_GET[$newkey] = $_REQUEST[$newkey];
 									}
-									
+
 									if (ffIsset($_POST, $key))
 									{
 										unset($_POST[$key]);
@@ -3155,11 +3298,11 @@ class ffPage_html extends ffPage_base
 									}
 								}
 							}
-							
+
 						}
 					}
 				}
-				
+
 				foreach ($this->components as $comp_key => $comp_obj)
 				{
 					if (
@@ -3179,11 +3322,11 @@ class ffPage_html extends ffPage_base
 									$_POST[$comp_key . "_detailaction"] = $struct_item->factory_id;
 							}
 						}
-					}						
+					}
 				}
 			}
 		}
-		
+
 		parent::process_params();
 	}
 
@@ -3246,20 +3389,15 @@ class ffPage_html extends ffPage_base
 					}
 					reset($this->components[$item]->widget_deps);
 				}
-				$success = false;
-				if (FF_ENABLE_MEM_PAGE_CACHING && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
-					$res = $this->cache->get($this->request_key . "_" . $item, $success);
-				if ($success)
-				{
-					$this->components_buffer[$item] = $res;
-					//$ret = $this->componentWidgetsProcess($item);
-				}
-				else
-					$this->components[$item]->process();
+                if ($this->use_cache && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
+                    $this->components_buffer[$item] = $this->cache->get($this->request_key . "_" . $item, "/ff/req");
+
+                if (!$this->components_buffer[$item])
+                    $this->components[$item]->process();
 			}
 			reset($components_keys);
 		}
-		
+
 		// After components, process fields
 		$fields_keys = array_keys($this->fields);
 		foreach ($fields_keys as $key => $item)
@@ -3321,7 +3459,7 @@ class ffPage_html extends ffPage_base
 							|| (is_subclass_of($this->components[$item], "ffDetails_base") && $this->components[$item]->main_record[0]->id === $this->getXHRComponent())
 					))
 						continue;
-					
+
 					$tmp_id_if = $this->components[$item]->getIDIF();
 
 					if ($this->components_buffer[$item] === null) // ignora nel caso in cui sia già stato preso da cache
@@ -3329,10 +3467,10 @@ class ffPage_html extends ffPage_base
 						$this->components_buffer[$item]["html"] = $this->components[$item]->process_interface();
 						$this->components_buffer[$item]["headers"] = $this->components[$item]->process_headers();
 						$this->components_buffer[$item]["footers"] = $this->components[$item]->process_footers();
-						
+
 						if (property_exists($this->components[$item], "widget_activebt_enable") && $this->components[$item]->widget_activebt_enable && !isset($this->widgets["activebuttons"]))
 							$this->widgetLoad("activebuttons");
-						
+
 						if (property_exists($this->components[$item], "widget_discl_enable") && $this->components[$item]->widget_discl_enable && !isset($this->widgets["disclosures"]))
 							$this->widgetLoad("disclosures");
 
@@ -3340,7 +3478,7 @@ class ffPage_html extends ffPage_base
 						$this->components_buffer[$item]["headers"] .= $ret["headers"];
 						$this->components_buffer[$item]["footers"] .= $ret["footers"];
 
-						if (FF_ENABLE_MEM_PAGE_CACHING && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
+						if ($this->use_cache && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
 						{
 							call_user_func_array(array($this->cache, "set"),
 									array_merge(
@@ -3409,7 +3547,7 @@ class ffPage_html extends ffPage_base
 			}
 		}
 		reset($butt_keys);
-			
+
 		// process fields with different location
 		$fld_keys = array_keys($this->fields);
 		foreach ($fld_keys as $key => $item)
@@ -3428,22 +3566,23 @@ class ffPage_html extends ffPage_base
 			}
 		}
 		reset($fld_keys);
-		
+
 		$this->tplProcessBounceComponents();
 
-		$rc = $this->doEvent("on_after_process_components", array(&$this));
-
-		if (strlen($this->layer) && !$this->isXHR())
-			$this->tplProcessLayout();
+		if (strlen($this->layer) && !$this->isXHR()) {
+            $this->tplProcessLayout();
+        }
 
 		$this->tplProcess();
 
-		if (!($this->isXHR() && $this->getXHRComponent()))
+        $rc = $this->doEvent("on_page_processed", array(&$this));
+
+        if (!($this->isXHR() && $this->getXHRComponent()))
 			$this->widgetsProcess();
 
 		return $this->tplParse($output_result);
 	}
-	
+
 	function getBrowser()
 	{
 	    $u_agent = $_SERVER['HTTP_USER_AGENT'];
@@ -3461,7 +3600,7 @@ class ffPage_html extends ffPage_base
 	    elseif (preg_match('/windows|win32/i', $u_agent)) {
 	        $platform = 'windows';
 	    }
-	   
+
 	    // Next get the name of the useragent yes seperately and for good reason
 		if (preg_match('/iPad/i',$u_agent))
 	    {
@@ -3518,7 +3657,7 @@ class ffPage_html extends ffPage_base
 			$pattern = '#(?<browser>' . join('|', $known) .
 		    ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
 		    $rc = @preg_match_all($pattern, $u_agent, $matches);
-		    
+
 		   	if ($rc === false) {
 			   	ffErrorHandler::raise("unable to check browser version", E_USER_ERROR, null, get_defined_vars());
 		   	}
@@ -3538,10 +3677,10 @@ class ffPage_html extends ffPage_base
 	    else {
 	        $version= $matches['version'][0];
 	    }
-	   
+
 	    // check if we have a number
 	    if ($version==null || $version=="") {$version="?";}
-	   
+
 	    return array(
 	        'userAgent' 	=> $u_agent
 	        , 'extendname'  => $bname
@@ -3552,7 +3691,7 @@ class ffPage_html extends ffPage_base
 	        , 'pattern'    	=> $pattern
 	    );
 	}
-	
+
 	/**
 	 * rileva se la pagina è stata richiesta con una chiamata Ajax
 	 * @return boolean
@@ -3612,19 +3751,19 @@ class ffPage_html extends ffPage_base
 		else
 			return $_REQUEST["XHR_CTX_ID"];
 	}
-	
+
 	function getXHRFFStruct($reset = false)
 	{
 		if (!isset($_REQUEST["XHR_FFSTRUCT"]))
 			return false;
-		
+
 		static $struct = null;
 		if ($struct === null || $reset)
 			$struct = json_decode($_REQUEST["XHR_FFSTRUCT"]);
-		
+
 		return $struct;
 	}
-	
+
 	function getXHRFormat()
 	{
 		if (!isset($_REQUEST["XHR_FORMAT"]))
@@ -3665,7 +3804,6 @@ class ffPage_html extends ffPage_base
 					$buffer .= $key . "=\"" . $value . "\"";
 				}
 			}
-			reset($property_set);
 		}
 		if($buffer)
 			return " " . $buffer;

@@ -62,7 +62,7 @@ $oRecord->addKeyField($oField);
 /**
  * Campi upload
  */
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -76,7 +76,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatar";<br />
@@ -90,7 +90,7 @@ $oRecord->addContent($code);
 $oRecord->addContent('</div>');
 /******************************************************************************************/
 
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice con label</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice con label</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -105,7 +105,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatarLabel";<br />
@@ -120,7 +120,7 @@ $oRecord->addContent($code);
 $oRecord->addContent('</div>');
 /******************************************************************************************/
 
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice Senza elimina thumb (nn funziona)</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice Senza elimina thumb (nn funziona)</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -136,7 +136,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatar";<br />
@@ -153,7 +153,7 @@ $oRecord->addContent($code);
 $oRecord->addContent('</div>');
 /******************************************************************************************/
 
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice con label e visualizza thumb filename</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice con label e visualizza thumb filename</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -169,7 +169,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatarLabelFilename";<br />
@@ -186,7 +186,7 @@ $oRecord->addContent('</div>');
 /******************************************************************************************/
 
 
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice con label e nasconde preview(non funziona)</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice con label e nasconde preview(non funziona)</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -202,7 +202,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatarLabelFilename";<br />
@@ -219,7 +219,7 @@ $oRecord->addContent('</div>');
 /******************************************************************************************/
 
 
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice con label Multiplo</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice con label Multiplo</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -235,7 +235,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatarLabelFilename";<br />
@@ -251,7 +251,7 @@ $oRecord->addContent($code);
 $oRecord->addContent('</div>');
 /******************************************************************************************/
 
-$oRecord->addContent('<h2 class="' . cm_getClassByFrameworkCss(array(12), "col") . '">Upload Semplice con label Multiplo con Edit</h2>');
+$oRecord->addContent('<h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Upload Semplice con label Multiplo con Edit</h2>');
 
 $oRecord->addContent('<div class="single-field">');
 
@@ -286,7 +286,7 @@ $oField->file_show_edit = true;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . cm_getClassByFrameworkCss(array(6), "col") . '">
+$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage);<br />
 		$oField->id = "avatarLabelFilename";<br />

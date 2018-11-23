@@ -1737,30 +1737,204 @@ function ffHTTP_getHeader($hname = "content-type")
 		return false;
 }
 
-function ffCommon_theme_init($theme = FF_MAIN_THEME)
+function ffCommon_main_theme_init()
 {
     static $loaded = false;
 	if (!$loaded)
 	{
-	    if(!defined("FF_DEFAULT_THEME"))            define("FF_DEFAULT_THEME", $theme);
-
 		if (
-					!is_dir(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME)
-				||	!is_dir(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff")
+					!is_dir(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME)
+				||	!is_dir(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff")
 			)
-			ffErrorHandler::raise("FORMS FRAMEWORK: Wrong default theme dir: " . FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME, E_USER_ERROR, null, get_defined_vars());
+			ffErrorHandler::raise("FORMS FRAMEWORK: Wrong default theme dir: " . FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME, E_USER_ERROR, null, get_defined_vars());
 
 		// Load other configs..
 
 		// ..theme
-		if (@is_file(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/config.php"))
-			require FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/config.php";
+		if (@is_file(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff/config.php"))
+			require FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff/config.php";
 
-        if (@is_file(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/common.php"))
-            require FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/common.php";
+        if (@is_file(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff/common.php"))
+            require FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff/common.php";
 
 		$loaded = true;
 	}
+}
+
+function ffCommon_ffPage_init($params, $resources = null)  {
+    $oPage = ffPage::factory(__TOP_DIR__, FF_SITE_PATH, null, $params["theme"]);
+    $oPage->loadResources($resources);
+    $oPage->loadLibrary();
+
+    $oPage->addEvent("tplAddJs_not_found", function ($page, $tag, $params) {
+        static $last_call;
+        if ($tag === $last_call) {
+            ffErrorHandler::raise("Autoloader recursive inclusion", E_USER_ERROR, $page, get_defined_vars());
+        }
+        $last_call = $tag;
+
+        $tag_parts = explode(".", $tag);
+        if (strpos($tag, "jquery.plugins.") === 0) {
+            $page->loadLibrary(FF_THEME_DISK_PATH . "/library/plugins/jquery." . $tag_parts[2]);
+            return true;
+        } elseif (strpos($tag, $tag_parts[0] . ".jquery.plugins.") === 0) {
+            $page->loadLibrary(FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[3]);
+            return true;
+        } elseif (strpos($tag, "library.") === 0) {
+            $page->loadLibrary(FF_THEME_DISK_PATH . "/library/" . $tag_parts[1]);
+            return true;
+        }
+    });
+
+    $oPage->title               = $params["title"];
+    $oPage->class_body          = $params["class_body"];
+    /*if($params["form"]) {
+        $oPage->use_own_form    = true;
+        if(!is_bool($params["form"])) {
+            $oPage->form_name   = $params["form"];
+        }
+    } else {
+        $oPage->use_own_form    = false;
+    }*/
+
+
+    //$oPage->use_own_js          = false; //$params["ffjs"];
+
+
+    $oPage->compact_js          = (DISABLE_CACHE === true
+                                    ? false
+                                    : $params["compact_js"]
+                                );
+    $oPage->compact_css         = (DISABLE_CACHE === true
+                                    ? false
+                                    : $params["compact_css"]
+                                );
+    $oPage->compress            = (DISABLE_CACHE === true
+                                    ? false
+                                    : $params["compact_html"]
+                                );
+
+
+
+/*
+    $cm->oPage->js_loaded = array();
+    $cm->oPage->sections = array();
+    $cm->oPage->resetJS();
+    $cm->oPage->resetCSS();
+    $cm->oPage->use_own_js = false;
+    $cm->oPage->compact_js = false;
+    $cm->oPage->compact_css = false;*/
+
+    if($params["framework_css"]) {
+        $oPage->frameworkCSS = Cms::getInstance("frameworkcss");
+        $oPage->frameworkCSS->set($params["framework_css"], $params["font_icon"]);
+    }
+
+    if(!$oPage->isXHR()) {
+        if($params["theme"] == FF_MAIN_THEME) {
+            $oPage->tplAddJs("jquery");
+
+            if($params["framework_css"]) {
+
+                $oPage->tplAddCss($params["framework_css"] . ".core");
+            }
+            if($params["font_icon"]) {
+                $oPage->tplAddCss("fonticons." . $params["font_icon"]);
+            }
+
+            $oPage->tplAddCss("ff.core");
+        }
+
+        $oPage->tplAddJs("app");
+        $oPage->tplAddCss("app");
+        $oPage->tplAddCss("icons");
+    }
+
+    $oPage->doEvent("on_layout_init", array($oPage, $params));
+
+    if ($oPage->isXHR())
+    {
+        if (!isset($_REQUEST["XHR_CTX_ID"]))
+        {
+            $params["page"] = "XHR";
+        }
+    }
+    if($params["page"]) {
+        $oPage->template_file = "ffPage_" . $params["page"] . ".html";
+    }
+
+    if ($params["layout"]) {
+        $oPage->layer = $params["layout"];
+    }
+
+    if(is_array($params["css"]) && count($params["css"])) {
+        if(!isset($params["css"][0])) {
+            $params["css"][0] = $params["css"];
+        }
+
+        foreach($params["css"] AS $css) {
+            $key = ($css["@attributes"]["name"]
+                ? $css["@attributes"]["name"]
+                : basename($css["@attributes"]["path"], ".css")
+            );
+
+            if($key) {
+                $oPage->tplAddCss($key, $css["@attributes"]["path"]);
+            }
+        }
+    }
+    if(is_array($params["js"]) && count($params["js"])) {
+        if(!isset($params["js"][0])) {
+            $params["js"][0] = $params["js"];
+        }
+
+        foreach($params["js"] AS $js) {
+            $key = ($js["@attributes"]["name"]
+                ? $js["@attributes"]["name"]
+                : basename($js["@attributes"]["path"], ".js")
+            );
+
+            if($key) {
+                $oPage->tplAddJs($key, $js["@attributes"]["path"]);
+            }
+
+        }
+    }
+    if(is_array($params["meta"]) && count($params["meta"])) {
+        if(!isset($params["meta"][0])) {
+            $params["meta"][0] = $params["meta"];
+        }
+
+        foreach($params["meta"] AS $meta) {
+            $oPage->tplAddMeta($meta["@attributes"]);
+        }
+    }
+    if(is_array($params["section"]) && count($params["section"])) {
+        if(!isset($params["section"][0])) {
+            $params["section"][0] = $params["section"];
+        }
+
+        foreach($params["section"] AS $section) {
+            $oPage->addSection($section["name"], $section);
+        }
+    }
+
+
+
+
+
+    //$page->tplAddJs("ff.ffPage");
+    //$oPage->use_own_js
+    //$this->oPage->override_css
+    //$this->oPage->override_js
+//$this->oPage->jquery_ui_theme
+    if (CM_IGNORE_THEME_DEFAULTS || $params["ignore_defaults"])
+    {
+        $oPage->page_css = array();
+        $oPage->page_js = array();
+        $oPage->page_meta = array();
+    }
+    return $oPage;
 }
 
 function ffIsset($array, $key)

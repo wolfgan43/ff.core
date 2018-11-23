@@ -53,19 +53,6 @@ $oField->multi_pairs = array(
 );
 $oRecord->addContent($oField, "advanced");
 
-if(!CM_SHOWFILES_OPTIMIZE) {
-	$oField = ffField::factory($cm->oPage);
-	$oField->id = "format_jpg_quality";
-	$oField->label = "Jpg Quality";
-	$oField->base_type = "Number";
-	$oField->default_value = new ffData("75", "Number");
-	$oField->widget = "slider";
-	$oField->min_val = "0";
-	$oField->max_val = "100";
-	$oField->step = "5";
-	$oRecord->addContent($oField, "advanced");
-}
-
 $oField = ffField::factory($cm->oPage);
 $oField->id = "theme";
 $oField->label = "Tema";
@@ -169,13 +156,13 @@ $oField->label = "Immagine";
 $oField->base_type = "Text";
 $oField->extended_type = "File";
 $oField->control_type = "file";
-$oField->file_temp_path = FF_DISK_PATH . "/uploads/showfiles";
-$oField->file_storing_path = FF_DISK_PATH . "/uploads/showfiles/[ID_VALUE]/watermarks";
+$oField->file_temp_path = FF_DISK_UPDIR . "/showfiles";
+$oField->file_storing_path = FF_DISK_UPDIR . "/showfiles/[ID_VALUE]/watermarks";
 $oField->file_show_delete = TRUE;
-$oField->file_saved_view_url		= FF_SITE_PATH . "/cm/showfiles." . FF_PHP_EXT . "/saved/[ID_VALUE]/[_FILENAME_]";
-$oField->file_saved_preview_url		= FF_SITE_PATH . "/cm/showfiles." . FF_PHP_EXT . "/saved/[ID_VALUE]/thumb/[_FILENAME_]";
-$oField->file_temp_view_url			= FF_SITE_PATH . "/cm/showfiles." . FF_PHP_EXT . "/temp/[_FILENAME_]";
-$oField->file_temp_preview_url		= FF_SITE_PATH . "/cm/showfiles." . FF_PHP_EXT . "/temp/thumb/[_FILENAME_]";
+$oField->file_saved_view_url		= CM_SHOWFILES . "/saved/[ID_VALUE]/[_FILENAME_]";
+$oField->file_saved_preview_url		= CM_SHOWFILES . "/saved/[ID_VALUE]/thumb/[_FILENAME_]";
+$oField->file_temp_view_url			= CM_SHOWFILES . "/temp/[_FILENAME_]";
+$oField->file_temp_preview_url		= CM_SHOWFILES . "/temp/thumb/[_FILENAME_]";
 $oField->file_allowed_mime = array(
 										"image/png"
 										, "image/gif"
@@ -204,6 +191,6 @@ $oRecord->addContent($oField, "watermark");
 $cm->oPage->addContent($oRecord);
 
 function MainRecord_on_done_action($component, $action) {
-	if (strlen($action) && CM_ENABLE_MEM_CACHING)
-		ffCache::getInstance(CM_CACHE_ADAPTER)->clear("__showfiles_modes__");
+	if ($action && CM_ENABLE_MEM_CACHING)
+		ffCache::getInstance()->clear("/cm/showfiles/modes");
 }

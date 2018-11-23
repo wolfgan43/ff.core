@@ -163,7 +163,7 @@ class ffDetails_sort extends ffDetails_base
 	var $libraries	= array();
 	
 	var $js_deps = array(
-		"ff.ffDetails.sortable" => null
+	    "ff.ffDetails.sortable" => null
 	);
 	
 	/**
@@ -538,12 +538,12 @@ class ffDetails_sort extends ffDetails_base
         $component_class["default"] = $this->class;
         if($this->framework_css["component"]["grid"]) {
             if(is_array($this->framework_css["component"]["grid"]))
-                $component_class["grid"] = cm_getClassByFrameworkCss($this->framework_css["component"]["grid"], "col");
+                $component_class["grid"] = Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["grid"], "col");
             else {
-                $component_class["grid"] = cm_getClassByFrameworkCss("", $this->framework_css["component"]["grid"]);
+                $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["grid"]);
             }
         }
-        $component_class["form"] = cm_getClassByFrameworkCss("component" . $this->framework_css["component"]["type"], "form");
+        $component_class["form"] = Cms::getInstance("frameworkcss")->get("component" . $this->framework_css["component"]["type"], "form");
 
         $this->tpl[0]->set_var("component_class", implode(" ", array_filter($component_class)));
 
@@ -553,11 +553,11 @@ class ffDetails_sort extends ffDetails_base
         if($this->framework_css["component"]["inner_wrap"]) 
         {
             if(is_array($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
+                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
             } elseif(is_bool($this->framework_css["component"]["inner_wrap"])) {
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="innerWrap">');
             } else {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
+                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
             }
             $this->tpl[0]->set_var("inner_wrap_end", '</div>');
         }       
@@ -565,11 +565,11 @@ class ffDetails_sort extends ffDetails_base
         if($this->framework_css["component"]["outer_wrap"]) 
         {
             if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
             } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->getIDIF() . 'Wrap outerWrap">');
             } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
             }
             $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
         }
@@ -629,10 +629,10 @@ class ffDetails_sort extends ffDetails_base
                 $this->buttons_options["addrow"]["label"] = ffTemplate::_get_word_by_code("ffDetail_addrow");
             
             if($this->buttons_options["addrow"]["icon"] === null)
-                $this->buttons_options["addrow"]["icon"] = cm_getClassByFrameworkCss("addrow", "icon-" . $this->buttons_options["addrow"]["aspect"] . "-tag");
+                $this->buttons_options["addrow"]["icon"] = Cms::getInstance("frameworkcss")->get("addrow", "icon-" . $this->buttons_options["addrow"]["aspect"] . "-tag");
 
             if($this->buttons_options["addrow"]["class"] === null)
-                $this->buttons_options["addrow"]["class"] = cm_getClassByFrameworkCss("addrow", $this->buttons_options["addrow"]["aspect"]);        
+                $this->buttons_options["addrow"]["class"] = Cms::getInstance("frameworkcss")->get("addrow", $this->buttons_options["addrow"]["aspect"]);        
 
             $this->tpl[0]->set_var("addrow_label", $this->buttons_options["addrow"]["label"]);
             $this->tpl[0]->set_var("addrow_class", $this->buttons_options["addrow"]["class"]);  
@@ -778,7 +778,7 @@ class ffDetails_sort extends ffDetails_base
 		$this->tpl[0]->set_var("SectError", "");
 		if (strlen($this->strError))
 		{
-			$this->tpl[0]->set_var("error_class", cm_getClassByDef($this->framework_css["error"]));
+			$this->tpl[0]->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["error"]));
 			$this->tpl[0]->set_var("strError", $this->strError);
 			$this->tpl[0]->parse("SectError", false);
 		}

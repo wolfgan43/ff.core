@@ -44,6 +44,40 @@
   .ffRecord label {
     color: #1976d2; }
 
+.pages {
+  float: right; }
+
+.pagenav .pagination {
+  float: right; }
+  .pagenav .pagination li.active span,
+  .pagenav .pagination li.active a {
+    background: #1976d2; }
+  .pagenav .pagination li a:focus,
+  .pagenav .pagination li span:focus {
+    background: #1976d2; }
+.pagenav__pages li a {
+  border: 1px solid #e7e7e7; }
+  .pagenav__pages li a:hover {
+    border: 1px solid #1e88e5;
+    background: #1976d2;
+    color: #FFF; }
+.pagenav__choice {
+  color: #1e88e5; }
+  .pagenav__choice input {
+    border-bottom: 2px solid #1e88e5; }
+    .pagenav__choice input:focus {
+      border-bottom: 2px solid #1976d2; }
+.pagenav__perPage a {
+  border: 1px solid #e7e7e7; }
+  .pagenav__perPage a:hover {
+    border: 1px solid #1e88e5;
+    background: #1976d2;
+    color: #FFF; }
+.pagenav__totEl {
+  border: 1px solid transparent; }
+  .pagenav__totEl span {
+    color: #1976d2; }
+
 /*
 * FF Overlay
 */

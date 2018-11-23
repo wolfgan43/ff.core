@@ -1,5 +1,4 @@
 <?php
-
 if (isset($cm->modules["security"]["auth_bypath"]) && count($cm->modules["security"]["auth_bypath"]))
 {
 	foreach ($cm->modules["security"]["auth_bypath"] as $key => $value)

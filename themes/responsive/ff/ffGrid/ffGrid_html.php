@@ -580,7 +580,7 @@ class ffGrid_html extends ffGrid_base
         {
         	$title_class["default"] = "dialogTitle";
         	$action_class["dialog"] = "dialogActionsPanel";
-            $action_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
+            $action_class["align"] = Cms::getInstance("frameworkcss")->get("align-right", "util");
         	$action_top_class = $action_class;
             $action_top_class["top"] = "top";
     		if($this->dialog_action_button)
@@ -595,11 +595,11 @@ class ffGrid_html extends ffGrid_base
             $action_class           = "";
         	$action_top_class       = "";
 
-			$this->tpl[0]->set_var("actions_top_class", cm_getClassByDef($this->framework_css["actionsTop"], $action_top_class));
-			$this->tpl[0]->set_var("actions_bottom_class", cm_getClassByDef($this->framework_css["actionsBottom"], $action_class));
+			$this->tpl[0]->set_var("actions_top_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["actionsTop"], $action_top_class));
+			$this->tpl[0]->set_var("actions_bottom_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["actionsBottom"], $action_class));
 		}
         if(strlen($this->title) || $this->widget_discl_enable) {
-        	$this->tpl[0]->set_var("title_class", cm_getClassByDef($this->framework_css["title"], $title_class));
+        	$this->tpl[0]->set_var("title_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["title"], $title_class));
             $this->tpl[0]->set_var("title", $this->title);
             $this->tpl[0]->parse("SectTitle", false);
         } else {
@@ -607,7 +607,7 @@ class ffGrid_html extends ffGrid_base
         }
 
         if ($this->description !== null) {
-			$this->tpl[0]->set_var("description_class", cm_getClassByDef($this->framework_css["description"]));        
+			$this->tpl[0]->set_var("description_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["description"]));        
             $this->tpl[0]->set_var("description", $this->description);
             $this->tpl[0]->parse("SectDescription", false);
         } else {
@@ -705,7 +705,7 @@ class ffGrid_html extends ffGrid_base
 
 		if (strlen($this->strError))
 		{
-			$this->tpl[0]->set_var("error_class", cm_getClassByDef($this->framework_css["error"]));		
+			$this->tpl[0]->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["error"]));		
 			$this->tpl[0]->set_var("strError", $this->strError);
 			$this->tpl[0]->parse("SectError", false);
 		}
@@ -879,7 +879,7 @@ class ffGrid_html extends ffGrid_base
 		$this->tpl[0]->set_var("max_colspan", count($this->grid_disposition[0]));
 		$this->tpl[0]->set_var("actual_alpha", ffCommon_specialchars($this->alpha));
 		$this->tpl[0]->set_var("field", ffCommon_specialchars($this->search_fields[$this->alpha_field]->label));
-		$this->tpl[0]->set_var("alpha_selected_" . $this->alpha, cm_getClassByFrameworkCss("current", "util"));
+		$this->tpl[0]->set_var("alpha_selected_" . $this->alpha, Cms::getInstance("frameworkcss")->get("current", "util"));
 		
 		if (isset($_REQUEST["XHR_DIALOG_ID"]))
 			$this->tpl[0]->set_var("alpha_action", "jQuery('#" . $this->prefix . "alpha').val(jQuery(this).attr('rel')); ff.ffPage.dialog.doRequest('" . $_REQUEST["XHR_DIALOG_ID"] . "', {'action' : 'alpha', 'component' :'" . $this->id . "'})");
@@ -902,41 +902,41 @@ class ffGrid_html extends ffGrid_base
         {
             if ($this->display_search_simple)
             {
-	            $wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
+	            $wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
                 foreach ($this->search_fields AS $key => $value)
                 {
                     if($this->open_adv_search === false && $this->search_fields[$key]->display && !$this->search_fields[$key]->multi_disp_as_filter)
                     {
                         //$this->tpl[0]->set_var("search_more_label", ffTemplate::_get_word_by_code("ffGrid_search_more"));
                         if($wrap_addon) {
-	                        $this->tpl[0]->set_var("search_more_container_class_start", '<div class="' . cm_getClassByFrameworkCss(array(1), "col") . '">');
+	                        $this->tpl[0]->set_var("search_more_container_class_start", '<div class="' . Cms::getInstance("frameworkcss")->get(array(1), "col") . '">');
 	                        $this->tpl[0]->set_var("search_more_container_class_end", '</div>');
 						}
-                        $this->tpl[0]->set_var("search_more_class", cm_getClassByFrameworkCss("more", "icon") . " " . cm_getClassByFrameworkCss("control-postfix", "form"));  
-                        //$this->tpl[0]->set_var("search_more_icon", cm_getClassByFrameworkCss("more", "icon-link-tag"));  
+                        $this->tpl[0]->set_var("search_more_class", Cms::getInstance("frameworkcss")->get("more", "icon") . " " . Cms::getInstance("frameworkcss")->get("control-postfix", "form"));  
+                        //$this->tpl[0]->set_var("search_more_icon", Cms::getInstance("frameworkcss")->get("more", "icon-link-tag"));  
                         $display_adv_search = $this->tpl[0]->parse("SectAdvSearch", false);
                         break;                                                                                                                                                                                                                                                                                                                                                                                                                                               
                     }
                 }
                 reset($this->search_fields);
     			
-    			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "javascript:ff.submitProcessKey(event, jQuery(this).next());";
+    			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "ff.submitProcessKey(event, jQuery(this).nextAll('.search'));";
 				$buffer = $this->search_fields[$this->search_simple_field_options["id"]]->process($this->search_simple_field_options["id"] . "_src");
 
 				if($wrap_addon) {
 					$arrSearchCol = array(10 - $display_adv_search);
-					$buffer = '<div class="' . cm_getClassByFrameworkCss($arrSearchCol, "col") . '">' . $buffer . '</div>';
+					$buffer = '<div class="' . Cms::getInstance("frameworkcss")->get($arrSearchCol, "col") . '">' . $buffer . '</div>';
 				}
                 $this->tpl[0]->set_var("SearchAll", $buffer);
             }
     
-            if(!$this->searched && $this->open_adv_search === false)
+            if(/*!$this->searched &&*/ $this->open_adv_search === false)
             	$this->tpl[0]->set_var("adv_class", "adv-search hidden");
         }
 
 		$search_class["default"] = "search";
-		$this->tpl[0]->set_var("search_class", cm_getClassByDef($this->framework_css["search"], $search_class));
-		$this->tpl[0]->set_var("search_box_class", cm_getClassByFrameworkCss("group", "form"));
+		$this->tpl[0]->set_var("search_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["search"], $search_class));
+		$this->tpl[0]->set_var("search_box_class", Cms::getInstance("frameworkcss")->get("group", "form"));
         
 		//$this->tpl[0]->set_var("maxspan", ($this->search_cols * 2));
 		//$this->tpl[0]->set_var("search_method", $this->search_method);
@@ -1125,11 +1125,11 @@ class ffGrid_html extends ffGrid_base
 				if(is_array($this->search_fields[$key]->framework_css["container"]["col"]) 
 				    && count($this->search_fields[$key]->framework_css["container"]["col"])
 				) {
-					$container_class = cm_getClassByFrameworkCss($this->search_fields[$key]->framework_css["container"]["col"], "col");
+					$container_class = Cms::getInstance("frameworkcss")->get($this->search_fields[$key]->framework_css["container"]["col"], "col");
 					$wrap_count = $wrap_count + $this->search_fields[$key]->framework_css["container"]["col"]["lg"];
 				} elseif($this->search_fields[$key]->framework_css["container"]["row"]) {
 					$row = "row-padding";
-					//$container_class = cm_getClassByFrameworkCss("row-padding", "form");
+					//$container_class = Cms::getInstance("frameworkcss")->get("row-padding", "form");
 					$wrap_count = 12;
 				} else {
 					$wrap_count = 12;
@@ -1142,7 +1142,7 @@ class ffGrid_html extends ffGrid_base
 				$this->tpl[0]->parse("SectSearchCol", true);
 
 				if($wrap_count >= 12) {
-					$this->tpl[0]->set_var("adv_row_class", cm_getClassByFrameworkCss($row, "form"));
+					$this->tpl[0]->set_var("adv_row_class", Cms::getInstance("frameworkcss")->get($row, "form"));
 					$this->tpl[0]->parse("SectSearchRow", true);
 					$this->tpl[0]->set_var("SectSearchCol", "");
 					$wrap_count = 0;
@@ -1173,18 +1173,18 @@ class ffGrid_html extends ffGrid_base
 
 			if ($show_section)
 			{
-				$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
+				$wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
 				if($wrap_addon) {
 					$arrSearchCol = array(2);
 				
-					$buffer = '<div class="' . cm_getClassByFrameworkCss($arrSearchCol, "col") . '">' . $buffer . '</div>';
+					$buffer = '<div class="' . Cms::getInstance("frameworkcss")->get($arrSearchCol, "col") . '">' . $buffer . '</div>';
 				}
 
 				$this->tpl[0]->set_var("SearchButtons", $buffer);
 				if(!$this->searched && $this->open_adv_search === false) {
 					$this->search_buttons[0]->id = "searchadv";
 					unset($this->search_buttons[0]->framework_css["addon"]);
-					$this->tpl[0]->set_var("SearchButtonsAdv", '<div class="' . cm_getClassByFrameworkCss("align-right", "util"). '">' . $this->search_buttons[0]->process() . '</div>');
+					$this->tpl[0]->set_var("SearchButtonsAdv", '<div class="' . Cms::getInstance("frameworkcss")->get("align-right", "util"). '">' . $this->search_buttons[0]->process() . '</div>');
 				}
 			}
 
@@ -1229,16 +1229,16 @@ class ffGrid_html extends ffGrid_base
         	);*/
 
         if ($this->display_edit_bt)
-        	$this->addGridDisposition("edit", "button", $this->buttons_options["edit"]["disposition"]["col"], $this->buttons_options["edit"]["disposition"]["row"]); 
+        	$this->addGridDisposition("edit", "button", $this->buttons_options["edit"]["disposition"]["col"], $this->buttons_options["edit"]["disposition"]["row"]);
         if ($this->display_delete_bt)
         	$this->addGridDisposition("delete", "button", $this->buttons_options["delete"]["disposition"]["col"], $this->buttons_options["delete"]["disposition"]["row"]);
-        	
+
         	
         	//echo $this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1]) - 1]["button"];
         parent::process_grid();
 
 		//$table_class["default"] = "ffGrid";
-        $this->tpl[0]->set_var("table_class", cm_getClassByDef($this->framework_css["table"]));
+        $this->tpl[0]->set_var("table_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["table"]));
 
         if ($this->display_new) // done at this time due to maxspan
         {
@@ -1258,7 +1258,7 @@ class ffGrid_html extends ffGrid_base
                             $this->parent[0]->get_globals() . $this->addit_insert_record_param;
 
                 $addnew_url_ajax = ffProcessTags($addnew_url_ajax, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
-				$addnew_url_noajax = $addnew_url_ajax . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
+				$addnew_url_noajax = $addnew_url_ajax; //. "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
 
 				/*if($this->full_ajax || $this->ajax_addnew)
                     $addnew_url = $addnew_url_ajax;
@@ -1276,10 +1276,10 @@ class ffGrid_html extends ffGrid_base
                 $this->buttons_options["addnew"]["label"] = ffTemplate::_get_word_by_code("ffGrid_addnew");
             
             if($this->buttons_options["addnew"]["icon"] === null)
-                $this->buttons_options["addnew"]["icon"] = cm_getClassByFrameworkCss("addnew", "icon-" . $this->buttons_options["addnew"]["aspect"] . "-tag");
+                $this->buttons_options["addnew"]["icon"] = Cms::getInstance("frameworkcss")->get("addnew", "icon-" . $this->buttons_options["addnew"]["aspect"] . "-tag");
 
             if($this->buttons_options["addnew"]["class"] === null)
-                $this->buttons_options["addnew"]["class"] = cm_getClassByFrameworkCss("addnew", $this->buttons_options["addnew"]["aspect"]);        
+                $this->buttons_options["addnew"]["class"] = Cms::getInstance("frameworkcss")->get("addnew", $this->buttons_options["addnew"]["aspect"]);        
 
             if ($this->full_ajax || $this->ajax_addnew)
             {
@@ -1315,10 +1315,10 @@ class ffGrid_html extends ffGrid_base
             }
             else
             {
-                $this->tpl[0]->set_var("addnew_url", ffCommon_specialchars($addnew_url_noajax));
+                $this->tpl[0]->set_var("addnew_url", "javascript:ff.ffPage.goToWithRetUrl('" . ffCommon_specialchars($addnew_url_noajax) . "');");
                 $this->tpl[0]->set_var("addnew_label", $this->buttons_options["addnew"]["label"]);
                 if(strlen($this->buttons_options["addnew"]["class"]))
-                    $this->tpl[0]->set_var("addnew_class", ' class="' . $this->buttons_options["addnew"]["class"] . '"');
+                    $this->tpl[0]->set_var("addnew_class", ' class="' . $this->buttons_options["addnew"]["class"] . ' noajax"');
                 $this->tpl[0]->set_var("addnew_icon", $this->buttons_options["addnew"]["icon"]);
                 $this->tpl[0]->parse("SectAddNewUrl", false);
                 $this->tpl[0]->set_var("SectAddNewBt", "");
@@ -1506,6 +1506,8 @@ class ffGrid_html extends ffGrid_base
 
                 if ($rc === null)
                 {
+
+
 					/**
 	                * Set Modify Delete And Confirm Delete Url
 	                */
@@ -1528,7 +1530,7 @@ class ffGrid_html extends ffGrid_base
 													. "cursor[rows]=" . rawurlencode($rows) . "&";
 	  					}                  
 
-	                    $modify_url["noajax"] = $modify_url["ajax"] . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
+	                    $modify_url["noajax"] = $modify_url["ajax"]; // . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
 	                    
 	                    if($this->full_ajax || $this->ajax_edit)
                     		$modify_url["default"] = $modify_url["ajax"];
@@ -1547,10 +1549,10 @@ class ffGrid_html extends ffGrid_base
 	                                    $this->parent[0]->get_globals() .
 	                                    $this->addit_record_param .
 	                                    $this->record_id . "_frmAction=confirmdelete"
-	                                    . ($this->full_ajax || $this->ajax_delete
+	                                    /*. ($this->full_ajax || $this->ajax_delete
                                     		? ""
                                     		: "&ret_url=" . rawurlencode($this->parent[0]->getRequestUri())
-	                                    );
+	                                    )*/;
 	                
 	                    $confirmurl = ffProcessTags($confirmurl, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
 
@@ -1559,7 +1561,7 @@ class ffGrid_html extends ffGrid_base
 	                                    , "yesno"
 	                                    , $this->parent[0]->title
 	                                    , $this->label_delete
-	                                    , ($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : $cancelurl)
+	                                    , null// ($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : "" /*$cancelurl*/)
 	                                    , $confirmurl
 	                                    );
 	                }
@@ -1575,10 +1577,10 @@ class ffGrid_html extends ffGrid_base
 	                                    $this->parent[0]->get_globals() .
 	                                    $this->addit_record_param .
 	                                    $this->record_id . "_frmAction=confirmdelete"
-	                                    . ($this->full_ajax || $this->ajax_delete
+	                                    /*. ($this->full_ajax || $this->ajax_delete
                                     		? ""
                                     		: "&ret_url=" . rawurlencode($this->parent[0]->getRequestUri())
-	                                    );
+	                                    )*/;
 	                    }
 	                    $confirmurl = ffProcessTags($confirmurl, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
 
@@ -1587,7 +1589,7 @@ class ffGrid_html extends ffGrid_base
 	                                                , "yesno"
 	                                                , $this->parent[0]->title
 	                                                , $this->label_delete
-	                                                , ($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : $cancelurl)
+	                                                , null //($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : "" /*$cancelurl*/)
 	                                                , $confirmurl
 	                                                );
 	                }                 
@@ -1648,7 +1650,7 @@ class ffGrid_html extends ffGrid_base
                     		{
                     			foreach($cols AS $col => $grid_contents)
                     			{
-				                    $this->parse_col($grid_contents, $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col + 1, count($cols), $row + 1);
+                                    $this->parse_col($grid_contents, $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col + 1, count($cols), $row + 1);
                     			}
                     		}
 
@@ -1669,7 +1671,7 @@ class ffGrid_html extends ffGrid_base
 
 							$this->tpl[0]->set_var("row_init_end", "</tbody></table></td>" . $buffer_col);
 						}
-                    	
+
                     }
                     else 
                     {
@@ -1741,7 +1743,7 @@ class ffGrid_html extends ffGrid_base
             //$this->tpl[0]->set_var("SectActionButtonsHeader", "");
             $this->tpl[0]->set_var("SectRecord", "");
         }
-		
+
 		$this->process_labels($col_count);
         // store value of fields in hidden section, but only for not displayed records
 
@@ -1790,9 +1792,9 @@ class ffGrid_html extends ffGrid_base
         $component_class["default"] = $this->class;
         if($this->framework_css["component"]["grid"]) {
             if(is_array($this->framework_css["component"]["grid"]))
-                $component_class["grid"] = cm_getClassByFrameworkCss($this->framework_css["component"]["grid"], "col");
+                $component_class["grid"] = Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["grid"], "col");
             else {
-                $component_class["grid"] = cm_getClassByFrameworkCss("", $this->framework_css["component"]["grid"]);
+                $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["grid"]);
             }
         }
         if ($this->db[0]->query_id && $this->db[0]->numRows())
@@ -1806,11 +1808,11 @@ class ffGrid_html extends ffGrid_base
         } 
         else 
         {
-        	$component_class["empty"] = "padding " . cm_getClassByFrameworkCss("clear", "util");
-        	$this->tpl[0]->set_var("norecord_class", cm_getClassByDef($this->framework_css["norecord"]));
+        	$component_class["empty"] = "padding " . Cms::getInstance("frameworkcss")->get("clear", "util");
+        	$this->tpl[0]->set_var("norecord_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["norecord"]));
             $this->tpl[0]->set_var("SectGridData", "");
 			$this->tpl[0]->set_var("SectGridTable", "");
-            $this->tpl[0]->set_var("SectGrid", "");
+            $this->tpl[0]->parse("SectGrid", false);
             //$this->tpl[0]->set_var("SectAlpha", "");
             //$this->tpl[0]->set_var("SectFilter", "");
             //$this->tpl[0]->set_var("SectSearch", "");
@@ -1840,11 +1842,11 @@ class ffGrid_html extends ffGrid_base
 	     if($this->framework_css["component"]["inner_wrap"]) 
          {
             if(is_array($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
+                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
             } elseif(is_bool($this->framework_css["component"]["inner_wrap"])) {
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="innerWrap">');
             } else {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
+                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
             }
             $this->tpl[0]->set_var("inner_wrap_end", '</div>');
         }       
@@ -1852,11 +1854,11 @@ class ffGrid_html extends ffGrid_base
         if($this->framework_css["component"]["outer_wrap"]) 
         {
             if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
             } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->getIDIF() . 'Wrap outerWrap">');
             } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
             }
             $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
         }
@@ -1935,13 +1937,13 @@ class ffGrid_html extends ffGrid_base
 				$arrColumnLabel = $field->framework_css["label"]["col"];
 				$arrColumnControl = $field->framework_css["control"]["col"];
 				
-				$label_class["label"] = cm_getClassByFrameworkCss("label", "form");
+				$label_class["label"] = Cms::getInstance("frameworkcss")->get("label", "form");
 			}
 			
 			if(is_array($arrColumnLabel) && count($arrColumnLabel)
 				&& is_array($arrColumnControl) && count($arrColumnControl)
 			) {
-				$label_class["align"] = cm_getClassByFrameworkCss(array("text-overflow", "text-nowrap"), "util");
+				$label_class["align"] = Cms::getInstance("frameworkcss")->get(array("text-overflow", "text-nowrap"), "util");
 				if($this->framework_css["component"]["type"] == "inline") {
 					$label_align = "right";
 					$control_align = "left";
@@ -1949,10 +1951,10 @@ class ffGrid_html extends ffGrid_base
 					$label_align = "left";
 					$control_align = "right";
 				}
-				$label_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-" . $label_align, "util") . '">';
+				$label_prefix = '<div class="' . Cms::getInstance("frameworkcss")->get($arrColumnLabel, "col") . " " . Cms::getInstance("frameworkcss")->get("align-" . $label_align, "util") . '">';
 				$label_postfix = '</div>';
 
-				$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . " " . cm_getClassByFrameworkCss("text-nowrap", "util") . " " . cm_getClassByFrameworkCss("align-" . $control_align, "util") . '">';
+				$control_prefix = '<div class="' . Cms::getInstance("frameworkcss")->get($arrColumnControl, "col") . " " . Cms::getInstance("frameworkcss")->get("text-nowrap", "util") . " " . Cms::getInstance("frameworkcss")->get("align-" . $control_align, "util") . '">';
 				$control_postfix = '</div>';
 				//$type_label = "-inline";
 
@@ -1995,30 +1997,30 @@ class ffGrid_html extends ffGrid_base
 		$buffer = $buffer_label_container . $buffer_control_container;
 		if($hide_container) {
 			if($label_set) {
-				$tmp_class["grid"] = cm_getClassByFrameworkCss("row", "form");
+				$tmp_class["grid"] = Cms::getInstance("frameworkcss")->get("row", "form");
 				
 				$buffer =  '<div class="' . $tmp_class["grid"] . '">' . $buffer . '</div>';
 			}
 		} else {
 			if($label_set && is_array($field->framework_css["container"]["col"]) && count($field->framework_css["container"]["col"])) {
-				$tmp_class["grid"] = cm_getClassByFrameworkCss("row", "form");
+				$tmp_class["grid"] = Cms::getInstance("frameworkcss")->get("row", "form");
 				
 				$buffer =  '<div class="' . $tmp_class["grid"] . '">' . $buffer . '</div>';
 				
 				if(is_array($field->framework_css["container"]["col"]) 
 					&& count($field->framework_css["container"]["col"])
 				) {
-					$container_class["grid"] = cm_getClassByFrameworkCss($field->framework_css["container"]["col"], "col");
+					$container_class["grid"] = Cms::getInstance("frameworkcss")->get($field->framework_css["container"]["col"], "col");
 				} elseif($field->framework_css["container"]["row"]) {
-					$container_class["grid"] = cm_getClassByFrameworkCss("row", "form");
+					$container_class["grid"] = Cms::getInstance("frameworkcss")->get("row", "form");
 				}
 			} elseif($label_set) {
-				/*$container_class["grid"] = cm_getClassByFrameworkCss("row", "form");	*/
+				/*$container_class["grid"] = Cms::getInstance("frameworkcss")->get("row", "form");	*/
 			} else {
 				if(is_array($field->framework_css["container"]["col"]) && count($field->framework_css["container"]["col"])) {
-					$container_class["grid"] = cm_getClassByFrameworkCss($field->framework_css["container"]["col"], "col");
+					$container_class["grid"] = Cms::getInstance("frameworkcss")->get($field->framework_css["container"]["col"], "col");
 				} elseif($field->framework_css["container"]["row"]) {
-					//$container_class["grid"] = cm_getClassByFrameworkCss("row", "form");
+					//$container_class["grid"] = Cms::getInstance("frameworkcss")->get("row", "form");
 				}
 			}		
 
@@ -2104,8 +2106,8 @@ class ffGrid_html extends ffGrid_base
 								$this->parent[0]->get_globals() .
 								$this->addit_record_param;
 
-				if(!$oField->url_ajax)
-					$field_url .= "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
+				//if(!$oField->url_ajax)
+				//	$field_url .= "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
 			} else {
 				if($oField->url_ajax)
 					$field_url = $modify_url["ajax"];
@@ -2115,7 +2117,7 @@ class ffGrid_html extends ffGrid_base
 
 			if($oField->url_ajax) {
 				$this->load_dialog($this->record_id, $this->dialog_options["edit"]);
-				$field_url = "javascript:ff.ffPage.dialog.doOpen('" . $this->record_id . "', '" . ffCommon_specialchars($field_url) . "');";
+				$field_url = "javascript:ff.ffPage.dialog.doOp0en('" . $this->record_id . "', '" . ffCommon_specialchars($field_url) . "');";
 			} else {
 				$field_url = ffCommon_specialchars($field_url);					    
 			}
@@ -2170,7 +2172,7 @@ class ffGrid_html extends ffGrid_base
 
 		} elseif($button == "edit" || $button == "delete") {
 			if($this->buttons_options[$button]["icon"] === null)
-			    $this->buttons_options[$button]["icon"] = cm_getClassByFrameworkCss($button . "row", "icon-" . $this->buttons_options[$button]["aspect"] . "-tag");
+			    $this->buttons_options[$button]["icon"] = Cms::getInstance("frameworkcss")->get($button . "row", "icon-" . $this->buttons_options[$button]["aspect"] . "-tag");
 			 
 			if($this->buttons_options[$button]["class"] === null) 
 			    $this->buttons_options[$button]["class"] = $button . "row";
@@ -2190,9 +2192,10 @@ class ffGrid_html extends ffGrid_base
 				$buffer = "<a " . (strlen($this->buttons_options[$button]["class"]) 
 		                                                    ? "class=\"" . $this->buttons_options[$button]["class"] . "\" " 
 		                                                    : ""
-		                                                ) 
-		                                                . "href=\"" . $url . "\">" 
-		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"] 
+		                                                )
+                                                        . "href=\"javascript:ff.ffPage.goToWithRetUrl('" . rawurlencode($url) . "');\">"
+		                                               // . "href=\"" . $url . "\">"
+		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"]
 		                                            . "</a>";						
 			}    
 		}
@@ -2368,7 +2371,7 @@ class ffGrid_html extends ffGrid_base
                                 ) . ");\""
                                 . " class=\"ff-sort"
                                 . ($this->order_default == $field->id
-                                    ? " " . cm_getClassByFrameworkCss("current", "util", $this->label_selected_class)
+                                    ? " " . Cms::getInstance("frameworkcss")->get("current", "util", $this->label_selected_class)
                                     : ""
                                 ) . "\">"
                                     . ($this->order_method == "labels" || $this->order_method == "both"
@@ -2376,7 +2379,7 @@ class ffGrid_html extends ffGrid_base
                                         : ""
                                     )
                                     . ($this->order_method == "icons" || $this->order_method == "both"
-                                        ? cm_getClassByFrameworkCss("sort" . ($this->order_default == $field->id ? "-" . strtolower($direction) : ""), "icon-link-tag")
+                                        ? Cms::getInstance("frameworkcss")->get("sort" . ($this->order_default == $field->id ? "-" . strtolower($direction) : ""), "icon-link-tag")
                                         : ""
                                     )
                             . "</a>";
@@ -2410,10 +2413,10 @@ class ffGrid_html extends ffGrid_base
                 					: ""
                 				) . ");\""
                 				. ($this->order_default == $field->id
-                					? " class=\"" .cm_getClassByFrameworkCss("current", "util", $this->label_selected_class)  . "\""
+                					? " class=\"" .Cms::getInstance("frameworkcss")->get("current", "util", $this->label_selected_class)  . "\""
                 					: ""
                 				) . ">" . 
-                					cm_getClassByFrameworkCss("sort" . ($this->order_default == $field->id ? "-" . strtolower($direction) : ""), "icon-link-tag")
+                					Cms::getInstance("frameworkcss")->get("sort" . ($this->order_default == $field->id ? "-" . strtolower($direction) : ""), "icon-link-tag")
                 			. "</a>";
 			}*/				
 		} elseif($hide_container || !$field->display_label)
@@ -2438,7 +2441,7 @@ class ffGrid_html extends ffGrid_base
 	        $container_class["type"] = strtolower($field->get_app_type());
 		
 		if ($this->order == $field->id)
-            $container_class["current"] = cm_getClassByFrameworkCss("current", "util", $this->label_selected_class);
+            $container_class["current"] = Cms::getInstance("frameworkcss")->get("current", "util", $this->label_selected_class);
 
 		$container_properties = $field->container_properties;
 		$container_properties["width"] = $field->width;         
@@ -2490,7 +2493,7 @@ class ffGrid_html extends ffGrid_base
 		    $col_class["last"] = $this->column_class_last;
 		
 		$col_class["cell"] = "cel" . ($row > 1 ? "-" . $row : "") . "-" . $col; 
-		$col_class["wrap"] = cm_getClassByFrameworkCss("text-nowrap", "util");
+		$col_class["wrap"] = Cms::getInstance("frameworkcss")->get("text-nowrap", "util");
 		/**
 		* Set Class And Properties by Grid Content Type
 		*/
@@ -2586,7 +2589,7 @@ class ffGrid_html extends ffGrid_base
                 {
                     foreach($cols AS $col => $grid_contents)
                     {
-				        $this->parse_col_label($grid_contents, $col + 1, count($cols), $row + 1);
+                        $this->parse_col_label($grid_contents, $col + 1, count($cols), $row + 1);
                     }
                 }
             
@@ -2667,14 +2670,14 @@ class ffGrid_html extends ffGrid_base
     
         if ($this->navigator_orientation == "both" || $this->navigator_orientation == "top")
         {
-        	$this->tpl[0]->set_var("pagenavigator_top_class", cm_getClassByDef($this->framework_css["navigatorTop"]));
+        	$this->tpl[0]->set_var("pagenavigator_top_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["navigatorTop"]));
             $this->tpl[0]->parse("SectPaginatorTop", false);
 		} else
             $this->tpl[0]->set_var("SectPaginatorTop", "");
 
         if ($this->navigator_orientation == "both" || $this->navigator_orientation == "bottom")
         {
-        	$this->tpl[0]->set_var("pagenavigator_bottom_class", cm_getClassByDef($this->framework_css["navigatorBottom"]));
+        	$this->tpl[0]->set_var("pagenavigator_bottom_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["navigatorBottom"]));
             $this->tpl[0]->parse("SectPaginatorBottom", false);
 		} else
         	$this->tpl[0]->set_var("SectPaginatorBottom", "");
@@ -2740,7 +2743,7 @@ class ffGrid_html extends ffGrid_base
             }
             else
             {
-                $tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
+                $tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
                 $tmp->id            = "search";
                 $tmp->label         = $this->buttons_options["search"]["label"];
                 $tmp->class         = $this->buttons_options["search"]["class"];
@@ -2758,7 +2761,7 @@ class ffGrid_html extends ffGrid_base
                 {
                     $this->parent[0]->tplAddJs("ff.ajax");
 
-                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
+                    $tmp->jsaction = "ff.ffGrid.searchHistoryPush('" . $this->getIDIF() . "_" . $this->search_simple_field_options["id"] . "'); " . ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
                 }
                 $this->addSearchButton(   $tmp
                                         , $this->buttons_options["search"]["index"]);
@@ -2776,7 +2779,7 @@ class ffGrid_html extends ffGrid_base
             }
             else
             {
-                $tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
+                $tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
                 $tmp->id            = "export";
                 $tmp->label         = $this->buttons_options["export"]["label"];
                 $tmp->class         = $this->buttons_options["export"]["class"];
@@ -2821,7 +2824,7 @@ class ffGrid_html extends ffGrid_base
 	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
 		else
@@ -2834,7 +2837,7 @@ class ffGrid_html extends ffGrid_base
 			$prop = "width";
 		else {
 			$prop = "class";
-			$width = cm_getClassByFrameworkCss("window-" . $width, "dialog");
+			$width = Cms::getInstance("frameworkcss")->get("window-" . $width, "dialog");
 		}
 		if($action) {
 			$this->dialog_options[$action][$prop] 	= $width;

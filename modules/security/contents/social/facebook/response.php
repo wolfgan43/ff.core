@@ -35,13 +35,13 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
         if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
         else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 
 	if(MOD_SEC_USER_AVATAR) {
 		if(MOD_SEC_GROUPS) {
@@ -51,7 +51,7 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
 		    $avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
 		}
 		
-		$tpl->set_var("avatar_class", cm_getClassByDef($framework_css["logout"]["account"]["avatar"]));
+		$tpl->set_var("avatar_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["avatar"]));
 		$tpl->set_var("avatar", mod_sec_get_avatar($avatar, MOD_SEC_USER_AVATAR_MODE));
 		$tpl->parse("SectAvatar", false);
 	}
@@ -71,22 +71,22 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
 	}
 
 	if($username) {
-		//$tpl->set_var("username_class", cm_getClassByDef($framework_css["logout"]["account"]["username"]));
+		//$tpl->set_var("username_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["username"]));
 		$tpl->set_var("username", $username);
 		$tpl->parse("SectUsername", false);
 	}
 	if($email) {
-		//$tpl->set_var("email_class", cm_getClassByDef($framework_css["logout"]["account"]["email"]));
+		//$tpl->set_var("email_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["email"]));
 		$tpl->set_var("email", $email);
 		$tpl->parse("SectEmail", false);
 	}
 
-    $tpl->set_var("logout_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-    $tpl->set_var("login_button_class", cm_getClassByDef($framework_css["actions"]["login"]));
+    $tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+    $tpl->set_var("login_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["login"]));
     $tpl->set_var("login_url", $dashboard_ret_url);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 	$cm->oPage->addContent($tpl);
 	return;	
@@ -244,20 +244,20 @@ try {
 	            $component_class["popup"] = "social-popup";
                 if($framework_css["component"]["grid"]) {
                     if(is_array($framework_css["component"]["grid"]))
-                        $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+                        $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
                     else {
-                        $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+                        $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
                     }
                 }  
 
                 $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-                $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
-			    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-			    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-			    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-			    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
+                $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
+			    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+			    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+			    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+			    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));
 			    $tpl->set_var("logout_url", $mod_sec_login->reverse);
-			    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+			    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
                 
 				$cm->oPage->addContent($tpl);
 				return;
@@ -285,13 +285,13 @@ try {
    			$component_class["popup"] = "social-popup";
             if($framework_css["component"]["grid"]) {
                 if(is_array($framework_css["component"]["grid"]))
-                    $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
                 else {
-                    $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
                 }
             }   
             $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-            $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+            $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 
 			if(MOD_SEC_USER_AVATAR) {
 				if(MOD_SEC_GROUPS) {
@@ -301,7 +301,7 @@ try {
 		        	$avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
 		        }
 
-				$tpl->set_var("avatar_class", cm_getClassByDef($framework_css["logout"]["account"]["avatar"]));
+				$tpl->set_var("avatar_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["avatar"]));
 				$tpl->set_var("avatar", mod_sec_get_avatar($avatar, MOD_SEC_USER_AVATAR_MODE));
 				$tpl->parse("SectAvatar", false);
 			}
@@ -321,12 +321,12 @@ try {
 			}
 
 			if($username) {
-				//$tpl->set_var("username_class", cm_getClassByDef($framework_css["logout"]["account"]["username"]));
+				//$tpl->set_var("username_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["username"]));
 				$tpl->set_var("username", $username);
 				$tpl->parse("SectUsername", false);
 			}
 			if($email) {
-				//$tpl->set_var("email_class", cm_getClassByDef($framework_css["logout"]["account"]["email"]));
+				//$tpl->set_var("email_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["email"]));
 				$tpl->set_var("email", $email);
 				$tpl->parse("SectEmail", false);
 			}
@@ -338,20 +338,20 @@ try {
    			$component_class["popup"] = "social-popup";
             if($framework_css["component"]["grid"]) {
                 if(is_array($framework_css["component"]["grid"]))
-                    $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
                 else {
-                    $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
                 }
             }   
             $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-            $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+            $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
             
-            $tpl->set_var("logout_class", cm_getClassByDef($framework_css["logout"]["def"]));
-            $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-            $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-            $tpl->set_var("login_button_class", cm_getClassByDef($framework_css["actions"]["login"]));
+            $tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+            $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+            $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+            $tpl->set_var("login_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["login"]));
             $tpl->set_var("login_url", $dashboard_ret_url);
-            $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+            $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
             
 			$cm->oPage->addContent($tpl);
 			
@@ -403,21 +403,21 @@ try {
    		$component_class["popup"] = "social-popup";
 	    if($framework_css["component"]["grid"]) {
 	        if(is_array($framework_css["component"]["grid"]))
-	            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+	            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
 	        else {
-	            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+	            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
 	        }
 	    }   
 	    
 	    $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-	    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+	    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 	    
-	    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-	    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-	    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-	    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
+	    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+	    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+	    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+	    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));
 	    $tpl->set_var("logout_url", $mod_sec_login->reverse);
-	    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+	    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 		$cm->oPage->addContent($tpl);
 	}
@@ -457,21 +457,21 @@ try {
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
         if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
         else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
     
-    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
+    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));
     $tpl->set_var("logout_url", $mod_sec_login->reverse);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 	$cm->oPage->addContent($tpl);
 	return;
@@ -511,21 +511,21 @@ try {
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
         if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
         else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
     
-    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"])); 
+    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"])); 
     $tpl->set_var("logout_url", $mod_sec_login->reverse);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
     
 	$cm->oPage->addContent($tpl);
 	return;

@@ -1,0 +1,5 @@
+#############
+# Redirect non https or non-www to https://www
+#------------
+RewriteCond %{HTTP_HOST}                    ^[DOMAIN_NAME]\.[DOMAIN_EXT]$
+RewriteRule (.*)                            http://www.[DOMAIN_NAME].[DOMAIN_EXT]%{REQUEST_URI} [L,R=301]

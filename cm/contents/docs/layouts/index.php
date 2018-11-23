@@ -46,10 +46,10 @@ $oRecord->addKeyField($oField);
 $oField = ffField::factory($cm->oPage);
 $oField->id = "layouts";
 $oField->extended_type = "Selection";
-foreach(glob(__TOP_DIR__ . "/modules/restricted/themes/responsive/layouts/layer_*") as $real_file) {
-    $filename = str_replace("layer_", "", basename($real_file, ".html"));
+foreach(glob(__TOP_DIR__ . "/modules/restricted/themes/responsive/layouts/*") as $real_file) {
+    $filename = basename($real_file, ".html");
 
-    $oField->multi_pairs[] = array(new ffData( $filename), new ffData(ucfirst($filename)));
+    $oField->multi_pairs[] = array(new ffData( $filename), new ffData(ucwords(str_replace("-", " ", $filename))));
 }
 $oField->multi_select_one = false;
 $oField->default_value = new ffData($layout);

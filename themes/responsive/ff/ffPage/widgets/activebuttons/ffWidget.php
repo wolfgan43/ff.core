@@ -34,7 +34,7 @@ class ffWidget_activebuttons extends ffCommon
 
 		$this->oPage = array(&$oPage);
 		
-		$this->tpl[0] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[0] = ffTemplate::factory(__DIR__);
 		$this->tpl[0]->load_file($this->template_file, "main");
 
 		$this->tpl[0]->set_var("site_path", FF_SITE_PATH);
@@ -73,7 +73,7 @@ class ffWidget_activebuttons extends ffCommon
 	
 	function process_footers()
 	{
-		$this->tpl[0]->set_var("spinner_class", cm_getClassByFrameworkCss("spinner", "icon"));
+		$this->tpl[0]->set_var("spinner_class", Cms::getInstance("frameworkcss")->get("spinner", "icon"));
 		
 		return $this->tpl[0]->rpparse("SectFooters", false);
 	}

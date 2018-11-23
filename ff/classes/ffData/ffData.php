@@ -228,11 +228,8 @@ class ffData extends ffClassChecks
 		if ($data_type == "Currency" && $locale == "ISO9075")
 			ffErrorHandler::raise("ffData cowardly refuse to manage currency on ISO9075", E_USER_ERROR, $this, get_defined_vars());
 			
-		if (__DIR__ !== "__DIR__")
-			require_once(__DIR__ . "/locale/FormsLocale_" . $locale . "." . FF_PHP_EXT);
-		else 
-			require_once("locale/FormsLocale_" . $locale . "." . FF_PHP_EXT);
-			
+        require_once(__DIR__ . "/locale/FormsLocale_" . $locale . "." . FF_PHP_EXT);
+
 		$funcname = "FormsLocale_" . $locale . "_Get" . $data_type;
 		/*if(!function_exists($funcname))
 			ffErrorHandler::raise("Function not exist " . $funcname, E_USER_ERROR, $this, get_defined_vars());*/
@@ -296,11 +293,8 @@ class ffData extends ffClassChecks
         if ($data_type == "Currency" && $locale == "ISO9075")
 			ffErrorHandler::raise("ffData cowardly refuse to manage currency on ISO9075", E_USER_ERROR, $this, get_defined_vars());
             
-		if (__DIR__ !== "__DIR__")
-			require_once(__DIR__ . "/locale/FormsLocale_" . $locale . "." . FF_PHP_EXT);
-		else 
-			require_once("locale/FormsLocale_" . $locale . "." . FF_PHP_EXT);
-            
+        require_once(__DIR__ . "/locale/FormsLocale_" . $locale . "." . FF_PHP_EXT);
+
 		$funcname = "FormsLocale_" . $locale . "_Check" . $data_type;
 		/*if(!function_exists($funcname))
 			ffErrorHandler::raise("Function not exist " . $funcname, E_USER_ERROR, $this, get_defined_vars());*/

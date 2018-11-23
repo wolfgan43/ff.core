@@ -8,11 +8,9 @@
  * @link http://www.formsphpframework.com
  */
 
-if (!defined("CM_URL_NORMALIZE"))			define("CM_URL_NORMALIZE", true);
+if (!defined("CM_URL_NORMALIZE"))			define("CM_URL_NORMALIZE", false);
 
 if (!defined("CM_MIME_FORCE"))				define("CM_MIME_FORCE", false);
-if (!defined("CM_MULTIDOMAIN_ROUTING"))     define("CM_MULTIDOMAIN_ROUTING", true);
-if (!defined("CM_DEFAULT_THEME"))			define("CM_DEFAULT_THEME", "responsive");
 if (!defined("CM_TABLE_PREFIX"))			define("CM_TABLE_PREFIX", "cm_");
 if (!defined("CM_LOCAL_APP_NAME"))			define("CM_LOCAL_APP_NAME", "FF CMS");
 if (!defined("CM_IGNORE_THEME_DEFAULTS"))	define("CM_IGNORE_THEME_DEFAULTS", false);
@@ -93,5 +91,3 @@ if (!defined("CM_JSCACHE_SMARTURLS"))			define("CM_JSCACHE_SMARTURLS", false);
 if (!defined("CM_JSCACHE_DEFERLOADING"))		define("CM_JSCACHE_DEFERLOADING", false);
 
 if (!defined("CM_MIME_FINFO"))					define("CM_MIME_FINFO", false);
-
-if (!defined("CM_MEDIACACHE_SHOWPATH"))			define("CM_MEDIACACHE_SHOWPATH", null);

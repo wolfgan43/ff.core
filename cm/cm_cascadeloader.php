@@ -8,137 +8,6 @@
  * @link http://www.formsphpframework.com
  */
 
-// --------------------------------------------
-//  CLASS SECTION
-
-ffPage::addEvent				("on_factory", "ffPage_on_factory"					, ffEvent::PRIORITY_HIGH);
-ffGrid::addEvent				("on_factory", "ffGrid_on_factory"					, ffEvent::PRIORITY_HIGH);
-ffRecord::addEvent			("on_factory", "ffRecord_on_factory"				, ffEvent::PRIORITY_HIGH);
-ffDetails::addEvent			("on_factory", "ffDetails_on_factory"				, ffEvent::PRIORITY_HIGH);
-ffPageNavigator::addEvent	("on_factory", "ffPageNavigator_on_factory"			, ffEvent::PRIORITY_HIGH);
-ffField::addEvent			("on_factory", "ffField_on_factory"					, ffEvent::PRIORITY_HIGH);
-ffButton::addEvent			("on_factory", "ffButton_on_factory"				, ffEvent::PRIORITY_HIGH);
-
-function ffPage_on_factory($disk_path, $site_path, $page_path, $theme, $variant)
-{
-    if (is_null($theme) || $theme === cm_getMainTheme() || !is_null($variant))
-        return null;
-    else
-    {
-        return cm_findCascadeClass("ffPage", $theme);
-    }
-}
-
-function ffGrid_on_factory($page, $disk_path, $theme, $variant)
-{
-    if (!is_null($variant) && isset($variant["path"]))
-        return null;
-    else
-        return cm_findCascadeClass("ffGrid", $theme, null, $variant["name"]);
-}
-
-function ffRecord_on_factory($page, $disk_path, $theme, $variant)
-{
-    if (!is_null($variant) && isset($variant["path"]))
-        return null; 
-    else
-        return cm_findCascadeClass("ffRecord", $theme, null, $variant["name"]);
-}
-
-function ffDetails_on_factory($page, $disk_path, $theme, $variant)
-{
-    if (!is_null($variant) && isset($variant["path"]))
-        return null;
-    else
-        return cm_findCascadeClass("ffDetails", $theme, null, $variant["name"]);
-}
-
-function ffPageNavigator_on_factory($page, $disk_path, $site_path, $page_path, $theme, $variant)
-{
-    if (!is_null($variant) && isset($variant["path"]))
-        return null;
-    else
-        return cm_findCascadeClass("ffPageNavigator", $theme, null, $variant["name"]);
-}
-
-function ffField_on_factory($page, $disk_path, $site_path, $page_path, $theme, $variant)
-{
-    if (!is_null($variant) && isset($variant["path"]))
-        return null;
-    else
-        return cm_findCascadeClass("ffField", $theme, null, $variant["name"]);
-}
-
-function ffButton_on_factory($page, $disk_path, $site_path, $page_path, $theme, $variant)
-{
-    if (!is_null($variant) && isset($variant["path"]))
-        return null;
-    else
-        return cm_findCascadeClass("ffButton", $theme, null, $variant["name"]);
-}
-
-function cm_findCascadeClass($class_type, $theme, $id = null, $variant_name = null, $raise_error = true)
-{
-    $cm = cm::getInstance();
-
-    $registry = ffGlobals::getInstance("_registry_");
-
-    if (!isset($registry->themes))
-    {
-        $registry->themes = array();
-    }
-    if (!isset($registry->themes[$theme]) && is_file(ff_getThemeDir($theme) . "/themes/" . $theme . "/theme_settings.xml"))
-    {
-        $registry->themes[$theme] = new SimpleXMLElement(ff_getThemeDir($theme) . "/themes/" . $theme . "/theme_settings.xml", null, true);
-    }
-
-    if ($variant_name === null)
-    {
-        $tmp = preg_replace('/\\.[^.\\s]{3,4}$/', '', rtrim($cm->oPage->page_path, "/"));
-        $base_path = ff_getThemeDir($theme) . "/themes/" . $theme . "/contents" . $tmp . "/" . $class_type;
-        if (is_dir($base_path) && is_file($base_path . "/settings.xml"))
-        {
-            $config = new SimpleXMLElement($base_path . "/settings.xml", null, true);
-            if (isset($config->default_class_suffix))
-            {
-                $class_name = $class_type . "_" . $config->default_class_suffix;
-
-                if (is_file($base_path . "/" . $class_name . "." . FF_PHP_EXT))
-                    return array("base_path" => $base_path . "/" . $class_name . "." . FF_PHP_EXT, "class_name" => $class_name);
-            }
-        }
-
-        $base_path = ff_getThemeDir($theme) . "/themes/" . $theme . "/ff/" . $class_type;
-        if (is_dir($base_path) && isset($registry->themes[$theme]->default_class_suffix))
-        {
-            $suffix = $registry->themes[$theme]->default_class_suffix;
-            $class_name = $class_type . "_" . $suffix;
-
-            if (is_file($base_path . "/" . $class_name . "." . FF_PHP_EXT))
-                return array("base_path" => $base_path . "/" . $class_name . "." . FF_PHP_EXT, "class_name" => $class_name);
-        }
-    }
-    else
-    {
-        $class_name = $variant_name;
-
-        $base_path = ff_getThemeDir($theme) . "/themes/" . $theme . "/contents" . $cm->oPage->page_path . "/" . $class_type;
-        if (is_file($base_path . "/" . $class_name . "." . FF_PHP_EXT))
-            return array("base_path" => $base_path . "/" . $class_name . "." . FF_PHP_EXT, "class_name" => $class_name);
-
-        $base_path = ff_getThemeDir($theme) . "/themes/" . $theme . "/ff/" . $class_type;
-        if (is_file($base_path . "/" . $class_name . "." . FF_PHP_EXT))
-            return array("base_path" => $base_path . "/" . $class_name . "." . FF_PHP_EXT, "class_name" => $class_name);
-    }
-
-    if ($theme != cm_getMainTheme())
-        return cm_findCascadeClass($class_type, cm_getMainTheme(), $id, $variant_name, $raise_error);
-
-    if ($theme == cm_getMainTheme() && $raise_error)
-        ffErrorHandler::raise("CM: Unable to find Class", E_USER_ERROR, $this, get_defined_vars());
-    else
-        return null;
-}
 
 // --------------------------------------------
 //  TEMPLATES SECTION
@@ -162,8 +31,8 @@ function ffPage_set_events(ffPage_base $page)
     }
 
     $page->addEvent("getTemplateDir", "ffPage_getTemplateDir", ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
-    $page->addEvent("getLayerDir", "ffPage_getLayerDir", ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
-    $page->addEvent("getLayoutDir", "ffPage_getLayoutDir", ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
+    //$page->addEvent("getLayerDir", "ffPage_getLayerDir", ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
+    //$page->addEvent("getLayoutDir", "ffPage_getLayoutDir", ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
     $page->addEvent("on_widget_load", "ffPage_on_widget_load" , ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
     $page->addEvent("on_js_parse", "ffPage_on_js_parse" , ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
     $page->addEvent("on_css_parse", "ffPage_on_css_parse" , ffEvent::PRIORITY_HIGH, 0, ffEvent::BREAK_NOT_EQUAL, null);
@@ -467,7 +336,7 @@ function ffPage_seo_optimize($oPage)
                                     && strpos($img_src, "?") !== false
                                 )
                             ) {
-                                switch (ffMimeTypeByExtension(ffGetFilename($img_src, false)))
+                                switch (ffMedia::getMimeTypeByExtension(ffGetFilename($img_src, false)))
                                 {
                                     case "image/jpeg":
                                     case "image/png":
@@ -512,10 +381,6 @@ function ffPage_seo_optimize($oPage)
         $content = $newdoc->saveHTML();
         if(CM_CACHE_IMG_LAZY_LOAD)
             $content = str_replace("></source>", " />", $content);
-
-        if(CM_CACHE_PATH_CONVERT_SHOWFILES && CM_MEDIACACHE_SHOWPATH) {
-            $content = str_replace(CM_SHOWFILES . "/", CM_MEDIACACHE_SHOWPATH . "/", $content);
-        }
 
         if(CM_CACHE_IMG_LAZY_LOAD_CSS) {
             $oPage->css_buffer["default"][]["content"] =  '
@@ -573,10 +438,6 @@ function ffPage_seo_optimize($oPage)
 }
 
 function cmCache_normalizeUrl($content) {
-	if(CM_CACHE_PATH_CONVERT_SHOWFILES && CM_MEDIACACHE_SHOWPATH) {
-//		$arrFind[] 			= CM_SHOWFILES . "/";
-//		$arrReplace[] 		= CM_MEDIACACHE_SHOWPATH . "/";
-	}
 	if($_SERVER["HTTPS"]) {
 		$arrFind[] 			= 'http://' . $_SERVER["HTTP_HOST"];
 		$arrReplace[] 		= 'https://' .  $_SERVER["HTTP_HOST"];
@@ -592,23 +453,20 @@ function cmCache_normalizeUrl($content) {
 
 function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = null)
 {
-    $showfiles = (CM_MEDIACACHE_SHOWPATH
-        ? CM_MEDIACACHE_SHOWPATH
-        : CM_SHOWFILES
-    );
+    $showfiles = CM_SHOWFILES;
 
     $image = pathinfo($src);
 	if(strpos($src, FF_SITE_PATH . FF_THEME_DIR . '/') === 0)
 	{
 
-	} elseif(strpos($src, FF_SITE_PATH . FF_UPDIR . '/') === 0)
+	} elseif(strpos($src, FF_SITE_UPDIR . '/') === 0)
     {
         $mode = "";
         if($width > 0 && $height > 0)
             $mode = "-" . $width . "x" . $height;
 
         $src = str_replace(
-            FF_SITE_PATH . FF_UPDIR . '/'
+            FF_SITE_UPDIR . '/'
             , $showfiles . '/'
             , $image["dirname"] . "/" . $image["filename"] . $mode . "." . $image["extension"]
         );
@@ -618,8 +476,6 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
         $showfiles_orig = null;
         if(strpos($src, CM_SHOWFILES . '/') === 0)
             $showfiles_orig = CM_SHOWFILES . '/';
-        if(strpos($src, FF_SITE_PATH . CM_SHOWFILES . '/') === 0)
-            $showfiles_orig = FF_SITE_PATH . CM_SHOWFILES . '/';
         if(strpos($src, FF_SITE_PATH . "/cm/showfiles" . '/') === 0)
             $showfiles_orig = FF_SITE_PATH . "/cm/showfiles" . '/';
         if(strpos($src, FF_SITE_PATH . "/cm/showfiles.php" . '/') === 0)
@@ -663,7 +519,7 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
 			}
 
 
-			if($is_mode) // is_file(FF_DISK_PATH . FF_UPDIR . $imageOrig["dirname"] . "/" . $imageOrig["basename"])
+			if($is_mode) // is_file(FF_DISK_UPDIR . $imageOrig["dirname"] . "/" . $imageOrig["basename"])
 			{
 				$imageOrig["mode"] = "-" . $imageOrig["mode"];
 			}
@@ -692,7 +548,7 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
 function cmCache_writeLog($data, $filename = "log") //writeLog
 {
 	if(DEBUG_LOG === true) {
-		$log_path = CM_CACHE_PATH . "/logs";
+		$log_path = CM_CACHE_DISK_PATH . "/logs";
 		if(!is_dir($log_path))
 			mkdir($log_path, 0777, true);
 
@@ -864,8 +720,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
 
                         if (@is_file($css_buffer_path[$css_buffer_key]["path"]))
                         {
-                            $css_file_key .= $css_buffer_path[$css_buffer_key]["path"];
-							$tmp_mtime = filemtime($css_buffer_path[$css_buffer_key]["path"]);
+                            $tmp_mtime = filemtime($css_buffer_path[$css_buffer_key]["path"]);
+
+                            $css_file_key .= $css_buffer_path[$css_buffer_key]["path"] . "-" . $tmp_mtime;
                             if ($tmp_mtime > $max_mtime)
                                 $max_mtime = $tmp_mtime;
                         }
@@ -981,113 +838,6 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
 
                         if (strlen($tmp_css_data))
                         {
-                            /*$server_url = "http://" . $_SERVER["HTTP_HOST"];
-                            $server_url_http = "http://" . $_SERVER["HTTP_HOST"];
-
-                            if ((substr(strtolower($css_buffer_value["path"]), 0, 7) != "http://" && substr(strtolower($css_buffer_value["path"]), 0, 8) != "https://" && substr($css_buffer_value["path"], 0, 2) != "//") && file_exists($css_buffer_value["path"]))
-                            {
-                                preg_match("/@import[\s]+url[\s]*\([\s]*\"?[\s]*([^\"\)]+)[\s]*\"?[\s]*\)\;?/", $tmp_css_data, $matches, PREG_OFFSET_CAPTURE, $offset);
-                                while (0 !== ($rc = preg_match("/@import[\s]+url[\s]*\([\s]*\"?[\s]*([^\"\)]+)[\s]*\"?[\s]*\)/", $tmp_css_data, $matches, PREG_OFFSET_CAPTURE, $offset)))
-                                {
-                                    $match = $matches[1][0];
-
-                                    // normalize url
-                                    if (strpos($match, "http://") === 0)
-                                    {
-                                        $match = substr($match, strlen("http://"));
-                                    }
-                                    elseif (strpos($match, "https://") === 0)
-                                    {
-                                        $match = substr($match, strlen("https://"));
-                                    }
-                                    if (strpos($match, $_SERVER["HTTP_HOST"]) === 0)
-                                    {
-                                        $match = substr($match, strlen($_SERVER["HTTP_HOST"]));
-                                    }
-                                    if (strlen(FF_SITE_PATH) && strpos($match, FF_SITE_PATH) === 0)
-                                    {
-                                        $match = substr($match, strlen(FF_SITE_PATH));
-                                    }
-
-                                    // check file existance on locale accessible path
-                                    if (strpos($match, "/") === 0)
-                                        $final_file = realpath(FF_DISK_PATH . $match);
-                                    else
-                                        $final_file = realpath(ffCommon_dirname($css_buffer_value["path"]) . "/" . $match);
-
-                                    if (strlen($final_file) && strpos($final_file, FF_DISK_PATH) === 0 && file_exists($final_file))
-                                    {
-                                        $tmp_import = file_get_contents($final_file);
-                                        $tmp_css_data = substr($tmp_css_data, 0, $matches[0][1]) . $tmp_import . substr($tmp_css_data, $matches[0][1] + strlen($matches[0][0]));
-                                        $offset = $matches[0][1];
-                                        continue;
-                                    }
-
-                                    $offset = $matches[0][1] + strlen($matches[0][0]);
-                                }
-                            }
-        */
-
-                            /*$tmp_css_data = str_replace("{site_path}", FF_SITE_PATH, $tmp_css_data);
-                            $tmp_css_data = str_replace("{showfiles}", CM_SHOWFILES, $tmp_css_data);
-                            $tmp_css_url = cm_extract_css_urls($tmp_css_data);
-
-                            if (is_array($tmp_css_url))
-                            {
-                                $tmp_css_link_replaced = array();
-                                foreach($tmp_css_url AS $tmp_css_url_value)
-                                {
-                                    if (isset($tmp_css_link_replaced[$tmp_css_url_value]))
-                                        continue;
-                                    if (
-                                        substr($tmp_css_url_value, 0, 1) !== "/"
-                                        && (substr(strtolower($tmp_css_url_value), 0, 7) !== "http://"
-                                            && substr(strtolower($tmp_css_url_value), 0, 8) !== "https://"
-                                            && substr($tmp_css_url_value, 0, 2) !== "//")
-                                    )
-                                    {
-                                        $arrBufferPath = parse_url(ffcommon_dirname($css_buffer_value["path"]) . "/" . $tmp_css_url_value);
-                                        if (
-                                            substr(strtolower($css_buffer_value["path"]), 0, 7) === "http://"
-                                            || substr(strtolower($css_buffer_value["path"]), 0, 8) === "https://"
-                                            || substr($css_buffer_value["path"], 0, 2) === "//"
-                                        )
-                                            $relative_buffer_path = cm_canonicalize($arrBufferPath["scheme"] . "://" . $arrBufferPath["host"] . $arrBufferPath["path"])
-                                                . (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
-                                                . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
-                                        else
-                                            $relative_buffer_path = substr(realpath($arrBufferPath["path"]), strlen(FF_DISK_PATH))
-                                                . (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
-                                                . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
-
-                                        if(strpos($relative_buffer_path, FF_THEME_DIR) === 0)
-                                        {
-                                            if(file_exists(ff_getThemeDir($oPage->theme) . FF_THEME_DIR . "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")))))
-                                            {
-                                                $relative_buffer_path =  "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")));
-                                            }
-                                            else
-                                            {
-                                                $relative_buffer_path = substr($relative_buffer_path, strlen(FF_THEME_DIR));
-                                            }
-
-                                            $relative_buffer_path = FF_SITE_PATH . FF_THEME_DIR . $relative_buffer_path;
-                                        }
-                                        elseif(strpos($relative_buffer_path, "/uploads") === 0 && CM_MEDIACACHE_SHOWPATH)
-                                        {
-                                            $relative_buffer_path = CM_MEDIACACHE_SHOWPATH . substr($relative_buffer_path, strlen("/uploads"));
-                                        }
-
-                                        if($relative_buffer_path)
-                                            $tmp_css_data = str_replace($tmp_css_url_value, $relative_buffer_path, $tmp_css_data);
-
-                                        $tmp_css_link_replaced[$tmp_css_url_value] = true;
-                                    }
-                                }
-                            } elseif(strpos($css_buffer_value["path"], FF_THEME_DISK_PATH) === 0) {
-                                $arrBufferPath = explode("/", str_replace(FF_THEME_DISK_PATH . "/", "", $css_buffer_value["path"]));
-                                $tmp_css_data = str_replace("../", FF_THEME_DIR . "/" . $arrBufferPath[0] . "/", $tmp_css_data);
-                            }*/
 
                             $tmp_css_data = cm_convert_url_in_abs_by_content($tmp_css_data, $css_buffer_value["path"]);
 
@@ -1155,9 +905,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         }
                     }
 
-                    if (CM_SHOWFILES_FORCE_PATH && CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
+                    if (CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
                     { //manipolazione percorsi dei file media per avere la gestione della cache
-                        $str_css_buffer = str_replace(FF_SITE_PATH . FF_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
+                        $str_css_buffer = str_replace(FF_SITE_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                         //if (CM_CSSCACHE_RENDER_THEME_PATH)
                         //    $str_css_buffer = str_replace(FF_SITE_PATH . THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                     }
@@ -1183,9 +933,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                     if ($uncompressed)
                         $str_css_buffer = file_get_contents($uncompressed_file);
 
-                    if (CM_SHOWFILES_FORCE_PATH && CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
+                    if (CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
                     { //manipolazione percorsi dei file media per avere la gestione della cache
-                        $str_css_buffer = str_replace(FF_SITE_PATH . FF_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
+                        $str_css_buffer = str_replace(FF_SITE_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                         //if (CM_CSSCACHE_RENDER_THEME_PATH)
                          //   $str_css_buffer = str_replace(FF_SITE_PATH . FF_THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                     }
@@ -1394,8 +1144,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
 
                         if (@is_file($oPage->js_buffer[$js_buffer_key]["path"]))
                         {
-                            $js_file_key .= $oPage->js_buffer[$js_buffer_key]["path"];
-							$tmp_mtime = filemtime($oPage->js_buffer[$js_buffer_key]["path"]);
+                            $tmp_mtime = filemtime($oPage->js_buffer[$js_buffer_key]["path"]);
+
+                            $js_file_key .= $oPage->js_buffer[$js_buffer_key]["path"] . "-" . $tmp_mtime;
 							if ($tmp_mtime > $max_mtime)
 								$max_mtime = $tmp_mtime;
                         }
@@ -1734,7 +1485,7 @@ function ffPage_getTemplateDir(ffPage_base $oPage, $template_file)
 {
     return cm_findCascadeTemplate("ffPage", $oPage->getTheme(), $template_file);
 }
-
+/*
 function ffPage_getLayerDir(ffPage_base $oPage, $file)
 {
     $tmp = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/layouts/" . ltrim($file, "/"), $oPage->getTheme(), false);
@@ -1742,8 +1493,8 @@ function ffPage_getLayerDir(ffPage_base $oPage, $file)
         return ffCommon_dirname($tmp);
     else
         return null;
-}
-
+}*/
+/*
 function ffPage_getLayoutDir(ffPage_base $oPage, $file)
 {
     $tmp = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/layouts/" . ltrim($file, "/"), $oPage->getTheme(), false);
@@ -1751,7 +1502,7 @@ function ffPage_getLayoutDir(ffPage_base $oPage, $file)
         return ffCommon_dirname($tmp);
     else
         return null;
-}
+}*/
 
 function ffGrid_getTemplateDir(ffGrid_base $grid)
 {
@@ -1994,15 +1745,15 @@ function cm_cascadeFindTemplate($path, $module = false, $raise_error = false)
 {
     $cm = cm::getInstance();
 
-    $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $cm->oPage->theme, $raise_error);
+    $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, CM_CONTENT_PATH . $cm->path_info . "/" . basename($path), $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, $raise_error);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, CM_MODULES_PATH . "/" . $module . $path, $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
         $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $cm->oPage->theme, $raise_error);
     if ($filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $cm->oPage->theme, $raise_error);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, CM_CONTENT_PATH . $cm->path_info . "/" . basename($path), $cm->oPage->theme, $raise_error);
     if ($filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, $raise_error);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, CM_MODULES_PATH . "/" . $module . $path, $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
         $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $cm->oPage->theme, $raise_error);
     if (!$module && $filename === null)
@@ -2046,7 +1797,7 @@ function cm_moduleCascadeFindTemplateByPath($module, $file, $theme, $raise_error
     else
     {
         // INTO GLOBAL THEME DIR
-        $realpath = realpath(FF_THEME_DISK_PATH . "/" . trim($theme, '/') . "/modules/" . $module . "/" . ltrim($file, '/'));
+        $realpath = realpath(FF_THEME_DISK_PATH . "/" . trim($theme, '/') . CM_MODULES_PATH . "/" . $module . "/" . ltrim($file, '/'));
         if (is_file($realpath))
             return $realpath;
 
@@ -2146,12 +1897,7 @@ function cm_findCascadeCSS($page, $theme, $file)
     }
 
     if ($theme != cm_getMainTheme()) {
-        $registry = ffGlobals::getInstance("_registry_");
-
-        if(isset($registry->ignore_defaults_main) && $registry->ignore_defaults_main)
-            return null;
-        else
-            return cm_findCascadeCSS($page, cm_getMainTheme(), $file);
+        return cm_findCascadeCSS($page, cm_getMainTheme(), $file);
     }
 
 

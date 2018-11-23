@@ -67,7 +67,7 @@ class ffWidget_tabs extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -85,7 +85,7 @@ class ffWidget_tabs extends ffCommon
 			$tpl_id = $oPage->components[$component]->getIDIF();
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
-			$oPage->components[$component]->processed_widgets[$id] = "tabs";
+//			$oPage->components[$component]->processed_widgets[$id] = "tabs";
 		}
 		else
 		{
@@ -97,7 +97,7 @@ class ffWidget_tabs extends ffCommon
 		if(isset($data["tab_mode"]))
 			$this->tab_mode = $data["tab_mode"];
 
-		$framework_css = cm_getFrameworkCss();
+		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
 		if(is_array($data["framework_css"]))
 			$this->framework_css = array_replace_recursive($this->framework_css, $data["framework_css"]);
 
@@ -107,8 +107,8 @@ class ffWidget_tabs extends ffCommon
 		$this->tpl[$tpl_id]->set_var("component_id", $id);
 		$this->tpl[$tpl_id]->set_var("tab_id", ($_REQUEST["XHR_CTX_ID"] ? $_REQUEST["XHR_CTX_ID"] . "-" : "") . $id);
 		$this->tpl[$tpl_id]->set_var("framework_css_name", $framework_css["name"]);
-		
-
+//		if($id == "MainRecord")
+//ffErrorHandler::raise("ASD", E_USER_ERROR, null, get_defined_vars());
 		if(!$framework_css["name"]) {
 			$this->oPage[0]->tplAddJs("jquery-ui");
 			$this->oPage[0]->tplAddJs("ff.history");
@@ -144,12 +144,12 @@ class ffWidget_tabs extends ffCommon
 
 			switch($this->tab_mode) {
 				case "right":
-					$wrap_tab_need = cm_getClassByFrameworkCss("menu-vertical-wrap", "tab");
+					$wrap_tab_need = Cms::getInstance("frameworkcss")->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical-right";
 					$tab_position = "Bottom";
 					break;
 				case "left":
-					$wrap_tab_need = cm_getClassByFrameworkCss("menu-vertical-wrap", "tab");
+					$wrap_tab_need = Cms::getInstance("frameworkcss")->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical";
 					break;
 				default:
@@ -161,155 +161,164 @@ class ffWidget_tabs extends ffCommon
 					$this->framework_css["menu"]["tab"] = "menu";
 			}
 
-			$first_menu_current = cm_getClassByFrameworkCss("menu-current", "tab");
+			$first_menu_current = Cms::getInstance("frameworkcss")->get("menu-current", "tab");
 			if(strpos($this->framework_css["pane-item"]["tab"], "effect") === false) {
-				$first_pane_current = cm_getClassByFrameworkCss("pane-current", "tab");
+				$first_pane_current = Cms::getInstance("frameworkcss")->get("pane-current", "tab");
 			} else {
-				$first_pane_current = cm_getClassByFrameworkCss("pane-current-effect", "tab");
+				$first_pane_current = Cms::getInstance("frameworkcss")->get("pane-current-effect", "tab");
 			}
 		}
-		//ffErrorHandler::raise("ASD", E_USER_WARNING, $data, get_defined_vars());
+        //ffErrorHandler::raise("AD", E_USER_WARNING  , $oPage->components[$component], get_defined_vars());
+
+        //ffErrorHandler::raise("ASD", E_USER_WARNING, $data, get_defined_vars());
 		$i = 0;
-		foreach ($data["contents"] as $subkey => $subvalue)
+		if(is_array($data["contents"]) && count($data["contents"]))
 		{
-			$data = array();
-			$output = "";
-			$title = "";
-			if ($subvalue["data"] === null)
-				continue;
-
-            if(isset($subvalue["title"]))
+            foreach ($data["contents"] as $subkey => $subvalue)
             {
-                $title = $subvalue["title"];
-            } else {
-                if (
-                    $subvalue["data"] instanceof ffGrid_base
-                    || $subvalue["data"] instanceof ffRecord_base
-                    || $subvalue["data"] instanceof ffDetails_base
-                )
-                    $title = $subvalue["data"]->title;
-                elseif (
-                    $subvalue["data"] instanceof ffField_base
-                )
-                    $title = $subvalue["data"]->label;
-            }
+                $data = array();
+                $enable_menu = false;
+                $output = "";
+                $title = "";
+                if ($subvalue["data"] === null)
+                    continue;
 
-            if(is_array($subvalue["menu"]) && count($subvalue["menu"]))
-            {
-                $default_menu = $this->framework_css["menu"];
-                foreach($subvalue["menu"] AS $mode => $items)
+                if(isset($subvalue["title"]))
                 {
-                    if(count($items) <= 1)
-                        break;
+                    $title = $subvalue["title"];
+                } else {
+                    if (
+                        $subvalue["data"] instanceof ffGrid_base
+                        || $subvalue["data"] instanceof ffRecord_base
+                        || $subvalue["data"] instanceof ffDetails_base
+                    )
+                        $title = $subvalue["data"]->title;
+                    elseif (
+                        $subvalue["data"] instanceof ffField_base
+                    )
+                        $title = $subvalue["data"]->label;
+                }
 
-                    if($mode == "right") {
-                        $default_menu["tab"] = "menu-vertical-right";
-                    } else {
-                        $default_menu["tab"] = "menu-vertical";
-                    }
-
-
-                    $wrap_menu_start    =  '<div class="' . cm_getClassByFrameworkCss($default_wrap_menu, "col") . '">'
-                        . '<ul ' . cm_getClassByDef($default_menu, null, true) . cm_getClassByFrameworkCss("menu", "data", "tab") . '>';
-                    $wrap_menu_end      = '</ul></div>';
-
-
-                    $menu = $wrap_menu_start;
-                    $menu_current = true;
-                    foreach ($items AS $key => $item)
+                if(is_array($subvalue["menu"]) && count($subvalue["menu"]))
+                {
+                    $default_menu = $this->framework_css["menu"];
+                    foreach($subvalue["menu"] AS $mode => $items)
                     {
-                        $menu_current = ($menu_current === true
-                            ? array("current" => cm_getClassByFrameworkCss("menu-current", "tab"))
+                        if(count($items) <= 1)
+                            break;
+
+                        if($oPage->components[$component] instanceof ffRecord_base && $oPage->components[$component]->tabs == $mode)
+                            break;
+
+                        if($mode == "right") {
+                            $default_menu["tab"] = "menu-vertical-right";
+                        } else {
+                            $default_menu["tab"] = "menu-vertical";
+                        }
+
+
+                        $wrap_menu_start    =  '<div class="' . Cms::getInstance("frameworkcss")->get($default_wrap_menu, "col") . '">'
+                            . '<ul ' . Cms::getInstance("frameworkcss")->getClass($default_menu, null, true) . Cms::getInstance("frameworkcss")->get("menu", "data", "tab") . '>';
+                        $wrap_menu_end      = '</ul></div>';
+
+                        $menu = $wrap_menu_start;
+                        $menu_current = true;
+                        foreach ($items AS $key => $item)
+                        {
+                            $menu_current = ($menu_current === true
+                                ? array("current" => Cms::getInstance("frameworkcss")->get("menu-current", "tab"))
+                                : null
+                            );
+                            $menu .= '<li ' . Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu-item"], $menu_current, true) . '><a href="#tabmenu-' . $key . '" ' . Cms::getInstance("frameworkcss")->get("menu-link", "data", "tab") . ' data-link="'  . ffCommon_url_rewrite($item) . '">' . $item . '</a></li>';
+                        }
+
+                        if($mode == "right") {
+                            $menu_right = $menu . $wrap_menu_end;
+                        } else {
+                            $menu_left = $menu . $wrap_menu_end;
+                        }
+                    }
+                    if($menu_left || $menu_right) {
+                        $enable_menu = true;
+                    }
+                }
+
+                if(is_array($subvalue["data"]))
+                    $data = $subvalue["data"];
+                else
+                    $data[] = $subvalue["data"];
+
+                $pane_current = true;
+                foreach($data AS $key => $content)
+                {
+                    $wrap_pane_item_start = "";
+                    $wrap_pane_item_end = "";
+                    if($enable_menu)
+                    {
+                        $pane_current = ($pane_current === true
+                            ? array("current" => Cms::getInstance("frameworkcss")->get("pane-current-effect", "tab"))
                             : null
                         );
-                        $menu .= '<li ' . cm_getClassByDef($this->framework_css["menu-item"], $menu_current, true) . '><a href="#tabmenu-' . $key . '" ' . cm_getClassByFrameworkCss("menu-link", "data", "tab") . '>' . $item . '</a></li>';
+
+                        $wrap_pane_item_start = '<div id="tabmenu-' . $key . '" ' . Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane-item"], $pane_current, true) . Cms::getInstance("frameworkcss")->get("pane-item", "data", "tab") . '>';
+                        $wrap_pane_item_end = '</div>';
                     }
 
-                    if($mode == "right") {
-                        $menu_right = $menu . $wrap_menu_end;
-                    } else {
-                        $menu_left = $menu . $wrap_menu_end;
+                    $ret = $oPage->getContentData($content);
+                    if (is_array($ret))
+                    {
+                        $oPage->output_buffer["headers"] .= $ret["headers"];
+                        $oPage->output_buffer["footers"] .= $ret["footers"];
+                        $output .= $wrap_pane_item_start . $ret["html"] . $wrap_pane_item_end;
+                    }
+                    else
+                    {
+                        $output .= $wrap_pane_item_start . $ret . $wrap_pane_item_end;
                     }
                 }
-                if($menu_left || $menu_right) {
-                    $enable_menu = true;
-                }
-            }
 
-            if(is_array($subvalue["data"]))
-                $data = $subvalue["data"];
-            else
-                $data[] = $subvalue["data"];
-
-            $pane_current = true;
-			foreach($data AS $key => $content)
-			{
                 if($enable_menu)
                 {
-                    $pane_current = ($pane_current === true
-                        ? array("current" => cm_getClassByFrameworkCss("pane-current-effect", "tab"))
-                        : null
-                    );
+                    $wrap_pane_start    = '<div class="' . Cms::getInstance("frameworkcss")->get($default_wrap_pane, "col") . '">'
+                        . '<div ' . Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane"], null, true) . Cms::getInstance("frameworkcss")->get("pane", "data", "tab") . '>';
+                    $wrap_pane_end      = '</div></div>';
 
-                    $wrap_pane_item_start = '<div id="tabmenu-' . $key . '" ' . cm_getClassByDef($this->framework_css["pane-item"], $pane_current, true) . cm_getClassByFrameworkCss("pane-item", "data", "tab") . '>';
-                    $wrap_pane_item_end = '</div>';
+                    $output = $menu_left . $wrap_pane_start . $output . $wrap_pane_end . $menu_right;
                 }
 
-				$ret = $oPage->getContentData($content);
-				if (is_array($ret))
-				{
-                    $oPage->output_buffer["headers"] .= $ret["headers"];
-                    $oPage->output_buffer["footers"] .= $ret["footers"];
-                    $output .= $wrap_pane_item_start . $ret["html"] . $wrap_pane_item_end;
-				}
-				else
+
+                if(!$title)
+                    $title = $subkey;
+
+                $buttons = $subvalue["buttons"];
+
+                $this->tpl[$tpl_id]->set_var("rrow", $i);
+                $this->tpl[$tpl_id]->set_var("tab_label", $title);
+                $this->tpl[$tpl_id]->set_var("tab_buttons", $buttons);
+                $this->tpl[$tpl_id]->set_var("content", $output);
+
+                /**
+                * Tab manage rows
+                */
+                if($this->tab_mode)
                 {
-                    $output .= $wrap_pane_item_start . $ret . $wrap_pane_item_end;
+                    $this->tpl[$tpl_id]->set_var("tab_pane_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane"], null, true) . Cms::getInstance("frameworkcss")->get("pane", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_pane_item_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . Cms::getInstance("frameworkcss")->get("pane-item", "data", "tab"));
+
+                    $this->tpl[$tpl_id]->set_var("tab_menu_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu"], null, true) . Cms::getInstance("frameworkcss")->get("menu", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_menu_item_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
+                    $this->tpl[$tpl_id]->set_var("tab_menu_link_properties", Cms::getInstance("frameworkcss")->get("menu-link", "data", "tab") . ' data-link="' . ffCommon_url_rewrite($title) . '"');
                 }
-			}
 
-            if($enable_menu)
-            {
-                $wrap_pane_start    = '<div class="' . cm_getClassByFrameworkCss($default_wrap_pane, "col") . '">'
-                    . '<div ' . cm_getClassByDef($this->framework_css["pane"], null, true) . cm_getClassByFrameworkCss("pane", "data", "tab") . '>';
-                $wrap_pane_end      = '</div></div>';
+                $first_menu_current = "";
+                $first_pane_current = "";
 
-                $output = $menu_left . $wrap_pane_start . $output . $wrap_pane_end . $menu_right;
+                $this->tpl[$tpl_id]->parse("SectHeaderRow" . $tab_position, true);
+                $this->tpl[$tpl_id]->parse("SectBodyRow", true);
+
+                $i++;
             }
-
-
-			if(!$title)
-				$title = $subkey;
-
-			$buttons = $subvalue["buttons"];
-
-			$this->tpl[$tpl_id]->set_var("rrow", $i);
-			$this->tpl[$tpl_id]->set_var("tab_label", $title);
-			$this->tpl[$tpl_id]->set_var("tab_buttons", $buttons);
-			$this->tpl[$tpl_id]->set_var("content", $output);
-				
-			/**
-			* Tab manage rows
-			*/
-			if($this->tab_mode)
-			{
-				$this->tpl[$tpl_id]->set_var("tab_pane_properties", cm_getClassByDef($this->framework_css["pane"], null, true) . cm_getClassByFrameworkCss("pane", "data", "tab"));
-				$this->tpl[$tpl_id]->set_var("tab_pane_item_properties", cm_getClassByDef($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . cm_getClassByFrameworkCss("pane-item", "data", "tab"));
-				
-				$this->tpl[$tpl_id]->set_var("tab_menu_properties", cm_getClassByDef($this->framework_css["menu"], null, true) . cm_getClassByFrameworkCss("menu", "data", "tab"));
-				$this->tpl[$tpl_id]->set_var("tab_menu_item_properties", cm_getClassByDef($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
-				$this->tpl[$tpl_id]->set_var("tab_menu_link_properties", cm_getClassByFrameworkCss("menu-link", "data", "tab"));
-			}
-
-			$first_menu_current = "";
-			$first_pane_current = "";
-			
-			$this->tpl[$tpl_id]->parse("SectHeaderRow" . $tab_position, true);
-			$this->tpl[$tpl_id]->parse("SectBodyRow", true);
-
-			$i++;
-		}		
-
+        }
 		/**
 		* Tab container
 		*/
@@ -321,11 +330,11 @@ class ffWidget_tabs extends ffCommon
 				$this->framework_css["menu"]["wrap_pane"] = $default_wrap_pane;
 			
 			if($this->framework_css["menu"]["wrap_menu"]) {
-				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["menu"]["wrap_menu"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["menu"]["wrap_menu"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_end", '</div>');
 			}
 			if($this->framework_css["menu"]["wrap_pane"]) {
-				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["menu"]["wrap_pane"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["menu"]["wrap_pane"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_end", '</div>');
 			}
 

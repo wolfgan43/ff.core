@@ -52,8 +52,8 @@ switch (true)
 		break;
 		
 	case (substr($_SERVER["HTTP_HOST"], (strlen(FF_ENV_PRODUCTION) * -1)) == FF_ENV_PRODUCTION):
-		define("FF_DISK_PATH", $disk_path);
-		define("FF_SITE_PATH", $site_path);
+		define("FF_DISK_PATH", "");
+		define("FF_SITE_PATH", "");
 
 		// DEFAULT DB CONNECTION 
 		define("FF_DATABASE_HOST", "localhost");
@@ -70,6 +70,8 @@ define("APPID", "691C9185-C34B-494Or4Z3-9450-FE374g3r");
 
 // session name
 session_name("PHPSESSFF");
+session_save_path("/tmp");
+//define("FF_THEME_ADMIN", "admin");
 
 
 
@@ -126,7 +128,5 @@ define("FF_DEFAULT_CHARSET", "UTF-8");
 
 define("FF_ENABLE_MEM_TPL_CACHING", false); // Template Caching: SPIEGARE DI CHE SI TRATTA
 define("FF_ENABLE_MEM_PAGE_CACHING", false); // Page Caching: SPIEGARE DI CHE SI TRATTA
-define("FF_DB_INTERFACE", "mysqli");
-define("FF_ORM_ENABLE", true);
 
 //define("COMPOSER_PATH", "/vendor"); //enable if you use composer

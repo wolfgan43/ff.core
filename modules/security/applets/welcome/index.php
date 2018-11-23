@@ -21,7 +21,7 @@ if(mod_security_check_session(false))	{
 	if(defined("MOD_SEC_USER_AVATAR") && MOD_SEC_USER_AVATAR) {
 		$avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR)->getValue();
 
-		if(strlen($avatar) && is_file(FF_DISK_PATH . FF_UPDIR . $avatar)) {
+		if(strlen($avatar) && is_file(FF_DISK_UPDIR . $avatar)) {
 			$tpl->set_var("avatar", CM_SHOWFILES . $avatar);
 			$tpl->parse("SectAvatar", false);
 		}

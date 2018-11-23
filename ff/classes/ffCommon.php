@@ -99,11 +99,25 @@ abstract class ffCommon extends ffClassChecks
 		
 		if (isset($ff_global_setting[$name]) && is_array($ff_global_setting[$name]) && count($ff_global_setting[$name]))
 		{
-			ffCommon::get_defaults_walkarray($this, $ff_global_setting[$name]);
+            $this->get_defaults_walkarray($this, $ff_global_setting[$name]);
 		}
 	}
-	
-	static private function get_defaults_walkarray(&$node, &$array)
+
+    public function getAbsPath($path = null)
+    {
+        return ($this::TOP_DIR != $this::PRJ_DIR
+            && $path
+            && (strpos($path, "/themes/library") === 0
+                || strpos($path, "/themes/restricted") === 0
+                || strpos($path, "/themes/responsive") === 0
+                || strpos($path, "/modules") === 0
+            )
+                ? $this::TOP_DIR
+                : $this::DISK_PATH
+            ) . $path;
+    }
+
+	private function get_defaults_walkarray(&$node, &$array)
 	{
 		foreach ($array as $key => $value)
 		{
@@ -113,13 +127,13 @@ abstract class ffCommon extends ffClassChecks
 				{
 					if (!isset($node[$key]))
 						$node[$key] = array();
-					ffCommon::get_defaults_walkarray($node[$key], $value);
+					$this->get_defaults_walkarray($node[$key], $value);
 				}
 				elseif (is_object($node))
 				{
 					if (!isset($node->$key))
 						$node->$key = array();
-					ffCommon::get_defaults_walkarray($node->$key, $value);
+                    $this->get_defaults_walkarray($node->$key, $value);
 				}
 				else
 					ffErrorHandler::raise("Mismatch variable type (try to init as null)", E_USER_ERROR, null, get_defined_vars());
@@ -240,7 +254,11 @@ abstract class ffCommon extends ffClassChecks
 				break;
 				
 			default:
-				$this->events[$event_name]["queues"][$priority][] = array("index" => $index, "counter" => count($this->events[$event_name]["queues"][$priority]), "event" => $event);
+			    $counter = (is_array($this->events[$event_name]["queues"][$priority])
+                            ? count($this->events[$event_name]["queues"][$priority])
+                            : 0
+                        );
+				$this->events[$event_name]["queues"][$priority][] = array("index" => $index, "counter" => $counter, "event" => $event);
 				break;
 		}
 		
@@ -332,4 +350,32 @@ abstract class ffCommon extends ffClassChecks
 		
 		return $results;
 	}
+
+
+    function setClassByFrameworkCss($resolution)
+    {
+        if($resolution)
+        {
+            if(is_array($resolution)) {
+                $res = $resolution;
+                if(count($resolution) < 4)
+                    $res = array_merge($res, array_fill(count($resolution), 4 - count($resolution), $resolution[count($resolution) - 1]));
+
+                $check = array_count_values($res);
+                if($check[0] == 4)
+                    $res = false;
+
+            } else {
+                $res = array_fill(0, 4, $resolution);
+            }
+        }
+
+        if($res)
+            return array(
+                "xs" => $res[3]
+            , "sm" => $res[2]
+            , "md" => $res[1]
+            , "lg" => $res[0]
+            );
+    }
 }

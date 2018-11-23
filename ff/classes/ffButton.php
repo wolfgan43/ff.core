@@ -60,10 +60,9 @@ class ffButton
 	 * @param String $site_path
 	 * @param String $page_path
 	 * @param String $theme
-	 * @param array() $variant
 	 * @return ffButton_base
 	 */
-	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null, array $variant = null)
+	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null)
 	{
 		if ($page === null && ($disk_path === null || $site_path === null))
 			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, null, get_defined_vars());
@@ -73,7 +72,7 @@ class ffButton
 			if ($page !== null)
 				$theme = $page->theme;
 			else
-				$theme = FF_LOADED_THEME;
+				$theme = FF_MAIN_THEME;
 		}
 			
 		if ($disk_path === null)
@@ -94,32 +93,13 @@ class ffButton
 				$page_path = $page->page_path;
 		}
 			
-		$res = self::doEvent("on_factory", array($page, $disk_path, $site_path, $page_path, $theme, $variant));
+		$res = self::doEvent("on_factory", array($page, $disk_path, $site_path, $page_path, $theme));
 		$last_res = end($res);
 
 		if (is_null($last_res))
 		{
-			$base_path = $disk_path . "/themes/" . $theme;
-			
-			if (!isset($variant["name"]))
-			{
-				$registry = ffGlobals::getInstance("_registry_");
-				if (!isset($registry->themes) || !isset($registry->themes[$theme]))
-				{
-					$registry->themes[$theme] = new SimpleXMLElement($base_path . "/theme_settings.xml", null, true);
-				}
-		
-				$suffix = $registry->themes[$theme]->default_class_suffix;
-				
-				$class_name = __CLASS__ . "_" . $suffix;
-			}
-			else
-				$class_name = $variant["name"];
-				
-			if (!isset($variant["path"]))
-				$base_path .= "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
-			else
-				$base_path .= $variant["path"];
+            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
+            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
 		}
 		else
 		{

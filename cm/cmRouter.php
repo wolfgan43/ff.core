@@ -3,8 +3,8 @@
  * @package ContentManager
  * @subpackage router
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2017, Samuele Diella
- * @license https://opensource.org/licenses/LGPL-3.0
+ * @copyright Copyright (c) 2004-2010, Samuele Diella
+ * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
 
@@ -12,52 +12,49 @@
  * @package ContentManager
  * @subpackage router
  * @author Samuele Diella <samuele.diella@gmail.com>
- * @copyright Copyright (c) 2004-2017, Samuele Diella
- * @license https://opensource.org/licenses/LGPL-3.0
+ * @copyright Copyright (c) 2004-2010, Samuele Diella
+ * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
 class cmRouter extends ffCommon
 {
-	private static $instances = null;
-	
-	const PRIORITY_TOP 			= 0;
-	const PRIORITY_VERY_HIGH	= 1;
-	const PRIORITY_HIGH			= 2;
-	const PRIORITY_NORMAL 		= 3;
-	const PRIORITY_LOW			= 4;
-	const PRIORITY_VERY_LOW		= 5;
-	const PRIORITY_BOTTOM 		= 6;
-	const PRIORITY_DEFAULT 		= cmRouter::PRIORITY_NORMAL;
-	
-	public $rules 			= array();
-	public $named_rules 	= array();
-	public $matched_rules 	= null;
-	public $counter			= 0;
-	
-	public $ordered		= false;
-	
-	private function __construct()
-	{
-	}
-	
-	private function __clone()
-	{
-	}
-	
-	public static function getInstance($name = null)
-	{
-		if ($name == null)
-			$name = "default";
-		
-		if (self::$instances === null)
-			self::$instances = array();
-		
-		if (!isset(cmRouter::$instances[$name]))
-			cmRouter::$instances[$name] = new cmRouter();
-			
-		return cmRouter::$instances[$name];
-	}
-	
+    private static $instances   = array();
+
+    const PRIORITY_TOP 			= 0;
+    const PRIORITY_VERY_HIGH	= 1;
+    const PRIORITY_HIGH			= 2;
+    const PRIORITY_NORMAL 		= 3;
+    const PRIORITY_LOW			= 4;
+    const PRIORITY_VERY_LOW		= 5;
+    const PRIORITY_BOTTOM 		= 6;
+    const PRIORITY_DEFAULT 		= cmRouter::PRIORITY_NORMAL;
+
+    public $rules 			    = array();
+    public $named_rules 	    = array();
+    public $matched_rules 	    = null;
+    public $counter			    = 0;
+
+    public $ordered		        = false;
+
+    private $bucket             = null;
+
+    private function __construct($name = null)
+    {
+        $this->bucket = ($name ? $name : "router");
+    }
+
+    private function __clone()
+    {
+    }
+
+    public static function getInstance($name = "router")
+    {
+        if (!isset(cmRouter::$instances[$name]))
+            cmRouter::$instances[$name] = new cmRouter($name);
+
+        return cmRouter::$instances[$name];
+    }
+
 	public function getRuleById($id)
 	{
 		if (isset($this->named_rules[$id]))
@@ -78,18 +75,18 @@ class cmRouter extends ffCommon
 	 * @param type $reverse
 	 * @param type $query
 	 * @param type $useragent [browser, version]
-	 * @param type $blocking 
+	 * @param type $blocking
 	 * @param type $control (cache)
 	 */
 	public function addRule($source, $destination, $priority = cmRouter::PRIORITY_DEFAULT, $accept_path_info = false, $process_next = false, $index = 0, $attrs = array(), $reverse = null, $query = null, $useragent = null, $blocking = false, $control = false, $hosts = array())
 	{
 		// --------------------------------------------
 		// CREAZIONE REGOLA
-		
+
 		$rule = new SimpleXMLElement("<rule></rule>");
-		
+
 		$rule->addChild("source", $source);
-		
+
 		if (is_array($destination) && count($destination))
 		{
 			$tmp_dest = $rule->addChild("destination");
@@ -99,7 +96,7 @@ class cmRouter extends ffCommon
 			}
 			reset($destination);
 		}
-		
+
 		switch ($priority)
 		{
 			case cmRouter::PRIORITY_TOP:
@@ -129,15 +126,15 @@ class cmRouter extends ffCommon
 			default:
 				$rule->addChild("priority", "NORMAL");
 		}
-		
+
 		if ($accept_path_info)
 			$rule->addChild("accept_path_info");
 
 		if ($process_next)
 			$rule->addChild("process_next");
-		
+
 		$rule->addChild("index", $index);
-		
+
 		if (is_array($attrs) && count($attrs))
 		{
 			foreach ($attrs as $key => $value)
@@ -146,7 +143,7 @@ class cmRouter extends ffCommon
 			}
 			reset($attrs);
 		}
-		
+
 		if (is_array($hosts) && count($hosts))
 		{
 			foreach ($hosts as $value)
@@ -155,13 +152,13 @@ class cmRouter extends ffCommon
 			}
 			reset($attrs);
 		}
-		
+
 		if ($reverse)
-			$rule->addChild("reverse", $reverse);
+			$rule->addChild("reverse");
 
 		if ($query !== null)
 			$rule->addChild("query", $query);
-		
+
 		if (is_array($useragent) && count($useragent))
 		{
 			$tmp_usrag = $rule->addChild("useragent");
@@ -171,58 +168,68 @@ class cmRouter extends ffCommon
 			}
 			reset($useragent);
 		}
-		
+
 		if ($blocking)
 			$rule->addChild("blocking");
 
 		if ($control)
 			$rule->addChild("control");
-		
+
 		// FINE CREAZIONE REGOLA
 		// --------------------------------------------
 
 		$this->addElementRule($rule);
 	}
-	
+
 	public function addXMLRule($xml)
 	{
 		// --------------------------------------------
 		// CREAZIONE REGOLA
-		
+
 		$rule = new SimpleXMLElement($xml);
-		
+
 		// FINE CREAZIONE REGOLA
 		// --------------------------------------------
 
 		$this->addElementRule($rule);
 	}
-	
+    public function loadMem() {
+        $router                             = false;
+        $cache                              = ffCache::getInstance();
+
+        $router                             = $cache->get("cm/" . $this->bucket ."/rules");
+        if($router !== false) {
+            $this->router->rules            = $router;
+            $this->router->named_rules      = $this->cache->get("cm/" . $this->bucket . "/named_rules");
+            $this->router->ordered          = true;
+        }
+
+        return (bool) $router;
+    }
 	public function loadFile($file)
 	{
-		$xml = new SimpleXMLElement("file://" . $file, null, true);
-		
-		if (count($xml->rule))
-		{
-			foreach ($xml->rule as $key => $rule)
-			{
-				if ($key == "comment")
-					continue;
-				
-				$this->addElementRule($rule);
-			}
-		}
+        if(is_file($file)) {
+            $xml = new SimpleXMLElement("file://" . $file, null, true);
+
+            if (count($xml->rule)) {
+                foreach ($xml->rule as $key => $rule) {
+                    if ($key == "comment")
+                        continue;
+
+                    $this->addElementRule($rule);
+                }
+            }
+        }
 		return;
 	}
-	
+
 	private function addElementRule($rule)
 	{
-		$this->ordered = false;
-		
 		$this->counter++;
 		$rule->counter = $this->counter;
 
 		$attrs = $rule->attributes();
-		
+
 		// check required params
 		if (isset($rule->priority))
 			$priority = (string)$rule->priority;
@@ -269,32 +276,7 @@ class cmRouter extends ffCommon
 				$this->rules[cmRouter::PRIORITY_DEFAULT][] = $rule;
 		}
 	}
-	
-	public function orderRules($priority = null)
-	{
-		if ($priority)
-		{
-			if (!isset($this->rules[$priority]))
-				return;
 
-			usort($this->rules[$priority], "ffCommon_IndexOrder");
-			$this->rules[$priority] = array_reverse($this->rules[$priority]);
-		}
-		else
-		{
-			for($i = cmRouter::PRIORITY_TOP; $i <= cmRouter::PRIORITY_BOTTOM; $i++)
-			{
-				if (!isset($this->rules[$i]))
-					continue;
-
-				usort($this->rules[$i], "ffCommon_IndexOrder");
-				$this->rules[$i] = array_reverse($this->rules[$i]);
-			}
-			
-			$this->ordered = true;
-		}
-	}
-	
 	public function process($url, $query = null, $host = null)
 	{
 		$this->matched_rules = array();
@@ -304,20 +286,20 @@ class cmRouter extends ffCommon
 			if (!isset($this->rules[$i]))
 				continue;
 
-			if (!$this->ordered)
-				$this->orderRules($i);
-				
+			usort($this->rules[$i], "ffCommon_IndexOrder");
+			$this->rules[$i] = array_reverse($this->rules[$i]);
+
 			foreach ($this->rules[$i] as $key => $value)
 			{
 				$attrs = $value->__attributes; //cmRouter::getRuleAttrs($value);
-				
+
 				if ($host !== null && isset($value->host))
 				{
 					if (!isset($attrs["host_mode"]) || strtolower($attrs["host_mode"]) == "allow")
 						$host_allow = false;
 					if (strtolower($attrs["host_mode"]) == "disallow")
 						$host_allow = true;
-					
+
 					if (count($value->host) == 1)
 					{
 						$host_matches = array();
@@ -346,11 +328,11 @@ class cmRouter extends ffCommon
 							}
 						}
 					}
-					
+
 					if (!$host_allow)
 						continue;
 				}
-				
+
 				if (count($value->source) == 1)
 				{
 					$matches = array();
@@ -361,7 +343,7 @@ class cmRouter extends ffCommon
 				else
 				{
 					$rc = false;
-					
+
 					for($c = 0; $c < count($value->source); $c++)
 					{
 						$matches = array();
@@ -371,21 +353,38 @@ class cmRouter extends ffCommon
 						$rc |= $sub_rc;
 					}
 				}
-				
+
 				if ($rc)
 				{
 					if (strlen((string)$attrs["id"]))
 						$this->matched_rules[(string)$attrs["id"]] = array("rule" => $value, "params" => $matches);
 					else
-						$this->matched_rules[] = array("rule" => $value, "params" => $matches, "host_params" => $host_matches);
-				}
+						$this->matched_rules[] = array("rule" => $value, "params" => $matches);
+                }
 			}
 			reset($this->rules[$i]);
+
+
 		}
-		
-		$this->ordered = true;
 	}
-	
+
+
+	public function getMatchedRules($key) {
+
+	    if(is_array($this->matched_rules) && count($this->matched_rules)) {
+	        foreach ($this->matched_rules AS $name => $router) {
+                if(isset($router["rule"]->$key)) {
+                    $res = (array) $router["rule"]->$key;
+                    unset($res["__tostring"]);
+                    unset($res["__attributes"]);
+                    break;
+                }
+            }
+        }
+
+       return $res;
+    }
+
 	static function getRuleAttrs($rule)
 	{
 		if (get_class($rule) == "ffSerializable")

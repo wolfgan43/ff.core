@@ -52,7 +52,7 @@ class ffWidget_checkgroup
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -151,7 +151,7 @@ class ffWidget_checkgroup
 					$class = $class . ($class ? " " : "") . "off";				
 				}
 				
-				$class .= " " . cm_getClassByFrameworkCss("row-padding", "form");
+				$class .= " " . Cms::getInstance("frameworkcss")->get("row-padding", "form");
 				$class .= " checkbox";
 
 				$this->tpl[$tpl_id]->set_var("class", $class);

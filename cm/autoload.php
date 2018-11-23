@@ -39,6 +39,10 @@ spl_autoload_register(function ($class) {
             case "PHPExcel":
                 require(__TOP_DIR__ . "/library/PHPexcel/class.PHPexcel" . $php_ext);
                 break;
+            case "OAuth2":
+                require FF_DISK_PATH . "/library/OAuth2/Autoloader.php";
+                OAuth2\Autoloader::register();
+                break;
             default:
         }
     }

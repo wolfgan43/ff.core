@@ -9,7 +9,7 @@
  * @link http://www.formsphpframework.com
  */
 
-$db = ffDBConnection::factory("db_sql_" . FF_DB_INTERFACE);
+$db = ffDBConnection::factory("db_sql_mysqli");
 $globals = ffGlobals::getInstance("ds");
 
 $globals->tables = $db->queryStructure(ffDBAdapter::TYPE_DB);

@@ -196,7 +196,6 @@ CREATE TABLE IF NOT EXISTS `cm_showfiles_modes` (
   `wmk_enable` char(1) NOT NULL,
   `wmk_image` varchar(255) NOT NULL,
   `wmk_alignment` varchar(255) NOT NULL,
-  `format_jpg_quality` int(3) NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
@@ -487,22 +486,6 @@ INSERT INTO `ff_languages` (`ID`, `code`, `description`, `status`, `tiny_code`, 
 (95, '', '', 0, '', 'vo'),
 (96, '', '', 0, '', 'yi'),
 (97, '', '', 0, '', 'zh');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `cm_charset_decode`
---
-
-DROP TABLE IF EXISTS `cm_charset_decode`;
-CREATE TABLE IF NOT EXISTS `cm_charset_decode` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `value` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `ff_languages_names`

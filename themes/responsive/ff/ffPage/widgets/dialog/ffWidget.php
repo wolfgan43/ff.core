@@ -44,7 +44,7 @@ class ffWidget_dialog extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("site_path", $this->oPage[0]->site_path);
@@ -69,7 +69,7 @@ class ffWidget_dialog extends ffCommon
 		$this->tpl[$tpl_id]->set_var("id", $id);
 		$this->tpl[$tpl_id]->set_var("name", $options["name"]);
 		
-		$framework_css = cm_getFrameworkCss();
+		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
 		
 		if (array_key_exists("id", $options))
 			$this->tpl[$tpl_id]->set_var("id_tag", ' id="' . $options["id"] . '"');
@@ -126,10 +126,10 @@ class ffWidget_dialog extends ffCommon
 		
 		if($framework_css["name"]) {
 			if(!is_numeric($options["width"])) {
-				$options["dialogClass"] = cm_getClassByFrameworkCss("window-" . $options["width"], "dialog", $options["dialogClass"]);
+				$options["dialogClass"] = Cms::getInstance("frameworkcss")->get("window-" . $options["width"], "dialog", $options["dialogClass"]);
 				$options["width"] = "";
 			} else {
-				$options["dialogClass"] = cm_getClassByFrameworkCss("window", "dialog", $options["dialogClass"]);		
+				$options["dialogClass"] = Cms::getInstance("frameworkcss")->get("window", "dialog", $options["dialogClass"]);		
 			}
 		}
 		if($options["callback"]) 

@@ -13,7 +13,17 @@ ff.ffField.gmap3 = (function () {
 
 		"init" : function (key, sensor, region)
 		{
-			ff.ffField.gmap3.loadMaps(true); 
+            if(window["google"] === undefined) {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                var url_data = window.location.href.parseUri();
+                script.src = url_data.protocol + "://maps.googleapis.com/maps/api/js?key=" + key + "&sensor=" + (sensor ? "true" : "false") + (region ? "&" + region : "") +"&callback=ff.ffField.gmap3.loadMaps";
+                document.body.appendChild(script);
+
+                window.onload = ff.ffField.gmap3.init;
+            } else {
+                ff.ffField.gmap3.loadMaps(true);
+            }
 		},
 		"addData": function(data) 
 		{

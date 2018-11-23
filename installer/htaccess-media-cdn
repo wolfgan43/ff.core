@@ -1,0 +1,19 @@
+#############
+# Using Sub Domains for Render Images
+#------------
+
+#media with SubDomains
+RewriteCond %{HTTP_HOST}                    ^media\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
+RewriteCond %{REQUEST_URI}  	            !^[FF_SITE_PATH]/cache/.thumbs
+RewriteCond %{REQUEST_URI}  	            !^[FF_SITE_PATH]/cm/error\.php
+RewriteRule ^(.*)                           [FF_SITE_PATH]/cache/.thumbs/$0 [L,QSA]
+
+#media:404 goto static
+#RewriteCond %{HTTP_HOST}                   ^media\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
+#RewriteCond %{REQUEST_FILENAME}            ^!-f
+#RewriteRule ^cache/.thumbs/(.*)            [DOMAIN_PROTOCOL]://static.[DOMAIN_NAME].[DOMAIN_EXT]/$1 [L,R=302,E=nocache:1]
+
+#static with SubDomains
+RewriteCond %{HTTP_HOST}                    ^static\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
+RewriteCond %{REQUEST_URI}  	            !^[FF_SITE_PATH]/cm/static\.php
+RewriteRule ^(.*)                           [FF_SITE_PATH]/cm/static\.php?_ffq_=%1 [L,QSA]

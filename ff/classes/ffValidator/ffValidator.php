@@ -59,7 +59,6 @@ class ffValidator
 	 * @param string $site_path
 	 * @param string $page_path
 	 * @param string $theme
-	 * @param mixed $variant
 	 * @return ffValidator_base
 	 */
 	public static function getInstance($name)

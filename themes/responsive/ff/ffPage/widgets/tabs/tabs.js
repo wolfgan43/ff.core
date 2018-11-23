@@ -15,7 +15,33 @@ var that = { /* publics */
 					"event_name" : "initIFElement"
 					, "event_params" : [id, "tabs"]
 				});
-				$('a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+
+				if(window.location.hash) {
+                    $('a[href="' + window.location.hash + '"]').tab('show');
+                }
+				$('ul a[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+					if($(this).closest(".ff-modal").length) {
+
+                    } else if(window.location.hash && $(this).closest("ul").is(".tabs-left, .tabs-right")) {
+
+					} else if(window.location.hash != jQuery(this).attr("href")) {
+                        //ff.updateQueryString(location.hash, "q:" + key, jQuery("#" + key + "_src").val(), "#");
+						var hash = jQuery(this).attr("href");
+                        if(history.pushState) {
+                            history.pushState(null, null, hash);
+                        } else {
+                            location.hash = hash;
+                        }
+                       // ff.ffPage.changeLinkRetUrl(hash);
+					}
+
+					if($(this).data("link")) {
+						var tabLink = $(this).data("link");
+						$(this).data("link", tabLink + "-active");
+                        $('a[data-link="' + tabLink + '"]').click();
+                        $(this).data("link", tabLink);
+                    }
+
 				 	that.doEvent({
 						"event_name" : "onActivate"
 						, "event_params" : [id, event, { "newPanel": jQuery(jQuery(this).attr("href"))}]

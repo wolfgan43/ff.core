@@ -205,7 +205,7 @@ $cm->oPage->addContent($tpl, null, "login");
 
 if(MOD_SEC_CSS_PATH !== false && isset($cm->router->matched_rules["mod_sec_login"]))
 {
-
+/*
 	if(MOD_SEC_CSS_PATH)
 		$filename = MOD_SEC_CSS_PATH;
 	else
@@ -218,7 +218,16 @@ if(MOD_SEC_CSS_PATH !== false && isset($cm->router->matched_rules["mod_sec_login
 		, "path" => $ret["path"]
 		, "priority" => cm::LAYOUT_PRIORITY_HIGH
 		, "index" => 100
-	));
+	));*/
+    $filename = (MOD_SEC_CSS_PATH
+        ? MOD_SEC_CSS_PATH
+        : "/modules/security/themes/" . cm_getMainTheme() . "/css/ff.modules.security.css"
+    );
+    $cm->oPage->tplAddCss("ff.modules.security", array(
+        "file" =>  basename($filename)
+        , "path" => ffCommon_dirname($filename)
+    ));
+
 }
 
 $res = $cm->modules["security"]["events"]->doEvent("onTplLoad", array(&$tpl, $logged, &$sErrorCode, &$sError));

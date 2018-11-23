@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ VGallery: CMS based on FormsFramework
+  ~ Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~  @package VGallery
+  ~  @subpackage core
+  ~  @author Alessandro Stucchi <wolfgan@gmail.com>
+  ~  @copyright Copyright (c) 2004, Alessandro Stucchi
+  ~  @license http://opensource.org/licenses/gpl-3.0.html
+  ~  @link https://github.com/wolfgan43/vgallery
+  -->
+    <configdata>
+    <menu>
+        <packages label="Packages" path="/restricted/packages" location="brand" />
+        <docs path="/restricted/docs" label="Docs (under development)" acl="3">
+            <pages path="/restricted/docs/pages" label="Pages" icon="file" />
+            <layouts path="/restricted/docs/layouts" label="Layouts" icon="object-group" />
+
+            <tables path="/restricted/docs/tables" label="Tables" description="questa e una descrizione di prova" readonly="h4" badge="5" icon="table" actions="/restricted/docs/tables/data_tables" />
+            <tables_basic path="/restricted/docs/tables/basic" label="Basic Tables" actions="/restricted/docs/tables/basic" />
+            <tables_data path="/restricted/docs/tables/data_tables" label="Data Tables" />
+            <tables_widgets path="/restricted/docs/tables/widgets" label="Widgets" />
+
+            <forms path="/restricted/docs/forms" label="Forms" description="Questa è una descrizione di prova" readonly="h4" badge="4" icon="pencil" actions="" />
+            <forms_controls path="/restricted/docs/forms/controls" label="Controls" badge="basic" />
+            <forms_controls_maps path="/restricted/docs/forms/controls/maps" label="Maps" />
+            <forms_controls_widgets path="/restricted/docs/forms/controls/widgets" label="Advanced Controls" badge="12" />
+            <forms_controls_uploads path="/restricted/docs/forms/controls/uploads" label="File Uploads" />
+            <forms_layouts path="/restricted/docs/forms/layouts" label="Form Layouts" badge="4" actions="/restricted/docs/forms/layouts" />
+            <forms_datatable path="/restricted/docs/forms/datatable" label="Form + DataTable" actions="/restricted/docs/forms/datatable" />
+            <forms_validation path="/restricted/docs/forms/validation" label="Form Validation" />
+
+
+            <ui path="/restricted/docs/ui" label="UI Kit" description="Questa è una descrizione di prova" readonly="h4"  icon="briefcase" actions="" />
+            <ui_cards path="/restricted/docs/ui/cards" label="Cards" />
+            <ui_buttons path="/restricted/docs/ui/buttons" label="Buttons" description="Questa è una descrizione di prova" />
+            <ui_modal path="/restricted/docs/ui/modal" label="Modal" />
+            <ui_tabs path="/restricted/docs/ui/tabs" label="Tabs" />
+            <ui_notifications path="/restricted/docs/ui/notifications" label="Notificatinons" />
+
+            <ui_grid path="/restricted/docs/ui/grid" label="Grid" />
+            <ui_general path="/restricted/docs/ui/general" label="General" />
+            <ui_typography path="/restricted/docs/ui/typography" label="Typography" />
+            <ui_icons path="/restricted/docs/ui/icons" label="Icons" />
+            <ui_media path="/restricted/docs/ui/media" label="Media" />
+        </docs>
+        <media path="/restricted/media" label="Media" location="brand" acl="3" />
+        <thumbs path="/restricted/thumbs" label="Thumbs" location="brand" acl="3" />
+        <layout path="/restricted/layout" label="Layout" icon="object-group" location="brand" position="footer" acl="3" />
+    </menu>
+    <pages>
+        <page path="/" title="Welcome" theme="false" layout="" class_body="" form="false" compact_js="true" compact_css="true" compact_html="true" framework_css="bootstrap" font_icon="fontawesome">
+            <!--<js path="jquery" />
+            <js path="bootstrap" />
+            <css name="bootstrap" />
+            <fonts name="fontawesome" />-->
+        </page>
+    </pages>
+    <env>
+        <CM_MIME_FINFO value="" />
+        <CM_ORM_ENABLE value="false" />
+    </env>
+</configdata>

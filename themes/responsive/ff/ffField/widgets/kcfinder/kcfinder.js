@@ -28,7 +28,6 @@ ff.ffField.kcfinder = (function () {
 			this.previewUrl			= params.previewUrl;
 			this.previewPath		= ff.site_path + "/cm/showfiles.php";
 			this.writable           = params.writable;
-			this.model				= params.model;
 			this.modelThumb			= params.modelThumb;
 			this.showFile			= params.showFile;
 			this.aviary				= params.aviary;
@@ -103,15 +102,12 @@ ff.ffField.kcfinder = (function () {
 			var previewUrl = this.previewUrl;
 			var writable = this.writable;
 		   /* var relativePath = this.relativePath;*/
-			var model = this.model;
 			var modelThumb = this.modelThumb;
 
 	        var byteSize = '';
 	        var suffix = '';
 		
-			
-		    if(model == 'default' && modelThumb == '')
-		        modelThumb = "thumb";
+
 			
 		    if(previewUrl == '') {
 			    if(modelThumb == '') {
@@ -145,17 +141,11 @@ ff.ffField.kcfinder = (function () {
 					descBlock = '<span class="file_name">' + strResponse + ' ' + byteSize + suffix + '' + '</span>';  
 
 				if(aviary)
-					editBlock = '<div class="edit"><a href="javascript:void(0);" alt="modify" class="' + icons["aviary"] + '" onclick="ff.load(\'ff.ffField.aviary\', function() { ff.ffField.aviary.launch(\'' + aviary.key + '\', \'' + aviary.tools + '\', \'' + aviary.theme + '\', \'' + aviary.version + '\', \'' + aviary.post_url + '\', \'' + aviary.img_hash + '\', \'' + field.id + '_img' + '\', \'' + viewFullUrl + '\', \'' + fileUrl.replace(ff.site_path + this.baseUrl, "") + '\'); });"></a></div>';
+					editBlock = '<div class="edit"><a href="javascript:void(0);" alt="modify" class="' + icons["aviary"] + '" onclick="ff.load(\'ff.ffField.aviary\', function() { ff.ffField.aviary.launch(\'' + field.id + '_img' + '\', \'' + viewFullUrl + '\', \'' + aviary.img_hash + '\', \'' + aviary.key + '\', \'' + aviary.tools + '\', \'' + aviary.theme + '\', \'' + aviary.version + '\', \'' + aviary.post_url + '\'); });"></a></div>';
 
 				cancelBlock = '<div class="cancel"><a href="javascript:ff.ffField.uploadifive.del(\'' + component + '\');" alt="delete" class="' + icons["cancel"] + '"></a></div>';
 
-		        if(model == "vertical") {
-	                jQuery("#uploadifive_" + idComponent).html('<span class="top">' + previewBlock + editBlock + cancelBlock + '</span>' + descBlock);
-				} else if(model == "horizzontal") {
-					jQuery("#uploadifive_" + idComponent).html('<span class="top">' + previewBlock + editBlock + cancelBlock + '</span>' + descBlock);
-				} else {
-					jQuery("#uploadifive_" + idComponent).html('<span class="top">' + previewBlock + editBlock + cancelBlock + '</span>' + descBlock);
-				}
+				jQuery("#uploadifive_" + idComponent).html('<span class="top">' + previewBlock + editBlock + cancelBlock + '</span>' + descBlock);
 				/*} */
 
 

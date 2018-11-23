@@ -1,10 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ VGallery: CMS based on FormsFramework
+  ~ Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~  @package VGallery
+  ~  @subpackage core
+  ~  @author Alessandro Stucchi <wolfgan@gmail.com>
+  ~  @copyright Copyright (c) 2004, Alessandro Stucchi
+  ~  @license http://opensource.org/licenses/gpl-3.0.html
+  ~  @link https://github.com/wolfgan43/vgallery
+  -->
+
 <configdata>
 	<menu>
 			<domains label="Domains" path="/restricted/domains" icon="globe" location="brand" position="header" acl="3" settings="MOD_SEC_MULTIDOMAIN" />
 			<packages label="Packages" path="/restricted/packages" icon="cubes" location="brand" position="header" acl="3" settings="MOD_SEC_MULTIDOMAIN" />
 			<profile label="Profilo" path="/restricted/profile" location="accountpanel"  />
-			<users label="Utenti" path="/restricted/users" icon="users" location="brand" position="footer" acl="3" />
+			<users label="Gestione Utenti" path="/restricted/users" icon="users" location="account" acl="3" />
+			<users2 label="Gestione Utenti" path="/restricted/users" icon="users" location="brand"  acl="3" />
 			<crypt label="Crypt" path="/restricted/crypt" icon="lock" location="brand" acl="3" redir="/restricted/crypt/init" settings="MOD_SEC_CRYPT">
 				<init path="/restricted/crypt/init" label="Crypt Init" settings="MOD_SEC_CRYPT"></init>
 				<view path="/restricted/crypt/view" label="Crypt View" settings="MOD_SEC_CRYPT"></view>

@@ -1,4 +1,29 @@
 <?php
+/**
+ * VGallery: CMS based on FormsFramework
+ * Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @package VGallery
+ *  @subpackage core
+ *  @author Alessandro Stucchi <wolfgan@gmail.com>
+ *  @copyright Copyright (c) 2004, Alessandro Stucchi
+ *  @license http://opensource.org/licenses/gpl-3.0.html
+ *  @link https://github.com/wolfgan43/vgallery
+ */
+
 define("MOD_SECURITY_PACKAGE_PUBLIC", 0);
 define("MOD_SECURITY_PACKAGE_PRIVATE", 1);
 
@@ -15,8 +40,8 @@ define("MOD_SEC_ERROR_LOGIN_FILL_ALL_FIELDS", "login_fill_all_fields");
 $cm = cm::getInstance();
 
 $cm->addEvent("on_load_module", "mod_security_cm_on_load_module");
-if (isset($cm->modules["restricted"]["events"]))
-	$cm->modules["restricted"]["events"]->addEvent("on_layout_process", "mod_security_cm_on_layout_process");
+//if (isset($cm->modules["restricted"]["events"]))
+//	$cm->modules["restricted"]["events"]->addEvent("on_layout_process", "mod_security_cm_on_layout_process");
 
 if (MOD_SEC_SOCIAL_GOOGLE)
 	require("Google/Service/Oauth2.php");
@@ -118,7 +143,7 @@ function mod_sec_showfiles_before_parsing_path($path_temp, $path_saved, $params,
 	}
 }
 
-function mod_security_cm_on_layout_process()
+/*function mod_security_cm_on_layout_process()
 {
 	$cm = cm::getInstance();
 	if (isset($cm->oPage->sections["accountpanel"]))
@@ -129,7 +154,7 @@ function mod_security_cm_on_layout_process()
 		$cm->oPage->sections["lang"]["events"]->addEvent("on_process", "mod_security_cm_on_load_lang");
 	if (isset($cm->oPage->sections["brand"]))
 		$cm->oPage->sections["brand"]["events"]->addEvent("on_process", "mod_security_cm_on_load_brand");
-}
+}*/
 
 function mod_security_cm_on_load_module($cm, $mod)
 {
@@ -197,7 +222,12 @@ function mod_security_load_config($file)
 
 	$xml = new SimpleXMLElement("file://" . $file, null, true);
 
-	if (isset($xml->session) && count($xml->session->children()))
+    //carica le env relative al modulo
+    if (isset($xml->env)) {
+        $cm->load_env_by_xml($xml->env);
+    }
+
+    if (isset($xml->session) && count($xml->session->children()))
 	{
 		foreach ($xml->session->children() as $key => $value)
 		{
@@ -617,9 +647,12 @@ function mod_security_check_session($prompt_login = true, $path = null, $just_ex
 		die("\n" . "sess_" . $sessid);
 */		
 	$tmp_path = session_save_path();
-	if (substr($tmp_path, -1) !== "/")
-			$tmp_path .= "/";
-
+    if(!strlen($tmp_path)){
+        $tmp_path = sys_get_temp_dir();
+    }
+	if (substr($tmp_path, -1) !== "/") {
+        $tmp_path .= "/";
+    }
 	if(!file_exists($tmp_path . "sess_" . $sessid))
 	{
 		if ($just_exists)
@@ -786,7 +819,7 @@ function access_denied($confirmurl = "", $dlg_site_path = "")
 	if (!strlen($confirmurl))
 		$confirmurl = $_SERVER["HTTP_REFERER"];
 	if (!strlen($confirmurl))
-		$confirmurl = FF_SITE_PATH . "/" . $cm->oPage->get_globals();
+		$confirmurl = FF_SITE_PATH . "/" . ($cm->oPage ? $cm->oPage->get_globals() : "");
 
 	if (!strlen($dlg_site_path))
 		$dlg_site_path = FF_SITE_PATH . "/dialog";
@@ -3366,12 +3399,8 @@ function mod_sec_get_avatar($avatar, $mode = null, $theme = null, $svg = false)
         )
     )
         $res = $avatar;
-    elseif($avatar && is_file(FF_DISK_PATH . FF_UPDIR . $avatar))
-	    $res = (substr(strtolower(CM_SHOWFILES), 0, 7) == "http://"
-				|| substr(strtolower(CM_SHOWFILES), 0, 8) == "https://"
-					? ""
-					: FF_SITE_PATH
-				) . CM_SHOWFILES . ($mode
+    elseif($avatar && is_file(FF_DISK_UPDIR . $avatar))
+	    $res = CM_SHOWFILES . ($mode
 	                            ? "/" . $mode
 	                            : ""
             				) . $avatar;
@@ -3464,8 +3493,8 @@ function modsec_getOauth2Server()
 	if (ffIsset($_REQUEST, "__OAUTH2DEBUG__"))
 	{
 		$parts = explode("/", $_SERVER["REQUEST_URI"]);
-		@mkdir(CM_CACHE_PATH . "/oauth2", 0777, true);
-		$fp = fopen(CM_CACHE_PATH . "/oauth2/" . end($parts) . "_" . uniqid(), "w+");
+		@mkdir(CM_CACHE_DISK_PATH . "/oauth2", 0777, true);
+		$fp = fopen(CM_CACHE_DISK_PATH . "/oauth2/" . end($parts) . "_" . uniqid(), "w+");
 		fwrite($fp, print_r($_REQUEST, true));
 		fclose($fp);
 	}
@@ -3509,8 +3538,8 @@ function modsec_OAuth2Error($response)
 	$tpl->set_var("theme", $cm->oPage->theme);
 	$tpl->set_var("http_domain", $_SERVER["HTTP_HOST"]);
 
-	$cm->preloadApplets($tpl);
-	$cm->parseApplets($tpl);
+	//$cm->preloadApplets($tpl);
+	//$cm->parseApplets($tpl);
 
 	$tpl->set_var("ret_url",			$_REQUEST["ret_url"]);
 	$tpl->set_var("encoded_ret_url",	rawurlencode($_REQUEST["ret_url"]));
@@ -3907,8 +3936,8 @@ function mod_sec_login_tpl_load($logged, $template_file = null) {
 	$tpl->set_var("theme", $cm->oPage->theme);
 	$tpl->set_var("http_domain", $_SERVER["HTTP_HOST"]);
 
-	$cm->preloadApplets($tpl);
-	$cm->parseApplets($tpl);
+	//$cm->preloadApplets($tpl);
+	//$cm->parseApplets($tpl);
 
 	$tpl->set_var("ret_url",			$cm->oPage->ret_url);
 	$tpl->set_var("encoded_ret_url",	rawurlencode($cm->oPage->ret_url));

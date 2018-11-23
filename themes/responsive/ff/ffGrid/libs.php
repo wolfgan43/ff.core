@@ -7,9 +7,6 @@ return array(
 					"path" => "/themes/responsive/ff/ffGrid"
 					, "file" => "ffGrid.js"
 					, "index" => 100
-					, "css_deps" => array(
-						"ff.core" => null
-					)
 				)
 			)
 		)

@@ -26,20 +26,24 @@
 
 $cm->oPage->layer = "empty";
 
-$framework_css = mod_sec_get_framework_css();
-$mod_sec_login = $cm->router->getRuleById("mod_sec_login");
-$mod_sec_dashboard = $cm->router->getRuleById("mod_sec_dashboard");
-if($mod_sec_dashboard)
-	$dashboard_ret_url = $mod_sec_dashboard->reverse;
+$framework_css = mod_auth_get_framework_css();
+$mod_auth_login = $cm->router->getRuleById("mod_auth_login");
+$mod_auth_dashboard = $cm->router->getRuleById("mod_auth_dashboard");
+if($mod_auth_dashboard) {
+    $dashboard_ret_url = $mod_auth_dashboard->reverse;
+}
 
-if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)
+if (Auth::check() && !Auth::isGuest())
 {
-	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
-	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
-	if ($filename === null)
-		$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
+	if ($filename === null) {
+        $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
+    }
+	if ($filename === null) {
+        $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/logged.html", $cm->oPage->theme, false);
+    }
+	if ($filename === null) {
+        $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/logged.html", $cm->oPage->theme);
+    }
 
 	$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 	$tpl->load_file(basename($filename), "main");
@@ -54,59 +58,38 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
    	$component_class["base"] = $framework_css["component"]["class"];
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
-        if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
-        else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+        if(is_array($framework_css["component"]["grid"])) {
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
+        } else {
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 
-	if(MOD_SEC_USER_AVATAR) {
-		if(MOD_SEC_GROUPS) {
-		    $user_permission = get_session("user_permission");
-			$avatar = $user_permission["avatar"];
-		} else {
-		    $avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
-		}
-		
-		$tpl->set_var("avatar_class", cm_getClassByDef($framework_css["logout"]["account"]["avatar"]));
-		$tpl->set_var("avatar", Auth::getUserAvatar(cm::env("MOD_SEC_USER_AVATAR_MODE"), $avatar));
+	if(cm::env("MOD_AUTH_USER_AVATAR")) {
+		$tpl->set_var("avatar_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["avatar"]));
+		$tpl->set_var("avatar", Auth::getUserAvatar(cm::env("MOD_AUTH_USER_AVATAR")));
 		$tpl->parse("SectAvatar", false);
 	}
-		
-	$email = ffCommon_specialchars(mod_security_getUserInfo("email", null, $db)->getValue());
-	
-	$username = ffCommon_specialchars(mod_security_getUserInfo(MOD_SEC_USER_FIRSTNAME, null, $db)->getValue() . " " . mod_security_getUserInfo(MOD_SEC_USER_LASTNAME, null, $db)->getValue());
-	if(!$username)
-		$username = ffCommon_specialchars(mod_security_getUserInfo(MOD_SEC_USER_FIRSTNAME, null, $db)->getValue());
-	if(!$username) {
-		if((MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "username"))
-			$username = ffCommon_specialchars(mod_security_getUserInfo("username", null, $db)->getValue());
-		elseif((MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "email")) {
-			$username = $email;
-			$email = "";
-		}
-	}
 
-	if($username) {
-		//$tpl->set_var("username_class", cm_getClassByDef($framework_css["logout"]["account"]["username"]));
-		$tpl->set_var("username", $username);
+	$user = Auth::get("user");
+
+	if($user->username) {
+		$tpl->set_var("username", $user->username);
 		$tpl->parse("SectUsername", false);
 	}
-	if($email) {
-		//$tpl->set_var("email_class", cm_getClassByDef($framework_css["logout"]["account"]["email"]));
-		$tpl->set_var("email", $email);
+	if($user->email) {
+		$tpl->set_var("email", $user->email);
 		$tpl->parse("SectEmail", false);
 	}
 
-    $tpl->set_var("logout_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-    $tpl->set_var("login_button_class", cm_getClassByDef($framework_css["actions"]["login"]));
+    $tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+    $tpl->set_var("login_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["login"]));
     $tpl->set_var("login_url", $dashboard_ret_url);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 	$cm->oPage->addContent($tpl);
 	return;	
@@ -118,8 +101,8 @@ use Facebook\GraphUser;
 use Facebook\FacebookRequestException;
 use Facebook\FacebookRedirectLoginHelper;
 
-FacebookSession::setDefaultApplication(MOD_SEC_SOCIAL_FACEBOOK_APPID, MOD_SEC_SOCIAL_FACEBOOK_SECRET);
-$helper = new FacebookRedirectLoginHelper(MOD_SEC_SOCIAL_FACEBOOK_CLIENT_REDIR_URI);
+FacebookSession::setDefaultApplication(cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_ID"), cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_SECRET"));
+$helper = new FacebookRedirectLoginHelper(cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_REDIRECT"));
 $helper->disableSessionStatusCheck();
 
 $_SESSION['FBRLH_' . 'state'] = $_GET["state"];
@@ -134,99 +117,111 @@ try {
                 $session, 'GET', '/me?fields=id,email,first_name,last_name,is_verified,birthday,cover,name,gender'
             ))->execute()->getGraphObject(GraphUser::className());
 
-
-            $arrDefaultFields = explode(",", MOD_SEC_DEFAULT_FIELDS);
-            $arrUserParams["email"] = $user_profile->getEmail();
-
-            if(!strlen($username)) {
-                $username = $user_profile->getName();
-            }
-            if(!strlen($username)) {
-                $arrUsername = explode("@", $arrUserParams["email"]);
-
-                $username = $arrUsername[0] . " " . substr($arrUsername[1], 0, strpos($arrUsername[1], "."));
-                $username = ucwords(str_replace(array(".", "-", "_"), array(" "), $username));
-            }
-
-            $arrUserParams["username"] = $username;
-            if(MOD_SEC_STRICT_FIELDS)
-            {
-                if(strlen(MOD_SEC_USER_FIRSTNAME))
-                {
-                    if(array_search(MOD_SEC_USER_FIRSTNAME, $arrDefaultFields) === false)
-                        $arrUserField[MOD_SEC_USER_FIRSTNAME] = $user_profile->getFirstName();
-                    else
-                        $arrUserParams[MOD_SEC_USER_FIRSTNAME] = $user_profile->getFirstName();
-                }
-
-                if(strlen(MOD_SEC_USER_LASTNAME))
-                {
-                    if(array_search(MOD_SEC_USER_LASTNAME, $arrDefaultFields) === false)
-                        $arrUserField[MOD_SEC_USER_LASTNAME] = $user_profile->getLastName();
-                    else
-                        $arrUserParams[MOD_SEC_USER_LASTNAME] = $user_profile->getLastName();
-                }
-
-                $cover = $user_profile->getProperty("cover");
-                if($cover) {
-                    if(array_search(MOD_SEC_USER_AVATAR, $arrDefaultFields) === false)
-                        $arrUserField[MOD_SEC_USER_AVATAR] = $cover->getProperty("source");
-                    else
-                        $arrUserParams[MOD_SEC_USER_AVATAR] = $cover->getProperty("source");
-                }
-            }
-            else
-            {
-                if(array_search("name", $arrDefaultFields) === false)
-                    $arrUserField["name"] = $user_profile->getFirstName();
-                else
-                    $arrUserParams["name"] = $user_profile->getFirstName();
-
-                if(array_search("surname", $arrDefaultFields) === false)
-                    $arrUserField["surname"] = $user_profile->getLastName();
-                else
-                    $arrUserParams["surname"] = $user_profile->getLastName();
-
-
-                $cover = $user_profile->getProperty("cover");
-                if($cover) {
-                    if (array_search("avatar", $arrDefaultFields) === false)
-                        $arrUserField["avatar"] = $cover->getProperty("source");
-                    else
-                        $arrUserParams["avatar"] = $cover->getProperty("source");
-                }
-
-                if(array_search("gender", $arrDefaultFields) === false)
-                    $arrUserField["gender"] = $user_profile->getGender();
-                else
-                    $arrUserParams["gender"] = $user_profile->getGender();
-
-                if(array_search("birthday", $arrDefaultFields) === false)
-                    $arrUserField["birthday"] = $user_profile->getBirthday();
-                else
-                    $arrUserParams["birthday"] = $user_profile->getBirthday();
-            }
-
-            if($arrUserParams["email"])
-                $arrUserParams["status"] = true;
-
-            // token
             $UserToken["token"] = $session->getToken();
             $UserToken["type"] = "facebook";
 
-            $res = mod_security_set_user_by_social("facebook", $arrUserParams, $arrUserField, $UserToken, null, false, true);
-            $sError = $res["error"];
+            if ($ID_domain === null) {
+                $ID_domain = mod_auth_get_domain();
+            }
+
+            $permanent_session = cm::env("MOD_AUTH_SESSION_PERMANENT");
+            $disable_events = false;
+            $skip_redirect = true;
+            $social = "facebook";
+
+            $email = $user_profile->getEmail();
+
+            if(1) {
+                $anagraphObject = Anagraph::getInstance();
+                $arrAnagraphList = $anagraphObject->read(
+                    array(
+                        "anagraph.ID"
+                        , "access.users.status"
+                        , "access.users.ID"
+                        , "access.users.username"
+                        , "access.users.avatar"
+                    ), array(
+                        "access.users.email" => $email
+                    )
+                );
+
+                if(is_array($arrAnagraphList) && count($arrAnagraphList)) {
+                    if($arrAnagraphList[0]["user"]["status"]) {
+                        $ID_user = $arrAnagraphList[0]["user"]["ID"];
+
+                        if($UserToken["token"]) {
+                            Anagraph::getInstance("access")->write(array(
+                                    "tokens.ID_user" => $ID_user
+                                    , "tokens.type" => $UserToken["type"]
+                                )
+                                , array(
+                                    "tokens.token" => $UserToken["token"]
+                                )
+                                , array(
+                                    "tokens.ID_user" => $ID_user
+                                    , "tokens.type" => $UserToken["type"]
+                                    , "tokens.token" => $UserToken["token"]
+                                )
+                            );
+                        }
+
+                        Auth::getInstance("session")->create($ID_user);
+                        $sError = false;
+                    } else {
+                        $sError = ffTemplate::_get_word_by_code($social . "_login_user_not_active");
+                    }
+                } else {
+                    $arrUserInfo["user"]["access.users.email"] = $email;
+                    $arrUserInfo["anagraph"]["anagraph.email"] = $email;
+
+                    if (!strlen($username)) {
+                        $username = $user_profile->getName();
+                    }
+                    if (!strlen($username)) {
+                        $arrUsername = explode("@", $arrUserParams["email"]);
+
+                        $username = $arrUsername[0] . " " . substr($arrUsername[1], 0, strpos($arrUsername[1], "."));
+                        $username = ucwords(str_replace(array(".", "-", "_"), array(" "), $username));
+                    }
+
+                    $arrUserInfo["user"]["access.users.username"] = $username;
+                    $arrUserInfo["user"]["access.users.username_slug"] = ffcommon_url_rewrite($username);
+
+                    $arrUserInfo["anagraph"]["anagraph_person.name"] = $user_profile->getFirstName();
+                    $arrUserInfo["anagraph"]["anagraph_person.surname"] = $user_profile->getLastName();
+
+
+                    $cover = $user_profile->getProperty("cover");
+                    if ($cover) {
+                        $arrUserField["anagraph"]["anagraph.avatar"] = $cover->getProperty("source");
+                        $arrUserField["user"]["access.users.avatar"] = $cover->getProperty("source");
+                    }
+
+                    $arrUserInfo["anagraph"]["anagraph_person.gender"] = $user_profile->getGender();
+                    $arrUserInfo["anagraph"]["anagraph_person.birthday"] = $user_profile->getBirthday();
+
+                    if ($arrUserInfo["anagraph"]["anagraph.email"]) {
+                        $arrUserInfo["user"]["status"] = true;
+                    }
+                    $arrUserInfo["tokens"] = $UserToken;
+                    create_new_user_social($arrUserInfo, $ID_domain);
+                }
+            }
+            // token
+
+
 
             if (strlen($sError))
 			{
-				$cm->modules["auth"]["events"]->doEvent("facebook_error", array(&$sError, &$ret_url, &$err_url));
-
-				if ($filename === null)
-					$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
-				if ($filename === null)
-					$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
-				if ($filename === null)
-					$filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
+				if ($filename === null) {
+                    $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/error.html", $cm->oPage->theme, false);
+                }
+                if ($filename === null) {
+                    $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/modules/security/contents/social/error.html", $cm->oPage->theme, false);
+                }
+				if ($filename === null) {
+                    $filename = cm_moduleCascadeFindTemplate($cm->module_path . "/themes", "/contents/social/error.html", $cm->oPage->theme);
+                }
 
 				$tpl = ffTemplate::factory(ffCommon_dirname($filename));
 				$tpl->load_file(basename($filename), "main");
@@ -243,21 +238,21 @@ try {
                 $component_class["base"] = $framework_css["component"]["class"];
 	            $component_class["popup"] = "social-popup";
                 if($framework_css["component"]["grid"]) {
-                    if(is_array($framework_css["component"]["grid"]))
-                        $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
-                    else {
-                        $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+                    if(is_array($framework_css["component"]["grid"])) {
+                        $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
+                    } else {
+                        $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
                     }
                 }  
 
                 $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-                $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
-			    $tpl->set_var("login_class", cm_getClassByDef($framework_css["login"]["def"]));
-			    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-			    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-			    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
-			    $tpl->set_var("logout_url", $mod_sec_login->reverse);
-			    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+                $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
+			    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["def"]));
+			    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+			    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+			    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));
+			    $tpl->set_var("logout_url", $mod_auth_login->reverse);
+			    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
                 
 				$cm->oPage->addContent($tpl);
 				return;
@@ -284,49 +279,28 @@ try {
    			$component_class["popup"] = "social-popup";
             if($framework_css["component"]["grid"]) {
                 if(is_array($framework_css["component"]["grid"]))
-                    $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
                 else {
-                    $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
                 }
             }   
             $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-            $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+            $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 
-			if(MOD_SEC_USER_AVATAR) {
-				if(MOD_SEC_GROUPS) {
-		            $user_permission = get_session("user_permission");
-					$avatar = $user_permission["avatar"];
-		        } else {
-		        	$avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
-		        }
-
-				$tpl->set_var("avatar_class", cm_getClassByDef($framework_css["logout"]["account"]["avatar"]));
-				$tpl->set_var("avatar", Auth::getUserAvatar(cm::env("MOD_SEC_USER_AVATAR_MODE"), $avatar));
+			if(cm::env("MOD_AUTH_USER_AVATAR")) {
+				$tpl->set_var("avatar_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["avatar"]));
+				$tpl->set_var("avatar", Auth::getUserAvatar(cm::env("MOD_AUTH_USER_AVATAR")));
 				$tpl->parse("SectAvatar", false);
 			}
 				
-			$email = ffCommon_specialchars(mod_security_getUserInfo("email", null, $db)->getValue());
-			
-			$username = ffCommon_specialchars(mod_security_getUserInfo(MOD_SEC_USER_FIRSTNAME, null, $db)->getValue() . " " . mod_security_getUserInfo(MOD_SEC_USER_LASTNAME, null, $db)->getValue());
-			if(!$username)
-				$username = ffCommon_specialchars(mod_security_getUserInfo(MOD_SEC_USER_FIRSTNAME, null, $db)->getValue());
-			if(!$username) {
-				if((MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "username"))
-					$username = ffCommon_specialchars(mod_security_getUserInfo("username", null, $db)->getValue());
-				elseif((MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "email")) {
-					$username = $email;
-					$email = "";
-				}
-			}
+			$user = Auth::get("user");
 
-			if($username) {
-				//$tpl->set_var("username_class", cm_getClassByDef($framework_css["logout"]["account"]["username"]));
-				$tpl->set_var("username", $username);
+			if($user->username) {
+				$tpl->set_var("username", $user->username);
 				$tpl->parse("SectUsername", false);
 			}
-			if($email) {
-				//$tpl->set_var("email_class", cm_getClassByDef($framework_css["logout"]["account"]["email"]));
-				$tpl->set_var("email", $email);
+			if($user->email) {
+				$tpl->set_var("email", $user->email);
 				$tpl->parse("SectEmail", false);
 			}
 
@@ -337,20 +311,20 @@ try {
    			$component_class["popup"] = "social-popup";
             if($framework_css["component"]["grid"]) {
                 if(is_array($framework_css["component"]["grid"]))
-                    $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
                 else {
-                    $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+                    $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
                 }
             }   
             $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-            $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+            $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
             
-            $tpl->set_var("logout_class", cm_getClassByDef($framework_css["logout"]["def"]));
-            $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-            $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-            $tpl->set_var("login_button_class", cm_getClassByDef($framework_css["actions"]["login"]));
+            $tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+            $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+            $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+            $tpl->set_var("login_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["login"]));
             $tpl->set_var("login_url", $dashboard_ret_url);
-            $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+            $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
             
 			$cm->oPage->addContent($tpl);
 			
@@ -387,21 +361,21 @@ try {
    		$component_class["popup"] = "social-popup";
 	    if($framework_css["component"]["grid"]) {
 	        if(is_array($framework_css["component"]["grid"]))
-	            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+	            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
 	        else {
-	            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+	            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
 	        }
 	    }   
 	    
 	    $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-	    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+	    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 	    
-	    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-	    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-	    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-	    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
-	    $tpl->set_var("logout_url", $mod_sec_login->reverse);
-	    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+	    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+	    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+	    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+	    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));
+	    $tpl->set_var("logout_url", $mod_auth_login->reverse);
+	    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 		$cm->oPage->addContent($tpl);
 	}
@@ -432,21 +406,21 @@ try {
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
         if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
         else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
     
-    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"]));
-    $tpl->set_var("logout_url", $mod_sec_login->reverse);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));
+    $tpl->set_var("logout_url", $mod_auth_login->reverse);
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 	$cm->oPage->addContent($tpl);
 	return;
@@ -477,21 +451,21 @@ try {
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
         if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
         else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
     
-    $tpl->set_var("login_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]["def"]));
-    $tpl->set_var("logout_button_class", cm_getClassByDef($framework_css["actions"]["logout"])); 
-    $tpl->set_var("logout_url", $mod_sec_login->reverse);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+    $tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"])); 
+    $tpl->set_var("logout_url", $mod_auth_login->reverse);
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
     
 	$cm->oPage->addContent($tpl);
 	return;

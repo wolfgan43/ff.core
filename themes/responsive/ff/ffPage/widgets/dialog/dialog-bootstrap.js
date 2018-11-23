@@ -341,7 +341,7 @@ __ff : true, /* used to recognize ff'objects */
      *    data.url
      *        cambia l'url del dialog su redirect interno
      */
-    
+
     if (customdata.callback)
         customdata.callback(id, data);
 
@@ -365,9 +365,9 @@ __ff : true, /* used to recognize ff'objects */
 			}
         }
 
-		if (!ff.ajax.ctxGet(id).needInit())
-			ff.ffPage.dialog.refresh(id, true);
-		else {
+		if (!ff.ajax.ctxGet(id).needInit()) {
+            ff.ffPage.dialog.refresh(id, true);
+        } else {
 			dialogs.get(id).waiting = true;
 			ff.ajax.blockUI();
 		}

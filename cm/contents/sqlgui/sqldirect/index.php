@@ -36,7 +36,7 @@ $sSQL = trim($_REQUEST["sqldirect_sql"]);
 if (!strlen($sSQL))
 	return;
 
-//$db = ffDBConnection::factory("db_sql_" . FF_DB_INTERFACE);
+//$db = ffDBConnection::factory("db_sql_mysqli");
 $db = ffDB_Sql::factory();
 $db->on_error = "ignore";
 $globals = ffGlobals::getInstance("sqlgui");

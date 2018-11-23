@@ -320,6 +320,8 @@ class ffRecord_dialog extends ffRecord_base
 
 	public function tplSetFixedVars()
 	{
+	    if(!$this->title)
+	        $this->title = $this->parent[0]->title;
 		if (is_array($this->fixed_vars) && count($this->fixed_vars))
 		{
 			foreach ($this->fixed_vars as $key => $value)
@@ -359,11 +361,11 @@ class ffRecord_dialog extends ffRecord_base
 
 		if(strlen($this->title)) {
 			$this->tpl[0]->set_var("record_title", $this->title);
-			$this->tpl[0]->set_var("title_class", cm_getClassByDef($this->framework_css["title"]));
+			$this->tpl[0]->set_var("title_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["title"]));
 			$this->tpl[0]->parse("SectTitle", false);
 		}
 		if ($this->description !== null) {
-			$this->tpl[0]->set_var("info_class", cm_getClassByDef($this->framework_css["info"]));
+			$this->tpl[0]->set_var("info_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["info"]));
 			$this->tpl[0]->set_var("record_description", $this->description);
 			$this->tpl[0]->parse("SectDescription", false);
 		}
@@ -381,12 +383,12 @@ class ffRecord_dialog extends ffRecord_base
 		$component_class["default"] = $this->class;
 		if($this->framework_css["component"]["grid"]) {
             if(is_array($this->framework_css["component"]["grid"]))
-                $component_class["grid"] = cm_getClassByFrameworkCss($this->framework_css["component"]["grid"], "col");
+                $component_class["grid"] = Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["grid"], "col");
             else {
-                $component_class["grid"] = cm_getClassByFrameworkCss("", $this->framework_css["component"]["grid"]);
+                $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["grid"]);
             }
         }
-		$component_class["form"] = cm_getClassByFrameworkCss("component" . ($this->framework_css["component"]["type"] ? "-" : "") . $this->framework_css["component"]["type"], "form");
+		$component_class["form"] = Cms::getInstance("frameworkcss")->get("component" . ($this->framework_css["component"]["type"] ? "-" : "") . $this->framework_css["component"]["type"], "form");
         
 		$this->properties["id"] = $this->getIDIF();
 		$this->properties["class"] = implode(" ", array_filter($component_class));
@@ -399,11 +401,11 @@ class ffRecord_dialog extends ffRecord_base
         if($this->framework_css["component"]["inner_wrap"]) 
         {
             if(is_array($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
+                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
             } elseif(is_bool($this->framework_css["component"]["inner_wrap"])) {
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="innerWrap">');
             } else {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
+                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
             }
             $this->tpl[0]->set_var("inner_wrap_end", '</div>');
         }       
@@ -411,11 +413,11 @@ class ffRecord_dialog extends ffRecord_base
         if($this->framework_css["component"]["outer_wrap"]) 
         {
             if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
             } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->getIDIF() . 'Wrap outerWrap">');
             } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . cm_getClassByFrameworkCss("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
+                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
             }
             $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
         }
@@ -566,7 +568,7 @@ class ffRecord_dialog extends ffRecord_base
 						else 
 						{
                             $group_class = array();
-                            $group_class["default"] = cm_getClassByDef($this->framework_css["group"]["def"]);
+                            $group_class["default"] = Cms::getInstance("frameworkcss")->getClass($this->framework_css["group"]["def"]);
                             $group_class["custom"] = (strlen($this->groups[$group_key]["class"]) ? $this->groups[$group_key]["class"] : $group_key);
 
                             if(is_array($group_value["tab"])) {
@@ -599,7 +601,7 @@ class ffRecord_dialog extends ffRecord_base
                                 $this->tpl[0]->set_var("SectGroupTitle", "");
                             } else {
                                 $arrTitleProperties = array();
-                                $arrTitleProperties["class"]["default"] = cm_getClassByDef($this->framework_css["group"]["title"]);
+                                $arrTitleProperties["class"]["default"] = Cms::getInstance("frameworkcss")->getClass($this->framework_css["group"]["title"]);
                                 $this->tpl[0]->set_var("title_properties", "");
 
                                 if($group_value["primary_field"]) {
@@ -740,7 +742,7 @@ class ffRecord_dialog extends ffRecord_base
 				    	)
 				    ) {//con le grid e troppo piccola la visualizzazione
 				    	$container_class["wrap"] = "form-wrap";
-				    	$container_class["row"] = cm_getClassByFrameworkCss("row", "form");
+				    	$container_class["row"] = Cms::getInstance("frameworkcss")->get("row", "form");
 					}
 
 				    //$this->displayed_fields++;
@@ -827,7 +829,7 @@ class ffRecord_dialog extends ffRecord_base
 					    $required_symbol = "";
 
 						if(($this->form_fields[$key]->get_control_type() == "checkbox" || $this->form_fields[$key]->get_control_type() == "radio") && $this->form_fields[$key]->widget == "") {
-							$control_var = cm_getClassByFrameworkCss("control-check-position", "form");
+							$control_var = Cms::getInstance("frameworkcss")->get("control-check-position", "form");
 							$is_combine_field = true;
 						}
 					    
@@ -889,12 +891,12 @@ class ffRecord_dialog extends ffRecord_base
 								if(is_array($arrColumnLabel) && count($arrColumnLabel)
 									&& is_array($arrColumnControl) && count($arrColumnControl)
 								) {
-									$this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByDef($this->form_fields[$key]->framework_css["label"]) . '">');
-									//$this->tpl[0]->set_var("label_prefix", '<div class="' . cm_getClassByFrameworkCss($arrColumnLabel, "col") . " " . cm_getClassByFrameworkCss("align-right", "util") . '">');
+									$this->tpl[0]->set_var("label_prefix", '<div class="' . Cms::getInstance("frameworkcss")->getClass($this->form_fields[$key]->framework_css["label"]) . '">');
+									//$this->tpl[0]->set_var("label_prefix", '<div class="' . Cms::getInstance("frameworkcss")->get($arrColumnLabel, "col") . " " . Cms::getInstance("frameworkcss")->get("align-right", "util") . '">');
 									$this->tpl[0]->set_var("label_postfix", '</div>');
 								
-									$control_prefix = '<div class="' . cm_getClassByDef($this->form_fields[$key]->framework_css["control"]) . '">';
-									//$control_prefix = '<div class="' . cm_getClassByFrameworkCss($arrColumnControl, "col") . '">';
+									$control_prefix = '<div class="' . Cms::getInstance("frameworkcss")->getClass($this->form_fields[$key]->framework_css["control"]) . '">';
+									//$control_prefix = '<div class="' . Cms::getInstance("frameworkcss")->get($arrColumnControl, "col") . '">';
 									$control_postfix = '</div>';
 								  //  $type_label = "inline";
 								}
@@ -903,12 +905,12 @@ class ffRecord_dialog extends ffRecord_base
 							//if($this->framework_css["component"]["type"] === null && $type_label)
 							//	$this->framework_css["component"]["type"] = $type_label;
 
-							$label_class = cm_getClassByFrameworkCss("label" . $type_label, "form");
+							$label_class = Cms::getInstance("frameworkcss")->get("label" . $type_label, "form");
 							if($this->framework_css["component"]["type"] && $is_combine_field) {
 								if($control_var == "_in_label")
-									$label_class .= ($label_class ? " " : "") . cm_getClassByFrameworkCss($arrColumnLabel, "push") . " " . cm_getClassByFrameworkCss($arrColumnControl, "col");
+									$label_class .= ($label_class ? " " : "") . Cms::getInstance("frameworkcss")->get($arrColumnLabel, "push") . " " . Cms::getInstance("frameworkcss")->get($arrColumnControl, "col");
 								else
-									$container_class["align"] = cm_getClassByFrameworkCss("align-right", "util");
+									$container_class["align"] = Cms::getInstance("frameworkcss")->get("align-right", "util");
 							}
 							
 							if($label_class)
@@ -930,11 +932,11 @@ class ffRecord_dialog extends ffRecord_base
 					    if(is_array($this->form_fields[$key]->framework_css["container"]["col"]) 
 				    		&& count($this->form_fields[$key]->framework_css["container"]["col"])
 					    ) {
-							$container_class["grid"] = cm_getClassByFrameworkCss($this->form_fields[$key]->framework_css["container"]["col"], "col");
+							$container_class["grid"] = Cms::getInstance("frameworkcss")->get($this->form_fields[$key]->framework_css["container"]["col"], "col");
 							if(!$is_wrapped) {
 								$wrap_class = array("form-wrap");
 								if($this->form_fields[$key]->framework_css["container"]["row"]) {
-									$wrap_class[] = cm_getClassByFrameworkCss("row", "form");
+									$wrap_class[] = Cms::getInstance("frameworkcss")->get("row", "form");
 								}
 								$this->tpl[0]->set_var("wrap_class", implode(" ", array_filter($wrap_class)));
 								$is_wrapped = $this->tpl[0]->parse("SectWrapStart", false);
@@ -942,19 +944,19 @@ class ffRecord_dialog extends ffRecord_base
 
 							$wrap_count = $wrap_count + $this->form_fields[$key]->framework_css["container"]["col"]["lg"];
 						} elseif($this->form_fields[$key]->framework_css["container"]["row"]) {
-							$container_class["row"] = cm_getClassByFrameworkCss("row-padding", "form");
-							//$container_class["grid"] = cm_getClassByFrameworkCss(array(12), "col");
+							$container_class["row"] = Cms::getInstance("frameworkcss")->get("row-padding", "form");
+							//$container_class["grid"] = Cms::getInstance("frameworkcss")->get(array(12), "col");
 
 							/*if($is_wrapped) {
 								$wrap_count = 12;
-								$container_class["grid"] = cm_getClassByFrameworkCss(array($wrap_count), "col");
+								$container_class["grid"] = Cms::getInstance("frameworkcss")->get(array($wrap_count), "col");
 							} elseif($label_set) { 
-								$container_class["row"] = cm_getClassByFrameworkCss("row", "form");
+								$container_class["row"] = Cms::getInstance("frameworkcss")->get("row", "form");
 							}*/
 						} else {
 							/*if($is_wrapped) {
 								$wrap_count = 12;
-								$container_class["grid"] = cm_getClassByFrameworkCss(array($wrap_count), "col");
+								$container_class["grid"] = Cms::getInstance("frameworkcss")->get(array($wrap_count), "col");
 							}*/
 						}
 					}
@@ -979,12 +981,12 @@ class ffRecord_dialog extends ffRecord_base
                         {
                             foreach ($this->form_fields[$key]->multi_fields as $mul_subkey => $mul_subvalue)
                             {
-                                $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" value="' . $this->form_fields[$key]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE) . '" />';
+                                $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)) . '" />';
                                 if($this->record_exist) 
-                                    $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" value="' . $this->form_fields[$key]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE) . '" />';
+                                    $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)) . '" />';
                             }
                         } else {
-                            $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . '" name="' . $this->id . "_". $key . "_ori" . '" value="' . $this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) . '" />';
+                            $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . '" name="' . $this->id . "_". $key . "_ori" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)) . '" />';
                         }
 
                         $rc |= $this->tpl[0]->set_var($key, $buffer_field);
@@ -998,7 +1000,7 @@ class ffRecord_dialog extends ffRecord_base
                                 $processed_field = $this->form_fields[$key]->process();
 
                                 if($control_prefix && ($this->form_fields[$key]->framework_css["fixed_pre_content"] || $this->form_fields[$key]->framework_css["fixed_post_content"])) {
-                                    $control_prefix = $control_prefix . '<div class="' . cm_getClassByFrameworkCss("group", "form") . '">';
+                                    $control_prefix = $control_prefix . '<div class="' . Cms::getInstance("frameworkcss")->get("group", "form") . '">';
                                     $control_postfix = '</div>' . $control_postfix;
                                 }                                
                                 $this->tpl[0]->set_var("content" . $control_var, $control_prefix . $processed_field . $control_postfix);
@@ -1094,13 +1096,13 @@ class ffRecord_dialog extends ffRecord_base
 				$container_inner_end = '';
 				if(count($container_class)) {
 					if(!$control_prefix && ($this->form_fields[$key]->framework_css["fixed_pre_content"] || $this->form_fields[$key]->framework_css["fixed_post_content"])) {
-						$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
+						$wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
 						if($wrap_addon) {
 							if($container_class["grid"]) {
-								$container_inner_start = '<div class="' . cm_getClassByFrameworkCss("group-padding", "form") . '">';
+								$container_inner_start = '<div class="' . Cms::getInstance("frameworkcss")->get("group-padding", "form") . '">';
 								$container_inner_end = '</div>';
 							} else {
-								$container_class["row"] = cm_getClassByFrameworkCss("group-padding", "form");
+								$container_class["row"] = Cms::getInstance("frameworkcss")->get("group-padding", "form");
 							}
 						}
 					}
@@ -1173,7 +1175,7 @@ class ffRecord_dialog extends ffRecord_base
 		}
 		reset($tmp_action_buttons);
 
-		$this->tpl[0]->set_var("actions_class", cm_getClassByDef($this->framework_css["actions"]));
+		$this->tpl[0]->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["actions"]));
 		$this->tpl[0]->set_var("ActionButtons", $buffer);
 		$this->tpl[0]->parse("SectControls", false);
 	}
@@ -1198,7 +1200,7 @@ class ffRecord_dialog extends ffRecord_base
 			}*/
 			else
 			{
-				$this->tpl[0]->set_var("error_class", cm_getClassByDef($this->framework_css["error"]));
+				$this->tpl[0]->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["error"]));
 				$this->tpl[0]->set_var("strError", $this->strError);
 				$this->tpl[0]->parse("SectError", false);
 			}	
@@ -1291,7 +1293,7 @@ class ffRecord_dialog extends ffRecord_base
                 $tmp->icon  = $this->buttons_options["cancel"]["icon"]; 
 
 
-/*				$tmp->class	= cm_getClassByFrameworkCss("cancel", $this->buttons_options["cancel"]["aspect"]);
+/*				$tmp->class	= Cms::getInstance("frameworkcss")->get("cancel", $this->buttons_options["cancel"]["aspect"]);
 				if ($this->buttons_options["cancel"]["class"])
 					$tmp->class	.= " " . $this->buttons_options["cancel"]["class"];
 */
@@ -1469,7 +1471,7 @@ class ffRecord_dialog extends ffRecord_base
 	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
 		else

@@ -35,7 +35,7 @@ class ffWidget_actex extends ffCommon
 	var $libraries		= array();
 	
     var $js_deps = array(
-                              "ff.ffField.actex"       => null
+                            "ff.ffField.actex"    => null
 						);
     var $css_deps 		= array();
 
@@ -73,7 +73,7 @@ class ffWidget_actex extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -216,7 +216,7 @@ class ffWidget_actex extends ffCommon
 							//, "callback"	=> (count($Field->resources) ? "ff.ffField.actex.dialog_success('" . $prefix . $id . "', '" . $Field->resources[0] . "')" : "")
 							, "tpl_id"		=> $tpl_id
 							, "addjs"		=> "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
-							, "class"		=> cm_getClassByFrameworkCss("addnew", "icon", array("class" => "hidden " . cm_getClassByFrameworkCss("control-prefix", "form")))
+							, "class"		=> Cms::getInstance("frameworkcss")->get("addnew", "icon", array("class" => "hidden " . Cms::getInstance("frameworkcss")->get("control-prefix", "form")))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogaddlink"
 						)
 					, $Field->parent_page[0]
@@ -276,7 +276,7 @@ class ffWidget_actex extends ffCommon
 							/*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_edit_" . $Field->parent[0]->id . "_" . $Field->id . "')"
 							, "tpl_id"		=> $tpl_id
-							, "class"		=> cm_getClassByFrameworkCss("editrow", "icon", array("class" => "hidden"))
+							, "class"		=> Cms::getInstance("frameworkcss")->get("editrow", "icon", array("class" => "hidden"))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogeditlink"
 						)
 					, $Field->parent_page[0]
@@ -357,7 +357,7 @@ class ffWidget_actex extends ffCommon
 							/*, "name"		=> '<img alt="delete" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_delete .'"' . (strlen($Field->actex_dialog_title_delete)  ? ' title="' . $Field->actex_dialog_title_delete . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_delete_" . $Field->parent[0]->id . "_" . $Field->id . "')"
 							, "tpl_id"		=> $tpl_id
-							, "class"		=> cm_getClassByFrameworkCss("deleterow", "icon", array("class" => "hidden"))
+							, "class"		=> Cms::getInstance("frameworkcss")->get("deleterow", "icon", array("class" => "hidden"))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogdeletelink"
 						)
 					, $Field->parent_page[0]
@@ -507,11 +507,11 @@ class ffWidget_actex extends ffCommon
 
         $action_class = "actex-actions";
         
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));    
-        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("trash-o", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon")); 
-        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));       
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", Cms::getInstance("frameworkcss")->get("caret-down", "icon", array("class" => ("actex-combo"))));    
+        $this->tpl[$tpl_id]->set_var("icon_delete", Cms::getInstance("frameworkcss")->get("trash-o", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_plus", Cms::getInstance("frameworkcss")->get("plus", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_minus", Cms::getInstance("frameworkcss")->get("minus", "icon")); 
+        $this->tpl[$tpl_id]->set_var("icon_loader", Cms::getInstance("frameworkcss")->get("spinner", "icon-tag", "spin"));       
 		if($Field->actex_autocomp) {
 			$this->tpl[$tpl_id]->parse("SectCombo", false);
 			$action_class .= " nopadding";
@@ -519,13 +519,13 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->set_var("SectCombo", "");
 		}
 
-        $this->tpl[$tpl_id]->set_var("actex_container", cm_getClassByFrameworkCss("group", "form", "actex-wrapper"));	
+        $this->tpl[$tpl_id]->set_var("actex_container", Cms::getInstance("frameworkcss")->get("group", "form", "actex-wrapper"));	
         $this->tpl[$tpl_id]->set_var("data_class", "actex" . (strlen($Field->data_class) ? " " : "") . $Field->data_class);
-        $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("control-feedback", "form", $action_class));	
+        $this->tpl[$tpl_id]->set_var("actions_class", Cms::getInstance("frameworkcss")->get("control-feedback", "form", $action_class));	
 
-        $this->tpl[$tpl_id]->set_var("actex_multi_container", cm_getClassByFrameworkCss("group", "list", "actex-multi"));	
-        $this->tpl[$tpl_id]->set_var("actex_multi_item", cm_getClassByFrameworkCss("item", "list"));	
-        $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "list"));	
+        $this->tpl[$tpl_id]->set_var("actex_multi_container", Cms::getInstance("frameworkcss")->get("group", "list", "actex-multi"));	
+        $this->tpl[$tpl_id]->set_var("actex_multi_item", Cms::getInstance("frameworkcss")->get("item", "list"));	
+        $this->tpl[$tpl_id]->set_var("actex_multi_badge", Cms::getInstance("frameworkcss")->get("badge", "list"));	
             
 		if ($Field->actex_reset_childs) {
 			$this->tpl[$tpl_id]->set_var("reset_childs", "true");
@@ -792,13 +792,42 @@ class ffWidget_actex extends ffCommon
             	{
                     $sSqlWhere = "";
                     $sSqlHaving = "";
+                    $strOperation = "";
+                    $strOperationHaving = "";
 
             		$condition = 0;
 					$field_key = ($Field->actex_compare_field ? $Field->actex_compare_field : "`" . $db->fields_names[0] . "`"); //se tolto lo 0 && da enormi problemi con il recupero del default valorizzato vedi vgallery extras modify campo ID_extended_type quando e ti tipo string gia valorizzato nel db
 					$field_key_having = ($Field->actex_having_field ? $Field->actex_having_field : $field_key);
-				
-					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
-					$strOperationHaving = $field_key_having . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
+
+
+
+                    switch($Field->actex_operation_field)
+                    {
+                        case "IN":
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                            break;
+                        case "FIND_IN_SET":
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                            break;
+                        case "LIKE":
+                            $strOperation .= " $field_key LIKE '%" . $db->toSql(str_replace(" " , "%", $strCompare), "Text", false) . "%'";
+                            $strOperationHaving .= " $field_key_having LIKE '%" . $db->toSql(str_replace(" " , "%", $strCompare), "Text", false) . "%'";
+                            break;
+                        case "<>":
+                            $strOperation .= " $field_key <> " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having <> " . $db->toSql($strCompare);
+                            break;
+                        case "=":
+                        default:
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                    }
+
+
+//					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
+//					$strOperationHaving = $field_key_having . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
 
 					$sSQL = $Field->source_SQL;
 					if(strpos($sSQL, "[HAVING]") !== false) 
@@ -948,7 +977,7 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->parse("SectBindingFoot", true);
 
 		if ($this->display_debug) {
-			$this->tpl[$tpl_id]->set_var("icon_debug", cm_getClassByFrameworkCss("bug", "icon"));    
+			$this->tpl[$tpl_id]->set_var("icon_debug", Cms::getInstance("frameworkcss")->get("bug", "icon"));    
 			$this->tpl[$tpl_id]->parse("SectDebug", false);
 		} /*else {
 			$this->tpl[$tpl_id]->set_var("SectDebug", "");

@@ -1,11 +1,10 @@
 <?php
 $cm->oPage->layer = "empty";
 
-$framework_css = mod_sec_get_framework_css();
-$mod_sec_login = $cm->router->getRuleById("mod_sec_login");
+$framework_css = mod_auth_get_framework_css();
+$mod_auth_login = $cm->router->getRuleById("mod_auth_login");
 
-if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)  
-{
+if (Auth::isLogged()) {
 	if ($filename === null)
 		$filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, "/contents" . $cm->path_info . "/social/logged.html", $cm->oPage->theme, false);
 	if ($filename === null)
@@ -27,24 +26,17 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
    	$component_class["popup"] = "social-popup";
     if($framework_css["component"]["grid"]) {
         if(is_array($framework_css["component"]["grid"]))
-            $component_class["grid"] = cm_getClassByFrameworkCss($framework_css["component"]["grid"], "col");
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
         else {
-            $component_class["grid"] = cm_getClassByFrameworkCss("", $framework_css["component"]["grid"]);      
+            $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);      
         }
     }   
     $tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
-    $tpl->set_var("inner_wrap_class", cm_getClassByDef($framework_css["inner-wrap"]));
+    $tpl->set_var("inner_wrap_class", Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]));
 
-	if(MOD_SEC_USER_AVATAR) {
-		if(MOD_SEC_GROUPS) {
-		    $user_permission = get_session("user_permission");
-			$avatar = $user_permission["avatar"];
-		} else {
-		    $avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
-		}	
-		
-		$tpl->set_var("avatar_class", cm_getClassByDef($framework_css["logout"]["account"]["avatar"]));
-		$tpl->set_var("avatar", Auth::getUserAvatar(cm::env("MOD_SEC_USER_AVATAR_MODE"), $avatar));
+	if(cm::env("MOD_AUTH_USER_AVATAR")) {
+		$tpl->set_var("avatar_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["avatar"]));
+		$tpl->set_var("avatar", Auth::getUserAvatar(cm::env("MOD_AUTH_USER_AVATAR")));
 		$tpl->parse("SectAvatar", false);
 	}
 		
@@ -63,22 +55,22 @@ if (mod_security_check_session(false) && get_session("UserNID") != MOD_SEC_GUEST
 	}
 
 	if($username) {
-		//$tpl->set_var("username_class", cm_getClassByDef($framework_css["logout"]["account"]["username"]));
+		//$tpl->set_var("username_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["username"]));
 		$tpl->set_var("username", $username);
 		$tpl->parse("SectUsername", false);
 	}
 	if($email) {
-		//$tpl->set_var("email_class", cm_getClassByDef($framework_css["logout"]["account"]["email"]));
+		//$tpl->set_var("email_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["email"]));
 		$tpl->set_var("email", $email);
 		$tpl->parse("SectEmail", false);
 	}
 
-    $tpl->set_var("logout_class", cm_getClassByDef($framework_css["logout"]["def"]));
-    $tpl->set_var("actions_class", cm_getClassByDef($framework_css["actions"]["def"]));
-    $tpl->set_var("account_class", cm_getClassByDef($framework_css["logout"]["account"]));
-    $tpl->set_var("login_button_class", cm_getClassByDef($framework_css["actions"]["login"]["def"])); 
-    $tpl->set_var("login_url", $mod_sec_login->reverse);
-    $tpl->set_var("error_class", cm_getClassByDef($framework_css["error"]));
+    $tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+    $tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
+    $tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]));
+    $tpl->set_var("login_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["login"]["def"])); 
+    $tpl->set_var("login_url", $mod_auth_login->reverse);
+    $tpl->set_var("error_class", Cms::getInstance("frameworkcss")->getClass($framework_css["error"]));
 
 	$cm->oPage->addContent($tpl);
 	return;
@@ -89,11 +81,11 @@ use Facebook\GraphUser;
 use Facebook\FacebookRequestException;
 use Facebook\FacebookRedirectLoginHelper;
 
-FacebookSession::setDefaultApplication(MOD_SEC_SOCIAL_FACEBOOK_APPID, MOD_SEC_SOCIAL_FACEBOOK_SECRET);
+FacebookSession::setDefaultApplication(cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_ID"), cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_SECRET"));
 
-$helper = new FacebookRedirectLoginHelper(MOD_SEC_SOCIAL_FACEBOOK_CLIENT_REDIR_URI);
+$helper = new FacebookRedirectLoginHelper(cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_REDIRECT"));
 $helper->disableSessionStatusCheck();
 
-$loginUrl = $helper->getLoginUrl(explode(",", MOD_SEC_SOCIAL_FACEBOOK_APPSCOPE), null, true, "https");
+$loginUrl = $helper->getLoginUrl(explode(",", cm::env("MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_SCOPE")), null, true, "https");
 
 ffRedirect($loginUrl);

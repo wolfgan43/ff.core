@@ -9,12 +9,14 @@
  * @link http://www.formsphpframework.com
  */
 
-if (isset($_REQUEST["__QUERY__"]))                  define("FF_URLPARAM_QUERY", $_REQUEST["__QUERY__"]);
-if (isset($_REQUEST["__DEBUG__"]))                  define("FF_URLPARAM_DEBUG", $_REQUEST["__DEBUG__"]);
+//if (isset($_REQUEST["__QUERY__"]))                  define("FF_URLPARAM_QUERY", $_REQUEST["__QUERY__"]);
+//if (isset($_REQUEST["__DEBUG__"]))                  define("FF_URLPARAM_DEBUG", $_REQUEST["__DEBUG__"]);
+//if (isset($_REQUEST["__NOCACHE__"]))                define("FF_URLPARAM_NOCACHE", $_REQUEST["__NOCACHE__"]);
+//if (isset($_REQUEST["__NOLAYOUT__"]))               define("FF_URLPARAM_NOLAYOUT", $_REQUEST["__NOLAYOUT__"]);
+
+//variabili per il debug
 if (isset($_REQUEST["__CLEARCACHE__"]))             define("FF_URLPARAM_CLEARCACHE", $_REQUEST["__CLEARCACHE__"]);
 if (isset($_REQUEST["__GENCACHE__"]))               define("FF_URLPARAM_GENCACHE", $_REQUEST["__GENCACHE__"]);
-if (isset($_REQUEST["__NOCACHE__"]))                define("FF_URLPARAM_NOCACHE", $_REQUEST["__NOCACHE__"]);
-if (isset($_REQUEST["__NOLAYOUT__"]))               define("FF_URLPARAM_NOLAYOUT", $_REQUEST["__NOLAYOUT__"]);
 if (isset($_REQUEST["__SHOWCASCADELOADER__"]))      define("FF_URLPARAM_SHOWCASCADELOADER", $_REQUEST["__SHOWCASCADELOADER__"]);
 
 

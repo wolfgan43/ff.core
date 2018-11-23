@@ -184,8 +184,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 		$id_component = $this->tplLoad();
 		$navigator_class["default"] = $id_component . "-pn";
         $pageparname = $this->getPrefix($id_component) . $this->page_parname;
-		$current_class = cm_getClassByFrameworkCss("current", "pagination");
-		$loader_class = cm_getClassByFrameworkCss("spinner", "icon", "spin");
+		$current_class = Cms::getInstance("frameworkcss")->get("current", "pagination");
+		$loader_class = Cms::getInstance("frameworkcss")->get("spinner", "icon", "spin");
 		$totpage = ceil($this->num_rows / $this->records_per_page);
 		
 		$navigator_properties["page"] = 'data-page="' . $this->page . '"';
@@ -232,7 +232,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
         $this->tpl[0]->set_var("callback", $this->callback);
         $this->tpl[0]->set_var("callback_params", $this->callback_params);
 
-		$this->tpl[0]->set_var("component_class", cm_getClassByDef($this->framework_css["component"], $navigator_class));
+		$this->tpl[0]->set_var("component_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["component"], $navigator_class));
 		$this->tpl[0]->set_var("component_properties", implode(" ", $navigator_properties));
 		$this->tpl[0]->set_var("page_parname", $this->page_parname);
 		$this->tpl[0]->set_var("current_class", $current_class);
@@ -266,23 +266,23 @@ class ffPageNavigator_html extends ffPageNavigator_base
 			if($this->with_choice)
 			{
 				$choice_class["default"] = "choice";
-				$choice_class["pages"] = cm_getClassByFrameworkCss("pages", "pagination");
-				$this->tpl[0]->set_var("choice_class", cm_getClassByDef($this->framework_css["choice"], $choice_class));
-				$this->tpl[0]->set_var("choice_box_class", cm_getClassByFrameworkCss("group", "form"));
+				$choice_class["pages"] = Cms::getInstance("frameworkcss")->get("pages", "pagination");
+				$this->tpl[0]->set_var("choice_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["choice"], $choice_class));
+				$this->tpl[0]->set_var("choice_box_class", Cms::getInstance("frameworkcss")->get("group", "form"));
 
-				$buffer_choice_label = '<span class="' . cm_getClassByFrameworkCss("control-prefix", "form") . '">' . ffTemplate::_get_word_by_code("go_to_page") . '</span>';
-				$buffer_choice_tot_page = '<span class="' . cm_getClassByFrameworkCss("control-postfix", "form") . '">' . ffTemplate::_get_word_by_code("of") . ' <span class="totpage">' . $totpage . '</span></span>';
+				$buffer_choice_label = '<span class="' . Cms::getInstance("frameworkcss")->get("control-prefix", "form") . '">' . ffTemplate::_get_word_by_code("go_to_page") . '</span>';
+				$buffer_choice_tot_page = '<span class="' . Cms::getInstance("frameworkcss")->get("control-postfix", "form") . '">' . ffTemplate::_get_word_by_code("of") . ' <span class="totpage">' . $totpage . '</span></span>';
 				
-				$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
+				$wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
 				if($wrap_addon) {
-					$buffer_choice_label = '<div class="' . cm_getClassByFrameworkCss(array(3), "col") . '">' . $buffer_choice_label . '</div>';
-					$buffer_choice_tot_page = '<div class="' . cm_getClassByFrameworkCss(array(5), "col") . '">' . $buffer_choice_tot_page . '</div>';
-					$this->tpl[0]->set_var("choice_input_box_class", cm_getClassByFrameworkCss(array(4), "col"));
+					$buffer_choice_label = '<div class="' . Cms::getInstance("frameworkcss")->get(array(3), "col") . '">' . $buffer_choice_label . '</div>';
+					$buffer_choice_tot_page = '<div class="' . Cms::getInstance("frameworkcss")->get(array(5), "col") . '">' . $buffer_choice_tot_page . '</div>';
+					$this->tpl[0]->set_var("choice_input_box_class", Cms::getInstance("frameworkcss")->get(array(4), "col"));
 					$this->tpl[0]->parse("SectChoiceInputStart", false);
 					$this->tpl[0]->parse("SectChoiceInputEnd", false);
 				}
 				$this->tpl[0]->set_var("current_page", $this->page);
-				$this->tpl[0]->set_var("choice_input_class", "currentpage " . cm_getClassByFrameworkCss("control", "form") . " " . cm_getClassByFrameworkCss("align-right", "util"));
+				$this->tpl[0]->set_var("choice_input_class", "currentpage " . Cms::getInstance("frameworkcss")->get("control", "form") . " " . Cms::getInstance("frameworkcss")->get("align-right", "util"));
 				$this->tpl[0]->set_var("choice_label", $buffer_choice_label);
 				$this->tpl[0]->set_var("choice_tot_page", $buffer_choice_tot_page);
 				
@@ -299,8 +299,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 					$this->tpl[0]->set_var("first_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
 				$this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, false, $this->url));
-	            $this->tpl[0]->set_var("first_class", cm_getClassByFrameworkCss("first", "icon"));
-	            //$this->tpl[0]->set_var("first_icon", cm_getClassByFrameworkCss("nav_first", "ico-link-tag"));
+	            $this->tpl[0]->set_var("first_class", Cms::getInstance("frameworkcss")->get("first", "icon"));
+	            //$this->tpl[0]->set_var("first_icon", Cms::getInstance("frameworkcss")->get("nav_first", "ico-link-tag"));
 				$this->tpl[0]->parse("SectFirstButton", false);
 			}
 
@@ -319,8 +319,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 				if($this->infinite)
 					$this->tpl[0]->set_var("prev_class", $loader_class . " prev");
 				else
-		            $this->tpl[0]->set_var("prev_class", cm_getClassByFrameworkCss("prev", "icon"));
-	            //$this->tpl[0]->set_var("prev_icon", cm_getClassByFrameworkCss("nav_prev", "ico-link-tag"));
+		            $this->tpl[0]->set_var("prev_class", Cms::getInstance("frameworkcss")->get("prev", "icon"));
+	            //$this->tpl[0]->set_var("prev_icon", Cms::getInstance("frameworkcss")->get("nav_prev", "ico-link-tag"));
 				$this->tpl[0]->parse("SectPrevButton", false);
 			}
 			
@@ -337,14 +337,14 @@ class ffPageNavigator_html extends ffPageNavigator_base
 				} else {
 					$containerClass[] = $page_inject;
 
-            		$this->tpl[0]->set_var("next_class", cm_getClassByFrameworkCss("next", "icon"));
+            		$this->tpl[0]->set_var("next_class", Cms::getInstance("frameworkcss")->get("next", "icon"));
 				}
 				if(count($containerClass))
 					$this->tpl[0]->set_var("next_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
 				$this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, ($this->page == $totpage ? false : $this->page + 1), $this->url));
 				
-	            //$this->tpl[0]->set_var("next_icon", cm_getClassByFrameworkCss("play", "ico-link-tag"));
+	            //$this->tpl[0]->set_var("next_icon", Cms::getInstance("frameworkcss")->get("play", "ico-link-tag"));
 				$this->tpl[0]->parse("SectNextButton", false);
 			}
 
@@ -364,8 +364,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 					$this->tpl[0]->set_var("last_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
         		
 				$this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, $totpage, $this->url));
-	            $this->tpl[0]->set_var("last_class", cm_getClassByFrameworkCss("last", "icon"));
-	            //$this->tpl[0]->set_var("last_icon", cm_getClassByFrameworkCss("nav_last", "ico-link-tag"));
+	            $this->tpl[0]->set_var("last_class", Cms::getInstance("frameworkcss")->get("last", "icon"));
+	            //$this->tpl[0]->set_var("last_icon", Cms::getInstance("frameworkcss")->get("nav_last", "ico-link-tag"));
 				$this->tpl[0]->parse("SectLastButton", false);
 			} 
 			
@@ -379,7 +379,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
 				if(count($containerClass)) 
 					$this->tpl[0]->set_var("first_frame_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
-		        $this->tpl[0]->set_var("prevframe_class", cm_getClassByFrameworkCss("prev-frame", "icon"));
+		        $this->tpl[0]->set_var("prevframe_class", Cms::getInstance("frameworkcss")->get("prev-frame", "icon"));
 				$this->tpl[0]->parse("SectPrevFrameButton", false);
 
 				$containerClass = array();
@@ -395,7 +395,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
 				if(count($containerClass)) 
 					$this->tpl[0]->set_var("last_frame_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 	            
-	            $this->tpl[0]->set_var("nextframe_class", cm_getClassByFrameworkCss("next-frame", "icon"));
+	            $this->tpl[0]->set_var("nextframe_class", Cms::getInstance("frameworkcss")->get("next-frame", "icon"));
 				$this->tpl[0]->parse("SectNextFrameButton", false);
 			}
 
@@ -484,8 +484,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 		        }
 			}
 
-			$this->tpl[0]->set_var("pagination_class", cm_getClassByDef($this->framework_css["pagination"]["def"]));			
-            $this->tpl[0]->set_var("pagination_menu_class", cm_getClassByDef($this->framework_css["pagination"]["menu"]));
+			$this->tpl[0]->set_var("pagination_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pagination"]["def"]));			
+            $this->tpl[0]->set_var("pagination_menu_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pagination"]["menu"]));
             $this->tpl[0]->parse("SectNav", false);
 		} else {
             if(is_array($this->framework_css["totelem"]["col"]) && count($this->framework_css["totelem"]["col"])) {
@@ -503,8 +503,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 		
 		if($this->with_totelem) {
         	$totelem_class["default"] = "totelem";
-			$totelem_class["pages"] = cm_getClassByFrameworkCss("pages", "pagination");
-        	$this->tpl[0]->set_var("totelem_class", cm_getClassByDef($this->framework_css["totelem"], $totelem_class));
+			$totelem_class["pages"] = Cms::getInstance("frameworkcss")->get("pages", "pagination");
+        	$this->tpl[0]->set_var("totelem_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["totelem"], $totelem_class));
 			$this->tpl[0]->set_var("totelem", $this->num_rows);
 			$this->tpl[0]->parse("SectTotElem", false);
 		}		
@@ -552,9 +552,9 @@ class ffPageNavigator_html extends ffPageNavigator_base
 
         if(($this->nav_display_selector && count($this->nav_selector_elements)) || $this->nav_selector_elements_all) {
         	$perpage_class["default"] = "perPage";
-        	$perpage_class["pages"] = cm_getClassByFrameworkCss("pages", "pagination");
+        	$perpage_class["pages"] = Cms::getInstance("frameworkcss")->get("pages", "pagination");
 
-        	$this->tpl[0]->set_var("perpage_class", cm_getClassByDef($this->framework_css["perPage"], $perpage_class));
+        	$this->tpl[0]->set_var("perpage_class", Cms::getInstance("frameworkcss")->getClass($this->framework_css["perPage"], $perpage_class));
 			$this->tpl[0]->parse("SectSelector", false);
 		} else {
             if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {

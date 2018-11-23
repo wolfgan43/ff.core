@@ -10,22 +10,12 @@
  * @link http://www.formsphpframework.com
  */
 
-if (!defined("FF_DB_INTERFACE"))                    define("FF_DB_INTERFACE", "mysqli");
-
-if(defined("COMPOSER_PATH") && COMPOSER_PATH)
-    require_once (__TOP_DIR__ . COMPOSER_PATH . "/autoload.php");
+//if(defined("COMPOSER_PATH") && COMPOSER_PATH)
+    require_once (__TOP_DIR__ . "/vendor/autoload.php");
 
 spl_autoload_register(function ($class) {
     $php_ext = ".php";
     switch ($class) {
-        case "ffDB_Sql":
-        case "ffDb_Sql":
-            require(__DIR__ . "/classes/ffDb_Sql/ffDb_Sql_" . FF_DB_INTERFACE . $php_ext);
-            break;
-        case "ffDB_MongoDB":
-        case "ffDb_MongoDB":
-            require(__DIR__ . "/classes/ffDB_Mongo/ffDb_MongoDB" . $php_ext);
-            break;
         case "ffEvent":
             require(__DIR__ . "/classes/ffEvents/ffEvent" . $php_ext);
             break;
@@ -37,22 +27,6 @@ spl_autoload_register(function ($class) {
             break;
         case "ffValidator":
             require(__DIR__ . "/classes/ffValidator/ffValidator" . $php_ext);
-            break;
-        case "ffCache":
-            require(__DIR__ . "/classes/ffCache/ffCacheAdapter" . $php_ext);
-            require(__DIR__ . "/classes/ffCache/ffCache" . $php_ext);
-            break;
-        case "ffTranslator":
-            require(__DIR__ . "/classes/ffTranslator/ffTranslator" . $php_ext);
-            break;
-        case "ffImage":
-        case "ffCanvas":
-        case "ffText":
-        case "ffThumb":
-            require(__DIR__ . "/classes/ffImage/ffImage" . $php_ext);
-            require(__DIR__ . "/classes/ffImage/ffCanvas" . $php_ext);
-            require(__DIR__ . "/classes/ffImage/ffText" . $php_ext);
-            require(__DIR__ . "/classes/ffImage/ffThumb" . $php_ext);
             break;
         case "ffErrorHandler":
             require(__DIR__ . "/error_handling" . $php_ext);
@@ -86,9 +60,6 @@ spl_autoload_register(function ($class) {
             require(__DIR__ . "/classes/ffXml/ffXmlParser" . $php_ext); // UNDER DEVELOPMENT
             require(__DIR__ . "/classes/ffXml/ffXmlElement" . $php_ext); // UNDER DEVELOPMENT
             break;
-        case "ffMedia":
-            require(__DIR__ . "/classes/ffMedia" . $php_ext);
-            break;
         default:
             if (strpos($class, "ff") === 0) {
                 require(__DIR__ . '/classes/' . $class . $php_ext);
@@ -118,14 +89,19 @@ function ffRewritePathInfo($env = "_ffq_") {
                 unset($tmp_request);
             }
         }
-        if (isset($_REQUEST[$env])) // used to manage .htaccess [QSA] option, this overwhelm other options
+        if ($_REQUEST[$env]) // used to manage .htaccess [QSA] option, this overwhelm other options
         {
             $fftmp_ffq = true;
             $_SERVER["PATH_INFO"] = $_REQUEST[$env];
             $_SERVER["ORIG_PATH_INFO"] = $_REQUEST[$env];
+        } elseif($_SERVER["PATH_INFO"] == "" && $_SERVER["REQUEST_URI"]) {
+            $_SERVER["PATH_INFO"] = rtrim($_SERVER["QUERY_STRING"]
+                ? rtrim($_SERVER["REQUEST_URI"],  $_SERVER["QUERY_STRING"])
+                : $_SERVER["REQUEST_URI"]
+                , "?");
         }
-        else if (isset($_SERVER["ORIG_PATH_INFO"]))
-            $_SERVER["PATH_INFO"] = $_SERVER["ORIG_PATH_INFO"];
+        //else if (isset($_SERVER["ORIG_PATH_INFO"]))
+        //    $_SERVER["PATH_INFO"] = $_SERVER["ORIG_PATH_INFO"];
 
         if (strlen($_SERVER["QUERY_STRING"]))
         {

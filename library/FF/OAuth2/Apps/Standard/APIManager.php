@@ -43,7 +43,7 @@ class APIManager {
 					if (!CM_ENABLE_MEM_CACHING)
 						throw new \BadFunctionCallException("you must pass a ffCache object in 'ref_sessions' or enable CM_ENABLE_MEM_CACHING");
 					else
-						$this->backend_sessions = \ffCache::getInstance(CM_CACHE_ADAPTER);
+						$this->backend_sessions = \ffCache::getInstance();
 				} elseif (!is_object($this->options["ref_sessions"]) || !is_a($this->options["ref_sessions"], "ffCache")) {
 					throw new \InvalidArgumentException("you must pass a ffCache object in 'ref_sessions' or enable CM_ENABLE_MEM_CACHING");
 				} else {
@@ -172,11 +172,9 @@ class APIManager {
 		$token = null;
 		switch ($this->options["backend_sessions"]) {
 			case "ffCache":
-				$ffcache_success = false;
-				$sessions = $this->backend_sessions->get("__FFOAUTH2STDAPP_SESSIONS__", $ffcache_success);
-				if ($ffcache_success)
+				$sessions = $this->backend_sessions->get("/ff/oauth2/sessions");
+				if ($sessions)
 				{
-					$sessions = unserialize($sessions);
 					if (is_array($sessions) && count($sessions)) foreach ($sessions as $key => $val) {
 						if ($val["type"] === $type && $val["subtype"] === $subtype && $val["username"] === $provider["username"]) {
 							$token = $val["token"];
@@ -212,11 +210,9 @@ class APIManager {
 		switch ($this->options["backend_sessions"]) {
 			case "ffCache":
 				$found = false;
-				$ffcache_success = false;
-				$sessions = $this->backend_sessions->get("__FFOAUTH2STDAPP_SESSIONS__", $ffcache_success);
-				if ($ffcache_success)
+				$sessions = $this->backend_sessions->get("/ff/oauth2/sessions");
+				if ($sessions)
 				{
-					$sessions = unserialize($sessions);
 					if (is_array($sessions) && count($sessions)) foreach ($sessions as $key => $val) {
 						if ($val["type"] === $type && $val["subtype"] === $subtype && $val["username"] === $provider["username"]) {
 							$found = true;
@@ -234,7 +230,7 @@ class APIManager {
 						, "token" => $token
 					);
 				
-				$this->backend_sessions->set("__FFOAUTH2STDAPP_SESSIONS__", null, serialize($sessions));
+				$this->backend_sessions->set("/ff/oauth2/sessions", $sessions);
 				break;
 			case "ffDb_Sql":
 				$sSQL = "SELECT 

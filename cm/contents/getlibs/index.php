@@ -1,5 +1,6 @@
 <?php
 // impedisce a google d'indicizzare il servizio
+
 if (strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "googlebot") !== false)
 {
 	die('<html>
@@ -24,12 +25,13 @@ $cm->oPage->js_loaded = array();
 $cm->oPage->sections = array();
 $cm->oPage->resetJS();
 $cm->oPage->resetCSS();
-$cm->oPage->use_own_js = false;
+//$cm->oPage->use_own_js = false;
 $cm->oPage->compact_js = false;
 $cm->oPage->compact_css = false;
 
 //$globals = ffGlobals::getInstance();
 //$globals->test = 1;
+
 if (strlen($_REQUEST["widgets"]))
 {
 	$widgets = $_REQUEST["widgets"];

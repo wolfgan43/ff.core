@@ -10,7 +10,6 @@ if (!defined("MOD_SEC_BRAND_ACL")) define ("MOD_SEC_BRAND_ACL", "3"); //relative
 if (!defined("MOD_SEC_GUEST_USER_ID")) 		define ("MOD_SEC_GUEST_USER_ID", null);
 if (!defined("MOD_SEC_GUEST_USER_NAME")) 	define ("MOD_SEC_GUEST_USER_NAME", "guest");
 if (!defined("MOD_SEC_GUEST_GROUP_ID")) 	define ("MOD_SEC_GUEST_GROUP_ID", null);
-if (!defined("MOD_SEC_GUEST_GROUP_NAME")) 	define ("MOD_SEC_GUEST_GROUP_NAME", "guests");
 
 if (!defined("MOD_SEC_ENABLE_GEOLOCALIZATION")) 	define ("MOD_SEC_ENABLE_GEOLOCALIZATION", false);
 

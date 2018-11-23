@@ -18,6 +18,7 @@ if(version_compare(phpversion(), "5.4", "<"))
 
 // set default extension for php files
 define("FF_PHP_EXT", "php");
+define("FF_PHP_SUFFIX", "html");
 
 // some preprocessing for CPU saving
 define("__FF_DIR__", dirname(__DIR__));
@@ -94,7 +95,6 @@ if (defined("FF_ONLY_INIT"))
 //}
 
 if (!defined("FF_URLREWRITE_REMOVEHYPENS"))         define("FF_URLREWRITE_REMOVEHYPENS", true);
-if (!defined("FF_ORM_ENABLE"))                      define("FF_ORM_ENABLE", true);
 
 if (!defined("FF_PREFIX"))                          define("FF_PREFIX", "ff_");
 if (!defined("FF_SUPPORT_PREFIX"))                  define("FF_SUPPORT_PREFIX", "support_");

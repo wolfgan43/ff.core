@@ -27,10 +27,17 @@
 $config = array(
     "api"                   => array(
         "login"             => $cm->router->getRuleById("mod_auth_login")->reverse
-        , "logout"          => $cm->router->getRuleById("mod_auth_logout")->reverse
+        , "logout"          => "/logout"
         , "recover"         => $cm->router->getRuleById("mod_auth_recover")->reverse
         , "registration"    => $cm->router->getRuleById("mod_auth_registration")->reverse
         , "activation"      => $cm->router->getRuleById("mod_auth_activation")->reverse
+    )
+    , "callback"            => array(
+        "login"             => null
+        , "logout"          => null
+        , "recover"         => null
+        , "registration"    => null
+        , "activation"      => null
     )
     , "title"               => array(
         "enable"            => false
@@ -63,47 +70,48 @@ $config = array(
         "facebook"          => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_FACEBOOK")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/facebook"
-            , "icon"        => cm_getClassByFrameworkCss("facebook", "icon")
+            , "icon"        => Cms::getInstance("frameworkcss")->get("facebook", "icon")
             , "name"        => "Facebook"
             , "title"       => "mod_auth_social_facebook"
         )
         , "gplus"           => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_GPLUS")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/gplus"
-            , "icon"        => cm_getClassByFrameworkCss("gplus", "icon")
+            , "icon"        => Cms::getInstance("frameworkcss")->get("gplus", "icon")
             , "name"        => "GooglePlus"
             , "title"       => "mod_auth_social_gplus"
         )
         , "twitter"         => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_TWITTER")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/twitter"
-            , "icon"        => cm_getClassByFrameworkCss("twitter", "icon")
+            , "icon"        => Cms::getInstance("frameworkcss")->get("twitter", "icon")
             , "name"        => "Twitter"
             , "title"       => "mod_auth_social_twitter"
         )
         , "linkedin"        => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_LINKEDIN")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/linkedin"
-            , "icon"        => cm_getClassByFrameworkCss("linkedin", "icon")
+            , "icon"        => Cms::getInstance("frameworkcss")->get("linkedin", "icon")
             , "name"        => "Linkedin"
             , "title"       => "mod_auth_social_linkedin"
         )
         , "dribble"         => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_DRIBBLE")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/dribble"
-            , "icon"        => cm_getClassByFrameworkCss("dribble", "icon")
+            , "icon"        => Cms::getInstance("frameworkcss")->get("dribble", "icon")
             , "name"        => "Dribble"
             , "title"       => "mod_auth_social_dribble"
         )
         , "ff"              => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_FF")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/ff"
-            , "icon"        => cm_getClassByFrameworkCss("cube", "icon")
+            , "icon"        => Cms::getInstance("frameworkcss")->get("cube", "icon")
             , "name"        => "FormsFramework"
             , "title"       => "mod_auth_social_ff"
         )
     )
 );
+
 $res = $cm->modules["auth"]["events"]->doEvent("on_before_login", array($config));
 $rc = end($res);
 if (is_array($rc))
@@ -112,7 +120,7 @@ if (is_array($rc))
 }
 
 if(Auth::islogged()) {
-    $widget = Auth::widget("logout", $config);
+    $widget = Auth::widget("logout", $config, str_replace($cm->router->getRuleById("mod_auth_login")->reverse, "/logout", $cm->path_info));
 }else {
     $widget = Auth::widget("login", $config);
 }

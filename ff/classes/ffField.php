@@ -74,7 +74,7 @@ class ffField
 	 * @param array $variant
 	 * @return ffField_base
 	 */
-	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null, array $variant = null)
+	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null)
 	{
 		if ($page === null && ($disk_path === null || $site_path === null))
 			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, null, get_defined_vars());
@@ -84,7 +84,7 @@ class ffField
 			if ($page !== null)
 				$theme = $page->theme;
 			else
-				$theme = FF_LOADED_THEME;
+				$theme = FF_MAIN_THEME;
 		}
 			
 		if ($disk_path === null)
@@ -106,33 +106,14 @@ class ffField
 		}
 			
 		
-		$res = self::doEvent("on_factory", array($page, $disk_path, $site_path, $page_path, $theme, $variant));
+		$res = self::doEvent("on_factory", array($page, $disk_path, $site_path, $page_path, $theme));
 		$last_res = end($res);
 
 		if (is_null($last_res))
 		{
-			$base_path = $disk_path . "/themes/" . $theme;
-			
-			if (!isset($variant["name"]))
-			{
-				$registry = ffGlobals::getInstance("_registry_");
-				if (!isset($registry->themes) || !isset($registry->themes[$theme]))
-				{
-					$registry->themes[$theme] = new SimpleXMLElement($base_path . "/theme_settings.xml", null, true);
-				}
-		
-				$suffix = $registry->themes[$theme]->default_class_suffix;
-				
-				$class_name = __CLASS__ . "_" . $suffix;
-			}
-			else
-				$class_name = $variant["name"];
-				
-			if (!isset($variant["path"]))
-				$base_path .= "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
-			else
-				$base_path .= $variant["path"];
-		}
+            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
+            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+        }
 		else
 		{
 			$base_path = $last_res["base_path"];
@@ -511,7 +492,7 @@ abstract class ffField_base extends ffCommon
 	var $file_normalize		= false;
 
 	/**
-	 * Percorso assoluto della cartella degli uploads (ad esempio: /var/www/website/uploads); se omesso verrà generato nel seguente modo: FF_DISK_PATH . "/uploads"
+	 * Percorso assoluto della cartella degli uploads (ad esempio: /var/www/website/uploads); se omesso verrà generato nel seguente modo: FF_DISK_UPDIR
 	 * @var Boolean
 	 */
 	var $file_base_path		= null;		
@@ -547,8 +528,8 @@ abstract class ffField_base extends ffCommon
 	 */
 	var $file_query_string					= "";
 	
-	var $file_modify_path					= "";
-	var $file_modify_dialog					= "";
+	var $file_modify_dialog					= true;
+	var $file_modify_referer                = "";
 
 	/**
 	 * eventuale query string da accodare all'url di visualizzazione
@@ -1425,7 +1406,7 @@ abstract class ffField_base extends ffCommon
 	function getFileBasePath()
 	{
 		if ($this->file_base_path === null)
-			return FF_DISK_PATH . FF_UPDIR;
+			return FF_DISK_UPDIR;
 		else
 			return $this->file_base_path;
 	}
@@ -2038,6 +2019,8 @@ abstract class ffField_base extends ffCommon
 
 	function process_file($id, &$value)
 	{
+	    static $loaded_dialog_fields = null;
+
 		$this->tpl[0]->set_var("id", ffCommon_specialchars($id));
 
 		$suffix_file 		= "file";
@@ -2060,6 +2043,14 @@ abstract class ffField_base extends ffCommon
 			$suffix_delete 		= "_" . $suffix_delete;
 		}
 
+		$file_thumb = (is_array($this->file_thumb)
+            ? implode("x", $this->file_thumb)
+            : (strlen($this->file_thumb)
+                ? $this->file_thumb
+                : ""
+            )
+        );
+
 		$this->tpl[0]->set_var("theme", $this->parent_page[0]->theme);
 		$this->tpl[0]->set_var("suffix_file", $suffix_file);
 		$this->tpl[0]->set_var("suffix_name", $suffix_name);
@@ -2071,10 +2062,46 @@ abstract class ffField_base extends ffCommon
 		$this->tpl[0]->set_var("tmpname", ffCommon_specialchars($this->file_tmpname));
 		$this->tpl[0]->set_var("encoded_filename", urlencode($value->getValue($this->get_app_type(), $this->get_locale())));
 
+        if($this->file_show_edit) {
+            $file_modify_path = ffMedia::MODIFY_PATH . "?key=" . $this->file_modify_referer . "&path=";
+
+            if($this->file_modify_dialog === true) {
+                $this->file_modify_dialog = $this->id . "_media";
+
+                if(!$loaded_dialog_fields[$this->file_modify_dialog]) {
+                    $params = array(
+                        "title" 				=> ffTemplate::_get_word_by_code("ffField_modify") . " " . $this->label
+                        , "class" 				=> null
+                        , "width" 				=> null
+                        , "height" 				=> null
+                        , "type" 				=> null
+                    );
+
+
+                    $this->parent_page[0]->widgetLoad("dialog");
+                    $this->parent_page[0]->widgets["dialog"]->process(
+                        $this->file_modify_dialog
+                        , array(
+                            "title"          	=> $params["title"]
+                            , "tpl_id"        	=> null
+                            , "width"        	=> $params["width"]
+                            , "height"        	=> $params["height"]
+                            , "dialogClass"     => $params["class"]
+                            , "type"			=> $params["type"]
+                        )
+                        , $this->parent_page[0]
+                    );
+                }
+            }
+        }
+
+
 		if (strlen($this->file_tmpname))
 		{
 			$filename = $this->file_tmpname;
-			
+            if(substr($filename, 0,1) == "/")
+                $this->file_full_path = true;
+
 			if ($this->file_full_path)
 			{
 				$tmp_path = str_replace($this->getFileBasePath(), "", $this->file_temp_path);
@@ -2097,18 +2124,18 @@ abstract class ffField_base extends ffCommon
             $view_url               = ($this->file_temp_view_url 
             	? $this->file_temp_view_url 
             	: ($is_local 
-            		? FF_SITE_PATH . CM_SHOWFILES
+            		? ""
             		: ""
             	) . $filename
             );
             $view_query_string      = ($this->file_temp_view_query_string ? $this->file_temp_view_query_string : 
 					($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string)
 				);
-            
+
             $preview_url = ($this->file_temp_preview_url
                 ? $this->file_temp_preview_url
-                : ($is_local 
-                	? FF_SITE_PATH . str_replace($this->getFileBasePath(), CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $this->file_temp_path)
+                : ($is_local
+                	? str_replace($this->getFileBasePath(), "", $this->file_temp_path)
                 	: $filename
                 ) 
             );
@@ -2130,7 +2157,11 @@ abstract class ffField_base extends ffCommon
 				if(count($arrFilename))
 					$filename = $arrFilename[0];
 			}
-			
+
+            if(substr($filename, 0,1) == "/")
+                $this->file_full_path = true;
+
+
 			if ($this->file_full_path)
 			{
 				if (
@@ -2157,16 +2188,15 @@ abstract class ffField_base extends ffCommon
             $view_url = ($this->file_saved_view_url
                 ? $this->file_saved_view_url
                 : ($is_local
-                	? FF_SITE_PATH . str_replace($this->getFileBasePath(), CM_SHOWFILES, $storing_path)
+                	? str_replace($this->getFileBasePath(), "", $storing_path)
                 	: $storing_path
                 ) . "/[_FILENAME_]"
             );
 			$view_query_string		= ($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string);
-            
-            $preview_url = ($this->file_saved_preview_url 
+            $preview_url = ($this->file_saved_preview_url
                 ? $this->file_saved_preview_url
                 : ($is_local
-                	? FF_SITE_PATH . str_replace($this->getFileBasePath(), CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $storing_path) 
+                	? str_replace($this->getFileBasePath(), "", $storing_path)
                 	: $storing_path
                 ) . "/[_FILENAME_]"
             );
@@ -2185,8 +2215,8 @@ abstract class ffField_base extends ffCommon
 		    //$view_url = ffProcessTags($view_url, $this->getKeysArray(), $this->getDataArray(), $mode);
             //$view_url = str_replace("//", "/0/", $view_url); //procedura per fixare il bug nel ffprocesstag che con un valore di tipo numerico ritorna "" al posto di 0
 		    $view_query_string = ffProcessTags($view_query_string, $this->getKeysArray(), $this->getDataArray(), $mode);
-		    
-		    $preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), $mode);
+            $preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), $mode);
+
 		   // $preview_url = str_replace("[_FILENAME_]", ($this->file_full_path ? ltrim($filename, "/") : $filename), $preview_url);
 		    //$preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), $mode);
             //$preview_url = str_replace("//", "/0/", $preview_url);  //procedura per fixare il bug nel ffprocesstag che con un valore di tipo numerico ritorna "" al posto di 0
@@ -2290,20 +2320,20 @@ abstract class ffField_base extends ffCommon
 
 					if($check_file) {
 						$processed_view_url = ffCommon_specialchars(str_replace("[_FILENAME_]", $real_file_value, $view_url));
-						if($this->file_modify_path) {
+						if($file_modify_path) {
 							$file_path = substr($file_full_path, strlen($this->getFileBasePath()));
 							if($this->file_modify_dialog) {
- 								$this->tpl[0]->set_var("ajax_view_url", " onclick=\"ff.ffPage.dialog.doOpen('" . $this->file_modify_dialog ."', '" . ffCommon_specialchars($this->file_modify_path . $file_path) . "', undefined, undefined, jQuery(this).closest('.uploaded-thumb'));\"");
+ 								$this->tpl[0]->set_var("ajax_view_url", " onclick=\"ff.ffPage.dialog.doOpen('" . $this->file_modify_dialog ."', '" . ffCommon_specialchars(FF_SITE_PATH . $file_modify_path . $file_path) . "');\"");
                                 $this->tpl[0]->set_var("view_url", "javascript:void(0);");
 							} else {
                                 $this->tpl[0]->set_var("ajax_view_url", "");
-								$this->tpl[0]->set_var("view_url", ffCommon_specialchars($this->file_modify_path . $file_path));
+								$this->tpl[0]->set_var("view_url", ffCommon_specialchars($file_modify_path . $file_path));
 							}
 						} else {
                             $this->tpl[0]->set_var("ajax_view_url", "");
-							$this->tpl[0]->set_var("view_url", $processed_view_url);
+							$this->tpl[0]->set_var("view_url", ffMedia::getUrl($processed_view_url, null, "url"));
 						}
-						$this->tpl[0]->set_var("preview_url", ffCommon_specialchars(str_replace("[_FILENAME_]", $real_file_value, $preview_url)));
+						$this->tpl[0]->set_var("preview_url", ffMedia::getUrl(ffCommon_specialchars(str_replace("[_FILENAME_]", $real_file_value, $preview_url)), $file_thumb, "url"));
 
 						/*
 						if($is_tmpfile)
@@ -2327,34 +2357,35 @@ abstract class ffField_base extends ffCommon
 						if($this->file_writable) 
 							$this->tpl[0]->parse("SectWritable", false);
 						
-						if ($this->file_show_edit) {
-							if(strlen($this->file_edit_type)) {
-								if(is_array($this->file_edit_params) 
-									&& array_key_exists($this->file_edit_type, $this->file_edit_params)
-									&& is_array($this->file_edit_params[$this->file_edit_type])
-									&& count($this->file_edit_params[$this->file_edit_type])
-								) {
-									$tmp = md5($id . "-" . $file_full_path);
-									$ff = get_session("ff");
-									$ff["aviary"][$tmp]["folder"] = str_replace($this->getFileBasePath(), "", ffCommon_dirname($file_full_path)); 
-									$ff["aviary"][$tmp]["base_path"] = $this->getFileBasePath();
-									set_session("ff", $ff);
-									
+						if ($this->file_show_edit && is_array($this->file_edit_params[$this->file_edit_type])) {
+                            if(!$this->file_edit_params[$this->file_edit_type]["key"]) {
+                                $cache = ffCache::getInstance();
+                                $this->file_edit_params[$this->file_edit_type]["key"] = $cache->get($this->file_edit_type . "/key");
+                            }
+							if($this->file_edit_params[$this->file_edit_type]["key"]) {
+                                $tmp = md5($id . "-" . $file_full_path);
+                                $ff = get_session("ff");
+                                $ff["aviary"][$tmp]["folder"] = str_replace($this->getFileBasePath(), "", ffCommon_dirname($file_full_path));
+                                $ff["aviary"][$tmp]["base_path"] = $this->getFileBasePath();
+                                set_session("ff", $ff);
 
-									foreach($this->file_edit_params[$this->file_edit_type] AS $params_key => $params_value) {
-										$this->tpl[0]->set_var(strtolower($this->file_edit_type) . "_" . $params_key, $params_value);
-									}
 
-									$this->tpl[0]->set_var(strtolower($this->file_edit_type) . "_url", $file_value);
-									$this->tpl[0]->set_var(strtolower($this->file_edit_type) . "_hash_img", $tmp);
-									$this->tpl[0]->parse("SezEdit" . $this->file_edit_type, false);
-								}
-								
-								$this->tpl[0]->parse("ShowEdit", false);	
+                                foreach($this->file_edit_params[$this->file_edit_type] AS $params_key => $params_value) {
+                                    $this->tpl[0]->set_var(strtolower($this->file_edit_type) . "_" . $params_key, $params_value);
+                                }
+
+                                $this->tpl[0]->set_var(strtolower($this->file_edit_type) . "_url", $file_value);
+                                $this->tpl[0]->set_var(strtolower($this->file_edit_type) . "_hash_img", $tmp);
+                                $this->tpl[0]->parse("SezEdit" . $this->file_edit_type, false);
 							}
-						} else 
-							$this->tpl[0]->set_var("ShowEdit", "");							
-						
+						}
+
+                        $this->tpl[0]->set_var("showfile_plugin", ($this->file_showfile_plugin
+                                                                    ? $this->file_showfile_plugin
+                                                                    : "origin-file"
+                                                                ));
+
+
 						$this->tpl[0]->set_var("filename_base", $filename_base);
 						$this->tpl[0]->parse("ShowPreviewImg", false);
 						$this->tpl[0]->set_var("ShowPreviewNoImg", "");

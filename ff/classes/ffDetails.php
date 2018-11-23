@@ -58,10 +58,9 @@ class ffDetails
 	 * @param ffPage_base $page
 	 * @param string $disk_path
 	 * @param string $theme
-	 * @param array $variant
 	 * @return ffDetails_base
 	 */
-	public static function factory(ffPage_base $page, $disk_path = null, $theme = null, array $variant = null)
+	public static function factory(ffPage_base $page, $disk_path = null, $theme = null)
 	{
 		if ($theme === null)
 			$theme = $page->theme;
@@ -69,33 +68,14 @@ class ffDetails
 		if ($disk_path === null)
 			$disk_path = $page->disk_path;
 			
-		$res = self::doEvent("on_factory", array($page, $disk_path, $theme, $variant));
+		$res = self::doEvent("on_factory", array($page, $disk_path, $theme));
 		$last_res = end($res);
 
 		if (is_null($last_res))
 		{
-			$base_path = $disk_path . "/themes/" . $theme;
-			
-			if (!isset($variant["name"]))
-			{
-				$registry = ffGlobals::getInstance("_registry_");
-				if (!isset($registry->themes) || !isset($registry->themes[$theme]))
-				{
-					$registry->themes[$theme] = new SimpleXMLElement($base_path . "/theme_settings.xml", null, true);
-				}
-		
-				$suffix = $registry->themes[$theme]->default_class_suffix;
-				
-				$class_name = __CLASS__ . "_" . $suffix;
-			}
-			else
-				$class_name = $variant["name"];
-
-			if (!isset($variant["path"]))
-				$base_path .= "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
-			else
-				$base_path .= $variant["path"];
-		}
+            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
+            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+        }
 		else
 		{
 			$base_path = $last_res["base_path"];
@@ -1005,8 +985,13 @@ abstract class ffDetails_base extends ffCommon
 					// pre-process for father values
 					foreach ($this->main_record[0]->key_fields as $key => $value)
 					{
-						$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->key_fields[$key]->value, $this->main_record[0]->key_fields[$key]->base_type), $tmp_SQL);
-						$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->key_fields[$key]->value, $this->main_record[0]->key_fields[$key]->base_type, false), $tmp_SQL);
+                        $key_value = ($this->main_record[0]->src_table
+                            ? $this->main_record[0]->key_fields[$key]->value
+                            : $this->main_record[0]->key_fields[$key]->default_value
+                        );
+
+						$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($key_value, $this->main_record[0]->key_fields[$key]->base_type), $tmp_SQL);
+						$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($key_value, $this->main_record[0]->key_fields[$key]->base_type, false), $tmp_SQL);
 					}
 					reset($this->main_record[0]->key_fields);
 
@@ -1026,8 +1011,13 @@ abstract class ffDetails_base extends ffCommon
 						}
 						else
 						{
-							$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->form_fields[$key]->value, $this->main_record[0]->form_fields[$key]->base_type), $tmp_SQL);
-							$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->form_fields[$key]->value, $this->main_record[0]->form_fields[$key]->base_type, false), $tmp_SQL);
+                            $form_value = ($this->main_record[0]->src_table
+                                ? $this->main_record[0]->form_fields[$key]->value
+                                : $this->main_record[0]->form_fields[$key]->default_value
+                            );
+
+							$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($form_value, $this->main_record[0]->form_fields[$key]->base_type), $tmp_SQL);
+							$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($form_value, $this->main_record[0]->form_fields[$key]->base_type, false), $tmp_SQL);
 						}
 					}
 					reset($this->main_record[0]->form_fields);
@@ -1101,8 +1091,9 @@ abstract class ffDetails_base extends ffCommon
 									case "db":
 										if ($this->db[0]->isSetField($this->hidden_fields[$key]->get_data_source()))
 											$this->recordset_ori[$i][$key] = $this->db[0]->getField($this->hidden_fields[$key]->get_data_source(), $this->hidden_fields[$key]->base_type);
-										else
-											$this->recordset_ori[$i][$key] = $dbtemp->getField($this->hidden_fields[$key]->get_data_source(), $this->hidden_fields[$key]->base_type);
+										else {
+                                            $this->recordset_ori[$i][$key] = $this->hidden_fields[$key]->getDefault(array(&$this));
+                                        }
 										break;
 
 									case "callback":
@@ -1321,8 +1312,13 @@ abstract class ffDetails_base extends ffCommon
 					// pre-process for father values
 					foreach ($this->main_record[0]->key_fields as $key => $value)
 					{
-						$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->key_fields[$key]->value, $this->main_record[0]->key_fields[$key]->base_type), $tmp_SQL);
-						$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->key_fields[$key]->value, $this->main_record[0]->key_fields[$key]->base_type, false), $tmp_SQL);
+                        $key_value = ($this->main_record[0]->src_table
+                            ? $this->main_record[0]->key_fields[$key]->value
+                            : $this->main_record[0]->key_fields[$key]->default_value
+                        );
+
+						$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($key_value, $this->main_record[0]->key_fields[$key]->base_type), $tmp_SQL);
+						$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($key_value, $this->main_record[0]->key_fields[$key]->base_type, false), $tmp_SQL);
 					}
 					reset($this->main_record[0]->key_fields);
 
@@ -1342,8 +1338,13 @@ abstract class ffDetails_base extends ffCommon
 						}
 						else
 						{
-							$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->form_fields[$key]->value, $this->main_record[0]->form_fields[$key]->base_type), $tmp_SQL);
-							$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($this->main_record[0]->form_fields[$key]->value, $this->main_record[0]->form_fields[$key]->base_type, false), $tmp_SQL);
+                            $form_value = ($this->main_record[0]->src_table
+                                ? $this->main_record[0]->form_fields[$key]->value
+                                : $this->main_record[0]->form_fields[$key]->default_value
+                            );
+
+							$tmp_SQL = str_replace("[" . $key . "_FATHER]", $this->db[0]->toSql($form_value, $this->main_record[0]->form_fields[$key]->base_type), $tmp_SQL);
+							$tmp_SQL = str_replace("[UNQUOTED_" . $key . "_FATHER]", $this->db[0]->toSql($form_value, $this->main_record[0]->form_fields[$key]->base_type, false), $tmp_SQL);
 						}
 					}
 					reset($this->main_record[0]->form_fields);
@@ -1550,7 +1551,7 @@ abstract class ffDetails_base extends ffCommon
                                         && substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
                                     ) {
 									    //if($this->form_fields[$key]->getFileBasePath() === null)
-										//    $this->form_fields[$key]->getFileBasePath() = FF_DISK_PATH . "/uploads";
+										//    $this->form_fields[$key]->getFileBasePath() = FF_DISK_UPDIR;
 
 									    //if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset[$i][$key]->getValue()))
 										    //$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileTempPath(false)) . "/" . basename($this->recordset[$i][$key]->getValue()));
@@ -1644,7 +1645,7 @@ abstract class ffDetails_base extends ffCommon
 				{
 					foreach ($this->form_fields as $key => $FormField)
 					{
-						$res = $this->doEvent("on_check_fields", array(&$this, $this->recordset[$i], &$FormField, $this->frmAction));
+                        $res = $this->doEvent("on_check_fields", array(&$this, $this->recordset[$i], &$FormField, $this->frmAction));
 						$rc = end($res);
 						if ($rc !== null && $rc !== false && strlen($rc))
 						{
@@ -2084,7 +2085,7 @@ abstract class ffDetails_base extends ffCommon
 	 * @return Boolean vedi process_action
 	 */
 	function insert_record($rec_SQL, $row)
-	{         
+	{
 		$res = $this->doEvent("on_do_record_action", array(&$this, "insert", $this->recordset[$row], $this->recordset_ori[$row]));
 		$rc = end($res);
 		if (null !== $rc)
@@ -2240,12 +2241,15 @@ abstract class ffDetails_base extends ffCommon
 			{
 				if (strlen($fields))
 					$fields .= ", ";
-				$fields .= $key;
+				$fields .= "`" . $key . "`";
 
 				if (strlen($values))
 					$values .= ", ";
 				$values .= $this->db[0]->toSql(
-									$this->main_record[0]->key_fields[$value]->value,
+                                ($this->main_record[0]->src_table
+                                    ? $this->main_record[0]->key_fields[$value]->value
+                                    : $this->main_record[0]->key_fields[$value]->default_value
+                                ),
 									$this->main_record[0]->key_fields[$value]->base_type
 								) . " ";
 			}
@@ -2498,7 +2502,6 @@ abstract class ffDetails_base extends ffCommon
 		}
 
 		$rc = $this->doEvent("on_before_record_update", array($this, $row, &$fields));
-
 		if (strlen($fields))
 		{
 			$sSQL = "UPDATE " . $this->src_table . " SET " . $fields . " WHERE " . $rec_SQL;
@@ -2593,7 +2596,13 @@ abstract class ffDetails_base extends ffCommon
 						$storing_path = ffProcessTags($this->form_fields[$key]->file_storing_path, $keys_array[$row], array_merge($values_array[$row]));
 						foreach ($this->fields_relationship as $subkey => $subvalue)
 						{
-							$storing_path = str_replace("[" . $subvalue . "_FATHER]", $this->main_record[0]->key_fields[$subvalue]->value->getValue(null, FF_SYSTEM_LOCALE), $storing_path);
+							$storing_path = str_replace("[" . $subvalue . "_FATHER]"
+                                , ($this->main_record[0]->src_table
+                                    ? $this->main_record[0]->key_fields[$subvalue]->value->getValue(null, FF_SYSTEM_LOCALE)
+                                    : $this->main_record[0]->key_fields[$subvalue]->default_value->getValue(null, FF_SYSTEM_LOCALE)
+                                )
+                                , $storing_path
+                            );
 						}
 						reset($this->fields_relationship);
 

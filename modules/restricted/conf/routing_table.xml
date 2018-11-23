@@ -9,12 +9,31 @@
 		</destination>
 		<reverse>/restricted/settings</reverse>
 	</rule>
+	<rule id="mod_restricted_login">
+		<priority>VERY_HIGH</priority>
+		<source>^/restricted/login$</source>
+		<destination>
+			<module>auth</module>
+			<url>/login$1</url>
+		</destination>
+		<reverse>/restricted/login</reverse>
+		<index>10</index>
+	</rule>
+	<rule id="mod_restricted_dashboard">
+		<priority>NORMAL</priority>
+		<source>^/restricted/dashboard(.*)</source>
+		<destination>
+			<module>restricted</module>
+			<url>/dashboard$1</url>
+		</destination>
+		<reverse>/restricted/dashboard</reverse>
+	</rule>
 	<rule id="restricted">
 		<priority>HIGH</priority>
 		<source>^/restricted(.*)</source>
 		<destination>
 			<module>restricted</module>
-			<url>/layout$0</url>
+			<url>/layout$1</url>
 		</destination>
 		<process_next />
 		<accept_path_info />

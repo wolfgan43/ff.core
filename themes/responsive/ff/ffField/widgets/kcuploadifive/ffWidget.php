@@ -53,7 +53,7 @@ class ffWidget_kcuploadifive extends ffCommon
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -129,17 +129,17 @@ class ffWidget_kcuploadifive extends ffCommon
 		$this->tpl[$tpl_id]->set_var("fixed_pre_content", $Field->fixed_pre_content);
 		$this->tpl[$tpl_id]->set_var("fixed_post_content", $Field->fixed_post_content);
 
-        $this->tpl[$tpl_id]->set_var("browse_class", cm_getClassByFrameworkCss("search", "icon", "lg"));
+        $this->tpl[$tpl_id]->set_var("browse_class", Cms::getInstance("frameworkcss")->get("search", "icon", "lg"));
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
         else 
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/kcuploadifive");  
         
-		if($Field->uploadifive_showfile_plugin) {
-			$this->oPage[0]->tplAddJs("jquery." . $Field->uploadifive_showfile_plugin);  
+		if($Field->file_showfile_plugin) {
+			$this->oPage[0]->tplAddJs("jquery." . $Field->file_showfile_plugin);
 
-			$this->tpl[$tpl_id]->set_var("showfile_plugin", "'" . $Field->uploadifive_showfile_plugin . "'");
+			$this->tpl[$tpl_id]->set_var("showfile_plugin", "'" . $Field->file_showfile_plugin . "'");
 		} else {
 			$this->tpl[$tpl_id]->set_var("showfile_plugin", "undefined");
 		}
@@ -151,7 +151,7 @@ class ffWidget_kcuploadifive extends ffCommon
 		if(!strlen($folder))
 			$folder = "/";
 
-		if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID) { //if(session_status() == PHP_SESSION_NONE) {
+		if(Auth::isLogged()) { //if(session_status() == PHP_SESSION_NONE) {
 			if ($plgCfg_kcuploadifive_UseOwnSession || $Field->actex_use_own_session) 
 				session_start();
 			$ff = get_session("ff");
@@ -161,7 +161,7 @@ class ffWidget_kcuploadifive extends ffCommon
 		
         if($Field->extended_type == "File") {
         	//$this->tpl[$tpl_id]->set_var("base_url", $folder);
-			if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID) {//if(session_status() == PHP_SESSION_NONE) {
+			if(Auth::isLogged()) {//if(session_status() == PHP_SESSION_NONE) {
 				$ff["uploadifive"][$tmp]["folder"] = $folder;
 				$ff["uploadifive"][$tmp]["base_path"] = $base_path;
 				
@@ -179,9 +179,9 @@ class ffWidget_kcuploadifive extends ffCommon
 					if(strlen($file_ext))
 						$file_ext .= "|";
 					if (strpos($file_allowed_mime_value, "/"))
-						$file_ext .= ffMimeTypeByExtension(substr($file_allowed_mime_value, strpos($file_allowed_mime_value, "/") + 1));
+						$file_ext .= ffMedia::getMimeTypeByExtension(substr($file_allowed_mime_value, strpos($file_allowed_mime_value, "/") + 1));
 					else
-						$file_ext .= ffMimeTypeByExtension($file_allowed_mime_value);
+						$file_ext .= ffMedia::getMimeTypeByExtension($file_allowed_mime_value);
 				}
 			}
 			if(strlen($file_ext))
@@ -225,10 +225,10 @@ class ffWidget_kcuploadifive extends ffCommon
 			$this->tpl[$tpl_id]->set_var("size_limit", 0);
 			$this->tpl[$tpl_id]->set_var("file_ext", "null");
 		}
-		$this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("cancel", "icon"));
-        $this->tpl[$tpl_id]->set_var("aviary_class", cm_getClassByFrameworkCss("crop", "icon"));  
-        $this->tpl[$tpl_id]->set_var("upload_class", cm_getClassByFrameworkCss("upload", "icon"));
-        $this->tpl[$tpl_id]->set_var("upload_icon", cm_getClassByFrameworkCss("upload", "icon-tag", "lg"));
+		$this->tpl[$tpl_id]->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("cancel", "icon"));
+        $this->tpl[$tpl_id]->set_var("aviary_class", Cms::getInstance("frameworkcss")->get("crop", "icon"));  
+        $this->tpl[$tpl_id]->set_var("upload_class", Cms::getInstance("frameworkcss")->get("upload", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_icon", Cms::getInstance("frameworkcss")->get("upload", "icon-tag", "lg"));
         
 		if($Field->file_multi) {
 			$this->tpl[$tpl_id]->set_var("multi", "true");
@@ -236,29 +236,41 @@ class ffWidget_kcuploadifive extends ffCommon
 			$this->tpl[$tpl_id]->set_var("multi", "false");
 		}
 
-		if($Field->file_modify_path) {
-			$this->tpl[$tpl_id]->set_var("showfile_path", "'" . $Field->file_modify_path . "'");
-		} else {
-			$this->tpl[$tpl_id]->set_var("showfile_path", "undefined");
-		}
+        if($Field->file_show_edit) {
+            $file_modify_path = ffMedia::MODIFY_PATH . "?key=" . $Field->file_modify_referer . "&path=";
 
-		if($Field->file_modify_dialog) {
-			$this->tpl[$tpl_id]->set_var("showfile_dialog", "'" . $Field->file_modify_dialog . "'");
-		} else {
-			$this->tpl[$tpl_id]->set_var("showfile_dialog", "undefined");
-		}
+            $this->tpl[$tpl_id]->set_var("showfile_path", "'" . $file_modify_path . "'");
 
-		if($Field->uploadifive_sort_path) {
-			$this->oPage[0]->tplAddJs("jquery-ui");
-			$this->tpl[$tpl_id]->set_var("showfile_sort", "'" . $Field->uploadifive_sort_path . "'");
-		} else {
-			$this->tpl[$tpl_id]->set_var("showfile_sort", "undefined");
-		}
+            if($Field->file_modify_dialog) {
+                if($Field->file_modify_dialog === true) {
+                    $Field->file_modify_dialog = $Field->id . "_media";
+                }
 
-		$this->tpl[$tpl_id]->set_var("thumb_model", $Field->uploadifive_model_thumb);
+                $this->tpl[$tpl_id]->set_var("showfile_dialog", "'" . $Field->file_modify_dialog . "'");
+            } else {
+                $this->tpl[$tpl_id]->set_var("showfile_dialog", "undefined");
+            }
+        } else {
+            $this->tpl[$tpl_id]->set_var("showfile_path", "undefined");
+            $this->tpl[$tpl_id]->set_var("showfile_dialog", "undefined");
+        }
 
-		$this->tpl[$tpl_id]->set_var("width", $Field->file_thumb["width"]);
-		$this->tpl[$tpl_id]->set_var("height", $Field->file_thumb["height"]);
+        if($Field->file_sortable) {
+            $this->oPage[0]->tplAddJs("jquery-ui");
+            $this->tpl[$tpl_id]->set_var("showfile_sort", ($Field->file_sortable === true
+                ? "true"
+                : "'" . $Field->file_sortable . "'"
+            ));
+        } else {
+            $this->tpl[$tpl_id]->set_var("showfile_sort", "undefined");
+        }
+
+        if(is_array($Field->file_thumb)) {
+            $this->tpl[$tpl_id]->set_var("width", $Field->file_thumb["width"]);
+            $this->tpl[$tpl_id]->set_var("height", $Field->file_thumb["height"]);
+       } elseif(strlen($Field->file_thumb)) {
+            $this->tpl[$tpl_id]->set_var("thumb_model", $Field->file_thumb);
+        }
 
 		if($Field->file_show_filename) {
 			$this->tpl[$tpl_id]->set_var("show_file", "true");
@@ -278,38 +290,35 @@ class ffWidget_kcuploadifive extends ffCommon
             $this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->getValue($Field->get_app_type(), $Field->get_locale())));
 
 
-		$this->tpl[$tpl_id]->set_var("aviary", "null");
-		if ($Field->file_show_edit) {
-			if(strlen($Field->file_edit_type)) {
-				if(is_array($Field->file_edit_params) 
-					&& array_key_exists($Field->file_edit_type, $Field->file_edit_params)
-					&& is_array($Field->file_edit_params[$Field->file_edit_type])
-					&& count($Field->file_edit_params[$Field->file_edit_type])
-					&& $Field->file_edit_type == "Aviary"
-				) {
-					if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID) {//if(session_status() == PHP_SESSION_NONE) {
-						$ff["aviary"][$tmp]["folder"] = $folder;
-						$ff["aviary"][$tmp]["base_path"] = $base_path;
-					}					
-					
-					$str_aviary = "'" . "img_hash" . "' : '" . $tmp . "'";
-					foreach($Field->file_edit_params[$Field->file_edit_type] AS $params_key => $params_value) {
-						if(strlen($str_aviary ))
-							$str_aviary .= ", ";
+        $this->tpl[$tpl_id]->set_var("aviary", "null");
+        if ($Field->file_show_edit && is_array($Field->file_edit_params[$Field->file_edit_type])) {
+            if(!$Field->file_edit_params[$Field->file_edit_type]["key"]) {
+                $cache = ffCache::getInstance();
+                $Field->file_edit_params[$Field->file_edit_type]["key"] = $cache->get($Field->file_edit_type . "/key");
+            }
+            if($Field->file_edit_params[$Field->file_edit_type]["key"]) {
+                if(Auth::isLogged()) {//if(session_status() == PHP_SESSION_NONE) {
+                    $ff["aviary"][$tmp]["folder"] = $folder;
+                    $ff["aviary"][$tmp]["base_path"] = $base_path;
+                }
 
-						$str_aviary .= "'" . "" . $params_key . "' : '" . $params_value . "'";
-					}
+                $str_aviary = "'" . "img_hash" . "' : '" . $tmp . "'";
+                foreach($Field->file_edit_params[$Field->file_edit_type] AS $params_key => $params_value) {
+                    if(strlen($str_aviary ))
+                        $str_aviary .= ", ";
 
-					
-					
-					$this->tpl[$tpl_id]->set_var("aviary", "{" . $str_aviary . "}");
-				}
-			}
-		}
+                    $str_aviary .= "'" . "" . $params_key . "' : '" . $params_value . "'";
+                }
+
+
+
+                $this->tpl[$tpl_id]->set_var("aviary", "{" . $str_aviary . "}");
+            }
+        }
 		
-		if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)//if(session_status() == PHP_SESSION_NONE)
-			set_session("ff", $ff);
-
+		if(Auth::isLogged()) {//if(session_status() == PHP_SESSION_NONE)
+            set_session("ff", $ff);
+        }
         //$this->tpl[0]->set_var("properties", $Field->getProperties());
 
         $this->tpl[$tpl_id]->parse("SectBinding", true);

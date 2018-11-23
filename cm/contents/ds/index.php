@@ -9,7 +9,7 @@
  * @link http://www.formsphpframework.com
  */
 
-$db = ffDBConnection::factory("db_sql_" . FF_DB_INTERFACE);
+$db = ffDBConnection::factory("db_sql_mysqli");
 $globals = ffGlobals::getInstance("ds");
 $globals_cache = ffGlobals::getInstance("__ds_cache__");
 $reverse = (string)$cm->router->getRuleById("ds")->reverse;
@@ -18,18 +18,18 @@ $reverse = (string)$cm->router->getRuleById("ds")->reverse;
 
 $globals->tables = $db->queryStructure(ffDBAdapter::TYPE_DB);
 
-$cache_path = CM_CACHE_PATH . "/ds";
+$cache_path = CM_CACHE_DISK_PATH . "/ds";
 if (!is_dir($cache_path))
 	@mkdir($cache_path, 0777, true);
 
 $cache_file = $cache_path . "/mod_restricted.xml";
 
-if (file_exists($cache_file))
+/*if (file_exists($cache_file))
 {
 	mod_restricted_load_config_file($cache_file);
 }
 else
-{
+{*/
 	$fp = fopen($cache_file, "w");
 
 	fwrite($fp, '<?xml version="1.0" encoding="utf-8"?>
@@ -55,7 +55,7 @@ else
 	</menu>
 </configdata>');
 	fclose($fp);
-}
+//}
 
 $path = $cm->router->matched_rules["ds"]["params"][1][0];
 if (!strlen($path))
@@ -71,7 +71,7 @@ $mode = $path_parts[1];
 
 $cm->modules["restricted"]["sel_topbar"]["elements"][$name]["selected"] = true;
 
-$cache_path = CM_CACHE_PATH . "/ds/" . $name;
+$cache_path = CM_CACHE_DISK_PATH . "/ds/" . $name;
 if (!is_dir($cache_path))
 	@mkdir($cache_path, 0777, true);
 

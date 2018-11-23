@@ -16,7 +16,8 @@ if(!defined("CM_CACHE_DISK_PATH")) define("CM_CACHE_DISK_PATH", FF_DISK_PATH . C
 define("CM_MODULES_PATH", "/modules");
 define("CM_MODULES_ROOT", __TOP_DIR__ . CM_MODULES_PATH);
 
-define("CM_CONTENT_ROOT",  __PRJ_DIR__ . "/contents");
+define("CM_CONTENT_PATH", "/contents");
+define("CM_CONTENT_ROOT",  __PRJ_DIR__ . CM_CONTENT_PATH);
 
 /**
  * E possibile definire la costante nei seguenti modi:
@@ -75,4 +76,4 @@ define("CM_CONTENT_ROOT",  __PRJ_DIR__ . "/contents");
  * RewriteCond %{REQUEST_URI}  	    !^[FF_SITE_PATH]/cm/static\.php
  * RewriteRule ^(.*)                  [FF_SITE_PATH]/cm/static\.php/$0 [L,QSA]
  */
-if(!defined("CM_SHOWFILES")) define("CM_SHOWFILES", FF_SITE_PATH . "/cm/showfiles." . FF_PHP_EXT);
+if(!defined("CM_SHOWFILES")) define("CM_SHOWFILES", FF_SITE_PATH . "/media");

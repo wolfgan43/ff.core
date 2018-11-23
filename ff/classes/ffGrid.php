@@ -58,10 +58,9 @@ class ffGrid
 	 * @param ffPage_base $page
 	 * @param string $disk_path
 	 * @param string $theme
-	 * @param array $variant
 	 * @return ffGrid_base
 	 */
-	public static function factory(ffPage_base $page, $disk_path = null, $theme = null, array $variant = null)
+	public static function factory(ffPage_base $page, $disk_path = null, $theme = null)
 	{
 		if ($theme === null)
 			$theme = $page->theme;
@@ -69,33 +68,14 @@ class ffGrid
 		if ($disk_path === null)
 			$disk_path = $page->disk_path;
 			
-		$res = self::doEvent("on_factory", array($page, $disk_path, $theme, $variant));
+		$res = self::doEvent("on_factory", array($page, $disk_path, $theme));
 		$last_res = end($res);
 
 		if (is_null($last_res))
 		{
-			$base_path = $disk_path . "/themes/" . $theme;
-			
-			if (!isset($variant["name"]))
-			{
-				$registry = ffGlobals::getInstance("_registry_");
-				if (!isset($registry->themes) || !isset($registry->themes[$theme]))
-				{
-					$registry->themes[$theme] = new SimpleXMLElement($base_path . "/theme_settings.xml", null, true);
-				}
-		
-				$suffix = $registry->themes[$theme]->default_class_suffix;
-				
-				$class_name = __CLASS__ . "_" . $suffix;
-			}
-			else
-				$class_name = $variant["name"];
-				
-			if (!isset($variant["path"]))
-				$base_path .= "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
-			else
-				$base_path .= $variant["path"];
-		}
+            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
+            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+        }
 		else
 		{
 			$base_path = $last_res["base_path"];
@@ -589,7 +569,7 @@ abstract class ffGrid_base extends ffCommon
 			$this->db[0] = ffDB_Sql::factory();
 
 		if ($this->use_paging && $this->navigator === null)
-			$this->navigator[0] = ffPageNavigator::factory($page, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
+			$this->navigator[0] = ffPageNavigator::factory($page, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 	}
 	
 	// -----------------------
@@ -1139,7 +1119,7 @@ abstract class ffGrid_base extends ffCommon
 				ffErrorHandler::raise("Cannot find alpha field into fields", E_USER_ERROR, $this, get_defined_vars());
 
 			$tmp_field = "";
-			
+            $tmp_sql = "";
 			if (strlen($tmp_alpha_cont[$this->alpha_field]->src_table))
 				$tmp_field .= "`" . $tmp_alpha_cont[$this->alpha_field]->src_table . "`.";
 
@@ -1763,7 +1743,7 @@ abstract class ffGrid_base extends ffCommon
 			}
 			else
 			{
-				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
+				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 				$tmp->id 			= "searched";
 				$tmp->label 		= $this->buttons_options["search"]["label"];
 				$tmp->aspect 		= "link";
@@ -1784,7 +1764,7 @@ abstract class ffGrid_base extends ffCommon
 			}
 			else
 			{
-				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
+				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 				$tmp->id 			= "export";
 				$tmp->label 		= $this->buttons_options["export"]["label"];
 				$tmp->aspect 		= "link";

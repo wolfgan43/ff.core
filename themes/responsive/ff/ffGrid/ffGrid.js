@@ -169,6 +169,16 @@ __ff : true, // used to recognize ff'objects
 "dialogOpen" : function(record_id, url, title, elemHighlight) {
 	ff.ffPage.dialog.doOpen(record_id, url, title, undefined, elemHighlight);
 	
+},
+
+"searchHistoryPush" : function(key) {
+	var search = ff.updateQueryString(location.search, key + "_src", jQuery("#" + key + "_src").val(), "?");
+
+	if(history.pushState) {
+        history.pushState(null, null, search);
+    } else {
+        location.search = search;
+    }
 }
 
 }; // publics' end
