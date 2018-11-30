@@ -57,7 +57,7 @@ function initsReset(id) {
 }*/
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects */
+__ff : "ff.ffPage.dialog-bootstrap", /* used to recognize ff'objects */
 
 "dialog_params"        : ff.hash(),
 /*"dialog_deps"        : ff.hash(),*/
@@ -237,8 +237,9 @@ __ff : true, /* used to recognize ff'objects */
 		else
             title = that.dialog_params.get(id)["title"];
     }
-
-	that.updateCursor(id, that.dialog_params.get(id)["url"]);
+	if(that.dialog_params.get(id)) {
+        that.updateCursor(id, that.dialog_params.get(id)["url"]);
+    }
 
     if (dialogs.get(id) && dialogs.get(id).instance) {
 	    var widget = dialogs.get(id).widget;
@@ -779,6 +780,10 @@ __ff : true, /* used to recognize ff'objects */
 }
 
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

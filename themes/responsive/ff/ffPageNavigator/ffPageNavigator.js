@@ -65,6 +65,8 @@ function calcPage(id) {
 function drawButtons(id) {
     var processed_code_template = '';
 	var component = navigators[id]["component"];
+	var tplProperties = "";
+	var tplAddClass = "";
 
     jQuery("." + component).find(".totpage").html(navigators[id].totpage);
 	if(navigators[id].totpage == 1) {
@@ -214,7 +216,7 @@ function eventButtons(id) {
 }
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.ffPageNavigator", // used to recognize ff'objects
 
 "addNavigator" : function (params) {
 	var prefix = (params.prefix !== undefined 
@@ -606,6 +608,10 @@ __ff : true, // used to recognize ff'objects
 }
 
 }; // publics' end
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

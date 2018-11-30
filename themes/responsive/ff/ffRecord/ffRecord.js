@@ -7,7 +7,7 @@ ff.ffRecord = (function () {
 //privates
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.ffRecord", // used to recognize ff'objects
 "init" : function(component) {
 	jQuery("#" + component + " .ffCheckDep").click();
 	ff.pluginLoad("ff.ajax", "/themes/library/ff/ajax.js", function() {
@@ -130,6 +130,9 @@ __ff : true, // used to recognize ff'objects
 ff.pluginAddInitLoad("ff.ffRecord", function () {
 	ff.addEvent({"event_name" : "onClearComponent", "func_name" : that.onClearComponent});
 });
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

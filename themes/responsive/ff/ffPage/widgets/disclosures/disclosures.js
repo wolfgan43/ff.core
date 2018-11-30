@@ -1,7 +1,7 @@
 ff.ffPage.disclosures = (function () {
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects */
+__ff : "ff.ffPage.disclosures", /* used to recognize ff'objects */
 
 "toggle" : function (element) {
 	element = jQuery("#" + element).get(0);
@@ -33,6 +33,10 @@ __ff : true, /* used to recognize ff'objects */
 }
 
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

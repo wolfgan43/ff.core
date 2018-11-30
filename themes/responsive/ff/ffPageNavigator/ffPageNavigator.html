@@ -75,25 +75,21 @@
   <!--EndSectNav-->
 </div>
 <!--BeginSectFooters-->
-<script type="text/javascript"> 
-	jQuery(function() {
-		ff.pluginAddInit("ff.ffPageNavigator", function () {
-			ff.ffPageNavigator.addNavigator({
-				"id"							: "{XHRcomponent}"
-                , "prefix"                      : "{prefix}"
-				, "page_parname"				: "{page_parname}"
-				<!--BeginSectNoInfinite-->
-				, "rec_per_page_parname"		: "{records_per_page_parname}"
-				, "rec_per_page"				: {selected_records_per_page}
-				, "page_per_frame"				: {page_per_frame}
-				<!--EndSectNoInfinite-->
-				, "doAjax"						: {doAjax}
-				, "infinite"					: {infinite}
-				, "currentClass"				: "{current_class}"
-                , "callback"                    : {callback}
-                , "callbackParams"              : {callback_params}
-			});
-		});
-	});
-</script>
+    ff.pluginAddInit("ff.ffPageNavigator", function () {
+        ff.ffPageNavigator.addNavigator({
+            "id"							: "{XHRcomponent}"
+            , "prefix"                      : "{prefix}"
+            , "page_parname"				: "{page_parname}"
+            <!--BeginSectNoInfinite-->
+            , "rec_per_page_parname"		: "{records_per_page_parname}"
+            , "rec_per_page"				: {selected_records_per_page}
+            , "page_per_frame"				: {page_per_frame}
+            <!--EndSectNoInfinite-->
+            , "doAjax"						: {doAjax}
+            , "infinite"					: {infinite}
+            , "currentClass"				: "{current_class}"
+            , "callback"                    : {callback}
+            , "callbackParams"              : {callback_params}
+        });
+    });
 <!--EndSectFooters-->

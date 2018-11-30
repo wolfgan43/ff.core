@@ -4,7 +4,7 @@ ff.ffField.gmap = (function () {
 	var gmap_data	=  new Array();
 
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.gmap", /* used to recognize ff'objects*/
 
 		"init" : function (key, region) {
 			if(window["google"] === undefined) {
@@ -282,6 +282,10 @@ ff.ffField.gmap = (function () {
 		    return true;
 		}
 	};
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 	return that;
 	

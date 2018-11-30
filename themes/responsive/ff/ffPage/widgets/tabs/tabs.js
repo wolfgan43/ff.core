@@ -4,7 +4,7 @@ ff.ffPage.tabs = (function () {
 var tabs = [];
 
 var that = { /* publics */
-	__ff : true, /* used to recognize ff'objects */
+	__ff : "ff.ffPage.tabs", /* used to recognize ff'objects */
 	"addTab" : function (id, type) {
 		switch (type) { 
 			case "base":
@@ -100,6 +100,10 @@ var that = { /* publics */
 		}
 	}
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

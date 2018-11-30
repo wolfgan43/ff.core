@@ -6,7 +6,7 @@
 ff.history = (function () {
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.history", // used to recognize ff'objects
 
 "pageload" : function (hash) {
 	// alert("pageload: " + hash);
@@ -55,6 +55,10 @@ __ff : true, // used to recognize ff'objects
 }
 
 }; // publics' end
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

@@ -9,7 +9,7 @@ ff.ffField.gmap3 = (function () {
 	
 	var that = { 
 		/* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.gmap", /* used to recognize ff'objects*/
 
 		"init" : function (key, sensor, region)
 		{
@@ -424,5 +424,10 @@ ff.ffField.gmap3 = (function () {
 			ff.ffField.gmap3.setInfo(id, address, marker.getPosition().lat(), marker.getPosition().lng(), marker.getMap().getZoom());
 		}
 	};
+
+	window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 })();

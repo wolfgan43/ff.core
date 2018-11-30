@@ -4,7 +4,7 @@ ff.tplService = (function () {
 	var keySearchToSkip = ["ret_url"];
 
     var that = { // publics
-        __ff : true, // used to recognize ff'objects
+        __ff : "ff.tplService", // used to recognize ff'objects
         "debug" : function(mode) {
         	debug = mode || true;
         },
@@ -878,6 +878,10 @@ ff.tplService = (function () {
 		}
         return tplRow;
     };
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
     return that;
     

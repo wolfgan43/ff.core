@@ -10,7 +10,7 @@ function randomString(length, chars) {
 
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.modules.security.oauth2", // used to recognize ff'objects
 
 "revokeApp" : function (client_id) {
 	var r = confirm("Are you sure to revoke app permission?");
@@ -49,6 +49,10 @@ __ff : true, // used to recognize ff'objects
 }
 	
 }; // publics' end
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

@@ -2,7 +2,7 @@ ff.ffField.ckeditor = (function () {
 	/* privates*/
 	
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.ckeditor", /* used to recognize ff'objects*/
 		"init" : function(id, brmode, theme, skin, lang, toolbar, custom_config, isDialog) {
 			var config = {};
 			config.allowedContent                           = true;
@@ -190,6 +190,10 @@ ff.ffField.ckeditor = (function () {
 			});
 		});
 	});
-	
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 })();

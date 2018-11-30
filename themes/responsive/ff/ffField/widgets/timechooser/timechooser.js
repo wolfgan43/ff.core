@@ -1,6 +1,6 @@
 ff.ffField.timechooser = (function () {
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.timechooser", /* used to recognize ff'objects*/
 		"fill" : function (control_id, control_hours_id, control_mins_id, sel_hours, sel_mins) {
 			var control_hours = document.getElementById(control_hours_id);
 			var control_mins = document.getElementById(control_mins_id);
@@ -44,7 +44,11 @@ ff.ffField.timechooser = (function () {
 			control.value = control_hours.value + ":" + control_mins.value;
 		}
 	};
-	
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 
 })();

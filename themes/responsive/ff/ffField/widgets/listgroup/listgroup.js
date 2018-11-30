@@ -2,13 +2,13 @@ ff.ffField.listgroup = (function () {
 	var separator		= [];
 
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.listgroup", /* used to recognize ff'objects*/
 		"addValue" : function (params) {
 			separator[params.id]			= params.separator;
 		},
 	    "move" : function (fbox,tbox, repository) {
-	        oFbox = document.getElementById(fbox);
-	        oTbox = document.getElementById(tbox);
+	        var oFbox = document.getElementById(fbox);
+	        var oTbox = document.getElementById(tbox);
 	        
 	        var i = 0;                    
 	        if(oFbox.value != "") {
@@ -23,12 +23,12 @@ ff.ffField.listgroup = (function () {
 	        }                        
 	    },                       
 	    "removeMe" : function (control, repository) {
-	        oControl = document.getElementById(control);
+	        var oControl = document.getElementById(control);
 	        
 	        var boxLength = oControl.length;
-	        arrSelected = new Array();
+	        var arrSelected = new Array();
 	                                        
-	        for (i = 0; i < boxLength; i++) {                            
+	        for (var i = 0; i < boxLength; i++) {
 	            if (oControl.length > i && oControl.options[i].selected) {                            
 	                oControl.options[i] = null;                            
 	                i--;                                
@@ -38,8 +38,8 @@ ff.ffField.listgroup = (function () {
 	    },
 		"recalc" : function (control, repository)
 		{
-	        oControl = document.getElementById(control);
-	        oRepository = document.getElementById(repository);
+	        var oControl = document.getElementById(control);
+	        var oRepository = document.getElementById(repository);
 
 	        var i = 0;
 	        var tmp = "";
@@ -55,6 +55,10 @@ ff.ffField.listgroup = (function () {
 	        }            
 		}
 	};
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 	return that;
 	

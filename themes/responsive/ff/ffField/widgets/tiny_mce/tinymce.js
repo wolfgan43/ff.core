@@ -1,6 +1,6 @@
 ff.ffField.tinymce = (function () {
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.tinymce", /* used to recognize ff'objects*/
         "init" : function(selectorClass, lang, plugins, buttons1, buttons2, buttons3, buttons4, buttons5, buttons6) {
             tinymce.baseURL = ff.base_path + "/themes/library/tiny_mce";
 
@@ -93,6 +93,10 @@ ff.ffField.tinymce = (function () {
 			});
 		});*/
 	});
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
     return that;
 })();

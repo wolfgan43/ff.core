@@ -1,6 +1,6 @@
 ff.ffField.datechooser = (function () {
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.datechooser", /* used to recognize ff'objects*/
 		"fill" : function (control_id, control_day_id, control_month_id, control_year_id, sel_day, sel_month, sel_year, typeDate) {
 			var control_day = document.getElementById(control_day_id);
 			var control_month = document.getElementById(control_month_id);
@@ -101,7 +101,11 @@ ff.ffField.datechooser = (function () {
 			}
 		}
 	};
-	
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 
 })();

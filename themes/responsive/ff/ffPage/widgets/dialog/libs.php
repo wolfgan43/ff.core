@@ -31,6 +31,16 @@ return array (
                 'ff.ajax' => NULL
               )
             ),
+            'dialog-bootstrap4' =>
+            array (
+              'path' => '/themes/responsive/ff/ffPage/widgets/dialog',
+              'file' => 'dialog-bootstrap4.js',
+              'index' => 100,
+              'js_deps' =>
+              array (
+                'ff.ajax' => NULL
+              )
+            ),
             'dialog-foundation' => 
             array (
               'path' => '/themes/responsive/ff/ffPage/widgets/dialog',

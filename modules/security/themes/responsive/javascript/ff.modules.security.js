@@ -99,7 +99,7 @@ var social_window = undefined;
 var login_dialog_id = undefined;
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.modules.security", // used to recognize ff'objects
 
 services : {
 	"login" : null
@@ -264,6 +264,10 @@ submit : function(action, component, elem, url, containerSuccess) {
 }
 
 }; // publics' end
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

@@ -7,7 +7,7 @@ ff.ffPage = (function () {
 //privates
 
 var that = { // publics
-    __ff : true, // used to recognize ff'objects
+    __ff : "ff.ffPage", // used to recognize ff'objects
     "goToWithRetUrl" : function (href, ret) {
         var url = href + (href.indexOf("?") < 0 ? "?" : "&") + "ret_url=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
         if(ret) {
@@ -20,6 +20,10 @@ var that = { // publics
 
     }
 }; // publics' end
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

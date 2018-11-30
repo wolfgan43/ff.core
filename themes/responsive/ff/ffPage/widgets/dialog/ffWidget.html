@@ -4,8 +4,7 @@
 <a href="javascript:void(0);" onclick="{addjs} ff.ffPage.dialog.doOpen('{id}');" class="{class}"{id_tag}>{name}</a>
 <!--EndSectControl-->
 <!--BeginSectFooters-->
-<script type="text/javascript">
-	ff.pluginAddInit("ff.ffPage.dialog", function () {
+	ff.pluginAddInit("ff.ffPage.{dialog_type}", function () {
 		<!--BeginSectIstance-->
 		ff.ffPage.dialog.addDialog({
 			"id" : "{id}"
@@ -16,9 +15,8 @@
 				<!--EndSectParam-->
 			}
 			<!--EndSectParams-->
-			{parse_params}	
+			{parse_params}
 		});
 		<!--EndSectIstance-->
 	});
-</script>
 <!--EndSectFooters-->

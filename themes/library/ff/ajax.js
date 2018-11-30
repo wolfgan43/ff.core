@@ -12,7 +12,7 @@ var ctxs = ff.hash();
 ctxs.inits_by_wdg = ff.hash();
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.ajax", // used to recognize ff'objects
 
 "ctx" : function (id, obj, type) {
 	
@@ -201,20 +201,6 @@ __ff : true, // used to recognize ff'objects
 	return that.ctxGet(id).replaceHTML(data);
 },
 
-"defaults" : {
-	"css"			: {
-			"padding":	0,
-			"margin":		0,
-			"top":		'40%',
-			"left":		'45%',
-			"textAlign":	'center',
-			"cursor":		'wait'
-		},
-	"overlayCSS"	: {},
-	"message"		: '<h1 class="block-loader"></h1>',
-	"display": true
-},
-
 "chainupdate"	: {},
 
 "getblocked_ui" : function () {
@@ -229,25 +215,8 @@ __ff : true, // used to recognize ff'objects
 
 	that.chainupdate.resources = ff.hash();
 	that.chainupdate.updated = ff.hash();
-	if(that.defaults.display) {
-		if(jQuery.blockUI === undefined) { //TOCHECK
-			ff.load("jquery.plugins.blockui", function () {
-				if (that.defaults.css !== undefined) jQuery.blockUI.defaults.css = that.defaults.css;
-				if (that.defaults.overlayCSS !== undefined) jQuery.blockUI.defaults.overlayCSS = that.defaults.overlayCSS;
-				jQuery.blockUI(
-					(that.defaults.message !== undefined ? {message : that.defaults.message} : {})
-				);
-			}, undefined, "", false);
-		} else {
-			if (that.defaults.css !== undefined) jQuery.blockUI.defaults.css = that.defaults.css;
-			if (that.defaults.overlayCSS !== undefined) jQuery.blockUI.defaults.overlayCSS = that.defaults.overlayCSS;
-			jQuery.blockUI(
-				(that.defaults.message !== undefined ? {message : that.defaults.message} : {})
-			);
-		}
-	} else {
-		jQuery("body").addClass("pbar");
-	}
+
+	jQuery("body").addClass("pbar");
 },
 
 "unblockUI" : function (chainupdate, reset, data) {
@@ -320,11 +289,8 @@ __ff : true, // used to recognize ff'objects
 				"event_name" : "onEmptyQueue",
 				"event_params"	: [data]
 			});
-			if(that.defaults.display)
-				jQuery.unblockUI();
-			else {
-				setTimeout('jQuery("body").removeClass("pbar");', 700);
-			}
+
+			setTimeout('jQuery("body").removeClass("pbar");', 700);
 		}
 	} else {
 		if(that.doEvent !== undefined)
@@ -333,13 +299,7 @@ __ff : true, // used to recognize ff'objects
 				"event_params"	: [data]
 			});
 			
-		if(that.defaults.display) {
-			if(jQuery.blockUI !== undefined)
-			jQuery.unblockUI();
-		} else {
-			setTimeout('jQuery("body").removeClass("pbar");', 700);   
-		}
-			
+		setTimeout('jQuery("body").removeClass("pbar");', 700);
 	}
 	
 	if (reset)
@@ -378,7 +338,13 @@ __ff : true, // used to recognize ff'objects
  */
 "doRequest" : function (params) {
 	var async	= params.async !== undefined ? params.async : true;
-	var form	= (params.formName ? jQuery("#" + params.formName) : jQuery("#frmMain"));
+	var form	= (params.formName
+					? jQuery("#" + params.formName)
+					: (params.component
+						? jQuery("#" + params.component)
+						: jQuery("#frmMain")
+					)
+				);
 
 	var url		= (params.url ? params.url : (function () {
 		if (params.component) {
@@ -800,12 +766,16 @@ __ff : true, // used to recognize ff'objects
 
 }; // publics' end
 
-ff.pluginAddInit("ff", function () {
-	ff.addEvent({
-		"event_name"  : "initIFElement"
-		, "func_name" : that.ctxInitEvent
-	});
-});
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+
+        ff.pluginAddInit("ff", function () {
+            ff.addEvent({
+                "event_name"  : "initIFElement"
+                , "func_name" : that.ctxInitEvent
+            });
+        });
+    });
 
 return that;
 

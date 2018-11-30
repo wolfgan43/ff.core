@@ -35,7 +35,7 @@ ff.pluginAddInit("ff.ajax", function () {
 // privates
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.ffGrid", // used to recognize ff'objects
 "icons" : {
 	"sort" : "fa-sort"
 	, "sortAsc" : "fa-sort-asc"
@@ -175,13 +175,17 @@ __ff : true, // used to recognize ff'objects
 	var search = ff.updateQueryString(location.search, key + "_src", jQuery("#" + key + "_src").val(), "?");
 
 	if(history.pushState) {
-        history.pushState(null, null, search);
+        history.pushState(null, null, (search ? search : window.location.pathname));
     } else {
         location.search = search;
     }
 }
 
 }; // publics' end
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

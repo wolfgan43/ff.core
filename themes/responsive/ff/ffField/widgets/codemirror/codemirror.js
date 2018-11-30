@@ -1,6 +1,6 @@
 ff.ffField.codemirror = (function () {
     var that = { /* publics*/
-            __ff : true, /* used to recognize ff'objects*/
+            __ff : "ff.ffField.codemirror", /* used to recognize ff'objects*/
             "init" : function(id, syntax, lang, writable) {
                 ff.addEvent({"event_name" : "getFields", "func_name" : that.onUpdateDialog});
 				if(!syntax)
@@ -72,6 +72,10 @@ ff.ffField.codemirror = (function () {
 			}
 	    
 	}; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 	return that;
 })();

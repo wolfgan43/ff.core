@@ -33,7 +33,7 @@ ff.modules.restricted = (function () {
   	
 
 	var that = { // publics
-		__ff : true, // used to recognize ff'objects
+		__ff : "ff.modules.restricted", // used to recognize ff'objects
 		"init" : function(params) {
 			if(params) {
 				if(params["menu"]) 		menuSelector = params["menu"];
@@ -186,8 +186,8 @@ ff.modules.restricted = (function () {
             }
         }
 	};
-	
-	jQuery(function() {
+    window.addEventListener('load', function () {
+        ff.initExt(that);
 		that.init();
 	});
 	

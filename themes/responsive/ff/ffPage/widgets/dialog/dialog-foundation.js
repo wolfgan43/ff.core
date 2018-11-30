@@ -82,7 +82,7 @@ function initsReset(id) {
 }*/
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects */
+__ff : "ff.ffPage.dialog-foundation", /* used to recognize ff'objects */
 
 "dialog_params"        : ff.hash(),
 /*"dialog_deps"        : ff.hash(),*/
@@ -896,6 +896,10 @@ __ff : true, /* used to recognize ff'objects */
 }
 
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

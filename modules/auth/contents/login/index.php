@@ -127,13 +127,15 @@ if(Auth::islogged()) {
 
 if ($widget["js"]) {
     $cm->oPage->tplAddJs("ff.modules.auth.login", array(
-        "embed" => $widget["js"]
+        "path" => dirname($widget["js"])
+        , "file" => basename($widget["js"])
     ));
 }
 
 if ($widget["css"]) {
     $cm->oPage->tplAddCss("ff.modules.auth.login", array(
-        "embed" => $widget["css"]
+        "path" => dirname($widget["css"])
+        , "file" => basename($widget["css"])
     ));
 }
 

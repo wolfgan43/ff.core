@@ -53,7 +53,7 @@
 			};
 
 			function formatSortingOrder(v) {
-
+                var i = 0;
 				if(typeof(v) != "Number") {
 					i = (v.toLowerCase() == "desc") ? 1 : 0;
 				} else {
@@ -130,10 +130,10 @@
 
 					table.resource_id = table.jTableSort["config"].resource_id;
 
-					tableHeaders = jQuery("thead th", table);
+					var tableHeaders = jQuery("thead th", table);
 
 					tableHeaders.each(function(index) {
-						th = this;
+						var th = this;
 
 						th.jTableSort = [];
 						th.jTableSort["column"] = index;
@@ -177,7 +177,7 @@
 					tableHeaders.click(function(e) {
 						jQuery(table).trigger("sortStart");
 
-						th = this;
+						var th = this;
 						var totalRows = (table.tBodies[0] && table.tBodies[0].rows.length) || 0;
 
 						if(!th.jTableSort["sortDisabled"] && totalRows > 0) {
@@ -486,15 +486,15 @@
 ff.ffGrid.labelsort = (function () {
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects */
+__ff : "ff.ffGrid.labelsort", /* used to recognize ff'objects */
 
 "onHeadGetOrdered" : function(table, index){
-	for (i = 0; i < table.jTableSort.config["headerList"].length; i++)
+	for (var i = 0; i < table.jTableSort.config["headerList"].length; i++)
 	{
 		jQuery(table.jTableSort.config["headerList"][i]).removeClass("first-selected").removeClass("last-selected").removeClass("button-selected");
 	}
 
-	th = table.jTableSort.config["headerList"][index];
+	var th = table.jTableSort.config["headerList"][index];
 	if (index == 0)
 		jQuery(th).addClass("first-selected");
 	else if (index == table.jTableSort.config["headerList"].length - 1)
@@ -504,6 +504,10 @@ __ff : true, /* used to recognize ff'objects */
 }
 
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

@@ -13,7 +13,7 @@ ff.ffField.kcfinder = (function () {
 	var aviary = null;
 
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.kcfinder", /* used to recognize ff'objects*/
 		"init" : function (params) {
 			this.component			= params.component;
             this.start              = params.start;
@@ -169,6 +169,11 @@ ff.ffField.kcfinder = (function () {
 			}
 		}
 	};
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 	
 })();

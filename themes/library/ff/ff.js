@@ -138,63 +138,65 @@ String.prototype.escapeHtml.options = {
 })(["floor","ceil","round"],0);
 
 // jQuery addons
+window.addEventListener('load', function () {
+    jQuery.fn.outerHTML = function(s) {
+        return s
+            ? this.before(s).remove()
+            : jQuery("<p>").append(this.eq(0).clone()).html();
+    };
 
-jQuery.fn.outerHTML = function(s) {
-    return s
-        ? this.before(s).remove()
-        : jQuery("<p>").append(this.eq(0).clone()).html();
-};
+    jQuery.fn.escape = function (str) {
+        if (typeof str === "number")
+            str = str.toString();
+        if (typeof str !== "string")
+            throw  "FF - Invalid param for jQuery.fn.escape";
+        else
+            return str.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|\/])/g, '\\$1');
+    };
 
-jQuery.fn.escape = function (str) {
-	if (typeof str === "number")
-		str = str.toString();
-	if (typeof str !== "string")
-		throw  "FF - Invalid param for jQuery.fn.escape";
-	else
-		return str.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|\/])/g, '\\$1');
-};
+    jQuery.fn.escapeGet = function (str) {
+        return jQuery("#" + jQuery.fn.escape(str));
+    };
 
-jQuery.fn.escapeGet = function (str) {
-	return jQuery("#" + jQuery.fn.escape(str));
-};
+    jQuery.fn.comboGetSelIndex = function (id) {
+        if (jQuery("#" + jQuery.fn.escape(id) + " optgroup").length)
+            return jQuery("#" + jQuery.fn.escape(id) + " option:selected").index("option");
+        else
+            return jQuery("#" + jQuery.fn.escape(id) + " option:selected").index();
+    };
 
-jQuery.fn.comboGetSelIndex = function (id) {
-	if (jQuery("#" + jQuery.fn.escape(id) + " optgroup").length)
-		return jQuery("#" + jQuery.fn.escape(id) + " option:selected").index("option");
-	else
-		return jQuery("#" + jQuery.fn.escape(id) + " option:selected").index();
-};
+    jQuery.fn.comboGetIndexByVal = function (id, value) {
+        if (jQuery("#" + jQuery.fn.escape(id) + " optgroup").length)
+            return jQuery("#" + jQuery.fn.escape(id) + " option[value='" + jQuery.fn.escape(ff.coalesce(value, "")) + "']").index("option");
+        else
+            return jQuery("#" + jQuery.fn.escape(id) + " option[value='" + jQuery.fn.escape(ff.coalesce(value, "")) + "']").index();
+    };
 
-jQuery.fn.comboGetIndexByVal = function (id, value) {
-	if (jQuery("#" + jQuery.fn.escape(id) + " optgroup").length)
-		return jQuery("#" + jQuery.fn.escape(id) + " option[value='" + jQuery.fn.escape(ff.coalesce(value, "")) + "']").index("option");
-	else
-		return jQuery("#" + jQuery.fn.escape(id) + " option[value='" + jQuery.fn.escape(ff.coalesce(value, "")) + "']").index();
-};
+    /* http://andreaslagerkvist.com/jquery/center/#jquery-plugin-source */
+    jQuery.fn.center = function (absolute) {
+        return this.each(function () {
+            var t = jQuery(this);
 
-/* http://andreaslagerkvist.com/jquery/center/#jquery-plugin-source */
-jQuery.fn.center = function (absolute) {
-    return this.each(function () {
-        var t = jQuery(this);
-
-        t.css({
-            position:    absolute ? 'absolute' : 'fixed', 
-            left:        '50%', 
-            top:        '50%'
-            /*zIndex:        '99'*/
-        }).css({
-            marginLeft:    '-' + (t.outerWidth() / 2) + 'px', 
-            marginTop:    '-' + (t.outerHeight() / 2) + 'px'
-        });
-
-        if (absolute) {
             t.css({
-                marginTop:    parseInt(t.css('marginTop'), 10) + jQuery(window).scrollTop(), 
-                marginLeft:    parseInt(t.css('marginLeft'), 10) + jQuery(window).scrollLeft()
+                position:    absolute ? 'absolute' : 'fixed',
+                left:        '50%',
+                top:        '50%'
+                /*zIndex:        '99'*/
+            }).css({
+                marginLeft:    '-' + (t.outerWidth() / 2) + 'px',
+                marginTop:    '-' + (t.outerHeight() / 2) + 'px'
             });
-        }
-    });
-};
+
+            if (absolute) {
+                t.css({
+                    marginTop:    parseInt(t.css('marginTop'), 10) + jQuery(window).scrollTop(),
+                    marginLeft:    parseInt(t.css('marginLeft'), 10) + jQuery(window).scrollLeft()
+                });
+            }
+        });
+    };
+});
+
 
 // Forms Framework Main Object
 var ff = (function () {
@@ -225,7 +227,7 @@ function initEvents(key) {
 			if (ref[parts[i]] === undefined)
 				ref[parts[i]] = {};
 			ref = ref[parts[i]];
-			
+
 			if (getType.toString.call(ref) === '[object Object]' && ref.events === undefined && ref.__ff === true) {
 				jQuery.extend(ref, ff.ffEvents());
 				extendLibs(ref, path);
@@ -308,7 +310,11 @@ var that = { // publics
 	that.js_path				= (params.js_path === undefined ? that.site_path + '/themes/' + that.theme + '/javascript' : params.js_path);
 	that.getlibs				= (params.getlibs === undefined ? that.site_path + '/services/getlibs' : params.getlibs);
 
-	if(params.lazyImg) {
+	if (jQuery === undefined) {
+        throw "Forms Framework require jQuery to work";
+    }
+
+    if(params.lazyImg) {
             jQuery(function() {
                 ff.lazyImg();
             });
@@ -350,83 +356,48 @@ var that = { // publics
 		});
 	}
 
-	// prepare to init static libs
-	that.pluginAddInitLoad("ff.ffEvents", function () {
-		jQuery.extend(ff, ff.ffEvents());
-		jQuery.extend(ff.fn, ff.ffEvents());
-		
-		// ready to init every library
-		if (params.libs !== undefined) {
-			params.libs.each(function (i, v) {
-				if (v.source === undefined && v.deps === undefined) {
-					that.libLoaded(v.type, v.id, true);
-				} else { // to load library
-					if (v.type === "js")
-						that.pluginLoad(v.id, v.source, v.callback, v.async, v.deps);
-					else if (v.type === "css")
-						that.injectCSS(v.id, v.source, v.callback, v.media);
-					else
-						throw "unhandled lib type: " + v.type;
-				}
-			});
-		}
-	});
-	
 	// ------------------------------------------------------------------------------------------------------
 	// force main infrastructure loading at start (when not already present), because nothing will work without it
-	
-	if (jQuery === undefined)
-		throw "Forms Framework require jQuery to work";
-	
-	if (libs.get("js") === undefined) libs.set("js", ff.hash());
-	if (libs.get("css") === undefined) libs.set("css", ff.hash());
-	
-	if (!libs.get("js").isset("jquery")) {
-		libs.get("js").set("jquery", {
-			"loaded" : false
-			, "source" : undefined
-			, "callback" : function () {that.pluginInitLoad("jquery");}
-			, "async" : undefined
-			, "media" : undefined
-			, "deps" : undefined
-		});
-		that.libDeps("js", "jquery", undefined, true);
-	}
-	
-	var chk_ff = false;
-	var chk_ev = false;
-	var chk_evs = false;
-	
-	if (libs.isset("js")) {
-		if (libs.get("js").isset("ff"))
-			chk_ff = true;
-		if (libs.get("js").isset("ff.ffEvent"))
-			chk_ev = true;
-		if (libs.get("js").isset("ff.ffEvents"))
-			chk_evs = true;
-	}
-	
-	if (!chk_ff) {
-		libs.get("js").set("ff", {
-			"loaded" : false
-			, "source" : undefined
-			, "callback" : function () {that.pluginInitLoad("ff");}
-			, "async" : undefined
-			, "media" : undefined
-			, "deps" : ff.hash([{"id" : "js", "value" : ["ff.ffEvents"]}])
-		});
-		that.libDeps("js", "ff", ff.hash([{"id" : "js", "value" : ["ff.ffEvents"]}]), true);
-	}
-	if (!chk_ev)
-		that.pluginLoad("ff.ffEvent",		"/themes/library/ff/ffEvent.js",	undefined, false);
-	else
-		that.libLoaded("js", "ff.ffEvent", true);
-	if (!chk_evs)
-		that.pluginLoad("ff.ffEvents",		"/themes/library/ff/ffEvents.js",	undefined, false);
-	else
-		that.libLoaded("js", "ff.ffEvents", true);
-},
 
+	//if (libs.get("js") === undefined) libs.set("js", ff.hash());
+	//if (libs.get("css") === undefined) libs.set("css", ff.hash());
+
+	//if (!libs.get("js").isset("jquery")) {
+		libs.get("js").set("jquery", {
+			"loaded" : true
+		});
+		//that.libDeps("js", "jquery", undefined, true);
+	//}
+    //if (!libs.get("js").isset("ff")) {
+        libs.get("js").set("ff.ffEvent", {
+            "loaded": true
+        });
+        libs.get("js").set("ff.ffEvents", {
+            "loaded": true
+        });
+        libs.get("js").set("ff", {
+            "loaded": true
+        });
+        ff.extend(ff.ffEvents());
+       // jQuery.extend(ff.fn, ff.ffEvents());
+    //}
+},
+"initExt" : function (ref) {
+	var key = undefined;
+    if (typeof(ref) === 'object' && ref.events === undefined && ref.__ff) {
+    	key = ref.__ff;
+        jQuery.extend(ref, ff.ffEvents());
+    } else if(ref) {
+        key = ref;
+	}
+
+	if(key) {
+        libs.get("js").set(key, {
+            "loaded": true
+        });
+        that.pluginInit(key);
+    }
+},
 "getComp" : function (id) {
 	return that.struct.get("comps").get(id);
 },
@@ -1608,6 +1579,8 @@ plugins_loads	= that.hash();
 plugins_inits	= that.hash();
 inits_uuid		= that.hash();
 libs			= that.hash();
+libs.set("css"	, that.hash());
+libs.set("js"	, that.hash());
 libs_deps		= that.hash();
 //libs_init		= that.hash();
 libs_rev_deps	= that.hash();
@@ -1617,3 +1590,242 @@ return that;
 
 // code' end.
 })();
+
+
+/**
+ * Forms Framework Javascript Handling Object
+ *	ffEvent' namespace
+ */
+
+ff.ffEvent = (function () {
+//privates
+
+    var that = {
+// publics
+        "BREAK_NEVER" 		: 0,
+        "BREAK_EQUAL" 		: 1,
+        "BREAK_NOT_EQUAL" 	: 2,
+        "BREAK_CALLBACK" 	: 3,
+        "BREAK_DEFAULT" 	: 0,
+
+        "PRIORITY_TOPLEVEL" : 0,
+        "PRIORITY_HIGH"		: 1,
+        "PRIORITY_NORMAL" 	: 2,
+        "PRIORITY_LOW"		: 3,
+        "PRIORITY_FINAL" 	: 4,
+        "PRIORITY_DEFAULT" 	: 2,
+
+        "factory" : function (params) {
+            var instance = {
+                "event_name"		: params.event_name || console.log("unnamed event"),
+                "func_name"			: params.func_name || console.log("invalid func"),
+                "priority"			: params.priority,
+                "break_when"		: params.break_when,
+                "break_value"		: params.break_value,
+                "additional_data"	: params.additional_data || [],
+                "context"			: undefined,
+                "id"				: (params.id === undefined ? ff.getUniqueID() : params.id),
+
+                "checkBreak" : function (result) {
+                    switch (this.break_when) {
+                        case ff.ffEvent.BREAK_CALLBACK:
+                            return this.break_value.apply(this, result);
+
+                        case ff.ffEvent.BREAK_EQUAL:
+                            if (result === this.break_value)
+                                return true;
+                            break;
+
+                        case ff.ffEvent.BREAK_NOT_EQUAL:
+                            if (result !== this.break_value)
+                                return true;
+                            break;
+                    }
+                    return false;
+                },
+
+                "remove" : function () {
+                    switch (this.priority) {
+                        case ff.ffEvent.PRIORITY_TOPLEVEL:
+                            return (undefined !== this.context.events.get(this.event_name).unset("toplevel"));
+                            break;
+
+                        case ff.ffEvent.PRIORITY_FINAL:
+                            return (undefined !== this.context.events.get(this.event_name).unset("final"));
+                            break;
+
+                        default:
+                            return (undefined !== this.context.events.get(this.event_name).get(this.priority).unset(this.id));
+                            break;
+                    }
+                }
+            };
+            return instance;
+        },
+
+        "getLast" : function (results){
+            if (results.length > 0)
+                return results[results.length];
+            else
+                return undefined;
+        }
+
+    }; // publics' end
+
+    return that;
+
+// code's end.
+})();
+
+
+/**
+ * Forms Framework Javascript Handling Object
+ *	ffEvents' namespace
+ */
+
+ff.ffEvents = function () {
+//privates
+
+    var that = {
+// publics
+        events : ff.hash(),
+
+        "addEvent" : function (params) {
+            var event_name		= params.event_name			|| console.log("event_name required");
+            var func_name		= params.func_name			|| console.log("func_name required");
+            var priority		= params.priority			=== undefined ? ff.ffEvent.PRIORITY_DEFAULT : params.priority;
+            var break_when		= params.break_when;
+            var break_value		= params.break_value;
+            var additional_data	= params.additional_data	|| [];
+
+            var event = ff.ffEvent.factory({
+                "event_name"		: event_name
+                , "func_name"		: func_name
+                , "priority"		: priority
+                , "break_when"		: break_when
+                , "break_value"		: break_value
+                , "additional_data" : additional_data
+                , "id"				: params.id
+            });
+
+            event.context = this;
+
+            if (!that.events.isset(event_name))
+                that.events.set(event_name, ff.hash());
+
+            switch (priority) {
+                case ff.ffEvent.PRIORITY_TOPLEVEL:
+                    if (that.events.get(event_name).get("toplevel") !== undefined)
+                        console.log("A toplevel event already exists");
+                    else {
+                        that.events.get(event_name).set("toplevel", event);
+                    }
+                    break;
+
+                case ff.ffEvent.PRIORITY_FINAL:
+                    if (that.events.isset(event_name).get("final"))
+                        console.log("A final event already exists");
+                    else {
+                        that.events.get(event_name).set("final", event);
+                    }
+                    break;
+
+                default:
+                    if (!that.events.get(event_name).isset(priority))
+                        that.events.get(event_name).set(priority, ff.hash());
+
+                    that.events.get(event_name).get(priority).set(event.id, event);
+                    break;
+            }
+
+            return event;
+        },
+
+        "doEvent" : function (params) {
+            var event_name		= params.event_name		|| console.log("event_name required");
+            var event_params	= params.event_params	|| [];
+            var results			= [];
+
+            var tmp_queue = that.events.get(event_name);
+            var tmp_events;
+            var event;
+            var tmp_args;
+            var rc = undefined;
+
+            if (tmp_queue !== undefined) {
+                if (tmp_queue.isset("toplevel")) {
+                    event = tmp_queue.get("toplevel");
+                    tmp_args = event_params.slice().concat(event.additional_data.slice());
+                    tmp_args.push(undefined);
+                    rc = event.func_name.apply(event, tmp_args);
+                    if (rc !== undefined) results.push(rc);
+
+                    if (event.checkBreak(rc))
+                        return results;
+                }
+
+                for (var q = ff.ffEvent.PRIORITY_TOPLEVEL + 1; q < ff.ffEvent.PRIORITY_FINAL; q++) {
+                    if (undefined !== (tmp_events = tmp_queue.get(q))) {
+                        var b = false;
+                        tmp_events.each(function (key, event, i) {
+                            tmp_args = event_params.slice().concat(event.additional_data.slice());
+                            tmp_args.push(results[results.length - 1]);
+                            rc = event.func_name.apply(event, tmp_args);
+                            if (rc !== undefined) results.push(rc);
+
+                            if (event.checkBreak(rc))
+                                return (b = true);
+                        });
+                        if (b) return results;
+                    }
+                }
+
+                if (tmp_queue.isset("final")) {
+                    event = tmp_queue.get("final");
+                    tmp_args = event_params.slice().concat(event.additional_data.slice());
+                    tmp_args.push(results[results.length - 1]);
+                    rc = event.func_name.apply(event, tmp_args);
+                    if (rc !== undefined) results.push(rc);
+
+                    if (event.checkBreak(rc))
+                        return results;
+                }
+            }
+
+            return results;
+        }
+        /* nn viene mai richiamata nel codice. Da errore con l'add e il delete del dettaglio          */
+        , "clearQueue" : function (event_name, priority) {
+            if (priority !== undefined) {
+                switch (priority) {
+                    case ff.ffEvent.PRIORITY_TOPLEVEL:
+                        that.events.get(event_name).unset("toplevel");
+                        break;
+
+                    case ff.ffEvent.PRIORITY_FINAL:
+                        that.events.get(event_name).unset("final");
+                        break;
+
+                    default:
+                        that.events.get(event_name).get(priority).clear();
+                        break;
+                }
+            } else {
+                that.events.get(event_name).clear();
+            }
+        }
+
+        , "getLastRes" : function (res) {
+            if (res !== undefined && res[res.length - 1]) {
+                return res[res.length - 1];
+            } else {
+                return undefined;
+            }
+        }
+
+    }; // publics' end
+
+    return that;
+
+// code's end.
+};

@@ -1,7 +1,7 @@
 ff.ffGrid.dragsort = (function () {
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects*/
+__ff : "ff.ffGrid.dragsort", /* used to recognize ff'objects*/
 
 "inst" : ff.hash(),
 
@@ -54,6 +54,10 @@ __ff : true, /* used to recognize ff'objects*/
 }
 
 }; /* publics' end*/
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

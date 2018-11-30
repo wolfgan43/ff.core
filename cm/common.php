@@ -649,9 +649,10 @@ function cm_filecache_empty_dir($path, $clean_back = false)
 
 function cm_libsExtend(&$libs, $addon)
 {
-	if (!is_array($addon))
-		ffErrorHandler::raise("Wrong extend usage", E_USER_ERROR, null, get_defined_vars());
-		
+	if (!is_array($addon)) {
+	    return;
+       // ffErrorHandler::raise("Wrong extend usage", E_USER_ERROR, null, get_defined_vars());
+    }
 	foreach ($addon as $key => $elements)
 	{
 		if (!ffIsset($libs, $key))
@@ -696,7 +697,7 @@ function cm_libsExtend(&$libs, $addon)
 		}
 	}
 }
-
+/*
 function cm_loadlibs(&$libs, $path, $name, $prefix = "", $force_reload = false, $descend = true)
 {
 	if(!file_exists($path) || !is_dir($path))
@@ -747,4 +748,4 @@ function cm_loadlibs_save($libs, $override = false) {
 		$tmp_libs_var = var_export($libs, true);
 		file_put_contents($cache_file, "<?php\n\nreturn $tmp_libs_var;\n\n", LOCK_EX);
 	}
-}
+}*/

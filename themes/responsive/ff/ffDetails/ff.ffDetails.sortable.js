@@ -8,7 +8,7 @@ ff.pluginAddInitLoad("ff.ffDetails.sortable", function () {
 }, 'b701d1d0-95b8-4912-b8d1-221491e11af7');
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects*/
+__ff : "ff.ffDetails.sortable", /* used to recognize ff'objects*/
 
 "inst" : ff.hash(),
 
@@ -42,6 +42,10 @@ __ff : true, /* used to recognize ff'objects*/
 }
 
 }; /* publics' end*/
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

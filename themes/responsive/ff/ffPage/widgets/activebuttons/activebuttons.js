@@ -1,7 +1,7 @@
 ff.ffPage.activebuttons = (function () {
 
 var that = { /* publics */
-	__ff : true, /* used to recognize ff'objects */
+	__ff : "ff.ffPage.activebuttons", /* used to recognize ff'objects */
 	"init" : function (spinnerClass) {
 		//jQuery(".activebuttons").unbind("click.activebuttons");
 		jQuery(".activebuttons").off("click.activebuttons").on("click.activebuttons", function() {
@@ -26,6 +26,10 @@ var that = { /* publics */
 		});
 	}
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

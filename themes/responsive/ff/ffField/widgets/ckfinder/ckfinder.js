@@ -4,14 +4,14 @@ ff.ffField.ckfinder = (function () {
 	var previewJs = true;
 
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.ckfinder", /* used to recognize ff'objects*/
 		"init" : function (params) {
 			this.basePath			= params.basePath;
 			this.baseUrl			= params.baseUrl;
 			this.previewJs			= params.previewJs;
 		},
 		"browseServer" : function ( startupPath, functionData ) {
-			finder = new CKFinder();
+			var finder = new CKFinder();
 			/* You can use the "CKFinder" class to render CKFinder in a page:*/
 			
 			
@@ -70,6 +70,11 @@ ff.ffField.ckfinder = (function () {
 			return false;
 		}
 	};
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 	
 })();

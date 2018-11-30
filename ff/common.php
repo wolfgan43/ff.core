@@ -1776,12 +1776,18 @@ function ffCommon_ffPage_init($params, $resources = null)  {
         $tag_parts = explode(".", $tag);
         if (strpos($tag, "jquery.plugins.") === 0) {
             $page->loadLibrary(FF_THEME_DISK_PATH . "/library/plugins/jquery." . $tag_parts[2]);
+            unset($page->js_loaded[$tag]);
+            $page->tplAddJs($tag);
             return true;
         } elseif (strpos($tag, $tag_parts[0] . ".jquery.plugins.") === 0) {
             $page->loadLibrary(FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[3]);
+            unset($page->js_loaded[$tag]);
+            $page->tplAddJs($tag);
             return true;
         } elseif (strpos($tag, "library.") === 0) {
             $page->loadLibrary(FF_THEME_DISK_PATH . "/library/" . $tag_parts[1]);
+            unset($page->js_loaded[$tag]);
+            $page->tplAddJs($tag);
             return true;
         }
     });
@@ -1825,9 +1831,16 @@ function ffCommon_ffPage_init($params, $resources = null)  {
     $cm->oPage->compact_js = false;
     $cm->oPage->compact_css = false;*/
 
+
+
+
     if($params["framework_css"]) {
         $oPage->frameworkCSS = Cms::getInstance("frameworkcss");
         $oPage->frameworkCSS->set($params["framework_css"], $params["font_icon"]);
+    }
+
+    if($params["theme"] != FF_MAIN_THEME) {
+        require_once ($oPage->getThemeDir() . "/common.php");
     }
 
     if(!$oPage->isXHR()) {
@@ -1835,7 +1848,6 @@ function ffCommon_ffPage_init($params, $resources = null)  {
             $oPage->tplAddJs("jquery");
 
             if($params["framework_css"]) {
-
                 $oPage->tplAddCss($params["framework_css"] . ".core");
             }
             if($params["font_icon"]) {

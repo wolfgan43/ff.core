@@ -256,7 +256,7 @@ class ffWidget_uploadifive extends ffCommon
         $this->tpl[$tpl_id]->set_var("aviary_class", Cms::getInstance("frameworkcss")->get("crop", "icon"));  
         $this->tpl[$tpl_id]->set_var("upload_class", Cms::getInstance("frameworkcss")->get("upload", "icon"));
         $this->tpl[$tpl_id]->set_var("upload_icon", Cms::getInstance("frameworkcss")->get("upload", "icon-tag", "lg"));
-        
+
 		if($Field->file_multi) {
 			$this->tpl[$tpl_id]->set_var("multi", "true");
 		} else {

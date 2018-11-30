@@ -10,7 +10,7 @@ ff.ffField.kcuploadifive = (function () {
 	
 
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.kcuploadifive", /* used to recognize ff'objects*/
 		
 		"init" : function (params) {
 			var component = params.component;
@@ -471,6 +471,11 @@ ff.ffField.kcuploadifive = (function () {
 			}
 		}
 	};
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 	
 })();

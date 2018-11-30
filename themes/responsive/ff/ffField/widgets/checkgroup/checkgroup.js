@@ -4,7 +4,7 @@ ff.ffField.checkgroup = (function () {
 
 
 	var that = { // publics
-		__ff : true, // used to recognize ff'objects
+		__ff : "ff.ffField.checkgroup", // used to recognize ff'objects
 		"recalc" : function(control, obj) {
 			var hidden = document.getElementById(control);
 			var tmp = "";
@@ -37,6 +37,9 @@ ff.ffField.checkgroup = (function () {
 		}
 	};
 
+	window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
-	
 })();

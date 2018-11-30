@@ -1,6 +1,6 @@
 ff.ffField.colorpicker = (function () {
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.colorpicker", /* used to recognize ff'objects*/
 		"change" : function (source, target) {
 			var value = jQuery(source).val();
 			if (!value.match(/[0-9abcdef]/))
@@ -17,11 +17,15 @@ ff.ffField.colorpicker = (function () {
 				jQuery("#" + target).val(value);
 		}
 		, "checkHex" : function() {
-			numcheck = /[a-z0-9_-]/;
+			var numcheck = /[a-z0-9_-]/;
 			return numcheck.test(window.event.keyCode);
 		}
 	};
-	
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 
 })();

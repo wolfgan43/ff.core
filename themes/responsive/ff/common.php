@@ -3,7 +3,7 @@
 
 // --------------------------------------
 //        libraries cache
-$glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
+/*$glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
 $glob_libs->libs = array();
 
 if (FF_THEME_RESTRICTED_LIBS_MEMCACHE)
@@ -37,14 +37,14 @@ if (!$glob_libs->libs)
             $cache->set("/ff/libs", $glob_libs->libs);
 		}
 	}
-}
+}*/
 
 // --------------------------------------	
 
 $cm = cm::getInstance();
 
 
-ffPage::addEvent			("on_factory_done", "ffTheme_responsive_ffPage_set_events"		, ffEvent::PRIORITY_HIGH);
+//ffPage::addEvent			("on_factory_done", "ffTheme_responsive_ffPage_set_events"		, ffEvent::PRIORITY_HIGH);
 ffGrid::addEvent			("on_factory_done", "ffTheme_responsive_ffGrid_set_events"		, ffEvent::PRIORITY_HIGH);
 ffRecord::addEvent			("on_factory_done", "ffTheme_responsive_ffRecord_set_events"	, ffEvent::PRIORITY_HIGH);
 ffDetails::addEvent			("on_factory_done", "ffTheme_responsive_ffDetails_set_events"	, ffEvent::PRIORITY_HIGH);
@@ -53,7 +53,7 @@ ffDetails::addEvent			("on_factory_done", "ffTheme_responsive_ffDetails_set_even
  */
 //$cm->addEvent("on_layout_init", "ffPage_on_layout_init");
 
-
+/*
 function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 {
 	$page->addEvent("tplAddJs_not_found", function ($page, $tag, $params) {
@@ -62,15 +62,14 @@ function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 			ffErrorHandler::raise("Autoloader recursive inclusion", E_USER_ERROR, $page, get_defined_vars());
 		$last_call = $tag;
 
-		$glob_libs = ffGlobals::getInstance("__ffTheme_libs__");
+		$libraries = $page->libraries;
 		$tag_parts = explode(".", $tag);
 
 		if (strpos($tag, "jquery.plugins.") === 0)
 		{
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/library/plugins/jquery." . $tag_parts[2], "plugins/" . $tag, "jquery");
+			cm_loadlibs($libraries, FF_THEME_DISK_PATH . "/library/plugins/jquery." . $tag_parts[2], "plugins/" . $tag, "jquery");
 
-			//die();
-			$page->libsExtend($glob_libs->libs["jquery/plugins/" . $tag]);
+			$page->libsExtend($libraries["jquery/plugins/" . $tag]);
 			unset($page->js_loaded[$tag]);
 
 			$page->tplAddJs($tag, $params);
@@ -78,43 +77,30 @@ function ffTheme_responsive_ffPage_set_events(ffPage_base $page)
 		} 
 		elseif (strpos($tag, $tag_parts[0] . ".jquery.plugins.") === 0)
 		{
-			if (!ffIsset($glob_libs->libs, "theme/" . $tag_parts[0]))
+			if (!ffIsset($libraries, "theme/" . $tag_parts[0]))
 			{
-				cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0], $tag_parts[0], "theme");
-				$page->libsExtend($glob_libs->libs["theme/" . $tag_parts[0]]);
+				cm_loadlibs($libraries, FF_THEME_DISK_PATH . "/" . $tag_parts[0], $tag_parts[0], "theme");
+				$page->libsExtend($libraries["theme/" . $tag_parts[0]]);
 			}
 			
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[3], "plugins/" . $tag, $tag_parts[0] . "/jquery");
-			$page->libsExtend($glob_libs->libs[$tag_parts[0] . "/jquery/plugins/" . $tag]);
+			cm_loadlibs($libraries, FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[3], "plugins/" . $tag, $tag_parts[0] . "/jquery");
+			$page->libsExtend($libraries[$tag_parts[0] . "/jquery/plugins/" . $tag]);
 			unset($page->js_loaded[$tag]);
 			$page->tplAddJs($tag, $params);
 			return true;
 		} 
 		elseif (strpos($tag, "library.") === 0)
 		{
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/library/" . $tag_parts[1], $tag, "library", false, true);
-			$page->libsExtend($glob_libs->libs["library/" . $tag]);
+			cm_loadlibs($libraries, FF_THEME_DISK_PATH . "/library/" . $tag_parts[1], $tag, "library", false, true);
+			$page->libsExtend($libraries["library/" . $tag]);
 			unset($page->js_loaded[$tag]);
 			$page->tplAddJs($tag, $params);
 			return true;
 		}
 
-		/*elseif (strpos($tag, $tag_parts[0] . ".jquery.") === 0)
-		{
-			if (!ffIsset($glob_libs->libs, "theme/" . $tag_parts[0]))
-			{
-				cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0], $tag_parts[0], "theme", false, false);
-				$page->libsExtend($glob_libs->libs["theme/" . $tag_parts[0]]);
-			}
-			
-			cm_loadlibs($glob_libs->libs, FF_THEME_DISK_PATH . "/" . $tag_parts[0] . "/javascript/plugins/jquery." . $tag_parts[2], "plugins/" . $tag_parts[0] . ".jquery.plugins." . $tag_parts[2], $tag_parts[0] . "/jquery", false, true, true);
-			$page->libsExtend($glob_libs->libs[$tag_parts[0] . "/jquery/plugins/" . $tag_parts[0] . ".jquery.plugins." . $tag_parts[2]]);
-			unset($page->js_loaded[$tag_parts[0] . ".jquery.plugins." . $tag_parts[2]]);
-			$page->tplAddJs($tag_parts[0] . ".jquery.plugins." . $tag_parts[2], $params);
-			return true;
-		} */
+
 	});
-}
+}*/
 
 function ffTheme_responsive_ffGrid_set_events(ffGrid_base $grid)
 {
@@ -168,8 +154,8 @@ ffRecord::addEvent ("on_factory", "ffTheme_responsive_ffRecord_on_factory", ffEv
 function ffTheme_responsive_ffRecord_on_factory($page, $disk_path, $theme)
 {
     return array(
-        "base_path"     => "ffRecord_dialog"
-        , "class_name"  => $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . "ffRecord_dialog" . "." . FF_PHP_EXT
+        "base_path"     => $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . "ffRecord" . "/" . "ffRecord_dialog" . "." . FF_PHP_EXT
+        , "class_name"  => "ffRecord_dialog"
     );
 }
 

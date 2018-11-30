@@ -86,7 +86,10 @@ class ffWidget_dialog extends ffCommon
 
 		if($type) { //da fare le varie opzioni nella dialog
 			$this->oPage[0]->tplAddJs("ff.ffPage.dialog-" . $type);
-		} else {
+            $this->tpl[$tpl_id]->set_var("dialog_type", "dialog-" . $type);
+        } else {
+            $this->tpl[$tpl_id]->set_var("dialog_type", "dialog");
+
 			$this->oPage[0]->tplAddJs("ff.ffPage.dialog");
 			$this->oPage[0]->tplAddCss("jquery-ui.theme");
 			$this->oPage[0]->tplAddCss("jquery-ui.button");

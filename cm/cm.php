@@ -217,7 +217,11 @@ class cm extends ffCommon
         }
         if(!$this->layout_vars["theme"]) {
             $this->layout_vars["theme"] = cm::env("APP_THEME");
-            if($this->isXHR()) {
+            if($this->layout_vars["theme"] != FF_MAIN_THEME) {
+                $this->loadConfig(__PRJ_DIR__ . FF_THEME_DIR . "/" . $this->layout_vars["theme"] . "/conf/config.xml");
+            }
+
+            if($this->isXHR() && $_REQUEST["XHR_THEME"]) {
                 $this->layout_vars["theme"] = $_REQUEST["XHR_THEME"];
             }
         }
@@ -1606,7 +1610,9 @@ class cm extends ffCommon
 			
 		foreach ($cm->oPage->sections as $key => $value)
 		{
-			$cm->preloadApplets($cm->oPage->sections[$key]["tpl"]);
+		    if($value["tpl"] instanceof ffTemplate) {
+                $cm->preloadApplets($cm->oPage->sections[$key]["tpl"]);
+            }
 		}
 		reset($cm->oPage->sections);
 		

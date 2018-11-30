@@ -52,7 +52,7 @@ var activecombo = function(params) {
 	/* privates' end*/
 	
 	var that = { /* publics */
-		__ff : true /* used to recognize ff'objects*/
+		__ff : "ff.ffField.actex.activecombo" /* used to recognize ff'objects*/
 		, "father"					: params.father
 		, "childs"					: params.childs
 		, "data"					: params.data || []
@@ -1289,16 +1289,18 @@ var activecombo = function(params) {
 			jQuery.fn.escapeGet(__id + "_label").trigger("focus");
 			return false;
 		});	
-
-		jQuery.extend(true, that, ff.ffEvents());
 	}
-	
-	constructor();
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+        constructor();
+    });
+
 	return that;
 }; // actex object end
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects*/
+__ff : "ff.ffField.actex", /* used to recognize ff'objects*/
 
 "init" : function (params) {
 	if (!initialized) {
@@ -1476,6 +1478,10 @@ function ajaxChainBlock (inst) {
 		});
 	}
 };
+
+window.addEventListener('load', function () {
+	ff.initExt(that);
+});
 
 return that;
 

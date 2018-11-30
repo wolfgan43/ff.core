@@ -304,7 +304,7 @@ class ffPage_html extends ffPage_base
 	}*/
     public function loadResources($patterns) {
         $patterns["/themes/" . $this->getTheme()] = array(
-            "filter"                    => array("css", "js", "html", "jpg", "svg", "png")
+            "filter"                    => array("css", "js", "html", "tpl", "jpg", "svg", "png")
             , "rules"                   => array(
                 "/layouts/"             => "layouts"
                 , "/common/"            => "common"
@@ -323,7 +323,8 @@ class ffPage_html extends ffPage_base
 
     public function loadLibrary($path = null) {
         if($path) {
-            $this->libraries = array_merge_recursive($this->libraries, Filemanager::getInstance("php")->read($path . "/libs.php"));
+            $this->libsExtend(Filemanager::getInstance("php")->read($path . "/libs.php"));
+//            $this->libraries = array_merge_recursive($this->libraries, Filemanager::getInstance("php")->read($path . "/libs.php"));
             Filemanager::getInstance("php")->write($this->libraries, CM_CACHE_DISK_PATH . "/libs.php");
         } else {
             $this->libraries = array();
@@ -332,8 +333,433 @@ class ffPage_html extends ffPage_base
             if (!isset($_REQUEST["__CLEARCACHE__"]) && file_exists($cache_file)) {
                 $this->libraries = include($cache_file);
             } else {
+                $this->libraries = array(
+                    "ff" => array(
+                        "default" => "latest"
+                    , "latest" => array(
+                            "path" => "/themes/library/ff"
+                        , "file" => "ff.js"
+                        , "index" => 100
+                        //, "async" => false
+                        , "css_defs" => array(
+                                "core" => array(
+                                    "path" => "/themes/responsive/css"
+                                , "file" => "ff.css"
+                                , "priority" => cm::LAYOUT_PRIORITY_HIGH
+                                , "index" => 150
+                                , "css_loads" => array(
+                                        ".skin" => array(
+                                            "path" => "/themes/responsive/css"
+                                        , "file" => "ff-skin.css"
+                                        )
+                                    )
+                                )
+                            )
+                        , "js_deps" => array(
+                                //"jquery" => null
+                            )
+                        , "js_loads" => array(
+                               // "ff.ffEvent" => null
+                               // , "ff.ffEvents" => null
+                            )
+                        , "js_defs" => array(
+                              /*  "ffEvent" => array(
+                                    "path" => "/themes/library/ff"
+                                , "file" => "ffEvent.js"
+                                , "index" => 100
+                                //, "async" => false
+                                )
+                            , "ffEvents" => array(
+                                    "path" => "/themes/library/ff"
+                                , "file" => "ffEvents.js"
+                                , "index" => 100
+                                //, "async" => false
+                                )
+                            ,*/ "history" => array(
+                                    "path" => "/themes/library/ff"
+                                , "file" => "history.js"
+                                , "index" => 100
+                                )
+                            , "ajax" => array(
+                                    "path" => "/themes/library/ff"
+                                , "file" => "ajax.js"
+                                , "index" => 100
+                                , "js_loads" => array(
+                                    )
+                                )
+                            , "ffPage" => array(
+                                    "path" => "/themes/responsive/ff/ffPage"
+                                , "file" => "ffPage.js"
+                                , "index" => 100
+                                )
+                            )
+                        )
+                    )
+                , "jquery" => array(
+                        "default" => "1.11.2"
+                    , "1.11.2" => array(
+                            "path" => "/themes/library/jquery"
+                        , "file" => null
+                        , "index" => 200
+                        , "async" => false
+                        , "js_defs" => array(
+                                "plugins" => array(
+                                    "empty" => true
+                                )
+                            )
+                        )
+                    )
+                , "jquery-ui" => array(
+                        "default" => "1.11.3"
+                    , "1.11.3" => array(
+                            "path" => "/themes/library/jquery-ui"
+                        , "file" => null
+                        , "index" => 200
+                        , "js_deps" => array(
+                                "jquery" => null
+                            )
+                        , "js_defs" => array(
+                            )
+                        , "css_loads" => array(
+                                "jquery-ui.core" => null,
+                                "ff-jqueryui" => array(
+                                    "path" => "/themes/responsive/css"
+                                , "file" => "ff-jqueryui.css"
+                                )
+                            )
+                        , "css_defs" => array(
+                                "accordion" => array(
+                                    "file" => "base/accordion.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "autocomplete" => array(
+                                    "file" => "base/autocomplete.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "button" => array(
+                                    "file" => "base/button.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "core" => array(
+                                    "file" => "base/core.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "datepicker" => array(
+                                    "file" => "base/datepicker.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "dialog" => array(
+                                    "file" => "base/dialog.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "draggable" => array(
+                                    "file" => "base/draggable.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "menu" => array(
+                                    "file" => "base/menu.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "progressbar" => array(
+                                    "file" => "base/progressbar.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "resizable" => array(
+                                    "file" => "base/resizable.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "selectable" => array(
+                                    "file" => "base/selectable.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "selectmenu" => array(
+                                    "file" => "base/selectmenu.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "slider" => array(
+                                    "file" => "base/slider.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "sortable" => array(
+                                    "file" => "base/sortable.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "spinner" => array(
+                                    "file" => "base/spinner.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "tabs" => array(
+                                    "file" => "base/tabs.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            , "tooltip" => array(
+                                    "file" => "base/tooltip.css"
+                                , "path" => "/themes/library/jquery-ui.themes"
+                                , "index" => 200
+                                )
+                            )
+                        )
+                    )
+                , "fonticons" => array(
+                        "default" => "latest"
+                    , "latest" => array(
+                            "empty" => true
+                        , "css_defs" => array(
+                                "fontawesome" => array(
+                                    "path" => "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css"
+                                , "file" => "font-awesome.min.css"
+                                , "index" => 175
+                                , "css_loads" => array(
+                                        ".ff" => array(
+                                            "path" => FF_THEME_DIR . "/" . FF_MAIN_THEME . "/css"
+                                        , "file" => "ff-fontawesome.css"
+                                        )
+                                    )
+                                )
+                            , "glyphicons" => array(
+                                    "path" => "/themes/responsive/css"
+                                , "file" => "bootstrap-glyphicons.min.css"
+                                , "index" => 175
+
+                                )
+                            )
+                        )
+                    )
+                , "bootstrap" => array(
+                        "default" => "latest"
+                    , "latest" => array(
+                            "empty" => true
+                        , "js_defs" => array(
+                                "core" => array(
+                                    "path" => "https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js"
+                                , "file" => "bootstrap.min.js"
+                                , "index" => 150
+                                , "js_deps" => array(
+                                        "jquery" => null
+                                    )
+                                )
+                            )
+                        , "css_defs" => array(
+                                "core" => array(
+                                    "path" => "https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css"
+                                , "file" => "bootstrap.min.css"
+                                , "index" => 150
+                                , "js_loads" => array(
+                                        "bootstrap.core" => null
+                                    )
+                                , "css_deps" => array(
+                                        //"fonticons.fontawesome" => null
+                                    )
+                                , "css_loads" => array(
+                                        ".ff" => array(
+                                            "path" => FF_THEME_DIR . "/" . FF_MAIN_THEME . "/css"
+                                        , "file" => "ff-bootstrap.css"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                , "foundation" => array(
+                        "default" => "latest"
+                    , "latest" => array(
+                            "empty" => true
+                        , "js_defs" => array(
+                                "core" => array(
+                                    "path" => "https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/js"
+                                , "file" => "foundation.min.js"
+                                , "index" => 150
+                                , "js_deps" => array(
+                                        "jquery" => null
+                                    )
+                                , "js_loads" => array(
+                                        ".init" => array(
+                                            "embed" => "
+								jQuery(function() {
+									jQuery(document).foundation();
+								});
+							"
+                                        )
+                                    )
+                                )
+                            )
+                        , "css_defs" => array(
+                                "core" => array(
+                                    "path" => "https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/css"
+                                , "file" => "foundation.min.css"
+                                , "index" => 150
+                                , "js_loads" => array(
+                                        "foundation.core" => null
+                                    )
+                                , "css_deps" => array(
+                                        //"fonticons.fontawesome" => null
+                                    )
+                                , "css_loads" => array(
+                                        ".ff" =>  array(
+                                            "path" => FF_THEME_DIR . "/" . FF_MAIN_THEME . "/css"
+                                        , "file" => "ff-foundation.css"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                , "google" => array(
+                        "default" => "latest"
+                    , "latest" => array(
+                            "empty" => true
+                        , "js_defs" => array(
+                                "adsense" => array(
+                                    "path" => "//pagead2.googlesyndication.com/pagead/js"
+                                , "file" => "adsbygoogle.js"
+                                , "priority" => cm::LAYOUT_PRIORITY_LOW
+                                , "js_loads" => array(
+                                        ".push" => array(
+                                            "embed" => "
+									jQuery(function() {
+										var adsbygoogle = window.adsbygoogle || [];
+										jQuery(\"ins.adsbygoogle\").each(function(){
+											if (jQuery(this).attr(\"data-adsbygoogle-status\") !== \"done\") {
+												adsbygoogle.push({});
+											}
+										});
+									});
+								"
+                                        )
+                                    )
+                                )
+                            , "jsapi" => array(
+                                    "empty" => true
+                                , "js_defs" => array(
+                                        "async" => array(
+                                            "path" => "https://www.google.com"
+                                        , "file" => "jsapi?callback=gloadinitcall"
+                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
+                                        , "js_deps" => array(
+                                                ".initcall" => array(
+                                                    "embed" => "
+											var gloadinit = [];
+											function gloadinitcall(callback) {
+												if (callback === undefined) {
+													gloadinit.forEach(function(entry) {
+														entry();
+													});
+													gloadinit = false;
+												} else {
+													if (gloadinit === false)
+														callback();
+													else
+														gloadinit.push(callback);
+												}
+											}
+										"
+                                                , "exclude_compact" => true
+                                                )
+                                            )
+                                        )
+                                    , "sync" => array(
+                                            "path" => "https://www.google.com"
+                                        , "file" => "jsapi"
+                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
+                                        , "js_deps" => array(
+                                                ".initcall" => array(
+                                                    "embed" => "
+											var gloadinit = [];
+											function gloadinitcall(callback) {
+												jQuery(window).ready(function(){callback();});
+											}
+										"
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            , "maps" => array(
+                                    "empty" => true
+                                , "js_defs" => array(
+                                        "async" => array(
+                                            "path" => "https://maps.googleapis.com/maps/api"
+                                        , "file" => "js?libraries=places&callback=gmapsinitcall"
+                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
+                                        , "js_deps" => array(
+                                                ".initcall" => array(
+                                                    "embed" => "
+											var gmapsinit = [];
+											function gmapsinitcall(callback) {
+												if (callback === undefined) {
+													gmapsinit.forEach(function(entry) {
+														entry();
+													});
+													gmapsinit = false;
+												} else {
+													if (gmapsinit === false)
+														callback();
+													else
+														gmapsinit.push(callback);
+												}
+											}
+										"
+                                                , "exclude_compact" => true
+                                                )
+                                            )
+                                        )
+                                    , "sync" => array(
+                                            "path" => "https://maps.googleapis.com/maps/api"
+                                        , "file" => "js?libraries=places"
+                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
+                                        , "js_deps" => array(
+                                                ".initcall" => array(
+                                                    "embed" => "
+											var gmapsinit = [];
+											function gmapsinitcall(callback) {
+												jQuery(window).ready(function(){callback();});
+											}
+										"
+                                                )
+                                            )
+                                        )
+                                    , "markerclusterer" => array(
+                                            "path" => FF_THEME_DIR . "/library/plugins/gmap3.markerclusterer",
+                                            "file" => "markerclusterer.js"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                , "facebook" => array(
+                        "default" => "latest",
+                        "latest" => array(
+                            "path" => "http://connect.facebook.net/" . strtolower(substr(FF_LOCALE, 0, 2)) . "_" . strtoupper(substr(FF_LOCALE, 0, 2))
+                        , "file" => "all.js"
+                        )
+                    )
+                , "library" => array(
+                        "default" => "latest",
+                        "latest" => array(
+                            "empty" => true
+                        )
+                    )
+                );
+
                 Filemanager::scan(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff", array("name" => array("libs.php")), function ($file) {
-                    $this->libraries = array_merge_recursive($this->libraries, Filemanager::getInstance("php")->read($file));
+                    $this->libsExtend(Filemanager::getInstance("php")->read($file));
                 });
 
                 Filemanager::getInstance("php")->write($this->libraries, CM_CACHE_DISK_PATH . "/libs.php");
@@ -867,6 +1293,7 @@ class ffPage_html extends ffPage_base
 		$lib_parts_last = array_pop($lib_parts); // exclude last (this)
 		$tmp_js_deps = array();
 		$last_ref = $this->libraries;
+
 		for ($i = 0; $i < count($lib_parts); $i++)
 		{
 			$name = $lib_parts[$i];
@@ -1214,11 +1641,11 @@ class ffPage_html extends ffPage_base
 		{
 			if ($this->getXHRCtx() && $this->template_file === "ffPage.html")
 			{
-				$tmp = $this->getTemplateDir("ffPage_dialog.html");
+				$tmp = $this->getTemplateDir("ffPage_XHR.html");
 				if ($tmp !== null)
 				{
 					$this->tpl[0] = ffTemplate::factory($tmp);
-					$this->tpl[0]->load_file("ffPage_dialog.html", "main");
+					$this->tpl[0]->load_file("ffPage_XHR.html", "main");
 				}
 				else
 				{
@@ -1334,9 +1761,6 @@ class ffPage_html extends ffPage_base
                                 $this->sections[$key]["tpl"] = $this->loadTemplate($key, "common");
 
                         }
-
-                        $this->tplProcessVars(array(&$this->sections[$key]["tpl"]));
-                        $this->tplSetGlobals(array(&$this->sections[$key]["tpl"]));
 
                         $this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
 
@@ -1571,56 +1995,41 @@ class ffPage_html extends ffPage_base
             }
         }
 
+        $this->parseOwnJs();
 
-		if ($this->use_own_js)
-		{
-			$this->tplAddMultiJS($this->default_js, cm::LAYOUT_PRIORITY_HIGH);
-			$this->tplAddMultiCss($this->default_css, cm::LAYOUT_PRIORITY_HIGH);
-			$this->tplAddJs("ff.init", array(
-					"async" => false
-					, "embed" => "{FFJSINIT}"
-					, "priority" => cm::LAYOUT_PRIORITY_HIGH
-					, "index" => -1000
-				));
-		}
+        /*if ($this->use_own_js)
+        {
+            $this->tplAddMultiJS($this->default_js, cm::LAYOUT_PRIORITY_HIGH);
+            $this->tplAddMultiCss($this->default_css, cm::LAUT_PRIORITY_HIGH);
+            /*$this->tplAddJs("ff.init", array(
+                    "async" => false
+                    , "embed" => "{FFJSINIT}"
+                    , "priority" => cm::LAYOUT_PRIORITY_HIGH
+                    , "index" => -1000
+                ));
+		}*/
 
 		$this->parse_css();
 		$this->parse_tags();
         $this->parse_js();
         $this->parse_meta();
         $this->parse_html_attr();
-
+/*
         if ($this->use_own_js)
 		{
 			$tmp = $this->tpl[0]->rpparse("SectFFJS", false);
 			$this->tpl[0]->ParsedBlocks["SectJs"] = str_replace("{FFJSINIT}", $tmp, $this->tpl[0]->ParsedBlocks["SectJs"]);
-			foreach ($this->js_buffer as $key => $value)
-			{
-				if (ffIsset($value, "content") && $value["content"] === "{FFJSINIT}")
-				{
-					$this->js_buffer[$key]["content"] = $tmp;
-					break;
-				}
-			}
+            $this->js_buffer["ff.init"]["content"] = $tmp;
+
+
 		}
-		$this->tpl[0]->set_var("SectFFJS", "");
+		$this->tpl[0]->set_var("SectFFJS", "");*/
 
 		$this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));
 		if ($this->isXHR())
 		{
 			if ($this->getXHRFormat() === false)
 			{
-				$this->output_buffer["headers"] = $this->tpl[0]->rpparse("SectHeaders", false) . $this->output_buffer["headers"];
-				$this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
-
-				if (!$this->getXHRComponent())
-				{
-					$this->tpl[0]->set_var("SectHeaders", "");
-					$this->tpl[0]->set_var("SectFooters", "");
-					$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
-					$this->output_buffer["html"] = $this->tpl[0]->rpparse("main", false);
-				}
-
 				$this->doEvent("on_tpl_parsed", array(&$this));
 			}
 
@@ -1630,7 +2039,8 @@ class ffPage_html extends ffPage_base
 		{
 			$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
 
-			if (strlen($this->output_buffer["headers"]))
+
+			/*if (strlen($this->output_buffer["headers"]))
 			{
 				$this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["headers"]);
 				$this->tpl[0]->parse("SectWidgetsHeaders", true);
@@ -1640,7 +2050,7 @@ class ffPage_html extends ffPage_base
 			{
 				$this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["footers"]);
 				$this->tpl[0]->parse("SectWidgetsFooters", true);
-			}
+			}*/
 
 			//$debug = $this->tpl[0];
 			//ffErrorHandler::raise("ASD", E_USER_ERROR, $this, get_defined_vars());
@@ -1658,6 +2068,49 @@ class ffPage_html extends ffPage_base
 		}
 		return true;
 	}
+
+	private function parseOwnJs() {
+        if ($this->use_own_js) {
+                $this->tplAddMultiJS($this->default_js, cm::LAYOUT_PRIORITY_HIGH);
+                $this->tplAddMultiCss($this->default_css, cm::LAYOUT_PRIORITY_HIGH);
+            if($this->isXHR()) {
+                if ($this->getXHRFormat() === false)
+                {
+                    $this->output_buffer["headers"] = $this->tpl[0]->rpparse("SectHeaders", false) . $this->output_buffer["headers"];
+                    $this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
+
+                    if (!$this->getXHRComponent())
+                    {
+                        $this->tpl[0]->set_var("SectHeaders", "");
+                        $this->tpl[0]->set_var("SectFooters", "");
+                        $this->tpl[0]->set_var("content", $this->output_buffer["html"]);
+                        $this->output_buffer["html"] = $this->tpl[0]->rpparse("main", false);
+                    }
+                }
+            } else {
+                if (strlen($this->output_buffer["headers"])) {
+                    $this->tplAddJs("ff.headers", array(
+                        "embed" => $this->output_buffer["headers"]
+                    ));
+                }
+
+                if (strlen($this->output_buffer["footers"])) {
+                    $this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["footers"]);
+                    $this->tpl[0]->parse("SectWidgetsFooters", true);
+                }
+
+                if($this->compact_js) {
+                    $this->tplAddJs("ff.init", array(
+                        "embed" => $this->tpl[0]->rpparse("SectFFJS", false)
+                        , "priority" => cm::LAYOUT_PRIORITY_HIGH
+                        , "index" => -1000
+                    ));
+                } else {
+                    $this->tpl[0]->parse("SectFFJS", false);
+                }
+            }
+        }
+    }
 
 	/**
 	 * Imposta le variabili globali all'interno di un template
@@ -1995,32 +2448,60 @@ class ffPage_html extends ffPage_base
 		{
 			foreach ($this->sections as $key => $value)
 			{
-				if ($value["tpl"] === null)
-					continue;
-
+				if ($value["tpl"] === null) {
+                    continue;
+                }
 				$this->sections[$key]["events"]->doEvent("on_process", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
 
-				// process components buffer
-				foreach ($this->components as $subkey => $item)
-				{
-					$rc = false;
+				switch (get_class($value["tpl"])) {
+				    case "ffSmarty":
+                        // process components buffer
+                        foreach ($this->components as $subkey => $item)
+                        {
+                            $rc = false;
 
-					if (/*$this->components[$subkey]->use_own_location && */$this->components[$subkey]->display !== false)
-					{
-						if ($this->components[$subkey]->location_name === null)
-							$rc = $value["tpl"]->set_var($subkey, $this->components_buffer[$subkey]["html"]);
-						else
-							$rc = $value["tpl"]->set_var($this->components[$subkey]->location_name, $this->components_buffer[$subkey]["html"]);
-					}
+                            if (/*$this->components[$subkey]->use_own_location && */$this->components[$subkey]->display !== false) {
+                                if ($this->components[$subkey]->location_name === null) {
+                                    $value["tpl"]->assign($subkey, $this->components_buffer[$subkey]["html"]);
+                                } else {
+                                    $value["tpl"]->assign($this->components[$subkey]->location_name, $this->components_buffer[$subkey]["html"]);
+                                }
+                            }
+                        }
+                        reset($this->components);
 
-					if ($rc)
-						$this->components_buffer[$subkey]["html"] = "";
+                        $value["tpl"]->assign("content", $value["content"]);
+                        $this->tpl_layer[0]->set_var($key, $value["tpl"]->process());
+                        break;
+                    case "ffTemplate":
+                        // process components buffer
+                        foreach ($this->components as $subkey => $item)
+                        {
+                            $rc = false;
 
-				}
-				reset($this->components);
-				$value["tpl"]->set_var("content", $value["content"]);
+                            if (/*$this->components[$subkey]->use_own_location && */$this->components[$subkey]->display !== false)
+                            {
+                                if ($this->components[$subkey]->location_name === null) {
+                                    $rc = $value["tpl"]->set_var($subkey, $this->components_buffer[$subkey]["html"]);
+                                } else {
+                                    $rc = $value["tpl"]->set_var($this->components[$subkey]->location_name, $this->components_buffer[$subkey]["html"]);
+                                }
+                            }
 
-				$this->tpl_layer[0]->set_var($key, $value["tpl"]->rpparse("main", false));
+                            if ($rc) {
+                                $this->components_buffer[$subkey]["html"] = "";
+                            }
+
+                        }
+                        reset($this->components);
+                        $value["tpl"]->set_var("content", $value["content"]);
+
+                        $this->tpl_layer[0]->set_var($key, $value["tpl"]->rpparse("main", false));
+                        break;
+                    default:
+                }
+
+
 			}
 			reset($this->sections);
 		}
@@ -2034,7 +2515,13 @@ class ffPage_html extends ffPage_base
             }
         }
 	}
+    /**
+     * Elabora il template del layout e delle sezioni
+     */
+    protected function tplProcessSection()
+    {
 
+    }
    /**
 	 * Elabora i CSS
 	 * Da richiamare ad ogni aggiunta di CSS se si aggiungono CSS dinamicamente post-elaborazione
@@ -2450,7 +2937,7 @@ class ffPage_html extends ffPage_base
 					}
 					else
 					{
-						if ($value["async"])
+						if (0 && $value["async"])
 						{
 							$this->tpl[0]->parse("SectAsyncCssPlugin", true);
 						}
@@ -3468,11 +3955,12 @@ class ffPage_html extends ffPage_base
 						$this->components_buffer[$item]["headers"] = $this->components[$item]->process_headers();
 						$this->components_buffer[$item]["footers"] = $this->components[$item]->process_footers();
 
-						if (property_exists($this->components[$item], "widget_activebt_enable") && $this->components[$item]->widget_activebt_enable && !isset($this->widgets["activebuttons"]))
-							$this->widgetLoad("activebuttons");
-
-						if (property_exists($this->components[$item], "widget_discl_enable") && $this->components[$item]->widget_discl_enable && !isset($this->widgets["disclosures"]))
-							$this->widgetLoad("disclosures");
+						if (property_exists($this->components[$item], "widget_activebt_enable") && $this->components[$item]->widget_activebt_enable && !isset($this->widgets["activebuttons"])) {
+                            $this->widgetLoad("activebuttons");
+                        }
+						if (property_exists($this->components[$item], "widget_discl_enable") && $this->components[$item]->widget_discl_enable && !isset($this->widgets["disclosures"])) {
+                            $this->widgetLoad("disclosures");
+                        }
 
 						$ret = $this->componentWidgetsProcess($tmp_id_if);
 						$this->components_buffer[$item]["headers"] .= $ret["headers"];
@@ -3577,8 +4065,9 @@ class ffPage_html extends ffPage_base
 
         $rc = $this->doEvent("on_page_processed", array(&$this));
 
-        if (!($this->isXHR() && $this->getXHRComponent()))
-			$this->widgetsProcess();
+        if (!($this->isXHR() && $this->getXHRComponent())) {
+            $this->widgetsProcess();
+        }
 
 		return $this->tplParse($output_result);
 	}

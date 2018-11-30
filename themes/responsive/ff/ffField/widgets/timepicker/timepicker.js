@@ -1,6 +1,6 @@
 ff.ffField.timepicker = (function () {
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.timepicker", /* used to recognize ff'objects*/
 		"fill" : function (control_id, control_hour_id, control_minute_id, sel_hour, sel_minute) {
 			var control_hour = document.getElementById(control_hour_id);
 			var control_minute = document.getElementById(control_minute_id);
@@ -38,7 +38,11 @@ ff.ffField.timepicker = (function () {
 			control.value = control_hour.selectedIndex + ":" + control_minute.selectedIndex;
 		}
 	};
-	
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 
 })();

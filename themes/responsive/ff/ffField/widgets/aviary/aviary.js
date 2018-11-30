@@ -8,7 +8,7 @@ ff.ffField.aviary = (function () {
 	var previewUrl = "/cm/showfiles.php"
 
 	var that = { /* publics*/
-		__ff : true, /* used to recognize ff'objects*/
+		__ff : "ff.ffField.aviary", /* used to recognize ff'objects*/
 		"init" : function (imgElem, imgPath, imgHash, key, tools, theme, version, postUrl) {
 			var tools = (tools ? tools : defaultTools);
 			var theme = (theme ? theme : defaultTheme);
@@ -75,6 +75,11 @@ ff.ffField.aviary = (function () {
 		   return false;
 		}		
 	};
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
+
 	return that;
 	
 })();		

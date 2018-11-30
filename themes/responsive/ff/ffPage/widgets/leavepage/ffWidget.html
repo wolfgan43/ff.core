@@ -2,7 +2,6 @@
 <!--EndSectHeaders-->
 
 <!--BeginSectFooters-->
-<script type="text/javascript">
 	function setConfirmUnload(on) {
 		 window.onbeforeunload = (on) ? unloadMessage : null;
 	}
@@ -16,7 +15,6 @@
 		 $(':input', myform).bind("change", function() { setConfirmUnload(true); }); // Prevent accidental navigation away
 		 $(':submit', myform).bind("click", function() { setConfirmUnload(false); });
 	});
-</script>
 <!--EndSectFooters-->
 
 <!--BeginSectIstance-->

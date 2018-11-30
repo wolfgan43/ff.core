@@ -17,82 +17,8 @@
     <!--BeginSectJs-->
         <script<!--BeginSectJsSrc--> src="{js_path}"<!--EndSectJsSrc--><!--BeginSectJSAsync--> async="async" defer="defer"<!--EndSectJSAsync-->>{js_embed}</script>
     <!--EndSectJs-->
-    <!--BeginSectFFJS-->
-        ff.initFF({
-    "base_path"		: "{base_path}",
-    "site_path"		: "{site_path}",
-    "theme"			: "{theme}",
-    "theme_ui"		: "{theme_ui}",
-    "language"		: "{language}",
-    "locale"		: "{locale}",
-    "layer"			: "{layer}",
-    "frameworkCss"	: "{framework_css}",
-    "fontIcon"		: "{font_icon}",
-    <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->
-    "lazyImg"	: {lazy_img},
-    "showfiles"		: '{showfiles}',
-
-    <!--BeginSectFFProperty-->
-    "{prop_name}"	: {prop_value},
-    <!--EndSectFFProperty-->
-    <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->
-    "struct"		: ff.hash([
-                              {'id': 'fields', 'value' : ff.hash([
-    <!--BeginSectFFFld-->
-        {
-    'id' : '{fieldid}',
-    'value' : {
-    "type"		: undefined
-                  , "widget"		: "{widget}"
-    , "resources"	: [<!--BeginSectFFFldResource-->{resource}<!--EndSectFFFldResource-->]
-    }
-    },
-    <!--EndSectFFFld-->
-    ])},
-    {'id': 'comps', 'value' : ff.hash([
-    <!--BeginSectFFObj-->
-        {'id': '{objid}', 'value' : {
-    "type"			: "{type}"
-    , "resources"	: [<!--BeginSectFFObjResource-->{resource}<!--EndSectFFObjResource-->]
-    , "fields"		: ff.hash([
-    <!--BeginSectFFObjFld-->
-        {
-    'id' : '{fieldid}',
-    'value' : {
-    "type"		: "{fldtype}"
-    , "widget"		: "{widget}"
-    , "resources"	: [<!--BeginSectFFFldResource-->{resource}<!--EndSectFFFldResource-->]
-    }
-    },
-    <!--EndSectFFObjFld-->
-    ])
-    <!--BeginSectFFObjProperty-->
-        , "{prop_name}"	: {prop_value}
-    <!--EndSectFFObjProperty-->
-    }},
-    <!--EndSectFFObj-->
-    ])}
-    ])
-    <!--BeginSectLibs-->
-        , "libs"		: [
-    <!--BeginSectLib-->
-        {'type' : '{lib_type}', 'id' : '{lib_tag}', 'deps' : {lib_deps}, 'media' : {lib_media}} ,<!--EndSectLib-->
-    ]
-    <!--EndSectLibs-->
-    });
-
-    <!--BeginSectAsyncCssPlugin-->
-        ff.injectCSS("{css_tag}", "{css_path}", undefined, {lib_media}, {css_async});
-    <!--EndSectAsyncCssPlugin-->
-    <!--BeginSectAsyncJsPlugin-->
-        ff.pluginLoad("{js_tag}", "{js_path}", undefined, {js_async}, {js_deps});
-    <!--EndSectAsyncJsPlugin-->
-    <!--EndSectFFJS-->
-    <!--BeginSectWidgetsHeaders-->
-        {WidgetsContent}
-    <!--EndSectWidgetsHeaders-->
-        </head>
-          <body{properties_body}>
+</head>
+<body{properties_body}>
     <!--BeginSectFormHeader-->
         <form id="{form_id}" name="{form_name}" method="{form_method}"{form_action}{form_enctype}>
     <!--BeginSectFormHidden-->
@@ -100,12 +26,91 @@
     <!--EndSectFormHidden-->
     <!--EndSectFormHeader-->
         {content}
-    <!--BeginSectWidgetsFooters-->
-        {WidgetsContent}
-    <!--EndSectWidgetsFooters-->
     <!--BeginSectFormFooter-->
         </form>
     <!--EndSectFormFooter-->
+
+    <!--BeginSectFFJS-->
+    <script defer="defer">
+        window.addEventListener('load', function () {
+            ff.initFF({
+            "base_path"		: "{base_path}",
+            "site_path"		: "{site_path}",
+            "theme"			: "{theme}",
+            "theme_ui"		: "{theme_ui}",
+            "language"		: "{language}",
+            "locale"		: "{locale}",
+            "layer"			: "{layer}",
+            "frameworkCss"	: "{framework_css}",
+            "fontIcon"		: "{font_icon}",
+            <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->
+            "lazyImg"	: {lazy_img},
+            "showfiles"		: '{showfiles}',
+
+            <!--BeginSectFFProperty-->
+            "{prop_name}"	: {prop_value},
+            <!--EndSectFFProperty-->
+            <!--BeginSectGroup-->"group"         : "{group}",<!--EndSectGroup-->
+            "struct"		: ff.hash([
+                                      {'id': 'fields', 'value' : ff.hash([
+            <!--BeginSectFFFld-->
+                {
+            'id' : '{fieldid}',
+            'value' : {
+            "type"		: undefined
+                          , "widget"		: "{widget}"
+            , "resources"	: [<!--BeginSectFFFldResource-->{resource}<!--EndSectFFFldResource-->]
+            }
+            },
+            <!--EndSectFFFld-->
+            ])},
+            {'id': 'comps', 'value' : ff.hash([
+            <!--BeginSectFFObj-->
+                {'id': '{objid}', 'value' : {
+            "type"			: "{type}"
+            , "resources"	: [<!--BeginSectFFObjResource-->{resource}<!--EndSectFFObjResource-->]
+            , "fields"		: ff.hash([
+            <!--BeginSectFFObjFld-->
+                {
+            'id' : '{fieldid}',
+            'value' : {
+            "type"		: "{fldtype}"
+            , "widget"		: "{widget}"
+            , "resources"	: [<!--BeginSectFFFldResource-->{resource}<!--EndSectFFFldResource-->]
+            }
+            },
+            <!--EndSectFFObjFld-->
+            ])
+            <!--BeginSectFFObjProperty-->
+                , "{prop_name}"	: {prop_value}
+            <!--EndSectFFObjProperty-->
+            }},
+            <!--EndSectFFObj-->
+            ])}
+            ])
+            <!--BeginSectLibs-->
+                , "libs"		: [
+            <!--BeginSectLib-->
+                {'type' : '{lib_type}', 'id' : '{lib_tag}', 'deps' : {lib_deps}, 'media' : {lib_media}} ,<!--EndSectLib-->
+            ]
+            <!--EndSectLibs-->
+            });
+
+            <!--BeginSectAsyncCssPlugin-->
+                ff.injectCSS("{css_tag}", "{css_path}", undefined, {lib_media}, {css_async});
+            <!--EndSectAsyncCssPlugin-->
+            <!--BeginSectAsyncJsPlugin-->
+                ff.pluginLoad("{js_tag}", "{js_path}", undefined, {js_async}, {js_deps});
+            <!--EndSectAsyncJsPlugin-->
+
+            <!--BeginSectWidgetsFooters-->
+                {WidgetsContent}
+            <!--EndSectWidgetsFooters-->
+        });
+    </script>
+    <!--EndSectFFJS-->
+
+
     <!--BeginSectJSDefer-->
     <!--BeginSectCSSDefer-->
         <noscript id="deferred-styles">
@@ -144,5 +149,5 @@
     else window.addEventListener('load', ffDF);
     </script>
     <!--EndSectJSDefer-->
-        </body>
-          </html>
+</body>
+</html>

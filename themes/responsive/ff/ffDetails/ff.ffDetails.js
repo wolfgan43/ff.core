@@ -40,7 +40,7 @@ var toggles_rows = ff.hash();
 var toggle_all = 0;
 
 var that = { // publics
-__ff : true, // used to recognize ff'objects
+__ff : "ff.ffDetails", // used to recognize ff'objects
 
 "turnToggle" : function (component, nome) {
 	var re = new RegExp("^" + component + "_recordset\\[\\d+\\]\\[" + nome + "\\]$");
@@ -183,6 +183,10 @@ __ff : true, // used to recognize ff'objects
 ff.pluginAddInitLoad("ff.ffDetails", function () {
 	ff.addEvent({"event_name" : "onClearComponent", "func_name" : that.onClearComponent});
 });
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 

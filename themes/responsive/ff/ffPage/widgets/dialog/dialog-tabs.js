@@ -63,7 +63,7 @@ ff.pluginAddInit("ff.ajax", function () {
 }, "73819724-4f5e-43a4-ad76-e7606e029bb7");
 
 var that = { /* publics */
-__ff : true, /* used to recognize ff'objects */
+__ff : "ff.ffPage.navtabs", /* used to recognize ff'objects */
 
 "getActiveGroup" : function () {
 	return jQuery(tabs_nav).tabs("option", "active");
@@ -461,6 +461,10 @@ __ff : true, /* used to recognize ff'objects */
 },
 
 }; /* publics' end */
+
+    window.addEventListener('load', function () {
+        ff.initExt(that);
+    });
 
 return that;
 
