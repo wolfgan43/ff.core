@@ -206,43 +206,12 @@ function ffRecord_dialog_on_done_action_output_results(ffRecord_base $record, $f
 /***
 * FRAMEWORK CSS Load JS / CSS Base
 */
-/*
-function ffPage_on_layout_init($oPage, $layout_vars) {
-    $framework_css = Cms::getInstance("frameworkcss")->getFramework(FF_THEME_FRAMEWORK_CSS);
-    $font_icon = Cms::getInstance("frameworkcss")->getFontIcon(FF_THEME_FONT_ICON);
 
-	if(!$oPage->isXHR()) {
-        if(is_array($font_icon)) {
-            $oPage->tplAddCss("fonticons." . $font_icon["name"]);
-        }
-
-        if(defined("FF_THEME_ADMIN") && FF_THEME_ADMIN && is_file(FF_THEME_DISK_PATH . "/" . FF_THEME_ADMIN . "/css/app.css")) {
-            $oPage->libraries["ff"]["latest"]["css_defs"]["theme"]["path"] = FF_THEME_DIR . "/" . FF_THEME_ADMIN . "/css";
-            $oPage->libraries["ff"]["latest"]["css_defs"]["theme"]["file"] = "app.css";
-            unset($oPage->libraries["ff"]["latest"]["css_defs"]["core"]["path"]);
-            unset($oPage->libraries["ff"]["latest"]["css_defs"]["core"]["file"]);
-            $oPage->libraries["ff"]["latest"]["css_defs"]["core"]["css_loads"] = array();
-
-            if(is_file(FF_THEME_DISK_PATH . "/" . FF_THEME_ADMIN . "/javascript/app.js")) {
-                $oPage->tplAddJs("app", array(
-                        "path" => FF_THEME_DIR . "/" . FF_THEME_ADMIN . "/javascript"
-                        , "file" => "app.js"
-                    )
-                );
-            }
-        } else if(is_array($framework_css)) {
-            if(is_file($oPage->getThemeDir() . "/css/" . $framework_css["name"] . ".css")) {
-                $oPage->libraries[$framework_css["name"]]["latest"]["css_defs"]["core"]["path"] = $oPage->getThemePath(false) . "/css";
-                $oPage->libraries[$framework_css["name"]]["latest"]["css_defs"]["core"]["file"] = $framework_css["name"] . ".css";
-            }
-            $oPage->tplAddCss($framework_css["name"] . ".core");
-		}
-	}
-}*/
 
 function ffTheme_restricted_icon($class) {
+    $cm = cm::getInstance();
 	$arrClass = explode("_", $class);
 
-	return Cms::getInstance("frameworkcss")->get($arrClass[1], "icon-tag");
+	return $cm->oPage->frameworkCSS->get($arrClass[1], "icon-tag");
 }
 

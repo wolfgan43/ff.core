@@ -151,7 +151,7 @@ class ffWidget_checkgroup
 					$class = $class . ($class ? " " : "") . "off";				
 				}
 				
-				$class .= " " . Cms::getInstance("frameworkcss")->get("row-padding", "form");
+				$class .= " " . $this->oPage[0]->frameworkCSS->get("row-padding", "form");
 				$class .= " checkbox";
 
 				$this->tpl[$tpl_id]->set_var("class", $class);

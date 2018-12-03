@@ -68,8 +68,8 @@ class ffWidget_dialog extends ffCommon
 
 		$this->tpl[$tpl_id]->set_var("id", $id);
 		$this->tpl[$tpl_id]->set_var("name", $options["name"]);
-		
-		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
+
+		$framework_css = $this->oPage[0]->frameworkCSS->getFramework();
 		
 		if (array_key_exists("id", $options))
 			$this->tpl[$tpl_id]->set_var("id_tag", ' id="' . $options["id"] . '"');
@@ -129,10 +129,10 @@ class ffWidget_dialog extends ffCommon
 		
 		if($framework_css["name"]) {
 			if(!is_numeric($options["width"])) {
-				$options["dialogClass"] = Cms::getInstance("frameworkcss")->get("window-" . $options["width"], "dialog", $options["dialogClass"]);
+				$options["dialogClass"] = $this->oPage[0]->frameworkCSS->get("window-" . $options["width"], "dialog", $options["dialogClass"]);
 				$options["width"] = "";
 			} else {
-				$options["dialogClass"] = Cms::getInstance("frameworkcss")->get("window", "dialog", $options["dialogClass"]);		
+				$options["dialogClass"] = $this->oPage[0]->frameworkCSS->get("window", "dialog", $options["dialogClass"]);
 			}
 		}
 		if($options["callback"]) 

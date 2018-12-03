@@ -106,12 +106,12 @@ else
 	$tpl->load_file("form.html", "main");
 }
  
-$tpl->set_var("confirm_class", Cms::getInstance("frameworkcss")->get("ActionButtonDelete", "button", "activebuttons"));
-$tpl->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("ActionButtonCancel", "button"));
+$tpl->set_var("confirm_class", $cm->oPage->frameworkCSS->get("ActionButtonDelete", "button", "activebuttons"));
+$tpl->set_var("cancel_class", $cm->oPage->frameworkCSS->get("ActionButtonCancel", "button"));
 
-$tpl->set_var("center_class", strtolower($type)); // Cms::getInstance("frameworkcss")->get("", "row"));
-$tpl->set_var("message_class", Cms::getInstance("frameworkcss")->get("warning", "icon", "5x"));
-$tpl->set_var("message_icon", Cms::getInstance("frameworkcss")->get("warning", "icon-tag", "5x"));
+$tpl->set_var("center_class", strtolower($type)); // $cm->oPage->frameworkCSS->get("", "row"));
+$tpl->set_var("message_class", $cm->oPage->frameworkCSS->get("warning", "icon", "5x"));
+$tpl->set_var("message_icon", $cm->oPage->frameworkCSS->get("warning", "icon-tag", "5x"));
 $tpl->set_var("site_path", FF_SITE_PATH);
 $tpl->set_var("theme", $cm->oPage->getTheme()); // TOCHECK
 

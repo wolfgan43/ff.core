@@ -901,6 +901,8 @@ function mod_auth_social_get_google_client()
  */
 
 function mod_auth_get_framework_css() {
+    $cm = cm::getInstance();
+
 	$framework_css = array(
         "component" => array(
             "class" => "loginBox security nopadding"
@@ -1069,9 +1071,9 @@ function mod_auth_get_framework_css() {
             , "callout" => "danger"
         )
         , "list" => array(
-            "container" => Cms::getInstance("frameworkcss")->get("group", "list")
-            , "horizontal" => Cms::getInstance("frameworkcss")->get("group-horizontal", "list")
-            , "item" => Cms::getInstance("frameworkcss")->get("item", "list")
+            "container" => $cm->oPage->frameworkCSS->get("group", "list")
+            , "horizontal" => $cm->oPage->frameworkCSS->get("group-horizontal", "list")
+            , "item" => $cm->oPage->frameworkCSS->get("item", "list")
         )
 		, "dropdown" => array(
 			"container" => array(
@@ -1163,15 +1165,15 @@ function mod_auth_get_framework_css() {
 			"util" => array("corner-circle", "corner-thumbnail")
 		)
 		, "collapse" => array(
-			"action" => Cms::getInstance("frameworkcss")->get("link", "data", "collapse")
-			, "pane" => Cms::getInstance("frameworkcss")->get("pane", "collapse")
-			, "current" => Cms::getInstance("frameworkcss")->get("current", "collapse")
-			, "menu" => Cms::getInstance("frameworkcss")->get("menu", "collapse")
+			"action" => $cm->oPage->frameworkCSS->get("link", "data", "collapse")
+			, "pane" => $cm->oPage->frameworkCSS->get("pane", "collapse")
+			, "current" => $cm->oPage->frameworkCSS->get("current", "collapse")
+			, "menu" => $cm->oPage->frameworkCSS->get("menu", "collapse")
 		)
         , "icons" => array(
-            "caret-collapsed" => "menu-caret " . Cms::getInstance("frameworkcss")->get("chevron-right", "icon")
-            , "caret" => "menu-caret " . Cms::getInstance("frameworkcss")->get("chevron-right", "icon", array("rotate-90"))
-            , "settings" => Cms::getInstance("frameworkcss")->get("cog", "icon")
+            "caret-collapsed" => "menu-caret " . $cm->oPage->frameworkCSS->get("chevron-right", "icon")
+            , "caret" => "menu-caret " . $cm->oPage->frameworkCSS->get("chevron-right", "icon", array("rotate-90"))
+            , "settings" => $cm->oPage->frameworkCSS->get("cog", "icon")
         )
     );
 

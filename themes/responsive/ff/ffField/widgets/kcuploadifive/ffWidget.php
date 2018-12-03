@@ -129,7 +129,7 @@ class ffWidget_kcuploadifive extends ffCommon
 		$this->tpl[$tpl_id]->set_var("fixed_pre_content", $Field->fixed_pre_content);
 		$this->tpl[$tpl_id]->set_var("fixed_post_content", $Field->fixed_post_content);
 
-        $this->tpl[$tpl_id]->set_var("browse_class", Cms::getInstance("frameworkcss")->get("search", "icon", "lg"));
+        $this->tpl[$tpl_id]->set_var("browse_class", $this->oPage[0]->frameworkCSS->get("search", "icon", "lg"));
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
@@ -225,10 +225,10 @@ class ffWidget_kcuploadifive extends ffCommon
 			$this->tpl[$tpl_id]->set_var("size_limit", 0);
 			$this->tpl[$tpl_id]->set_var("file_ext", "null");
 		}
-		$this->tpl[$tpl_id]->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("cancel", "icon"));
-        $this->tpl[$tpl_id]->set_var("aviary_class", Cms::getInstance("frameworkcss")->get("crop", "icon"));  
-        $this->tpl[$tpl_id]->set_var("upload_class", Cms::getInstance("frameworkcss")->get("upload", "icon"));
-        $this->tpl[$tpl_id]->set_var("upload_icon", Cms::getInstance("frameworkcss")->get("upload", "icon-tag", "lg"));
+		$this->tpl[$tpl_id]->set_var("cancel_class", $this->oPage[0]->frameworkCSS->get("cancel", "icon"));
+        $this->tpl[$tpl_id]->set_var("aviary_class", $this->oPage[0]->frameworkCSS->get("crop", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_class", $this->oPage[0]->frameworkCSS->get("upload", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_icon", $this->oPage[0]->frameworkCSS->get("upload", "icon-tag", "lg"));
         
 		if($Field->file_multi) {
 			$this->tpl[$tpl_id]->set_var("multi", "true");

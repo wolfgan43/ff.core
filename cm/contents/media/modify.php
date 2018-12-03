@@ -108,9 +108,9 @@ if ($db->nextRecord()) {
 $tpl = ffTemplate::factory(__DIR__);
 $tpl->load_file("preview.html", "main");
 $tpl->set_var("theme_path", ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme());
-$tpl->set_var("container_class", Cms::getInstance("frameworkcss")->get(array(4), "col", "preview"));
-$tpl->set_var("download_class", Cms::getInstance("frameworkcss")->get("download", "icon")); 
-$tpl->set_var("modify_class", Cms::getInstance("frameworkcss")->get("crop", "icon"));
+$tpl->set_var("container_class", $cm->oPage->frameworkCSS->get(array(4), "col", "preview"));
+$tpl->set_var("download_class", $cm->oPage->frameworkCSS->get("download", "icon"));
+$tpl->set_var("modify_class", $cm->oPage->frameworkCSS->get("crop", "icon"));
 
 $cache = ffCache::getInstance();
 if($cache->get("aviary/key")) {
@@ -119,7 +119,7 @@ if($cache->get("aviary/key")) {
 }
 
 $tpl->set_var("media_class", $media_plugin);
-$tpl->set_var("media_thumb_class", Cms::getInstance("frameworkcss")->get("corner-thumbnail", "util"));
+$tpl->set_var("media_thumb_class", $cm->oPage->frameworkCSS->get("corner-thumbnail", "util"));
 $tpl->set_var("media_width", "600");
 $tpl->set_var("media_height", "400");
 
@@ -127,9 +127,9 @@ $tpl->set_var("view_path", FF_SITE_UPDIR);
 $tpl->set_var("preview_path", ffMedia::SHOWFILES);
 $tpl->set_var("media_time", time());
 
-$tpl->set_var("row_class", Cms::getInstance("frameworkcss")->get("row", "form"));
-$tpl->set_var("control_class", Cms::getInstance("frameworkcss")->get("control", "form")); 
-$tpl->set_var("info_class", Cms::getInstance("frameworkcss")->get("info", "callout") . " " . Cms::getInstance("frameworkcss")->get("text-overflow", "util"));
+$tpl->set_var("row_class", $cm->oPage->frameworkCSS->get("row", "form"));
+$tpl->set_var("control_class", $cm->oPage->frameworkCSS->get("control", "form"));
+$tpl->set_var("info_class", $cm->oPage->frameworkCSS->get("info", "callout") . " " . $cm->oPage->frameworkCSS->get("text-overflow", "util"));
 
 $original_size = formatSizeUnits(filesize($real_file));
 //Original image
@@ -144,7 +144,7 @@ $arrParentPath = explode("/", trim($parent_path, "/"));
 if(is_array($arrParentPath) && count($arrParentPath)) {
     foreach($arrParentPath AS $arrParentPath_value) { 
         $parent_title = ucwords(str_replace("-", " " , $arrParentPath_value));
-        $str_menu_parent_path .= ($str_menu_parent_path ? '<ul class="list-group">' : '') . '<li class="list-group-item ' . Cms::getInstance("frameworkcss")->get(array("text-nowrap", "text-overflow"), "util") . '" title="' . $parent_title . '"><a href="javascript:void(0);"' . Cms::getInstance("frameworkcss")->get("folder-open", "icon-tag") . " " . $parent_title . '</a>';
+        $str_menu_parent_path .= ($str_menu_parent_path ? '<ul class="list-group">' : '') . '<li class="list-group-item ' . $cm->oPage->frameworkCSS->get(array("text-nowrap", "text-overflow"), "util") . '" title="' . $parent_title . '"><a href="javascript:void(0);"' . $cm->oPage->frameworkCSS->get("folder-open", "icon-tag") . " " . $parent_title . '</a>';
     }
 }
 $tpl->set_var("media_tree_path", '<ul class="nopadding">' . $str_menu_parent_path . str_repeat("</li></ul>", substr_count($parent_path, "/")));
@@ -176,14 +176,14 @@ if (is_array($cacheThumbs) && count($cacheThumbs)) {
 
 //referer
 if(is_array($referer) && count($referer)) {
-    $tpl->set_var("referer_container_class", Cms::getInstance("frameworkcss")->get("group", "list"));
+    $tpl->set_var("referer_container_class", $cm->oPage->frameworkCSS->get("group", "list"));
     foreach ($referer AS $ref_key => $ref_value) {
         $arrItemClass = array("item");
         if($ref_value) {
             $arrItemClass[] = "current";
         }
 
-        $tpl->set_var("referer_class", Cms::getInstance("frameworkcss")->get($arrItemClass, "list"));
+        $tpl->set_var("referer_class", $cm->oPage->frameworkCSS->get($arrItemClass, "list"));
         $tpl->set_var("referer_name", $ref_key);
         if($cm->isXHR()) {
             $tpl->set_var("referer_url", "javascript:ff.ffPage.dialog.goToUrl('" . $_REQUEST["XHR_CTX_ID"] . "', '" . $cm->path_info . "?path=" . rawurlencode($path) . "&key=" . rawurlencode($ref_key) . "');");
@@ -215,7 +215,7 @@ $oRecord->resources[] = $oRecord->id;
 //$oRecord->user_vars["path"] = ffCommon_dirname($path);
 $oRecord->buttons_options["delete"]["display"] = false;
 /* Title Block */
-//$oRecord->fixed_pre_content = '<h1 class="dialogTitle admin-title vg-content">' . Cms::getInstance("frameworkcss")->get("vg-gallery", "icon-tag", array("2x", "content")) . $gallery_title . '</h1>';
+//$oRecord->fixed_pre_content = '<h1 class="dialogTitle admin-title vg-content">' . $cm->oPage->frameworkCSS->get("vg-gallery", "icon-tag", array("2x", "content")) . $gallery_title . '</h1>';
 $oRecord->setWidthComponent(8);
 //  $oRecord->class = "nopadding";
 

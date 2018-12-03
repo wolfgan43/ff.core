@@ -97,7 +97,7 @@ class ffWidget_tabs extends ffCommon
 		if(isset($data["tab_mode"]))
 			$this->tab_mode = $data["tab_mode"];
 
-		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
+		$framework_css = $this->oPage[0]->frameworkCSS->getFramework();
 		if(is_array($data["framework_css"]))
 			$this->framework_css = array_replace_recursive($this->framework_css, $data["framework_css"]);
 
@@ -144,12 +144,12 @@ class ffWidget_tabs extends ffCommon
 
 			switch($this->tab_mode) {
 				case "right":
-					$wrap_tab_need = Cms::getInstance("frameworkcss")->get("menu-vertical-wrap", "tab");
+					$wrap_tab_need = $this->oPage[0]->frameworkCSS->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical-right";
 					$tab_position = "Bottom";
 					break;
 				case "left":
-					$wrap_tab_need = Cms::getInstance("frameworkcss")->get("menu-vertical-wrap", "tab");
+					$wrap_tab_need = $this->oPage[0]->frameworkCSS->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical";
 					break;
 				default:
@@ -161,11 +161,11 @@ class ffWidget_tabs extends ffCommon
 					$this->framework_css["menu"]["tab"] = "menu";
 			}
 
-			$first_menu_current = Cms::getInstance("frameworkcss")->get("menu-current", "tab");
+			$first_menu_current = $this->oPage[0]->frameworkCSS->get("menu-current", "tab");
 			if(strpos($this->framework_css["pane-item"]["tab"], "effect") === false) {
-				$first_pane_current = Cms::getInstance("frameworkcss")->get("pane-current", "tab");
+				$first_pane_current = $this->oPage[0]->frameworkCSS->get("pane-current", "tab");
 			} else {
-				$first_pane_current = Cms::getInstance("frameworkcss")->get("pane-current-effect", "tab");
+				$first_pane_current = $this->oPage[0]->frameworkCSS->get("pane-current-effect", "tab");
 			}
 		}
         //ffErrorHandler::raise("AD", E_USER_WARNING  , $oPage->components[$component], get_defined_vars());
@@ -217,8 +217,8 @@ class ffWidget_tabs extends ffCommon
                         }
 
 
-                        $wrap_menu_start    =  '<div class="' . Cms::getInstance("frameworkcss")->get($default_wrap_menu, "col") . '">'
-                            . '<ul ' . Cms::getInstance("frameworkcss")->getClass($default_menu, null, true) . Cms::getInstance("frameworkcss")->get("menu", "data", "tab") . '>';
+                        $wrap_menu_start    =  '<div class="' . $this->oPage[0]->frameworkCSS->get($default_wrap_menu, "col") . '">'
+                            . '<ul ' . $this->oPage[0]->frameworkCSS->getClass($default_menu, null, true) . $this->oPage[0]->frameworkCSS->get("menu", "data", "tab") . '>';
                         $wrap_menu_end      = '</ul></div>';
 
                         $menu = $wrap_menu_start;
@@ -226,10 +226,10 @@ class ffWidget_tabs extends ffCommon
                         foreach ($items AS $key => $item)
                         {
                             $menu_current = ($menu_current === true
-                                ? array("current" => Cms::getInstance("frameworkcss")->get("menu-current", "tab"))
+                                ? array("current" => $this->oPage[0]->frameworkCSS->get("menu-current", "tab"))
                                 : null
                             );
-                            $menu .= '<li ' . Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu-item"], $menu_current, true) . '><a href="#tabmenu-' . $key . '" ' . Cms::getInstance("frameworkcss")->get("menu-link", "data", "tab") . ' data-link="'  . ffCommon_url_rewrite($item) . '">' . $item . '</a></li>';
+                            $menu .= '<li ' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["menu-item"], $menu_current, true) . '><a href="#tabmenu-' . $key . '" ' . $this->oPage[0]->frameworkCSS->get("menu-link", "data", "tab") . ' data-link="'  . ffCommon_url_rewrite($item) . '">' . $item . '</a></li>';
                         }
 
                         if($mode == "right") {
@@ -256,11 +256,11 @@ class ffWidget_tabs extends ffCommon
                     if($enable_menu)
                     {
                         $pane_current = ($pane_current === true
-                            ? array("current" => Cms::getInstance("frameworkcss")->get("pane-current-effect", "tab"))
+                            ? array("current" => $this->oPage[0]->frameworkCSS->get("pane-current-effect", "tab"))
                             : null
                         );
 
-                        $wrap_pane_item_start = '<div id="tabmenu-' . $key . '" ' . Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane-item"], $pane_current, true) . Cms::getInstance("frameworkcss")->get("pane-item", "data", "tab") . '>';
+                        $wrap_pane_item_start = '<div id="tabmenu-' . $key . '" ' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane-item"], $pane_current, true) . $this->oPage[0]->frameworkCSS->get("pane-item", "data", "tab") . '>';
                         $wrap_pane_item_end = '</div>';
                     }
 
@@ -279,8 +279,8 @@ class ffWidget_tabs extends ffCommon
 
                 if($enable_menu)
                 {
-                    $wrap_pane_start    = '<div class="' . Cms::getInstance("frameworkcss")->get($default_wrap_pane, "col") . '">'
-                        . '<div ' . Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane"], null, true) . Cms::getInstance("frameworkcss")->get("pane", "data", "tab") . '>';
+                    $wrap_pane_start    = '<div class="' . $this->oPage[0]->frameworkCSS->get($default_wrap_pane, "col") . '">'
+                        . '<div ' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane"], null, true) . $this->oPage[0]->frameworkCSS->get("pane", "data", "tab") . '>';
                     $wrap_pane_end      = '</div></div>';
 
                     $output = $menu_left . $wrap_pane_start . $output . $wrap_pane_end . $menu_right;
@@ -302,12 +302,12 @@ class ffWidget_tabs extends ffCommon
                 */
                 if($this->tab_mode)
                 {
-                    $this->tpl[$tpl_id]->set_var("tab_pane_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane"], null, true) . Cms::getInstance("frameworkcss")->get("pane", "data", "tab"));
-                    $this->tpl[$tpl_id]->set_var("tab_pane_item_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . Cms::getInstance("frameworkcss")->get("pane-item", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_pane_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane"], null, true) . $this->oPage[0]->frameworkCSS->get("pane", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_pane_item_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . $this->oPage[0]->frameworkCSS->get("pane-item", "data", "tab"));
 
-                    $this->tpl[$tpl_id]->set_var("tab_menu_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu"], null, true) . Cms::getInstance("frameworkcss")->get("menu", "data", "tab"));
-                    $this->tpl[$tpl_id]->set_var("tab_menu_item_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
-                    $this->tpl[$tpl_id]->set_var("tab_menu_link_properties", Cms::getInstance("frameworkcss")->get("menu-link", "data", "tab") . ' data-link="' . ffCommon_url_rewrite($title) . '"');
+                    $this->tpl[$tpl_id]->set_var("tab_menu_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["menu"], null, true) . $this->oPage[0]->frameworkCSS->get("menu", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_menu_item_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
+                    $this->tpl[$tpl_id]->set_var("tab_menu_link_properties", $this->oPage[0]->frameworkCSS->get("menu-link", "data", "tab") . ' data-link="' . ffCommon_url_rewrite($title) . '"');
                 }
 
                 $first_menu_current = "";
@@ -330,11 +330,11 @@ class ffWidget_tabs extends ffCommon
 				$this->framework_css["menu"]["wrap_pane"] = $default_wrap_pane;
 			
 			if($this->framework_css["menu"]["wrap_menu"]) {
-				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["menu"]["wrap_menu"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->get($this->framework_css["menu"]["wrap_menu"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_end", '</div>');
 			}
 			if($this->framework_css["menu"]["wrap_pane"]) {
-				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["menu"]["wrap_pane"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->get($this->framework_css["menu"]["wrap_pane"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_end", '</div>');
 			}
 

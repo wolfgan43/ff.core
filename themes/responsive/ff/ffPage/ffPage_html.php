@@ -1885,8 +1885,8 @@ class ffPage_html extends ffPage_base
 	 */
 	protected function tplProcessVars($tpl)
 	{
-		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
-		$font_icon = Cms::getInstance("frameworkcss")->getFontIcon();
+		$framework_css = $this->frameworkCSS->getFramework();
+		$font_icon = $this->frameworkCSS->getFontIcon();
 
         if(__TOP_DIR__ != __PRJ_DIR__)
             $tpl[0]->set_var("base_path", substr($this->site_path, 0, strpos($this->site_path, "/domains/")));

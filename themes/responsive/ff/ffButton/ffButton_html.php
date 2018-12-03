@@ -47,12 +47,12 @@ class ffButton_html extends ffButton_base
 		if($this->class === false) 
 			$class = $this->id;
 		elseif(is_array($this->class)) {
-			$class = Cms::getInstance("frameworkcss")->get($this->id, $this->framework_css["aspect"], $this->class["params"]) . (strlen($this->class["value"]) ? " " . $this->class["value"] : "");
+			$class = $this->parent_page[0]->frameworkCSS->get($this->id, $this->framework_css["aspect"], $this->class["params"]) . (strlen($this->class["value"]) ? " " . $this->class["value"] : "");
 		} else
-			$class = Cms::getInstance("frameworkcss")->get($this->id, $this->framework_css["aspect"]) . (strlen($this->class) ? " " . $this->class : "");
+			$class = $this->parent_page[0]->frameworkCSS->get($this->id, $this->framework_css["aspect"]) . (strlen($this->class) ? " " . $this->class : "");
 
 		if($this->framework_css["addon"]) {
-			$class .= " " . Cms::getInstance("frameworkcss")->get("control-" . $this->framework_css["addon"], "form");
+			$class .= " " . $this->parent_page[0]->frameworkCSS->get("control-" . $this->framework_css["addon"], "form");
 		}
 		if($this->activebuttons)
 			$class .= " activebuttons";
@@ -64,7 +64,7 @@ class ffButton_html extends ffButton_base
 	function get_icon($only_class = null)
     {              
         if ($this->icon === NULL && $only_class !== false)  {  
-            return Cms::getInstance("frameworkcss")->get($this->id, "icon-" . ($only_class ? "" : $this->framework_css["aspect"] . "-tag-") . "default");
+            return $this->parent_page[0]->frameworkCSS->get($this->id, "icon-" . ($only_class ? "" : $this->framework_css["aspect"] . "-tag-") . "default");
         } else
             return array($this->icon); 
     }		

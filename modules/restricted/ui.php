@@ -55,7 +55,7 @@ function on_load_section_brand($page, $tpl)
     $framework_css = mod_restricted_get_framework_css();
     $attr["location_default"] = "brand";
 
-    $tpl->set_var("logo_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logo"]));
+    $tpl->set_var("logo_class", $cm->oPage->frameworkCSS->getClass($framework_css["logo"]));
 
     $logo_url = $cm->modules["restricted"]["obj"]->getLogo($cm::env("MOD_RESTRICTED_LOGO_PATH"));
 
@@ -68,14 +68,14 @@ function on_load_section_brand($page, $tpl)
             $tpl->set_var("host_name", $cm->modules["auth"]["obj"]->getDomainName());
         }
 
-        $tpl->set_var("nav_left_class", "domain");//Cms::getInstance("frameworkcss")->getClass($framework_css["fullbar"]["nav"]["left"]));
+        $tpl->set_var("nav_left_class", "domain");//$cm->oPage->frameworkCSS->getClass($framework_css["fullbar"]["nav"]["left"]));
         $tpl->set_var("more_icon", '<i class="' . $framework_css["icons"]["settings"] . '"></i>');
         $tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-        $tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
-        $tpl->set_var("panel_header_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["header"]));
-        $tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
-        $tpl->set_var("panel_links_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["links"]));
-        $tpl->set_var("panel_footer_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["footer"]));
+        $tpl->set_var("panel_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["container"]));
+        $tpl->set_var("panel_header_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["header"]));
+        $tpl->set_var("panel_body_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["def"]));
+        $tpl->set_var("panel_links_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["links"]));
+        $tpl->set_var("panel_footer_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["footer"]));
 
         $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
         $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
@@ -119,8 +119,8 @@ function on_load_section_lang($page, $tpl, $attr)
     if(is_array($locale["lang"]) && count($locale["lang"])) {
 
         $tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-        $tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
-        $tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
+        $tpl->set_var("panel_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["container"]));
+        $tpl->set_var("panel_body_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["def"]));
 
         $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
         $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
@@ -241,7 +241,7 @@ function on_load_section_favorite($page, $tpl, $attr)
                 $value["label"] = ffTemplate::_get_word_by_code(substr($value["label"], 1));
 			}
 			if($value["icon"]) {
-                $tpl->set_var("icon", Cms::getInstance("frameworkcss")->get($value["icon"], "icon-tag", "lg"));
+                $tpl->set_var("icon", $cm->oPage->frameworkCSS->get($value["icon"], "icon-tag", "lg"));
             }
 
             if($attr["label"] === false) {
@@ -359,13 +359,13 @@ function on_load_section_topbar($page, $tpl, $attr)
                         if(is_array($action_data)) {
                             $action_path = $action_data["path"];
                             if($action_data["icon"])
-                                $action_icon = Cms::getInstance("frameworkcss")->get($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
+                                $action_icon = $cm->oPage->frameworkCSS->get($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
 
                             $action_label = $action_data["label"];
                         } elseif($cm->modules["restricted"]["menu_bypath"][$action_data]) {
                             $action_path = $action_data;
                             if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"])
-                                $action_icon = Cms::getInstance("frameworkcss")->get($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
+                                $action_icon = $cm->oPage->frameworkCSS->get($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
 
                             $action_label = $cm->modules["restricted"]["menu_bypath"][$action_data][0]["label"];
                         }
@@ -465,7 +465,7 @@ function on_load_section_topbar($page, $tpl, $attr)
             }
 
             if(($attr["icons"] === true || $attr["icons"] == "all" || $attr["icons"] == "mainmenu") && $value["icon"])
-                $item_icon = Cms::getInstance("frameworkcss")->get($value["icon"], "icon-tag", "lg");
+                $item_icon = $cm->oPage->frameworkCSS->get($value["icon"], "icon-tag", "lg");
 
             if($attr["label"] === false) {
                 $item_properties["title"] = 'title="' . $value["label"] . '"';
@@ -483,13 +483,13 @@ function on_load_section_topbar($page, $tpl, $attr)
             }
 
             if($value["position"]) {
-                $item_class["grid"] = Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"][$value["position"]]);
+                $item_class["grid"] = $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["actions"][$value["position"]]);
             }
             if($value["class"]) {
                 $item_class["custom"] = $value["class"];
             }
             if($value["badge"]) {
-                $item_actions[] = '<span class="' . Cms::getInstance("frameworkcss")->get("default", "badge") . '">' . $value["badge"] . '</span>';
+                $item_actions[] = '<span class="' . $cm->oPage->frameworkCSS->get("default", "badge") . '">' . $value["badge"] . '</span>';
             }
 
             /*
@@ -709,13 +709,13 @@ function on_load_section_sidebar($page, $tpl, $attr)
                         if(is_array($action_data)) {
                             $action_path = $action_data["path"];
                             if($action_data["icon"]) {
-                                $action_icon = Cms::getInstance("frameworkcss")->get($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
+                                $action_icon = $cm->oPage->frameworkCSS->get($action_data["icon"], "icon") . ($action_data["class"] ? " " . $action_data["class"] : "");
                             }
                             $action_label = $action_data["label"];
                         } elseif($cm->modules["restricted"]["menu_bypath"][$action_data]) {
                             $action_path = $action_data;
                             if($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"]) {
-                                $action_icon = Cms::getInstance("frameworkcss")->get($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
+                                $action_icon = $cm->oPage->frameworkCSS->get($cm->modules["restricted"]["menu_bypath"][$action_data][0]["icon"], "icon");
                             }
                             $action_label = $cm->modules["restricted"]["menu_bypath"][$action_data][0]["label"];
                         }
@@ -819,7 +819,7 @@ function on_load_section_sidebar($page, $tpl, $attr)
             }
 
             if(($attr["icons"] === true || $attr["icons"] == "all" || $attr["icons"] == "mainmenu") && $value["icon"]) {
-                $item_icon = Cms::getInstance("frameworkcss")->get($value["icon"], "icon-tag", "lg");
+                $item_icon = $cm->oPage->frameworkCSS->get($value["icon"], "icon-tag", "lg");
             }
 
             if($attr["label"] === false) {
@@ -838,14 +838,14 @@ function on_load_section_sidebar($page, $tpl, $attr)
             }
 
             if($value["position"]) {
-                $item_class["grid"] = Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"][$value["position"]]);
+                $item_class["grid"] = $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["actions"][$value["position"]]);
             }
             if($value["class"]) {
                 $item_class["custom"] = $value["class"];
             }
 
             if($value["badge"]) {
-                $item_actions[] = '<span class="' . Cms::getInstance("frameworkcss")->get("default", "badge") . '">' . $value["badge"] . '</span>';
+                $item_actions[] = '<span class="' . $cm->oPage->frameworkCSS->get("default", "badge") . '">' . $value["badge"] . '</span>';
             }
 
             /*

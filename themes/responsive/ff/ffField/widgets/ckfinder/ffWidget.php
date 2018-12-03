@@ -106,7 +106,7 @@ class ffWidget_ckfinder extends ffCommon
 		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 		//$this->tpl[$tpl_id]->set_var("class", $this->class);
 		//$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
-        $this->tpl[$tpl_id]->set_var("browse_class", Cms::getInstance("frameworkcss")->get("search", "icon", "lg"));
+        $this->tpl[$tpl_id]->set_var("browse_class", $this->oPage[0]->frameworkCSS->get("search", "icon", "lg"));
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);

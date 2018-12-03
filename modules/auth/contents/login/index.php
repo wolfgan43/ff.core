@@ -70,42 +70,42 @@ $config = array(
         "facebook"          => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_FACEBOOK")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/facebook"
-            , "icon"        => Cms::getInstance("frameworkcss")->get("facebook", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("facebook", "icon")
             , "name"        => "Facebook"
             , "title"       => "mod_auth_social_facebook"
         )
         , "gplus"           => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_GPLUS")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/gplus"
-            , "icon"        => Cms::getInstance("frameworkcss")->get("gplus", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("gplus", "icon")
             , "name"        => "GooglePlus"
             , "title"       => "mod_auth_social_gplus"
         )
         , "twitter"         => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_TWITTER")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/twitter"
-            , "icon"        => Cms::getInstance("frameworkcss")->get("twitter", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("twitter", "icon")
             , "name"        => "Twitter"
             , "title"       => "mod_auth_social_twitter"
         )
         , "linkedin"        => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_LINKEDIN")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/linkedin"
-            , "icon"        => Cms::getInstance("frameworkcss")->get("linkedin", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("linkedin", "icon")
             , "name"        => "Linkedin"
             , "title"       => "mod_auth_social_linkedin"
         )
         , "dribble"         => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_DRIBBLE")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/dribble"
-            , "icon"        => Cms::getInstance("frameworkcss")->get("dribble", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("dribble", "icon")
             , "name"        => "Dribble"
             , "title"       => "mod_auth_social_dribble"
         )
         , "ff"              => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_FF")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/ff"
-            , "icon"        => Cms::getInstance("frameworkcss")->get("cube", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("cube", "icon")
             , "name"        => "FormsFramework"
             , "title"       => "mod_auth_social_ff"
         )

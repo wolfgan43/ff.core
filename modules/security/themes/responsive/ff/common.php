@@ -1,6 +1,7 @@
 <?php
   function mod_sec_get_framework_css() {
-	$framework_css = array(
+    $cm = cm::getInstance();
+    $framework_css = array(
         "component" => array(
             "class" => "loginBox security nopadding"
             , "type" => null        //null OR '' OR "-inline"
@@ -163,9 +164,9 @@
             , "callout" => "danger"
         )
         , "icons" => array(
-			"caret-collapsed" => Cms::getInstance("frameworkcss")->get("chevron-right", "icon")
-			, "caret" => Cms::getInstance("frameworkcss")->get("chevron-down", "icon")
-			, "settings" => Cms::getInstance("frameworkcss")->get("cog", "icon")
+			"caret-collapsed" => $cm->oPage->frameworkCSS->get("chevron-right", "icon")
+			, "caret" => $cm->oPage->frameworkCSS->get("chevron-down", "icon")
+			, "settings" => $cm->oPage->frameworkCSS->get("cog", "icon")
 		)
     );
 
@@ -200,7 +201,7 @@ function on_load_section_brand($page, $tpl)
     $attr["layout_default"] = "brand";
 
 
-    $tpl->set_var("logo_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logo"]));
+    $tpl->set_var("logo_class", $cm->oPage->frameworkCSS->getClass($framework_css["logo"]));
 	if($ID_domain)
 		$host_name = get_session("Domain");
 	else
@@ -220,38 +221,19 @@ function on_load_section_brand($page, $tpl)
 	            $tpl->set_var("host_name", CM_LOCAL_APP_NAME);
 	    }
 
-		$tpl->set_var("nav_left_class", "domain");//Cms::getInstance("frameworkcss")->getClass($framework_css["fullbar"]["nav"]["left"]));
+		$tpl->set_var("nav_left_class", "domain");//$cm->oPage->frameworkCSS->getClass($framework_css["fullbar"]["nav"]["left"]));
 		$tpl->set_var("more_icon", '<i class="' . $framework_css["icons"]["settings"] . '"></i>');
 		$tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-		$tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
-		$tpl->set_var("panel_header_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["header"]));
-		$tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
-		$tpl->set_var("panel_links_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["links"]));
-		$tpl->set_var("panel_footer_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["footer"]));
+		$tpl->set_var("panel_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["container"]));
+		$tpl->set_var("panel_header_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["header"]));
+		$tpl->set_var("panel_body_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["def"]));
+		$tpl->set_var("panel_links_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["links"]));
+		$tpl->set_var("panel_footer_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["footer"]));
 
         $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
         $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
         $tpl->set_var("list_group_item_class", $framework_css["list"]["item"]);
 
-
-		/*$mod_sec_domains = $cm->router->getRuleById("mod_sec_domains");
-		if($mod_sec_domains->reverse) {
-			$tpl->set_var("manage_domains", FF_SITE_PATH . $mod_sec_domains->reverse);
-			$tpl->set_var("domains_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["domains"]));
-			$tpl->parse("SectDomains", false);
-		}
-		$mod_sec_profiling = $cm->router->getRuleById("mod_sec_profiling");	
-		if($mod_sec_profiling->reverse) {
-			$tpl->set_var("manage_profiling", FF_SITE_PATH . $mod_sec_profiling->reverse);
-			$tpl->set_var("profiling_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["profiling"]));
-			$tpl->parse("SectProfiling", false);
-		}
-        $mod_restricted_settings = $cm->router->getRuleById("mod_restricted_settings");
-        if($mod_restricted_settings->reverse) {
-            $tpl->set_var("manage_settings", FF_SITE_PATH . $mod_restricted_settings->reverse);
-            $tpl->set_var("settings_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["settings"]));
-            $tpl->parse("SectSettings", false);
-        }*/
 
         if($page->sections["admin"] && $page->tpl_layer[0]->isset_var("brand") && !$page->tpl_layer[0]->isset_var("admin")) {
             $tpl->set_var("admin", $page->sections["admin"]["tpl"]->rpparse("SectMenu", false));
@@ -261,13 +243,6 @@ function on_load_section_brand($page, $tpl)
 		$tpl->parse("SectBrandName", false);
 
 		if(MOD_SEC_MULTIDOMAIN && !defined("MOD_SEC_NOACCOUNTSCOMBO") && mod_security_is_admin()) {
-            //if(!$ID_domain)
-            //	$host_class = " hidden";
-
-            //$tpl->set_var("host_class", Cms::getInstance("frameworkcss")->getClass($framework_css["fullbar"]["nav"]["left"]) . $host_class);
-            //$tpl->set_var("host_name", get_session("Domain"));
-            //$tpl->set_var("host_icon", Cms::getInstance("frameworkcss")->get("external-link", "icon-tag"));
-
             $field = ffField::factory($page);
             $field->id = "accounts";
             $field->base_type = "Number";
@@ -355,8 +330,8 @@ function on_load_section_lang($page, $tpl, $attr)
 
 		$tpl->set_var("flag_dim", "f" . $flag_dim);
 		$tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-		$tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
-		$tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
+		$tpl->set_var("panel_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["container"]));
+		$tpl->set_var("panel_body_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["def"]));
 
         $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
         $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
@@ -416,21 +391,21 @@ function on_load_section_account($page, $tpl, $attr)
 		$db = mod_security_get_main_db();	
 	
 	$tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-	$tpl->set_var("img_class", Cms::getInstance("frameworkcss")->getClass($framework_css["image"]));
-	$tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
-	$tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
-	$tpl->set_var("panel_img_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["img"]));
-	$tpl->set_var("panel_desc_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["desc"]));
-	$tpl->set_var("panel_links_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["links"]));
-	$tpl->set_var("panel_footer_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["footer"]));
+	$tpl->set_var("img_class", $cm->oPage->frameworkCSS->getClass($framework_css["image"]));
+	$tpl->set_var("panel_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["container"]));
+	$tpl->set_var("panel_body_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["def"]));
+	$tpl->set_var("panel_img_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["img"]));
+	$tpl->set_var("panel_desc_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["desc"]));
+	$tpl->set_var("panel_links_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["links"]));
+	$tpl->set_var("panel_footer_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["footer"]));
 
     $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
     $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);
     $tpl->set_var("list_group_item_class", $framework_css["list"]["item"]);
 
-	$tpl->set_var("profile_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["profile"]));
-	$tpl->set_var("users_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["users"]));
-	$tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["logout"]));
+	$tpl->set_var("profile_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["actions"]["profile"]));
+	$tpl->set_var("users_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["actions"]["users"]));
+	$tpl->set_var("logout_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["actions"]["logout"]));
 
 	if(MOD_SEC_GROUPS) {
 		$user_permission = get_session("user_permission");
@@ -691,9 +666,9 @@ function mod_sec_login_getFrameworkCss($logged) {
 		$component_class["base"] = $framework_css["component"]["class"];
 		if($framework_css["component"]["grid"]) {
 			if(is_array($framework_css["component"]["grid"]))
-			    $component_class["grid"] = Cms::getInstance("frameworkcss")->get($framework_css["component"]["grid"], "col");
+			    $component_class["grid"] = $cm->oPage->frameworkCSS->get($framework_css["component"]["grid"], "col");
 			else {
-			    $component_class["grid"] = Cms::getInstance("frameworkcss")->get("", $framework_css["component"]["grid"]);
+			    $component_class["grid"] = $cm->oPage->frameworkCSS->get("", $framework_css["component"]["grid"]);
 			}
 		} 
 		
@@ -730,13 +705,13 @@ cm::getInstance()->modules["security"]["events"]->addEvent("onTplLoad", function
 		    $tpl->set_var("logo_login", $logo_url);
 		    $tpl->parse("SectLogoImg" . $logo, false);
 		}
-		$tpl->set_var("logo_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logo"]));
+		$tpl->set_var("logo_class", $cm->oPage->frameworkCSS->getClass($framework_css["logo"]));
 		$tpl->parse("SectLogo" . $logo, false);
 	}
 
 	if($framework_css["inner_wrap"])
 	{
-		$tpl->set_var("inner_wrap_start", '<div class="'. Cms::getInstance("frameworkcss")->getClass($framework_css["inner-wrap"]) . '">');
+		$tpl->set_var("inner_wrap_start", '<div class="'. $cm->oPage->frameworkCSS->getClass($framework_css["inner-wrap"]) . '">');
 		$tpl->set_var("inner_wrap_end", '</div>');
 	}
 	
@@ -786,25 +761,25 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 		/**
 		* Login Actions
 		*/
-		$tpl->set_var("row_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["standard"]["record"]));
-		$tpl->set_var("field_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["standard"]["field"]));
+		$tpl->set_var("row_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["standard"]["record"]));
+		$tpl->set_var("field_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["standard"]["field"]));
 		
 		if(MOD_SEC_ENABLE_TOKEN)
 		{
-		    $tpl->set_var("stayconnect_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["standard"]["stayconnect"]));
+		    $tpl->set_var("stayconnect_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["standard"]["stayconnect"]));
 		    $tpl->parse("SectStayConnected", false);
 		}
 
 		if(MOD_SEC_USERNAME_RECOVER_USERNAME && $mod_sec_recover_username)
 		{     
-		    $tpl->set_var("recover_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["standard"]["recover"]));
+		    $tpl->set_var("recover_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["standard"]["recover"]));
 		    $tpl->set_var("recover", (string)$mod_sec_recover_username->reverse);
 		    $tpl->parse("SectRecoverUsername", false);
 		} 
 
 		if(MOD_SEC_PASSWORD_RECOVER && $mod_sec_recover)
 		{     
-			$tpl->set_var("recover_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["standard"]["recover"]));
+			$tpl->set_var("recover_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["standard"]["recover"]));
 		    $tpl->set_var("recover", (string)$mod_sec_recover->reverse);
 			$tpl->parse("SectRecoverPassword", false);
 		} 
@@ -817,7 +792,7 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 		    elseif($mod_sec_register)
 		        $register_link = (string)$mod_sec_register->reverse;
 
-		    $tpl->set_var("register_class", Cms::getInstance("frameworkcss")->getClass($framework_css["links"]["register"]));
+		    $tpl->set_var("register_class", $cm->oPage->frameworkCSS->getClass($framework_css["links"]["register"]));
 		    $tpl->set_var("register", $register_link);
 		    $tpl->parse("SectRegister", false);
 		} 	
@@ -854,9 +829,9 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 		
 		$tpl->set_var("url", $cm->oPage->site_path . $cm->oPage->page_path);
 		
-		$tpl->set_var("login_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["login"]));	
-		$tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));
-		$tpl->set_var("login_standard_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["standard"]["def"]));
+		$tpl->set_var("login_button_class", $cm->oPage->frameworkCSS->getClass($framework_css["actions"]["login"]));
+		$tpl->set_var("actions_class", $cm->oPage->frameworkCSS->getClass($framework_css["actions"]["def"]));
+		$tpl->set_var("login_standard_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["standard"]["def"]));
 		$tpl->parse("SectStandardLogin", false);
 	}
 
@@ -865,8 +840,8 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 	*/ 
 	if (MOD_SEC_SOCIAL_GOOGLE)
 	{
-	    $tpl->set_var("social_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["social"]["google"]));
-	    $tpl->set_var("social_icon", Cms::getInstance("frameworkcss")->get("google", "icon-tag"));
+	    $tpl->set_var("social_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["social"]["google"]));
+	    $tpl->set_var("social_icon", $cm->oPage->frameworkCSS->get("google", "icon-tag"));
 	    $tpl->set_var("social_url_google", FF_SITE_PATH . $mod_sec_social_url . "/google");
 	    $tpl->parse("SectSocialLoginGoogle" . ucfirst(MOD_SEC_SOCIAL_POS), false);
 	    $tpl->parse("SectSocialLogoutGoogle", false);
@@ -874,8 +849,8 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 
 	if (MOD_SEC_SOCIAL_FACEBOOK)
 	{
-	    $tpl->set_var("social_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["social"]["facebook"]));
-	    $tpl->set_var("social_icon", Cms::getInstance("frameworkcss")->get("facebook", "icon-tag"));
+	    $tpl->set_var("social_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["social"]["facebook"]));
+	    $tpl->set_var("social_icon", $cm->oPage->frameworkCSS->get("facebook", "icon-tag"));
 	    $tpl->set_var("social_url_facebook", FF_SITE_PATH . $mod_sec_social_url . "/facebook");
 	    $tpl->parse("SectSocialLoginFacebook" . ucfirst(MOD_SEC_SOCIAL_POS), false);
 	    $tpl->parse("SectSocialLogoutFacebook", false);
@@ -883,7 +858,7 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 
 	if(MOD_SEC_SOCIAL_JANRAIN)
 	{
-	    $tpl->set_var("social_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["social"]["janrain"]));
+	    $tpl->set_var("social_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["social"]["janrain"]));
 	    $tpl->set_var("janrain_appname", ffCommon_url_rewrite(MOD_SEC_SOCIAL_JANRAIN_APPNAME));
 	   
 	    $tpl->parse("SectJanRainLogin", false);
@@ -896,24 +871,24 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 		if(MOD_SEC_LOGIN_STANDARD)
 			$framework_css["login"]["social"]["def"]["class"] .= " " . MOD_SEC_SOCIAL_POS . "-standard-login"; 
 			
-	    $tpl->set_var("login_social_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["social"]["def"]));
+	    $tpl->set_var("login_social_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["social"]["def"]));
 		$tpl->parse("SectSocialLogin" . ucfirst(MOD_SEC_SOCIAL_POS), false);
 	}
 	
 	if (MOD_SEC_LOGIN_BACK_URL)
 	{
 	    $count_links++;
-	    $tpl->set_var("back_class", Cms::getInstance("frameworkcss")->getClass($framework_css["links"]["back"]));
+	    $tpl->set_var("back_class", $cm->oPage->frameworkCSS->getClass($framework_css["links"]["back"]));
 	    $tpl->set_var("back_url", FF_SITE_PATH . "/"); 
 	    $tpl->parse("SectLoginBack", false);
 	}    
 
 	if($count_links) {
-		$tpl->set_var("link_class", Cms::getInstance("frameworkcss")->getClass($framework_css["links"]["def"]));
+		$tpl->set_var("link_class", $cm->oPage->frameworkCSS->getClass($framework_css["links"]["def"]));
 		$tpl->parse("SectLoginLinks", false);
 	}		
 	
-	$tpl->set_var("login_class", Cms::getInstance("frameworkcss")->getClass($framework_css["login"]["def"]));  
+	$tpl->set_var("login_class", $cm->oPage->frameworkCSS->getClass($framework_css["login"]["def"]));
 	$tpl->parse("SectLogin", false);
 
 	
@@ -991,7 +966,7 @@ function mod_sec_process_logout(&$tpl, $logged, $skip_action = false)
 		    $avatar = mod_security_getUserInfo(MOD_SEC_USER_AVATAR, null, $db)->getValue();
 		}	
 		
-		$tpl->set_var("avatar_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["avatar"]));
+		$tpl->set_var("avatar_class", $cm->oPage->frameworkCSS->getClass($framework_css["logout"]["account"]["avatar"]));
 		$tpl->set_var("avatar", mod_sec_get_avatar($avatar, MOD_SEC_USER_AVATAR_MODE));
 		$tpl->parse("SectAvatar", false);
 	}
@@ -1018,28 +993,28 @@ function mod_sec_process_logout(&$tpl, $logged, $skip_action = false)
 		$tpl->parse("SectEmail", false);
 	}
 	
-	$tpl->set_var("account_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["account"]["def"]));
+	$tpl->set_var("account_class", $cm->oPage->frameworkCSS->getClass($framework_css["logout"]["account"]["def"]));
 	if(!$skip_action)
 	{
-		$tpl->set_var("logout_button_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["logout"]));	
-		$tpl->set_var("actions_class", Cms::getInstance("frameworkcss")->getClass($framework_css["actions"]["def"]));	
+		$tpl->set_var("logout_button_class", $cm->oPage->frameworkCSS->getClass($framework_css["actions"]["logout"]));
+		$tpl->set_var("actions_class", $cm->oPage->frameworkCSS->getClass($framework_css["actions"]["def"]));
 		$tpl->parse("SectStandardLogout", false); 
 	}
 	
 	if (MOD_SEC_LOGIN_BACK_URL)
 	{
 	    $count_links++;
-	    $tpl->set_var("back_class", Cms::getInstance("frameworkcss")->getClass($framework_css["links"]["back"]));
+	    $tpl->set_var("back_class", $cm->oPage->frameworkCSS->getClass($framework_css["links"]["back"]));
 	    $tpl->set_var("back_url", $cm->oPage->ret_url); 
 	    $tpl->parse("SectLogoutBack", false);
 	}    
 
 	if($count_links) {
-		$tpl->set_var("link_class", Cms::getInstance("frameworkcss")->getClass($framework_css["links"]["def"]));
+		$tpl->set_var("link_class", $cm->oPage->frameworkCSS->getClass($framework_css["links"]["def"]));
 		$tpl->parse("SectLogoutLinks", false);
 	}
 
-	$tpl->set_var("logout_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logout"]["def"]));
+	$tpl->set_var("logout_class", $cm->oPage->frameworkCSS->getClass($framework_css["logout"]["def"]));
 	$tpl->parse("SectLogout", false); 	
 	
 	$tpl->set_var("container_class", implode(" ", array_filter($component_class))); 
@@ -1048,11 +1023,12 @@ function mod_sec_process_logout(&$tpl, $logged, $skip_action = false)
 }
 
 function mod_sec_process_error($sError, $framework_css = null) {
+    $cm = cm::getInstance();
 	if($sError) {
 		if(!$framework_css)
 			$framework_css = mod_sec_get_framework_css();
 	
-		$strError = '<div class="' . Cms::getInstance("frameworkcss")->getClass($framework_css["error"]) . '">' . $sError . '</div>';
+		$strError = '<div class="' . $cm->oPage->frameworkCSS->getClass($framework_css["error"]) . '">' . $sError . '</div>';
 	}
 	return $strError;
 }

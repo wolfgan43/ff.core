@@ -135,7 +135,7 @@ $oField->store_in_db = false;
 $oRecord->addContent($oField);
 
 
-$oRecord->addContent('<hr /><h2 class="' . Cms::getInstance("frameworkcss")->get(array(12), "col") . '">Campo Semplice</h2>');
+$oRecord->addContent('<hr /><h2 class="' . $cm->oPage->frameworkCSS->get(array(12), "col") . '">Campo Semplice</h2>');
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "name";
@@ -145,7 +145,7 @@ $oField->store_in_db = false;
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$code = '<div class="' . Cms::getInstance("frameworkcss")->get(array(6), "col") . '">
+$code = '<div class="' . $cm->oPage->frameworkCSS->get(array(6), "col") . '">
 	<code>
 		$oField = ffField::factory($cm->oPage); 										<br />
 		$oField->id = "name"; 															<br />

@@ -37,9 +37,9 @@ function on_load_section_multidomain($page, $tpl, $attr) {
         //if(!$ID_domain)
         //	$host_class = " hidden";
 
-        //$tpl->set_var("host_class", Cms::getInstance("frameworkcss")->getClass($framework_css["fullbar"]["nav"]["left"]) . $host_class);
+        //$tpl->set_var("host_class", $cm->oPage->frameworkCSS->getClass($framework_css["fullbar"]["nav"]["left"]) . $host_class);
         //$tpl->set_var("host_name", get_session("Domain"));
-        //$tpl->set_var("host_icon", Cms::getInstance("frameworkcss")->get("external-link", "icon-tag"));
+        //$tpl->set_var("host_icon", $cm->oPage->frameworkCSS->get("external-link", "icon-tag"));
 
         $field = ffField::factory($page);
         $field->id = "accounts";
@@ -102,13 +102,13 @@ function on_load_section_account($page, $tpl, $attr)
 
 
     $tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-    $tpl->set_var("img_class", Cms::getInstance("frameworkcss")->getClass($framework_css["image"]));
-    $tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
-    $tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
-    $tpl->set_var("panel_img_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["img"]));
-    $tpl->set_var("panel_desc_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["desc"]));
-    $tpl->set_var("panel_links_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["links"]));
-    $tpl->set_var("panel_footer_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["footer"]));
+    $tpl->set_var("img_class", $cm->oPage->frameworkCSS->getClass($framework_css["image"]));
+    $tpl->set_var("panel_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["container"]));
+    $tpl->set_var("panel_body_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["def"]));
+    $tpl->set_var("panel_img_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["img"]));
+    $tpl->set_var("panel_desc_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["desc"]));
+    $tpl->set_var("panel_links_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["body"]["links"]));
+    $tpl->set_var("panel_footer_class", $cm->oPage->frameworkCSS->getClass($framework_css["dropdown"]["footer"]));
 
     $tpl->set_var("list_group_class", $framework_css["list"]["container"]);
     $tpl->set_var("list_group_horizontal_class", $framework_css["list"]["horizontal"]);

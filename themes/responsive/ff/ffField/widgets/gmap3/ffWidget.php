@@ -91,18 +91,18 @@ Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 		
-		$this->tpl[$tpl_id]->set_var("container_class", Cms::getInstance("frameworkcss")->get("group", "form"));
+		$this->tpl[$tpl_id]->set_var("container_class", $this->oPage[0]->frameworkCSS->get("group", "form"));
 
-		$wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
+		$wrap_addon = $this->oPage[0]->frameworkCSS->get("wrap-addon", "form");
 		if($wrap_addon) {
-			$this->tpl[$tpl_id]->set_var("wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get(array(10), "col") . '">');
-			$this->tpl[$tpl_id]->set_var("wrap_middle", '</div><div class="' . Cms::getInstance("frameworkcss")->get(array(2), "col") . '">');
+			$this->tpl[$tpl_id]->set_var("wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->get(array(10), "col") . '">');
+			$this->tpl[$tpl_id]->set_var("wrap_middle", '</div><div class="' . $this->oPage[0]->frameworkCSS->get(array(2), "col") . '">');
 			$this->tpl[$tpl_id]->set_var("wrap_end", '</div>');
 		}
-		$this->tpl[$tpl_id]->set_var("search_class", Cms::getInstance("frameworkcss")->get("control", "form"));
-		$this->tpl[$tpl_id]->set_var("search_bt_class", Cms::getInstance("frameworkcss")->get("search", "link") . " " . Cms::getInstance("frameworkcss")->get("control-postfix", "form") . " " . Cms::getInstance("frameworkcss")->get("search", "icon"));
+		$this->tpl[$tpl_id]->set_var("search_class", $this->oPage[0]->frameworkCSS->get("control", "form"));
+		$this->tpl[$tpl_id]->set_var("search_bt_class", $this->oPage[0]->frameworkCSS->get("search", "link") . " " . $this->oPage[0]->frameworkCSS->get("control-postfix", "form") . " " . $this->oPage[0]->frameworkCSS->get("search", "icon"));
 
-		$this->tpl[$tpl_id]->set_var("map_class", Cms::getInstance("frameworkcss")->get(array(12), "col", "nopadding"));
+		$this->tpl[$tpl_id]->set_var("map_class", $this->oPage[0]->frameworkCSS->get(array(12), "col", "nopadding"));
 
 		
         if(strlen($Field->widget_path))

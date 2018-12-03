@@ -1846,7 +1846,7 @@ function ffCommon_ffPage_init($params, $resources = null)  {
 
 
     if($params["framework_css"]) {
-        $oPage->frameworkCSS = Cms::getInstance("frameworkcss");
+        $oPage->frameworkCSS = new frameworkCSS();
         $oPage->frameworkCSS->set($params["framework_css"], $params["font_icon"]);
     }
 
