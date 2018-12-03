@@ -27,10 +27,9 @@
 <configdata>
     <menu>
         <default path="/" hide="true" />
-        <admin path="/restricted" redir="/restricted/dashboard"  hide="true" label="Admin" />
+        <admin path="/restricted" redir="/restricted/dashboard" hide="true" label="Admin" />
+        <dashboard path="/restricted/dashboard" label="Dashboard" location="brand" />
 
-
-        <!--<dashboard path="/restricted/dashboard" label="Dashboard" location="brand" />-->
         <settings path="/restricted/settings" label="Settings" location="brand" position="footer" icon="cogs"  acl="3" />
     </menu>
     <pages>

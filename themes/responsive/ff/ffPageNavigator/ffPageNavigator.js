@@ -29,7 +29,7 @@ ff.pluginAddInit("ff.ajax", function () {
 });
 
 // privates
-var navigators = [];
+var navigators 	= [];
 
 function calcPage(id) {
 	// adjust values
@@ -70,25 +70,25 @@ function drawButtons(id) {
 
     jQuery("." + component).find(".totpage").html(navigators[id].totpage);
 	if(navigators[id].totpage == 1) {
-		jQuery("." + component + " .pages LI").addClass("hidden");
+		jQuery("." + component + " .pages LI").addClass(navigators[id].hiddenClass);
 		jQuery("." + component + " .page").parent().remove();
-        jQuery("." + component + " .choice").addClass("hidden");
+        jQuery("." + component + " .choice").addClass(navigators[id].hiddenClass);
         jQuery("." + component).each(function () {
 			if(parseInt(jQuery(".perPage li:first a", this).attr("rel")) >= navigators[id].totrec) {
-				jQuery(".perPage", this).addClass("hidden");
+				jQuery(".perPage", this).addClass(navigators[id].hiddenClass);
 			} else {
-				jQuery(".perPage", this).removeClass("hidden");
+				jQuery(".perPage", this).removeClass(navigators[id].hiddenClass);
 				jQuery(".perPage li", this).removeClass(navigators[id].currentClass);
 				jQuery(".perPage a", this).each(function() {
 					var recPerPage = parseInt(jQuery(this).attr("rel"));
 				
 					if(recPerPage > navigators[id].totrec) {
-						jQuery(this).parent().addClass("hidden");
+						jQuery(this).parent().addClass(navigators[id].hiddenClass);
 					} else {
 						if(recPerPage == navigators[id].totrec && jQuery(".perPage a.rec-all", this).length && !jQuery(this).hasClass("rec-all"))
-							jQuery(this).parent().addClass("hidden");
+							jQuery(this).parent().addClass(navigators[id].hiddenClass);
 						else
-							jQuery(this).parent().removeClass("hidden");
+							jQuery(this).parent().removeClass(navigators[id].hiddenClass);
 						if(recPerPage == navigators[id].rec_per_page)
 							jQuery(this).parent().addClass(navigators[id].currentClass);
 					}
@@ -97,43 +97,43 @@ function drawButtons(id) {
             
         });
 	} else {
-		jQuery("." + component + " .pages").addClass("hidden");
+		jQuery("." + component + " .pages").addClass(navigators[id].hiddenClass);
         for (var i = navigators[id].start_page; i <= navigators[id].end_page; i++) {
             if(i > navigators[id].page) {
                 tplProperties = ' rel="next"';
-                tplAddClass = '';
+                tplAddClass = (navigators[id].pageClass ? ' class="' + navigators[id].pageClass + '"' : '');
             } else if(i < navigators[id].page) {
                 tplProperties = ' rel="prev"';        
-                tplAddClass = '';
+                tplAddClass = (navigators[id].pageClass ? ' class="' + navigators[id].pageClass + '"' : '');
             } else {
                 tplProperties = '';
-                tplAddClass = ' class="' + navigators[id].currentClass + '"';
+                tplAddClass = ' class="' + (navigators[id].pageClass ? navigators[id].pageClass + ' ' : '') + navigators[id].currentClass + '"';
             }
-            processed_code_template += '<li' + tplAddClass + '><a class="page" href="' + ff.ffPageNavigator.updateUriParams("page", (i > 1 ? i : "")) + '" data-page="' + i + '"' + tplProperties + '>' + i + '</a></li>';
+            processed_code_template += '<li' + tplAddClass + '><a class="page' + (navigators[id].pageLinkClass ? ' ' + navigators[id].pageLinkClass : '') + '" href="' + ff.ffPageNavigator.updateUriParams("page", (i > 1 ? i : "")) + '" data-page="' + i + '"' + tplProperties + '>' + i + '</a></li>';
         }
         jQuery("." + component).each(function () {
             jQuery(".page:last", this).parent().next().addClass("pinject");
         	jQuery(".page", this).parent().remove();
             jQuery(".pinject", this).before(processed_code_template);
 
-            jQuery(".pages", this).removeClass("hidden");
-            jQuery(".choice", this).removeClass("hidden");
+            jQuery(".pages", this).removeClass(navigators[id].hiddenClass);
+            jQuery(".choice", this).removeClass(navigators[id].hiddenClass);
 
 			if(parseInt(jQuery(".perPage li:first a", this).attr("rel")) >= navigators[id].totrec) {
-				jQuery(".perPage", this).addClass("hidden");
+				jQuery(".perPage", this).addClass(navigators[id].hiddenClass);
 			} else {
-				jQuery(".perPage", this).removeClass("hidden");
+				jQuery(".perPage", this).removeClass(navigators[id].hiddenClass);
 				jQuery(".perPage li", this).removeClass(navigators[id].currentClass);
 				jQuery(".perPage a", this).each(function() {
 					var recPerPage = parseInt(jQuery(this).attr("rel"));
 				
 					if(recPerPage > navigators[id].totrec) {
-						jQuery(this).parent().addClass("hidden");
+						jQuery(this).parent().addClass(navigators[id].hiddenClass);
 					} else {
 						if(recPerPage == navigators[id].totrec && jQuery(".perPage a.rec-all", this).length && !jQuery(this).hasClass("rec-all"))
-							jQuery(this).parent().addClass("hidden");
+							jQuery(this).parent().addClass(navigators[id].hiddenClass);
 						else
-							jQuery(this).parent().removeClass("hidden");
+							jQuery(this).parent().removeClass(navigators[id].hiddenClass);
 						if(recPerPage == navigators[id].rec_per_page)
 							jQuery(this).parent().addClass(navigators[id].currentClass);
 					}
@@ -158,15 +158,15 @@ function eventButtons(id) {
             if (navigators[id].totpage > 1) {
                 //jQuery(".prev", this).removeClass("disabled");
                 //jQuery(".next", this).removeClass("disabled");
-                jQuery(".prev", this).parent().removeClass("hidden");
-                jQuery(".next", this).parent().removeClass("hidden");
+                jQuery(".prev", this).parent().removeClass(navigators[id].hiddenClass);
+                jQuery(".next", this).parent().removeClass(navigators[id].hiddenClass);
                 jQuery(".prev", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.prevPage);
                 jQuery(".next", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.nextPage);
             } else {
                 //jQuery(".prev", this).addClass("disabled");
                 //jQuery(".next", this).addClass("disabled");
-                jQuery(".prev", this).parent().addClass("hidden");
-                jQuery(".next", this).parent().addClass("hidden");
+                jQuery(".prev", this).parent().addClass(navigators[id].hiddenClass);
+                jQuery(".next", this).parent().addClass(navigators[id].hiddenClass);
                 jQuery(".prev", this).unbind(".ff.ffPageNavigator");
                 jQuery(".next", this).unbind(".ff.ffPageNavigator");
             }
@@ -174,19 +174,19 @@ function eventButtons(id) {
 
             if (navigators[id].page > 2) {
                 jQuery(".first", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.firstPage);
-                jQuery(".first", this).parent().removeClass("hidden");
+                jQuery(".first", this).parent().removeClass(navigators[id].hiddenClass);
                 //jQuery(".first", this).removeClass("disabled");
             } else {
-                jQuery(".first", this).parent().addClass("hidden"); 
+                jQuery(".first", this).parent().addClass(navigators[id].hiddenClass);
                // jQuery(".first", this).addClass("disabled");
             }
 
             if (navigators[id].totpage - navigators[id].page > 1 ) {
                 jQuery(".last", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.lastPage);
-                jQuery(".last", this).parent().removeClass("hidden");
+                jQuery(".last", this).parent().removeClass(navigators[id].hiddenClass);
                // jQuery(".last", this).removeClass("disabled");
             } else {
-                jQuery(".last", this).parent().addClass("hidden");
+                jQuery(".last", this).parent().addClass(navigators[id].hiddenClass);
                 //jQuery(".last", this).addClass("disabled");
             }  
 
@@ -197,19 +197,19 @@ function eventButtons(id) {
 
         if (navigators[id].start_page > 1) {
             jQuery(".prev-frame", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.prevFrame);
-            jQuery(".prev-frame", this).parent().removeClass("hidden");
+            jQuery(".prev-frame", this).parent().removeClass(navigators[id].hiddenClass);
             //jQuery(".prev-frame", this).removeClass("disabled");
         } else {
-            jQuery(".prev-frame", this).parent().addClass("hidden");
+            jQuery(".prev-frame", this).parent().addClass(navigators[id].hiddenClass);
             //jQuery(".prev-frame", this).addClass("disabled");
         }
 
         if (navigators[id].end_page < navigators[id].totpage) {
             jQuery(".next-frame", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.nextFrame);
-            jQuery(".next-frame", this).parent().removeClass("hidden");
+            jQuery(".next-frame", this).parent().removeClass(navigators[id].hiddenClass);
             //jQuery(".next-frame", this).removeClass("disabled");
         } else {
-            jQuery(".next-frame", this).parent().addClass("hidden");
+            jQuery(".next-frame", this).parent().addClass(navigators[id].hiddenClass);
             //jQuery(".next-frame", this).addClass("disabled");
         }
     });
@@ -235,6 +235,9 @@ __ff : "ff.ffPageNavigator", // used to recognize ff'objects
 		, "doAjax"						: params.doAjax
         , "infinite"                    : params.infinite
 		, "currentClass"				: params.currentClass || "current"
+		, "hiddenClass"					: params.hiddenClass || "hidden"
+		, "pageClass"					: params.pageClass || ""
+		, "pageLinkClass"				: params.pageLinkClass || ""
 		, "loaderClass"					: params.loaderClass
         , "callback"                    : params.callback
         , "callbackParams"              : params.callbackParams || {}

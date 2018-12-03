@@ -205,7 +205,7 @@ abstract class ffGrid_base extends ffCommon
 
 	var $fixed_vars = array();
 
-	var $force_no_field_params		= false;
+	var $force_no_field_params		= true;
 	var $include_all_records		= false;
 	var $use_own_location		= false;
 	var $location_name			= null;
@@ -297,7 +297,6 @@ abstract class ffGrid_base extends ffCommon
 	 * @var Boolean
 	 */
 	var $display_new			= true;					
-	var $display_not_add_new	= true;
 
 	var $display_actions		= true;
 
@@ -337,24 +336,15 @@ abstract class ffGrid_base extends ffCommon
 	 * @var Boolean
 	 */
 	var $use_paging			= true;
-
-	/**
-	 * Numero di record per ogni pagina
-	 * @var Number
-	 */
-	var $default_records_per_page	= 25;
-	var $default_page	= 1;
-	var $default_nav_selector_elements = array(10, 25, 50);
-	
 	var $pagination_save_memory = true;
 	var $pagination_save_memory_in_use = false;
 	protected $rrow = false;
-	
+
 	/**
 	 * Visualizza il page navigator
 	 * @var boolean
 	 */
-	var $display_navigator		= true;					
+	var $display_navigator		= true;
 	var $navigator				= null;					/* a ffPageNavigator object. Read ffPageNavigator
 															docs for personalization. If you don't instantiate it
 															explicity, ffGrid do it for you with standard
@@ -373,7 +363,7 @@ abstract class ffGrid_base extends ffCommon
 	 * la variabile va OBBLIGATORIAMENTE impostata.
 	 * @var String
 	 */
-	var $order_default			= "";					
+	var $order_default			= "";
 
 	var $use_alpha				= false;				/* determine if records will be filtered using alphabetical
 															index. */
@@ -426,18 +416,18 @@ abstract class ffGrid_base extends ffCommon
 	var $recordset_keys			= array();
 	var $recordset_values		= array();
 	var $displayed_keys			= array();
-	
+
 	var $recordset_ori_values 	= array();
 
 	/**
 	 * Array contenente i pulsanti associati ad ogni recordo della grid
 	 * @var array()
 	 */
-	var $grid_buttons			= array();				
-	
+	var $grid_buttons			= array();
+
 	/**
 	 * Array di pulsanti associati alla grid.
-	 * @var array() 
+	 * @var array()
 	 */
 	var $action_buttons			= array();
     var $action_buttons_header  = array();
@@ -445,7 +435,7 @@ abstract class ffGrid_base extends ffCommon
 	 * Array di pulsanti visualizzati sotto il box della ricerca
 	 * @var array()
 	 */
-	var $search_buttons			= array();				
+	var $search_buttons			= array();
 
 	var $fields_values			= array();
 
@@ -456,11 +446,11 @@ abstract class ffGrid_base extends ffCommon
 
 	var $params					= "";					// a collection of all of the above
 
-	var $page					= "";					/* current page displayed (view page_navigator in main Form file)
+	var $page					= 1;					/* current page displayed (view page_navigator in main Form file)
 														   automatically set to 1 by the code if not set */
-	var $frame					= "";					// as above
-	var $records_per_page		= "";					// as above
-	var $nav_selector_elements  = "";
+	var $page_per_frame			= 6;					// as above
+	var $records_per_page		= 25;					// as above
+	var $nav_selector_elements  = array(10, 25, 50);
 
 	/**
 	 * Azione eseguita sul form
@@ -472,7 +462,7 @@ abstract class ffGrid_base extends ffCommon
 	 * Descrizione dell'errore
 	 * @var String
 	 */
-	var $strError				= "";					
+	var $strError				= "";
 
 	var $alpha					= "";					// the selected letter to filter by
 
@@ -510,14 +500,14 @@ abstract class ffGrid_base extends ffCommon
 	 * L'uRL completo della pagina
 	 * @var String
 	 */
-	var $url					= "";					
+	var $url					= "";
 	var $full_record_url		= "";					// full parameterized record url without keys
 
 	var $use_fields_params		= false;
 
 	var $db						= null;					// Internal DB_Sql() Object
 	var $tpl					= null;					// Internal ffTemplate() object
-	
+
 	private $parsed_fields			= 0;
 	private $parsed_filters			= 0;
 	private $parsed_hidden_fields 	= 0;
@@ -536,7 +526,7 @@ abstract class ffGrid_base extends ffCommon
 	var $libraries	= array();
 	var $js_deps	= array();
 	var $css_deps	= array();
-	
+
 // ---------------------------------------------------------------
 	//  ABSTRACT FUNCS (depends on theme)
 	// ---------------------------------------------------------------
@@ -544,7 +534,7 @@ abstract class ffGrid_base extends ffCommon
 	abstract protected function tplLoad();
 	abstract public function tplParse($output_result);
 	abstract public function structProcess($tpl);
-	
+
 	// ---------------------------------------------------------------
 	//  PUBLIC FUNCS
 	// ---------------------------------------------------------------
@@ -568,10 +558,11 @@ abstract class ffGrid_base extends ffCommon
 		if ($this->db === null)
 			$this->db[0] = ffDB_Sql::factory();
 
-		if ($this->use_paging && $this->navigator === null)
-			$this->navigator[0] = ffPageNavigator::factory($page, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
+		if ($this->use_paging && $this->navigator === null) {
+            $this->navigator[0] = ffPageNavigator::factory($page, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
+        }
 	}
-	
+
 	// -----------------------
 	//  Internal Array funcs
 
@@ -585,7 +576,7 @@ abstract class ffGrid_base extends ffCommon
         if ($value !== null && !get_class($value) == "ffData")
             ffErrorHandler::raise("Wrong call to addHiddenField: value must be a ffData"
 								, E_USER_ERROR, $this, get_defined_vars());
-	
+
 		$this->hidden_fields[$field] = $value;
 	}
 
@@ -598,7 +589,7 @@ abstract class ffGrid_base extends ffCommon
         if (!is_subclass_of($field, "ffField_base"))
             ffErrorHandler::raise("Wrong call to addSearchField: object must be a ffField"
 								, E_USER_ERROR, $this, get_defined_vars());
-	
+
 		$field->cont_array =& $this->search_fields;
 		$field->parent = array(&$this);
 		$this->search_fields[$field->id] = $field;
@@ -618,10 +609,10 @@ abstract class ffGrid_base extends ffCommon
 		$field->parent = array(&$this);
 		$field->cont_array =& $this->grid_fields;
 		$this->grid_fields[$field->id] = $field;
-		
+
 		if ($field->crypt && $field->order_field === null)
 			$toOrder = false;
-		
+
 		if ($toOrder && $field->data_type !== "" && $this->use_order)
 			$this->grid_fields[$field->id]->allow_order = true;
 	}
@@ -684,7 +675,7 @@ abstract class ffGrid_base extends ffCommon
         $button->parent = array(&$this);
         $this->action_buttons_header[$button->id] = $button;
     }
-    
+
 	/**
 	 * Aggiunge un pulsante di ricerca
 	 * @param ffButton_base $button
@@ -719,7 +710,7 @@ abstract class ffGrid_base extends ffCommon
 		else
 			return $this->source_SQL;
 	}
-	
+
 	/**
 	 * process preparation' function
 	 * usually called by ffPage
@@ -728,10 +719,10 @@ abstract class ffGrid_base extends ffCommon
 	{
 		// Load Template and initialize it
 		$this->tplLoad();
-			
+
 		// First of all, process all page's params
 		$this->process_params();
-		
+
 		// Finally, prepare SQL
 		$sSQL = $this->getSQL();
 
@@ -810,7 +801,7 @@ abstract class ffGrid_base extends ffCommon
 				}
 				//---------------------------------------------
 			}
-			
+
 		    $this->processed_SQL = $sSQL;
         }
 	}
@@ -852,18 +843,18 @@ abstract class ffGrid_base extends ffCommon
 
 			$this->process_action_buttons();
 	        $this->process_action_buttons_header();
-	        
+
 			$this->process_search();
 			$this->process_alpha();
 			$this->process_hidden();
 		}
-		
+
 		$this->process_grid();		// process navigator and labels (with order) from inside
 
 		if ($output_result !== null)
 			return $this->tplParse($output_result);
 	}
-	
+
 	function getProperties($property_set)
 	{
 		$buffer = "";
@@ -897,7 +888,7 @@ abstract class ffGrid_base extends ffCommon
 
 	/**
 	 * Restituisce il tema utilizzato da ffGrid
-	 * @return String Tema utilizzato da ffGrid 
+	 * @return String Tema utilizzato da ffGrid
 	 */
 	function getTheme()
 	{
@@ -924,7 +915,7 @@ abstract class ffGrid_base extends ffCommon
 			return $last_res;
 		}
 	}
-	
+
 	/**
 	 * params processing function
 	 * usually called by ffPage
@@ -937,13 +928,14 @@ abstract class ffGrid_base extends ffCommon
 			if ($this->rrow < 0)
 				$this->rrow = 0;
 		}
-		
+
 		$this->process_alpha_params();
 		$this->process_search_params();
 		$this->process_order_params();
 		$this->process_navigator_params();
 		if (!$this->force_no_field_params)
 			$this->process_fields_params();
+
 		$this->process_hidden_params();
 
 		$this->params = $this->order_params;
@@ -1068,16 +1060,20 @@ abstract class ffGrid_base extends ffCommon
 	{
 		if (!$this->use_paging)
 			return;
-		
-		$this->page = intval($this->parent[0]->retrieve_param($this->id, $this->navigator[0]->page_parname));
-		$this->records_per_page = intval($this->parent[0]->retrieve_param($this->id, $this->navigator[0]->records_per_page_parname));
 
-		if (!$this->records_per_page)
-			$this->records_per_page = $this->default_records_per_page;
-		if (!$this->page)
-			$this->page = $this->default_page;
-		if (!$this->nav_selector_elements)
-			$this->nav_selector_elements = $this->default_nav_selector_elements;
+		$page = intval($this->parent[0]->retrieve_param($this->id, $this->navigator[0]->page_parname));
+        if($page) {
+            $this->page = $page;
+        }
+
+        $records_per_page = intval($this->parent[0]->retrieve_param($this->id, $this->navigator[0]->records_per_page_parname));
+        if($records_per_page) {
+            $this->records_per_page = $records_per_page;
+        }
+        $page_per_frame = intval($this->parent[0]->retrieve_param($this->id, $this->navigator[0]->page_per_frame_parname));
+        if($page_per_frame) {
+            $this->page_per_frame = $page_per_frame;
+        }
 
 		if ($this->tpl !== null)
 		{
@@ -1102,7 +1098,7 @@ abstract class ffGrid_base extends ffCommon
 		else
 			$this->alpha = $this->alpha_default;
 
-		$this->tpl[0]->set_var("selected_alpha", $this->alpha);				
+		$this->tpl[0]->set_var("selected_alpha", $this->alpha);
 		if (strlen($this->search_params))
 			$this->search_params .= "&";
 		$this->search_params .= $this->getPrefix() . "alpha=" . urlencode($this->alpha);
@@ -1114,7 +1110,7 @@ abstract class ffGrid_base extends ffCommon
 				$tmp_alpha_cont = $this->search_fields;
 			else if(isset($this->grid_fields[$this->alpha_field]))
 				$tmp_alpha_cont = $this->grid_fields;
-			
+
 			if ($tmp_alpha_cont === null)
 				ffErrorHandler::raise("Cannot find alpha field into fields", E_USER_ERROR, $this, get_defined_vars());
 
@@ -1169,7 +1165,7 @@ abstract class ffGrid_base extends ffCommon
 		{
 			if ($this->search_fields[$key]->skip_search)
 				continue;
-			
+
 			if (strlen($this->search_fields[$key]->src_table))
 				$tblprefix = "`" . $this->search_fields[$key]->src_table . "`.";
 			else
@@ -1377,7 +1373,7 @@ abstract class ffGrid_base extends ffCommon
 			$is_default = true;
 			$this->order = $this->order_default;
 		}
-		
+
 		if (!$this->SQL_passthrough)
 		{
 			$tmp = null;
@@ -1395,11 +1391,11 @@ abstract class ffGrid_base extends ffCommon
 			// build order SQL
 			if (strlen($tmp->order_SQL))
 			{
-				if($is_default) 
+				if($is_default)
 				{
 					$this->sqlOrder = " " . str_replace("[ORDER_DIR]", $this->direction, $tmp->order_SQL); //. " " .  $this->direction . " ";
-				} 
-				else 
+				}
+				else
 				{
 					if($this->order != $this->order_default) {
 						$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";
@@ -1410,10 +1406,10 @@ abstract class ffGrid_base extends ffCommon
 			}
 			else
 			{
-				$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";				
+				$this->sqlOrder = " " . $tmp->get_order_field() . " " .  $this->direction . " ";
 			}
 		}
-		
+
 		if($this->tpl !== null) {
 			$this->tpl[0]->set_var("actual_order", $this->order);
 			$this->tpl[0]->set_var("actual_direction", $this->direction);
@@ -1423,7 +1419,7 @@ abstract class ffGrid_base extends ffCommon
 			if($this->use_order) {
 				$this->tpl[0]->parse("SectHiddenOrder", false);
 			} else {
-				$this->tpl[0]->set_var("SectHiddenOrder", "");			
+				$this->tpl[0]->set_var("SectHiddenOrder", "");
 			}
 		}
 	}
@@ -1483,14 +1479,10 @@ abstract class ffGrid_base extends ffCommon
 			else
 			{
 				$this->tpl[0]->set_var("SectAddNew", "");
-				if ($this->display_not_add_new)
-					$this->tpl[0]->parse("SectNotAddNew", false);
-				else
-					$this->tpl[0]->set_var("SectNotAddNew", "");
 			}
 		}
 
-        if (strlen($this->processed_SQL)) 
+        if (strlen($this->processed_SQL))
         {
 			do
 			{
@@ -1499,14 +1491,15 @@ abstract class ffGrid_base extends ffCommon
 				if (!$this->SQL_passthrough)
 				{
 					if (
-						$this->pagination_save_memory 
-						&& strpos($sSQL, "LIMIT") === false 
-						&& strpos($sSQL, "SQL_CALC_FOUND_ROWS") === false 
+						$this->pagination_save_memory
+						&& strpos($sSQL, "LIMIT") === false
+						&& strpos($sSQL, "SQL_CALC_FOUND_ROWS") === false
 						&& strpos($sSQL, "SELECT") === 0
 					)
 					{
 						if ($this->rrow !== false)
 						{
+
 							$sSQL = "SELECT SQL_CALC_FOUND_ROWS" . substr($sSQL, 6);
 							$sSQL .= " LIMIT " . intval($this->rrow) . ", 1";
 							$this->pagination_save_memory_in_use = true;
@@ -1518,12 +1511,11 @@ abstract class ffGrid_base extends ffCommon
 							$this->pagination_save_memory_in_use = true;
 						}
 					}
-				}			
-
+				}
 				$this->db[0]->query($sSQL);
 
 				// fix if out of bounds
-				if ($num_rows = $this->db[0]->numRows())
+				if ($num_rows = $this->db[0]->numRows($this->pagination_save_memory_in_use))
 				{
 					$wanted_record = ($this->rrow ? $this->rrow : 
 							($this->use_paging ? $this->records_per_page * ($this->page - 1) : 0)

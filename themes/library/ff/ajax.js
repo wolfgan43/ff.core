@@ -410,7 +410,12 @@ __ff : "ff.ajax", // used to recognize ff'objects
 			url = ff.urlAddParam(url, "XHR_FFSTRUCT", JSON.stringify(out_struct));
 		}
 	}
-	
+
+	var libs = ff.libToString("js");
+	if(libs) {
+        url = ff.urlAddParam(url, "XHR_FFLIBS", libs);
+    }
+
 	if (params.action) {
 		for (var i = 0; i < fields.length; i++) {
 			if (fields[i].name == "frmAction") {
@@ -540,11 +545,11 @@ __ff : "ff.ajax", // used to recognize ff'objects
 
 	if (data["html"] !== undefined) {
 		// inserisco il nuovo contenuto
-		if (data["headers"] !== undefined) {
+		if (data["headers"].replace(/\s+/, '')) {
 			var tmpdiv = ff.getUniqueID();
 			//jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["headers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
-			jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["headers"] + '</div>');
-			jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
+			jQuery("body").append('<script type="text/javascript" id="fftmp' + tmpdiv + '">' + data["headers"] + '</script>');
+			//jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
 		}
 		
 		if(params.ctx && ctxs.get(params.ctx) !== undefined) {
@@ -595,11 +600,11 @@ __ff : "ff.ajax", // used to recognize ff'objects
 				jQuery("#" + params.component + "_hidden").replaceWith(data["hidden"]);
 		}
 
-		if (data["footers"] !== undefined) {
+		if (data["footers"].replace(/\s+/, '')) {
 			var tmpdiv = ff.getUniqueID();
 			//jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
-			jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '</div>');
-			jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
+			jQuery("body").append('<script type="text/javascript" id="fftmp' + tmpdiv + '">' + data["footers"] + '</script>');
+			//jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
 		}
         
 		that.doEvent({

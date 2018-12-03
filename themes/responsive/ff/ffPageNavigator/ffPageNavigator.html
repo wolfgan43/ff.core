@@ -43,31 +43,31 @@
   <div class="{pagination_class}">
   <ul class="{pagination_menu_class}">
     <!--BeginSectFirstButton-->
-    <li><a href="{url}" class="{first_class}" rel="prev">{first_icon}</a>
+    <li{page_class}><a href="{url}" class="{first_class}" rel="prev">{first_icon}</a>
     </li>
     <!--EndSectFirstButton-->
     <!--BeginSectPrevFrameButton-->
-    <li><a href="javascript:void(0);" class="{prevframe_class}">{prevframe_icon}</a>
+    <li{page_class}><a href="javascript:void(0);" class="{prevframe_class}">{prevframe_icon}</a>
     </li>
     <!--EndSectPrevFrameButton-->
     <!--BeginSectPrevButton-->
-    <li><a href="{url}" class="{prev_class}" rel="prev">{prev_icon}</a>
+    <li{page_class}><a href="{url}" class="{prev_class}" rel="prev">{prev_icon}</a>
     </li>
     <!--EndSectPrevButton-->
     <!--BeginSectPageButton-->
-    <li{page_class}><a href="{url}" class="page" data-page="{num_page}">{num_page}</a>
+    <li{page_class}><a href="{url}" class="{page_link_class}" data-page="{num_page}">{num_page}</a>
     </li>
     <!--EndSectPageButton-->
     <!--BeginSectNextButton-->
-    <li><a href="{url}" class="{next_class}" rel="next">{next_icon}</a>
+    <li{page_class}><a href="{url}" class="{next_class}" rel="next">{next_icon}</a>
     </li>
     <!--EndSectNextButton-->
     <!--BeginSectNextFrameButton-->
-    <li><a href="javascript:void(0);" class="{nextframe_class}">{nextframe_icon}</a>
+    <li{page_class}><a href="javascript:void(0);" class="{nextframe_class}">{nextframe_icon}</a>
     </li>
     <!--EndSectNextFrameButton-->
     <!--BeginSectLastButton-->
-    <li><a href="{url}" class="{last_class}" rel="next">{last_icon}</a>
+    <li{page_class}><a href="{url}" class="{last_class}" rel="next">{last_icon}</a>
     </li>
     <!--EndSectLastButton-->
   </ul>
@@ -88,6 +88,9 @@
             , "doAjax"						: {doAjax}
             , "infinite"					: {infinite}
             , "currentClass"				: "{current_class}"
+            , "hiddenClass"				    : "{hidden_class}"
+            , "pageClass"				    : "{page_item_class}"
+            , "pageLinkClass"				: "{page_link_class}"
             , "callback"                    : {callback}
             , "callbackParams"              : {callback_params}
         });

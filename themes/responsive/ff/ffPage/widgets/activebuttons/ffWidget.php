@@ -63,7 +63,12 @@ class ffWidget_activebuttons extends ffCommon
 
 	function get_component_footers($id)
 	{
-		return "";
+        if (!isset($this->tpl[$id]))
+            return;
+
+        $this->tpl[$id]->set_var("spinner_class", Cms::getInstance("frameworkcss")->get("spinner", "icon"));
+
+        return $this->tpl[$id]->rpparse("SectFooters", false);
 	}
 
 	function process_headers()

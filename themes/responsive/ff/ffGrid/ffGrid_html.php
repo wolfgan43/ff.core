@@ -1,6 +1,31 @@
 <?php
-class ffGrid_html extends ffGrid_base 
-{   
+/**
+ * VGallery: CMS based on FormsFramework
+ * Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @package VGallery
+ *  @subpackage core
+ *  @author Alessandro Stucchi <wolfgan@gmail.com>
+ *  @copyright Copyright (c) 2004, Alessandro Stucchi
+ *  @license http://opensource.org/licenses/gpl-3.0.html
+ *  @link https://github.com/wolfgan43/vgallery
+ */
+
+class ffGrid_html extends ffGrid_base
+{
 	var $framework_css = array(
 			"component" => array(
                 "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
@@ -46,8 +71,14 @@ class ffGrid_html extends ffGrid_base
 						"xs" => 12
 						, "sm" => 12
 						, "md" => 5
-						, "lg" => 5						
+						, "lg" => 5
 				)
+			)
+            , "searchAdv" => array(
+				"class" => "adv-search"
+				, "util" => array(
+				    "hide"
+                )
 			)
 			, "navigatorTop" => array(
 				"class" => null
@@ -85,7 +116,7 @@ class ffGrid_html extends ffGrid_base
 					, "md" => 6
 					, "lg" => 5
 				)
-			)			
+			)
 			, "actionsBottom" => array(
 				"class" => null
 				, "col" => array(
@@ -155,7 +186,7 @@ class ffGrid_html extends ffGrid_base
 									, "delete" => array(
 											"class"		=> null
 											, "label"	=> null
-                                            , "aspect"    => "link" 
+                                            , "aspect"    => "link"
                                             , "disposition" => array("row" => 1, "col" => "default")
 									)
 									, "edit" => array(
@@ -167,7 +198,7 @@ class ffGrid_html extends ffGrid_base
 									)
 									, "addnew" => array(
 											"class"		=> null
-											, "label"	=> null 
+											, "label"	=> null
 											, "icon"	=> null
 											, "aspect"	=> "link"
 									)
@@ -181,9 +212,9 @@ class ffGrid_html extends ffGrid_base
 											, "aspect"	=> "link"
 									)
 								);
-	
+
 	var $id_if					= null;
-	
+
 	var $grid_disposition_elem = array();
 	var $component_properties = array();
     var $dialog_delete_url = null;
@@ -228,9 +259,9 @@ class ffGrid_html extends ffGrid_base
      * @var Boolean
      */
     var $ajax_search    = false;
-    
+
     var $ajax_update_all = false;
-    
+
     var $dialog_options = array(
         "addnew" => array(
         	"type" 			=> null
@@ -245,7 +276,7 @@ class ffGrid_html extends ffGrid_base
             , "height" 		=> ""
             , "title" 		=> ""
             , "class" 		=> null
-        )    
+        )
         , "delete" => array(
             "type" 			=> null
             , "width" 		=> ""
@@ -254,7 +285,7 @@ class ffGrid_html extends ffGrid_base
             , "class" 		=> null
         )
     );
-    
+
     /**
      * una classe da associare alla riga
      * @var String
@@ -271,7 +302,7 @@ class ffGrid_html extends ffGrid_base
                                 , "second" => "even"
                             );
 	var $cel_class = "cel-[COUNT]";
-    
+
     /**
      * La classe da assegnare alle colonne intermedie
      * @var String
@@ -359,7 +390,7 @@ class ffGrid_html extends ffGrid_base
      * @var Array
      */
     var $widget_deps = array(
-    		array("name" => "fullclick") 
+    		array("name" => "fullclick")
         );
     /**
      * Se la ricerca avanzata dev'essere aperta di default
@@ -371,7 +402,7 @@ class ffGrid_html extends ffGrid_base
      * @var String
      */
     public $description = null;
-    
+
     public $no_record_label = null;
     /**
      * Se la widget "disclosure panels" dev'essere abilitata di default
@@ -383,12 +414,12 @@ class ffGrid_html extends ffGrid_base
      * @var Boolean
      */
     var $widget_def_open = true;
-    
+
     var $widget_activebt_enable = false;
-    
+
     var $navigator_doAjax = true;
     var $navigator_display_selector = true;
-    
+
 	var $grid_disposition	= null;				// array of ffFields and fButtons to display in grid  by Row and Col
 	var $grid_disposition_options = array(		// Wrap elem with same type in the same Col
 		"button" => array(
@@ -412,18 +443,18 @@ class ffGrid_html extends ffGrid_base
 	var $js_deps = array(
 		"ff.ffGrid" => null
 	);
-	
+
 	/**
      * Il costruttore dell'oggetto
      * da non richiamare direttamente
      * @param ffPage_base $page
      * @param String $disk_path
-     * @param String $theme 
+     * @param String $theme
      */
     function __construct(ffPage_base $page, $disk_path, $theme)
     {
         parent::__construct($page, $disk_path, $theme);
-        
+
 		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
 
@@ -447,7 +478,7 @@ class ffGrid_html extends ffGrid_base
             }
         }
     }
-    
+
 	/**
 	 * Aggiunge un campo che verrà visualizzato
 	 * @param ffField Il campo da aggiungere
@@ -458,9 +489,9 @@ class ffGrid_html extends ffGrid_base
 		$field->framework_css = array_replace_recursive($this->framework_css["field" . ($this->framework_css["component"]["type"] ? "-" . $this->framework_css["component"]["type"] : "")], $field->framework_css);
 
 		parent::addContent($field, $toOrder);
-		
-		$this->addGridDisposition($field->id, "field", $col, $row, $params);		
-	} 	 
+
+		$this->addGridDisposition($field->id, "field", $col, $row, $params);
+	}
 
 	/**
 	 * Aggiunge un pulsante a ffGrid; il pulsante viene aggiunto ad ogni riga di ffGrid
@@ -477,7 +508,7 @@ class ffGrid_html extends ffGrid_base
     	$default_type = array(
     		"button" => -1
     	);
-    	
+
 		if(!count($this->grid_disposition))
 			$this->grid_disposition[] = array();
 
@@ -487,13 +518,13 @@ class ffGrid_html extends ffGrid_base
 			$row = $row - 1;
 		elseif($row == "last")
 			$row = count($this->grid_disposition) - 1;
-		
+
 		if($row < 0)
 			$row = 0;
-				
+
 		if($row - count($this->grid_disposition) > 1)
 			$row = count($this->grid_disposition) + 1;
-		
+
 		if($col == "last" && !isset($this->grid_disposition_elem["data"][$row][count($this->grid_disposition[$row]) - 1][$component_type]))
 			$col = null;
 		if($col == "default")
@@ -505,10 +536,10 @@ class ffGrid_html extends ffGrid_base
 		if($col === null) {
 			$col = count($this->grid_disposition[$row]);
 
-			if($this->grid_disposition_options[$component_type]["wrap_col"]  
-				&& isset($default_type[$component_type]) 
-				&& $col > 0 
-				&& count($this->grid_disposition_elem["data"][$row][$col + $default_type[$component_type]]) == 1 
+			if($this->grid_disposition_options[$component_type]["wrap_col"]
+				&& isset($default_type[$component_type])
+				&& $col > 0
+				&& count($this->grid_disposition_elem["data"][$row][$col + $default_type[$component_type]]) == 1
 				&& isset($this->grid_disposition_elem["data"][$row][$col + $default_type[$component_type]][$component_type])
 			) {
 				$col = $col + $default_type[$component_type];
@@ -518,22 +549,22 @@ class ffGrid_html extends ffGrid_base
 		} elseif($col == "last") {
 			$col = count($this->grid_disposition[$row]) - 1;
 		}
-		
+
 		if($col < 0)
 			$col = count($this->grid_disposition[$row]);
-			
+
 		if($col - count($this->grid_disposition[$row]) > 1)
 			$col = count($this->grid_disposition[$row]) + 1;
 
 		$params["type"] = $component_type;
 
-		$this->grid_disposition[$row][$col][$ID_component] = $params;    
-		
+		$this->grid_disposition[$row][$col][$ID_component] = $params;
+
 		$this->grid_disposition_elem["data"][$row][$col][$component_type]++;
 		$this->grid_disposition_elem[$component_type][$row]++;
 		$this->grid_disposition_elem["count"][$row]++;
     }
-	
+
 	function getIDIF()
 	{
 		if ($this->id_if !== null)
@@ -547,36 +578,36 @@ class ffGrid_html extends ffGrid_base
 		$tmp = $this->getIDIF();
 		if (strlen($tmp))
 			return $tmp . "_";
-	}	
-	
+	}
+
     /**
      * Carica il template della griglia
      */
     protected function tplLoad()
     {
-    
+
         $this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
         $this->tpl[0]->load_file($this->template_file, "main");
-    
+
         $this->tpl[0]->set_var("site_path", $this->site_path);
         $this->tpl[0]->set_var("page_path", $this->page_path);
         $this->tpl[0]->set_var("theme", $this->getTheme());
         $this->tpl[0]->set_var("this_url", rawurlencode($this->parent[0]->getRequestUri()));
-    
+
         $this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
         $this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
-        
+
         $this->tpl[0]->set_var("fixed_title_content", $this->fixed_title_content);
         $this->tpl[0]->set_var("fixed_heading_content", $this->fixed_heading_content);
         $this->tpl[0]->set_var("fixed_body_content", $this->fixed_body_content);
-        
+
         $this->tpl[0]->set_var("SectHiddenField", "");
-    
+
         $this->tpl[0]->set_var("component", $this->getPrefix());
         $this->tpl[0]->set_var("component_id", $this->getIDIF());
-        
+
     	//$action_class["default"] = "actions";
-        if(isset($_REQUEST["XHR_CTX_ID"])) 
+        if(isset($_REQUEST["XHR_CTX_ID"]))
         {
         	$title_class["default"] = "dialogTitle";
         	$action_class["dialog"] = "dialogActionsPanel";
@@ -585,11 +616,11 @@ class ffGrid_html extends ffGrid_base
             $action_top_class["top"] = "top";
     		if($this->dialog_action_button)
     			$action_top_class["force"] = "force";
-            
+
 			$this->tpl[0]->set_var("actions_top_class", implode(" " , array_filter($action_top_class)));
 			$this->tpl[0]->set_var("actions_bottom_class", implode(" " , array_filter($action_class)));
-		} 
-		else 
+		}
+		else
 		{
         	$title_class["default"] = "ffTitle";
             $action_class           = "";
@@ -613,13 +644,13 @@ class ffGrid_html extends ffGrid_base
         } else {
             $this->tpl[0]->set_var("SectDescription", "");
         }
-    
+
         if ($this->parent !== NULL)
             $this->tpl[0]->set_var("ret_url", $this->parent[0]->ret_url);
-    
-    
+
+
         $this->setProperties();
-    
+
         if (is_array($this->fixed_vars) && count($this->fixed_vars))
         {
             foreach ($this->fixed_vars as $key => $value)
@@ -628,10 +659,10 @@ class ffGrid_html extends ffGrid_base
             }
             reset($this->fixed_vars);
         }
-    
+
         $res = $this->doEvent("on_load_template", array(&$this, $this->tpl[0]));
     }
-    
+
     /**
      * Elabora il template
      * @param Boolean $output_result se dev'essere visualizzata immediatamente l'elaborazione
@@ -663,9 +694,9 @@ class ffGrid_html extends ffGrid_base
                 $this->json_result["rows"] = $this->db[0]->numRows();
             else
                 $this->json_result["rows"] = 0;
-            
+
             $this->json_result["page"] = $this->page;
-    
+
             if (isset($_REQUEST["XHR_SECTION"]))
             {
                 if ($this->use_paging || $this->use_search || $this->use_alpha || $this->use_order || $this->parsed_hidden_fields || $this->use_fields_params)
@@ -676,7 +707,7 @@ class ffGrid_html extends ffGrid_base
                 return $this->tpl[0]->rpparse("Sect" . $_REQUEST["XHR_SECTION"], false);
             }
         }
-        
+
         if ($output_result === true)
         {
             $this->tpl[0]->pparse("main", false);
@@ -687,29 +718,29 @@ class ffGrid_html extends ffGrid_base
             return $this->tpl[0]->rpparse("main", false);
         }
     }
-    
+
     function process_headers()
     {
         if (!isset($this->tpl[0]))
             return;
-    
+
         if (!$this->display_navigator || !$this->use_paging || ($this->navigator[0]->num_rows <= $this->navigator[0]->records_per_page && !($this->ajax_search || $this->full_ajax)))
             return $this->tpl[0]->rpparse("SectHeaders", false);
         else
             return $this->tpl[0]->rpparse("SectHeaders", false) . $this->navigator[0]->process_headers();
     }
-    
+
     function process_footers()
     {
         if (!isset($this->tpl[0]))
             return;
-            
+
         if (!$this->display_navigator || !$this->use_paging || ($this->navigator[0]->num_rows <= $this->navigator[0]->records_per_page && !($this->ajax_search || $this->full_ajax)))
             return $this->tpl[0]->rpparse("SectFooters", false);
         else
             return $this->tpl[0]->rpparse("SectFooters", false) . $this->navigator[0]->process_footers();
     }
-    
+
     /**
 	 * error template processing function
 	 * called by process_interface()
@@ -727,51 +758,51 @@ class ffGrid_html extends ffGrid_base
 		}
 		else
 			$this->tpl[0]->set_var("SectError", "");
-	} 
+	}
     /**
      * Elabora i parametri di ricerca
      */
     function process_search_params()
     {
         parent::process_search_params();
-        
-        if($this->display_search_simple && strlen($this->search_fields[$this->search_simple_field_options["id"]]->getValue()) && $this->search_simple_field_options["src_having"]) 
+
+        if($this->display_search_simple && strlen($this->search_fields[$this->search_simple_field_options["id"]]->getValue()) && $this->search_simple_field_options["src_having"])
         {
             $tmp_sqlHaving = "";
-            foreach ($this->grid_fields AS $key => $value) 
+            foreach ($this->grid_fields AS $key => $value)
             {
                 if ($this->grid_fields[$key]->data_type == "" || $this->grid_fields[$key]->skip_search)
                     continue;
-    
+
                 $tmp_sql = "";
-    
+
                 $tmp_where_value = "";
                 if(strlen($this->grid_fields[$key]->src_table))
                     $tblprefix = "`" . $this->grid_fields[$key]->src_table . "`.";
                 else
                     $tblprefix = "";
-                    
-                if($this->grid_fields[$key]->extended_type == "Selection" && $this->grid_fields[$key]->source_SQL) 
+
+                if($this->grid_fields[$key]->extended_type == "Selection" && $this->grid_fields[$key]->source_SQL)
                 {
                     $this->grid_fields[$key]->pre_process();
-                    
+
                     if(is_array($this->grid_fields[$key]->recordset) && count($this->grid_fields[$key]->recordset))
                     {
                         foreach ($this->grid_fields[$key]->recordset AS $source_SQL_key => $source_SQL_value)
                         {
-                            if(strpos($source_SQL_value[1]->getValue(), $this->search_fields[$this->search_simple_field_options["id"]]->getValue()) !== false)                
+                            if(strpos($source_SQL_value[1]->getValue(), $this->search_fields[$this->search_simple_field_options["id"]]->getValue()) !== false)
                             {
                                 if(strlen($tmp_where_value))
                                     $tmp_where_value .= ", ";
-                                    
+
                                 $tmp_where_value .= $this->db[0]->toSql($source_SQL_value[0]);
                             }
                         }
                     }
                     if(strlen($tmp_where_value))
                         $tmp_sql = $tblprefix . "`" . $this->grid_fields[$key]->get_data_source() . "` IN (" . $tmp_where_value . ")";
-                } 
-                elseif($this->grid_fields[$key]->extended_type == "Selection" && $this->grid_fields[$key]->multi_pairs) 
+                }
+                elseif($this->grid_fields[$key]->extended_type == "Selection" && $this->grid_fields[$key]->multi_pairs)
                 {
                     if(is_array($this->grid_fields[$key]->multi_pairs) && count($this->grid_fields[$key]->multi_pairs))
                     {
@@ -781,38 +812,38 @@ class ffGrid_html extends ffGrid_base
                             {
                                 if(strlen($tmp_where_value))
                                     $tmp_where_value .= ", ";
-                                    
+
                                 $tmp_where_value .= $this->db[0]->toSql($multi_pairs_value[0]);
                             }
                         }
                     }
                     if(strlen($tmp_where_value))
                         $tmp_sql = $tblprefix . "`" . $this->grid_fields[$key]->get_data_source() . "` IN (" . $tmp_where_value . ")";
-                } 
-                else 
+                }
+                else
                 {
 					if ($this->grid_fields[$key]->crypt)
 					{
 						$tmp_where_value = $this->search_fields[$this->search_simple_field_options["id"]]->value->getValue();
-						
+
 						if ($this->grid_fields[$key]->crypt_modsec)
 						{
 							$tmp_where_value = mod_sec_crypt_string($tmp_where_value);
 						}
-						
+
 						if (is_array($this->grid_fields[$key]->src_fields) && count($this->grid_fields[$key]->src_fields))
 							$tmp_sql .= " ( ";
 
 						$tmp_sql = " " . $tblprefix . "`" . $this->grid_fields[$key]->get_data_source() . "` = UNHEX(" . $this->db[0]->toSql(bin2hex($tmp_where_value)) . ") ";
-						
-						if (is_array($this->grid_fields[$key]->src_fields) && count($this->grid_fields[$key]->src_fields))                        
+
+						if (is_array($this->grid_fields[$key]->src_fields) && count($this->grid_fields[$key]->src_fields))
 						{
 							foreach ($this->grid_fields[$key]->src_fields AS $addfld_key => $addfld_value)
-							{                                                                                                                                                                                                                               
+							{
 								$tmp_where_part = " " . $tblprefix . "`" . $this->grid_fields[$addfld_key]->get_data_source() . "` = UNHEX(" . $this->db[0]->toSql(bin2hex($tmp_where_value)) . ") ";
-								$tmp_sql .= " OR " . $tmp_where_part . " ";                                                                                                                                                                                                                      
+								$tmp_sql .= " OR " . $tmp_where_part . " ";
 							}
-							reset($this->grid_fields[$key]->src_fields);                                                                                                                                                                                                                                                                                                                                                                                        
+							reset($this->grid_fields[$key]->src_fields);
 							$tmp_sql .= " ) ";
 						}
 					}
@@ -834,7 +865,7 @@ class ffGrid_html extends ffGrid_base
 						{
 							$tmp_where_value = $this->db[0]->toSql($this->search_fields[$this->search_simple_field_options["id"]]->value);
 						}
-					
+
 						if (is_array($this->grid_fields[$key]->src_fields) && count($this->grid_fields[$key]->src_fields))
 							$tmp_sql .= " ( ";
 
@@ -843,40 +874,40 @@ class ffGrid_html extends ffGrid_base
 						$tmp_where_part = str_replace("[VALUE]", $tmp_where_value, $tmp_where_part);
 						$tmp_sql .= " " . $tmp_where_part . " ";
 
-						if (is_array($this->grid_fields[$key]->src_fields) && count($this->grid_fields[$key]->src_fields))                        
+						if (is_array($this->grid_fields[$key]->src_fields) && count($this->grid_fields[$key]->src_fields))
 						{
 							foreach ($this->grid_fields[$key]->src_fields AS $addfld_key => $addfld_value)
-							{                                                                                                                                                                                                                               
+							{
 								$tmp_where_part = $this->search_fields[$this->search_simple_field_options["id"]]->src_operation;
 								$tmp_where_part = str_replace("[NAME]", $this->grid_fields[$addfld_key], $tmp_where_part);
 								$tmp_where_part = str_replace("[VALUE]", $tmp_where_value, $tmp_where_part);
-								$tmp_sql .= " OR " . $tmp_where_part . " ";                                                                                                                                                                                                                      
+								$tmp_sql .= " OR " . $tmp_where_part . " ";
 							}
-							reset($this->grid_fields[$key]->src_fields);                                                                                                                                                                                                                                                                                                                                                                                        
+							reset($this->grid_fields[$key]->src_fields);
 							$tmp_sql .= " ) ";
 						}
 					}
                 }
-    
+
                 //if($this->grid_fields[$key]->src_having)
                 //{
                     if (strlen($tmp_sqlHaving) && strlen($tmp_sql))
                         $tmp_sqlHaving .= " OR ";
-    
+
                     $tmp_sqlHaving .=  $tmp_sql;
-                /*} else {      
+                /*} else {
                     if (strlen($tmp_sqlWhere) && strlen($tmp_sql))
                         $tmp_sqlWhere .= " OR ";
-                                                                                                                                    
+
                     $tmp_sqlWhere .=  $tmp_sql;
-                }*/                                                                                         
+                }*/
             }
             reset ($this->grid_fields);
-            if(strlen($tmp_sqlHaving)) 
+            if(strlen($tmp_sqlHaving))
                 $this->sqlHaving = " ( " . $tmp_sqlHaving . " ) ";
-        
+
             /*if(strlen($tmp_sqlWhere))
-                $this->sqlWhere = " ( " . $tmp_sqlWhere . " ) ";*/                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                $this->sqlWhere = " ( " . $tmp_sqlWhere . " ) ";*/
         }
     }
 
@@ -896,12 +927,12 @@ class ffGrid_html extends ffGrid_base
 		$this->tpl[0]->set_var("actual_alpha", ffCommon_specialchars($this->alpha));
 		$this->tpl[0]->set_var("field", ffCommon_specialchars($this->search_fields[$this->alpha_field]->label));
 		$this->tpl[0]->set_var("alpha_selected_" . $this->alpha, $this->parent[0]->frameworkCSS->get("current", "util"));
-		
+
 		if (isset($_REQUEST["XHR_DIALOG_ID"]))
-			$this->tpl[0]->set_var("alpha_action", "jQuery('#" . $this->prefix . "alpha').val(jQuery(this).attr('rel')); ff.ffPage.dialog.doRequest('" . $_REQUEST["XHR_DIALOG_ID"] . "', {'action' : 'alpha', 'component' :'" . $this->id . "'})");
+			$this->tpl[0]->set_var("alpha_action", "jQuery('#" . $this->getPrefix() . "alpha').val(jQuery(this).attr('rel')); ff.ffPage.dialog.doRequest('" . $_REQUEST["XHR_DIALOG_ID"] . "', {'action' : 'alpha', 'component' :'" . $this->id . "'})");
 		else
-			$this->tpl[0]->set_var("alpha_action", "jQuery('#" . $this->prefix . "alpha').val(jQuery(this).attr('rel'));  ff.ajax.doRequest({'action' : 'alpha', 'component' :'" . $this->id . "'})");
-		
+			$this->tpl[0]->set_var("alpha_action", "jQuery('#" . $this->getPrefix() . "alpha').val(jQuery(this).attr('rel'));  ff.ajax.doRequest({'action' : 'alpha', 'component' :'" . $this->id . "'})");
+
 		$this->tpl[0]->parse("SectAlpha", false);
 	}
 
@@ -909,7 +940,7 @@ class ffGrid_html extends ffGrid_base
 	 * search template processing function
 	 * called by process_interface()
 	 */
-    function process_search() 
+    function process_search()
     {
         if (!$this->use_search || ($this->parent[0]->getXHRComponent() == $this->id && $this->parent[0]->getXHRSection() == "GridData"))
             return;
@@ -928,14 +959,16 @@ class ffGrid_html extends ffGrid_base
 	                        $this->tpl[0]->set_var("search_more_container_class_start", '<div class="' . $this->parent[0]->frameworkCSS->get(array(1), "col") . '">');
 	                        $this->tpl[0]->set_var("search_more_container_class_end", '</div>');
 						}
-                        $this->tpl[0]->set_var("search_more_class", $this->parent[0]->frameworkCSS->get("more", "icon") . " " . $this->parent[0]->frameworkCSS->get("control-postfix", "form"));
+                        $this->tpl[0]->set_var("search_more_class", $this->parent[0]->frameworkCSS->get("searchdropdown", "button") . " " . $this->parent[0]->frameworkCSS->get("control-postfix", "form"));
+                        $this->tpl[0]->set_var("hide_class", $this->parent[0]->frameworkCSS->get("hide", "util"));
+
                         //$this->tpl[0]->set_var("search_more_icon", $this->parent[0]->frameworkCSS->get("more", "icon-link-tag"));
                         $display_adv_search = $this->tpl[0]->parse("SectAdvSearch", false);
-                        break;                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                        break;
                     }
                 }
                 reset($this->search_fields);
-    			
+
     			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "ff.submitProcessKey(event, jQuery(this).nextAll('.search'));";
 				$buffer = $this->search_fields[$this->search_simple_field_options["id"]]->process($this->search_simple_field_options["id"] . "_src");
 
@@ -945,20 +978,23 @@ class ffGrid_html extends ffGrid_base
 				}
                 $this->tpl[0]->set_var("SearchAll", $buffer);
             }
-    
+
             if(/*!$this->searched &&*/ $this->open_adv_search === false)
-            	$this->tpl[0]->set_var("adv_class", "adv-search hidden");
+            	$this->tpl[0]->set_var("adv_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["searchAdv"]));
+
         }
 
 		$search_class["default"] = "search";
 		$this->tpl[0]->set_var("search_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["search"], $search_class));
 		$this->tpl[0]->set_var("search_box_class", $this->parent[0]->frameworkCSS->get("group", "form"));
-        
-		//$this->tpl[0]->set_var("maxspan", ($this->search_cols * 2));
+
+
+
+            //$this->tpl[0]->set_var("maxspan", ($this->search_cols * 2));
 		//$this->tpl[0]->set_var("search_method", $this->search_method);
 		//$this->tpl[0]->set_var("search_url", $this->search_url);
 
-		//$col = 1; 
+		//$col = 1;
 		//$last_span = 0;
 		$wrap_count = 0;
 
@@ -973,7 +1009,7 @@ class ffGrid_html extends ffGrid_base
 			$class = $this->search_fields[$key]->container_class;
 			if(!strlen($class))
 				$class = $this->column_class;
-			
+
 			if(strlen($class)) {
 				$this->tpl[0]->set_var("container_class", " " . $class);
 			} else {
@@ -982,27 +1018,27 @@ class ffGrid_html extends ffGrid_base
 			if ($this->search_fields[$key]->multi_disp_as_filter)
 			{
 				$this->parsed_filters++;
-				
+
 				$this->tpl[0]->set_var("id", $this->search_fields[$key]->id . "_src");
 				$this->tpl[0]->set_var("value", ffCommon_specialchars($this->search_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE)));
 				$this->parse_hidden_field();
-				
+
 				$this->tpl[0]->set_var("SectFilterRow", "");
 				$this->tpl[0]->set_var("SectFilterElement", "");
 				$this->tpl[0]->set_var("SectSelFilterElement", "");
 				$this->tpl[0]->set_var("SectNoElements", "");
-				
+
 				$this->tpl[0]->set_var("FilterElement_id", $this->search_fields[$key]->id . "_src");
 				$this->tpl[0]->set_var("Filter_title", $this->search_fields[$key]->label);
-				
+
 				$this->search_fields[$key]->pre_process();
-				
+
 				$tmp_field_value = $this->search_fields[$key]->value->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale());
-				
+
 				if ($this->search_fields[$key]->multi_select_one && !$this->search_fields[$key]->multi_limit_select)
 				{
 					$this->tpl[0]->set_var("FilterElement_label", $this->search_fields[$key]->multi_select_one_label);
-					
+
 					if ($this->search_fields[$key]->multi_select_one_val !== null)
 					{
 						$tmp_value = $this->search_fields[$key]->multi_select_one_val->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale());
@@ -1011,7 +1047,7 @@ class ffGrid_html extends ffGrid_base
 					{
 						$tmp_value = "";
 					}
-					
+
 					$this->tpl[0]->set_var("FilterElement_value", $tmp_value);
 
 					if ($tmp_value == $tmp_field_value)
@@ -1029,10 +1065,10 @@ class ffGrid_html extends ffGrid_base
 						$this->tpl[0]->parse("SectFilterElement", false);
 						$this->tpl[0]->set_var("SectSelFilterElement", "");
 					}
-					
+
 					$this->tpl[0]->parse("SectFilterRow", true);
 				}
-	
+
 				if ($this->search_fields[$key]->multi_select_noone &&
 						(!$this->search_fields[$key]->multi_limit_select ||
 							($this->search_fields[$key]->multi_limit_select && $this->search_fields[$key]->multi_select_noone_val->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) == $tmp_field_value)
@@ -1040,12 +1076,12 @@ class ffGrid_html extends ffGrid_base
 					)
 				{
 					$this->tpl[0]->set_var("FilterElement_label", $this->search_fields[$key]->multi_select_noone_label);
-					
+
 					if ($this->search_fields[$key]->multi_select_noone_val !== null)
 						$tmp_value = $this->search_fields[$key]->multi_select_noone_val->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale());
 					else
 						$tmp_value = "";
-					
+
 					$this->tpl[0]->set_var("FilterElement_value", $tmp_value);
 
 					if ($tmp_value == $tmp_field_value)
@@ -1059,26 +1095,26 @@ class ffGrid_html extends ffGrid_base
 							$this->tpl[0]->set_var("filter_action", "ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {'action' : 'filter', 'component' :'" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $tmp_value . "'})");
 						else
 							$this->tpl[0]->set_var("filter_action", "ff.ajax.doRequest({'action' : 'filter', 'component' : '" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $tmp_value . "'});");
-						
+
 						$this->tpl[0]->parse("SectFilterElement", false);
 						$this->tpl[0]->set_var("SectSelFilterElement", "");
 					}
-					
+
 					$this->tpl[0]->parse("SectFilterElement", false);
 					$this->tpl[0]->parse("SectFilterRow", true);
 				}
-	
-				
+
+
 				if (is_array($this->search_fields[$key]->recordset) && count($this->search_fields[$key]->recordset))
 				{
 					foreach ($this->search_fields[$key]->recordset as $sub_key => $sub_item)
 					{
 						list($tmp, $item_key) = each($sub_item);
 						list($tmp, $item_value) = each($sub_item);
-						
+
 						$this->tpl[0]->set_var("FilterElement_value", $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()));
 						$this->tpl[0]->set_var("FilterElement_label", $item_value->getValue($this->search_fields[$key]->get_multi_app_type(), $this->search_fields[$key]->get_locale()));
-						
+
 						if ($item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) == $tmp_field_value)
 						{
 							$this->tpl[0]->set_var("SectFilterElement", "");
@@ -1090,11 +1126,11 @@ class ffGrid_html extends ffGrid_base
 								$this->tpl[0]->set_var("filter_action", "ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {'action' : 'filter', 'component' :'" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) . "'})");
 							else
 								$this->tpl[0]->set_var("filter_action", "ff.ajax.doRequest({'action' : 'filter', 'component' : '" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) . "'});");
-							
+
 							$this->tpl[0]->parse("SectFilterElement", false);
 							$this->tpl[0]->set_var("SectSelFilterElement", "");
 						}
-						
+
 						$this->tpl[0]->parse("SectFilterRow", true);
 					}
 					reset($this->search_fields[$key]->recordset);
@@ -1103,7 +1139,7 @@ class ffGrid_html extends ffGrid_base
 				{
 					$this->tpl[0]->parse("SectNoElements", "");
 				}
-				
+
 				$this->tpl[0]->parse("SectFilter", true);
 			}
 			elseif($this->display_search)
@@ -1114,15 +1150,15 @@ class ffGrid_html extends ffGrid_base
 				{
 					// display label from
 					if($this->search_fields[$key]->interval_from_label)
-						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_from_src">' . ffCommon_specialchars($this->search_fields[$key]->interval_from_label). '</label>'; 
-					
+						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_from_src">' . ffCommon_specialchars($this->search_fields[$key]->interval_from_label). '</label>';
+
 					// display control from
 					$buffer .= $this->search_fields[$key]->process($this->search_fields[$key]->id . "_from_src", $this->search_fields[$key]->interval_from_value);
 
 					// display label to
 					if($this->search_fields[$key]->interval_to_label)
-						$buffer = '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_to_src">' . ffCommon_specialchars($this->search_fields[$key]->interval_to_label). '</label>'; 
-					
+						$buffer = '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_to_src">' . ffCommon_specialchars($this->search_fields[$key]->interval_to_label). '</label>';
+
 					// display control to
 					$buffer .= $this->search_fields[$key]->process($this->search_fields[$key]->id . "_to_src", $this->search_fields[$key]->interval_to_value);
 				}
@@ -1130,15 +1166,15 @@ class ffGrid_html extends ffGrid_base
 				{
 					// display label
 					if($this->search_fields[$key]->label)
-						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_src">' . ffCommon_specialchars($this->search_fields[$key]->label). '</label>'; 
-					
+						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_src">' . ffCommon_specialchars($this->search_fields[$key]->label). '</label>';
+
 					// display control
 					$buffer .= $this->search_fields[$key]->process($this->search_fields[$key]->id . "_src");
 				}
-				
+
 				$this->parsed_fields++;
 				$row = "row";
-				if(is_array($this->search_fields[$key]->framework_css["container"]["col"]) 
+				if(is_array($this->search_fields[$key]->framework_css["container"]["col"])
 				    && count($this->search_fields[$key]->framework_css["container"]["col"])
 				) {
 					$container_class = $this->parent[0]->frameworkCSS->get($this->search_fields[$key]->framework_css["container"]["col"], "col");
@@ -1149,7 +1185,7 @@ class ffGrid_html extends ffGrid_base
 					$wrap_count = 12;
 				} else {
 					$wrap_count = 12;
-				}				
+				}
 
 				if($container_class)
 					$buffer = '<div class="' . $container_class . '">' . $buffer . "</div>";
@@ -1166,11 +1202,11 @@ class ffGrid_html extends ffGrid_base
 			}
 		}
 		reset($this->search_fields);
-		
-		if($this->display_search) 
+
+		if($this->display_search)
 		{
 			//$this->tpl[0]->parse("SectSearchRow", true);
-			
+
 			$show_section = false;
 
 			//$this->initControls();
@@ -1192,7 +1228,7 @@ class ffGrid_html extends ffGrid_base
 				$wrap_addon = $this->parent[0]->frameworkCSS->get("wrap-addon", "form");
 				if($wrap_addon) {
 					$arrSearchCol = array(2);
-				
+
 					$buffer = '<div class="' . $this->parent[0]->frameworkCSS->get($arrSearchCol, "col") . '">' . $buffer . '</div>';
 				}
 
@@ -1206,7 +1242,7 @@ class ffGrid_html extends ffGrid_base
 
 			if ($this->parsed_fields)
 				$this->tpl[0]->parse("SectFields", false);
-				
+
 			if ($this->search_container === null)
 				$this->tpl[0]->parse("SectSearch", false);
 			else
@@ -1217,30 +1253,30 @@ class ffGrid_html extends ffGrid_base
 		}
 
 		if ($this->parsed_filters)
-			$this->tpl[0]->parse("SectFilters", false);        
+			$this->tpl[0]->parse("SectFilters", false);
     }
 
     /**
      * Esegue il processing vero e proprio dei contenuti della grid
      */
     public function process_grid()
-    {    
+    {
         if ($this->display_grid == "never" || ($this->display_grid == "search" && !strlen($this->searched)))
         {
             $this->tpl[0]->set_var("SectGridTable", "");
 			$this->tpl[0]->parse("SectGrid", false);
             return;
         }
-         
+
 		// Manage various buttons
         /*if ($this->display_edit_bt)
-        	$this->addGridDisposition("edit", "button", ($this->grid_disposition_elem["button"][$this->buttons_options["delete"]["disposition"]["row"] - 1] == $this->grid_disposition_elem["data"][$this->buttons_options["edit"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["edit"]["disposition"]["row"] - 1]) - 1]["button"] 
-        		? "last" 
+        	$this->addGridDisposition("edit", "button", ($this->grid_disposition_elem["button"][$this->buttons_options["delete"]["disposition"]["row"] - 1] == $this->grid_disposition_elem["data"][$this->buttons_options["edit"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["edit"]["disposition"]["row"] - 1]) - 1]["button"]
+        		? "last"
         		: $this->buttons_options["delete"]["disposition"]["col"]), $this->buttons_options["edit"]["disposition"]["row"]
-        	); 
+        	);
         if ($this->display_delete_bt)
-        	$this->addGridDisposition("delete", "button", ($this->grid_disposition_elem["button"][$this->buttons_options["delete"]["disposition"]["row"] - 1] == $this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1]) - 1]["button"] 
-        		? "last" 
+        	$this->addGridDisposition("delete", "button", ($this->grid_disposition_elem["button"][$this->buttons_options["delete"]["disposition"]["row"] - 1] == $this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1]) - 1]["button"]
+        		? "last"
         		: $this->buttons_options["delete"]["disposition"]["col"]), $this->buttons_options["delete"]["disposition"]["row"]
         	);*/
 
@@ -1249,7 +1285,7 @@ class ffGrid_html extends ffGrid_base
         if ($this->display_delete_bt)
         	$this->addGridDisposition("delete", "button", $this->buttons_options["delete"]["disposition"]["col"], $this->buttons_options["delete"]["disposition"]["row"]);
 
-        	
+
         	//echo $this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1]) - 1]["button"];
         parent::process_grid();
 
@@ -1279,11 +1315,11 @@ class ffGrid_html extends ffGrid_base
                 }
 				/*if($this->full_ajax || $this->ajax_addnew)
                     $addnew_url = $addnew_url_ajax;
-                else 
-                    $addnew_url = $addnew_url_noajax;	*/			
+                else
+                    $addnew_url = $addnew_url_noajax;	*/
             }
-            
-         
+
+
 /*            $res = $this->doEvent("onUrlInsert", array(&$this, $temp_url));
             $rc = end($res);
                 if ($rc !== null)
@@ -1291,7 +1327,7 @@ class ffGrid_html extends ffGrid_base
 */
             if($this->buttons_options["addnew"]["label"] === null)
                 $this->buttons_options["addnew"]["label"] = ffTemplate::_get_word_by_code("ffGrid_addnew");
-            
+
             if($this->buttons_options["addnew"]["icon"] === null)
                 $this->buttons_options["addnew"]["icon"] = $this->parent[0]->frameworkCSS->get("addnew", "icon-" . $this->buttons_options["addnew"]["aspect"] . "-tag");
 
@@ -1301,17 +1337,17 @@ class ffGrid_html extends ffGrid_base
             if ($this->full_ajax || $this->ajax_addnew)
             {
 				$this->load_dialog($this->record_id, $this->dialog_options["addnew"]);
-				$buffer = "<a " . (strlen($this->buttons_options["addnew"]["class"]) 
-		                                                    ? "class=\"" . $this->buttons_options["addnew"]["class"] . "\" " 
+				$buffer = "<a " . (strlen($this->buttons_options["addnew"]["class"])
+		                                                    ? "class=\"" . $this->buttons_options["addnew"]["class"] . "\" "
 		                                                    : ""
-		                                                ) 
+		                                                )
 		                                                . ($addnew_url_ajax
 
                                                             ? "href=\"javascript:ff.ffPage.dialog.doOpen('" . $this->record_id . "', '" . ffCommon_specialchars($addnew_url_ajax) . "');\">"
                                                             : "href=\"javascript:void(0);\">"
                                                         )
-		                                                . $this->buttons_options["addnew"]["icon"] . $this->buttons_options["addnew"]["label"] 
-		                                            . "</a>";				
+		                                                . $this->buttons_options["addnew"]["icon"] . $this->buttons_options["addnew"]["label"]
+		                                            . "</a>";
 				$this->tpl[0]->set_var("addnew_bt", $buffer);
 				/*
                 $this->parent[0]->widgetLoad("dialog");
@@ -1350,14 +1386,10 @@ class ffGrid_html extends ffGrid_base
         else
         {
             $this->tpl[0]->set_var("SectAddNew", "");
-            if ($this->display_not_add_new)
-                $this->tpl[0]->parse("SectNotAddNew", false);
-            else
-                $this->tpl[0]->set_var("SectNotAddNew", "");
         }
-        
+
         $col_count = count($this->grid_fields);
-        
+
         if ($this->display_edit_bt)
             $col_count++;
 
@@ -1371,7 +1403,7 @@ class ffGrid_html extends ffGrid_base
 
         $this->process_navigator(); // done at this time due to maxspan and $this->db[0]->numRows()
 
-        if ($this->db[0]->query_id && $this->db[0]->nextRecord())
+        if ($this->db[0]->query_id )
         {
         	/**
         	* Set last button Col
@@ -1382,8 +1414,8 @@ class ffGrid_html extends ffGrid_base
             ) {
                 $last_button = $this->grid_disposition[0][count($this->grid_disposition) - 1];
                 unset($this->grid_disposition[0][count($this->grid_disposition) - 1]);
-            }        
-        
+            }
+
 			if ($this->full_ajax || $this->ajax_edit || $this->ajax_delete) {
 				if($this->visible_edit_bt || $this->display_edit_url)
 					$this->load_dialog($this->record_id, $this->dialog_options["edit"]);
@@ -1391,40 +1423,47 @@ class ffGrid_html extends ffGrid_base
 				if($this->visible_delete_bt)
 					$this->load_dialog($this->record_id, $this->dialog_options["delete"]);
 			}
+
             //$this->tpl[0]->set_var("SectNoRecords", "");
-            if ($this->use_paging && !$this->pagination_save_memory_in_use)
-                $this->db[0]->jumpToPage($this->page, $this->records_per_page);
-            
             $arrGridData = array();
-            $break_while = false;
-            $recordset_count = 0;
+            if ($this->use_paging && !$this->pagination_save_memory_in_use) {
+                if($this->db[0]->nextRecord()) {
+                    $this->db[0]->jumpToPage($this->page, $this->records_per_page);
+                    $break_while = false;
+                    $recordset_count = 0;
 
-            $rows = $this->db[0]->numRows();
-            $srow = (($this->page - 1) * $this->records_per_page) + 1;
-            do
-            {
-            	$arrGridData[] = $this->db[0]->record;
-	            if ($this->use_paging && $recordset_count >= $this->records_per_page - 1)
-	                $break_while = true;   
+                    $rows = $this->db[0]->numRows();
+                    $srow = (($this->page - 1) * $this->records_per_page) + 1;
+                    do {
+                        $arrGridData[] = $this->db[0]->record;
+                        if ($this->use_paging && $recordset_count >= $this->records_per_page - 1)
+                            $break_while = true;
 
-				$recordset_count++;
-			} while($this->db[0]->nextRecord() && !$break_while);           
-            
+                        $recordset_count++;
+                    } while ($this->db[0]->nextRecord() && !$break_while);
+                }
+            } else {
+                $arrGridData = array_values($this->db[0]->getRecordset());
+                $rows = $this->db[0]->numRows();
+            }
+
+
+
         	$res = $this->doEvent("on_loaded_data", array(&$this, &$arrGridData));
-            
+
             foreach($arrGridData AS $rrow => $record)
             {
             	$this->db[0]->record = $record;
-            	
+
                 $this->tpl[0]->set_var("row", $rrow);
 
                 $res = $this->doEvent("on_load_row", array(&$this, $this->db[0], $rrow));
-                
+
                 /* Step 1: retrieve values (done in 2 steps due to events needs) */
 
                 $keys = "";
                 $row_properties = array();
-				
+
                 //$unicKey = $i;
                 if (count($this->key_fields))
                 {
@@ -1436,7 +1475,7 @@ class ffGrid_html extends ffGrid_base
                         $aKeys[$key] = $this->key_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
                         $keys .= "keys[" . $this->key_fields[$key]->id . "]=" . $this->key_fields[$key]->value->getValue($this->key_fields[$key]->base_type, FF_SYSTEM_LOCALE) . "&";
                         //$unicKey .= $this->key_fields[$key]->value->getValue($this->key_fields[$key]->base_type, FF_SYSTEM_LOCALE);
-                        
+
                         $this->tpl[0]->set_var("Key_" . $key, $this->key_fields[$key]->getValue($this->key_fields[$key]->get_app_type(), $this->key_fields[$key]->get_locale()));
                         $this->tpl[0]->set_var("encoded_Key_" . $key, rawurlencode($this->key_fields[$key]->getValue($this->key_fields[$key]->get_app_type(), $this->key_fields[$key]->get_locale())));
                         if (strlen($this->key_fields[$key]->value->ori_value))
@@ -1544,18 +1583,18 @@ class ffGrid_html extends ffGrid_base
 	                                $this->addit_record_param;
 
 		                $modify_url["ajax"] = ffProcessTags($modify_url["ajax"], $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
-	  					
+
 	  					if($this->cursor_dialog) {
 	  						$modify_url["ajax"] .= "cursor[id]=" . rawurlencode($this->getIDIF()) . "&"
 													. "cursor[rrow]=" . rawurlencode($srow + $rrow) . "&"
 													. "cursor[rows]=" . rawurlencode($rows) . "&";
-	  					}                  
+	  					}
 
 	                    $modify_url["noajax"] = $modify_url["ajax"]; // . "ret_url=" . rawurlencode($this->parent[0]->getRequestUri());
-	                    
+
 	                    if($this->full_ajax || $this->ajax_edit)
                     		$modify_url["default"] = $modify_url["ajax"];
-	                    else 
+	                    else
                     		$modify_url["default"] = $modify_url["noajax"];
 	                }
 
@@ -1574,7 +1613,7 @@ class ffGrid_html extends ffGrid_base
                                     		? ""
                                     		: "&ret_url=" . rawurlencode($this->parent[0]->getRequestUri())
 	                                    )*/;
-	                
+
 	                    $confirmurl = ffProcessTags($confirmurl, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
 
 	                    $delete_url = $this->dialog(
@@ -1613,52 +1652,52 @@ class ffGrid_html extends ffGrid_base
 	                                                , null //($this->full_ajax || $this->ajax_delete ? "[CLOSEDIALOG]" : "" /*$cancelurl*/)
 	                                                , $confirmurl
 	                                                );
-	                }                 
+	                }
                     $this->tpl[0]->set_var("keys", $keys); // Useful for Fixed Fields Templates
 
-                   
 
-                    if($this->display_edit_url) 
+
+                    if($this->display_edit_url)
                     {
                     	$row_class["editable"] = "clickable";
-                    	if($this->full_ajax || $this->ajax_edit) 
+                    	if($this->full_ajax || $this->ajax_edit)
                     		$row_class["editable"] .= " ajax";
-						if($this->record_target == true) 
+						if($this->record_target == true)
                     		$row_properties["data-target"] = "_blank";
 
                     	$row_properties["data-url"] = ffCommon_specialchars($modify_url["default"]);
-                    } else 
+                    } else
                     	$row_class["editable"] = "";
 
 					/**
-					* Ser Row Class And Properties                    	
+					* Ser Row Class And Properties
 					*/
                     if($this->switch_row_class["display"])
                     {
                         if($row_class["oddeven"] == $this->switch_row_class["first"])
                             $row_class["oddeven"] = $this->switch_row_class["second"];
-                        else 
+                        else
                             $row_class["oddeven"] = $this->switch_row_class["first"];
                     }
 
                     $row_class["record"] = "row-" . ($rrow + 1);
-                         
-                   
+
+
                     $row_class["custom"] = trim($this->row_class);
-                    
+
                     /**
                     * Process Rows Cols Fields buttons
                     */
                    //print_r($this->grid_disposition_elem);
                    // print_r($this->grid_disposition);
-                    if(is_array($this->grid_disposition) && count($this->grid_disposition)) 
+                    if(is_array($this->grid_disposition) && count($this->grid_disposition))
                     {
                     	$buffer_col = "";
                     	if(count($this->grid_disposition) > 1) {
                     		$this->tpl[0]->set_var("row_init_start", '<td class="cel-1 mixed"><table><tbody>');
                     	}
 
-                    	foreach($this->grid_disposition AS $row => $cols) 
+                    	foreach($this->grid_disposition AS $row => $cols)
                     	{
 							if(count($this->grid_disposition) > 1) {
                     			$this->tpl[0]->set_var("row_start", '<tr' . (isset($this->grid_disposition_elem["rows"][$row])
@@ -1667,7 +1706,7 @@ class ffGrid_html extends ffGrid_base
                     			)
                     			. '>');
 							}
-                    		if(is_array($cols) && count($cols)) 
+                    		if(is_array($cols) && count($cols))
                     		{
                     			foreach($cols AS $col => $grid_contents)
                     			{
@@ -1676,7 +1715,7 @@ class ffGrid_html extends ffGrid_base
                     		}
 
 					        $this->tpl[0]->parse("SectRow", true);
-					        $this->tpl[0]->set_var("SectCol", "");                  
+					        $this->tpl[0]->set_var("SectCol", "");
 						    $this->tpl[0]->set_var("row_start", "");
 						    $this->tpl[0]->set_var("row_end",  "");
 
@@ -1694,13 +1733,13 @@ class ffGrid_html extends ffGrid_base
 						}
 
                     }
-                    else 
+                    else
                     {
-	                    $col = 1;  
+	                    $col = 1;
 	                    foreach ($this->grid_fields as $key => $FormField)
 	                    {
 	                        $this->parse_col($FormField, $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col, $col_count);
-	                        
+
 	                        $col++;
 	                    }
 	                    reset($this->grid_fields);
@@ -1710,7 +1749,7 @@ class ffGrid_html extends ffGrid_base
 	                        foreach($this->grid_buttons as $key => $FormButton)
 	                        {
 		                        $this->parse_col($FormButton, $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col, $col_count);
-		                        
+
 		                        $col++;
 	                        }
 	                        reset($this->grid_buttons);
@@ -1718,18 +1757,18 @@ class ffGrid_html extends ffGrid_base
 				   		if($this->display_edit_bt)
 				   		{
 				   			$this->parse_col(($this->visible_edit_bt ? "edit": ""), $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col, $col_count);
-				   			
+
 				   			$col++;
-						}						
+						}
 				   		if($this->display_delete_bt)
 				   		{
 				   			$this->parse_col(($this->visible_delete_bt ? "delete": ""), $recordset_key, $rrow, $modify_url, $keys, $delete_url, $col, $col_count);
-				   			
+
 				   			$col++;
 						}
 
 				        $this->tpl[0]->parse("SectRow", true);
-				        $this->tpl[0]->set_var("SectCol", "");                  
+				        $this->tpl[0]->set_var("SectCol", "");
 					}
 
                     //$this->tpl[0]->set_var("RowNumber", $rrow);
@@ -1743,12 +1782,12 @@ class ffGrid_html extends ffGrid_base
 			        $row_properties["class"] = implode(" " , array_filter($row_class));
 
 			        $this->tpl[0]->set_var("row_properties", $this->getProperties($row_properties));
-                    
+
                     $rc = end($res);
                     if ($rc === null)
                         $this->tpl[0]->parse("SectRecord", true);
 
-			        $this->tpl[0]->set_var("SectRow", "");                  
+			        $this->tpl[0]->set_var("SectRow", "");
                 }
 
                 // EVENT HANDLER
@@ -1827,8 +1866,8 @@ class ffGrid_html extends ffGrid_base
 			$this->tpl[0]->parse("SectGridTable", false);
             $this->tpl[0]->parse("SectGrid", false);
             $this->tpl[0]->set_var("SectNoRecords", "");
-        } 
-        else 
+        }
+        else
         {
         	$component_class["empty"] = "padding " . $this->parent[0]->frameworkCSS->get("clear", "util");
         	$this->tpl[0]->set_var("norecord_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["norecord"]));
@@ -1841,27 +1880,27 @@ class ffGrid_html extends ffGrid_base
             if ($this->no_record_label !== null)
             {
                 $this->tpl[0]->set_var("grid_no_record", $this->no_record_label);
-            } 
-            else 
+            }
+            else
             {
                 $this->tpl[0]->set_var("grid_no_record", ffTemplate::_get_word_by_code("grid_no_record"));
             }
-            
+
             $this->tpl[0]->parse("SectNoRecords", false);
         }
-		
+
 		if($this->tpl[0]->isset_var("component_class")) {
 		    $this->tpl[0]->set_var("component_class", implode(" " , array_filter($component_class)));
 		} else {
 			$this->component_properties["class"] = implode(" ", array_filter($component_class));
 		}
-		
+
 		$this->tpl[0]->set_var("component_properties", $this->getProperties($this->component_properties));
 
 		if(is_array($this->framework_css["component"]["col"]) && $this->framework_css["component"]["inner_wrap"] === null)
 			$this->framework_css["component"]["inner_wrap"] = "row";
-		
-	     if($this->framework_css["component"]["inner_wrap"]) 
+
+	     if($this->framework_css["component"]["inner_wrap"])
          {
             if(is_array($this->framework_css["component"]["inner_wrap"])) {
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
@@ -1871,9 +1910,9 @@ class ffGrid_html extends ffGrid_base
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
             }
             $this->tpl[0]->set_var("inner_wrap_end", '</div>');
-        }       
-           
-        if($this->framework_css["component"]["outer_wrap"]) 
+        }
+
+        if($this->framework_css["component"]["outer_wrap"])
         {
             if(is_array($this->framework_css["component"]["outer_wrap"])) {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
@@ -1882,7 +1921,7 @@ class ffGrid_html extends ffGrid_base
             } else {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
             }
-            $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
+            $this->tpl[0]->set_var("outer_wrap_end", '</div>');
         }
     }
 
@@ -1890,7 +1929,7 @@ class ffGrid_html extends ffGrid_base
     {
 	    if (!is_subclass_of($field, "ffField_base"))
 	        ffErrorHandler::raise("Wrong Grid Field: must be a ffField", E_USER_ERROR, $this, get_defined_vars());
-    
+
 	    if ($field->display === false)
 	        return false;
 
@@ -1906,14 +1945,14 @@ class ffGrid_html extends ffGrid_base
 	    {
 	        $buffer_control_value = $field->process(
 	                    "recordset_values[$recordset_key][" . $field->id . "]");
-	    }	        
-	    
+	    }
+
 	    /**
 	    * Set Field Symbol
 	    */
 		if(strlen($this->symbol_valuta) && $field->app_type == "Currency")
 			$buffer_symbol = $this->symbol_valuta;
-			
+
 
 		/**
 	    * Set Field Data Info
@@ -1929,13 +1968,13 @@ class ffGrid_html extends ffGrid_base
 	                $container_properties["title"] = strip_tags($this->db[0]->getField($field->data_info["field"], $field->data_info["base_type"], true));
 	        }
 	    }
-	    
+
 		/**
 	    * Set Field Label
 	    */
 		if(/*!$hide_container &&*/ $display_label && $field->display_label && strlen($field->label))
 		{
-			if($field->encode_label) 	
+			if($field->encode_label)
 				$buffer_label_value = ffCommon_specialchars($field->label);
 			else
 				$buffer_label_value = $field->label;
@@ -1947,16 +1986,16 @@ class ffGrid_html extends ffGrid_base
 
 			if($field->control_type != "")
 				$label_properties["label_for"] = $this->getIDIF() . "_" . $field->id;
-			
+
 			$label_class = array();
 			if(is_array($field->framework_css))
 			{
 				$arrColumnLabel = $field->framework_css["label"]["col"];
 				$arrColumnControl = $field->framework_css["control"]["col"];
-				
+
 				$label_class["label"] = $this->parent[0]->frameworkCSS->get("label", "form");
 			}
-			
+
 			if(is_array($arrColumnLabel) && count($arrColumnLabel)
 				&& is_array($arrColumnControl) && count($arrColumnControl)
 			) {
@@ -1977,18 +2016,18 @@ class ffGrid_html extends ffGrid_base
 
 				$label_set = true;
 			}
-			
+
 			$label_properties["class"] = implode(" ", array_filter($label_class));
-			
+
 			$buffer_label = '<label ' . $field->getProperties($label_properties) . ' title="' . $buffer_label_value . '">' . $buffer_label_value . '</label>';
 			$buffer_label_container = $label_prefix . $buffer_label . $label_postfix;
-			
+
 			//$label_set = true;
-		}	        
-    
+		}
+
    		/**
 	    * Set Field Control
-	    */ 
+	    */
 	    $field_url = $this->parse_field_url($field, $modify_url, $keys);
 		if($field_url)
 		{
@@ -1998,7 +2037,7 @@ class ffGrid_html extends ffGrid_base
 		}
 
 		$buffer_control_container = $control_prefix . $buffer_control . $control_postfix;
-		
+
 		/**
 		* Set Field Container
 		*/
@@ -2008,23 +2047,23 @@ class ffGrid_html extends ffGrid_base
 	    $container_class["container"] = $field->container_class;
 	    if($field->get_app_type() == "Text" && $field->extended_type != "String")
 	        $container_class["type"] = strtolower($field->extended_type);
-	    else 
+	    else
 	        $container_class["type"] = strtolower($field->get_app_type());
 
 		$buffer = $buffer_label_container . $buffer_control_container;
 		if($hide_container) {
 			if($label_set) {
 				$tmp_class["grid"] = $this->parent[0]->frameworkCSS->get("row", "form");
-				
+
 				$buffer =  '<div class="' . $tmp_class["grid"] . '">' . $buffer . '</div>';
 			}
 		} else {
 			if($label_set && is_array($field->framework_css["container"]["col"]) && count($field->framework_css["container"]["col"])) {
 				$tmp_class["grid"] = $this->parent[0]->frameworkCSS->get("row", "form");
-				
+
 				$buffer =  '<div class="' . $tmp_class["grid"] . '">' . $buffer . '</div>';
-				
-				if(is_array($field->framework_css["container"]["col"]) 
+
+				if(is_array($field->framework_css["container"]["col"])
 					&& count($field->framework_css["container"]["col"])
 				) {
 					$container_class["grid"] = $this->parent[0]->frameworkCSS->get($field->framework_css["container"]["col"], "col");
@@ -2039,14 +2078,14 @@ class ffGrid_html extends ffGrid_base
 				} elseif($field->framework_css["container"]["row"]) {
 					//$container_class["grid"] = $this->parent[0]->frameworkCSS->get("row", "form");
 				}
-			}		
+			}
 
 			$tmp_properties = $container_properties;
 			$tmp_properties["class"] = implode(" ", array_filter($container_class));
 
 			$buffer = '<div ' . $field->getProperties($tmp_properties) . '>' . $buffer . '</div>';
 		}
-		
+
 		/**
 		* Parse Fixed Field Vars
 		*/
@@ -2057,25 +2096,25 @@ class ffGrid_html extends ffGrid_base
 		$this->tpl[0]->set_var("url_" . $field->id . "_display_value", ffCommon_url_rewrite($buffer_control_value));
 		$this->tpl[0]->set_var("ent_" . $field->id . "_display_value", ffCommon_specialchars($buffer_control_value));
 		$this->tpl[0]->set_var("ent_" . $field->id . "_value", ffCommon_specialchars($field->value->getValue()));
-		
+
 		/**
 		* Parse Field Sections
 		*/
-   		if ($this->tpl[0]->isset_var("Field_" . $field->id) === false && $this->tpl[0]->isset_var("EncodedField_" . $field->id) === false) 
-   		{     
-			$this->tpl[0]->set_var("Value", $buffer);		
+   		if ($this->tpl[0]->isset_var("Field_" . $field->id) === false && $this->tpl[0]->isset_var("EncodedField_" . $field->id) === false)
+   		{
+			$this->tpl[0]->set_var("Value", $buffer);
 		    $this->tpl[0]->parse("SectGridContent", true);
 
 		    $this->tpl[0]->set_var("Fvalue_" . $field->id, $buffer_control_value);
 		    $this->tpl[0]->set_var("EncodedFvalue_" . $field->id, rawurlencode(ffCommon_url_normalize($buffer_control_value)));
-		} 
-		else 
+		}
+		else
 		{
 	        $this->tpl[0]->set_var("Field_" . $field->id . "_url", ffCommon_specialchars($field_url));
 	        $this->tpl[0]->set_var("Field_" . $field->id, $buffer_control_value);
 		    $this->tpl[0]->set_var("EncodedField_" . $field->id, rawurlencode(ffCommon_url_normalize($buffer_control_value)));
 		}
-		
+
 		if (strlen($this->grid_fields[$field->id]->value->ori_value))
 		{
 		    $this->tpl[0]->parse("SectSetField_" . $field->id, false);
@@ -2092,9 +2131,9 @@ class ffGrid_html extends ffGrid_base
 		    $this->tpl[0]->set_regexp_var("/SectSet_" . $field->id . "_.+/", "");
 		    $this->tpl[0]->parse("SectSet_" . $field->id . "_" . $this->grid_fields[$field->id]->value->getValue($this->grid_fields[$field->id]->base_type, FF_SYSTEM_LOCALE), false);
 		}
-		
+
 		$this->tpl[0]->parse("Sect_" . $field->id, false);
-				
+
 		return array(
 			"symbol" => $buffer_symbol
 			, "control" => $buffer_control
@@ -2108,8 +2147,8 @@ class ffGrid_html extends ffGrid_base
     }
 
 	/**
-	* Set Field Url    
-	*/    
+	* Set Field Url
+	*/
     function parse_field_url($oField, $modify_url, $keys)
     {
 		$field_url = null;
@@ -2136,7 +2175,7 @@ class ffGrid_html extends ffGrid_base
 				$this->load_dialog($this->record_id, $this->dialog_options["edit"]);
 				$field_url = "javascript:ff.ffPage.dialog.doOp0en('" . $this->record_id . "', '" . ffCommon_specialchars($field_url) . "');";
 			} else {
-				$field_url = ffCommon_specialchars($field_url);					    
+				$field_url = ffCommon_specialchars($field_url);
 			}
 		} elseif(strlen($oField->url)) {
 			if($oField->url_ajax) {
@@ -2147,9 +2186,9 @@ class ffGrid_html extends ffGrid_base
 			}
 		}
 		$oField->url_parsed = $field_url;
-		return $field_url;    
+		return $field_url;
     }
-    function parse_button($button, $recordset_key, $rrow, $url, $hide_container = true) 
+    function parse_button($button, $recordset_key, $rrow, $url, $hide_container = true)
     {
 		/**
 		* Set Button Class
@@ -2175,7 +2214,7 @@ class ffGrid_html extends ffGrid_base
 	                "value" => ($hide_container ? $button->class : implode(" ", array_filter($container_class)))
 	                , "params" => array("strict" => true)
 			    );*/
-			    
+
 			    $button->class = array(
 	                "value" => $button->class
 	                , "params" => array("strict" => true)
@@ -2190,38 +2229,38 @@ class ffGrid_html extends ffGrid_base
 		} elseif($button == "edit" || $button == "delete") {
 			if($this->buttons_options[$button]["icon"] === null)
 			    $this->buttons_options[$button]["icon"] = $this->parent[0]->frameworkCSS->get($button . "row", "icon-" . $this->buttons_options[$button]["aspect"] . "-tag");
-			 
-			if($this->buttons_options[$button]["class"] === null) 
+
+			if($this->buttons_options[$button]["class"] === null)
 			    $this->buttons_options[$button]["class"] = $button . "row";
 
  			if ($this->full_ajax || ($button == "edit" && $this->ajax_edit) || ($button == "delete" && $this->ajax_delete))
-		    {	                        
-				$buffer = "<a " . (strlen($this->buttons_options[$button]["class"]) 
-		                                                    ? "class=\"" . $this->buttons_options[$button]["class"] . "\" " 
+		    {
+				$buffer = "<a " . (strlen($this->buttons_options[$button]["class"])
+		                                                    ? "class=\"" . $this->buttons_options[$button]["class"] . "\" "
 		                                                    : ""
-		                                                ) 
-		                                                . "href=\"javascript:ff.ffPage.dialog.doOpen('" . $this->record_id . "', '" . rawurlencode($url) . "');\">" 
-		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"] 
+		                                                )
+		                                                . "href=\"javascript:ff.ffPage.dialog.doOpen('" . $this->record_id . "', '" . rawurlencode($url) . "');\">"
+		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"]
 		                                            . "</a>";
 			}
 			else
 			{
-				$buffer = "<a " . (strlen($this->buttons_options[$button]["class"]) 
-		                                                    ? "class=\"" . $this->buttons_options[$button]["class"] . "\" " 
+				$buffer = "<a " . (strlen($this->buttons_options[$button]["class"])
+		                                                    ? "class=\"" . $this->buttons_options[$button]["class"] . "\" "
 		                                                    : ""
 		                                                )
                                                         . "href=\"javascript:ff.ffPage.goToWithRetUrl('" . rawurlencode($url) . "');\">"
 		                                               // . "href=\"" . $url . "\">"
 		                                                . $this->buttons_options[$button]["icon"] . $this->buttons_options[$button]["label"]
-		                                            . "</a>";						
-			}    
+		                                            . "</a>";
+			}
 		}
-		
+
 		if($buffer) {
-			$this->tpl[0]->set_var("Value", $buffer);		
-			$this->tpl[0]->parse("SectGridContent", true);		
+            $this->tpl[0]->set_var("Value", $buffer);
+			$this->tpl[0]->parse("SectGridContent", true);
 		}
-				
+
 		return array(
 			"container" => $buffer
 			, "container_class" => $container_class
@@ -2236,14 +2275,14 @@ class ffGrid_html extends ffGrid_base
 		* set Col Class
 		*/
 		$col_class = array();
-		
+
 		$col_class["container"] = $this->column_class;
-		
+
 		if ($col == 1 && $this->column_class_first)
 		    $col_class["first"] = $this->column_class_first;
 		elseif ($col == $col_count && $this->column_class_last)
 		    $col_class["last"] = $this->column_class_last;
-		
+
 		$col_class["cell"] = str_replace(array(
 											"[COUNT]"
 											, "[ROW]"
@@ -2254,17 +2293,17 @@ class ffGrid_html extends ffGrid_base
 											, $row
 											, $col
 										)
-										, $this->cel_class); 
-		
+										, $this->cel_class);
+
 		/**
 		* Set Grid Content
 		*/
 
-		if(is_array($grid_contents)) 
+		if(is_array($grid_contents))
 		{
 			if(is_array($grid_contents) && count($grid_contents))
 			{
-				foreach($grid_contents AS $key => $params) 
+				foreach($grid_contents AS $key => $params)
 				{
 					$res = null;
 
@@ -2283,11 +2322,11 @@ class ffGrid_html extends ffGrid_base
 					$col_class["cell"] = str_replace("[ID]", $key, $col_class["cell"]);
 					if(is_array($res)) {
 						$col_class = array_replace($col_class, $res["container_class"]);
-						$col_properties = $res["container_properties"];					
+						$col_properties = $res["container_properties"];
 					}
 				}
 			}
-		} 
+		}
 		elseif (is_object($grid_contents) && is_subclass_of($grid_contents, "ffField_base"))
 		{
 			$field = $this->parse_field($grid_contents, $recordset_key, $modify_url, $keys);
@@ -2318,7 +2357,7 @@ class ffGrid_html extends ffGrid_base
 			$colspan = max($this->grid_disposition_elem["count"]) - $col_count;
 			if($colspan)
 				$col_properties["colspan"] = $colspan + 1;
-		}	
+		}
 		/**
 		* Parse Col Vars
 		*/
@@ -2333,7 +2372,7 @@ class ffGrid_html extends ffGrid_base
 		$this->tpl[0]->parse("SectColStart", false);
 		$this->tpl[0]->parse("SectColEnd", false);
 
-		if($output_buffer) 
+		if($output_buffer)
 		{
 			$buffer = $this->tpl[0]->rpparse("SectCol", false);
 		}
@@ -2342,10 +2381,10 @@ class ffGrid_html extends ffGrid_base
 			$this->tpl[0]->parse("SectCol", true);
 		}
 
-		$this->tpl[0]->set_var("SectGridContent", "");    
+		$this->tpl[0]->set_var("SectGridContent", "");
 		$this->tpl[0]->set_var("SectColStart", "");
 		$this->tpl[0]->set_var("SectColEnd", "");
-		
+
 		return $buffer;
     }
 
@@ -2367,17 +2406,17 @@ class ffGrid_html extends ffGrid_base
 		*/
  		if ($this->order_method != "none" && $field->allow_order)
 		{
-			if ($this->order == $field->id) {  
+			if ($this->order == $field->id) {
 				if ($this->direction == "ASC")
 				        $direction = "ASC";
 				    else
 				        $direction = "DESC";
 			} else {
-				$direction = $field->order_dir; 
+				$direction = $field->order_dir;
 			}
-			
+
             if($field->display_label /*&& $this->order_method*/ && $buffer_label_value)
-            {                 
+            {
                 $buffer_label = "<a href=\"javascript:void(0);\""
                                 . " onclick=\"ff.ffGrid.ajaxOrder(this, '" .
                                     $this->getIDIF() . "', '" .
@@ -2401,30 +2440,30 @@ class ffGrid_html extends ffGrid_base
                                     )
                             . "</a>";
             }
-            
-          /*  
+
+          /*
 			if ($field->display_label && ($this->order_method == "labels" || $this->order_method == "both"))
-			{	            
-                $buffer_label = "<a href=\"javascript:void(0);\" " 
-                			. "onclick=\"ff.ffGrid.ajaxOrder('" . 
-                				$this->getIDIF() . "', '" . 
-                				$field->id . "', undefined" 
+			{
+                $buffer_label = "<a href=\"javascript:void(0);\" "
+                			. "onclick=\"ff.ffGrid.ajaxOrder('" .
+                				$this->getIDIF() . "', '" .
+                				$field->id . "', undefined"
                 				. ($_REQUEST["XHR_CTX_ID"]
                 					? ", '" . $_REQUEST["XHR_CTX_ID"] . "'"
                 					: ""
                 				) . ");\">" . $buffer_label_value . "</a>";
-			} 
-			
+			}
+
 			if ($this->order_method == "icons" || $this->order_method == "both")
 			{
                 $rev_direction = (strtoupper($direction) == "ASC"
                                     ? "DESC"
                                     : "ASC"
                                 );
-                $buffer_icon = "<a href=\"javascript:void(0);\" " 
-                				. "onclick=\"ff.ffGrid.ajaxOrder('" . 
-                					$this->getIDIF() . "', '" . 
-                					$field->id . "', '" . $rev_direction . "'" 
+                $buffer_icon = "<a href=\"javascript:void(0);\" "
+                				. "onclick=\"ff.ffGrid.ajaxOrder('" .
+                					$this->getIDIF() . "', '" .
+                					$field->id . "', '" . $rev_direction . "'"
                 				. ($_REQUEST["XHR_CTX_ID"]
                 					? ", '" . $_REQUEST["XHR_CTX_ID"] . "'"
                 					: ""
@@ -2432,10 +2471,10 @@ class ffGrid_html extends ffGrid_base
                 				. ($this->order_default == $field->id
                 					? " class=\"" .$this->parent[0]->frameworkCSS->get("current", "util", $this->label_selected_class)  . "\""
                 					: ""
-                				) . ">" . 
+                				) . ">" .
                 					$this->parent[0]->frameworkCSS->get("sort" . ($this->order_default == $field->id ? "-" . strtolower($direction) : ""), "icon-link-tag")
                 			. "</a>";
-			}*/				
+			}*/
 		} elseif($hide_container || !$field->display_label)
 			$buffer_label = $buffer_label_value;
 
@@ -2445,23 +2484,23 @@ class ffGrid_html extends ffGrid_base
 		*/
         if ($field->get_control_type() == "checkbox" && $field->display_label && !isset($field->properties["disabled"])) {
 	        $buffer_select = "<input type=\"checkbox\" onclick=\"this.value = ff.ffGrid.turnToggle('" . $this->getIDIF() . "', '" . $field->id . "', this.value);\" value=\"0\" />";
-		}            
-		
-		
+		}
+
+
 		/**
 		* Set Field Container
 		*/
 		$container_class["base"] = "ffField";
 	    if($field->get_app_type() == "Text" && $field->extended_type != "String")
 	        $container_class["type"] = strtolower($field->extended_type);
-	    else 
+	    else
 	        $container_class["type"] = strtolower($field->get_app_type());
-		
+
 		if ($this->order == $field->id)
             $container_class["current"] = $this->parent[0]->frameworkCSS->get("current", "util", $this->label_selected_class);
 
 		$container_properties = $field->container_properties;
-		$container_properties["width"] = $field->width;         
+		$container_properties["width"] = $field->width;
 
 	    if($this->tpl[0]->isset_var("col_class")) {
 	        $this->tpl[0]->set_var("col_class", implode(" " , array_filter($col_class)));
@@ -2474,7 +2513,7 @@ class ffGrid_html extends ffGrid_base
 
 			$buffer = '<div ' . $field->getProperties($tmp_properties) . '>' . $buffer . '</div>';
 		}
-        
+
         if (!$this->use_fixed_fields) {
             $this->tpl[0]->set_var("Label", $buffer);
             $this->tpl[0]->parse("SectGridLabel", true);
@@ -2482,7 +2521,7 @@ class ffGrid_html extends ffGrid_base
 			$this->tpl[0]->set_var("Label", $buffer_icon . $buffer_label . $buffer_select);
             $this->tpl[0]->parse("SectGridLabel" . $field->id, false);
 		}
-		
+
 		return array(
 			"icon" => $buffer_icon
 			, "select" => $buffer_select
@@ -2493,33 +2532,33 @@ class ffGrid_html extends ffGrid_base
 			, "container_properties" => ($hide_container ? $container_properties : array())
 		);
     }
-    
-    function parse_col_label($grid_contents, $col, $col_count, $row = 1) 
+
+    function parse_col_label($grid_contents, $col, $col_count, $row = 1)
     {
     	//$this->tpl[0]->set_var("SectCol", "");
 		/**
 		* set Col Class
 		*/
 		$col_class = array();
-		
+
 		$col_class["container"] = $this->label_class;
-		
+
 		if ($col == 1 && $this->column_class_first)
 		    $col_class["first"] = $this->column_class_first;
 		elseif ($col == $col_count && $this->column_class_last)
 		    $col_class["last"] = $this->column_class_last;
-		
-		$col_class["cell"] = "cel" . ($row > 1 ? "-" . $row : "") . "-" . $col; 
+
+		$col_class["cell"] = "cel" . ($row > 1 ? "-" . $row : "") . "-" . $col;
 		$col_class["wrap"] = $this->parent[0]->frameworkCSS->get("text-nowrap", "util");
 		/**
 		* Set Class And Properties by Grid Content Type
 		*/
 
-		if(is_array($grid_contents)) 
+		if(is_array($grid_contents))
 		{
 			if(is_array($grid_contents) && count($grid_contents))
 			{
-				foreach($grid_contents AS $key => $params) 
+				foreach($grid_contents AS $key => $params)
 				{
 					$res = null;
 					if($params["type"] == "field") {
@@ -2528,14 +2567,14 @@ class ffGrid_html extends ffGrid_base
 						$res["container_class"]["base"] = "ffButton";
 						$res["container_properties"] = array();
 					}
-					
+
 					if(is_array($res)) {
 						$col_class = array_replace($col_class, $res["container_class"]);
 						$col_properties = $res["container_properties"];
 					}
 				}
 			}
-		} 
+		}
 		elseif (is_object($grid_contents) && is_subclass_of($grid_contents, "ffField_base"))
 		{
 			$field = $this->parse_field_label($grid_contents, $col_class);
@@ -2555,8 +2594,8 @@ class ffGrid_html extends ffGrid_base
 			$col_class["base"] = "ffButton";
 			$col_class["default"] = "delete";
 		}
-		
-		
+
+
 		/**
 		* Parse Col Vars
 		*/
@@ -2568,13 +2607,13 @@ class ffGrid_html extends ffGrid_base
 		}
 
 		$this->tpl[0]->set_var("col_properties", $this->getProperties($col_properties));
-		
-		
+
+
 		$this->tpl[0]->parse("SectColLabelStart", false);
 		$this->tpl[0]->parse("SectColLabelEnd", false);
 		$this->tpl[0]->parse("SectColLabel", true);
-		$this->tpl[0]->set_var("SectGridLabel", "");    
-    }    
+		$this->tpl[0]->set_var("SectGridLabel", "");
+    }
     /**
      *  Elabora le label della griglia
      */
@@ -2598,27 +2637,27 @@ class ffGrid_html extends ffGrid_base
        // $tot_labels += (is_array($this->grid_buttons) ? count($this->grid_buttons) : 0);
        // $tot_labels += (is_array($this->grid_fields) ? count($this->grid_fields) : 0);
 
-		if(is_array($this->grid_disposition) && count($this->grid_disposition)) 
+		if(is_array($this->grid_disposition) && count($this->grid_disposition))
         {
-            foreach($this->grid_disposition AS $row => $cols) 
+            foreach($this->grid_disposition AS $row => $cols)
             {
-                if(is_array($cols) && count($cols)) 
+                if(is_array($cols) && count($cols))
                 {
                     foreach($cols AS $col => $grid_contents)
                     {
                         $this->parse_col_label($grid_contents, $col + 1, count($cols), $row + 1);
                     }
                 }
-            
+
             }
         }
-        else        
+        else
         {
-	        $col = 1;  
+	        $col = 1;
 	        foreach ($this->grid_fields as $key => $FormField)
 	        {
 	            $this->parse_col_label($FormField, $col, $col_count);
-	            
+
 	            $col++;
 	        }
 	        reset($this->grid_fields);
@@ -2628,7 +2667,7 @@ class ffGrid_html extends ffGrid_base
 	            foreach($this->grid_buttons as $key => $FormButton)
 	            {
 		            $this->parse_col_label($FormButton, $col, $col_count);
-		            
+
 		            $col++;
 	            }
 	            reset($this->grid_buttons);
@@ -2636,15 +2675,15 @@ class ffGrid_html extends ffGrid_base
 			if($this->display_edit_bt)
 			{
 				$this->parse_col_label(($this->visible_edit_bt ? "edit": ""), $col, $col_count);
-				
+
 				$col++;
-			}						
+			}
 			if($this->display_delete_bt)
 			{
 				$this->parse_col_label(($this->visible_delete_bt ? "delete": ""), $col, $col_count);
-				
+
 				$col++;
-			}						
+			}
         }
 
 		$this->tpl[0]->parse("SectLabels", false);
@@ -2660,6 +2699,9 @@ class ffGrid_html extends ffGrid_base
         $this->navigator[0]->page = $this->page;
         $this->navigator[0]->records_per_page = $this->records_per_page;
         $this->navigator[0]->nav_selector_elements = $this->nav_selector_elements;
+        $this->navigator[0]->PagePerFrame = $this->page_per_frame;
+
+
         if ($this->db[0]->query_id)
             $this->navigator[0]->num_rows = $this->db[0]->numRows();
 
@@ -2681,9 +2723,9 @@ class ffGrid_html extends ffGrid_base
 
         /*if($this->navigator[0]->num_rows >  $this->navigator[0]->records_per_page)
         {*/
-        
+
         $this->tpl[0]->set_var("PageNavigator", $this->navigator[0]->process());
-        $this->tpl[0]->parse("SectPageNavigator", false);
+        //$this->tpl[0]->parse("SectPageNavigator", false);
     
         if ($this->navigator_orientation == "both" || $this->navigator_orientation == "top")
         {

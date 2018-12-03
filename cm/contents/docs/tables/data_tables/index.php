@@ -62,10 +62,13 @@ $oGrid->use_search = true;
  * Nasconde il campo "esporta"
  */
 $oGrid->use_paging = true;
+//$oGrid->records_per_page = 10;
 $oGrid->record_url = $cm->oPage->site_path . $cm->oPage->page_path . "/modify";
 $oGrid->record_id = "UsersModify";
 $oGrid->resources[] = $oGrid->record_id;
-
+$oGrid->use_alpha = true;
+$oGrid->records_per_page = 10;
+$oGrid->display_edit_bt = true;
 
 /**
  * Inizializzazione dell'oggetto ffField,
@@ -89,8 +92,25 @@ $oField->base_type = "Number";
 $oGrid->addKeyField($oField);
 
 $oField = ffField::factory($cm->oPage);
+$oField->id = "username";
+$oField->label = ffTranslator::get_word_by_code("username");
+$oGrid->addSearchField($oField);
+
+
+$oField = ffField::factory($cm->oPage);
 $oField->id = "avatar";
 $oField->label = ffTemplate::_get_word_by_code("avatar");
+$oField->extended_type = "File";
+/**
+ * Percorso in cui verrà salvato il file
+ */
+//$oField->file_storing_path = FF_DISK_UPDIR . "/anagraph/[ID_VALUE]";
+/**
+ * Percorso in cui verrà salvato il file temporaneo
+ */
+//$oField->file_temp_path = FF_DISK_UPDIR . "/anagraph";
+//$oField->file_thumb = "100x100";
+$oField->control_type = "picture";
 $oGrid->addContent($oField);
 
 
@@ -110,6 +130,14 @@ $oField = ffField::factory($cm->oPage);
 $oField->id = "email";
 $oField->label = ffTemplate::_get_word_by_code("email");
 $oField->base_type = "Text";
+$oGrid->addContent($oField);
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "created";
+$oField->label = ffTemplate::_get_word_by_code("created");
+$oField->base_type = "Timestamp";
+$oField->extended_type = "DateTime";
+$oField->app_type = "DateTime";
 $oGrid->addContent($oField);
 
 /**

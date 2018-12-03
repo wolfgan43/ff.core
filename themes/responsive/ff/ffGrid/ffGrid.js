@@ -109,32 +109,32 @@ __ff : "ff.ffGrid", // used to recognize ff'objects
 		return this.id.match(re);
 	}).prop("checked", false).trigger("change");
 },
-"advsearchHide" : function(component) {
+"advsearchHide" : function(component, hideClass) {
+    if(!hideClass) {
+        hideClass = 'hidden';
+    }
+
 	jQuery('#' + component + ' .adv-search').addClass('hidden'); 
 
 //	jQuery('#' + component + '_search').removeClass('hidden');
 //	jQuery('#' + component + '_searchadv').addClass('hidden');
 },
-"advsearchShow" : function(component) {
+"advsearchShow" : function(component, hideClass) {
+    if(!hideClass) {
+        hideClass = 'hidden';
+    }
+
 	jQuery('#' + component + ' .adv-search').removeClass('hidden');
 	
 //	jQuery('#' + component + '_search').addClass('hidden');
 //	jQuery('#' + component + '_searchadv').removeClass('hidden');
 },
-"advsearchToggle" : function(component, visibility) {
-	if(visibility === undefined) {
-		if(!jQuery('#' + component + ' .adv-search').hasClass('hidden')) { 
-			ff.ffGrid.advsearchHide(component);
-		} else { 
-			ff.ffGrid.advsearchShow(component);
-		}
-	} else {
-		if(visibility == "hidden") {
-			ff.ffGrid.advsearchHide(component);
-		} else {
-			ff.ffGrid.advsearchShow(component);
-		}
+"advsearchToggle" : function(component, hideClass) {
+	if(!hideClass) {
+        hideClass = 'hidden';
 	}
+
+    jQuery('#' + component + ' .adv-search').toggleClass(hideClass);
 },
 "dropdownSort" : function(component, id) {
 	jQuery("#" + id + " ul.sort").appendTo(jQuery("#" + id + " .dropdown-sort-data"));

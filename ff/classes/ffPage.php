@@ -1038,7 +1038,7 @@ abstract class ffPage_base extends ffCommon
     /**
      * elabora le widget globali caricate
      */
-    function widgetsProcess()
+   /* function widgetsProcess()
     {
         if (is_array($this->widgets) && count($this->widgets))
         {
@@ -1056,7 +1056,7 @@ abstract class ffPage_base extends ffCommon
             $this->tpl[0]->set_var("SectWidgetsHeaders", "");
             $this->tpl[0]->set_var("SectWidgetsFooters", "");
         }
-    }
+    }*/
 
     /**
      * elabora le widget per il componente specifico

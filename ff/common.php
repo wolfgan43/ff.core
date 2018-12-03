@@ -1766,6 +1766,17 @@ function ffCommon_ffPage_init($params, $resources = null)  {
     $oPage->loadResources($resources);
     $oPage->loadLibrary();
 
+    if($_REQUEST["XHR_FFLIBS"]) {
+        $struct = json_decode($_REQUEST["XHR_FFLIBS"]);
+        if(is_array($struct) && count($struct)) {
+            foreach ($struct AS $lib) {
+                $oPage->excludeLib($lib, "js");
+
+            }
+        }
+
+    }
+
     $oPage->addEvent("tplAddJs_not_found", function ($page, $tag, $params) {
         static $last_call;
         if ($tag === $last_call) {
@@ -1855,8 +1866,9 @@ function ffCommon_ffPage_init($params, $resources = null)  {
             }
 
             $oPage->tplAddCss("ff.core");
+        } else {
+            $oPage->excludeLib("jquery", "js");
         }
-
         $oPage->tplAddJs("app");
         $oPage->tplAddCss("app");
         $oPage->tplAddCss("icons");

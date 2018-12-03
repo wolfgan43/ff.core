@@ -31,6 +31,7 @@ $db = ffDB_Sql::factory();
  * purchè sia rispettata la coerenza in seguito
  */
 $oRecord = ffRecord::factory($cm->oPage);
+$oRecord->tab = true;
 /**
  * ID dell'oggetto.
  * Se questo oggetto è in relazione con un altro (modifica) è importante che questo campo coincida
@@ -51,7 +52,9 @@ $oRecord->title = ffTemplate::_get_word_by_code("user_modify");
  * verrà delegata negli eventi
  */
 $oRecord->src_table = "access_users";
-
+$oRecord->insert_additional_fields = array(
+    "created" => new ffData(time(), "Number")
+);
 /**
  * Inizializzazione dell'oggetto ffField,
  * elemento base di tutte le sovrastrutture del framework (grid, record e detail)
@@ -80,8 +83,9 @@ $oField->id = "avatar";
  */
 $oField->container_class = "avatar";
 $oField->label = ffTemplate::_get_word_by_code("avatar");
+$oField->extended_type = "File";
 $oField->widget = "uploadifive";
-$oRecord->addContent($oField);
+$oRecord->addContent($oField, "Avatar");
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "username";
@@ -91,7 +95,7 @@ $oField->label = ffTemplate::_get_word_by_code("username");
  * se non compilato restituirà  un errore
  */
 $oField->required = true;
-$oRecord->addContent($oField);
+$oRecord->addContent($oField, "Altro");
 
 $oField = ffField::factory($cm->oPage);
 $oField->id = "email";
@@ -102,8 +106,21 @@ $oField->addValidator("email");
  * se non compilato restituirà  un errore
  */
 $oField->required = true;
-$oRecord->addContent($oField);
+$oField->setWidthComponent(6);
 
+$oRecord->addContent($oField, "Altro");
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "tel";
+$oField->label = ffTemplate::_get_word_by_code("tel");
+
+/**
+ * Indica l'obbligatorietà  del campo in questione,
+ * se non compilato restituirà  un errore
+ */
+$oField->setWidthComponent(6);
+
+$oRecord->addContent($oField, "Altro");
 
 /**
  * Viene innestato l'oggetto $oRecord all'interno della pagina

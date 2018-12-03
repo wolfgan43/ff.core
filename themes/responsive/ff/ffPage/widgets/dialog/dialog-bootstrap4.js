@@ -300,28 +300,31 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 	});	
 
 	if(url) {
-		ff.ajax.ctxGet(id).reset();
-	    dialogs.get(id).params.current_url = dialogs.get(id).params.url;
-	    
-	    var evres = that.doEvent({"event_name": "doOpen", "event_params" : [that, id, url, title]});
-	    if (evres !== true) {
-	        ff.ajax.doRequest({
-	            "url"			: that.parseUrl(id, dialogs.get(id).params.current_url),
-	            "type"			: "GET",
-	            "callback"		: that.onSuccess,
-	            "customdata"	: {
-	                "id" : id
-					, "caller" : {
-						"func" : ff.ffPage.dialog.doOpen
-						, "args" : ff.argsAsArray(arguments)
-					}
-	            },
-	            "injectid"		: dialogs.get(id).instance,
-	            "ctx"			: id,
-				"brandnew"		: true,
-	            "doredirects"	: dialogs.get(id).params.doredirects
-	        });
-	    }
+        if(ff.ajax.ctxGet(id)) {
+        	ff.ajax.ctxGet(id).reset();
+
+			dialogs.get(id).params.current_url = dialogs.get(id).params.url;
+
+			var evres = that.doEvent({"event_name": "doOpen", "event_params" : [that, id, url, title]});
+			if (evres !== true) {
+				ff.ajax.doRequest({
+					"url"			: that.parseUrl(id, dialogs.get(id).params.current_url),
+					"type"			: "GET",
+					"callback"		: that.onSuccess,
+					"customdata"	: {
+						"id" : id
+						, "caller" : {
+							"func" : ff.ffPage.dialog.doOpen
+							, "args" : ff.argsAsArray(arguments)
+						}
+					},
+					"injectid"		: dialogs.get(id).instance,
+					"ctx"			: id,
+					"brandnew"		: true,
+					"doredirects"	: dialogs.get(id).params.doredirects
+				});
+			}
+        }
 	} else {
 		ff.ffPage.dialog.makeInstance(id, html || jQuery("#" + id).outerHTML(), title);
 		that.refresh(id);
