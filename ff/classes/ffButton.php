@@ -260,7 +260,7 @@ abstract class ffButton_base extends ffCommon
 
 	/**
 	 * La pagina contenente ffButton
-	 * @var String
+	 * @var ffPage_html
 	 */
 	var $parent_page			= NULL;
 
@@ -320,6 +320,10 @@ abstract class ffButton_base extends ffCommon
 	*/
 	function __construct($disk_path, $site_path, $page_path, $theme)
 	{
+        if ($_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest") {
+            $this->jsaction = "ff.ajax.ctxDoAction('[[XHR_CTX_ID]]', '[[frmAction]]', '[[component_action]]');";
+        }
+
 		$this->get_defaults("ffButton");
 		$this->get_defaults();
 

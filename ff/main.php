@@ -37,7 +37,7 @@ define("__PRJ_DIR__", (strpos($_SERVER["REQUEST_URI"], "/domains/") === false
 ));*/
 define("__PRJ_DIR__", (getenv("FF_PROJECT_DIR") && getenv("FF_PROJECT_DIR") != "1"
     ? getenv("FF_PROJECT_DIR")
-    : ($_SERVER["REDIRECT_FF_PROJECT_DIR"]
+    : (isset($_SERVER["REDIRECT_FF_PROJECT_DIR"])
         ? $_SERVER["REDIRECT_FF_PROJECT_DIR"]
         : __TOP_DIR__
     )

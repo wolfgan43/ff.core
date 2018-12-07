@@ -123,6 +123,9 @@ class ffPage_html extends ffPage_base
 	// loaded with libs.json
     var $libraries                  = null;
     public $resources               = null;
+    /**
+     * @var frameworkCSS
+     */
     public $frameworkCSS            = null;
 
 	var $default_css	= array(
@@ -1885,8 +1888,8 @@ class ffPage_html extends ffPage_base
 	 */
 	protected function tplProcessVars($tpl)
 	{
-		$framework_css = $this->frameworkCSS->getFramework();
-		$font_icon = $this->frameworkCSS->getFontIcon();
+		$framework_css = frameworkCSS::getFramework();
+		$font_icon = frameworkCSS::getFontIcon();
 
         if(__TOP_DIR__ != __PRJ_DIR__)
             $tpl[0]->set_var("base_path", substr($this->site_path, 0, strpos($this->site_path, "/domains/")));

@@ -24,9 +24,7 @@
  *  @link https://github.com/wolfgan43/vgallery
  */
 
-class ffGrid_html extends ffGrid_base
-{
-	var $framework_css = array(
+frameworkCSS::extend(array(
 			"component" => array(
                 "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
                 , "outer_wrap" => false //false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
@@ -88,10 +86,28 @@ class ffGrid_html extends ffGrid_base
                 )
 			)
 			, "table" => array(
-				"class" => null
+				"class" => "dataTable table table-centered mb-0" //null
 				, "col" => false
-				, "table" => array("container", "oddeven", "responsive")
+				, "table" => null //array("container", "oddeven", "responsive")
 			)
+            , "sort" => array(
+                "icon" => array(
+                    "sortable" => "sort"
+                    , "ASC" => "sort-asc"
+                    , "DESC" => "sort-desc"
+                ),
+                "sortable" => array(
+                     "table" => array("sorting")
+                )
+                , "ASC" => array(
+                    "class" => null
+                    , "table" => array("sorting_asc")
+                )
+                , "DESC" => array(
+                    "class" => null
+                    , "table" => array("sorting_desc")
+                )
+            )
 			, "filters" => array(
 				"class" => null
 				, "col" => array(
@@ -170,9 +186,11 @@ class ffGrid_html extends ffGrid_base
 						, "md" => 12
 						, "lg" => 12
 					)
-			)
-	);
+			)), "ffGrid");
 
+class ffGrid_html extends ffGrid_base
+{
+	var $framework_css          = null;
 	var $buttons_options		= array(
 									"search" => array(
 											  "display" => true
@@ -451,11 +469,13 @@ class ffGrid_html extends ffGrid_base
      * @param String $disk_path
      * @param String $theme
      */
-    function __construct(ffPage_base $page, $disk_path, $theme)
+    function __construct(ffPage_html $page, $disk_path, $theme)
     {
         parent::__construct($page, $disk_path, $theme);
 
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+        $this->framework_css = frameworkCSS::findComponent("ffGrid");
+
+        if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
 
         if ($this->display_search_simple)
@@ -466,7 +486,7 @@ class ffGrid_html extends ffGrid_base
             }
             else
             {
-                $tmp = ffField::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->theme);
+                $tmp = ffField::factory($page);
                 $tmp->id			= $this->search_simple_field_options["id"];
                 $tmp->label			= $this->search_simple_field_options["label"];
                 $tmp->src_operation = $this->search_simple_field_options["src_operation"];
@@ -2391,6 +2411,8 @@ class ffGrid_html extends ffGrid_base
     function parse_field_label($field, $col_class, $hide_container = true)
     {
         $buffer_icon = "";
+
+        $container_properties = $field->container_properties;
 		/**
 		*  Set Label
 		*/
@@ -2417,28 +2439,32 @@ class ffGrid_html extends ffGrid_base
 
             if($field->display_label /*&& $this->order_method*/ && $buffer_label_value)
             {
-                $buffer_label = "<a href=\"javascript:void(0);\""
-                                . " onclick=\"ff.ffGrid.ajaxOrder(this, '" .
-                                    $this->getIDIF() . "', '" .
-                                    $field->id . "'"
-                                . ($_REQUEST["XHR_CTX_ID"]
-                                    ? ", '" . $_REQUEST["XHR_CTX_ID"] . "'"
-                                    : ""
-                                ) . ");\""
-                                . " class=\"ff-sort"
-                                . ($this->order_default == $field->id
-                                    ? " " . $this->parent[0]->frameworkCSS->get("current", "util", $this->label_selected_class)
-                                    : ""
-                                ) . "\">"
-                                    . ($this->order_method == "labels" || $this->order_method == "both"
-                                        ? $buffer_label_value
-                                        : ""
-                                    )
-                                    . ($this->order_method == "icons" || $this->order_method == "both"
-                                        ? $this->parent[0]->frameworkCSS->get("sort" . ($this->order_default == $field->id ? "-" . strtolower($direction) : ""), "icon-link-tag")
-                                        : ""
-                                    )
-                            . "</a>";
+                if ($this->order_default == $field->id) {
+                    $container_properties["aria-sort"] = strtolower($direction) == "asc" ? "ascending" : "descending";
+                    $container_class["sort"] = $this->parent[0]->frameworkCSS->getClass($this->framework_css["sort"][$direction]);
+                    $container_class["current"] = $this->parent[0]->frameworkCSS->get("current", "util", $this->label_selected_class);
+                    $sort_icon = $this->framework_css["sort"]["icon"][$direction];
+                } else {
+                    $container_class["sort"] = $this->parent[0]->frameworkCSS->getClass($this->framework_css["sort"]["sortable"]);
+                    $sort_icon = $this->framework_css["sort"]["icon"]["sortable"];
+                }
+
+                $buffer_label = ($this->order_method == "labels" || $this->order_method == "both"
+                        ? $buffer_label_value
+                        : ""
+                    )
+                    . ($sort_icon && ($this->order_method == "icons" || $this->order_method == "both")
+                        ? $this->parent[0]->frameworkCSS->get($sort_icon, "icon-link-tag")
+                        : ""
+                    );
+
+                $container_properties["onclick"] = "ff.ffGrid.ajaxOrder(this, '" . $this->getIDIF() . "', '" . $field->id . "'"
+                    . ($_REQUEST["XHR_CTX_ID"]
+                        ? ", '" . $_REQUEST["XHR_CTX_ID"] . "'"
+                        : ""
+                    ) . ");";
+
+
             }
 
           /*
@@ -2499,7 +2525,7 @@ class ffGrid_html extends ffGrid_base
 		if ($this->order == $field->id)
             $container_class["current"] = $this->parent[0]->frameworkCSS->get("current", "util", $this->label_selected_class);
 
-		$container_properties = $field->container_properties;
+
 		$container_properties["width"] = $field->width;
 
 	    if($this->tpl[0]->isset_var("col_class")) {
@@ -2507,6 +2533,9 @@ class ffGrid_html extends ffGrid_base
 	    }
 
 		$buffer = $buffer_icon . $buffer_label . $buffer_select;
+
+
+
 		if(!$hide_container) {
 			$tmp_properties = $container_properties;
 			$tmp_properties["class"] = implode(" ", array_filter($container_class));
@@ -2521,6 +2550,10 @@ class ffGrid_html extends ffGrid_base
 			$this->tpl[0]->set_var("Label", $buffer_icon . $buffer_label . $buffer_select);
             $this->tpl[0]->parse("SectGridLabel" . $field->id, false);
 		}
+
+
+
+
 
 		return array(
 			"icon" => $buffer_icon
@@ -2724,9 +2757,23 @@ class ffGrid_html extends ffGrid_base
         /*if($this->navigator[0]->num_rows >  $this->navigator[0]->records_per_page)
         {*/
 
-        $this->tpl[0]->set_var("PageNavigator", $this->navigator[0]->process());
+        if($this->tpl[0]->isset_var("PageNavigator")) {
+            $this->tpl[0]->set_var("PageNavigator", $this->navigator[0]->process());
+        }
+        if($this->tpl[0]->isset_var("PageNavigator.selector")) {
+            $this->tpl[0]->set_var("PageNavigator.selector", $this->navigator[0]->process("selector"));
+        }
+        if($this->tpl[0]->isset_var("PageNavigator.choice")) {
+            $this->tpl[0]->set_var("PageNavigator.choice", $this->navigator[0]->process("choice"));
+        }
+        if($this->tpl[0]->isset_var("PageNavigator.totelem")) {
+            $this->tpl[0]->set_var("PageNavigator.totelem", $this->navigator[0]->process("totelem"));
+        }
+        if($this->tpl[0]->isset_var("PageNavigator.nav")) {
+            $this->tpl[0]->set_var("PageNavigator.nav", $this->navigator[0]->process("nav"));
+        }
         //$this->tpl[0]->parse("SectPageNavigator", false);
-    
+
         if ($this->navigator_orientation == "both" || $this->navigator_orientation == "top")
         {
         	$this->tpl[0]->set_var("pagenavigator_top_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorTop"]));
@@ -2755,7 +2802,7 @@ class ffGrid_html extends ffGrid_base
 			$name = $this->record_id;
 
 		if(array_key_exists($this->getIDIF() . "_" . $name, $dialog_loaded))
-			return;		
+			return;
 
 		if($params === null)
 			$params = array(
@@ -2765,12 +2812,12 @@ class ffGrid_html extends ffGrid_base
 				, "height" 				=> null
 				, "type" 				=> null
 			);
-		
+
 		if(!count($dialog_loaded))
 			$this->parent[0]->widgetLoad("dialog");
 
 		$this->parent[0]->widgets["dialog"]->process(
-			$name 
+			$name
 			, array(
 		            "title"          	=> $params["title"]
 					, "tpl_id"        	=> $this->getIDIF()
@@ -2782,8 +2829,8 @@ class ffGrid_html extends ffGrid_base
 			, $this->parent[0]
 		);
     }
-    
-    
+
+
     /**
      * Inizializza i controlli di default della griglia
      */
@@ -2815,7 +2862,7 @@ class ffGrid_html extends ffGrid_base
                 if (isset($_REQUEST["XHR_CTX_ID"]))
                 {
                     $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "") . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "',{'action'    : '" . $this->getIDIF() . "_search','component' : '" . $this->getIDIF() . "','section'    : 'GridData'});";
-                } 
+                }
                 elseif ($this->full_ajax || $this->ajax_search)
                 {
                     $this->parent[0]->tplAddJs("ff.ajax");
@@ -2856,11 +2903,11 @@ class ffGrid_html extends ffGrid_base
             }
         }
     }
-    
+
 	public function structProcess($tpl)
     {
 		$rc = 0;
-		
+
         if ($this->ajax_update_all)
         {
 			$rc++;
@@ -2868,7 +2915,7 @@ class ffGrid_html extends ffGrid_base
             $tpl->set_var("prop_value",    "true");
             $tpl->parse("SectFFObjProperty",    true);
         }
-		
+
 		if ($this->id_if !== null)
 		{
 			$rc++;
@@ -2876,18 +2923,19 @@ class ffGrid_html extends ffGrid_base
             $tpl->set_var("prop_value",   '"' . $this->id . '"');
             $tpl->parse("SectFFObjProperty",    true);
 		}
-		
+
 		return $rc;
     }
-	
-	function setWidthComponent($resolution_large_to_small) 
+
+	function setWidthComponent($resolution_large_to_small)
 	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
-		elseif(strlen($resolution_large_to_small))
-			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
-		else
-			$this->framework_css["component"]["grid"] = false;
+		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) {
+            $this->framework_css["component"]["grid"] = frameworkCSS::setResolution($resolution_large_to_small);
+        } elseif(strlen($resolution_large_to_small)) {
+            $this->framework_css["component"]["grid"] = $resolution_large_to_small;
+        } else {
+            $this->framework_css["component"]["grid"] = false;
+        }
 	}
 	
 	function setWidthDialog($width, $action = null) 

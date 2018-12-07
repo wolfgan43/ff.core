@@ -75,7 +75,7 @@ class ffRecord
 
 		if (is_null($last_res))
 		{
-            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
+            $class_name = __CLASS__ . "_" . ($page->isXHR() ? "xhr" : FF_PHP_SUFFIX);
             $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
 		else
@@ -500,6 +500,9 @@ abstract class ffRecord_base extends ffCommon
 	// -----------------------------------------------------------------------------------------
 	//  PRIVATE VARS (used by code, don't touch or may be explode with a nice flare effect! :-)
 
+    /**
+     * @var ffPage_html
+     */
 	var $parent					= null;
 
 	/**

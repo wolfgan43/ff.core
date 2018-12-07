@@ -481,7 +481,7 @@ abstract class ffDetails_base extends ffCommon
 	//  PRIVATE VARS (used by code, don't touch or may be explode with a nice flare effect! :-)
 	/**
 	 * l'oggetto ffPage collegato
-	 * @var Array
+	 * @var ffPage_html
 	 */
 	var $parent 				= null;
 

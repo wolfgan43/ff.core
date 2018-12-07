@@ -69,7 +69,7 @@ class ffWidget_dialog extends ffCommon
 		$this->tpl[$tpl_id]->set_var("id", $id);
 		$this->tpl[$tpl_id]->set_var("name", $options["name"]);
 
-		$framework_css = $this->oPage[0]->frameworkCSS->getFramework();
+		$framework_css = frameworkCSS::getFramework();
 		
 		if (array_key_exists("id", $options))
 			$this->tpl[$tpl_id]->set_var("id_tag", ' id="' . $options["id"] . '"');

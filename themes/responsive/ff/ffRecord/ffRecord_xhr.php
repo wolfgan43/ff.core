@@ -1,89 +1,90 @@
 <?php
-class ffRecord_dialog extends ffRecord_base
+frameworkCSS::extend(array(
+    "component" => array(
+        "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
+        , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
+        , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
+        , "type" => null        //null OR '' OR "inline"
+    )
+    , "title" => array(
+        "class" => "dialogTitle"
+        , "col" => false
+    )
+    , "actions" => array(
+        "class" => "actions dialogActionsPanel"
+        , "col" => false
+    )
+    , "group" => array(
+        "def" => null
+        , "title" => array(
+            "class" => "padding"
+        )
+    )
+    , "record" => array(
+        "row" => true
+    )
+    , "field" => array(
+        "label" => array(
+            "col" => null
+        )
+        , "control" => array(
+        "   col" => null
+        )
+    )
+    , "field-inline" => array(
+        "label" => array(
+            "col" => array(
+                "xs" => 0
+                , "sm" => 0
+                , "md" => 12
+                , "lg" => 4
+            )
+        )
+    , "control" => array(
+            "col" => array(
+                "xs" => 12
+            , "sm" => 12
+            , "md" => 12
+            , "lg" => 8
+            )
+        )
+    )
+    , "info" => array(
+        "class" => "info"
+        , "callout" => "info"
+    )
+    , "error" => array(
+        "class" => "error dialogSubTitle"
+        , "callout" => "danger"
+    )
+    , "widget" => array(
+        "tab" => array(
+            "menu" => array(
+                "class" => null
+                //, "tab" => null //menu OR menu-vertical OR menu-vertical-right
+                , "wrap_menu" => null	// null OR array(xs, sm, md, lg)
+                , "wrap_pane" => null	// null OR array(xs, sm, md, lg)
+            )
+        , "menu-item" => array(
+                "class" => null
+                , "tab" => "menu-item"
+            )
+        , "pane" => array(
+                "class" => null
+                , "tab" => "pane"
+            )
+        , "pane-item" => array(
+                "class" => null
+                , "tab" => "pane-item-effect" // pane-item-effect OR pane-item
+            )
+        )
+    )
+), "ffRecord_xhr");
+
+class ffRecord_xhr extends ffRecord_base
 {
-	var $framework_css 			= array(
-			"component" => array(
-                "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
-                , "type" => null        //null OR '' OR "inline"
-			)
-			, "title" => array(
-				"class" => "dialogTitle"
-				, "col" => false
-			)
-			, "actions" => array(
-				"class" => "actions dialogActionsPanel"
-				, "col" => false		
-			)
-			, "group" => array(
-				"def" => null
-				, "title" => array(
-					"class" => "padding"
-				)
-			)
-			, "record" => array(
-				"row" => true
-			)
-			, "field" => array(
-				"label" => array(
-					"col" => null
-				)
-				, "control" => array(
-					"col" => null
-				)
-			)
-			, "field-inline" => array(
-				"label" => array(
-					"col" => array(
-						"xs" => 0
-						, "sm" => 0
-						, "md" => 12
-						, "lg" => 4
-					)
-				)
-				, "control" => array(
-					"col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 8
-					)
-				)
-			)
-			, "info" => array(
-			    "class" => "info"
-			    , "callout" => "info"
-			)
-			, "error" => array(
-				"class" => "error dialogSubTitle"
-				, "callout" => "danger"
-			)
-			, "widget" => array(
-				"tab" => array(
-					"menu" => array(
-						"class" => null
-						//, "tab" => null //menu OR menu-vertical OR menu-vertical-right
-						, "wrap_menu" => null	// null OR array(xs, sm, md, lg)
-						, "wrap_pane" => null	// null OR array(xs, sm, md, lg)
-					)
-					, "menu-item" => array(
-						"class" => null
-						, "tab" => "menu-item"
-					)
-					, "pane" => array(
-						"class" => null
-						, "tab" => "pane"
-					)
-					, "pane-item" => array(
-						"class" => null
-						, "tab" => "pane-item-effect" // pane-item-effect OR pane-item
-					)
-				)			
-			)	
-	
-	);	
-	
+	var $framework_css 			= null;
+
 	var $buttons_options		= array(
 											"insert" => array(
 														  "display" => true
@@ -120,10 +121,10 @@ class ffRecord_dialog extends ffRecord_base
 														, "obj" 	=> null
 														, "label" 	=> null
                                                         , "aspect"  => "link"
-                                                        , "icon"	=> null 
+                                                        , "icon"	=> null
 											  				)
 										  , "cursor_first" => array(
-														  "display" => true  
+														  "display" => true
 														, "index" 	=> 4
 														, "obj" 	=> null
 														, "label" 	=> ""
@@ -131,7 +132,7 @@ class ffRecord_dialog extends ffRecord_base
 														, "newicon" => "NewIcon_firstl"
 															)
 										  , "cursor_prev" => array(
-														  "display" => true  
+														  "display" => true
 														, "index" 	=> 3
 														, "obj" 	=> null
 														, "label" 	=> ""
@@ -139,7 +140,7 @@ class ffRecord_dialog extends ffRecord_base
 														, "newicon" => "NewIcon_left"
 															)
 										  , "cursor_next" => array(
-														  "display" => true  
+														  "display" => true
 														, "index" 	=> 0
 														, "obj" 	=> null
 														, "label" 	=> ""
@@ -147,44 +148,44 @@ class ffRecord_dialog extends ffRecord_base
 														, "newicon" => "NewIcon_right"
 															)
 										  , "cursor_last" => array(
-														  "display" => true  
+														  "display" => true
 														, "index" 	=> -1
 														, "obj" 	=> null
 														, "label" 	=> ""
 								                        , "aspect"  => "button"
 														, "newicon" => "NewIcon_lastr"
-															)											  				
+															)
 										);
 
 	var $id_if					= null;
 
 	var $cursor_dialog = false;
-	
-	public $template_file 	= "ffRecord_dialog.html";
+
+	public $template_file 	= "ffRecord_xhr.html";
 
 	public $tpl				= null;					// Internal ffTemplate() object
 
 	public $prefix			= null;
-	
+
 	/**
 	 * Abilita i tab
 	 * @var Boolean
-	 */	
+	 */
 	public $tab				= false;// false OR top OR left OR right
-    
+
     /**
 	 * Una collezione dei tabs presenti nella pagina
 	 * @var Array
 	 */
 	var $tabs				= array();
-	
+
 	public $description = null;
 
 	var $widget_discl_enable = true;
 	var $widget_def_open = true;
-	
+
 	var $widget_activebt_enable = false;
-	
+
 	var $displayed_fields		= 0;
 
 /*	var $buttons_options		= array(
@@ -212,7 +213,7 @@ class ffRecord_dialog extends ffRecord_base
 							)
 
 		  , "cancel" => array(
-						  "display" => true  
+						  "display" => true
 						, "index" 	=> 0
 						, "obj" 	=> null
 						, "label" 	=> null
@@ -227,16 +228,23 @@ class ffRecord_dialog extends ffRecord_base
 	);
 
 	var $properties = null;
-	
-	
+
+
 	function __construct(ffPage_base $page, $disk_path, $theme)
     {
         parent::__construct($page, $disk_path, $theme);
-		
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+
+        /**
+         * @var $page ffPage_html
+
+         */
+        $this->framework_css = $page->frameworkCSS->findComponent("ffRecord_xhr");
+
+
+        if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
 	}
-		
+
 	function getIDIF()
 	{
 		if ($this->id_if !== null)
@@ -251,7 +259,7 @@ class ffRecord_dialog extends ffRecord_base
 		if (strlen($tmp))
 			return $tmp . "_";
 	}
-	
+
 	/**
 	 * aggiunge un contenuto all'oggetto record
 	 * supporta ffField_base, ffDetails_base, ffGrid_base
@@ -269,7 +277,7 @@ class ffRecord_dialog extends ffRecord_base
 				$content->framework_css = array_replace_recursive($this->framework_css["field" . ($this->framework_css["component"]["type"] ? "-" : "") . $this->framework_css["component"]["type"]], $content->framework_css);
 			}
 		}
-		
+
 		parent::addContent($content, $group, $id);
 	}
 	public function addTab($name)
@@ -389,16 +397,16 @@ class ffRecord_dialog extends ffRecord_base
             }
         }
 		$component_class["form"] = $this->parent[0]->frameworkCSS->get("component" . ($this->framework_css["component"]["type"] ? "-" : "") . $this->framework_css["component"]["type"], "form");
-        
+
 		$this->properties["id"] = $this->getIDIF();
 		$this->properties["class"] = implode(" ", array_filter($component_class));
-		
+
 		$this->tpl[0]->set_var("component_properties", $this->getProperties());
 
 		if(is_array($this->framework_css["component"]["col"]) && $this->framework_css["component"]["inner_wrap"] === null)
 			$this->framework_css["component"]["inner_wrap"] = "row";
 
-        if($this->framework_css["component"]["inner_wrap"]) 
+        if($this->framework_css["component"]["inner_wrap"])
         {
             if(is_array($this->framework_css["component"]["inner_wrap"])) {
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
@@ -408,9 +416,9 @@ class ffRecord_dialog extends ffRecord_base
                 $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
             }
             $this->tpl[0]->set_var("inner_wrap_end", '</div>');
-        }       
-           
-        if($this->framework_css["component"]["outer_wrap"]) 
+        }
+
+        if($this->framework_css["component"]["outer_wrap"])
         {
             if(is_array($this->framework_css["component"]["outer_wrap"])) {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
@@ -419,11 +427,11 @@ class ffRecord_dialog extends ffRecord_base
             } else {
                 $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
             }
-            $this->tpl[0]->set_var("outer_wrap_end", '</div>');                
+            $this->tpl[0]->set_var("outer_wrap_end", '</div>');
         }
 
 		if ($this->tab && count($this->tabs))
-		{                
+		{
 			$this->tpl[0]->set_var("form_tabs", $this->parent[0]->widgets["tabs"]->process($this->getIDIF(), $this->tabs, $this->parent[0], $this->id));
 		}
 		elseif ($this->displayed_fields)
@@ -438,7 +446,7 @@ class ffRecord_dialog extends ffRecord_base
 
 		return $output_buffer;
 	}
-	
+
 	function process_headers()
 	{
 		if (!isset($this->tpl[0]))
@@ -454,7 +462,7 @@ class ffRecord_dialog extends ffRecord_base
 
 		return $this->tpl[0]->rpparse("SectFooters", false);
 	}
-	
+
 	protected function tplDisplayContents()
 	{
 		foreach($this->key_fields as $key => $FormField)
@@ -535,7 +543,7 @@ class ffRecord_dialog extends ffRecord_base
 			if (!$content["group"]) {
 				$this->groups["_main_"]["contents"][$key] = $content;
 				continue;
-			}	
+			}
 			//if ($this->groups[$key]["tab"])
 			//	$groups_tabs[$this->groups[$key]["tab"]]++;
 		}
@@ -547,7 +555,7 @@ class ffRecord_dialog extends ffRecord_base
 		if (is_array($this->groups) && count($this->groups))
 		{
             $last_tab_key = "";
-			foreach($this->groups AS $group_key => $group_value) 
+			foreach($this->groups AS $group_key => $group_value)
 			{
 				$i = $this->tplDisplayFields($this->groups[$group_key]["contents"], $group_key, $group_value["primary_field"]);
 				if ($i > 0)
@@ -559,13 +567,13 @@ class ffRecord_dialog extends ffRecord_base
 					{
 				        $this->tpl[0]->set_var("group_pre_content", $this->groups[$group_key]["fixed_pre_content"]);
 				        $this->tpl[0]->set_var("group_post_content", $this->groups[$group_key]["fixed_post_content"]);
-					
-						if($group_key == "_main_") 
+
+						if($group_key == "_main_")
 						{
 							$this->tpl[0]->set_var("SectGroupStart", "");
 							$this->tpl[0]->set_var("SectGroupEnd", "");
-						} 
-						else 
+						}
+						else
 						{
                             $group_class = array();
                             $group_class["default"] = $this->parent[0]->frameworkCSS->getClass($this->framework_css["group"]["def"]);
@@ -687,28 +695,28 @@ class ffRecord_dialog extends ffRecord_base
                             $this->tpl[0]->parse("SectGroup", true);
                         }
 					}
-				}	
+				}
 			}
 		}
 
 		if (isset($this->groups["_main_"]) && $this->groups["_main_"]["data"] !== null)
 			$this->tpl[0]->set_var("form_default", $this->groups["_main_"]["data"]);
 	}
-	
+
 	/**
 	 * Visualizza il campo del record
 	 */
-	protected function tplDisplayFields($contents, $group_key, $primary_field = null) 
+	protected function tplDisplayFields($contents, $group_key, $primary_field = null)
 	{
 		$this->tpl[0]->set_var("SectGroupRow", "");
 		$this->tpl[0]->set_var("SectGroupRow_" . $group_key, "");
-	
+
 		$vars_to_reset = array();
 		$i = 0;
 		$wrap_count = 0;
 		$count_contents = 0;
 
-        if(is_array($contents) && count($contents)) 
+        if(is_array($contents) && count($contents))
         {
             $is_wrapped = false;
 		    foreach ($contents as $key => $subvalue)
@@ -719,10 +727,10 @@ class ffRecord_dialog extends ffRecord_base
 				$this->tpl[0]->set_var("content_pre_label", "");
 				$this->tpl[0]->set_var("content_in_label", "");
 				$this->tpl[0]->set_var("content", "");
-				
+
 		    	$container_class = array();
 		    	$container_properties = array();
-		    	
+
 		    	$count_contents++;
 			    if (is_string($subvalue["data"]) || get_class($subvalue["data"]) == "ffTemplate" || is_subclass_of($subvalue["data"], "ffDetails_base") || is_subclass_of($subvalue["data"], "ffGrid_base") || is_subclass_of($subvalue["data"], "ffRecord_base"))
 			    {
@@ -734,10 +742,10 @@ class ffRecord_dialog extends ffRecord_base
 					    $this->tpl[0]->set_var("content", $subvalue["data"]->rpparse("main", false));
 				    else
 					    $this->tpl[0]->set_var("content", "{{" . $subvalue["data"]->id . "}}");
-				    
+
  					if(($this->framework_css["record"]["row"] && (!$wrap_count || $wrap_count >= 12))
-				    	&& (is_object($subvalue["data"]) 
-				    		&& (is_subclass_of($subvalue["data"], "ffDetails_base") || is_subclass_of($subvalue["data"], "ffGrid_base") || is_subclass_of($subvalue["data"], "ffRecord_base")) 
+				    	&& (is_object($subvalue["data"])
+				    		&& (is_subclass_of($subvalue["data"], "ffDetails_base") || is_subclass_of($subvalue["data"], "ffGrid_base") || is_subclass_of($subvalue["data"], "ffRecord_base"))
 				    		&& !$subvalue["data"]->framework_css["component"]["grid"]
 				    	)
 				    ) {//con le grid e troppo piccola la visualizzazione
@@ -772,7 +780,7 @@ class ffRecord_dialog extends ffRecord_base
 						    reset($this->form_fields[$subvalue["data"]->id]->multi_fields);
 					    }
 					    else
-					    {     
+					    {
 						    if($this->record_exist) {
 	                            $this->tpl[0]->set_var("id", $subvalue["data"]->id . "_ori");
 							    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$subvalue["data"]->id]->value_ori->getValue($this->form_fields[$subvalue["data"]->id]->base_type, FF_SYSTEM_LOCALE)));
@@ -780,9 +788,9 @@ class ffRecord_dialog extends ffRecord_base
 	                        }
 					    }
 				    }
-				    
+
 				    $i++;
-					
+
 				    // EVENT HANDLER
 				    $res = $this->doEvent("on_process_field", array(&$this, $key));
 
@@ -792,7 +800,7 @@ class ffRecord_dialog extends ffRecord_base
 					    $this->tpl[0]->set_var($field_key, "");
 				    }
 				    reset($vars_to_reset);
-				    
+
 				    $this->tpl[0]->set_var("container_properties", $this->form_fields[$key]->getProperties($this->form_fields[$key]->container_properties));
 
 				    if (is_array($this->form_fields[$key]->container_vars) && count($this->form_fields[$key]->container_vars))
@@ -804,23 +812,23 @@ class ffRecord_dialog extends ffRecord_base
 					    }
 					    reset($this->form_fields[$key]->container_vars);
 				    }
-			    
-				    
+
+
 				    if(strlen($this->form_fields[$key]->container_class))
 					    $container_class["custom"] = $this->form_fields[$key]->container_class;
 					else
 						$container_class["custom"] = $this->form_fields[$key]->class;
-						
+
 				    if($this->form_fields[$key]->placeholder === true) {
 					    $this->form_fields[$key]->placeholder = ffCommon_specialchars($this->form_fields[$key]->label);
-				    }				    	
+				    }
 
 				    $control_var = "";
 					$control_prefix = "";
 					$control_postfix = "";
 					$is_combine_field = false;
-				    					
-				    // LABEL 
+
+				    // LABEL
 				    $label_set = false;
 				    if($this->form_fields[$key]->display_label)
 				    {
@@ -832,20 +840,20 @@ class ffRecord_dialog extends ffRecord_base
 							$control_var = $this->parent[0]->frameworkCSS->get("control-check-position", "form");
 							$is_combine_field = true;
 						}
-					    
-					    if ($this->form_fields[$key]->description !== null) 
-					    {       
+
+					    if ($this->form_fields[$key]->description !== null)
+					    {
 						    $this->tpl[0]->set_var("fielDescription", $this->form_fields[$key]->description);
 						    $this->tpl[0]->parse("SectDescriptionLabel", false);
-	                        
+
 	                        $label_set = true;
-					    }	
+					    }
 					    else
 					    {
 						    $this->tpl[0]->set_var("fielDescription", "");
 						    $this->tpl[0]->set_var("SectDescriptionLabel", "");
 					    }
-	                    
+
 	                    if($this->form_fields[$key]->label_properties)
 	                    {
 						    $this->tpl[0]->set_var("label_properties", " " . $this->form_fields[$key]->getProperties($this->form_fields[$key]->label_properties));
@@ -857,18 +865,18 @@ class ffRecord_dialog extends ffRecord_base
 							$required_symbol = "*";
 					    }
 
- 						if(strlen($this->form_fields[$key]->label)) 
+ 						if(strlen($this->form_fields[$key]->label))
 	                    {
 						    if($primary_field == $key && !$control_var) {
 						    	$prefix_label = "content_pre_";
-						    	$label_set = false; 
-						    } 
+						    	$label_set = false;
+						    }
 						    else
 						    {
 						    	$prefix_label = "";
-						    	$label_set = true; 
+						    	$label_set = true;
 							}
-						    if($this->form_fields[$key]->encode_label) 	
+						    if($this->form_fields[$key]->encode_label)
 							    $this->tpl[0]->set_var($prefix_label . "label", ffCommon_specialchars($this->form_fields[$key]->label) . $required_symbol);
 						    else
 							    $this->tpl[0]->set_var($prefix_label . "label",$this->form_fields[$key]->label . $required_symbol);
@@ -879,7 +887,7 @@ class ffRecord_dialog extends ffRecord_base
 						    * Label Class
 						    */
 						    $this->tpl[0]->set_var("label_for", $this->getIDIF() . "_" . $key);
-						    
+
 							$arrColumnLabel = $this->form_fields[$key]->framework_css["label"]["col"];
 							$arrColumnControl = $this->form_fields[$key]->framework_css["control"]["col"];
 							$type_label = "";
@@ -894,14 +902,14 @@ class ffRecord_dialog extends ffRecord_base
 									$this->tpl[0]->set_var("label_prefix", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->form_fields[$key]->framework_css["label"]) . '">');
 									//$this->tpl[0]->set_var("label_prefix", '<div class="' . $this->parent[0]->frameworkCSS->get($arrColumnLabel, "col") . " " . $this->parent[0]->frameworkCSS->get("align-right", "util") . '">');
 									$this->tpl[0]->set_var("label_postfix", '</div>');
-								
+
 									$control_prefix = '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->form_fields[$key]->framework_css["control"]) . '">';
 									//$control_prefix = '<div class="' . $this->parent[0]->frameworkCSS->get($arrColumnControl, "col") . '">';
 									$control_postfix = '</div>';
 								  //  $type_label = "inline";
 								}
 							}
-							
+
 							//if($this->framework_css["component"]["type"] === null && $type_label)
 							//	$this->framework_css["component"]["type"] = $type_label;
 
@@ -912,7 +920,7 @@ class ffRecord_dialog extends ffRecord_base
 								else
 									$container_class["align"] = $this->parent[0]->frameworkCSS->get("align-right", "util");
 							}
-							
+
 							if($label_class)
 								$this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
 							else
@@ -921,15 +929,15 @@ class ffRecord_dialog extends ffRecord_base
 					    } else {
 					    	$control_var = "";
 					    }
-				    } 
+				    }
 
 				    /**
 				    * Row Class
 				    */
-				    $container_class["default"] = $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false)); 
-				    
+				    $container_class["default"] = $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false));
+
 					if($primary_field != $key) {
-					    if(is_array($this->form_fields[$key]->framework_css["container"]["col"]) 
+					    if(is_array($this->form_fields[$key]->framework_css["container"]["col"])
 				    		&& count($this->form_fields[$key]->framework_css["container"]["col"])
 					    ) {
 							$container_class["grid"] = $this->parent[0]->frameworkCSS->get($this->form_fields[$key]->framework_css["container"]["col"], "col");
@@ -950,7 +958,7 @@ class ffRecord_dialog extends ffRecord_base
 							/*if($is_wrapped) {
 								$wrap_count = 12;
 								$container_class["grid"] = $this->parent[0]->frameworkCSS->get(array($wrap_count), "col");
-							} elseif($label_set) { 
+							} elseif($label_set) {
 								$container_class["row"] = $this->parent[0]->frameworkCSS->get("row", "form");
 							}*/
 						} else {
@@ -982,7 +990,7 @@ class ffRecord_dialog extends ffRecord_base
                             foreach ($this->form_fields[$key]->multi_fields as $mul_subkey => $mul_subvalue)
                             {
                                 $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "[" . $mul_subkey . "]" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)) . '" />';
-                                if($this->record_exist) 
+                                if($this->record_exist)
                                     $buffer_field .= '<input type="hidden" id="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" name="' . $this->id . "_". $key . "_ori" . "[" . $mul_subkey . "]" . '" value="' . ffCommon_specialchars($this->form_fields[$key]->value_ori[$mul_subkey]->getValue($mul_subvalue["type"], FF_SYSTEM_LOCALE)) . '" />';
                             }
                         } else {
@@ -991,7 +999,7 @@ class ffRecord_dialog extends ffRecord_base
 
                         $rc |= $this->tpl[0]->set_var($key, $buffer_field);
                     }
-                    
+
 				    if (!$rc)
 				    {
 					    if (!$this->display_values || strlen($this->form_fields[$key]->control_type))
@@ -1002,7 +1010,7 @@ class ffRecord_dialog extends ffRecord_base
                                 if($control_prefix && ($this->form_fields[$key]->framework_css["fixed_pre_content"] || $this->form_fields[$key]->framework_css["fixed_post_content"])) {
                                     $control_prefix = $control_prefix . '<div class="' . $this->parent[0]->frameworkCSS->get("group", "form") . '">';
                                     $control_postfix = '</div>' . $control_postfix;
-                                }                                
+                                }
                                 $this->tpl[0]->set_var("content" . $control_var, $control_prefix . $processed_field . $control_postfix);
                             }
 					    }
@@ -1081,7 +1089,7 @@ class ffRecord_dialog extends ffRecord_base
 						    reset($this->form_fields[$key]->multi_fields);
 					    }
 					    else
-					    {       
+					    {
 	                        if($this->record_exist) {
 							    $this->tpl[0]->set_var("id", $key . "_ori");
 							    $this->tpl[0]->set_var("value", ffCommon_specialchars($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
@@ -1089,7 +1097,7 @@ class ffRecord_dialog extends ffRecord_base
 	                        }
 					    }
 				    }
-	    */					
+	    */
 			    }
 
 				$container_inner_start = '';
@@ -1106,7 +1114,7 @@ class ffRecord_dialog extends ffRecord_base
 							}
 						}
 					}
-									
+
 				    $str_container_class = implode(" ", array_filter($container_class));
 				    if($str_container_class)
 				    	$container_properties["class"] = $str_container_class;
@@ -1114,15 +1122,15 @@ class ffRecord_dialog extends ffRecord_base
 				if(is_array($container_properties) && count($container_properties)) {
 					$str_container_properties = "";
 					foreach($container_properties AS $container_properties_key => $container_properties_value) {
-						
+
 						$str_container_properties .= " " . $container_properties_key . '="' . (is_array($container_properties_value) ? implode(" ", array_filter($container_properties_value)) : $container_properties_value) . '"';
 					}
 					$this->tpl[0]->set_var("container_properties", $str_container_properties);
-					
+
 					$this->tpl[0]->set_var("field_container_start", '<div' . $str_container_properties . '>' . $container_inner_start);
 					$this->tpl[0]->set_var("field_container_end", $container_inner_end . '</div>');
-				}	
-							    
+				}
+
 				if($primary_field == $key && is_subclass_of($subvalue["data"], "ffField_base")) {
 					$this->tpl[0]->set_var("GroupTitle", $this->tpl[0]->ProceedTpl("SectGroupRow"));
 				} else {
@@ -1130,18 +1138,18 @@ class ffRecord_dialog extends ffRecord_base
 						$this->tpl[0]->parse("SectWrapEnd", false);
 						$wrap_count = 0;
 						$is_wrapped = false;
-					}			    
+					}
 
 				    $rc = $this->tpl[0]->parse("SectGroupRow_" . $group_key, true);
 				    if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
-				    
+
 				    $this->tpl[0]->set_var("SectWrapStart", "");
 				    $this->tpl[0]->set_var("SectWrapEnd", "");
 				}
 		    }
 		    reset($contents);
         }
-        
+
 		return $i;
 	}
 
@@ -1184,9 +1192,9 @@ class ffRecord_dialog extends ffRecord_base
 	{
 		if ($sError !== null)
 			$this->strError = $sError;
-		
+
 		$this->doEvent("on_error", array($this));
-		
+
 		$this->tpl[0]->set_var("SectError", "");
 		if (strlen($this->strError))
 		{
@@ -1203,7 +1211,7 @@ class ffRecord_dialog extends ffRecord_base
 				$this->tpl[0]->set_var("error_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["error"]));
 				$this->tpl[0]->set_var("strError", $this->strError);
 				$this->tpl[0]->parse("SectError", false);
-			}	
+			}
 		}
 	}
 
@@ -1271,8 +1279,8 @@ class ffRecord_dialog extends ffRecord_base
 
 			$this->addActionButton(	  $tmp
 									, $this->buttons_options["cursor_prev"]["index"]);
-		}			
-			
+		}
+
 		// PREPARE DEFAULT BUTTONS
 		if ($this->buttons_options["cancel"]["display"])
 		{
@@ -1280,7 +1288,7 @@ class ffRecord_dialog extends ffRecord_base
 			{
 				if($this->buttons_options["cancel"]["label"] === null)
 					$this->buttons_options["cancel"]["label"] = ffTemplate::_get_word_by_code("ffRecord_close");
-				
+
 				$tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
 				$tmp->id 			= "ActionButtonCancel";
 				$tmp->label 		= $this->buttons_options["cancel"]["label"];
@@ -1290,7 +1298,7 @@ class ffRecord_dialog extends ffRecord_base
 
                 if (isset($this->buttons_options["cancel"]["class"]))
 					$tmp->class	= $this->buttons_options["cancel"]["class"];
-                $tmp->icon  = $this->buttons_options["cancel"]["icon"]; 
+                $tmp->icon  = $this->buttons_options["cancel"]["icon"];
 
 
 /*				$tmp->class	= $this->parent[0]->frameworkCSS->get("cancel", $this->buttons_options["cancel"]["aspect"]);
@@ -1329,7 +1337,7 @@ class ffRecord_dialog extends ffRecord_base
 			$tmp = $this->getActionButton("ActionButtonInsert");
 			$tmp->class = $tmp->get_class() . " insert";
 		}*/
-		
+
 		if ($this->cursor_dialog && $this->record_exist)
 		{
 			// -------------
@@ -1389,7 +1397,7 @@ class ffRecord_dialog extends ffRecord_base
 
 			$this->addActionButton(	  $tmp
 									, $this->buttons_options["cursor_last"]["index"]);
-		}		
+		}
 	}
 
 	/*function redirect($url)
@@ -1398,7 +1406,7 @@ class ffRecord_dialog extends ffRecord_base
 		$this->json_result["close"] = false;
 		die(ffCommon_jsonenc($this->json_result, true));
 	}*/
-	
+
 	/**
 	 * Esegue un reload dello stesso componente in base alle caratteristiche del record e della richiesta, se XHR o meno
 	 * NB: se la richiesta non è XHR, viene effettuato un redirect completo
@@ -1423,7 +1431,7 @@ class ffRecord_dialog extends ffRecord_base
 			return parent::redirect($this->parent[0]->getRequestUri($refresh_keys));
 		}
 	}
-	
+
 	public function structProcess($tpl)
 	{
 		if ($this->id_if !== null)
@@ -1433,7 +1441,7 @@ class ffRecord_dialog extends ffRecord_base
             $tpl->parse("SectFFObjProperty",    true);
 		}
 	}
-	
+
 	function getProperties($property_set = null)
 	{
 		if ($property_set === null)
@@ -1467,37 +1475,37 @@ class ffRecord_dialog extends ffRecord_base
 		}
 		return $buffer;
 	}
-	
-	function setWidthComponent($resolution_large_to_small) 
+
+	function setWidthComponent($resolution_large_to_small)
 	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
+		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small))
+			$this->framework_css["component"]["grid"] = frameworkCSS::setResolution($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
 		else
 			$this->framework_css["component"]["grid"] = false;
 	}
-	
+
 	function addDefaultButton($type, $obj)
 	{
 		if($obj->label === null)
 			$obj->label = ffTemplate::_get_word_by_code("ffRecord_" . $type);
 
 		$obj->label = $this->buttons_options[$type]["icon"] . $obj->label;
-		
+
 		$obj->activebuttons	= $this->buttons_options[$type]["activebuttons"];
 		$obj->icon  = $this->buttons_options[$type]["icon"];
-		
+
 		if(strlen($obj->url) && strpos($obj->url, "javascript:") === 0)
 		{
 			$obj->url = "javascript:void(0);";
 			$obj->properties["onclick"] = substr($obj->url, strlen("javascript:"));
 		}
-		
+
 		parent::addDefaultButton($type, $obj);
-	} 
-	
-	function setTitle($title, $class = null) 
+	}
+
+	function setTitle($title, $class = null)
 	{
 		$this->framework_css["title"]["class"] = "dialogTitle " . $class;
 		$this->title = $title;

@@ -9,8 +9,9 @@ var that = { /* publics */
 		switch (type) { 
 			case "base":
 				break;
-			case "bootstrap":
-			case "bootstrap-fluid":
+            case "bootstrap4":
+            case "bootstrap-fluid":
+            case "bootstrap4-fluid":
 				ff.doEvent({
 					"event_name" : "initIFElement"
 					, "event_params" : [id, "tabs"]

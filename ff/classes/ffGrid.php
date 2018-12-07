@@ -84,7 +84,7 @@ class ffGrid
 		
 		require_once $base_path;
 		$tmp = new $class_name($page, $disk_path, $theme);
-		
+
 		$res = self::doEvent("on_factory_done", array($tmp));
 
 		return $tmp;
@@ -386,6 +386,9 @@ abstract class ffGrid_base extends ffCommon
 	// ---------------------------------------------------------------
 	//  PRIVATE VARS (used by code, don't touch or may be explode! :-)
 
+    /**
+     * @var ffPage_html
+     */
 	var $parent					= null;					// The containing class
 
 	/**
@@ -545,7 +548,7 @@ abstract class ffGrid_base extends ffCommon
 	 * @param String $disk_path il percorso su disco del tema
 	 * @param String $theme il tema impiegato
 	 */
-	function __construct(ffPage_base $page, $disk_path, $theme)
+	function __construct(ffPage_base &$page, $disk_path, $theme)
 	{
 		$this->get_defaults("ffGrid");
 		$this->get_defaults();

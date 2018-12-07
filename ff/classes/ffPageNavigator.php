@@ -275,7 +275,7 @@ abstract class ffPageNavigator_base extends ffCommon
 
 	/**
 	 * l'oggetto pagina a cui appartiene il navigator
-	 * @var mixed
+	 * @var ffPage_html
 	 */
 	var $oPage					= null;
 

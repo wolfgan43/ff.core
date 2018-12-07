@@ -42,24 +42,33 @@ __ff : "ff.ffGrid", // used to recognize ff'objects
 	, "sortDesc" : "fa-sort-desc"
 },
 "class" : {
-	"current" : "active"
+	"sort" : {
+		"sortable" : "sorting",
+		"ASC" : "sorting_asc",
+		"DESC" : "sorting_desc"
+	}
+},
+"properties" : {
+	"aria-sort" : {
+        "ASC" : "ascending",
+        "DESC" : "descending"
+	}
 },
 "ajaxOrder" : function (elem, id, field, dir, ctx) {
-	jQuery("#frmAction").val(id + "_order"); 
-	if (dir === undefined) {
-		if (jQuery("#" + id + "_order").val() != field || jQuery("#" + id + "_direction").val() == "DESC")
-			jQuery("#" + id + "_direction").val("ASC");
-		else
-			jQuery("#" + id + "_direction").val("DESC");
-	} else {
-		jQuery("#" + id + "_direction").val(dir);
-	}
-    jQuery("#" + id + "_order").val(field);  
-
-    jQuery("#" + id + " .ff-sort").parent().removeClass(this.class.current);
-    jQuery("#" + id + " .ff-sort i").removeClass(this.icons.sortAsc + " " + this.icons.sortDesc).addClass(this.icons.sort);
-    jQuery(elem).parent().addClass(this.class.current);
-    jQuery("i", elem).removeClass(this.icons.sort + " " + this.icons.sortAsc + " " + this.icons.sortDesc).addClass(jQuery("#" + id + "_direction").val() == "ASC" ? this.icons.sortAsc : this.icons.sortDesc);
+	jQuery("#frmAction").val(id + "_order");
+    if (dir === undefined) {
+        if (jQuery("#" + id + "_order").val() != field || jQuery("#" + id + "_direction").val() == "DESC")
+            jQuery("#" + id + "_direction").val("ASC");
+        else
+            jQuery("#" + id + "_direction").val("DESC");
+    } else {
+        jQuery("#" + id + "_direction").val(dir);
+    }
+    jQuery("#" + id + "_order").val(field);
+    var direction = jQuery("#" + id + "_direction").val(); // ASC || DESC
+    jQuery(elem).parent().find("TH").removeClass([this.class.sort["sortable"], this.class.sort["ASC"], this.class.sort["DESC"]]).addClass(this.class.sort["sortable"]).attr("aria-sort", false);
+    jQuery(elem).removeClass(this.class.sort["sortable"]).addClass(this.class.sort[direction]);
+    jQuery(elem).attr("aria-sort", this.properties["aria-sort"][direction]);
 
 	if (ctx === undefined) {
 	    ff.load("ff.ajax", function() {

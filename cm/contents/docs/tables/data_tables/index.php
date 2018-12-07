@@ -69,7 +69,7 @@ $oGrid->resources[] = $oGrid->record_id;
 $oGrid->use_alpha = true;
 $oGrid->records_per_page = 10;
 $oGrid->display_edit_bt = true;
-
+$oGrid->setWidthComponent(6);
 /**
  * Inizializzazione dell'oggetto ffField,
  * elemento base di tutte le sovrastrutture del framework (grid, record e detail)

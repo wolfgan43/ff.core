@@ -10,31 +10,32 @@
 * @version beta 2
 * @since beta 2
 */
+frameworkCSS::extend(array(
+        "container" => array(
+            //"class" => null
+            "row"	=> true
+            //, "col" => null
+        )/* se definiti a null fa fallire il merge con il record
+        , "label" => array(
+            "class" => null
+            , "col" => null
+        )
+        , "control" => array(
+            "class" => null
+            , "col" => null
+
+        )
+        , "fixed_pre_content" => false // false OR array(xs,sm,md,lg)
+        , "fixed_post_content" => false // false OR array(xs,sm,md,lg)
+        */
+        , "fixed_pre_content" => true // false OR array(xs,sm,md,lg)
+        , "fixed_post_content" => true // false OR array(xs,sm,md,lg)
+    ), "ffField");
+
 
 class ffField_html extends ffField_base
 {
-	var $framework_css					= array(
-											"container" => array(
-												//"class" => null
-												"row"	=> true
-												//, "col" => null
-											)/* se definiti a null fa fallire il merge con il record
-											, "label" => array(
-												"class" => null
-												, "col" => null
-											)
-											, "control" => array(
-												"class" => null
-												, "col" => null
-												
-											)
-											, "fixed_pre_content" => false // false OR array(xs,sm,md,lg)
-											, "fixed_post_content" => false // false OR array(xs,sm,md,lg)
-											*/
-                                            , "fixed_pre_content" => true // false OR array(xs,sm,md,lg)
-                                            , "fixed_post_content" => true // false OR array(xs,sm,md,lg)
-
-    );
+	var $framework_css					= null;
 	var $url = null;
 	var $url_ajax = false;
 	var $url_parsed = null;
@@ -463,7 +464,15 @@ class ffField_html extends ffField_base
 	var $container_vars = array();
     
     var $widget_path = "";
-    
+
+    function __construct($disk_path, $site_path, $page_path, $theme)
+    {
+        parent::__construct($disk_path, $site_path, $page_path, $theme);
+
+        $this->framework_css = frameworkCSS::findComponent("ffField");
+
+    }
+
 	/**
 	 * recupera il file del template
 	 * @param String $control_type il tipo di controllo di cui recuperare il template
@@ -688,47 +697,52 @@ class ffField_html extends ffField_base
 	
 	function setWidthComponent($resolution_large_to_small) 
 	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["container"]["col"] = $this->setClassByFrameworkCss($resolution_large_to_small);
-		elseif(strlen($resolution_large_to_small))
-			$this->framework_css["container"]["row"] = $resolution_large_to_small;
+		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) {
+            $this->framework_css["container"]["col"] = frameworkCSS::setResolution($resolution_large_to_small);
+        } elseif(strlen($resolution_large_to_small)) {
+            $this->framework_css["container"]["row"] = $resolution_large_to_small;
+        }
 	}	
 
 	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true, $align = "right") 
 	{
-		$this->framework_css["label"]["col"] = $this->setClassByFrameworkCss($resolution_large_to_small);
+		$this->framework_css["label"]["col"] = frameworkCSS::setResolution($resolution_large_to_small);
 		if($align) {
 			$this->framework_css["label"]["util"] = array(
 				"align-" . $align
 			);			
 		}
 		if($reverse_control_class && is_array($this->framework_css["label"]["col"])) {
-			$this->framework_css["control"]["col"] = array(
+            $this->framework_css["control"]["col"] = frameworkCSS::setResolution($this->framework_css["label"]["col"], true);
+
+/*			$this->framework_css["control"]["col"] = array(
 				"xs" => ($this->framework_css["label"]["col"]["xs"] == 12 ? 12 : 12 - $this->framework_css["label"]["col"]["xs"])
 				, "sm" => ($this->framework_css["label"]["col"]["sm"] == 12 ? 12 : 12 - $this->framework_css["label"]["col"]["sm"])
 				, "md" => ($this->framework_css["label"]["col"]["md"] == 12 ? 12 : 12 - $this->framework_css["label"]["col"]["md"])
 				, "lg" => ($this->framework_css["label"]["col"]["lg"] == 12 ? 12 : 12 - $this->framework_css["label"]["col"]["lg"])
 			);
+*/
 		}	
 	}
 
 	function setWidthControl($resolution_large_to_small) 
 	{
-		$this->framework_css["control"]["col"] = $this->setClassByFrameworkCss($resolution_large_to_small);
+		$this->framework_css["control"]["col"] = frameworkCSS::setResolution($resolution_large_to_small);
 	}	
 	
 	function setLabelProperties($properties) 
 	{
 		if(isset($properties["col"]))
-			$properties["col"] = $this->setClassByFrameworkCss($properties["col"]);
+			$properties["col"] = frameworkCSS::setResolution($properties["col"]);
 
 		$this->framework_css["label"] = array_replace($this->framework_css["label"], $properties);
 	}	
 
 	function setControlProperties($properties) 
 	{
-		if(isset($properties["col"]))
-			$properties["col"] = $this->setClassByFrameworkCss($properties["col"]);
+		if(isset($properties["col"])) {
+            $properties["col"] = frameworkCSS::setResolution($properties["col"]);
+        }
 			
 		$this->framework_css["control"] = array_replace($this->framework_css["control"], $properties);
 	}	

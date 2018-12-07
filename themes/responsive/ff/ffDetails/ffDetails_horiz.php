@@ -1,7 +1,5 @@
 <?php
-class ffDetails_horiz extends ffDetails_base
-{
-    var $framework_css = array(
+frameworkCSS::extend(array(
 			"component" => array(
 				"inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
                 , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
@@ -50,7 +48,11 @@ class ffDetails_horiz extends ffDetails_base
 				"class" => "error"
 				, "callout" => "danger"
 			)
-	);
+	), "ffDetails_horiz");
+
+class ffDetails_horiz extends ffDetails_base
+{
+    var $framework_css = null;
 
 	var $buttons_options		= array(
                                     "addrow" => array(
@@ -154,11 +156,13 @@ class ffDetails_horiz extends ffDetails_base
 		"ff.ffDetails" => null
 	);
 	
-	function __construct(ffPage_base $page, $disk_path, $theme)
+	function __construct(ffPage_html $page, $disk_path, $theme)
 	{
 		ffDetails_base::__construct($page, $disk_path, $theme);
 
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+        $this->framework_css = frameworkCSS::findComponent("ffDetails_horiz");
+
+        if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
 	}
 	

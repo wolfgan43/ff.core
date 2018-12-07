@@ -1,4 +1,55 @@
 <?php
+frameworkCSS::extend(array(
+			"component" => array(
+				"inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
+                , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
+				, "grid" => false		//false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
+				, "type" => null		//null OR '' OR "inline"
+			)
+			, "actions" => array(
+				"class" => "actions"
+				, "row" => true
+				, "util" => "right"
+			)
+			, "record" => array(
+				"row" => true
+			)
+			, "field" => array(
+				"label" => array(
+					"col" => null
+				)
+				, "control" => array(
+					"col" => null
+				)
+			)
+			, "field-inline" => array(
+				"label" => array(
+					"col" => array(
+						"xs" => 0
+						, "sm" => 0
+						, "md" => 12
+						, "lg" => 4
+					)
+				)
+				, "control" => array(
+					"col" => array(
+						"xs" => 12
+						, "sm" => 12
+						, "md" => 12
+						, "lg" => 8
+					)
+				)
+			)
+			, "info" => array(
+				"class" => "info"
+				, "callout" => "info"
+			)
+			, "error" => array(
+				"class" => "error"
+				, "callout" => "danger"
+			)
+	), "ffDetails_sort");
+
 function ffDetails_drag_update_order($detail, $row, &$fields)
 {
 	if (strlen($fields))
@@ -48,56 +99,7 @@ function ffDetails_sort_on_load_data(ffDetails_sort $detail)
 
 class ffDetails_sort extends ffDetails_base
 {
-    var $framework_css = array(
-			"component" => array(
-				"inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-				, "grid" => false		//false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
-				, "type" => null		//null OR '' OR "inline"
-			)
-			, "actions" => array(
-				"class" => "actions"
-				, "row" => true
-				, "util" => "right"
-			)
-			, "record" => array(
-				"row" => true
-			)
-			, "field" => array(
-				"label" => array(
-					"col" => null
-				)
-				, "control" => array(
-					"col" => null
-				)
-			)
-			, "field-inline" => array(
-				"label" => array(
-					"col" => array(
-						"xs" => 0
-						, "sm" => 0
-						, "md" => 12
-						, "lg" => 4
-					)
-				)
-				, "control" => array(
-					"col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 8
-					)
-				)
-			)
-			, "info" => array(
-				"class" => "info"
-				, "callout" => "info"
-			)
-			, "error" => array(
-				"class" => "error"
-				, "callout" => "danger"
-			)
-	);
+    var $framework_css = null;
 	var $buttons_options		= array(
                                     "addrow" => array(
                                           "display" => true
@@ -176,7 +178,9 @@ class ffDetails_sort extends ffDetails_base
 	{
 		ffDetails_base::__construct($page, $disk_path, $theme);
 
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
+        $this->framework_css = frameworkCSS::findComponent("ffDetails_sort");
+
+        if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
 		
 		$this->addEvent("on_load_data", "ffDetails_sort_on_load_data", ffEvent::PRIORITY_HIGH);

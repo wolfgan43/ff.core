@@ -76,6 +76,7 @@ class ffField
 	 */
 	public static function factory(ffPage_base $page = null, $disk_path = null, $site_path = null, $page_path = null, $theme = null)
 	{
+
 		if ($page === null && ($disk_path === null || $site_path === null))
 			ffErrorHandler::raise("page or fixed path_vars required", E_USER_ERROR, null, get_defined_vars());
 		
@@ -119,7 +120,7 @@ class ffField
 			$base_path = $last_res["base_path"];
 			$class_name = $last_res["class_name"];
 		}
-				
+
 		require_once $base_path;
 		$tmp = new $class_name($disk_path, $site_path, $page_path, $theme);
 		
@@ -1035,7 +1036,7 @@ abstract class ffField_base extends ffCommon
 
 	/**
 	 * Pagina contenente il Field
-	 * @var array()
+	 * @var ffPage_html
 	 */
 	var $parent_page	= null;
 

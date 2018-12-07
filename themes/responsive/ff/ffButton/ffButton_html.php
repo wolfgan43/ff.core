@@ -1,4 +1,8 @@
 <?php
+frameworkCSS::extend(array(
+    "aspect" => "link"
+), "ffButton");
+
 class ffButton_html extends ffButton_base
 {
 	/**
@@ -14,10 +18,18 @@ class ffButton_html extends ffButton_base
 	var $fixed_pre_content = "";
 	var $fixed_post_content = "";
 	var $activebuttons = false;
-	var $framework_css = array(
-		"aspect" => "link"
-	);
-	/**
+	var $framework_css = null;
+
+    function __construct($disk_path, $site_path, $page_path, $theme)
+    {
+        parent::__construct($disk_path, $site_path, $page_path, $theme);
+
+        $this->framework_css = frameworkCSS::findComponent("ffButton");
+
+    }
+
+
+    /**
 	 * recupera il file del template
 	 * @return String 
 	 */

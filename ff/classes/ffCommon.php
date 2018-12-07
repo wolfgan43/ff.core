@@ -90,16 +90,22 @@ abstract class ffCommon extends ffClassChecks
 	 * @global mixed $ff_global_setting
 	 * @param string $name il nome della classe. se omesso è la classe corrente
 	 */
+	private static $ff_global_setting = array();
+	public static function setDefaults($data) {
+	    self::$ff_global_setting = array_replace_recursive((array) self::$ff_global_setting, $data);
+    }
+
 	function get_defaults($name = null)
 	{
-		global $ff_global_setting;
+		//global $ff_global_setting;
+        self::$ff_global_setting;
 
 		if ($name === null)
 			$name = get_class($this);
 		
-		if (isset($ff_global_setting[$name]) && is_array($ff_global_setting[$name]) && count($ff_global_setting[$name]))
+		if (isset(self::$ff_global_setting[$name]) && is_array(self::$ff_global_setting[$name]) && count(self::$ff_global_setting[$name]))
 		{
-            $this->get_defaults_walkarray($this, $ff_global_setting[$name]);
+            $this->get_defaults_walkarray($this, self::$ff_global_setting[$name]);
 		}
 	}
 
@@ -350,32 +356,4 @@ abstract class ffCommon extends ffClassChecks
 		
 		return $results;
 	}
-
-
-    function setClassByFrameworkCss($resolution)
-    {
-        if($resolution)
-        {
-            if(is_array($resolution)) {
-                $res = $resolution;
-                if(count($resolution) < 4)
-                    $res = array_merge($res, array_fill(count($resolution), 4 - count($resolution), $resolution[count($resolution) - 1]));
-
-                $check = array_count_values($res);
-                if($check[0] == 4)
-                    $res = false;
-
-            } else {
-                $res = array_fill(0, 4, $resolution);
-            }
-        }
-
-        if($res)
-            return array(
-                "xs" => $res[3]
-            , "sm" => $res[2]
-            , "md" => $res[1]
-            , "lg" => $res[0]
-            );
-    }
 }

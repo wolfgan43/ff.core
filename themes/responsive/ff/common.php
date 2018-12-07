@@ -140,16 +140,16 @@ else
 // -------------------------------------------------------------------------------
 //  cambia i button per agire all'interno dei contesti ajax, qualsiasi tipo siano
 // -------------------------------------------------------------------------------
-
+/*
 global $ff_global_setting;
 $ff_global_setting["ffButton_html"]["jsaction"] = "ff.ajax.ctxDoAction('[[XHR_CTX_ID]]', '[[frmAction]]', '[[component_action]]');";
-
+*/
 // -------------------------------------------------------------
 //  parti di codice da aggiungere solo in presenza di un dialog
 // -------------------------------------------------------------
 if (!ffIsset($_REQUEST, "XHR_CTX_TYPE") || $_REQUEST["XHR_CTX_TYPE"] !== "dialog")
 	return;
-
+/*
 ffRecord::addEvent ("on_factory", "ffTheme_responsive_ffRecord_on_factory", ffEvent::PRIORITY_HIGH, 100, ffEvent::BREAK_NOT_EQUAL, null);
 function ffTheme_responsive_ffRecord_on_factory($page, $disk_path, $theme)
 {
@@ -157,7 +157,7 @@ function ffTheme_responsive_ffRecord_on_factory($page, $disk_path, $theme)
         "base_path"     => $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . "ffRecord" . "/" . "ffRecord_dialog" . "." . FF_PHP_EXT
         , "class_name"  => "ffRecord_dialog"
     );
-}
+}*/
 
 ffRecord::addEvent("on_factory_done", "ffRecord_set_events_dialog", ffEvent::PRIORITY_HIGH);
 function ffRecord_set_events_dialog(ffRecord_base $record)

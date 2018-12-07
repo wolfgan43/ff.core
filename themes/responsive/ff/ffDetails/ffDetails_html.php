@@ -1,7 +1,5 @@
 <?php
-class ffDetails_html extends ffDetails_base
-{
-    var $framework_css = array(
+frameworkCSS::extend(array(
 			"component" => array(
 				"inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
                 , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
@@ -106,9 +104,13 @@ class ffDetails_html extends ffDetails_base
 						"class" => null
 						, "tab" => "pane-item-effect" // pane-item-effect OR pane-item
 					)
-				)			
+				)
 			)
-	);
+	), "ffDetails");
+
+class ffDetails_html extends ffDetails_base
+{
+    var $framework_css = null;
 
 	var $buttons_options		= array(
                                     "addrow" => array(
@@ -188,9 +190,11 @@ class ffDetails_html extends ffDetails_base
 		"ff.ffDetails" => null
 	);
 	
-	function __construct(ffPage_base $page, $disk_path, $theme)
+	function __construct(ffPage_html $page, $disk_path, $theme)
 	{
 		ffDetails_base::__construct($page, $disk_path, $theme);
+
+        $this->framework_css = frameworkCSS::findComponent("ffDetails");
 
 		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
@@ -1260,12 +1264,13 @@ class ffDetails_html extends ffDetails_base
 	
 	function setWidthComponent($resolution_large_to_small) 
 	{
-		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
-		elseif(strlen($resolution_large_to_small))
-			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
-		else
-			$this->framework_css["component"]["grid"] = false;
+		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) {
+            $this->framework_css["component"]["grid"] = frameworkCSS::setResolution($resolution_large_to_small);
+        } elseif(strlen($resolution_large_to_small)) {
+            $this->framework_css["component"]["grid"] = $resolution_large_to_small;
+        } else {
+            $this->framework_css["component"]["grid"] = false;
+        }
 	}
 	
 	function addDefaultButton($type, $obj)

@@ -106,7 +106,7 @@ $oField->addValidator("email");
  * se non compilato restituirà  un errore
  */
 $oField->required = true;
-$oField->setWidthComponent(6);
+$oField->setWidthComponent(array(6,7,8,9, 10));
 
 $oRecord->addContent($oField, "Altro");
 
@@ -118,7 +118,7 @@ $oField->label = ffTemplate::_get_word_by_code("tel");
  * Indica l'obbligatorietà  del campo in questione,
  * se non compilato restituirà  un errore
  */
-$oField->setWidthComponent(6);
+$oField->setWidthComponent(array(6,7,8,9, 10));
 
 $oRecord->addContent($oField, "Altro");
 

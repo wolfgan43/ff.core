@@ -97,7 +97,7 @@ class ffWidget_tabs extends ffCommon
 		if(isset($data["tab_mode"]))
 			$this->tab_mode = $data["tab_mode"];
 
-		$framework_css = $this->oPage[0]->frameworkCSS->getFramework();
+		$framework_css = frameworkCSS::getFramework();
 		if(is_array($data["framework_css"]))
 			$this->framework_css = array_replace_recursive($this->framework_css, $data["framework_css"]);
 

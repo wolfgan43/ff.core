@@ -1762,10 +1762,26 @@ function ffCommon_main_theme_init()
 }
 
 function ffCommon_ffPage_init($params, $resources = null)  {
+    /*ffCommon::setDefaults(array(
+        "ffPage" => array(
+            "default_css" => array(
+                "app" => null
+            )
+        )
+    ));*/
+
+    /**
+     * @var $oPage ffPage_html
+     */
     $oPage = ffPage::factory(__TOP_DIR__, FF_SITE_PATH, null, $params["theme"]);
+    $oPage->title               = $params["title"];
+    $oPage->class_body          = $params["class_body"];
+    $oPage->compact_js          = $params["compact_js"];
+    $oPage->compact_css         = $params["compact_css"];
+    $oPage->compress            = $params["compact_html"];
+
     $oPage->loadResources($resources);
     $oPage->loadLibrary();
-
     if($_REQUEST["XHR_FFLIBS"]) {
         $struct = json_decode($_REQUEST["XHR_FFLIBS"]);
         if(is_array($struct) && count($struct)) {
@@ -1776,7 +1792,6 @@ function ffCommon_ffPage_init($params, $resources = null)  {
         }
 
     }
-
     $oPage->addEvent("tplAddJs_not_found", function ($page, $tag, $params) {
         static $last_call;
         if ($tag === $last_call) {
@@ -1803,51 +1818,11 @@ function ffCommon_ffPage_init($params, $resources = null)  {
         }
     });
 
-    $oPage->title               = $params["title"];
-    $oPage->class_body          = $params["class_body"];
-    /*if($params["form"]) {
-        $oPage->use_own_form    = true;
-        if(!is_bool($params["form"])) {
-            $oPage->form_name   = $params["form"];
-        }
-    } else {
-        $oPage->use_own_form    = false;
-    }*/
-
-
-    //$oPage->use_own_js          = false; //$params["ffjs"];
-
-
-    $oPage->compact_js          = (DISABLE_CACHE === true
-                                    ? false
-                                    : $params["compact_js"]
-                                );
-    $oPage->compact_css         = (DISABLE_CACHE === true
-                                    ? false
-                                    : $params["compact_css"]
-                                );
-    $oPage->compress            = (DISABLE_CACHE === true
-                                    ? false
-                                    : $params["compact_html"]
-                                );
-
-
-
-/*
-    $cm->oPage->js_loaded = array();
-    $cm->oPage->sections = array();
-    $cm->oPage->resetJS();
-    $cm->oPage->resetCSS();
-    $cm->oPage->use_own_js = false;
-    $cm->oPage->compact_js = false;
-    $cm->oPage->compact_css = false;*/
-
-
-
+    //load theme
 
     if($params["framework_css"]) {
         $oPage->frameworkCSS = new frameworkCSS();
-        $oPage->frameworkCSS->set($params["framework_css"], $params["font_icon"]);
+        frameworkCSS::factory($params["framework_css"], $params["font_icon"]);
     }
 
     if($params["theme"] != FF_MAIN_THEME) {
@@ -1866,13 +1841,18 @@ function ffCommon_ffPage_init($params, $resources = null)  {
             }
 
             $oPage->tplAddCss("ff.core");
+            $oPage->tplAddJs("ff.ffPage");
         } else {
             $oPage->excludeLib("jquery", "js");
         }
+
         $oPage->tplAddJs("app");
+        $oPage->tplAddCss("dataTables.bootstrap4"); //todo: da togliere
         $oPage->tplAddCss("app");
         $oPage->tplAddCss("icons");
     }
+    //load theme
+
 
     $oPage->doEvent("on_layout_init", array($oPage, $params));
 
@@ -1942,6 +1922,11 @@ function ffCommon_ffPage_init($params, $resources = null)  {
             $oPage->addSection($section["name"], $section);
         }
     }
+
+
+
+
+
 
 
 

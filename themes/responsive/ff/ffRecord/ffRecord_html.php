@@ -1,7 +1,5 @@
 <?php
-class ffRecord_html extends ffRecord_base
-{    
-    var $framework_css = array(
+frameworkCSS::extend(array(
 			"component" => array(
 				"inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
                 , "outer_wrap" => false // false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
@@ -85,9 +83,14 @@ class ffRecord_html extends ffRecord_base
 						"class" => null
 						, "tab" => "pane-item-effect" // pane-item-effect OR pane-item
 					)
-				)			
+				)
 			)
-	);
+	), "ffRecord");
+
+
+class ffRecord_html extends ffRecord_base
+{    
+    var $framework_css = null;
 	
 	var $buttons_options		= array(
 											"insert" => array(
@@ -196,10 +199,12 @@ class ffRecord_html extends ffRecord_base
 	var $properties = null;
 	
 	
-	function __construct(ffPage_base $page, $disk_path, $theme)
+	function __construct(ffPage_html $page, $disk_path, $theme)
     {
         parent::__construct($page, $disk_path, $theme);
-		
+
+        $this->framework_css = $page->frameworkCSS->findComponent("ffRecord");
+
 		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
 			$this->id_if = uniqid();
 	}
@@ -1335,7 +1340,7 @@ class ffRecord_html extends ffRecord_base
 	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
+			$this->framework_css["component"]["grid"] = frameworkCSS::setResolution($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
 		else
