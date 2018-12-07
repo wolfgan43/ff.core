@@ -1,0 +1,23 @@
+{
+    "name": "hcore/auth",
+    "description": "hcore auth",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Alessandro Stucchi",
+            "email": "alessandro.stucchi@healthtouch.eu"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.1.3",
+        "hcore/core": "dev-master",
+        "hcore/stats": "dev-master",
+        "hcore/orm": "dev-master",
+        "hcore/api": "dev-master",
+        "spomky-labs/otphp": "^10.0@dev"
+    },
+    "autoload": {
+        "files": ["autoload.php"]
+    }
+}

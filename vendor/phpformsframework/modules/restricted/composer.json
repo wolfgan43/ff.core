@@ -1,0 +1,27 @@
+{
+    "name": "phpformsframework/modules/restricted",
+    "description": "php FormsFramework Module",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Alessandro Stucchi",
+            "email": "wolfgan@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.1.3",
+        "phpformsframework/ff" : "dev-master"
+    },
+    "autoload": {
+        "files": [
+            "common.php"
+        ]
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@bitbucket.org:cmsff/ff.git"
+        }
+    ]
+}

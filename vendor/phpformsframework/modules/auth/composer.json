@@ -1,0 +1,32 @@
+{
+    "name": "phpformsframework/modules/auth",
+    "description": "php FormsFramework Module",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Alessandro Stucchi",
+            "email": "wolfgan@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.1.3",
+        "phpformsframework/ff" : "dev-master",
+        "hcore/auth": "dev-master"
+    },
+    "autoload": {
+        "files": [
+            "common.php"
+        ]
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@bitbucket.org:cmsff/ff.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@bitbucket.org:HealthwareGroup/hcore.auth.git"
+        }
+    ]
+}

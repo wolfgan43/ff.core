@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configdata>
+	<menu>
+		<domains label="Domains" path="/restricted/domains" location="brand" />
+		<profile label="Profilo" path="/restricted/profile" location="account,accountpanel" position="footer" />
+		<users label="Utenti" path="/restricted/users" location="brand,account" />
+		<profiling label="Profili" path="/restricted/profiling" location="brand" />
+		<!--<crypt_init label="Inizalizza Crittografia" path="/admin/crypt/init" location="admin" acl="3" />-->
+		<!--<crypt_view label="Visualizza Chiavi Crittografia" path="/admin/crypt/view" location="admin" acl="3" />-->
+		<!--<oauth2 hide="true" profiling_skip="true" />
+		<apiserver path="/apiserver" label="API Server" location="admin" acl="3" redir="/apiserver/apps">
+			<apps path="/apiserver/apps" label="Applications" />
+			<scopes path="/apiserver/scopes" label="Scopes" />
+		</apiserver>-->
+		<logout label="Esci" path="/login" location="account,accountpanel" position="footer" />
+	</menu>
+	<layout>
+		<nolayout path="/login" />
+		<nolayout path="/recover" />
+		<nolayout path="/change_password" />
+	</layout>
+	<sections>
+		<account />
+		<accountpanel />
+		<multidomain />
+	</sections>
+	<auth>
+		<noauth path="/login" />
+		<noauth path="/recover" />
+		<noauth path="/registration" />
+		<!--<noauth path="/services/security/check_session" />-->
+		<!--<noauth path="/services/security/checkaccounts" />-->
+		<!--<noauth path="/oauth2" />-->
+	</auth>
+	<fields>
+		<firstname label="Nome" db="anagraph_person.name" group="userinfo" required="true" />
+		<lastname label="Cognome" db="anagraph_person.surname" group="userinfo" required="true" />
+		<company label="Società" db="anagraph_person.company" group="userinfo" />
+		<piva label="Partita IVA" db="anagraph_person.piva" group="userinfo" />
+		<cf label="Codice Fiscale" db="anagraph_person.cf" group="userinfo" validators="cf" />
+		<address label="Indirizzo" db="anagraph_place.billaddress" group="userinfo" />
+		<city label="Città" db="anagraph_place.billcity" group="userinfo" />
+		<prov label="Provincia" db="anagraph_place.billprovince" group="userinfo" extended_type="Selection" source_SQL="SELECT support_province.CarAbbreviation, support_province.Name FROM support_province ORDER BY support_province.Name" />
+		<cap label="CAP" db="anagraph_place.billcap" group="userinfo" />
+		<tel label="Telefono" db="anagraph_tel.*" group="userinfo" />
+		<cell label="Cellulare" db="anagraph_tel" group="userinfo" />
+		<fax label="FAX" db="anagraph_tel" group="userinfo" />
+	</fields>
+	<env>
+		<MOD_AUTH_USER_AVATAR value="100x100" />
+		<MOD_AUTH_MULTIDOMAIN value="false" />
+		<MOD_AUTH_USERNAME_RECOVER_USERNAME value="false" />
+		<MOD_AUTH_PASSWORD_RECOVER value="false" />
+		<MOD_AUTH_SOCIAL_FACEBOOK value="true" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_ID value="" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_SECRET value="" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_SCOPE value="" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_REDIRECT value="" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_PAGE_NAME value="" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_PAGE_REQUIRE_LIKE value="" />
+		<MOD_AUTH_SOCIAL_FACEBOOK_PAGE_DISPLAY_ONLY_IN value="false" />
+		<MOD_AUTH_SOCIAL_GPLUS value="false" />
+		<MOD_AUTH_SOCIAL_GPLUS_CLIENT_ID value="" />
+		<MOD_AUTH_SOCIAL_GPLUS_CLIENT_SECRET value="" />
+		<MOD_AUTH_SOCIAL_GPLUS_CLIENT_SCOPE value="" />
+		<MOD_AUTH_SOCIAL_GPLUS_CLIENT_REDIRECT value="" />
+		<MOD_AUTH_SOCIAL_GPLUS_APP_NAME value="" />
+		<MOD_AUTH_SOCIAL_TWITTER value="false" />
+		<MOD_AUTH_SOCIAL_TWITTER_CLIENT_ID value="" />
+		<MOD_AUTH_SOCIAL_TWITTER_CLIENT_SECRET value="" />
+		<MOD_AUTH_SOCIAL_TWITTER_CLIENT_SCOPE value="" />
+		<MOD_AUTH_SOCIAL_TWITTER_CLIENT_REDIRECT value="" />
+		<MOD_AUTH_SOCIAL_LINKEDIN value="false" />
+		<MOD_AUTH_SOCIAL_LINKEDIN_CLIENT_ID value="" />
+		<MOD_AUTH_SOCIAL_LINKEDIN_CLIENT_SECRET value="" />
+		<MOD_AUTH_SOCIAL_LINKEDIN_CLIENT_SCOPE value="" />
+		<MOD_AUTH_SOCIAL_LINKEDIN_CLIENT_REDIRECT value="" />
+		<MOD_AUTH_SOCIAL_DRIBBLE value="false" />
+		<MOD_AUTH_SOCIAL_DRIBBLE_CLIENT_ID value="" />
+		<MOD_AUTH_SOCIAL_DRIBBLE_CLIENT_SECRET value="" />
+		<MOD_AUTH_SOCIAL_DRIBBLE_CLIENT_SCOPE value="" />
+		<MOD_AUTH_SOCIAL_DRIBBLE_CLIENT_REDIRECT value="" />
+		<MOD_AUTH_SOCIAL_FF value="false" />
+		<MOD_AUTH_SOCIAL_FF_CLIENT_ID value="" />
+		<MOD_AUTH_SOCIAL_FF_CLIENT_SECRET value="" />
+		<MOD_AUTH_SOCIAL_FF_CLIENT_REDIRECT value="" />
+
+		<MOD_AUTH_SESSION_PERMANENT value="false" />
+		<MOD_AUTH_COOKIE_SHARE value="true" />
+		<MOD_AUTH_REGISTRATION value="false" />
+        <MOD_AUTH_GUEST_GROUP_NAME value="guests" />
+        <MOD_AUTH_GUEST_GROUP_ID value="2" />
+        <MOD_AUTH_GUEST_USER_NAME value="guest" />
+        <MOD_AUTH_GUEST_USER_ID value="2" />
+        <MOD_AUTH_BRAND_ACL value="3" />
+        <MOD_AUTH_BRAND_LOGO value="" />
+	</env>
+</configdata>

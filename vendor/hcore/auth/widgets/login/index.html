@@ -1,0 +1,81 @@
+<!--
+  ~ VGallery: CMS based on FormsFramework
+  ~ Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~  @package VGallery
+  ~  @subpackage core
+  ~  @author Alessandro Stucchi <wolfgan@gmail.com>
+  ~  @copyright Copyright (c) 2004, Alessandro Stucchi
+  ~  @license http://opensource.org/licenses/gpl-3.0.html
+  ~  @link https://github.com/wolfgan43/vgallery
+  -->
+
+<div id="new-login-box" class="login-box-page">
+    <!--BeginSezPageTitle-->
+    <div class="login-box-title">{_login_page_title}</div>
+    <!--EndSezPageTitle-->
+    <!--BeginSezPageSubtitle-->
+    <div class="login-box-subtitle">{_login_page_subtitle}</div>
+    <!--EndSezPageSubtitle-->
+    <div class="login-input-container">
+        <div class="error-container">
+            <input class="hidden"/>
+        </div>
+        <input type="hidden" name="csrf" value="{csrf_token}">
+        <!--BeginSezDomainHidden-->
+        <input type="hidden" name="domain" value="{domain_name}">
+        <!--EndSezDomainHidden-->
+        <!--BeginSezDomain-->
+        <label class="field-label">{_domain_field_label}</label>
+        <div class="domain-container">
+            <input name="domain" class="domain" type="text" placeholder="{_domain_field_placeholde}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="return hCore.auth.submitProcessKey(event, 'loginUtenteNewBox');" required>
+        </div>
+        <!--EndSezDomain-->
+        <label class="field-label">{_email_field_label}</label>
+        <div class="username-container">
+            <input name="username" class="username" type="email" placeholder="{_email_field_placeholde}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="return hCore.auth.submitProcessKey(event, 'loginUtenteNewBox');" required>
+        </div>
+        <label class="field-label">{_password_field_label}</label>
+        <input name="password" class="password" type="password" placeholder="{_password_field_placeholder}" onkeydown="return hCore.auth.submitProcessKey(event, 'loginUtenteNewBox');" required>
+        <!--BeginSezRecoverContainer-->
+        <div class="recover-container">
+        <!--BeginSezRecoverPassword-->
+        <div class="pass-recover"><a href="{recover_password_path}">{_recover_password_link}</a></div>
+        <!--EndSezRecoverPassword-->
+        <!--BeginSezRecoverUsername-->
+        <div class="pass-username"><a href="{recover_username_path}">{_recover_username_link}</a></div>
+        <!--EndSezRecoverUsername-->
+        </div>
+        <!--EndSezRecoverContainer-->
+        <a id="loginUtenteNewBox" href="javascript:void(0);" class="button login-button" onclick="hCore.auth.login('{login_url}', 'new-login-box', '{ret_url}');">{_login_button_action}</a>
+        <!--BeginSezStayConnect-->
+        <div class="stayconnected">
+            <span>
+            <input type="checkbox" id="rememberme" name="stayconnected"/>
+            <label for="rememberme"></label>
+            <ins onclick="jQuery('#rememberme').click();">{_stay_connected_label}</ins>
+            </span>
+        </div>
+        <!--EndSezStayConnect-->
+
+    </div>
+    <!--BeginSezSocialLogin-->
+    <a class="{social_class}-register-button social-button" onclick="hCore.auth.social.requestLogin('{social_dialog_name}', '{social_path}');"><i class="{social_icon}"></i>{social_text_button}{social_name}</a>
+    <!--EndSezSocialLogin-->
+    <!--BeginSezRegistration-->
+    <div class="go-to-register">{_go_to_register_text}<a href="{register_path}">{_go_to_register_link}!</a></div>
+    <!--EndSezRegistration-->
+</div>
