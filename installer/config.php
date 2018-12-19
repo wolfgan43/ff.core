@@ -66,10 +66,16 @@ switch (true)
 }
 
 // unique application id
-define("APPID", "691C9185-C34B-494Or4Z3-9450-FE374g3r");
+define("APPID", "not_set");
+if(APPID == "not_set"){
+    die("Modifica l'APPID in config.php");
+}
 
 // session name
-session_name("PHPSESSFF");
+session_name("not_set");
+if(session_name == "not_set"){
+    die("Modifica l'session_name in config.php");
+}
 session_save_path("/tmp");
 //define("FF_THEME_ADMIN", "admin");
 
