@@ -62,6 +62,7 @@ switch (true)
 		define("FF_DATABASE_PASSWORD", "");
 
 		define("FF_ENV", FF_ENV_PRODUCTION);
+        define("FF_ERROR_HANDLER_HIDE", true);
 		break;
 }
 
