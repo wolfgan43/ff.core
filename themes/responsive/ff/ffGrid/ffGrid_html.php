@@ -26,70 +26,129 @@
 
 frameworkCSS::extend(array(
 			"component" => array(
-                "inner_wrap" => false // null OR false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
-                , "outer_wrap" => false //false OR true OR array(xs, sm, md, lg) OR 'row-default' OR 'row' OR 'row-fluid'
+                "outer_wrap" => null
+                , "inner_wrap" => array(
+                    "card" => "container"
+                )
+                , "header_wrap" => array(
+                    "card" => "header"
+                )
+                , "body_wrap" => array(
+                    "card" => "body"
+                )
+                , "footer_wrap" => array(
+                    "card" => "footer"
+                )
                 , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
                 , "type" => "inline"		//null OR '' OR "inline"
 			)
 			, "title" => array(
-					"class" => null
-					, "col" => array(
-								"xs" => 12
-								, "sm" => 12
-								, "md" => 12
-								, "lg" => 12
-							)
-					)
+                "class" => null
+                , "card" => "title"
+            )
+            , "description" => array(
+                "class" => null
+                , "card" => "sub-title"
+            )
 			, "actionsTop" => array(
-					"class" => "actions"
-					, "col" => array(
-							"xs" => 12
-							, "sm" => 12
-							, "md" => 7
-							, "lg" => 7
-					)
-					, "util" => array(
-						"right"
-						, "align-right"
-					)
-			)
-			, "description" => array(
-					"class" => null
-					, "callout" => "info"
-					, "col" => array(
-							"xs" => 12
-							, "sm" => 12
-							, "md" => 12
-							, "lg" => 12
-					)
+			    "def" => array(
+                    "class" => "actions mr-0 mb-3"
+                    , "row" => "end"
+                )
+                , "button" => array(
+                    "class" => "mr-1"
+                )
+
 			)
 			, "search" => array(
-				"class" => null
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 5
-						, "lg" => 5
-				)
+			    "def" => null
+                , "input" => array(
+                    "class" => null
+                    , "form" => array("control-sm")
+                )
+                , "button" => array(
+                    "class" => null
+                    , "button" => array(
+                        "color" => "primary"
+                        , "size" => "small"
+                    )
+                )
 			)
             , "searchAdv" => array(
-				"class" => "adv-search"
+				"class" => "bg-light"
 				, "util" => array(
 				    "hide"
                 )
+                , "card" => "container"
 			)
 			, "navigatorTop" => array(
-				"class" => null
-				, "col" => null
-                , "util" => array(
-                    "clear"
+                "selector" => null
+                , "nav" => null
+                , "totelem" => null
+                , "choice" => null
+			)
+            , "tableBefore" => array(
+                "def" => array(
+                    "class" => null
+                    , "row" => "between"
                 )
-			)
+                , "left" => array(
+                    "class" => null
+                    , "col" => array(
+                        "xs" => 12
+                        , "sm" => 12
+                        , "md" => 6
+                        , "lg" => 6
+                    )
+                )
+                , "right" => array(
+                    "class" => null
+                    , "col" => array(
+                        "xs" => 12
+                        , "sm" => 12
+                        , "md" => 6
+                        , "lg" => 6
+                    )
+                )
+            )
 			, "table" => array(
-				"class" => "dataTable table table-centered mb-0" //null
+				"class" => null
 				, "col" => false
-				, "table" => null //array("container", "oddeven", "responsive")
+				, "table" => array("container", "oddeven", "responsive")
 			)
+            , "tableAfter" => array(
+                "def" => array(
+                    "class" => null
+                    , "row" => "between"
+                )
+                , "left" => array(
+                    "class" => null
+                    , "col" => array(
+                        "xs" => 12
+                        , "sm" => 12
+                        , "md" => 6
+                        , "lg" => 4
+                    )
+                )
+                , "center" => array(
+                    "class" => null
+                    , "col" => array(
+                        "xs" => 0
+                        , "sm" => 0
+                        , "md" => 0
+                        , "lg" => 4
+                    )
+                )
+                , "right" => array(
+                    "class" => null
+                    , "col" => array(
+                        "xs" => 12
+                        , "sm" => 12
+                        , "md" => 6
+                        , "lg" => 4
+                    )
+                )
+            )
             , "sort" => array(
                 "icon" => array(
                     "sortable" => "sort"
@@ -108,43 +167,32 @@ frameworkCSS::extend(array(
                     , "table" => array("sorting_desc")
                 )
             )
-			, "filters" => array(
-				"class" => null
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 12
-				)
-			)
-			, "navigatorBottom" => array(
-				"class" => null
-				, "col" => null
-				, "util" => array(
-					"clear"
-				)
+			, "filter" => array(
+				"def" => array(
+				    "class" => "ml-1"
+                    , "button" => "secondary"
+                )
+                , "icon" => "filter"
 			)
 			, "alphanum" => array(
-				"class" => null
-				, "col" => array(
-					"xs" => 8
-					, "sm" => 8
-					, "md" => 6
-					, "lg" => 5
-				)
+				"class" => "mt-2"
+				, "table" => "small"
+			)
+            , "navigatorBottom" => array(
+                "selector" => null
+                , "totelem" => null
+                , "choice" => null
+                , "nav" => null
 			)
 			, "actionsBottom" => array(
-				"class" => null
-				, "col" => array(
-					"xs" => 12
-					, "sm" => 12
-					, "md" => 12
-					, "lg" => 12
-				)
-				, "util" => array(
-					"align-right"
-				)
-			)
+			    "def" => array(
+                    "class" => "mr-0"
+                    , "row" => "end"
+                )
+                , "button" => array(
+                    "class" => "mr-1"
+                )
+            )
 			, "field" => array(
 				"label" => array(
 					"col" => null
@@ -178,14 +226,16 @@ frameworkCSS::extend(array(
 				, "callout" => "danger"
 			)
 			, "norecord" => array(
-				"class" => "norecord"
-				, "callout" => "info"
-				, "col" => array(
-						"xs" => 12
-						, "sm" => 12
-						, "md" => 12
-						, "lg" => 12
-					)
+			    "def" => array(
+			        "class" => "mt-2"
+			        , "card" => "container"
+                    , "util" => array(
+                        "align-center"
+                    )
+                )
+                , "wrap" => array(
+                    "card" => "body"
+                )
 			)), "ffGrid");
 
 class ffGrid_html extends ffGrid_base
@@ -205,14 +255,14 @@ class ffGrid_html extends ffGrid_base
 											"class"		=> null
 											, "label"	=> null
                                             , "aspect"    => "link"
-                                            , "disposition" => array("row" => 1, "col" => "default")
+                                            , "disposition" => array("row" => 1, "col" => "last")
 									)
 									, "edit" => array(
 											"class"		=> null
 											, "label"	=> null
                                             , "icon"    => null
                                             , "aspect"  => "link"
-                                            , "disposition" => array("row" => 1, "col" => "default")
+                                            , "disposition" => array("row" => 1, "col" => "last")
 									)
 									, "addnew" => array(
 											"class"		=> null
@@ -475,8 +525,9 @@ class ffGrid_html extends ffGrid_base
 
         $this->framework_css = frameworkCSS::findComponent("ffGrid");
 
-        if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
-			$this->id_if = uniqid();
+        if (ffTheme::RANDOMIZE_COMP_ID) {
+            $this->id_if = uniqid();
+        }
 
         if ($this->display_search_simple)
         {
@@ -492,6 +543,8 @@ class ffGrid_html extends ffGrid_base
                 $tmp->src_operation = $this->search_simple_field_options["src_operation"];
                 $tmp->src_prefix	= $this->search_simple_field_options["src_prefix"];
                 $tmp->src_postfix	= $this->search_simple_field_options["src_postfix"];
+                $tmp->framework_css["control"] = $this->framework_css["search"]["input"];
+
                 $tmp->data_type		= "";
                 $tmp->display		= false;
                 $this->addSearchField($tmp);
@@ -605,9 +658,9 @@ class ffGrid_html extends ffGrid_base
      */
     protected function tplLoad()
     {
-
-        $this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
-        $this->tpl[0]->load_file($this->template_file, "main");
+        $this->tpl[0] = $this->parent[0]->loadTemplate(pathinfo($this->template_file, PATHINFO_FILENAME));
+        //$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
+        //$this->tpl[0]->load_file($this->template_file, "main");
 
         $this->tpl[0]->set_var("site_path", $this->site_path);
         $this->tpl[0]->set_var("page_path", $this->page_path);
@@ -631,7 +684,7 @@ class ffGrid_html extends ffGrid_base
         {
         	$title_class["default"] = "dialogTitle";
         	$action_class["dialog"] = "dialogActionsPanel";
-            $action_class["align"] = $this->parent[0]->frameworkCSS->get("align-right", "util");
+          //  $action_class["align"] = $this->parent[0]->frameworkCSS->get("align-right", "util");
         	$action_top_class = $action_class;
             $action_top_class["top"] = "top";
     		if($this->dialog_action_button)
@@ -642,15 +695,14 @@ class ffGrid_html extends ffGrid_base
 		}
 		else
 		{
-        	$title_class["default"] = "ffTitle";
             $action_class           = "";
         	$action_top_class       = "";
 
-			$this->tpl[0]->set_var("actions_top_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["actionsTop"], $action_top_class));
-			$this->tpl[0]->set_var("actions_bottom_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["actionsBottom"], $action_class));
+            $this->tpl[0]->set_var("actions_top_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["actionsTop"]["def"], $action_top_class));
+			$this->tpl[0]->set_var("actions_bottom_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["actionsBottom"]["def"], $action_class));
 		}
         if(strlen($this->title) || $this->widget_discl_enable) {
-        	$this->tpl[0]->set_var("title_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["title"], $title_class));
+        	$this->tpl[0]->set_var("title_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["title"]));
             $this->tpl[0]->set_var("title", $this->title);
             $this->tpl[0]->parse("SectTitle", false);
         } else {
@@ -720,11 +772,16 @@ class ffGrid_html extends ffGrid_base
             if (isset($_REQUEST["XHR_SECTION"]))
             {
                 if ($this->use_paging || $this->use_search || $this->use_alpha || $this->use_order || $this->parsed_hidden_fields || $this->use_fields_params)
-                    $this->json_result["hidden"] = $this->tpl[0]->rpparse("SectHidden", false);
+                    $this->json_result["hidden"] = preg_replace('/\s+/', ' ', $this->tpl[0]->rpparse("SectHidden", false));
                 else
                     $this->json_result["hidden"] = "";
 
-                return $this->tpl[0]->rpparse("Sect" . $_REQUEST["XHR_SECTION"], false);
+                if($this->json_result["rows"]) {
+                    return $this->tpl[0]->rpparse("Sect" . $_REQUEST["XHR_SECTION"], false);
+                } else {
+                    $this->json_result["injectid"] = "#" . $this->id . " TABLE.dataTable";
+                    return $this->tpl[0]->rpparse("SectNoRecords", false);
+                }
             }
         }
 
@@ -943,6 +1000,7 @@ class ffGrid_html extends ffGrid_base
 			return;
 		}
 
+		$this->tpl[0]->set_var("alphanum_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["alphanum"], array("alphanum")));
 		$this->tpl[0]->set_var("max_colspan", count($this->grid_disposition[0]));
 		$this->tpl[0]->set_var("actual_alpha", ffCommon_specialchars($this->alpha));
 		$this->tpl[0]->set_var("field", ffCommon_specialchars($this->search_fields[$this->alpha_field]->label));
@@ -967,12 +1025,14 @@ class ffGrid_html extends ffGrid_base
 
         if($this->display_search)
         {
+            $this->tpl[0]->set_var("hide_class", $this->parent[0]->frameworkCSS->get("hide", "util"));
+
             if ($this->display_search_simple)
             {
-	            $wrap_addon = $this->parent[0]->frameworkCSS->get("wrap-addon", "form");
+	            /*$wrap_addon = $this->parent[0]->frameworkCSS->get("wrap-addon", "form");
                 foreach ($this->search_fields AS $key => $value)
                 {
-                    if($this->open_adv_search === false && $this->search_fields[$key]->display && !$this->search_fields[$key]->multi_disp_as_filter)
+                    if($this->open_adv_search === false && $this->search_fields[$key]->display )
                     {
                         //$this->tpl[0]->set_var("search_more_label", ffTemplate::_get_word_by_code("ffGrid_search_more"));
                         if($wrap_addon) {
@@ -987,25 +1047,40 @@ class ffGrid_html extends ffGrid_base
                         break;
                     }
                 }
-                reset($this->search_fields);
+                reset($this->search_fields);*/
 
-    			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "ff.submitProcessKey(event, jQuery(this).nextAll('.search'));";
-				$buffer = $this->search_fields[$this->search_simple_field_options["id"]]->process($this->search_simple_field_options["id"] . "_src");
-
+    			$this->search_fields[$this->search_simple_field_options["id"]]->properties["onkeydown"] = "ff.submitProcessKey(event, jQuery('#" . $this->getIDIF() . " .ffSearch'));";
+    			$buffer = $this->search_fields[$this->search_simple_field_options["id"]]->process($this->search_simple_field_options["id"] . "_src");
+/*
 				if($wrap_addon) {
 					$arrSearchCol = array(10 - $display_adv_search);
 					$buffer = '<div class="' . $this->parent[0]->frameworkCSS->get($arrSearchCol, "col") . '">' . $buffer . '</div>';
-				}
+				}*/
                 $this->tpl[0]->set_var("SearchAll", $buffer);
             }
+           // $this->open_adv_search  = true;
+            if(/*!$this->searched &&*/ $this->open_adv_search) {
+                $this->framework_css["filter"]["def"]["util"][] = "current";
+                $this->tpl[0]->set_var("adv_class", "adv-search");
+            } else {
+                $this->tpl[0]->set_var("adv_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["searchAdv"], array("adv-search")));
+           }
 
-            if(/*!$this->searched &&*/ $this->open_adv_search === false)
-            	$this->tpl[0]->set_var("adv_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["searchAdv"]));
+            if(is_array($this->search_fields) && count($this->search_fields)) {
+                $this->tpl[0]->set_var("filter_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["filter"]["def"]));
+                if($this->framework_css["filter"]["icon"]) {
+                    $this->tpl[0]->set_var("filter_icon", $this->parent[0]->frameworkCSS->get($this->framework_css["filter"]["icon"], "icon-tag"));
+                }
+                $this->tpl[0]->set_var("filter_properties", $this->parent[0]->frameworkCSS->get("toggle", "data", "button"));
+
+
+                $this->tpl[0]->parse("SectFilterToggle", false);
+            }
 
         }
 
 		$search_class["default"] = "search";
-		$this->tpl[0]->set_var("search_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["search"], $search_class));
+		$this->tpl[0]->set_var("search_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["search"]["def"], $search_class));
 		$this->tpl[0]->set_var("search_box_class", $this->parent[0]->frameworkCSS->get("group", "form"));
 
 
@@ -1035,7 +1110,7 @@ class ffGrid_html extends ffGrid_base
 			} else {
 				$this->tpl[0]->set_var("container_class", "");
 			}
-			if ($this->search_fields[$key]->multi_disp_as_filter)
+			/*if ($this->search_fields[$key]->multi_disp_as_filter)
 			{
 				$this->parsed_filters++;
 
@@ -1162,7 +1237,7 @@ class ffGrid_html extends ffGrid_base
 
 				$this->tpl[0]->parse("SectFilter", true);
 			}
-			elseif($this->display_search)
+			else*/ if($this->display_search)
 			{
 				$buffer = "";
 				$container_class = "";
@@ -1184,7 +1259,9 @@ class ffGrid_html extends ffGrid_base
 				}
 				else
 				{
-					// display label
+                    $this->search_fields[$key]->properties["onkeydown"] = "ff.submitProcessKey(event, jQuery('#" . $this->getIDIF() . " .ffSearch'));";
+
+                    // display label
 					if($this->search_fields[$key]->label)
 						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_src">' . ffCommon_specialchars($this->search_fields[$key]->label). '</label>';
 
@@ -1245,19 +1322,19 @@ class ffGrid_html extends ffGrid_base
 
 			if ($show_section)
 			{
-				$wrap_addon = $this->parent[0]->frameworkCSS->get("wrap-addon", "form");
-				if($wrap_addon) {
+				//$wrap_addon = $this->parent[0]->frameworkCSS->get("wrap-addon", "form");
+				/*if($wrap_addon) {
 					$arrSearchCol = array(2);
 
 					$buffer = '<div class="' . $this->parent[0]->frameworkCSS->get($arrSearchCol, "col") . '">' . $buffer . '</div>';
-				}
+				}*/
 
 				$this->tpl[0]->set_var("SearchButtons", $buffer);
-				if(!$this->searched && $this->open_adv_search === false) {
+				/*if(!$this->searched && $this->open_adv_search === false) {
 					$this->search_buttons[0]->id = "searchadv";
 					unset($this->search_buttons[0]->framework_css["addon"]);
 					$this->tpl[0]->set_var("SearchButtonsAdv", '<div class="' . $this->parent[0]->frameworkCSS->get("align-right", "util"). '">' . $this->search_buttons[0]->process() . '</div>');
-				}
+				}*/
 			}
 
 			if ($this->parsed_fields)
@@ -1272,8 +1349,8 @@ class ffGrid_html extends ffGrid_base
 			}
 		}
 
-		if ($this->parsed_filters)
-			$this->tpl[0]->parse("SectFilters", false);
+		/*if ($this->parsed_filters)
+			$this->tpl[0]->parse("SectFilters", false);*/
     }
 
     /**
@@ -1305,12 +1382,20 @@ class ffGrid_html extends ffGrid_base
         if ($this->display_delete_bt)
         	$this->addGridDisposition("delete", "button", $this->buttons_options["delete"]["disposition"]["col"], $this->buttons_options["delete"]["disposition"]["row"]);
 
-
         	//echo $this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1][count($this->grid_disposition_elem["data"][$this->buttons_options["delete"]["disposition"]["row"] - 1]) - 1]["button"];
         parent::process_grid();
 
 		//$table_class["default"] = "ffGrid";
         $this->tpl[0]->set_var("table_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["table"]));
+
+        $this->tpl[0]->set_var("table_before_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableBefore"]["def"]));
+        $this->tpl[0]->set_var("table_before_left_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableBefore"]["left"]));
+        $this->tpl[0]->set_var("table_before_right_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableBefore"]["right"]));
+
+        $this->tpl[0]->set_var("table_after_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableAfter"]["def"]));
+        $this->tpl[0]->set_var("table_after_left_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableAfter"]["left"]));
+        $this->tpl[0]->set_var("table_after_center_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableAfter"]["center"]));
+        $this->tpl[0]->set_var("table_after_right_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["tableAfter"]["right"]));
 
         if ($this->display_new) // done at this time due to maxspan
         {
@@ -1466,8 +1551,6 @@ class ffGrid_html extends ffGrid_base
                 $arrGridData = array_values($this->db[0]->getRecordset());
                 $rows = $this->db[0]->numRows();
             }
-
-
 
         	$res = $this->doEvent("on_loaded_data", array(&$this, &$arrGridData));
 
@@ -1872,11 +1955,7 @@ class ffGrid_html extends ffGrid_base
 
         $component_class["default"] = $this->class;
         if($this->framework_css["component"]["grid"]) {
-            if(is_array($this->framework_css["component"]["grid"]))
-                $component_class["grid"] = $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["grid"], "col");
-            else {
-                $component_class["grid"] = $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["grid"]);
-            }
+            $component_class["grid"] = $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["grid"]);
         }
         if ($this->db[0]->query_id && $this->db[0]->numRows())
         {
@@ -1890,23 +1969,7 @@ class ffGrid_html extends ffGrid_base
         else
         {
         	$component_class["empty"] = "padding " . $this->parent[0]->frameworkCSS->get("clear", "util");
-        	$this->tpl[0]->set_var("norecord_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["norecord"]));
-            $this->tpl[0]->set_var("SectGridData", "");
-			$this->tpl[0]->set_var("SectGridTable", "");
-            $this->tpl[0]->parse("SectGrid", false);
-            //$this->tpl[0]->set_var("SectAlpha", "");
-            //$this->tpl[0]->set_var("SectFilter", "");
-            //$this->tpl[0]->set_var("SectSearch", "");
-            if ($this->no_record_label !== null)
-            {
-                $this->tpl[0]->set_var("grid_no_record", $this->no_record_label);
-            }
-            else
-            {
-                $this->tpl[0]->set_var("grid_no_record", ffTemplate::_get_word_by_code("grid_no_record"));
-            }
-
-            $this->tpl[0]->parse("SectNoRecords", false);
+        	$this->process_noRecord();
         }
 
 		if($this->tpl[0]->isset_var("component_class")) {
@@ -1917,32 +1980,32 @@ class ffGrid_html extends ffGrid_base
 
 		$this->tpl[0]->set_var("component_properties", $this->getProperties($this->component_properties));
 
-		if(is_array($this->framework_css["component"]["col"]) && $this->framework_css["component"]["inner_wrap"] === null)
-			$this->framework_css["component"]["inner_wrap"] = "row";
-
-	     if($this->framework_css["component"]["inner_wrap"])
-         {
-            if(is_array($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["inner_wrap"], "col", "innerWrap") . '">');
-            } elseif(is_bool($this->framework_css["component"]["inner_wrap"])) {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="innerWrap">');
-            } else {
-                $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["inner_wrap"], "innerWrap") . '">');
-            }
-            $this->tpl[0]->set_var("inner_wrap_end", '</div>');
-        }
-
         if($this->framework_css["component"]["outer_wrap"])
         {
-            if(is_array($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get($this->framework_css["component"]["outer_wrap"], "col", $this->getIDIF() . "Wrap outerWrap"). '">');
-            } elseif(is_bool($this->framework_css["component"]["outer_wrap"])) {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->getIDIF() . 'Wrap outerWrap">');
-            } else {
-                $this->tpl[0]->set_var("outer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->get("", $this->framework_css["component"]["outer_wrap"], $this->getIDIF() . "Wrap outerWrap") . '">');
-            }
+            $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["outer_wrap"]) . '">');
             $this->tpl[0]->set_var("outer_wrap_end", '</div>');
         }
+
+		if(is_array($this->framework_css["component"]["col"]) && $this->framework_css["component"]["inner_wrap"] === null)
+			$this->framework_css["component"]["inner_wrap"] = array("row" => true);
+
+		if($this->framework_css["component"]["inner_wrap"]) {
+            $this->tpl[0]->set_var("inner_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["inner_wrap"]) . '">');
+            $this->tpl[0]->set_var("inner_wrap_end", '</div>');
+        }
+        if($this->framework_css["component"]["header_wrap"]) {
+            $this->tpl[0]->set_var("header_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["header_wrap"]) . '">');
+            $this->tpl[0]->set_var("header_wrap_end", '</div>');
+        }
+        if($this->framework_css["component"]["body_wrap"]) {
+            $this->tpl[0]->set_var("body_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["body_wrap"]) . '">');
+            $this->tpl[0]->set_var("body_wrap_end", '</div>');
+        }
+        if($this->framework_css["component"]["footer_wrap"]) {
+            $this->tpl[0]->set_var("footer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["footer_wrap"]) . '">');
+            $this->tpl[0]->set_var("footer_wrap_end", '</div>');
+        }
+
     }
 
     function parse_field($field, $recordset_key, $modify_url, $keys, $hide_container = true, $display_label = false)
@@ -2761,36 +2824,91 @@ class ffGrid_html extends ffGrid_base
             $this->tpl[0]->set_var("PageNavigator", $this->navigator[0]->process());
         }
         if($this->tpl[0]->isset_var("PageNavigator.selector")) {
-            $this->tpl[0]->set_var("PageNavigator.selector", $this->navigator[0]->process("selector"));
+            $navigator_selector = $this->navigator[0]->process("selector");
+
         }
         if($this->tpl[0]->isset_var("PageNavigator.choice")) {
-            $this->tpl[0]->set_var("PageNavigator.choice", $this->navigator[0]->process("choice"));
+            $navigator_choice = $this->navigator[0]->process("choice");
         }
         if($this->tpl[0]->isset_var("PageNavigator.totelem")) {
-            $this->tpl[0]->set_var("PageNavigator.totelem", $this->navigator[0]->process("totelem"));
+            $navigator_totelem = $this->navigator[0]->process("totelem");
         }
         if($this->tpl[0]->isset_var("PageNavigator.nav")) {
-            $this->tpl[0]->set_var("PageNavigator.nav", $this->navigator[0]->process("nav"));
+            $navigator_nav = $this->navigator[0]->process("nav");
         }
-        //$this->tpl[0]->parse("SectPageNavigator", false);
 
+        //$this->tpl[0]->parse("SectPageNavigator", false);
         if ($this->navigator_orientation == "both" || $this->navigator_orientation == "top")
         {
-        	$this->tpl[0]->set_var("pagenavigator_top_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorTop"]));
+            $this->tpl[0]->set_var("PageNavigator.selector", ($navigator_selector && $this->framework_css["navigatorTop"]["selector"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorTop"]["selector"]) . '">' . $navigator_selector . '</div>'
+                : $navigator_selector
+            ));
+            $this->tpl[0]->set_var("PageNavigator.choice", ($navigator_choice && $this->framework_css["navigatorTop"]["choice"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorTop"]["choice"]) . '">' . $navigator_choice . '</div>'
+                : $navigator_selector
+            ));
+            $this->tpl[0]->set_var("PageNavigator.totelem", ($navigator_totelem && $this->framework_css["navigatorTop"]["totelem"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorTop"]["totelem"]) . '">' . $navigator_totelem . '</div>'
+                : $navigator_totelem
+            ));
+            $this->tpl[0]->set_var("PageNavigator.nav", ($navigator_nav && $this->framework_css["navigatorTop"]["nav"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorTop"]["nav"]) . '">' . $navigator_nav . '</div>'
+                : $navigator_nav
+            ));
+
             $this->tpl[0]->parse("SectPaginatorTop", false);
-		} else
-            $this->tpl[0]->set_var("SectPaginatorTop", "");
+		} //else
+          //  $this->tpl[0]->set_var("SectPaginatorTop", "");
 
         if ($this->navigator_orientation == "both" || $this->navigator_orientation == "bottom")
         {
-        	$this->tpl[0]->set_var("pagenavigator_bottom_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorBottom"]));
+            $this->tpl[0]->set_var("PageNavigator.selector", ($navigator_selector && $this->framework_css["navigatorBottom"]["selector"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorBottom"]["selector"]) . '">' . $navigator_selector . '</div>'
+                : $navigator_selector
+            ));
+            $this->tpl[0]->set_var("PageNavigator.choice", ($navigator_choice && $this->framework_css["navigatorBottom"]["choice"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorBottom"]["choice"]) . '">' . $navigator_choice . '</div>'
+                : $navigator_choice
+            ));
+            $this->tpl[0]->set_var("PageNavigator.totelem", ($navigator_totelem && $this->framework_css["navigatorBottom"]["totelem"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorBottom"]["totelem"]) . '">' . $navigator_totelem . '</div>'
+                : $navigator_totelem
+            ));
+            $this->tpl[0]->set_var("PageNavigator.nav", ($navigator_nav && $this->framework_css["navigatorBottom"]["nav"]
+                ? '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["navigatorBottom"]["nav"]) . '">' . $navigator_nav . '</div>'
+                : $navigator_nav
+            ));
+
             $this->tpl[0]->parse("SectPaginatorBottom", false);
-		} else
-        	$this->tpl[0]->set_var("SectPaginatorBottom", "");
+		}// else
+        //	$this->tpl[0]->set_var("SectPaginatorBottom", "");
         //}
         $this->tpl[0]->parse("SectHiddenPageNavigator", false);
     }
+    function process_noRecord() {
+        $this->tpl[0]->set_var("norecord_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["norecord"]["def"]));
+        if($this->framework_css["norecord"]["wrap"]) {
+            $this->tpl[0]->set_var("norecord_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["norecord"]["wrap"]) . '">');
+            $this->tpl[0]->set_var("norecord_wrap_end", '</div>');
+        }
+        $this->tpl[0]->set_var("SectGridData", "");
+        $this->tpl[0]->set_var("SectGridTable", "");
+        $this->tpl[0]->parse("SectGrid", false);
+        //$this->tpl[0]->set_var("SectAlpha", "");
+        //$this->tpl[0]->set_var("SectFilter", "");
+        //$this->tpl[0]->set_var("SectSearch", "");
+        if ($this->no_record_label !== null)
+        {
+            $this->tpl[0]->set_var("grid_no_record", $this->no_record_label);
+        }
+        else
+        {
+            $this->tpl[0]->set_var("grid_no_record", ffTemplate::_get_word_by_code("grid_no_record"));
+        }
 
+        $this->tpl[0]->parse("SectNoRecords", false);
+    }
 	/**
 	*  Load Widget Dialog for Edit and Delete
 	*/
@@ -2852,22 +2970,24 @@ class ffGrid_html extends ffGrid_base
                 $tmp = ffButton::factory(null, $this->disk_path, $this->site_path, $this->page_path, $this->getTheme());
                 $tmp->id            = "search";
                 $tmp->label         = $this->buttons_options["search"]["label"];
-                $tmp->class         = $this->buttons_options["search"]["class"];
+                $tmp->class         = "ffSearch " . $this->buttons_options["search"]["class"];
                 $tmp->icon          = $this->buttons_options["search"]["icon"];
                 $tmp->aspect        = $this->buttons_options["search"]["aspect"];
                 $tmp->action_type   = "submit";
                 $tmp->frmAction     = "search";
                 $tmp->framework_css["addon"] = "postfix";
+                $tmp->framework_css["aspect"] = $this->framework_css["search"]["button"];
+
 
                 if (isset($_REQUEST["XHR_CTX_ID"]))
                 {
-                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "") . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "',{'action'    : '" . $this->getIDIF() . "_search','component' : '" . $this->getIDIF() . "','section'    : 'GridData'});";
+                    $tmp->jsaction = ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "") /*. ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ")*/ . " ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "',{'action'    : '" . $this->getIDIF() . "_search','component' : '" . $this->getIDIF() . "','section'    : 'GridData'});";
                 }
                 elseif ($this->full_ajax || $this->ajax_search)
                 {
                     $this->parent[0]->tplAddJs("ff.ajax");
 
-                    $tmp->jsaction = "ff.ffGrid.searchHistoryPush('" . $this->getIDIF() . "_" . $this->search_simple_field_options["id"] . "'); " . ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  . ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ") . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
+                    $tmp->jsaction = "ff.ffGrid.searchHistoryPush('" . $this->getIDIF() . "_" . $this->search_simple_field_options["id"] . "'); " . ($this->reset_page_on_search ? " jQuery('#" . $this->getPrefix() . $this->navigator[0]->page_parname . "').val('1'); " : "")  /*. ($this->open_adv_search === true ? "" : " ff.ffGrid.advsearchHide('" . $this->getIDIF() . "'); ")*/ . " ff.ajax.doRequest({'component' : '" . $this->getIDIF() . "','section' : 'GridData'});";
                 }
                 $this->addSearchButton(   $tmp
                                         , $this->buttons_options["search"]["index"]);
@@ -2930,9 +3050,9 @@ class ffGrid_html extends ffGrid_base
 	function setWidthComponent($resolution_large_to_small)
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) {
-            $this->framework_css["component"]["grid"] = frameworkCSS::setResolution($resolution_large_to_small);
+            $this->framework_css["component"]["grid"] = array("col" => frameworkCSS::setResolution($resolution_large_to_small));
         } elseif(strlen($resolution_large_to_small)) {
-            $this->framework_css["component"]["grid"] = $resolution_large_to_small;
+            $this->framework_css["component"]["grid"] = array("row" => $resolution_large_to_small);
         } else {
             $this->framework_css["component"]["grid"] = false;
         }

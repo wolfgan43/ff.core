@@ -44,9 +44,10 @@ class ffButton_html extends ffButton_base
 				case "button":
 					return "ffButton_button.html";
 				case "link":
+                default:
 					return "ffButton_link.html";
-				default:
-					return "ffButton_" . $this->aspect . ".html";
+
+					//return "ffButton_" . $this->aspect . ".html";
 			}
 		}
 	}
@@ -55,23 +56,43 @@ class ffButton_html extends ffButton_base
 	* @return String
 	*/
 	function get_class($custom_class = null)
-	{	
-		if($this->class === false) 
-			$class = $this->id;
-		elseif(is_array($this->class)) {
-			$class = $this->parent_page[0]->frameworkCSS->get($this->id, $this->framework_css["aspect"], $this->class["params"]) . (strlen($this->class["value"]) ? " " . $this->class["value"] : "");
-		} else
-			$class = $this->parent_page[0]->frameworkCSS->get($this->id, $this->framework_css["aspect"]) . (strlen($this->class) ? " " . $this->class : "");
+	{
+        $class = array();
+
+		if($this->class === false) {
+            $class[] = $this->id;
+        } elseif(is_array($this->class)) {
+			$class[] = $this->parent_page[0]->frameworkCSS->get($this->id, $this->framework_css["aspect"], $this->class["params"]) . (strlen($this->class["value"]) ? " " . $this->class["value"] : "");
+		} else {
+		    if(!isset($this->framework_css["aspect"]["button"])) {
+                switch ($this->aspect) {
+                    case "button":
+                    case "link":
+                        $class[] = $this->parent_page[0]->frameworkCSS->get($this->id, "button");
+                        break;
+                    default:
+                        $class[] = $this->parent_page[0]->frameworkCSS->get($this->aspect, "button");
+
+                }
+            }
+            if(is_array($this->framework_css["aspect"])) {
+                $class[] = $this->parent_page[0]->frameworkCSS->getClass($this->framework_css["aspect"]);
+            }
+
+            if(strlen($this->class)) {
+                $class[] = $this->class;
+            }
+        }
 
 		if($this->framework_css["addon"]) {
-			$class .= " " . $this->parent_page[0]->frameworkCSS->get("control-" . $this->framework_css["addon"], "form");
+			$class[] = $this->parent_page[0]->frameworkCSS->get("control-" . $this->framework_css["addon"], "form");
 		}
 		if($this->activebuttons)
-			$class .= " activebuttons";
+			$class[] = "activebuttons";
 		if($custom_class) 
-			$class .= " " . $custom_class;
+			$class[] = $custom_class;
 
-		return $class;
+		return implode(" ", $class);
 	}
 	function get_icon($only_class = null)
     {              
@@ -85,12 +106,12 @@ class ffButton_html extends ffButton_base
 	 */
 	public function tplLoad()
 	{
-		if($this->aspect == "button")
-			$this->framework_css["aspect"] = $this->aspect;
+		//if($this->aspect == "button")
+		//	$this->framework_css["aspect"] = $this->aspect;
 
-		$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
-	
-		$this->tpl[0]->load_file($this->getTemplateFile(), "main");
+        $this->tpl[0] = $this->parent_page[0]->loadTemplate(pathinfo($this->getTemplateFile(), PATHINFO_FILENAME));
+		//$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
+		//$this->tpl[0]->load_file($this->getTemplateFile(), "main");
 
 		if ($this->parent !== NULL && strlen($this->parent[0]->id))
 			$this->tpl[0]->set_var("container", $this->parent[0]->id . "_");

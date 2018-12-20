@@ -1736,7 +1736,7 @@ function ffHTTP_getHeader($hname = "content-type")
 	else
 		return false;
 }
-
+/*
 function ffCommon_main_theme_init()
 {
     static $loaded = false;
@@ -1759,26 +1759,34 @@ function ffCommon_main_theme_init()
 
 		$loaded = true;
 	}
-}
-
+}*/
+/*
 function ffCommon_ffPage_init($params, $resources = null)  {
-    /*ffCommon::setDefaults(array(
-        "ffPage" => array(
-            "default_css" => array(
-                "app" => null
-            )
-        )
-    ));*/
+   // $theme = ffTheme::factory($params, $resources);
 
-    /**
-     * @var $oPage ffPage_html
-     */
     $oPage = ffPage::factory(__TOP_DIR__, FF_SITE_PATH, null, $params["theme"]);
     $oPage->title               = $params["title"];
     $oPage->class_body          = $params["class_body"];
     $oPage->compact_js          = $params["compact_js"];
     $oPage->compact_css         = $params["compact_css"];
     $oPage->compress            = $params["compact_html"];
+
+    if($params["theme"] != FF_MAIN_THEME && is_file(FF_THEME_DISK_PATH . "/" . $params["theme"] . "/common.php")) {
+        $resources[FF_SITE_PATH . FF_THEME_DIR . "/" . $params["theme"]] = array(
+            "filter"                    => array("css", "js", "html", "tpl", "jpg", "svg", "png")
+            ,    "rules"                   => array(
+                "/layouts/"             => "layouts"
+                , "/common/"            => "common"
+                , "/contents/"          => "components"
+                , "/widgets/"           => "widgets"
+                , "/assets/dist/css/"   => "css"
+                , "/assets/dist/js/"    => "js"
+                , "/assets/dist/img/"   => "images"
+                , "/assets/dist/fonts/" => "fonts"
+                , "/ff/"                => "components"
+            )
+        );
+    }
 
     $oPage->loadResources($resources);
     $oPage->loadLibrary();
@@ -1795,9 +1803,8 @@ function ffCommon_ffPage_init($params, $resources = null)  {
     $oPage->addEvent("tplAddJs_not_found", function ($page, $tag, $params) {
         static $last_call;
         if ($tag === $last_call) {
-            ffErrorHandler::raise("Autoloader recursive inclusion", E_USER_ERROR, $page, get_defined_vars());
+            ffErrorHandler::raise("JS: Autoloader recursive inclusion", E_USER_ERROR, $page, get_defined_vars());
         }
-        $last_call = $tag;
 
         $tag_parts = explode(".", $tag);
         if (strpos($tag, "jquery.plugins.") === 0) {
@@ -1817,7 +1824,13 @@ function ffCommon_ffPage_init($params, $resources = null)  {
             return true;
         }
     });
-
+    $oPage->addEvent("tplAddCss_not_found", function ($page, $tag, $params) {
+        static $last_call;
+        if ($tag === $last_call) {
+            ffErrorHandler::raise("CSS: Autoloader recursive inclusion", E_USER_ERROR, $page, get_defined_vars());
+        }
+        $last_call = $tag;
+    });
     //load theme
 
     if($params["framework_css"]) {
@@ -1825,12 +1838,19 @@ function ffCommon_ffPage_init($params, $resources = null)  {
         frameworkCSS::factory($params["framework_css"], $params["font_icon"]);
     }
 
-    if($params["theme"] != FF_MAIN_THEME) {
+    if($params["theme"] != FF_MAIN_THEME && is_file($oPage->getThemeDir() . "/common.php")) {
+        $skip_main_theme = true;
         require_once ($oPage->getThemeDir() . "/common.php");
     }
 
     if(!$oPage->isXHR()) {
-        if($params["theme"] == FF_MAIN_THEME) {
+        if($skip_main_theme) {
+            $oPage->excludeLib("jquery", "js");
+            $oPage->tplAddJs("app", array("priority" => cm::LAYOUT_PRIORITY_HIGH));
+             $oPage->tplAddCss("dataTables.bootstrap4"); //todo: da togliere
+            $oPage->tplAddCss("app");
+            $oPage->tplAddCss("icons");
+        } else {
             $oPage->tplAddJs("jquery");
 
             if($params["framework_css"]) {
@@ -1839,17 +1859,14 @@ function ffCommon_ffPage_init($params, $resources = null)  {
             if($params["font_icon"]) {
                 $oPage->tplAddCss("fonticons." . $params["font_icon"]);
             }
+            $oPage->tplAddJs("jquery.nicescroll", "https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.3/jquery.nicescroll.min.js");
 
             $oPage->tplAddCss("ff.core");
             $oPage->tplAddJs("ff.ffPage");
-        } else {
-            $oPage->excludeLib("jquery", "js");
+            $oPage->tplAddJs("app");
+            $oPage->tplAddCss("app");
+            $oPage->tplAddCss("icons");
         }
-
-        $oPage->tplAddJs("app");
-        $oPage->tplAddCss("dataTables.bootstrap4"); //todo: da togliere
-        $oPage->tplAddCss("app");
-        $oPage->tplAddCss("icons");
     }
     //load theme
 
@@ -1944,7 +1961,7 @@ function ffCommon_ffPage_init($params, $resources = null)  {
         $oPage->page_meta = array();
     }
     return $oPage;
-}
+}*/
 
 function ffIsset($array, $key)
 {
@@ -2264,16 +2281,36 @@ function ff_getAbsDir($path, $return_abs = true)
             || strpos($path, "/themes/responsive") === 0
             || strpos($path, "/modules") === 0
         )
-    )
-        if($return_abs)
+    ) {
+        if ($return_abs) {
             return __FF_DIR__;
-        else
+        } else {
             return true;
-    else
-        if($return_abs)
+        }
+    } elseif(strpos($path, "/vendor") === 0) {
+        if ($return_abs) {
+            return __TOP_DIR__;
+        } else {
+            return true;
+        }
+    } else {
+        if ($return_abs) {
             return FF_DISK_PATH;
-        else
+        } else {
             return false;
+        }
+    }
+}
+
+function ff_stripAbsDir($path) {
+    if(strpos($path, FF_DISK_PATH) === 0) {
+        $path = str_replace(FF_DISK_PATH, "", $path);
+    } elseif(strpos($path, __FF_DIR__) === 0) {
+        $path = str_replace(__FF_DIR__, "", $path);
+    } elseif(strpos($path, __TOP_DIR__) === 0) {
+        $path = str_replace(FF_DISK_PATH, "", $path);
+    }
+    return $path;
 }
 
 if(!function_exists('hash_equals'))

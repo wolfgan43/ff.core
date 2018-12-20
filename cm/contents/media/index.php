@@ -38,6 +38,7 @@ $oGrid->source_SQL = "SELECT " . CM_TABLE_PREFIX . "media.`ID`
                         LEFT JOIN " . FF_PREFIX . "languages ON " . FF_PREFIX . "languages.ID = " . CM_TABLE_PREFIX . "media.ID_lang  
                       [WHERE]
                        GROUP BY " . CM_TABLE_PREFIX . "media.`path`, " . CM_TABLE_PREFIX . "media.`key`
+                       [HAVING]
                        [ORDER]";
 $oGrid->order_default = "path";
 $oGrid->record_url = $cm->oPage->site_path . $cm->oPage->page_path . "/modify";

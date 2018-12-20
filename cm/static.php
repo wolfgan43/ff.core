@@ -29,23 +29,28 @@ require_once (dirname(__DIR__) . "/ff/main.php");
 
 if(strpos($_SERVER["PATH_INFO"], FF_SITE_PATH . "/media/") === 0) {
     $site_path = FF_SITE_PATH . "/media";
-    $path_info = substr($_SERVER["PATH_INFO"], strlen(FF_SITE_PATH . "/media"));
 }
 if(strpos($_SERVER["PATH_INFO"], FF_SITE_PATH . "/static/") === 0) {
     $site_path = FF_SITE_PATH . "/static";
-    $path_info = substr($_SERVER["PATH_INFO"], strlen(FF_SITE_PATH . "/static"));
+}
+if(strpos($_SERVER["PATH_INFO"],  "/media/") === 0) {
+    $site_path = "/media";
+}
+if(strpos($_SERVER["PATH_INFO"], "/static/") === 0) {
+    $site_path = "/static";
 }
 if(strpos($_SERVER["HTTP_HOST"], "media.") === 0) {
     $site_path = "";
-    $path_info = $_SERVER["PATH_INFO"];
 }
 if(strpos($_SERVER["HTTP_HOST"], "static.") === 0) {
     $site_path = "";
-    $path_info = $_SERVER["PATH_INFO"];
 }
-if(!$path_info) {
-    $path_info = $_SERVER["PATH_INFO"];
-}
+
+
+$path_info = ($site_path
+    ? substr($_SERVER["PATH_INFO"], strlen($site_path))
+    : $_SERVER["PATH_INFO"]
+);
 
 ffMedia::getInstance($path_info)->render();
 exit;

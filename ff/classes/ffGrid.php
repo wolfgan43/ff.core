@@ -73,16 +73,16 @@ class ffGrid
 
 		if (is_null($last_res))
 		{
-            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
-            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+            $class_name = __CLASS__ . "_" . ffTheme::TYPE;
+            //$base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
 		else
 		{
-			$base_path = $last_res["base_path"];
+			//$base_path = $last_res["base_path"];
 			$class_name = $last_res["class_name"];
 		}
 		
-		require_once $base_path;
+		//require_once $base_path;
 		$tmp = new $class_name($page, $disk_path, $theme);
 
 		$res = self::doEvent("on_factory_done", array($tmp));
@@ -595,7 +595,8 @@ abstract class ffGrid_base extends ffCommon
 
 		$field->cont_array =& $this->search_fields;
 		$field->parent = array(&$this);
-		$this->search_fields[$field->id] = $field;
+
+        $this->search_fields[$field->id] = $field;
 	}
 
 	/**
@@ -662,7 +663,10 @@ abstract class ffGrid_base extends ffCommon
                             , E_USER_ERROR, $this, get_defined_vars());
 
 		$button->parent = array(&$this);
-		$this->action_buttons[$button->id] = $button;
+        if($this->framework_css["actionsBottom"]["button"]) {
+            $button->framework_css["aspect"] = $this->framework_css["actionsBottom"]["button"];
+        }
+        $this->action_buttons[$button->id] = $button;
 	}
 
     /**
@@ -676,6 +680,9 @@ abstract class ffGrid_base extends ffCommon
                             , E_USER_ERROR, $this, get_defined_vars());
 
         $button->parent = array(&$this);
+        if($this->framework_css["actionsTop"]["button"]) {
+            $button->framework_css["aspect"] = $this->framework_css["actionsTop"]["button"];
+        }
         $this->action_buttons_header[$button->id] = $button;
     }
 
@@ -1744,7 +1751,9 @@ abstract class ffGrid_base extends ffCommon
 				$tmp->aspect 		= "link";
 				$tmp->action_type 	= "submit";
 				$tmp->frmAction		= "search";
-				$this->addSearchButton(	  $tmp
+                $tmp->framework_css = $this->framework_css["search"]["button"];
+
+                $this->addSearchButton(	  $tmp
 										, $this->buttons_options["search"]["index"]);
 			}
 		}

@@ -1,5 +1,30 @@
 <?php
-class ffPage_html extends ffPage_base 
+/**
+ * VGallery: CMS based on FormsFramework
+ * Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @package VGallery
+ *  @subpackage core
+ *  @author Alessandro Stucchi <wolfgan@gmail.com>
+ *  @copyright Copyright (c) 2004, Alessandro Stucchi
+ *  @license http://opensource.org/licenses/gpl-3.0.html
+ *  @link https://github.com/wolfgan43/vgallery
+ */
+
+class ffPage_html extends ffPage_base
 {
 	/**
 	 * Il suffisso della dir del layer
@@ -24,7 +49,7 @@ class ffPage_html extends ffPage_base
 	var $sections 				= array();
 
 	//var $js_browser_detection	= true;
-	
+
 	/**
 	 * Se deve essere utilizzato il framework Javascript
 	 * @var Boolean
@@ -119,7 +144,7 @@ class ffPage_html extends ffPage_base
 
     var $widget_tabs_placeholder = null;
 	var $widget_tabs_context = null;
-	
+
 	// loaded with libs.json
     var $libraries                  = null;
     public $resources               = null;
@@ -133,7 +158,7 @@ class ffPage_html extends ffPage_base
 	var $exclude_css = array();
 	/*var $libraries_css = array(
 		);*/
-                                    
+
 	//var $css_browser_detection		= false;
 
 	/**
@@ -173,13 +198,13 @@ class ffPage_html extends ffPage_base
 	 * @var String
 	 */
 	var $form_enctype			= "";
-	
+
 	/**
 	 * Il tema di jquery.ui
 	 * @var String
 	 */
 	var $jquery_ui_theme 		= "";
-	
+
 	/**
 	 * Il nome del template da caricare per l'utilizzo con ffPage
 	 * @var String
@@ -206,20 +231,20 @@ class ffPage_html extends ffPage_base
 	 * @var Array
 	 */
 	public $page_css				= array();
-	
+
 	public $compact_js 			   = false;
 	public $js_buffer 			   = array();
-    public $override_js            = array(); 
-    
+    public $override_js            = array();
+
 	/**
 	 * I Javascript caricati nella pagina, identificati da un TAG
 	 * @var Array
 	 */
     public $page_js                	= array();
     public $page_tags               = array();
-    
+
 	public $compress			   	= false;
-	
+
 	public $minify					= "strip"; // HTML post-process, can be: false, strip, strong_strip, minify
 	public $page_defer				= array(); // array keys js and css of all compress resources (js and css)
 	/**
@@ -233,7 +258,7 @@ class ffPage_html extends ffPage_base
 	 * @var Array
 	 */
     public $page_html_attr         = array();
-    
+
 	/**
 	 * Una classe da impostare sul tag BODY
 	 * @var String
@@ -309,27 +334,78 @@ class ffPage_html extends ffPage_base
 		else
 			return $this->getLayerDir($layout_file);
 	}*/
-    public function loadResources($patterns) {
-        $patterns["/themes/" . $this->getTheme()] = array(
-            "filter"                    => array("css", "js", "html", "tpl", "jpg", "svg", "png")
-            , "rules"                   => array(
-                "/layouts/"             => "layouts"
-                , "/common/"            => "common"
-                , "/contents/"          => "components"
-                , "/widgets/"           => "widgets"
-                , "/css/"               => "css"
-                , "/javascript/"        => "js"
-                , "/images/"            => "images"
-                , "/fonts/"             => "fonts"
-                , "/ff/"                => "components"
+    public function loadResources($patterns, $excludeDirname = null) {
+        $default_rules = array(
+            "layouts" => array(
+                "type" => "layouts"
+                , "ext" => array(
+                    "html" => true
+                    , "tpl" => true
+                )
+            )
+            , "common" => array(
+                "type" => "common"
+                , "ext" => array(
+                    "html" => true
+                    , "tpl" => true
+                )
+            )
+            , "widgets" => array(
+                "type" => "widgets"
+                , "ext" => array(
+                    "html" => true
+                    , "tpl" => true
+                )
+            )
+            , "css" => array(
+                "type" => "css"
+                , "ext" => array(
+                    "css" => true
+                )
+            )
+            , "js" => array(
+                "type" => "js"
+                , "ext" => array(
+                    "js" => true
+                )
+            )
+            , "images" => array(
+                "type" => "images"
+                , "ext" => array(
+                    "jpg" => true
+                    , "png" => true
+                    , "svg" => true
+                    , "jpeg" => true
+                    , "gif" => true
+                )
+            )
+            , "components" => array(
+                "type" => "components"
+                , "ext" => array(
+                    "html" => true
+                    , "tpl" => true
+                )
             )
         );
+        if(is_array($patterns) && count($patterns)) {
+            foreach ($patterns AS $pattern => $params) {
+                if (is_array($params["rules"]) && count($params["rules"])) {
+                    foreach ($params["rules"] AS $path => $rule){
+                        if($default_rules[$rule]) {
+                            $patterns[$pattern]["rules"][$path] = $default_rules[$rule];
+                        }
+                    }
+                }
+            }
+        }
+
+        Filemanager::scanExclude($excludeDirname);
 
         $this->resources = Filemanager::scan($patterns);
     }
 
     public function loadLibrary($path = null) {
-        if($path) {
+        if($path && !is_array($path)) {
             $this->libsExtend(Filemanager::getInstance("php")->read($path . "/libs.php"));
 //            $this->libraries = array_merge_recursive($this->libraries, Filemanager::getInstance("php")->read($path . "/libs.php"));
             Filemanager::getInstance("php")->write($this->libraries, CM_CACHE_DISK_PATH . "/libs.php");
@@ -340,430 +416,7 @@ class ffPage_html extends ffPage_base
             if (!isset($_REQUEST["__CLEARCACHE__"]) && file_exists($cache_file)) {
                 $this->libraries = include($cache_file);
             } else {
-                $this->libraries = array(
-                    "ff" => array(
-                        "default" => "latest"
-                    , "latest" => array(
-                            "path" => "/themes/library/ff"
-                        , "file" => "ff.js"
-                        , "index" => 100
-                        //, "async" => false
-                        , "css_defs" => array(
-                                "core" => array(
-                                    "path" => "/themes/responsive/css"
-                                , "file" => "ff.css"
-                                , "priority" => cm::LAYOUT_PRIORITY_HIGH
-                                , "index" => 150
-                                , "css_loads" => array(
-                                        ".skin" => array(
-                                            "path" => "/themes/responsive/css"
-                                        , "file" => "ff-skin.css"
-                                        )
-                                    )
-                                )
-                            )
-                        , "js_deps" => array(
-                                //"jquery" => null
-                            )
-                        , "js_loads" => array(
-                               // "ff.ffEvent" => null
-                               // , "ff.ffEvents" => null
-                            )
-                        , "js_defs" => array(
-                              /*  "ffEvent" => array(
-                                    "path" => "/themes/library/ff"
-                                , "file" => "ffEvent.js"
-                                , "index" => 100
-                                //, "async" => false
-                                )
-                            , "ffEvents" => array(
-                                    "path" => "/themes/library/ff"
-                                , "file" => "ffEvents.js"
-                                , "index" => 100
-                                //, "async" => false
-                                )
-                            ,*/ "history" => array(
-                                    "path" => "/themes/library/ff"
-                                , "file" => "history.js"
-                                , "index" => 100
-                                )
-                            , "ajax" => array(
-                                    "path" => "/themes/library/ff"
-                                , "file" => "ajax.js"
-                                , "index" => 100
-                                , "js_loads" => array(
-                                    )
-                                )
-                            , "ffPage" => array(
-                                    "path" => "/themes/responsive/ff/ffPage"
-                                , "file" => "ffPage.js"
-                                , "index" => 100
-                                )
-                            )
-                        )
-                    )
-                , "jquery" => array(
-                        "default" => "1.11.2"
-                    , "1.11.2" => array(
-                            "path" => "/themes/library/jquery"
-                        , "file" => null
-                        , "index" => 200
-                        , "async" => false
-                        , "js_defs" => array(
-                                "plugins" => array(
-                                    "empty" => true
-                                )
-                            )
-                        )
-                    )
-                , "jquery-ui" => array(
-                        "default" => "1.11.3"
-                    , "1.11.3" => array(
-                            "path" => "/themes/library/jquery-ui"
-                        , "file" => null
-                        , "index" => 200
-                        , "js_deps" => array(
-                                "jquery" => null
-                            )
-                        , "js_defs" => array(
-                            )
-                        , "css_loads" => array(
-                                "jquery-ui.core" => null,
-                                "ff-jqueryui" => array(
-                                    "path" => "/themes/responsive/css"
-                                , "file" => "ff-jqueryui.css"
-                                )
-                            )
-                        , "css_defs" => array(
-                                "accordion" => array(
-                                    "file" => "base/accordion.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "autocomplete" => array(
-                                    "file" => "base/autocomplete.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "button" => array(
-                                    "file" => "base/button.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "core" => array(
-                                    "file" => "base/core.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "datepicker" => array(
-                                    "file" => "base/datepicker.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "dialog" => array(
-                                    "file" => "base/dialog.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "draggable" => array(
-                                    "file" => "base/draggable.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "menu" => array(
-                                    "file" => "base/menu.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "progressbar" => array(
-                                    "file" => "base/progressbar.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "resizable" => array(
-                                    "file" => "base/resizable.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "selectable" => array(
-                                    "file" => "base/selectable.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "selectmenu" => array(
-                                    "file" => "base/selectmenu.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "slider" => array(
-                                    "file" => "base/slider.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "sortable" => array(
-                                    "file" => "base/sortable.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "spinner" => array(
-                                    "file" => "base/spinner.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "tabs" => array(
-                                    "file" => "base/tabs.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            , "tooltip" => array(
-                                    "file" => "base/tooltip.css"
-                                , "path" => "/themes/library/jquery-ui.themes"
-                                , "index" => 200
-                                )
-                            )
-                        )
-                    )
-                , "fonticons" => array(
-                        "default" => "latest"
-                    , "latest" => array(
-                            "empty" => true
-                        , "css_defs" => array(
-                                "fontawesome" => array(
-                                    "path" => "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css"
-                                , "file" => "font-awesome.min.css"
-                                , "index" => 175
-                                , "css_loads" => array(
-                                        ".ff" => array(
-                                            "path" => FF_THEME_DIR . "/" . FF_MAIN_THEME . "/css"
-                                        , "file" => "ff-fontawesome.css"
-                                        )
-                                    )
-                                )
-                            , "glyphicons" => array(
-                                    "path" => "/themes/responsive/css"
-                                , "file" => "bootstrap-glyphicons.min.css"
-                                , "index" => 175
-
-                                )
-                            )
-                        )
-                    )
-                , "bootstrap" => array(
-                        "default" => "latest"
-                    , "latest" => array(
-                            "empty" => true
-                        , "js_defs" => array(
-                                "core" => array(
-                                    "path" => "https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js"
-                                , "file" => "bootstrap.min.js"
-                                , "index" => 150
-                                , "js_deps" => array(
-                                        "jquery" => null
-                                    )
-                                )
-                            )
-                        , "css_defs" => array(
-                                "core" => array(
-                                    "path" => "https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css"
-                                , "file" => "bootstrap.min.css"
-                                , "index" => 150
-                                , "js_loads" => array(
-                                        "bootstrap.core" => null
-                                    )
-                                , "css_deps" => array(
-                                        //"fonticons.fontawesome" => null
-                                    )
-                                , "css_loads" => array(
-                                        ".ff" => array(
-                                            "path" => FF_THEME_DIR . "/" . FF_MAIN_THEME . "/css"
-                                        , "file" => "ff-bootstrap.css"
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                , "foundation" => array(
-                        "default" => "latest"
-                    , "latest" => array(
-                            "empty" => true
-                        , "js_defs" => array(
-                                "core" => array(
-                                    "path" => "https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/js"
-                                , "file" => "foundation.min.js"
-                                , "index" => 150
-                                , "js_deps" => array(
-                                        "jquery" => null
-                                    )
-                                , "js_loads" => array(
-                                        ".init" => array(
-                                            "embed" => "
-								jQuery(function() {
-									jQuery(document).foundation();
-								});
-							"
-                                        )
-                                    )
-                                )
-                            )
-                        , "css_defs" => array(
-                                "core" => array(
-                                    "path" => "https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/css"
-                                , "file" => "foundation.min.css"
-                                , "index" => 150
-                                , "js_loads" => array(
-                                        "foundation.core" => null
-                                    )
-                                , "css_deps" => array(
-                                        //"fonticons.fontawesome" => null
-                                    )
-                                , "css_loads" => array(
-                                        ".ff" =>  array(
-                                            "path" => FF_THEME_DIR . "/" . FF_MAIN_THEME . "/css"
-                                        , "file" => "ff-foundation.css"
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                , "google" => array(
-                        "default" => "latest"
-                    , "latest" => array(
-                            "empty" => true
-                        , "js_defs" => array(
-                                "adsense" => array(
-                                    "path" => "//pagead2.googlesyndication.com/pagead/js"
-                                , "file" => "adsbygoogle.js"
-                                , "priority" => cm::LAYOUT_PRIORITY_LOW
-                                , "js_loads" => array(
-                                        ".push" => array(
-                                            "embed" => "
-									jQuery(function() {
-										var adsbygoogle = window.adsbygoogle || [];
-										jQuery(\"ins.adsbygoogle\").each(function(){
-											if (jQuery(this).attr(\"data-adsbygoogle-status\") !== \"done\") {
-												adsbygoogle.push({});
-											}
-										});
-									});
-								"
-                                        )
-                                    )
-                                )
-                            , "jsapi" => array(
-                                    "empty" => true
-                                , "js_defs" => array(
-                                        "async" => array(
-                                            "path" => "https://www.google.com"
-                                        , "file" => "jsapi?callback=gloadinitcall"
-                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
-                                        , "js_deps" => array(
-                                                ".initcall" => array(
-                                                    "embed" => "
-											var gloadinit = [];
-											function gloadinitcall(callback) {
-												if (callback === undefined) {
-													gloadinit.forEach(function(entry) {
-														entry();
-													});
-													gloadinit = false;
-												} else {
-													if (gloadinit === false)
-														callback();
-													else
-														gloadinit.push(callback);
-												}
-											}
-										"
-                                                , "exclude_compact" => true
-                                                )
-                                            )
-                                        )
-                                    , "sync" => array(
-                                            "path" => "https://www.google.com"
-                                        , "file" => "jsapi"
-                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
-                                        , "js_deps" => array(
-                                                ".initcall" => array(
-                                                    "embed" => "
-											var gloadinit = [];
-											function gloadinitcall(callback) {
-												jQuery(window).ready(function(){callback();});
-											}
-										"
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            , "maps" => array(
-                                    "empty" => true
-                                , "js_defs" => array(
-                                        "async" => array(
-                                            "path" => "https://maps.googleapis.com/maps/api"
-                                        , "file" => "js?libraries=places&callback=gmapsinitcall"
-                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
-                                        , "js_deps" => array(
-                                                ".initcall" => array(
-                                                    "embed" => "
-											var gmapsinit = [];
-											function gmapsinitcall(callback) {
-												if (callback === undefined) {
-													gmapsinit.forEach(function(entry) {
-														entry();
-													});
-													gmapsinit = false;
-												} else {
-													if (gmapsinit === false)
-														callback();
-													else
-														gmapsinit.push(callback);
-												}
-											}
-										"
-                                                , "exclude_compact" => true
-                                                )
-                                            )
-                                        )
-                                    , "sync" => array(
-                                            "path" => "https://maps.googleapis.com/maps/api"
-                                        , "file" => "js?libraries=places"
-                                        , "priority" => cm::LAYOUT_PRIORITY_LOW
-                                        , "js_deps" => array(
-                                                ".initcall" => array(
-                                                    "embed" => "
-											var gmapsinit = [];
-											function gmapsinitcall(callback) {
-												jQuery(window).ready(function(){callback();});
-											}
-										"
-                                                )
-                                            )
-                                        )
-                                    , "markerclusterer" => array(
-                                            "path" => FF_THEME_DIR . "/library/plugins/gmap3.markerclusterer",
-                                            "file" => "markerclusterer.js"
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                , "facebook" => array(
-                        "default" => "latest",
-                        "latest" => array(
-                            "path" => "http://connect.facebook.net/" . strtolower(substr(FF_LOCALE, 0, 2)) . "_" . strtoupper(substr(FF_LOCALE, 0, 2))
-                        , "file" => "all.js"
-                        )
-                    )
-                , "library" => array(
-                        "default" => "latest",
-                        "latest" => array(
-                            "empty" => true
-                        )
-                    )
-                );
+                $this->libraries = $path;
 
                 Filemanager::scan(FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/ff", array("name" => array("libs.php")), function ($file) {
                     $this->libsExtend(Filemanager::getInstance("php")->read($file));
@@ -877,6 +530,10 @@ class ffPage_html extends ffPage_base
         } elseif($params) {
             $path                                       = dirname($params);
             $file                                       = basename($params);
+        }
+
+        if(!$priority) {
+            $priority = cm::LAYOUT_PRIORITY_DEFAULT;
         }
 
 		/*if ($file === "jquery.css")
@@ -1070,7 +727,7 @@ class ffPage_html extends ffPage_base
             $css = $this->getAsset($tag, "css");
             if ($css) {
                 $file = basename($css);
-                $path = str_replace(FF_DISK_PATH, "", dirname($css));
+                $path = ff_stripAbsDir(dirname($css));
             }
         }
 
@@ -1295,6 +952,10 @@ class ffPage_html extends ffPage_base
             $file                                       = basename($params);
         }
 
+        if(!$priority) {
+		    $priority = cm::LAYOUT_PRIORITY_DEFAULT;
+        }
+
         if(strpos($tag, "ff") === 0) {
             $this->use_own_js = true;
         }
@@ -1305,7 +966,7 @@ class ffPage_html extends ffPage_base
 		$this->js_loaded[$tag] = array(); // avoid infinite recursion
 
 		$tmp_async = ($async !== null ? $async : (
-							$this->isXHR() ? true : true //false
+							$this->isXHR() ? true : false //false
 						)
 				);
 
@@ -1670,19 +1331,22 @@ class ffPage_html extends ffPage_base
 				$tmp = $this->getTemplateDir("ffPage_XHR.html");
 				if ($tmp !== null)
 				{
-					$this->tpl[0] = ffTemplate::factory($tmp);
-					$this->tpl[0]->load_file("ffPage_XHR.html", "main");
+                    $this->tpl[0] = $this->loadTemplate("ffPage_XHR");
+                    //$this->tpl[0] = ffTemplate::factory($tmp);
+					//$this->tpl[0]->load_file("ffPage_XHR.html", "main");
 				}
 				else
 				{
-					$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
-					$this->tpl[0]->load_file($this->template_file, "main");
+                    $this->tpl[0] = $this->loadTemplate(pathinfo($this->template_file, PATHINFO_FILENAME));
+                    //$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
+					//$this->tpl[0]->load_file($this->template_file, "main");
 				}
 			}
 			else
 			{
-				$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
-				$this->tpl[0]->load_file($this->template_file, "main");
+                $this->tpl[0] = $this->loadTemplate(pathinfo($this->template_file, PATHINFO_FILENAME));
+                //$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
+				//$this->tpl[0]->load_file($this->template_file, "main");
 			}
 		}
 		else
@@ -1746,23 +1410,18 @@ class ffPage_html extends ffPage_base
 
 			$res = $this->doEvent("on_tpl_layer_loaded", array(&$this, $this->tpl_layer[0]));
 
+
+
+
+
 			// SECTIONS
 			if (!$this->isXHR())
 			{
-				if (property_exists("ffPage_html", "navbar") && strlen($this->navbar))
-				{
-					ffErrorHandler::raise("Obsolete use of ->navbar, use ->sections[\"navbar\"] instead", E_USER_ERROR, $this, get_defined_vars());
-				}
-
-				if (property_exists("ffPage_html", "topbar") && strlen($this->topbar))
-				{
-					ffErrorHandler::raise("Obsolete use of ->topbar, use ->sections[\"topbar\"] instead", E_USER_ERROR, $this, get_defined_vars());
-				}
-
 				if (is_array($this->sections) && count($this->sections))
 				{
 					foreach ($this->sections AS $key => $value)
 					{
+
 					    switch($value["type"]) {
                             case "php":
                                 ob_start();
@@ -1788,7 +1447,21 @@ class ffPage_html extends ffPage_base
 
                         }
 
-                        $this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
+                        //$this->sections[$key]["events"]->doEvent("on_load_template", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
+                        $params = array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]);
+
+                        /* Override Part */
+
+                        if (isset($value["override"]) && isset($value["override_method"])) {
+                            $method = $value["override_method"];
+                            $obj = $value["override"];
+                            //ddd($params[0]);
+                            $obj::$method($this, $this->sections[$key]["tpl"], $value["attributes"]);
+                            continue;
+                        }
+                        /* Override Part */
+
+                        $this->sections[$key]["events"]->doEvent("on_load_template", $params);
 
 					}
 					reset($this->sections);
@@ -1891,10 +1564,12 @@ class ffPage_html extends ffPage_base
 		$framework_css = frameworkCSS::getFramework();
 		$font_icon = frameworkCSS::getFontIcon();
 
-        if(__TOP_DIR__ != __PRJ_DIR__)
+        /*if(__TOP_DIR__ != __PRJ_DIR__)
             $tpl[0]->set_var("base_path", substr($this->site_path, 0, strpos($this->site_path, "/domains/")));
         else
-            $tpl[0]->set_var("base_path", $this->site_path);
+            $tpl[0]->set_var("base_path", $this->site_path);*/
+
+        $tpl[0]->set_var("base_path", FF_BASE_PATH);
 
         $tpl[0]->set_var("site_path", $this->site_path);
 		$tpl[0]->set_var("language", FF_LOCALE);
@@ -2060,6 +1735,14 @@ class ffPage_html extends ffPage_base
 			{
 				$this->doEvent("on_tpl_parsed", array(&$this));
 			}
+			//die($this->tpl[0]->rpparse("SectHeaders", false));
+
+            $this->output_buffer["headers"] .= $this->tpl[0]->rpparse("SectHeaders", false);
+            $this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
+
+            $this->output_buffer["headers"] = preg_replace('/\s+/', ' ', $this->output_buffer["headers"]);
+            $this->output_buffer["footers"] = preg_replace('/\s+/', ' ', $this->output_buffer["footers"]);
+            $this->output_buffer["html"] = preg_replace('/\s+/', ' ', $this->output_buffer["html"]);
 
 			cm::jsonParse(array_merge($this->json_result, $this->output_buffer), $output_result);
 		}
@@ -2104,8 +1787,8 @@ class ffPage_html extends ffPage_base
             if($this->isXHR()) {
                 if ($this->getXHRFormat() === false)
                 {
-                    $this->output_buffer["headers"] = preg_replace('/\s+/', ' ',$this->tpl[0]->rpparse("SectHeaders", false) . $this->output_buffer["headers"]);
-                    $this->output_buffer["footers"] = preg_replace('/\s+/', ' ',$this->output_buffer["footers"] . $this->tpl[0]->rpparse("SectFooters", false));
+                    $this->output_buffer["headers"] = $this->tpl[0]->rpparse("SectHeaders", false) . $this->output_buffer["headers"];
+                    $this->output_buffer["footers"] = $this->output_buffer["footers"] . $this->tpl[0]->rpparse("SectFooters", false);
 
                     if (!$this->getXHRComponent())
                     {
@@ -2446,6 +2129,7 @@ class ffPage_html extends ffPage_base
 	/**
 	 * Elabora il template del layout e delle sezioni
 	 */
+
 	protected function tplProcessLayout()
 	{
 		$this->doEvent("on_tpl_layer_process", array(&$this, $this->tpl_layer[0]));
@@ -2480,6 +2164,7 @@ class ffPage_html extends ffPage_base
 				if ($value["tpl"] === null) {
                     continue;
                 }
+
 				$this->sections[$key]["events"]->doEvent("on_process", array(&$this, &$this->sections[$key]["tpl"], $value["attributes"]));
 
 				switch (get_class($value["tpl"])) {
@@ -2925,15 +2610,15 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->set_var("css_path", $tmp_path);
 				else
 				{
-					$mtime = @filemtime(ff_getAbsDir($tmp_path));
-					if (ff_getAbsDir($tmp_path, false))
+					$mtime = @filemtime(ff_getAbsDir($tmp_path) . $tmp_path);
+					/*if (0 && ff_getAbsDir($tmp_path, false))
 					{
 						$a = FF_DISK_PATH;
 						$b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
 						$c = substr(__TOP_DIR__, strlen($b));
 						$this->tpl[0]->set_var("css_path", $c . $tmp_path . ($mtime ? "?" . $mtime : ""));
 					}
-					else
+					else*/
 						$this->tpl[0]->set_var("css_path", FF_SITE_PATH . $tmp_path . ($mtime ? "?" . $mtime : ""));
 				}
 
@@ -3091,6 +2776,8 @@ class ffPage_html extends ffPage_base
 	 */
     public function parse_js()
     {
+        $position = "Bottom";
+
         $this->tpl[0]->set_var("SectJs", "");
         $this->tpl[0]->set_var("SectAsyncJsPlugin", "");
 
@@ -3166,10 +2853,14 @@ class ffPage_html extends ffPage_base
 						//$this->tpl[0]->parse("SectLib", true);
 						//$this->tpl[0]->parse("SectLibs", false);
 
-						$this->tpl[0]->set_var("js_embed", $value["embed"]);
-						$this->tpl[0]->parse("SectJsEmbed", false);
-						$this->tpl[0]->set_var("SectJsSrc", "");
-						$this->tpl[0]->parse("SectJs", true);
+                        $this->tpl[0]->set_var("js_embed", $value["embed"]);
+                        if($this->isXHR()) {
+                            $this->tpl[0]->parse("SectJsEmbed", false);
+                            $this->tpl[0]->set_var("SectJsSrc", "");
+                            $this->tpl[0]->parse("SectJs", true);
+                        } else {
+                            $this->tpl[0]->parse("SectJsEmbed", true);
+                        }
 					}
 					continue;
 				}
@@ -3274,6 +2965,7 @@ class ffPage_html extends ffPage_base
 									}
 									else
 									{
+
 										$tmp_path .= "/" . ($value["file"] ? $value["file"] : $key . ".js");
 										$tmp_file = ff_getAbsDir($tmp_path) . $tmp_path;
 									}
@@ -3453,15 +3145,15 @@ class ffPage_html extends ffPage_base
 					$this->tpl[0]->set_var("js_path", $tmp_path);
 				else
 				{
-					$mtime = @filemtime(ff_getAbsDir($tmp_path));
-					if (ff_getAbsDir($tmp_path, false))
+					$mtime = @filemtime(ff_getAbsDir($tmp_path) . $tmp_path);
+					/*if (0 && ff_getAbsDir($tmp_path, false))
 					{
 						$a = FF_DISK_PATH;
 						$b = substr($a, 0, strlen(FF_SITE_PATH) * -1);
 						$c = substr(__TOP_DIR__, strlen($b));
 						$this->tpl[0]->set_var("js_path", $c . $tmp_path . ($mtime ? "?" . $mtime : ""));
 					}
-					else
+					else*/
 						$this->tpl[0]->set_var("js_path", FF_SITE_PATH . $tmp_path . ($mtime ? "?" . $mtime : ""));
 				}
 
@@ -3498,18 +3190,18 @@ class ffPage_html extends ffPage_base
 						}
 						else
 						{
-							$this->tpl[0]->parse("SectJsSrc", false);
+							$this->tpl[0]->parse("SectJsSrc" . $position, false);
 							if($value["async"]) {
-                                $this->tpl[0]->parse("SectJSAsync", false);
+                               // $this->tpl[0]->parse("SectJSAsync", false);
                             }
 							$this->tpl[0]->set_var("SectJsEmbed", "");
-							$this->tpl[0]->parse("SectJs", true);
+							$this->tpl[0]->parse("SectJs" . $position, true);
 							if (!$static_init/* && ffIsset($alldeps, $key)*/)
 							{
 								$this->tpl[0]->set_var("js_embed", "ff.libLoadStatic('js', '$key');"); //, $tmp_lib_deps
 								$this->tpl[0]->parse("SectJsEmbed", false);
-								$this->tpl[0]->set_var("SectJsSrc", "");
-								$this->tpl[0]->parse("SectJs", true);
+								$this->tpl[0]->set_var("SectJsSrc" . $position, "");
+								$this->tpl[0]->parse("SectJs" . $position, true);
 							}
 						}
 					}
@@ -3752,7 +3444,7 @@ class ffPage_html extends ffPage_base
 
 	function process_params()
 	{
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID && count($this->components))
+		if (ffTheme::RANDOMIZE_COMP_ID && count($this->components))
 		{
 			$tmp = $this->getXHRFFStruct();
 			if ($tmp)

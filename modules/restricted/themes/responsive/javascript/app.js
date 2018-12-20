@@ -1,18 +1,3 @@
-jQuery.fn.selectText = function(){
-	var doc = document, element = this[0], range, selection;
-	if (doc.body.createTextRange) {
-		range = document.body.createTextRange();
-		range.moveToElementText(element);
-		range.select();
-	} else if (window.getSelection) {
-		selection = window.getSelection();        
-		range = document.createRange();
-		range.selectNodeContents(element);
-		selection.removeAllRanges();
-		selection.addRange(range);
-	}
-};
-
 ff.modules.restricted = (function () {
     const MOBILE_WIDTH 		= 768;
     const SCROLL_PARAMS		= {
@@ -186,10 +171,19 @@ ff.modules.restricted = (function () {
             }
         }
 	};
-    window.addEventListener('load', function () {
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-		that.init();
-	});
+        that.init();
+    }
+
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 	
 	return that;
 

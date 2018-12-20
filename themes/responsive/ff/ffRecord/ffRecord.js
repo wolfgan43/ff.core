@@ -127,12 +127,19 @@ __ff : "ff.ffRecord", // used to recognize ff'objects
 
 }; // publics' end
 
-ff.pluginAddInitLoad("ff.ffRecord", function () {
-	ff.addEvent({"event_name" : "onClearComponent", "func_name" : that.onClearComponent});
-});
-    window.addEventListener('load', function () {
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-    });
+        ff.addEvent({"event_name" : "onClearComponent", "func_name" : that.onClearComponent});
+    }
+
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 
 return that;
 

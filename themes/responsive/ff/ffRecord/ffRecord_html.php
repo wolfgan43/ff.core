@@ -205,8 +205,9 @@ class ffRecord_html extends ffRecord_base
 
         $this->framework_css = $page->frameworkCSS->findComponent("ffRecord");
 
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
-			$this->id_if = uniqid();
+		if (ffTheme::RANDOMIZE_COMP_ID) {
+            $this->id_if = uniqid();
+        }
 	}
 	
 	function getIDIF()
@@ -288,8 +289,9 @@ class ffRecord_html extends ffRecord_base
 	{
 		if ($this->tpl === null)
 		{
-			$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
-			$this->tpl[0]->load_file($this->template_file, "main");
+            $this->tpl[0] = $this->parent[0]->loadTemplate(pathinfo($this->template_file, PATHINFO_FILENAME));
+            //$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
+			//$this->tpl[0]->load_file($this->template_file, "main");
 		}
 
 		$this->tpl[0]->set_var("component", $this->getPrefix());

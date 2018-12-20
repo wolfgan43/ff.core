@@ -10,46 +10,6 @@
         <reverse>/actexparse</reverse>
         <index>999</index>
     </rule>
-    <rule id="parsedata">
-        <priority>HIGH</priority>
-        <source>/parsedata$</source>
-        <destination>
-            <url>[MAIN_THEME]/ff/ffField/widgets/activecomboex/parsedata</url>
-            <toplevel />
-        </destination>
-        <reverse>/parsedata</reverse>
-        <index>999</index>
-    </rule>
-    <rule id="aparsedata">
-        <priority>HIGH</priority>
-        <source>/aparsedata$</source>
-        <destination>
-            <url>[MAIN_THEME]/ff/ffField/widgets/autocomplete/parsedata</url>
-            <toplevel />
-        </destination>
-        <reverse>/aparsedata</reverse>
-        <index>999</index>
-    </rule> 
-    <rule id="aparsedatax">
-        <priority>HIGH</priority>
-        <source>/aparsedatax$</source>
-        <destination>
-            <url>[MAIN_THEME]/ff/ffField/widgets/autocompletex/parsedata</url>
-            <toplevel />
-        </destination>
-        <reverse>/aparsedatax</reverse>
-        <index>999</index>
-    </rule> 
-    <rule id="atparsedata">
-        <priority>HIGH</priority>
-        <source>/atparsedata$</source>
-        <destination>
-            <url>[MAIN_THEME]/ff/ffField/widgets/autocompletetoken/parsedata</url>
-            <toplevel />
-        </destination>
-        <reverse>/atparsedata</reverse>
-        <index>999</index>
-    </rule> 
 	<rule id="dialog">
 		<priority>NORMAL</priority>
 		<source>/dialog(/[^/]*){0,1}$</source>
@@ -139,6 +99,7 @@
 			<url>$0</url>
 			<content_root>/contents</content_root>
 		</destination>
+        <accept_path_info />
 		<!--<process_next />-->
 	</rule>
 </ffxml>

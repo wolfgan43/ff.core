@@ -1283,18 +1283,26 @@ var activecombo = function(params) {
 
 		return buffer;
 	};
-	
-	function constructor() { // NB: called below publics
-		jQuery.fn.escapeGet("actex_" + __id + "_combo").click(function() {
-			jQuery.fn.escapeGet(__id + "_label").trigger("focus");
-			return false;
-		});	
-	}
 
-    window.addEventListener('load', function () {
+
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-        constructor();
-    });
+        jQuery.fn.escapeGet("actex_" + __id + "_combo").click(function() {
+            jQuery.fn.escapeGet(__id + "_label").trigger("focus");
+            return false;
+        });
+    }
+
+    constructor();
+    /*
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }*/
 
 	return that;
 }; // actex object end
@@ -1468,7 +1476,7 @@ function ajaxUpdate (id, retData) {
 	
 	if (inst.insert_mode !== false)
 		that.insertModeOff(id);
-};
+}
 
 function ajaxChainBlock (inst) {
 	if (inst.childs.length) {
@@ -1477,11 +1485,20 @@ function ajaxChainBlock (inst) {
 			ajaxChainBlock(that.getInstance(child));
 		});
 	}
-};
+}
 
-window.addEventListener('load', function () {
-	ff.initExt(that);
-});
+    /* Init obj */
+    function constructor() { // NB: called below publics
+        ff.initExt(that);
+    }
+
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 
 return that;
 

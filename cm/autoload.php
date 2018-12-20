@@ -16,10 +16,10 @@ spl_autoload_register(function ($class) {
     $php_ext = ".php";
     switch ($class) {
         case "cm":
-            require(__DIR__ . '/cm' . $php_ext);
+            require('cm' . $php_ext);
             break;
         case "cmRouter":
-            require(__DIR__ . '/' . $class . $php_ext);
+            require('cmRouter' . $php_ext);
             break;
         default:
     }

@@ -68,12 +68,13 @@ function drawButtons(id) {
 	var tplProperties = "";
 	var tplAddClass = "";
 
-    jQuery("." + component).find(".totpage").html(navigators[id].totpage);
-	if(navigators[id].totpage == 1) {
-		jQuery("." + component + " .pages LI").addClass(navigators[id].hiddenClass);
-		jQuery("." + component + " .page").parent().remove();
-        jQuery("." + component + " .choice").addClass(navigators[id].hiddenClass);
-        jQuery("." + component).each(function () {
+    if(navigators[id].totpage <= 1) {
+		//jQuery("." + component + " .pages LI").addClass(navigators[id].hiddenClass);
+        jQuery("." + component + ".pages").addClass(navigators[id].hiddenClass);
+        jQuery("." + component + " .page").parent().remove();
+        jQuery("." + component + ".choice").addClass(navigators[id].hiddenClass);
+
+       /* jQuery("." + component).each(function () {
 			if(parseInt(jQuery(".perPage li:first a", this).attr("rel")) >= navigators[id].totrec) {
 				jQuery(".perPage", this).addClass(navigators[id].hiddenClass);
 			} else {
@@ -95,9 +96,8 @@ function drawButtons(id) {
 				});
 			}
             
-        });
+        });*/
 	} else {
-		jQuery("." + component + " .pages").addClass(navigators[id].hiddenClass);
         for (var i = navigators[id].start_page; i <= navigators[id].end_page; i++) {
             if(i > navigators[id].page) {
                 tplProperties = ' rel="next"';
@@ -111,7 +111,22 @@ function drawButtons(id) {
             }
             processed_code_template += '<li' + tplAddClass + '><a class="page' + (navigators[id].pageLinkClass ? ' ' + navigators[id].pageLinkClass : '') + '" href="' + ff.ffPageNavigator.updateUriParams("page", (i > 1 ? i : "")) + '" data-page="' + i + '"' + tplProperties + '>' + i + '</a></li>';
         }
-        jQuery("." + component).each(function () {
+        jQuery("." + component + ".pages").removeClass(navigators[id].hiddenClass);
+        var lastPage = jQuery("." + component + ".pages .page:last").parent().next();
+        if(!lastPage.length) {
+            lastPage = jQuery("." + component + ".pages LI:last");
+		}
+        if(lastPage.length) {
+            lastPage.addClass("pinject");
+            jQuery("." + component + ".pages .page").parent().remove();
+            jQuery("." + component + ".pages .pinject").before(processed_code_template);
+        } else {
+            jQuery("." + component + ".pages UL").append(processed_code_template);
+        }
+
+        jQuery("." + component + ".choice").removeClass(navigators[id].hiddenClass);
+
+        /*jQuery("." + component).each(function () {
             jQuery(".page:last", this).parent().next().addClass("pinject");
         	jQuery(".page", this).parent().remove();
             jQuery(".pinject", this).before(processed_code_template);
@@ -126,7 +141,7 @@ function drawButtons(id) {
 				jQuery(".perPage li", this).removeClass(navigators[id].currentClass);
 				jQuery(".perPage a", this).each(function() {
 					var recPerPage = parseInt(jQuery(this).attr("rel"));
-				
+
 					if(recPerPage > navigators[id].totrec) {
 						jQuery(this).parent().addClass(navigators[id].hiddenClass);
 					} else {
@@ -139,13 +154,31 @@ function drawButtons(id) {
 					}
 				});
 			}
-        });
+        });*/
 	}
 
+
+    jQuery("." + component).find(".totpage").html(navigators[id].totpage);
 	jQuery("." + component).find(".currentpage").val(navigators[id].page);
-	jQuery("." + component).find(".totelem").children("span").text(navigators[id].totrec);
-	
-    return false;   
+	jQuery("." + component).find(".totelem").text(navigators[id].totrec);
+    if(navigators[id].totrec > 0) {
+        jQuery("." + component + ".totelem").removeClass(navigators[id].hiddenClass);
+        jQuery("." + component + ".perPage").removeClass(navigators[id].hiddenClass);
+    } else {
+        jQuery("." + component + ".totelem").addClass(navigators[id].hiddenClass);
+        jQuery("." + component + ".perPage").addClass(navigators[id].hiddenClass);
+    }
+    if(jQuery("." + component + ".choice").length && jQuery("." + component + ".pages").length) {
+        if (navigators[id].totpage > 10) {
+            jQuery("." + component + ".choice").parent().removeClass(navigators[id].hiddenClass);
+            jQuery("." + component + ".pages").parent().addClass(navigators[id].hiddenClass);
+        } else {
+            jQuery("." + component + ".choice").parent().addClass(navigators[id].hiddenClass);
+            jQuery("." + component + ".pages").parent().removeClass(navigators[id].hiddenClass);
+
+        }
+    }
+    return false;
 }
 
 function eventButtons(id) {
@@ -188,9 +221,12 @@ function eventButtons(id) {
             } else {
                 jQuery(".last", this).parent().addClass(navigators[id].hiddenClass);
                 //jQuery(".last", this).addClass("disabled");
-            }  
-
-            jQuery(".rec-page, .rec-all", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.changeRecPerPage);
+            }
+            var recAction = "click";
+            if(jQuery(".rec-page, .rec-all", this).is("select")) {
+                recAction = "change";
+            }
+            jQuery(".rec-page, .rec-all", this).bind(recAction + ".ff.ffPageNavigator", {"id" : id}, that.changeRecPerPage);
         }
 
         jQuery(".currentpage", this).bind("keydown.ff.ffPageNavigator", {"id" : id}, that.goPage);
@@ -411,8 +447,11 @@ __ff : "ff.ffPageNavigator", // used to recognize ff'objects
 
 "changeRecPerPage" : function(ev) {
     ev.preventDefault();
-    var recPerPage = parseInt(jQuery(ev.currentTarget).attr("rel"));
-    
+    var recPerPage = parseInt(jQuery(ev.currentTarget).is("select")
+        ? jQuery(ev.currentTarget).val()
+        : jQuery(ev.currentTarget).attr("rel")
+    );
+
     if(recPerPage) {
         navigators[ev.data.id].rec_per_page = recPerPage;
 
@@ -612,9 +651,18 @@ __ff : "ff.ffPageNavigator", // used to recognize ff'objects
 
 }; // publics' end
 
-    window.addEventListener('load', function () {
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-    });
+    }
+
+    if(document.readyState == "complete") {
+        constructor();
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 
 return that;
 

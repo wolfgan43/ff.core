@@ -112,16 +112,16 @@ class ffField
 
 		if (is_null($last_res))
 		{
-            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
-            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+            $class_name = __CLASS__ . "_" . ffTheme::TYPE;
+           // $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
 		else
 		{
-			$base_path = $last_res["base_path"];
+			//$base_path = $last_res["base_path"];
 			$class_name = $last_res["class_name"];
 		}
 
-		require_once $base_path;
+		//require_once $base_path;
 		$tmp = new $class_name($disk_path, $site_path, $page_path, $theme);
 		
 		$res = self::doEvent("on_factory_done", array($tmp));
@@ -351,7 +351,7 @@ abstract class ffField_base extends ffCommon
 	 * (funziona solo se aggiunto con addSearchField()
 	 * @var Boolean
 	 */
-	var $multi_disp_as_filter 	= false;
+	//var $multi_disp_as_filter 	= false;
 
 	/**
 	 * Permette d'impostare una funzione che viene eseguita una volta per ogni elemento di un campo
@@ -1921,9 +1921,6 @@ abstract class ffField_base extends ffCommon
 	function process_textarea($id, &$value)
 	{
 		$this->process_input($id, $value);
-
-		if(!$this->properties || !$this->properties["readonly"])
-			$this->tpl[0]->parse("SectAutoGrow", false);
 	}
 	
 	/**

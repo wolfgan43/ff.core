@@ -472,9 +472,18 @@ ff.ffField.kcuploadifive = (function () {
 		}
 	};
 
-    window.addEventListener('load', function () {
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-    });
+    }
+
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 
 	return that;
 	

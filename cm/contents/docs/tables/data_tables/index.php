@@ -36,6 +36,8 @@ $oGrid = ffGrid::factory($cm->oPage);
  */
 $oGrid->id = "Users";
 $oGrid->full_ajax = true;
+$oGrid->title = "Data Table";
+$oGrid->description = "Sono una descrizione di prova";
 /**
  * La query utilizzata per recuperare i dati da visualizzare.
  * Possono essere anche più tabelle in join.
@@ -139,6 +141,33 @@ $oField->base_type = "Timestamp";
 $oField->extended_type = "DateTime";
 $oField->app_type = "DateTime";
 $oGrid->addContent($oField);
+
+$oButton = ffButton::factory($cm->oPage);
+$oButton->id = "modify_selected";
+$oButton->ajax = $oGrid->record_id;
+$oButton->label = ffTemplate::_get_word_by_code("export");
+$oButton->aspect = "secondary";
+//$oButton->action_type = "gotourl";
+$oButton->url = $cm->oPage->site_path . $cm->oPage->page_path . $cm->real_path_info . "/pricelist/modify-selected?keys[formcnf-ID]=" . $_REQUEST["keys"]["ID"];
+$oGrid->addActionButtonHeader($oButton);
+
+$oButton = ffButton::factory($cm->oPage);
+$oButton->id = "modify_selected2";
+$oButton->ajax = $oGrid->record_id;
+$oButton->label = ffTemplate::_get_word_by_code("print");
+$oButton->aspect = "button";
+$oButton->action_type = "gotourl";
+$oButton->url = $cm->oPage->site_path . $cm->oPage->page_path . $cm->real_path_info . "/pricelist/modify-selected?keys[formcnf-ID]=" . $_REQUEST["keys"]["ID"];
+$oGrid->addActionButton($oButton);
+
+$oButton = ffButton::factory($cm->oPage);
+$oButton->id = "modify_selected3";
+$oButton->ajax = $oGrid->record_id;
+$oButton->label = ffTemplate::_get_word_by_code("print");
+$oButton->aspect = "info";
+$oButton->action_type = "gotourl";
+$oButton->url = $cm->oPage->site_path . $cm->oPage->page_path . $cm->real_path_info . "/pricelist/modify-selected?keys[formcnf-ID]=" . $_REQUEST["keys"]["ID"];
+$oGrid->addActionButton($oButton);
 
 /**
  * Inserisce la struttura all'interno di un tab, dichiarandone la label

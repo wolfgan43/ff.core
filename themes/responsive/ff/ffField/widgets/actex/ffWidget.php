@@ -91,9 +91,7 @@ class ffWidget_actex extends ffCommon
 
 	function process($id, &$value, ffField_base &$Field)
 	{
-		global $plgCfg_ActiveComboEX_UseOwnSession;
-        
-		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
+	    if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
 			$tpl_id = $Field->parent[0]->getIDIF();
 			$prefix = $tpl_id . "_";
@@ -101,7 +99,7 @@ class ffWidget_actex extends ffCommon
 				$this->prepare_template($tpl_id);
 			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
 			$this->tpl[$tpl_id]->set_var("container", $prefix);
-			$Field->parent[0]->processed_widgets[$prefix . $id] = "actex";
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "actex";
 		}
 		else
 		{
@@ -600,7 +598,7 @@ class ffWidget_actex extends ffCommon
             {
 				$tmp = md5($tmp_sql);
                 
-			    if (!defined("FF_ACTEX_SESSION_STARTED") && ($plgCfg_ActiveComboEX_UseOwnSession || $Field->actex_use_own_session))
+			    if (!defined("FF_ACTEX_SESSION_STARTED") && $Field->actex_use_own_session)
 			    {
 				   if (isset($_POST[session_name()]))
 						session_id($_POST[session_name()]);

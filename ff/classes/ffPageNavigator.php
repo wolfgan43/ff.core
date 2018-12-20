@@ -98,16 +98,16 @@ class ffPageNavigator
 
 		if (is_null($last_res))
 		{
-            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
-            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+            $class_name = __CLASS__ . "_" . ffTheme::TYPE;
+            //$base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
 		else
 		{
-			$base_path = $last_res["base_path"];
+			//$base_path = $last_res["base_path"];
 			$class_name = $last_res["class_name"];
 		}
 		
-		require_once $base_path;
+		//require_once $base_path;
 		$tmp = new $class_name($disk_path, $site_path, $page_path, $theme, $page);
 
 		$res = self::doEvent("on_factory_done", array($tmp));
@@ -250,7 +250,7 @@ abstract class ffPageNavigator_base extends ffCommon
 	 * Abilita la visualizzazione del pulsante "tutti i record"
 	 * @var Boolean
 	 */
-    var $nav_selector_elements_all = false;
+    var $nav_selector_elements_all = true;
 
 	/**
 	 * Nome del form utilizzato per la navigazione. Di default è "frmMain"

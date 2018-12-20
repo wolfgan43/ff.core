@@ -195,6 +195,21 @@ window.addEventListener('load', function () {
             }
         });
     };
+
+    jQuery.fn.selectText = function(){
+        var doc = document, element = this[0], range, selection;
+        if (doc.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(element);
+            range.select();
+        } else if (window.getSelection) {
+            selection = window.getSelection();
+            range = document.createRange();
+            range.selectNodeContents(element);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    };
 });
 
 
@@ -343,14 +358,25 @@ var that = { // publics
 		params.libs.each(function (i, v) {
 			if (libs.get(v.type) === undefined) libs.set(v.type, ff.hash());
 			if (v.source === undefined) { // preloaded library, simply add it without loading, it will be initialized by ff.ffEvents initLoad (below)
-				libs.get(v.type).set(v.id, {
-					"loaded" : false
-					, "source" : undefined
-					, "callback" : (v.type === "js" ? function () {that.pluginInitLoad(v.id);} : undefined)
-					, "async" : undefined
-					, "media" : undefined
-					, "deps" : v.deps
-				});
+				if(libs.get(v.type).isset(v.id)) {
+					var libValue = libs.get(v.type).get(v.id);
+                    libValue["deps"] = v.deps;
+                    libs.get(v.type).set(v.id, libValue);
+				} else {
+                    libs.get(v.type).set(v.id, {
+                        "loaded": (v.type === "js" && v.id.indexOf("ff.") === 0
+							? false
+							: true
+						)
+                        , "source": undefined
+                        , "callback": (v.type === "js" ? function () {
+                            that.pluginInitLoad(v.id);
+                        } : undefined)
+                        , "async": undefined
+                        , "media": undefined
+                        , "deps": v.deps
+                    });
+                }
 				that.libDeps(v.type, v.id, v.deps, true);
 			}
 		});
@@ -369,7 +395,7 @@ var that = { // publics
 		//that.libDeps("js", "jquery", undefined, true);
 	//}
     //if (!libs.get("js").isset("ff")) {
-        libs.get("js").set("ff.ffEvent", {
+        /*libs.get("js").set("ff.ffEvent", {
             "loaded": true
         });
         libs.get("js").set("ff.ffEvents", {
@@ -377,8 +403,8 @@ var that = { // publics
         });
         libs.get("js").set("ff", {
             "loaded": true
-        });
-        ff.extend(ff.ffEvents());
+        });*/
+
        // jQuery.extend(ff.fn, ff.ffEvents());
     //}
 },
@@ -392,9 +418,15 @@ var that = { // publics
 	}
 
 	if(key) {
-        libs.get("js").set(key, {
-            "loaded": true
-        });
+        if(libs.get("js").isset(key)) {
+            var libValue = libs.get("js").get(key);
+            libValue["loaded"] = true;
+            libs.get("js").set(key, libValue);
+        } else {
+            libs.get("js").set(key, {
+                "loaded": true
+            });
+        }
         that.pluginInit(key);
     }
 },
@@ -561,8 +593,15 @@ var that = { // publics
 	var tmp = libs.get(type).get(id);
 	if (tmp.loaded)
 		return;
-	
+
 	tmp.loaded = true;
+	if(id.indexOf("ff.") === 0) {
+		ref = eval(id);
+        if (typeof(ref) === 'object' && ref.events === undefined && ref.__ff) {
+            key = ref.__ff;
+            jQuery.extend(ref, ff.ffEvents());
+        }
+    }
 	if (tmp.callback !== undefined)
 		tmp.callback(false);
 	
@@ -606,6 +645,15 @@ var that = { // publics
 			source();
 			ff.libLoaded(type, id);
 		} else {
+
+
+			jQuery.getScript(that.fixPath(source), function(data) {
+                //jQuery("head").append('<script type="text/javascript">ff.libLoaded("' + type + '", "' + id + '");</script>');
+                //jQuery(function () {ff.libLoaded(type, id)});
+                ff.libLoaded(type, id);
+                return true;
+			});
+			/*
 			jQuery.ajax({
 				"async": async,
 				"url": that.fixPath(source),
@@ -615,7 +663,7 @@ var that = { // publics
 					//jQuery("head").append('<script type="text/javascript">ff.libLoaded("' + type + '", "' + id + '");</script>');
 					jQuery(function () {ff.libLoaded(type, id)});
 				}
-			});
+			});*/
 		}
 		/*
 		if (async || async === undefined) {
@@ -780,8 +828,9 @@ var that = { // publics
 			plugins_inits.set(id, []);
 
 		plugins_inits.get(id).push(callback);
-	} else
-		callback();
+	} else {
+        callback();
+    }
 },
 
 "pluginInitLoad" : function (id) {
@@ -884,7 +933,7 @@ var that = { // publics
 			ff.getLibs(plugin, object);
 	}
 	if(callback)
-		ff.pluginAddInit(plugin, callback, uuid);
+			ff.pluginAddInit(plugin, callback, uuid);
 },
 "extend" : function (object) {
 	jQuery.extend(ff, object);
@@ -1829,3 +1878,5 @@ ff.ffEvents = function () {
 
 // code's end.
 };
+
+ff.extend(ff.ffEvents());

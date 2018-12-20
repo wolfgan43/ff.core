@@ -1,20 +1,3 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.3/jquery.nicescroll.min.js" ></script>
-<script>
-    $(document).ready(function () {
-        $("#mainmenu").niceScroll({
-            cursorcolor:"#1976d2",
-            cursorborder:"0",
-            cursorwidth:"5px"
-        });
-        $('.mainmenu_toggle').on('click', function () {
-            $('#mainmenu, #content').toggleClass('active');
-            $(this).toggleClass('active');
-        });
-        $('#mainmenu a').on('click', function () {
-            $("#mainmenu").getNiceScroll().resize();
-        });
-    });
-</script>
 <div class="wrapper -fixedtop">
     <div class="col-xs-12 header__fixed-top"><div class="col-xs-12">{brand} <a href="javascript:void(0);" class="mainmenu_toggle header__menutoggler navbar-btn" >
         <span></span>

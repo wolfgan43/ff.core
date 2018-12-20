@@ -23,7 +23,7 @@
  *    This file is not used by CKEditor, you may remove it.
  *    Changing this file will not change your CKEditor configuration.
  */
- 
+
 var CKBUILDER_CONFIG = {
 	skin: 'bootstrapck',
 	preset: 'standard',

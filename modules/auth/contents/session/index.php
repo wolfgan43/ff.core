@@ -47,6 +47,6 @@ if(!Auth::check()) {
 }
 
 if($access_denied) {
-    ffRedirect("/login?error=" . $access_denied . "&redirect=" . $cm->path_info);
+    ffRedirect(Auth::SITE_PATH . "/login?error=" . $access_denied . "&redirect=" . Auth::SITE_PATH . $cm->path_info);
 }
 

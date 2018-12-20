@@ -208,10 +208,5 @@ function ffRecord_dialog_on_done_action_output_results(ffRecord_base $record, $f
 */
 
 
-function ffTheme_restricted_icon($class) {
-    $cm = cm::getInstance();
-	$arrClass = explode("_", $class);
 
-	return $cm->oPage->frameworkCSS->get($arrClass[1], "icon-tag");
-}
 
