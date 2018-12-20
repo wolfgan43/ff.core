@@ -76,15 +76,6 @@
             <toplevel />
 		</destination>
 	</rule>
-	<rule id="sqlgui">
-		<priority>NORMAL</priority>
-		<source>/restricted/sqlgui(.*)</source>
-		<destination>
-			<url>/cm/contents/sqlgui/$1</url>
-            <toplevel />
-		</destination>
-		<reverse>/sqlgui</reverse>
-	</rule>
     <rule id="docs">
         <priority>NORMAL</priority>
         <source>/restricted/docs(.*)</source>
@@ -104,25 +95,6 @@
         <accept_path_info />
         <reverse>/restricted/media</reverse>
     </rule>
-	<rule id="ds">
-		<priority>NORMAL</priority>
-		<source>/restricted/ds(.*)</source>
-		<destination>
-			<url>/cm/contents/ds/$1</url>
-            <toplevel />
-		</destination>
-		<accept_path_info />
-		<reverse>/ds</reverse>
-	</rule>
-	<rule id="ds_services">
-		<priority>VERY_HIGH</priority>
-		<source>^/services/ds(.*)</source>
-		<destination>
-			<url>/cm/contents/ds/services$1</url>
-		</destination>
-		<accept_path_info />
-		<reverse>/services/ds</reverse>
-	</rule>
 	<rule id="getlibs">
         <source>^/services/getlibs$</source>
         <destination>

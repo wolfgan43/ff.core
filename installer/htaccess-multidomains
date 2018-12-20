@@ -7,82 +7,131 @@ AddDefaultCharset UTF-8
 # LEGEND
 #-----------------
 #
-# [DOMAIN_SUB]                                          www
-# [DOMAIN_NAME]                                         mydomain
-# [DOMAIN_EXT]                                          com
-# [PROJECT_NAME]    => NAME SUB_DOMAIN                  mysubdomain
-# [FF_SITE_PATH]    => PROJECT_FOLDER                   /myproject
-# [FF_DISK_PATH]    => DOCUMENT_ROOT + PROJECT_FOLDER   /var/www/vhost/mydomain.com/httpdocs/myproject
-# [FFCM_DISK_PATH]  => __FF_DIR__                       /var/www/vhost/mydomain.com/httpdocs/myproject/ff
+# [DOMAIN_PROTOCOL]
+# [DOMAIN_NAME]
+# [DOMAIN_EXT]
+# [PROJECT_NAME]
+# [FF_DISK_PATH]
 #
 
-### OPTIONAL: Add htaccess-redirect-http OR htaccess-redirect-https
-### REQUIRE: Add htaccess-multidomains-media-cdn OR htaccess-multidomains-media-nocdn
+
+#############
+# Redirect non https or non-www to https://www
+#------------
+#RewriteCond %{HTTPS} off [OR]
+#RewriteCond %{HTTP_HOST} ^[DOMAIN_NAME]\.com$
+#RewriteRule (.*) https://www.[DOMAIN_NAME].com%{REQUEST_URI} [L,R=301]
+
+#############
+# Redirect non https to https (sub domains)
+#------------
+#RewriteCond %{HTTPS} off
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 #############
 # ENV
 #------------
-SetEnvIf Host "[DOMAIN_SUB].[DOMAIN_NAME].[DOMAIN_EXT]" FF_PROJECT_DIR=[FF_DISK_PATH]/domains/[PROJECT_NAME]
+SetEnvIf Host "[DOMAIN_NAME].com" FF_PROJECT_DIR=/home/[DOMAIN_NAME]/public_html/[FF_DISK_PATH]/domains/[PROJECT_NAME]
+
 
 #############
 # Services
 #------------
 
 #getlibs
-RewriteCond   %{HTTP_HOST}  	            [DOMAIN_SUB]\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
-RewriteCond   %{REQUEST_URI}	            ^[FF_SITE_PATH]/domains/[PROJECT_NAME]/services/getlibs(.*)
-RewriteRule  ^(.*)                          [FF_SITE_PATH]/services/getlibs%1 [L,QSA]
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME]\.com$
+RewriteCond   %{REQUEST_URI}	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/services/getlibs(.*)
+RewriteRule  ^(.*)  /[FF_DISK_PATH]/services/getlibs%1 [L,QSA]
 
 #uploader
-RewriteCond   %{HTTP_HOST}  	            [DOMAIN_SUB]\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
-RewriteCond   %{REQUEST_URI}	            ^[FF_SITE_PATH]/domains/[PROJECT_NAME]/themes/library/plugins/jquery\.uploadifive/uploadifive\.php
-RewriteRule  ^(.*)                          [FF_SITE_PATH]/themes/library/plugins/jquery\.uploadifive/uploadifive\.php [L,QSA]
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME]\.com$
+RewriteCond   %{REQUEST_URI}	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/themes/library/plugins/jquery\.uploadifive/uploadifive\.php
+RewriteRule  ^(.*)  /[FF_DISK_PATH]/themes/library/plugins/jquery\.uploadifive/uploadifive\.php [L,QSA]
 
 
 #############
 # Error
 #------------
-ErrorDocument 404                           [FF_SITE_PATH]/cm/error.php
-ErrorDocument 403                           [FF_SITE_PATH]/cm/error.php
+errorDocument 404 /[FF_DISK_PATH]/cm/error.php
+errorDocument 403 /[FF_DISK_PATH]/cm/error.php
+
+#############
+# Asset
+#------------
+
+#showfiles
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
+RewriteCond   %{REQUEST_URI}	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/cm/showfiles\.php
+RewriteRule  ^cm/showfiles.php(.*)  /[FF_DISK_PATH]/cm/showfiles\.php?_ffq_=$1 [L,QSA]
+
+#css | js
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
+RewriteCond   %{REQUEST_URI}  	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/asset
+RewriteRule   ^asset/(.*)    /[FF_DISK_PATH]/domains/[PROJECT_NAME]/cache/$1 [L]
+
+#media
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
+RewriteCond   %{REQUEST_URI}  	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/media
+RewriteRule   ^media/(.*)    /[FF_DISK_PATH]/domains/[PROJECT_NAME]/cache/.thumbs/$1 [L]
+
+#static
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
+RewriteCond   %{REQUEST_URI}	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/static
+RewriteRule   ^static(.*)    /[FF_DISK_PATH]/cm/static\.php?_ffq_=$1 [L,QSA]
+
+#############
+# Using Sub Domains for Render Images
+#------------
+
+#media with SubDomains
+ RewriteCond %{HTTP_HOST}           ^media\.[DOMAIN_NAME]\.com$ [NC]
+ RewriteCond %{REQUEST_URI}  	    !^/[FF_DISK_PATH]/cache/.thumbs
+ RewriteCond %{REQUEST_URI}  	    !^/[FF_DISK_PATH]/cm/error\.php
+ RewriteRule ^(.*)                  /[FF_DISK_PATH]/cache/.thumbs/$0 [L,QSA]
+
+#media:404 goto static
+# RewriteCond %{HTTP_HOST}           ^media\.[DOMAIN_NAME]\.com$ [NC]
+# RewriteCond %{REQUEST_FILENAME}    ^!-f
+# RewriteRule ^cache/.thumbs/(.*)     http://static.[DOMAIN_NAME].com/$1 [L,R=302,E=nocache:1]
+
+#static with SubDomains
+ RewriteCond %{HTTP_HOST}           ^static\.[DOMAIN_NAME]\.com$ [NC]
+ RewriteCond %{REQUEST_URI}  	    !^/[FF_DISK_PATH]/cm/static\.php
+ RewriteRule ^(.*)                  /[FF_DISK_PATH]/cm/static\.php/$0 [L,QSA]
+
 
 #############
 # Modules
 #------------
-RewriteCond   %{REQUEST_URI}	            ^[FF_SITE_PATH]/modules
-RewriteCond   %{REQUEST_URI}	            !^[FF_SITE_PATH]/modules/([^/]+)/themes(.+)
-RewriteRule  ^modules/([^/]+)(.+)           [FF_SITE_PATH]/modules/$1/themes$2 [L,QSA]
+
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
+RewriteCond   %{REQUEST_URI}	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/modules/([^/]+)/themes(.+)
+RewriteRule  ^modules/([^/]+)/themes(.+)  /[FF_DISK_PATH]/modules/$1/themes$2 [L,QSA]
+
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
+RewriteCond   %{REQUEST_URI}	^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/modules
+RewriteRule  ^modules/([^/]+)(.+)  /[FF_DISK_PATH]/modules/$1/themes$2 [L,QSA]
 
 #############
 # Basic rules
 #------------
-RewriteCond   %{HTTP_HOST}  	            [DOMAIN_SUB]\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
+RewriteCond   %{HTTP_HOST}  	[DOMAIN_NAME].com$
 #core
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/applets/([^/]+)/themes(.+)
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/modules/([^/]+)/themes(.+)
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/cm/
-
-#install
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/install
-
-#media
-RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/asset
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/media
-RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/static
-
+RewriteCond   %{REQUEST_URI}  	!^/[FF_DISK_PATH]/modules/([^/]+)/themes(.+)
 #static
-RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/cache
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/themes
-RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/uploads
+RewriteCond   %{REQUEST_URI}    !^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/cache
+RewriteCond   %{REQUEST_URI}  	!^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/themes
+RewriteCond   %{REQUEST_URI}    !^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/uploads
 
-#libs
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/vendor
 
-#root files
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/robots\.txt
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/domains/[PROJECT_NAME]/favicon
-RewriteRule   ^(.*)                         [FF_SITE_PATH]/cm/main\.php?_ffq_=/$0 [L,QSA]
+#media, css, js
+#RewriteCond   %{REQUEST_URI}   !^/[FF_DISK_PATH]/domains/[projectdirname]/asset
+#RewriteCond   %{REQUEST_URI}   !^/[FF_DISK_PATH]/domains/[projectdirname]/media
+#RewriteCond   %{REQUEST_URI}   !^/[FF_DISK_PATH]/domains/[projectdirname]/static
+RewriteCond   %{REQUEST_URI}  	!^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/robots\.txt
+RewriteCond   %{REQUEST_URI}  	!^/[FF_DISK_PATH]/domains/[PROJECT_NAME]/favicon
+RewriteRule   ^(.*)    /[FF_DISK_PATH]/cm/main\.php?_ffq_=/$0 [L,QSA]
 
-### REQUIRE: Add htaccess-security
 # RULES
 <IfModule mod_deflate.c>
 # force deflate for mangled headers

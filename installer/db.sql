@@ -1,32 +1,53 @@
 -- phpMyAdmin SQL Dump
--- version 3.2.4
--- http://www.phpmyadmin.net
+-- version 4.8.3
+-- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Oct 15, 2010 at 09:32
--- Server version: 5.1.41
--- PHP Version: 5.3.1
+-- Host: localhost:3306
+-- Creato il: Dic 20, 2018 alle 10:53
+-- Versione del server: 5.6.41-log
+-- Versione PHP: 7.2.7
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `riccimilano`
+-- Database: `xoduslab_serrcenternewsite`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_layout`
+-- Struttura della tabella `cm_charset_decode`
 --
 
-DROP TABLE IF EXISTS `cm_layout`;
-CREATE TABLE IF NOT EXISTS `cm_layout` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_charset_decode` (
+  `ID` int(11) NOT NULL,
+  `code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `value` varchar(255) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_layout`
+--
+
+CREATE TABLE `cm_layout` (
+  `ID` int(11) NOT NULL,
   `path` tinytext NOT NULL,
   `layer` varchar(255) NOT NULL DEFAULT '',
   `page` varchar(255) NOT NULL,
   `main_theme` varchar(255) NOT NULL,
   `theme` varchar(255) NOT NULL,
+  `framework_css` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `class_body` varchar(255) NOT NULL,
   `enable_cascading` char(1) NOT NULL,
@@ -38,65 +59,63 @@ CREATE TABLE IF NOT EXISTS `cm_layout` (
   `compact_js` char(1) NOT NULL,
   `compact_css` char(1) NOT NULL,
   `ignore_defaults_main` char(1) NOT NULL,
-  `reset_css` char(1) collate utf8_unicode_ci NOT NULL,
-  `reset_js` char(1) collate utf8_unicode_ci NOT NULL,
-  `domains` text NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `reset_css` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `reset_js` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `domains` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
+--
+-- Dump dei dati per la tabella `cm_layout`
+--
+
+INSERT INTO `cm_layout` (`ID`, `path`, `layer`, `page`, `main_theme`, `theme`, `framework_css`, `title`, `class_body`, `enable_cascading`, `reset_cascading`, `ignore_defaults`, `exclude_ff_js`, `exclude_form`, `enable_gzip`, `compact_js`, `compact_css`, `ignore_defaults_main`, `reset_css`, `reset_js`, `domains`) VALUES
+(1, '/', 'main', '', 'responsive', 'public', '', '', '', '1', '', '', '1', '1', '', '', '', '1', '', '', ''),
+(2, '/restricted', '', '', 'responsive', 'public', '', '', '', '1', '1', '0', '0', '', '', '', '', '0', '1', '', '');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_layout_cdn`
+-- Struttura della tabella `cm_layout_cdn`
 --
-DROP TABLE IF EXISTS `cm_layout_cdn`;
-CREATE TABLE IF NOT EXISTS `cm_layout_cdn` (
-`ID` INT( 11 ) NOT NULL AUTO_INCREMENT ,
-`ID_layout` int(11) NOT NULL,
-`name` VARCHAR( 255 ) NOT NULL ,
-`type` VARCHAR( 255 ) NOT NULL ,
-`url` VARCHAR( 255 ) NOT NULL ,
-`status` char(1) NOT NULL,
-PRIMARY KEY ( `ID` )
-) ENGINE = MYISAM;
+
+CREATE TABLE `cm_layout_cdn` (
+  `ID` int(11) NOT NULL,
+  `ID_layout` int(11) NOT NULL,
+  `name` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `type` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `url` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `status` char(1) COLLATE latin1_general_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 -- --------------------------------------------------------
 
-
 --
--- Table structure for table `cm_layout_css`
+-- Struttura della tabella `cm_layout_css`
 --
 
-DROP TABLE IF EXISTS `cm_layout_css`;
-CREATE TABLE IF NOT EXISTS `cm_layout_css` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_layout_css` (
+  `ID` int(11) NOT NULL,
   `ID_layout` int(11) NOT NULL,
   `path` varchar(255) NOT NULL,
   `file` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `cascading` char(1) NOT NULL,
   `priority` int(11) NOT NULL,
-  `order` int(11) NOT NULL,
-  `index` int(11) NOT NULL,
   `exclude_compact` int(1) NOT NULL,
   `visible` char(1) NOT NULL,
-  `theme_include` varchar(255) NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `priority` (`priority`),
-  KEY `order` (`order`),
-  KEY `index` (`index`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `order` int(11) NOT NULL,
+  `index` int(11) NOT NULL,
+  `theme_include` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_layout_js`
+-- Struttura della tabella `cm_layout_js`
 --
 
-DROP TABLE IF EXISTS `cm_layout_js`;
-CREATE TABLE IF NOT EXISTS `cm_layout_js` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_layout_js` (
+  `ID` int(11) NOT NULL,
   `ID_layout` int(11) NOT NULL,
   `path` varchar(255) NOT NULL,
   `file` varchar(255) NOT NULL,
@@ -105,80 +124,338 @@ CREATE TABLE IF NOT EXISTS `cm_layout_js` (
   `plugin_path` varchar(255) NOT NULL,
   `js_path` varchar(255) NOT NULL,
   `priority` int(11) NOT NULL,
-  `order` int(11) NOT NULL,
-  `index` int(11) NOT NULL,
   `exclude_compact` int(1) NOT NULL,
   `theme_exclude` varchar(255) NOT NULL,
   `theme_include` varchar(255) NOT NULL,
   `visible` char(1) NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `priority` (`priority`),
-  KEY `order` (`order`),
-  KEY `index` (`index`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `order` int(11) NOT NULL,
+  `index` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_layout_meta`
+-- Struttura della tabella `cm_layout_meta`
 --
 
-DROP TABLE IF EXISTS `cm_layout_meta`;
-CREATE TABLE IF NOT EXISTS `cm_layout_meta` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_layout_meta` (
+  `ID` int(11) NOT NULL,
   `ID_layout` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
   `content` varchar(255) NOT NULL,
-  `cascading` char(1) NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `ID_layout` (`ID_layout`)
+  `cascading` char(1) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dump dei dati per la tabella `cm_layout_meta`
+--
+
+INSERT INTO `cm_layout_meta` (`ID`, `ID_layout`, `name`, `type`, `content`, `cascading`) VALUES
+(1, 1, 'viewport', 'name', 'width=device-width, initial-scale=1.0, maximum-scale=1.0', '1');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_layout_sect`
+-- Struttura della tabella `cm_layout_sect`
 --
 
-DROP TABLE IF EXISTS `cm_layout_sect`;
-CREATE TABLE IF NOT EXISTS `cm_layout_sect` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_layout_sect` (
+  `ID` int(11) NOT NULL,
   `ID_layout` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
-  `theme_include` varchar(255) NOT NULL,
-  `cascading` char(1) NOT NULL,
-  PRIMARY KEY (`ID`)
+  `cascading` char(1) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_showfiles`
+-- Struttura della tabella `cm_media`
 --
 
-DROP TABLE IF EXISTS `cm_showfiles`;
-CREATE TABLE IF NOT EXISTS `cm_showfiles` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_media` (
+  `ID` int(11) NOT NULL,
+  `path` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `key` varchar(50) COLLATE latin1_general_ci NOT NULL,
+  `ID_lang` int(11) NOT NULL,
+  `title` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `description` varchar(255) COLLATE latin1_general_ci NOT NULL,
+  `permalink` varchar(255) COLLATE latin1_general_ci NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_restricted_settings`
+--
+
+CREATE TABLE `cm_mod_restricted_settings` (
+  `ID` int(11) NOT NULL,
+  `ID_domains` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `descrizione` varchar(255) NOT NULL DEFAULT '',
+  `value` varchar(255) NOT NULL DEFAULT ''
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_domains`
+--
+
+CREATE TABLE `cm_mod_security_domains` (
+  `ID` int(11) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `owner` int(11) NOT NULL,
+  `company_name` varchar(255) NOT NULL,
+  `type` int(11) NOT NULL,
+  `creation_date` datetime NOT NULL,
+  `expiration_date` date NOT NULL,
+  `time_zone` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  `billing_status` int(11) NOT NULL,
+  `db_host` varchar(255) NOT NULL,
+  `db_name` varchar(255) NOT NULL,
+  `db_user` varchar(255) NOT NULL,
+  `db_pass` varchar(255) NOT NULL,
+  `ID_packages` int(11) NOT NULL,
+  `max_users` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_domains_fields`
+--
+
+CREATE TABLE `cm_mod_security_domains_fields` (
+  `ID` int(11) NOT NULL,
+  `ID_domains` int(11) NOT NULL,
+  `field` varchar(255) NOT NULL,
+  `value` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_packages`
+--
+
+CREATE TABLE `cm_mod_security_packages` (
+  `ID` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `type` char(1) NOT NULL,
+  `order` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_packages_fields`
+--
+
+CREATE TABLE `cm_mod_security_packages_fields` (
+  `ID` int(11) NOT NULL,
+  `ID_packages` int(11) NOT NULL,
+  `field` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `unlimited` char(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_profiles`
+--
+
+CREATE TABLE `cm_mod_security_profiles` (
+  `ID` int(11) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `created_time` datetime NOT NULL,
+  `created_user` int(11) NOT NULL,
+  `modified_time` datetime NOT NULL,
+  `modified_user` int(11) NOT NULL,
+  `enabled` char(1) NOT NULL,
+  `order` int(11) NOT NULL,
+  `special` varchar(255) NOT NULL,
+  `acl` varchar(255) NOT NULL,
+  `ID_domains` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_profiles_pairs`
+--
+
+CREATE TABLE `cm_mod_security_profiles_pairs` (
+  `ID` int(11) NOT NULL,
+  `ID_profile` int(11) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `view_own` char(1) NOT NULL,
+  `view_others` char(1) NOT NULL,
+  `modify_own` char(1) NOT NULL,
+  `modify_others` char(1) NOT NULL,
+  `insert_own` char(1) NOT NULL,
+  `insert_others` char(1) NOT NULL,
+  `delete_own` char(1) NOT NULL,
+  `delete_others` char(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_rel_profiles_users`
+--
+
+CREATE TABLE `cm_mod_security_rel_profiles_users` (
+  `ID` int(11) NOT NULL,
+  `ID_user` int(11) NOT NULL,
+  `ID_profile` int(11) NOT NULL,
+  `enabled` char(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_timezones`
+--
+
+CREATE TABLE `cm_mod_security_timezones` (
+  `ID` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dump dei dati per la tabella `cm_mod_security_timezones`
+--
+
+INSERT INTO `cm_mod_security_timezones` (`ID`, `name`) VALUES
+(1, 'GMT-14'),
+(2, 'GMT-13'),
+(3, 'GMT-12'),
+(4, 'GMT-11'),
+(5, 'GMT-10'),
+(6, 'GMT-9'),
+(7, 'GMT-8'),
+(8, 'GMT-7'),
+(9, 'GMT-6'),
+(10, 'GMT-5'),
+(11, 'GMT-4'),
+(12, 'GMT-3'),
+(13, 'GMT-2'),
+(14, 'GMT-1'),
+(15, 'GMT+0'),
+(16, 'GMT+1'),
+(17, 'GMT+2'),
+(18, 'GMT+3'),
+(19, 'GMT+4'),
+(20, 'GMT+5'),
+(21, 'GMT+6'),
+(22, 'GMT+7'),
+(23, 'GMT+8'),
+(24, 'GMT+9'),
+(25, 'GMT+10'),
+(26, 'GMT+11'),
+(27, 'GMT+12');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_token`
+--
+
+CREATE TABLE `cm_mod_security_token` (
+  `ID` int(11) NOT NULL,
+  `token` varchar(512) COLLATE utf8_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ID_user` int(11) NOT NULL,
+  `ID_domain` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_users`
+--
+
+CREATE TABLE `cm_mod_security_users` (
+  `ID` int(11) NOT NULL,
+  `ID_domains` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL DEFAULT '',
+  `username_slug` varchar(255) NOT NULL,
+  `firstname` varchar(255) NOT NULL,
+  `lastname` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL DEFAULT '',
+  `level` char(1) NOT NULL DEFAULT '',
+  `status` char(1) NOT NULL,
+  `expiration` datetime NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `time_zone` int(11) NOT NULL,
+  `company` varchar(255) NOT NULL,
+  `role` int(11) NOT NULL,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  `password_generated_at` datetime NOT NULL,
+  `temp_password` varchar(255) NOT NULL,
+  `password_used` char(1) NOT NULL,
+  `ID_packages` int(11) NOT NULL,
+  `lastlogin` datetime NOT NULL,
+  `profile` int(11) NOT NULL,
+  `special` varchar(255) NOT NULL,
+  `avatar` varchar(255) NOT NULL,
+  `tel` varchar(255) NOT NULL,
+  `cell` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dump dei dati per la tabella `cm_mod_security_users`
+--
+
+INSERT INTO `cm_mod_security_users` (`ID`, `ID_domains`, `username`, `username_slug`, `firstname`, `lastname`, `password`, `level`, `status`, `expiration`, `email`, `time_zone`, `company`, `role`, `created`, `modified`, `password_generated_at`, `temp_password`, `password_used`, `ID_packages`, `lastlogin`, `profile`, `special`, `avatar`, `tel`, `cell`) VALUES
+(1, 0, 'superadmin', '', 'Nome', 'Cognome', 'superadmin', '3', '1', '0000-00-00 00:00:00', 'mail@latuamail.it', 0, 'Azienda', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', 0, '0000-00-00 00:00:00', 0, '', '', '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_mod_security_users_fields`
+--
+
+CREATE TABLE `cm_mod_security_users_fields` (
+  `ID` int(11) NOT NULL,
+  `ID_users` int(11) NOT NULL,
+  `field` varchar(255) NOT NULL,
+  `value` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cm_showfiles`
+--
+
+CREATE TABLE `cm_showfiles` (
+  `ID` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `source` text NOT NULL,
   `field_file` varchar(255) NOT NULL,
   `path_temp` varchar(255) NOT NULL,
   `path_full` varchar(255) NOT NULL,
-  `expires` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `expires` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_showfiles_modes`
+-- Struttura della tabella `cm_showfiles_modes`
 --
 
-DROP TABLE IF EXISTS `cm_showfiles_modes`;
-CREATE TABLE IF NOT EXISTS `cm_showfiles_modes` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_showfiles_modes` (
+  `ID` int(11) NOT NULL,
   `ID_showfiles` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `shortdesc` tinytext NOT NULL,
@@ -196,23 +473,31 @@ CREATE TABLE IF NOT EXISTS `cm_showfiles_modes` (
   `wmk_enable` char(1) NOT NULL,
   `wmk_image` varchar(255) NOT NULL,
   `wmk_alignment` varchar(255) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `format_jpg_quality` int(3) NOT NULL,
+  `display_name` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dump dei dati per la tabella `cm_showfiles_modes`
+--
+
+INSERT INTO `cm_showfiles_modes` (`ID`, `ID_showfiles`, `name`, `shortdesc`, `dim_x`, `dim_y`, `max_x`, `max_y`, `bgcolor`, `mode`, `when`, `alignment`, `theme`, `alpha`, `format`, `wmk_enable`, `wmk_image`, `wmk_alignment`, `format_jpg_quality`, `display_name`) VALUES
+(1, 1, 'res-thumb', '', '150', '150', 0, 0, 'FFFFFF', 'crop', 'ever', 'center', 'default', 127, '', '', '', '', 0, ''),
+(2, 1, 'thumb', '', '600', '600', 0, 0, 'FFFFFF', 'crop', 'ever', 'center', 'default', 127, 'jpg', '0', '', 'center', 100, ''),
+(16, 0, 'ogtag', '', '600', '600', 0, 0, 'FFFFFF', 'crop', 'ever', 'top-middle', 'default', 127, 'jpg', '0', '', 'center', 100, '');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_showfiles_where`
+-- Struttura della tabella `cm_showfiles_where`
 --
 
-DROP TABLE IF EXISTS `cm_showfiles_where`;
-CREATE TABLE IF NOT EXISTS `cm_showfiles_where` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `cm_showfiles_where` (
+  `ID` int(11) NOT NULL,
   `ID_showfiles` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `dbskip` char(1) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+  `dbskip` char(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -220,42 +505,283 @@ CREATE TABLE IF NOT EXISTS `cm_showfiles_where` (
 -- Struttura della tabella `ff_international`
 --
 
-DROP TABLE IF EXISTS `ff_international`;
-CREATE TABLE IF NOT EXISTS `ff_international` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ff_international` (
+  `ID` int(11) NOT NULL,
   `ID_lang` int(11) NOT NULL DEFAULT '0',
   `word_code` varchar(255) NOT NULL DEFAULT '',
   `description` text NOT NULL,
   `is_new` int(1) NOT NULL DEFAULT '0',
-  `last_update` datetime NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `ID_lang` (`ID_lang`,`word_code`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+  `last_update` datetime NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dump dei dati per la tabella `ff_international`
+--
+
+INSERT INTO `ff_international` (`ID`, `ID_lang`, `word_code`, `description`, `is_new`, `last_update`) VALUES
+(1, 1, 'login_username', 'nome utente', 0, '0000-00-00 00:00:00'),
+(2, 1, 'login_password', 'password', 0, '0000-00-00 00:00:00'),
+(3, 1, 'login_confirm', 'Accedi', 0, '0000-00-00 00:00:00'),
+(4, 1, 'login_text_logout', 'Logout', 0, '0000-00-00 00:00:00'),
+(5, 1, 'nav_profile', 'Profilo', 0, '0000-00-00 00:00:00'),
+(6, 1, 'logout_title', 'Sei sicuro di voler effettuare il Logout?', 0, '0000-00-00 00:00:00'),
+(7, 1, 'logout_confirm', 'Si', 0, '0000-00-00 00:00:00'),
+(8, 1, 'logout_cancel', 'No', 0, '0000-00-00 00:00:00'),
+(9, 1, 'user_username', 'Username', 0, '0000-00-00 00:00:00'),
+(10, 1, 'user_password', 'Password', 0, '0000-00-00 00:00:00'),
+(11, 1, 'user_confirmpass', 'Conferma Password', 0, '0000-00-00 00:00:00'),
+(12, 1, 'user_email', 'Indirizzo E-Mail', 0, '0000-00-00 00:00:00'),
+(13, 1, 'user_nome', 'Nome', 0, '0000-00-00 00:00:00'),
+(14, 1, 'user_cognome', 'Cognome', 0, '0000-00-00 00:00:00'),
+(15, 1, 'user_indirizzo', 'Indirizzo', 0, '0000-00-00 00:00:00'),
+(16, 1, 'user_citta', 'Città', 0, '0000-00-00 00:00:00'),
+(17, 1, 'user_provincia', 'Provincia', 0, '0000-00-00 00:00:00'),
+(18, 1, 'user_cap', 'CAP', 0, '0000-00-00 00:00:00'),
+(19, 1, 'user_paese', 'Paese', 0, '0000-00-00 00:00:00'),
+(20, 1, 'user_telefono', 'Telefono', 0, '0000-00-00 00:00:00'),
+(21, 1, 'user_datanascita', 'Data di Nascita (gg/mm/aaaa)', 0, '0000-00-00 00:00:00'),
+(22, 1, 'user_sesso', 'Sesso', 0, '0000-00-00 00:00:00'),
+(23, 1, 'user_provincianascita', 'Provincia di Nascita', 0, '0000-00-00 00:00:00'),
+(24, 1, 'user_cittanascita', 'Nato a', 0, '0000-00-00 00:00:00'),
+(25, 1, 'user_codicefiscale', 'Codice Fiscale', 0, '0000-00-00 00:00:00'),
+(26, 1, 'user_sessomaschio', 'Maschio', 0, '0000-00-00 00:00:00'),
+(27, 1, 'user_sessofemmina', 'Femmina', 0, '0000-00-00 00:00:00'),
+(28, 1, 'user_piva', 'Partita IVA', 0, '0000-00-00 00:00:00'),
+(29, 1, 'user_publish', 'Pubblica in Home Page', 0, '0000-00-00 00:00:00'),
+(30, 1, 'back_to_site', 'Torna al sito', 0, '0000-00-00 00:00:00'),
+(31, 1, 'developer_label', 'Sviluppato da ', 0, '0000-00-00 00:00:00'),
+(32, 1, 'developer_url', 'http://www.xodusweb.com', 0, '0000-00-00 00:00:00'),
+(33, 1, 'developer_name', 'XODUS New Media', 0, '0000-00-00 00:00:00'),
+(34, 1, 'ffGrid_addnew', 'Aggiungi', 0, '0000-00-00 00:00:00'),
+(35, 1, 'articles', 'Pagine', 0, '0000-00-00 00:00:00'),
+(36, 1, 'articles_sections', 'Sezioni', 0, '0000-00-00 00:00:00'),
+(37, 1, 'catalog_items', 'Prodotti', 0, '0000-00-00 00:00:00'),
+(38, 1, 'no_limit_items_begin', 'Puoi inserire ancora', 0, '0000-00-00 00:00:00'),
+(39, 1, 'no_limit_items_end', 'prodotti su ', 0, '0000-00-00 00:00:00'),
+(40, 1, 'catalog_categories', 'Categorie', 0, '0000-00-00 00:00:00'),
+(41, 1, 'catalog_groups', 'Gruppi Campi Aggiuntivi', 0, '0000-00-00 00:00:00'),
+(42, 1, 'catalog_fields', 'Campi Aggiuntivi', 0, '0000-00-00 00:00:00'),
+(43, 1, 'article', 'Pagina', 0, '0000-00-00 00:00:00'),
+(44, 1, 'article_detail', 'Contenuto', 0, '0000-00-00 00:00:00'),
+(45, 1, 'grid_no_record', 'Nessun elemento disponibile', 0, '0000-00-00 00:00:00'),
+(46, 1, 'article_title', 'Titolo', 0, '0000-00-00 00:00:00'),
+(47, 1, 'article_slug', 'Slug', 0, '0000-00-00 00:00:00'),
+(48, 1, 'article_short_desc', 'Descrizione', 0, '0000-00-00 00:00:00'),
+(49, 1, 'article_video', 'Video', 0, '0000-00-00 00:00:00'),
+(50, 1, 'article_img', 'Immagine', 0, '0000-00-00 00:00:00'),
+(51, 1, 'ffRecord_update', 'Aggiorna', 0, '0000-00-00 00:00:00'),
+(52, 1, 'ffRecord_delete', 'Elimina', 0, '0000-00-00 00:00:00'),
+(53, 1, 'ffRecord_cancel', 'Indietro', 0, '0000-00-00 00:00:00'),
+(54, 1, 'ffRecord_close', 'Chiudi', 0, '0000-00-00 00:00:00'),
+(55, 1, 'articolo', 'Prodotto', 0, '0000-00-00 00:00:00'),
+(56, 1, 'ffDetail_addrow', 'Aggiungi', 0, '0000-00-00 00:00:00'),
+(57, 1, 'articolo_modify', 'Modifica prodotto', 0, '0000-00-00 00:00:00'),
+(58, 1, 'articolo_insert', 'Inserimento prodotto', 0, '0000-00-00 00:00:00'),
+(59, 1, 'item_detail', 'Descrizione prodotto', 0, '0000-00-00 00:00:00'),
+(60, 1, 'right', 'Destra', 0, '0000-00-00 00:00:00'),
+(61, 1, 'left', 'Sinistra', 0, '0000-00-00 00:00:00'),
+(62, 1, 'top', 'Evidenza', 0, '0000-00-00 00:00:00'),
+(63, 1, 'login_title', 'Log In', 0, '0000-00-00 00:00:00'),
+(64, 1, 'recover_password', 'Hai dimenticato la Password?', 0, '0000-00-00 00:00:00'),
+(65, 1, 'register_link', 'Registrati', 0, '0000-00-00 00:00:00'),
+(66, 1, 'ffRecord_insert', 'Inserisci', 0, '0000-00-00 00:00:00'),
+(67, 1, 'video', 'Video', 0, '0000-00-00 00:00:00'),
+(68, 1, 'pdf', 'PDF', 0, '0000-00-00 00:00:00'),
+(69, 1, 'gallery', 'Galleria Fotografica', 0, '0000-00-00 00:00:00'),
+(70, 1, 'yes', 'Si', 0, '0000-00-00 00:00:00'),
+(71, 1, 'no', 'No', 0, '0000-00-00 00:00:00'),
+(72, 1, 'logout', 'Esci', 0, '0000-00-00 00:00:00'),
+(73, 1, 'edit_profile', 'Modifica profilo', 0, '0000-00-00 00:00:00'),
+(74, 1, 'frame_per_page', 'Righe per pagina', 0, '0000-00-00 00:00:00'),
+(75, 1, 'notify_add_cat', 'Hai aggiunto:', 0, '0000-00-00 00:00:00'),
+(76, 1, 'category_name', 'Sezione', 0, '0000-00-00 00:00:00'),
+(77, 1, 'category_slug', 'Slug', 0, '0000-00-00 00:00:00'),
+(78, 1, 'catalog_search_box', 'Ricerca', 0, '0000-00-00 00:00:00'),
+(79, 1, 'catalog_menu_all', 'Tutti i prodotti', 0, '0000-00-00 00:00:00'),
+(80, 1, 'register_privacy_check', 'Accettazione Privacy', 0, '0000-00-00 00:00:00'),
+(81, 1, 'condition_check', 'Accetto le condizioni di vendita', 0, '0000-00-00 00:00:00'),
+(82, 1, 'mod_sec_register_bt', 'Registrati', 0, '0000-00-00 00:00:00'),
+(83, 1, 'no_article', '', 1, '0000-00-00 00:00:00'),
+(84, 1, 'login_domain', '', 1, '0000-00-00 00:00:00'),
+(85, 1, 'manage_users', '', 1, '0000-00-00 00:00:00'),
+(86, 1, 'total', '', 1, '0000-00-00 00:00:00'),
+(87, 1, 'require_note', '', 1, '0000-00-00 00:00:00'),
+(88, 1, 'pricelist_title', '', 1, '0000-00-00 00:00:00'),
+(89, 1, 'close', '', 1, '0000-00-00 00:00:00'),
+(90, 1, 'search_bt', '', 1, '0000-00-00 00:00:00'),
+(91, 1, 'cm::LAYOUT_PRIORITY_TOPLEVEL', '', 1, '0000-00-00 00:00:00'),
+(92, 1, 'cm::LAYOUT_PRIORITY_HIGH', '', 1, '0000-00-00 00:00:00'),
+(93, 1, 'cm::LAYOUT_PRIORITY_NORMAL', '', 1, '0000-00-00 00:00:00'),
+(94, 1, 'cm::LAYOUT_PRIORITY_LOW', '', 1, '0000-00-00 00:00:00'),
+(95, 1, 'cm::LAYOUT_PRIORITY_FINAL', '', 1, '0000-00-00 00:00:00'),
+(96, 1, 'article_languages', '', 1, '0000-00-00 00:00:00'),
+(97, 1, 'article_ID_lang', '', 1, '0000-00-00 00:00:00'),
+(98, 1, 'article_code', '', 1, '0000-00-00 00:00:00'),
+(99, 1, 'item_detail_languages', '', 1, '0000-00-00 00:00:00'),
+(100, 1, 'item_detail_ID_lang', '', 1, '0000-00-00 00:00:00'),
+(101, 1, 'item_detail_code', '', 1, '0000-00-00 00:00:00'),
+(102, 1, 'category_languages', '', 1, '0000-00-00 00:00:00'),
+(103, 1, 'category_ID_lang', '', 1, '0000-00-00 00:00:00'),
+(104, 1, 'category_code', '', 1, '0000-00-00 00:00:00'),
+(105, 1, 'mod_keeng_search_for', '', 1, '0000-00-00 00:00:00'),
+(106, 1, 'userinfo', '', 1, '0000-00-00 00:00:00'),
+(107, 1, 'user_profile', '', 1, '0000-00-00 00:00:00'),
+(108, 1, 'ffDetail_general', '', 1, '0000-00-00 00:00:00'),
+(109, 1, 'category_ID_category', '', 1, '0000-00-00 00:00:00'),
+(110, 1, 'utenti_username', '', 1, '0000-00-00 00:00:00'),
+(111, 1, 'utenti_email', '', 1, '0000-00-00 00:00:00'),
+(112, 1, 'griglia_semplice', '', 1, '0000-00-00 00:00:00'),
+(113, 1, 'utenti_avatar', '', 1, '0000-00-00 00:00:00'),
+(114, 1, 'griglia_con_aggiunta', '', 1, '0000-00-00 00:00:00'),
+(115, 1, 'griglia_con_dialog', '', 1, '0000-00-00 00:00:00'),
+(116, 1, 'griglia_con_dragsort', '', 1, '0000-00-00 00:00:00'),
+(117, 1, 'uploadifive', '', 1, '0000-00-00 00:00:00'),
+(118, 1, 'day', '', 1, '0000-00-00 00:00:00'),
+(119, 1, 'month', '', 1, '0000-00-00 00:00:00'),
+(120, 1, 'year', '', 1, '0000-00-00 00:00:00'),
+(121, 1, 'ffField_modify', '', 1, '0000-00-00 00:00:00'),
+(122, 1, 'media_modify', '', 1, '0000-00-00 00:00:00'),
+(123, 1, 'gallery_modify_name', '', 1, '0000-00-00 00:00:00'),
+(124, 1, 'media_name_label', '', 1, '0000-00-00 00:00:00'),
+(125, 1, 'media_size_label', '', 1, '0000-00-00 00:00:00'),
+(126, 1, 'gallery_field_languages', '', 1, '0000-00-00 00:00:00'),
+(127, 1, 'gallery_field_ID_languages', '', 1, '0000-00-00 00:00:00'),
+(128, 1, 'gallery_field_code_lang', '', 1, '0000-00-00 00:00:00'),
+(129, 1, 'gallery_field_alias', '', 1, '0000-00-00 00:00:00'),
+(130, 1, 'gallery_field_description', '', 1, '0000-00-00 00:00:00'),
+(131, 1, 'gallery_field_visible', '', 1, '0000-00-00 00:00:00'),
+(132, 1, 'gallery_field_alt_url', '', 1, '0000-00-00 00:00:00'),
+(133, 1, 'media_title', '', 1, '0000-00-00 00:00:00'),
+(134, 1, 'media_description', '', 1, '0000-00-00 00:00:00'),
+(135, 1, 'for', '', 1, '0000-00-00 00:00:00'),
+(136, 1, 'catalog', '', 1, '0000-00-00 00:00:00'),
+(137, 1, 'in', '', 1, '0000-00-00 00:00:00'),
+(138, 1, 'media_permalink', '', 1, '0000-00-00 00:00:00'),
+(139, 1, 'media', '', 1, '0000-00-00 00:00:00'),
+(140, 1, 'media_path', '', 1, '0000-00-00 00:00:00'),
+(141, 1, 'media_key', '', 1, '0000-00-00 00:00:00'),
+(142, 1, 'media_cover', '', 1, '0000-00-00 00:00:00'),
+(143, 1, 'utenti_modify', '', 1, '0000-00-00 00:00:00'),
+(144, 1, 'kcuploadifive', '', 1, '0000-00-00 00:00:00'),
+(145, 1, 'utenti_surname', '', 1, '0000-00-00 00:00:00'),
+(146, 1, 'utenti_status', '', 1, '0000-00-00 00:00:00'),
+(147, 1, 'utenti_ID_type', '', 1, '0000-00-00 00:00:00'),
+(148, 1, 'utenti_last_update', '', 1, '0000-00-00 00:00:00'),
+(149, 1, 'utenti_gmap', '', 1, '0000-00-00 00:00:00'),
+(150, 1, 'utenti_slider', '', 1, '0000-00-00 00:00:00'),
+(151, 1, 'utenti_listgroup', '', 1, '0000-00-00 00:00:00'),
+(152, 1, 'utenti_checkgroup', '', 1, '0000-00-00 00:00:00'),
+(153, 1, 'nothing', '', 1, '0000-00-00 00:00:00'),
+(154, 1, 'bill_qta_received', '', 1, '0000-00-00 00:00:00'),
+(155, 1, 'bill_qta_sent', '', 1, '0000-00-00 00:00:00'),
+(156, 1, 'bill_time_received', '', 1, '0000-00-00 00:00:00'),
+(157, 1, 'bill_time_sent', '', 1, '0000-00-00 00:00:00'),
+(158, 1, 'bill_services_received', '', 1, '0000-00-00 00:00:00'),
+(159, 1, 'bill_services_sent', '', 1, '0000-00-00 00:00:00'),
+(160, 1, 'utenti_autocompletetoken', '', 1, '0000-00-00 00:00:00'),
+(161, 1, 'autocompletetoken_not_found', '', 1, '0000-00-00 00:00:00'),
+(162, 1, 'autocompletetoken_init', '', 1, '0000-00-00 00:00:00'),
+(163, 1, 'autocompletetoken_searching', '', 1, '0000-00-00 00:00:00'),
+(164, 1, 'autocompletetoken_label', '', 1, '0000-00-00 00:00:00'),
+(165, 1, 'utenti_autocomplete', '', 1, '0000-00-00 00:00:00'),
+(166, 1, 'utenti_ckeditor', '', 1, '0000-00-00 00:00:00'),
+(167, 1, 'utenti_slug', '', 1, '0000-00-00 00:00:00'),
+(168, 1, 'listgroup_label', '', 1, '0000-00-00 00:00:00'),
+(169, 1, 'layout_general', '', 1, '0000-00-00 00:00:00'),
+(170, 1, 'layout_sections', '', 1, '0000-00-00 00:00:00'),
+(171, 1, 'layout_css', '', 1, '0000-00-00 00:00:00'),
+(172, 1, 'cm::LAYOUT_PRIORITY_DEFAULT', '', 1, '0000-00-00 00:00:00'),
+(173, 1, 'layout_js', '', 1, '0000-00-00 00:00:00'),
+(174, 1, 'layout_meta', '', 1, '0000-00-00 00:00:00'),
+(175, 1, 'layout_cdn', '', 1, '0000-00-00 00:00:00'),
+(176, 1, 'addrow_num_col', '', 1, '0000-00-00 00:00:00'),
+(177, 1, 'goto_url', '', 1, '0000-00-00 00:00:00'),
+(178, 1, 'login_fill_all_fields', 'Il nome utente o la password non sono corretti.', 1, '0000-00-00 00:00:00'),
+(179, 1, 'article_not_set', '', 1, '0000-00-00 00:00:00'),
+(180, 1, 'extras_image_modify_fix_x', '', 1, '0000-00-00 00:00:00'),
+(181, 1, 'extras_image_modify_fix_y', '', 1, '0000-00-00 00:00:00'),
+(182, 1, 'extras_image_modify_name', '', 1, '0000-00-00 00:00:00'),
+(183, 1, 'extras_image_modify_smart_url', '', 1, '0000-00-00 00:00:00'),
+(184, 1, 'extras_image_modify_image', '', 1, '0000-00-00 00:00:00'),
+(185, 1, 'extras_image_modify_mode', '', 1, '0000-00-00 00:00:00'),
+(186, 1, 'crop', '', 1, '0000-00-00 00:00:00'),
+(187, 1, 'proportional', '', 1, '0000-00-00 00:00:00'),
+(188, 1, 'stretch', '', 1, '0000-00-00 00:00:00'),
+(189, 1, 'none', '', 1, '0000-00-00 00:00:00'),
+(190, 1, 'extras_image_modify_when', '', 1, '0000-00-00 00:00:00'),
+(191, 1, 'always', '', 1, '0000-00-00 00:00:00'),
+(192, 1, 'to_smaller', '', 1, '0000-00-00 00:00:00'),
+(193, 1, 'to_bigger', '', 1, '0000-00-00 00:00:00'),
+(194, 1, 'extras_image_modifyalign', '', 1, '0000-00-00 00:00:00'),
+(195, 1, 'top-left', '', 1, '0000-00-00 00:00:00'),
+(196, 1, 'top-middle', '', 1, '0000-00-00 00:00:00'),
+(197, 1, 'top-right', '', 1, '0000-00-00 00:00:00'),
+(198, 1, 'middle-left', '', 1, '0000-00-00 00:00:00'),
+(199, 1, 'center', '', 1, '0000-00-00 00:00:00'),
+(200, 1, 'middle-right', '', 1, '0000-00-00 00:00:00'),
+(201, 1, 'bottom-left', '', 1, '0000-00-00 00:00:00'),
+(202, 1, 'bottom-middle', '', 1, '0000-00-00 00:00:00'),
+(203, 1, 'bottom-right', '', 1, '0000-00-00 00:00:00'),
+(204, 1, 'extras_image_modify_alpha', '', 1, '0000-00-00 00:00:00'),
+(205, 1, 'extras_image_modify_resize', '', 1, '0000-00-00 00:00:00'),
+(206, 1, 'extras_image_modify_background', '', 1, '0000-00-00 00:00:00'),
+(207, 1, 'extras_image_modify_transparent', '', 1, '0000-00-00 00:00:00'),
+(208, 1, 'extras_image_modify_frame_size', '', 1, '0000-00-00 00:00:00'),
+(209, 1, 'extras_image_modify_frame_color', '', 1, '0000-00-00 00:00:00'),
+(210, 1, 'extras_image_modify_extension', '', 1, '0000-00-00 00:00:00'),
+(211, 1, 'jpg', '', 1, '0000-00-00 00:00:00'),
+(212, 1, 'png', '', 1, '0000-00-00 00:00:00'),
+(213, 1, 'extras_image_modify_watermarkimage', '', 1, '0000-00-00 00:00:00'),
+(214, 1, 'extras_image_modify_image_cover', '', 1, '0000-00-00 00:00:00'),
+(215, 1, 'extras_image_modify_wmk_mode', '', 1, '0000-00-00 00:00:00'),
+(216, 1, 'extras_image_modify_image_align', '', 1, '0000-00-00 00:00:00'),
+(217, 1, 'extras_image_modify_wmk_alpha', '', 1, '0000-00-00 00:00:00'),
+(218, 1, 'extras_image_modify_image_dir', '', 1, '0000-00-00 00:00:00'),
+(219, 1, 'extras_image_modify_image_file', '', 1, '0000-00-00 00:00:00'),
+(220, 1, 'extras_image_modify_watermarktext', '', 1, '0000-00-00 00:00:00'),
+(221, 1, 'extras_image_modify_word_size', '', 1, '0000-00-00 00:00:00'),
+(222, 1, 'extras_image_modify_word_color', '', 1, '0000-00-00 00:00:00'),
+(223, 1, 'extras_image_modify_word_type', '', 1, '0000-00-00 00:00:00'),
+(224, 1, 'extras_image_modify_word_align', '', 1, '0000-00-00 00:00:00'),
+(225, 1, 'extras_image_modify_word_dir', '', 1, '0000-00-00 00:00:00'),
+(226, 1, 'extras_image_modify_word_file', '', 1, '0000-00-00 00:00:00'),
+(227, 1, 'extras_image_modify_advanced', '', 1, '0000-00-00 00:00:00'),
+(228, 1, 'extras_image_modify_max_upload', '', 1, '0000-00-00 00:00:00'),
+(229, 1, 'extras_image_modify_force_icon', '', 1, '0000-00-00 00:00:00'),
+(230, 1, 'extras_image_modify_allowed_ext', '', 1, '0000-00-00 00:00:00'),
+(231, 1, 'login_wrong_user_not_found', 'Utente e/o password sbagliati.', 1, '0000-00-00 00:00:00'),
+(232, 1, 'datepicker_choose', '', 1, '0000-00-00 00:00:00'),
+(233, 1, 'datepicker_time', '', 1, '0000-00-00 00:00:00'),
+(234, 1, 'datepicker_hour', '', 1, '0000-00-00 00:00:00'),
+(235, 1, 'datepicker_minute', '', 1, '0000-00-00 00:00:00'),
+(236, 1, 'datepicker_second', '', 1, '0000-00-00 00:00:00'),
+(237, 1, 'datepicker_current', '', 1, '0000-00-00 00:00:00'),
+(238, 1, 'datepicker_close', '', 1, '0000-00-00 00:00:00'),
+(239, 1, 'item_not_set', '', 1, '0000-00-00 00:00:00'),
+(240, 1, 'divisore', '', 1, '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ff_languages`
+-- Struttura della tabella `ff_languages`
 --
 
-DROP TABLE IF EXISTS `ff_languages`;
-CREATE TABLE IF NOT EXISTS `ff_languages` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ff_languages` (
+  `ID` int(11) NOT NULL,
   `code` char(3) NOT NULL DEFAULT '',
   `description` varchar(255) NOT NULL DEFAULT '',
   `status` int(1) NOT NULL DEFAULT '0',
   `tiny_code` varchar(255) NOT NULL DEFAULT '',
-  `iso6391` varchar(255) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=98 ;
+  `iso6391` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 --
--- Dumping data for table `ff_languages`
+-- Dump dei dati per la tabella `ff_languages`
 --
 
 INSERT INTO `ff_languages` (`ID`, `code`, `description`, `status`, `tiny_code`, `iso6391`) VALUES
-(1, 'ITA', 'Italiano', 1, '', 'it'),
 (2, '', '', 0, '', 'ab'),
+(1, 'ITA', 'Italiano', 1, '', 'it'),
 (3, '', '', 0, '', 'af'),
 (4, '', '', 0, '', 'an'),
 (5, '', '', 0, '', 'ar'),
@@ -274,9 +800,9 @@ INSERT INTO `ff_languages` (`ID`, `code`, `description`, `status`, `tiny_code`, 
 (18, '', '', 0, '', 'cu'),
 (19, '', '', 0, '', 'cy'),
 (20, '', '', 0, '', 'da'),
-(21, '', '', 0, '', 'de'),
+(21, 'DEU', 'Deutch', 0, 'de', 'de'),
 (22, '', '', 0, '', 'el'),
-(23, 'ENG', 'Inglese', 1, '', 'en'),
+(23, 'ENG', 'English', 0, 'en', 'en'),
 (24, '', '', 0, '', 'eo'),
 (25, '', '', 0, '', 'es'),
 (26, '', '', 0, '', 'et'),
@@ -341,7 +867,7 @@ INSERT INTO `ff_languages` (`ID`, `code`, `description`, `status`, `tiny_code`, 
 (86, '', '', 0, '', 'sv'),
 (87, '', '', 0, '', 'sw'),
 (88, '', '', 0, '', 'tk'),
-(89, '', '', 0, '', 'tr'),
+(89, 'TUR', 'Türkçe', 0, '', 'tr'),
 (90, '', '', 0, '', 'ty'),
 (91, '', '', 0, '', 'uk'),
 (92, '', '', 0, '', 'ur'),
@@ -354,34 +880,18 @@ INSERT INTO `ff_languages` (`ID`, `code`, `description`, `status`, `tiny_code`, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cm_charset_decode`
+-- Struttura della tabella `ff_languages_names`
 --
 
-DROP TABLE IF EXISTS `cm_charset_decode`;
-CREATE TABLE IF NOT EXISTS `cm_charset_decode` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `value` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ff_languages_names`
---
-
-DROP TABLE IF EXISTS `ff_languages_names`;
-CREATE TABLE IF NOT EXISTS `ff_languages_names` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ff_languages_names` (
+  `ID` int(11) NOT NULL,
   `ID_lang` int(11) NOT NULL,
   `ID_trans` int(11) NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2497 ;
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `ff_languages_names`
+-- Dump dei dati per la tabella `ff_languages_names`
 --
 
 INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
@@ -810,7 +1320,7 @@ INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 (423, 18, 25, 'eslavo eclesiástico'),
 (424, 18, 26, 'kirikuslaavi'),
 (425, 18, 29, 'kirkkoslaavi'),
-(426, 18, 32, 'slavon d''église'),
+(426, 18, 32, 'slavon d\'église'),
 (427, 18, 40, 'crkvenoslavenski'),
 (428, 18, 42, 'Templomi szláv'),
 (429, 18, 45, 'Church Slavic'),
@@ -2201,8 +2711,7 @@ INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 (1814, 71, 74, 'norweski (nynorsk)'),
 (1815, 71, 75, 'Norueguês (Nynors)'),
 (1816, 71, 77, 'norveški (nynorsk)'),
-(1817, 71, 81, 'nórčina (nynorsk)');
-INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
+(1817, 71, 81, 'nórčina (nynorsk)'),
 (1818, 71, 82, 'norveščina (nynorsk)'),
 (1819, 71, 86, 'norska (nynorska)'),
 (1820, 71, 89, 'Norveççe (Norsk)'),
@@ -2275,7 +2784,8 @@ INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 (1887, 74, 59, 'Lenkų'),
 (1888, 74, 60, 'Poļu'),
 (1889, 74, 66, 'Pollakk'),
-(1890, 74, 70, 'Pools'),
+(1890, 74, 70, 'Pools');
+INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 (1891, 74, 72, 'Polsk'),
 (1892, 74, 74, 'polski'),
 (1893, 74, 75, 'Polaco'),
@@ -2430,7 +2940,7 @@ INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 (2042, 80, 1, 'Sami settentrionale'),
 (2043, 80, 59, 'Šiaurės samių'),
 (2044, 80, 60, 'Ziemeļsāmu'),
-(2045, 80, 66, 'Sami ta'' Fuq'),
+(2045, 80, 66, 'Sami ta\' Fuq'),
 (2046, 80, 70, 'Noord-Samisch'),
 (2047, 80, 72, 'Nordsamisk'),
 (2048, 80, 74, 'północny sami'),
@@ -2882,3 +3392,888 @@ INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 (2494, 97, 82, 'kitajščina'),
 (2495, 97, 86, 'kinesiska'),
 (2496, 97, 89, 'Çince');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `rel_tag_items`
+--
+
+CREATE TABLE `rel_tag_items` (
+  `ID` int(11) NOT NULL,
+  `ID_tag` varchar(255) NOT NULL,
+  `ID_item` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dump dei dati per la tabella `rel_tag_items`
+--
+
+INSERT INTO `rel_tag_items` (`ID`, `ID_tag`, `ID_item`) VALUES
+(1, '1', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `support_countries`
+--
+
+CREATE TABLE `support_countries` (
+  `ID` int(11) NOT NULL,
+  `desc` varchar(255) NOT NULL,
+  `code` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dump dei dati per la tabella `support_countries`
+--
+
+INSERT INTO `support_countries` (`ID`, `desc`, `code`) VALUES
+(1, 'Albania', 'AL'),
+(2, 'Algeria', 'DZ'),
+(3, 'Andorra', 'AD'),
+(4, 'Angola', 'AN7'),
+(5, 'Anguilla', 'AI'),
+(6, 'Antigua e Barbuda', 'AG'),
+(7, 'Antille Olandesi', 'AN'),
+(8, 'Arabia Saudita', 'SA'),
+(9, 'Argentina', 'AR'),
+(10, 'Armenia', 'AM'),
+(11, 'Aruba', 'AW'),
+(12, 'Australia', 'AU'),
+(13, 'Austria', 'AT'),
+(14, 'Azerbaigian', 'AZ'),
+(15, 'Bahamas', 'BS'),
+(16, 'Bahrain', 'BH'),
+(17, 'Bangladesh', 'BD'),
+(18, 'Barbados', 'BB'),
+(19, 'Barbuda (Antigua)', 'AG1'),
+(20, 'Belgio', 'BE'),
+(21, 'Belize', 'BZ'),
+(22, 'Benin', 'BJ'),
+(23, 'Bermuda', 'BM'),
+(24, 'Bielorussia', 'BY'),
+(25, 'Bolivia', 'BO'),
+(26, 'Bonaire (Antille Olandesi)', 'AN1'),
+(27, 'Bosnia-Herzegovina', 'BA'),
+(28, 'Botswana', 'BW'),
+(29, 'Brasile', 'BR'),
+(30, 'Brunei', 'BN'),
+(31, 'Bulgaria', 'BG'),
+(32, 'Burkina Faso', 'BF'),
+(33, 'Burundi', 'BI'),
+(34, 'Cambogia', 'KH'),
+(35, 'Camerun', 'CM'),
+(36, 'Canada', 'CA'),
+(37, 'Ceca, Repubblica', 'CZ'),
+(38, 'Centrafricana, Repubblica', 'CF'),
+(39, 'Ceuta', 'XCE'),
+(40, 'Ciad', 'TD'),
+(41, 'Cile', 'CL'),
+(42, 'Cina, Repubblica Popolare', 'CN'),
+(43, 'Cipro', 'CY'),
+(44, 'Cisgiordania e Gaza', 'XGC'),
+(45, 'Colombia', 'CO'),
+(46, 'Congo (Brazzaville)', 'CG1'),
+(47, 'Congo, Repubblica Dem.', 'CG'),
+(48, 'Corea del Sud', 'KR'),
+(49, 'Costa d\'Avorio', 'CI'),
+(50, 'Costa Rica', 'CR'),
+(51, 'Croazia', 'HR'),
+(52, 'Curaçao (Antille Olandesi)', 'AN2'),
+(53, 'Danimarca', 'DK'),
+(54, 'Dominica', 'DM'),
+(55, 'Dominicana, Repubblica', 'DO'),
+(56, 'Ecuador', 'EC'),
+(57, 'Egitto', 'EG'),
+(58, 'El Salvador', 'SV'),
+(59, 'Emirati Arabi Uniti', 'AE'),
+(60, 'Eritrea', 'ER'),
+(61, 'Estonia', 'EE'),
+(62, 'Etiopia', 'ET'),
+(63, 'Federazione Yugoslava', 'YU'),
+(64, 'Figi', 'FJ'),
+(65, 'Filippine', 'PH'),
+(66, 'Finlandia', 'FI'),
+(67, 'Francia', 'FR'),
+(68, 'Gabon', 'GA'),
+(69, 'Gambia', 'GM'),
+(70, 'Gaza e Cisgiordania', 'XCG'),
+(71, 'Georgia', 'GE'),
+(72, 'Germania', 'DE'),
+(73, 'Ghana', 'GH'),
+(74, 'Giamaica', 'JM'),
+(75, 'Giappone', 'JP'),
+(76, 'Gibilterra', 'GI'),
+(77, 'Gibuti', 'DJ'),
+(78, 'Giordania', 'JO'),
+(79, 'Grecia', 'GR'),
+(80, 'Grenada', 'GD'),
+(81, 'Groenlandia', 'GL'),
+(82, 'Guadalupa', 'GP'),
+(83, 'Guam', 'GU'),
+(84, 'Guatemala', 'GT'),
+(85, 'Guinea', 'GN'),
+(86, 'Guinea Equatoriale', 'GQ'),
+(87, 'Guinea-Bissau', 'GW'),
+(88, 'Guyana', 'GY'),
+(89, 'Guyana Francese', 'GF'),
+(90, 'Haiti', 'HT'),
+(91, 'Honduras', 'HN'),
+(92, 'Hong Kong', 'HK'),
+(93, 'India', 'IN'),
+(94, 'Indonesia', 'ID'),
+(95, 'Irlanda, Repubblica', 'IE'),
+(96, 'Islanda', 'IS'),
+(97, 'Isola Union (St Vincente Grenadines)', 'VC'),
+(98, 'Isola Wake', 'XIW'),
+(99, 'Isole Canarie', 'XIC'),
+(100, 'Isole Capo Verde', 'CV'),
+(101, 'Isole Cayman', 'KY'),
+(102, 'Isole Cook', 'CK'),
+(103, 'Isole Faroe', 'FO'),
+(104, 'Isole Marianne del Nord', 'MP'),
+(105, 'Isole Marshall', 'MH'),
+(106, 'Isole Salomone', 'SB'),
+(107, 'Isole Turks e Caicos', 'TC'),
+(108, 'Isole Vergini Britanniche', 'VG'),
+(109, 'Isole Vergini Statunitensi', 'VI'),
+(110, 'Isole Wallis e Futuna', 'WF'),
+(111, 'Israele', 'IL'),
+(112, 'Italia', 'IT'),
+(113, 'Kazakistan', 'KZ'),
+(114, 'Kenya', 'KE'),
+(115, 'Kiribati', 'KI'),
+(116, 'Kosrae (Stati Federali Micronesia)', 'FM1'),
+(117, 'Kuwait', 'KW'),
+(118, 'Kyrgyzstan', 'KG'),
+(119, 'Laos', 'LA'),
+(120, 'Lesotho', 'LS'),
+(121, 'Lettonia', 'LV'),
+(122, 'Libano', 'LB'),
+(123, 'Liberia', 'LR'),
+(124, 'Liechtenstein', 'LI'),
+(125, 'Lituania', 'LT'),
+(126, 'Lussemburgo', 'LU'),
+(127, 'Macau', 'MO'),
+(128, 'Macedonia', 'MK'),
+(129, 'Madagascar', 'MG'),
+(130, 'Madera,  Isola di', 'XMI'),
+(131, 'Malawi', 'MW'),
+(132, 'Maldive', 'MV'),
+(133, 'Malesia', 'MY'),
+(134, 'Mali', 'ML'),
+(135, 'Malta', 'MT'),
+(136, 'Marocco', 'MA'),
+(137, 'Martinica', 'MQ'),
+(138, 'Mauritania', 'MR'),
+(139, 'Mauritius', 'MU'),
+(140, 'Melilla', 'XME'),
+(141, 'Messico', 'MX'),
+(142, 'Micronesia (Stati Federali della)', 'FM2'),
+(143, 'Moldavia', 'MD'),
+(144, 'Monaco (Principato di)', 'MC'),
+(145, 'Mongolia', 'MO1'),
+(146, 'Montserrat', 'MS'),
+(147, 'Mozambico', 'MZ'),
+(148, 'Myanmar', 'MM'),
+(149, 'Namibia', 'NA'),
+(150, 'Nepal', 'NP'),
+(151, 'Nevis (St.Kitts - Nevis)', 'KN1'),
+(152, 'Nicaragua', 'NI'),
+(153, 'Niger', 'NE'),
+(154, 'Nigeria', 'NG'),
+(155, 'Norvegia', 'NO'),
+(156, 'Nuova Caledonia', 'NC'),
+(157, 'Nuova Zelanda', 'NZ'),
+(158, 'Olanda (Paesi Bassi)', 'NL'),
+(159, 'Olandesi, Antille', 'AN3'),
+(160, 'Oman', 'OM'),
+(161, 'Pakistan', 'PK'),
+(162, 'Palau', 'PW'),
+(163, 'Panama', 'PA'),
+(164, 'Papua Nuova Guinea', 'PG'),
+(165, 'Paraguay', 'PY'),
+(166, 'Per&#249;', 'PE'),
+(167, 'Polinesia Francese', 'PF'),
+(168, 'Polonia', 'PL'),
+(169, 'Ponape (Stati Federali Micronesia)', 'FM3'),
+(170, 'Portogallo', 'PT'),
+(171, 'Puerto Rico (Portorico)', 'PR'),
+(172, 'Qatar', 'QA'),
+(173, 'Regno Unito - Galles', 'GBW'),
+(174, 'Regno Unito - Inghilterra', 'GBE'),
+(175, 'Regno Unito - Irlanda del Nord', 'GBI'),
+(176, 'Regno Unito - Scozia', 'GBS'),
+(177, 'R&#233;union', 'RE'),
+(178, 'Romania', 'RO'),
+(179, 'Rota (Isole Marianne del Nord)', 'MP2'),
+(180, 'Ruanda', 'RW'),
+(181, 'Russia', 'RU'),
+(182, 'Saba (Antille Olandesi)', 'AN4'),
+(183, 'Saipan (Isole Marianne del Nord)', 'MP1'),
+(184, 'Samoa Americane', 'AS'),
+(185, 'Samoa Occidentale', 'AS1'),
+(186, 'Senegal', 'SN'),
+(187, 'Seychelles', 'SC'),
+(188, 'Sierra Leone', 'SL'),
+(189, 'Singapore', 'SG'),
+(190, 'Siria', 'SY'),
+(191, 'Slovacca, Repubblica', 'SK'),
+(192, 'Slovenia', 'SI'),
+(193, 'Spagna', 'ES'),
+(194, 'Sri Lanka', 'LK'),
+(195, 'St. Barth&#233;lemy', 'XSB'),
+(196, 'St. Christopher (St. Kitts-Nevis)', 'KN2'),
+(197, 'St. Croix (Isole Vergini Statunitensi)', 'VI1'),
+(198, 'St. Eustatius (Antille Olandesi)', 'AN5'),
+(199, 'St. John (Isole Vergini Statunitensi)', 'VI2'),
+(200, 'St. Kitts (St. Kitts-Nevis)', 'KN3'),
+(201, 'St. Lucia', 'LC'),
+(202, 'St. Maarten (Antille Olandesi)', 'AN6'),
+(203, 'St. Martin (Guadalupa)', 'GP1'),
+(204, 'St. Thomas (Isole Vergini Statunitensi)', 'VI3'),
+(205, 'St. Vincent e le Grenadine', 'VC1'),
+(206, 'Sud Africa', 'ZA'),
+(207, 'Suriname', 'SR'),
+(208, 'Svezia', 'SE'),
+(209, 'Svizzera', 'CH'),
+(210, 'Swaziland', 'SZ'),
+(211, 'Tahiti', 'HT1'),
+(212, 'Tailandia', 'TH'),
+(213, 'Taiwan', 'TW'),
+(214, 'Tajikistan', 'TJ'),
+(215, 'Tanzania', 'TZ'),
+(216, 'Tinian (Isole Marianne del Nord)', 'MP3'),
+(217, 'Togo', 'TG'),
+(218, 'Tonga', 'TO'),
+(219, 'Tortola (Isole Vergini Britanniche)', 'VG1'),
+(220, 'Trinidad e Tobago', 'TT'),
+(221, 'Truk (Stati Federali Micronesia)', 'FM4'),
+(222, 'Tunisia', 'TN'),
+(223, 'Turchia', 'TR'),
+(224, 'Turkmenistan', 'TM'),
+(225, 'Tuvalu', 'TV'),
+(226, 'Ucraina', 'UA'),
+(227, 'Uganda', 'UG'),
+(228, 'Ungheria', 'HU'),
+(229, 'Uruguay', 'UY'),
+(230, 'USA - Alabama', 'USAL'),
+(231, 'USA - Alaska', 'USAK'),
+(232, 'USA - altri stati', 'US'),
+(233, 'USA - Arizona', 'USAZ'),
+(234, 'USA - Arkansas', 'USAR'),
+(235, 'USA - California', 'USCA'),
+(236, 'USA - Colorado', 'USCO'),
+(237, 'USA - Conneticut', 'USCT'),
+(238, 'USA - Delaware', 'USDE'),
+(239, 'USA - Dist. of Columbia', 'USDC'),
+(240, 'USA - Florida', 'USFL'),
+(241, 'USA - Georgia', 'USGA'),
+(242, 'USA - Hawaii', 'USHI'),
+(243, 'USA - Idaho', 'USID'),
+(244, 'USA - Illinois', 'USIL'),
+(245, 'USA - Indiana', 'USIN'),
+(246, 'USA - Iowa', 'USIA'),
+(247, 'USA - Kansas', 'USKS'),
+(248, 'USA - Kentucky', 'USKY'),
+(249, 'USA - Louisiana', 'USLA'),
+(250, 'USA - Maine', 'USME'),
+(251, 'USA - Maryland', 'USMD'),
+(252, 'USA - Massachusetts', 'USMA'),
+(253, 'USA - Michigan', 'USMI'),
+(254, 'USA - Minnesota', 'USMN'),
+(255, 'USA - Mississippi', 'USMS'),
+(256, 'USA - Missouri', 'USMO'),
+(257, 'USA - Montana', 'USMT'),
+(258, 'USA - Nebraska', 'USNE'),
+(259, 'USA - Nevada', 'USNV'),
+(260, 'USA - New Hampshire', 'USNH'),
+(261, 'USA - New Jersey', 'USNJ'),
+(262, 'USA - New Mexico', 'USNM'),
+(263, 'USA - New York', 'USNY'),
+(264, 'USA - North Carolina', 'USNC'),
+(265, 'USA - North Dakota', 'USND'),
+(266, 'USA - Ohio', 'USOH'),
+(267, 'USA - Oklahoma', 'USOK'),
+(268, 'USA - Oregon', 'USOR'),
+(269, 'USA - Pennsylvania', 'USPA'),
+(270, 'USA - Rhode Island', 'USRI'),
+(271, 'USA - South Carolina', 'USSC'),
+(272, 'USA - South Dakota', 'USSD'),
+(273, 'USA - Tennessee', 'USTN'),
+(274, 'USA - Texas', 'USTX'),
+(275, 'USA - Utah', 'USUT'),
+(276, 'USA - Vermont', 'USVT'),
+(277, 'USA - Virginia', 'USVA'),
+(278, 'USA - Washington', 'USWA'),
+(279, 'USA - West Virginia', 'USWV'),
+(280, 'USA - Wisconsin', 'USWI'),
+(281, 'USA - Wyoming', 'USWY'),
+(282, 'Uzbekistan', 'UZ'),
+(283, 'Vanuatu', 'VU'),
+(284, 'Venezuela', 'VE'),
+(285, 'Vietnam', 'VN'),
+(286, 'Virgin Gorda (Isole Vergini Britanniche)', 'VG2'),
+(287, 'Yap (Stati Federali Micronesia)', 'FM5'),
+(288, 'Yemen, Repubblica dello', 'YE'),
+(289, 'Zambia', 'ZM'),
+(290, 'Zimbabwe', 'ZW');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `support_province`
+--
+
+CREATE TABLE `support_province` (
+  `ID` int(11) NOT NULL,
+  `RegionID` int(11) NOT NULL,
+  `Name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `CarAbbreviation` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dump dei dati per la tabella `support_province`
+--
+
+INSERT INTO `support_province` (`ID`, `RegionID`, `Name`, `CarAbbreviation`, `slug`) VALUES
+(1, 1, 'Torino', 'TO', 'torino'),
+(2, 1, 'Vercelli', 'VC', 'vercelli'),
+(3, 1, 'Novara', 'NO', 'novara'),
+(4, 1, 'Cuneo', 'CN', 'cuneo'),
+(5, 1, 'Asti', 'AT', 'asti'),
+(6, 1, 'Alessandria', 'AL', 'alessandria'),
+(7, 2, 'Aosta', 'AO', 'aosta'),
+(8, 7, 'Imperia', 'IM', 'imperia'),
+(9, 7, 'Savona', 'SV', 'savona'),
+(10, 7, 'Genova', 'GE', 'genova'),
+(11, 7, 'La Spezia', 'SP', 'la-spezia'),
+(12, 3, 'Varese', 'VA', 'varese'),
+(13, 3, 'Como', 'CO', 'como'),
+(14, 3, 'Sondrio', 'SO', 'sondrio'),
+(15, 3, 'Milano', 'MI', 'milano'),
+(16, 3, 'Bergamo', 'BG', 'bergamo'),
+(17, 3, 'Brescia', 'BS', 'brescia'),
+(18, 3, 'Pavia', 'PV', 'pavia'),
+(19, 3, 'Cremona', 'CR', 'cremona'),
+(20, 3, 'Mantova', 'MN', 'mantova'),
+(21, 4, 'Bolzano', 'BZ', 'bolzano'),
+(22, 4, 'Trento', 'TN', 'trento'),
+(23, 5, 'Verona', 'VR', 'verona'),
+(24, 5, 'Vicenza', 'VI', 'vicenza'),
+(25, 5, 'Belluno', 'BL', 'belluno'),
+(26, 5, 'Treviso', 'TV', 'treviso'),
+(27, 5, 'Venezia', 'VE', 'venezia'),
+(28, 5, 'Padova', 'PD', 'padova'),
+(29, 5, 'Rovigo', 'RO', 'rovigo'),
+(30, 6, 'Udine', 'UD', 'udine'),
+(31, 6, 'Gorizia', 'GO', 'gorizia'),
+(32, 6, 'Trieste', 'TS', 'trieste'),
+(33, 8, 'Piacenza', 'PC', 'piacenza'),
+(34, 8, 'Parma', 'PR', 'parma'),
+(35, 8, 'Reggio Emilia', 'RE', 'reggio-emilia'),
+(36, 8, 'Modena', 'MO', 'modena'),
+(37, 8, 'Bologna', 'BO', 'bologna'),
+(38, 8, 'Ferrara', 'FE', 'ferrara'),
+(39, 8, 'Ravenna', 'RA', 'ravenna'),
+(40, 8, 'Forlì Cesena', 'FC', 'forli-cesena'),
+(41, 11, 'Pesaro Urbino', 'PU', 'pesaro-urbino'),
+(42, 11, 'Ancona', 'AN', 'ancona'),
+(43, 11, 'Macerata', 'MC', 'macerata'),
+(44, 11, 'Ascoli Piceno', 'AP', 'ascoli-piceno'),
+(45, 9, 'Massa Carrara', 'MS', 'massa-carrara'),
+(46, 9, 'Lucca', 'LU', 'lucca'),
+(47, 9, 'Pistoia', 'PT', 'pistoia'),
+(48, 9, 'Firenze', 'FI', 'firenze'),
+(49, 9, 'Livorno', 'LI', 'livorno'),
+(50, 9, 'Pisa', 'PI', 'pisa'),
+(51, 9, 'Arezzo', 'AR', 'arezzo'),
+(52, 9, 'Siena', 'SI', 'siena'),
+(53, 9, 'Grosseto', 'GR', 'grosseto'),
+(54, 10, 'Perugia', 'PG', 'perugia'),
+(55, 10, 'Terni', 'TR', 'terni'),
+(56, 12, 'Viterbo', 'VT', 'viterbo'),
+(57, 12, 'Rieti', 'RI', 'rieti'),
+(58, 12, 'Roma', 'RM', 'roma'),
+(59, 12, 'Latina', 'LT', 'latina'),
+(60, 12, 'Frosinone', 'FR', 'frosinone'),
+(61, 15, 'Caserta', 'CE', 'caserta'),
+(62, 15, 'Benevento', 'BN', 'benevento'),
+(63, 15, 'Napoli', 'NA', 'napoli'),
+(64, 15, 'Avellino', 'AV', 'avellino'),
+(65, 15, 'Salerno', 'SA', 'salerno'),
+(66, 13, 'L\'Aquila', 'AQ', 'l-aquila'),
+(67, 13, 'Teramo', 'TE', 'teramo'),
+(68, 13, 'Pescara', 'PE', 'pescara'),
+(69, 13, 'Chieti', 'CH', 'chieti'),
+(70, 14, 'Campobasso', 'CB', 'campobasso'),
+(71, 16, 'Foggia', 'FG', 'foggia'),
+(72, 16, 'Bari', 'BA', 'bari'),
+(73, 16, 'Taranto', 'TA', 'taranto'),
+(74, 16, 'Brindisi', 'BR', 'brindisi'),
+(75, 16, 'Lecce', 'LE', 'lecce'),
+(76, 17, 'Potenza', 'PZ', 'potenza'),
+(77, 17, 'Matera', 'MT', 'matera'),
+(78, 18, 'Cosenza', 'CS', 'cosenza'),
+(79, 18, 'Catanzaro', 'CZ', 'catanzaro'),
+(80, 18, 'Reggio di Calabria', 'RC', 'reggio-di-calabria'),
+(81, 19, 'Trapani', 'TP', 'trapani'),
+(82, 19, 'Palermo', 'PA', 'palermo'),
+(83, 19, 'Messina', 'ME', 'messina'),
+(84, 19, 'Agrigento', 'AG', 'agrigento'),
+(85, 19, 'Caltanissetta', 'CL', 'caltanissetta'),
+(86, 19, 'Enna', 'EN', 'enna'),
+(87, 19, 'Catania', 'CT', 'catania'),
+(88, 19, 'Ragusa', 'RG', 'ragusa'),
+(89, 19, 'Siracusa', 'SR', 'siracusa'),
+(90, 20, 'Sassari', 'SS', 'sassari'),
+(91, 20, 'Nuoro', 'NU', 'nuoro'),
+(92, 20, 'Cagliari', 'CA', 'cagliari'),
+(93, 6, 'Pordenone', 'PN', 'pordenone'),
+(94, 14, 'Isernia', 'IS', 'isernia'),
+(95, 20, 'Oristano', 'OR', 'oristano'),
+(96, 1, 'Biella', 'BI', 'biella'),
+(97, 3, 'Lecco', 'LC', 'lecco'),
+(98, 3, 'Lodi', 'LO', 'lodi'),
+(99, 8, 'Rimini', 'RN', 'rimini'),
+(100, 9, 'Prato', 'PO', 'prato'),
+(101, 18, 'Crotone', 'KR', 'crotone'),
+(102, 18, 'Vibo Valentia', 'VV', 'vibo-valentia'),
+(103, 1, 'Verbano Cusio Ossola', 'VB', 'verbano-cusio-ossola'),
+(104, 20, 'Olbia Tempio', 'OT', 'olbia-tempio'),
+(105, 20, 'Ogliastra', 'OG', 'ogliastra'),
+(106, 20, 'Medio Campidano', 'VS', 'medio-campidano'),
+(107, 20, 'Carbonia Iglesias', 'CI', 'carbonia-iglesias'),
+(108, 3, 'Monza e della Brianza', 'MB', 'monza-e-della-brianza'),
+(109, 11, 'Fermo', 'FM', 'fermo'),
+(110, 16, 'Barletta Andria Trani', 'BT', 'barletta-andria-trani');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `support_regioni`
+--
+
+CREATE TABLE `support_regioni` (
+  `ID` int(11) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dump dei dati per la tabella `support_regioni`
+--
+
+INSERT INTO `support_regioni` (`ID`, `Name`, `slug`) VALUES
+(1, 'Piemonte', 'piemonte'),
+(2, 'Valle d\'Aosta', 'valle-d-aosta'),
+(3, 'Lombardia', 'lombardia'),
+(4, 'Trentino Alto Adige', 'trentino-alto-adige'),
+(5, 'Veneto', 'veneto'),
+(6, 'Friuli Venezia Giulia', 'friuli-venezia-giulia'),
+(7, 'Liguria', 'liguria'),
+(8, 'Emilia Romagna', 'emilia-romagna'),
+(9, 'Toscana', 'toscana'),
+(10, 'Umbria', 'umbria'),
+(11, 'Marche', 'marche'),
+(12, 'Lazio', 'lazio'),
+(13, 'Abruzzo', 'abruzzo'),
+(14, 'Molise', 'molise'),
+(15, 'Campania', 'campania'),
+(16, 'Puglia', 'puglia'),
+(17, 'Basilicata', 'basilicata'),
+(18, 'Calabria', 'calabria'),
+(19, 'Sicilia', 'sicilia'),
+(20, 'Sardegna', 'sardegna');
+
+--
+-- Indici per le tabelle scaricate
+--
+
+--
+-- Indici per le tabelle `cm_charset_decode`
+--
+ALTER TABLE `cm_charset_decode`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_layout`
+--
+ALTER TABLE `cm_layout`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_layout_cdn`
+--
+ALTER TABLE `cm_layout_cdn`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_layout_css`
+--
+ALTER TABLE `cm_layout_css`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_layout_js`
+--
+ALTER TABLE `cm_layout_js`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_layout_meta`
+--
+ALTER TABLE `cm_layout_meta`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_layout` (`ID_layout`);
+
+--
+-- Indici per le tabelle `cm_layout_sect`
+--
+ALTER TABLE `cm_layout_sect`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_media`
+--
+ALTER TABLE `cm_media`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_mod_restricted_settings`
+--
+ALTER TABLE `cm_mod_restricted_settings`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_mod_security_domains`
+--
+ALTER TABLE `cm_mod_security_domains`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_packages` (`ID_packages`);
+
+--
+-- Indici per le tabelle `cm_mod_security_domains_fields`
+--
+ALTER TABLE `cm_mod_security_domains_fields`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_domains` (`ID_domains`),
+  ADD KEY `ID_domains_2` (`ID_domains`,`field`);
+
+--
+-- Indici per le tabelle `cm_mod_security_packages`
+--
+ALTER TABLE `cm_mod_security_packages`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_mod_security_packages_fields`
+--
+ALTER TABLE `cm_mod_security_packages_fields`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `ID_packages_2` (`ID_packages`,`field`),
+  ADD KEY `ID_packages` (`ID_packages`);
+
+--
+-- Indici per le tabelle `cm_mod_security_profiles`
+--
+ALTER TABLE `cm_mod_security_profiles`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_mod_security_profiles_pairs`
+--
+ALTER TABLE `cm_mod_security_profiles_pairs`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_profile` (`ID_profile`);
+
+--
+-- Indici per le tabelle `cm_mod_security_rel_profiles_users`
+--
+ALTER TABLE `cm_mod_security_rel_profiles_users`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_mod_security_timezones`
+--
+ALTER TABLE `cm_mod_security_timezones`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_mod_security_token`
+--
+ALTER TABLE `cm_mod_security_token`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `type` (`type`,`ID_user`),
+  ADD KEY `ID_user` (`ID_user`),
+  ADD KEY `ID_domain` (`ID_domain`);
+
+--
+-- Indici per le tabelle `cm_mod_security_users`
+--
+ALTER TABLE `cm_mod_security_users`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_packages` (`ID_packages`),
+  ADD KEY `profile` (`profile`);
+
+--
+-- Indici per le tabelle `cm_mod_security_users_fields`
+--
+ALTER TABLE `cm_mod_security_users_fields`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_users` (`ID_users`),
+  ADD KEY `ID_users_2` (`ID_users`,`field`),
+  ADD KEY `field` (`field`);
+
+--
+-- Indici per le tabelle `cm_showfiles`
+--
+ALTER TABLE `cm_showfiles`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_showfiles_modes`
+--
+ALTER TABLE `cm_showfiles_modes`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `cm_showfiles_where`
+--
+ALTER TABLE `cm_showfiles_where`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `ff_international`
+--
+ALTER TABLE `ff_international`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `ID_lang` (`ID_lang`,`word_code`);
+
+--
+-- Indici per le tabelle `ff_languages`
+--
+ALTER TABLE `ff_languages`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `ff_languages_names`
+--
+ALTER TABLE `ff_languages_names`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `rel_tag_items`
+--
+ALTER TABLE `rel_tag_items`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `support_countries`
+--
+ALTER TABLE `support_countries`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indici per le tabelle `support_province`
+--
+ALTER TABLE `support_province`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `RegionID` (`RegionID`);
+
+--
+-- Indici per le tabelle `support_regioni`
+--
+ALTER TABLE `support_regioni`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- AUTO_INCREMENT per le tabelle scaricate
+--
+
+--
+-- AUTO_INCREMENT per la tabella `cm_charset_decode`
+--
+ALTER TABLE `cm_charset_decode`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_layout`
+--
+ALTER TABLE `cm_layout`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_layout_cdn`
+--
+ALTER TABLE `cm_layout_cdn`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_layout_css`
+--
+ALTER TABLE `cm_layout_css`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_layout_js`
+--
+ALTER TABLE `cm_layout_js`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_layout_meta`
+--
+ALTER TABLE `cm_layout_meta`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_layout_sect`
+--
+ALTER TABLE `cm_layout_sect`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_media`
+--
+ALTER TABLE `cm_media`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_restricted_settings`
+--
+ALTER TABLE `cm_mod_restricted_settings`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_domains`
+--
+ALTER TABLE `cm_mod_security_domains`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_domains_fields`
+--
+ALTER TABLE `cm_mod_security_domains_fields`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_packages`
+--
+ALTER TABLE `cm_mod_security_packages`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_packages_fields`
+--
+ALTER TABLE `cm_mod_security_packages_fields`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_profiles`
+--
+ALTER TABLE `cm_mod_security_profiles`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_profiles_pairs`
+--
+ALTER TABLE `cm_mod_security_profiles_pairs`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_rel_profiles_users`
+--
+ALTER TABLE `cm_mod_security_rel_profiles_users`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_timezones`
+--
+ALTER TABLE `cm_mod_security_timezones`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_token`
+--
+ALTER TABLE `cm_mod_security_token`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_users`
+--
+ALTER TABLE `cm_mod_security_users`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_mod_security_users_fields`
+--
+ALTER TABLE `cm_mod_security_users_fields`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_showfiles`
+--
+ALTER TABLE `cm_showfiles`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_showfiles_modes`
+--
+ALTER TABLE `cm_showfiles_modes`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT per la tabella `cm_showfiles_where`
+--
+ALTER TABLE `cm_showfiles_where`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT per la tabella `ff_international`
+--
+ALTER TABLE `ff_international`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=241;
+
+--
+-- AUTO_INCREMENT per la tabella `ff_languages`
+--
+ALTER TABLE `ff_languages`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+
+--
+-- AUTO_INCREMENT per la tabella `ff_languages_names`
+--
+ALTER TABLE `ff_languages_names`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2497;
+
+--
+-- AUTO_INCREMENT per la tabella `rel_tag_items`
+--
+ALTER TABLE `rel_tag_items`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT per la tabella `support_countries`
+--
+ALTER TABLE `support_countries`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=291;
+
+--
+-- AUTO_INCREMENT per la tabella `support_province`
+--
+ALTER TABLE `support_province`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+
+--
+-- AUTO_INCREMENT per la tabella `support_regioni`
+--
+ALTER TABLE `support_regioni`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
