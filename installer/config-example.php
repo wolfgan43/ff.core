@@ -14,7 +14,8 @@
 //  GLOBAL SETTINGS
 // *****************
 
-define("FF_ENV_DEVELOPMENT", "localhost");
+// specificare host con www es: www.nomesito.it
+define("FF_ENV_DEVELOPMENT", "");
 define("FF_ENV_STAGING", "");
 define("FF_ENV_PRODUCTION", "");
 
@@ -79,6 +80,8 @@ if(session_name == "not_set"){
 }
 session_save_path("/tmp");
 
+// percorso showfiles
+define("CM_SHOWFILES", FF_SITE_PATH . "/media");
 
 
 // activecomboex

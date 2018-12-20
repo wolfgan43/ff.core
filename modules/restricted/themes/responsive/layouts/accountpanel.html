@@ -2,7 +2,7 @@
 	<a {toggle_properties} href="#panel-account">
 		<!--BeginSectUserAvatar-->
 		<img  class="{img_class}" width="40" height="40" src="{avatar}" alt="{account}" />
-		<!--EndSectUserAvatar-->
+        <!--EndSectUserAvatar-->
 		{user_account}
 	</a>
 	<div id="panel-account" class="{panel_class}">
@@ -11,24 +11,24 @@
 			<div class="{panel_img_class}">
 				<img  class="{img_class}" width="80" height="80" src="{avatar}" alt="{account}" />
 			</div>
-			<!--EndSectAvatar-->
+            <!--EndSectAvatar-->
 			<div class="{panel_desc_class}">
 				<strong>{account}</strong>
 				<br />
 				{info}
-				<!--BeginSectElement--><{item_tag} {item_properties}>{item_icon}{label}</{item_tag}><!--EndSectElement-->
-				<br /> 
-				<!--BeginSectProfile-->
+                <!--BeginSectElement--><{item_tag} {item_properties}>{item_icon}{label}</{item_tag}><!--EndSectElement-->
+				<br />
+            <!--BeginSectProfile-->
 				<a class="{profile_class}" href="{user_profile}">{_edit_profile}</a>
-				<!--EndSectProfile-->				
+            <!--EndSectProfile-->
 
 			</div>
 			<div class="{panel_links_class}">
-			
+
 			</div>
 		</div>
 		<div class="{panel_footer_class}">
 			<a class="{logout_class}" href="{site_path}/restricted/login?frmAction=logout&ret_url={encoded_this_url}"> {_logout}</a>
-		</div>		
-	</div>
+		</div>
+    </div>
 </span>
