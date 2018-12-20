@@ -258,7 +258,7 @@ class statsVisitor
      */
     public function write_stats($user = null, $page = null) {
 		if(!$user)                          { $user = Auth::get("user", array("toArray" => true)); }
-		$visitor                            = Stats::getVisitor();
+		$visitor                            = Util::getVisitor();
 
 		if($user["ID"]) {
             $user["visitor"]                = ($visitor["unique"]

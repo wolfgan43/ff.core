@@ -295,7 +295,7 @@ class statsTrace
                                                                                                 ? $visitor["unique"]
                                                                                                 : ($user["ID"]
                                                                                                     ? "Invalid Page"
-                                                                                                    : (Stats::isCrawler()
+                                                                                                    : (Util::isCrawler()
                                                                                                         ? "Bot"
                                                                                                         : "Invalid Page (guest)"
                                                                                                     )

@@ -28,6 +28,7 @@ if(!defined("SUPERADMIN_USERNAME"))                         define("SUPERADMIN_U
 if(!defined("SUPERADMIN_PASSWORD"))                         define("SUPERADMIN_PASSWORD", null);
 if(!defined("AUTH_USERNAME"))                               define("AUTH_USERNAME", null);
 if(!defined("AUTH_PASSWORD"))                               define("AUTH_PASSWORD", null);
+if(!defined("AUTH_SECURITY_LEVEL"))                         define("AUTH_SECURITY_LEVEL", "7");
 
 use OTPHP\HOTP;
 use OTPHP\TOTP;
@@ -37,7 +38,15 @@ class Auth extends vgCommon
     const APPID                                                     = APPID;
     const API_PATH                                                  = "/api/auth/user";
     const PROFILE_PATH                                              = "/conf/profiling";
-    const SECURITY_LEVEL                                            = "7"; //APP_SECURITY_LEVEL;
+    /*
+     * 1 : Client
+     * 2 : Domain
+     * 4 : Certificate
+     *
+     * 3 : GDPR KEY Access
+     * 7 : GDPR Sensitive Data
+     */
+    const SECURITY_LEVEL                                            = AUTH_SECURITY_LEVEL; //APP_SECURITY_LEVEL;
     const AUTHOR                                                    = "VGallery Auth";
 
     const CERTIFICATE_KL                                            = "002010008005";
@@ -65,6 +74,7 @@ class Auth extends vgCommon
 
     public static $request                                          = array(//todo: da capire dove viene richiesto request public
                                                                         "token"             => "t"
+                                                                        , "code"              => "code"
                                                                         , "code"             => "code"
                                                                         , "username"        => "username"
                                                                         , "password"        => "password"
@@ -195,9 +205,9 @@ class Auth extends vgCommon
                                                                         : self::getReq("password")
                                                                     );
 
-        if(!$opt["domain"])                                     $opt["domain"] = self::getReq("domain");
+        if(!$opt["domain"])                                         $opt["domain"] = self::getReq("domain");
 
-        $security                                               = self::security($opt); //todo: da verificare perche nn popola il dominio
+        $security                                                   = self::security($opt); //todo: da verificare perche nn popola il dominio
         if(isset($security["status"]) && $security["status"] === "0") {
             if($username && $password) {
                 if($opt["method"] == "session") {
@@ -210,10 +220,10 @@ class Auth extends vgCommon
                                                                         "users.password"        => $password
                                                                         , "users.ID_domain"     => $ID_domain
                                                                     );
-
-                if (Cms::getInstance("validator")->isEmail($username)) {
+                $validator                                          = new Validator();
+                if ($validator->isEmail($username)) {
                     $where["users.email"]                           = $username;
-                } elseif (Cms::getInstance("validator")->isTel($username)) {
+                } elseif ($validator->isTel($username)) {
                     $where["users.tel"]                             = $username;
                 } else {
                     $where["users.username"]                        = $username;
@@ -245,7 +255,7 @@ class Auth extends vgCommon
                                                                                         )
                                                                             , "create"  => array(
                                                                                 "key" => self::APPID . "-" . $ID_domain . "-" . $username . "-" . $password
-                                                                                , "expire" => ($security["domain"]["security"]["token_expire"]
+                                                                                , "expire" => (isset($security["domain"]["security"]["token_expire"])
                                                                                     ? $security["domain"]["security"]["token_expire"]
                                                                                     : null
                                                                                 )
@@ -417,7 +427,7 @@ class Auth extends vgCommon
                                                                     : ""
                                                                 );
 
-                            Cms::redirect($_SERVER["HTTP_HOST"] . $_SERVER["PATH_INFO"] . $query);
+                            Auth::redirect($_SERVER["HTTP_HOST"] . $_SERVER["PATH_INFO"] . $query);
                         }
                     }
 
@@ -513,18 +523,18 @@ class Auth extends vgCommon
                             //da far partire la 2fa basata su domanda segreta
                         }
 
-
+                        $validator                                          = new Validator();
                         switch($scopes) {
                             case "email":
                                 $field                              = "email";
-                                $invalid                            = (Cms::getInstance("validator")->isEmail($value)
+                                $invalid                            = ($validator->isEmail($value)
                                                                         ? false
                                                                         : "Invalid Email"
                                                                     );
                                 break;
                             case "password":
                                 $field                              = "password";
-                                $invalid                            = Cms::getInstance("validator")->invalidPassword($value, $return["security"]["domain"]["security"]["pw_validator"]);
+                                $invalid                            = $validator->invalidPassword($value, $return["security"]["domain"]["security"]["pw_validator"]);
                                 break;
                             case "activation":
                                 $field                              = "status";
@@ -613,10 +623,12 @@ class Auth extends vgCommon
                                                                     );
 
         if($username) {
-            if (Cms::getInstance("validator")->isEmail($username)) {
+            $validator                                              = new Validator();
+
+            if ($validator->isEmail($username)) {
                 $where["users.email"]                               = $username;
                 $sender_default                                     = "email";
-            } elseif (Cms::getInstance("validator")->isTel($username)) {
+            } elseif ($validator->isTel($username)) {
                 $where["users.tel"]                                 = $username;
                 $sender_default                                     = "tel";
             } else {
@@ -668,7 +680,7 @@ class Auth extends vgCommon
                                                                         , "template"            => "auth" . $opt["email_path"] . "::" . $endpoint . "_code.html"
                                                                         , "fields"              => array(
                                                                             "code"              => $code
-                                                                            , "url"             => Cms::getUrl(self::API_PATH . "/" . $endpoint . "?code=" . $code)
+                                                                            , "url"             => Auth::getUrl(self::API_PATH . "/" . $endpoint . "?code=" . $code)
                                                                             , "username"        => $user["username"]
                                                                             , "name"            => $user["name"]
                                                                             , "surname"         => $user["surname"]
@@ -834,8 +846,8 @@ class Auth extends vgCommon
                 if($validator["username"]["status"] === "0" && $validator["password"]["status"] === "0") {
                     $model                                          = self::getReqBySchema($opt["model"]);
 
-                    $email                                          = $model["select"]["anagraph.email"];
-                    $tel                                            = $model["select"]["anagraph.tel"];
+                    $email                                          = self::getReq("email", false); // $model["select"]["anagraph.email"];
+                    $tel                                            = self::getReq("tel", false); // $model["select"]["anagraph.tel"];
 
                     $validator["email"]                             = ($email
                                                                         ? self::validate($email, "email", array("security" => $security))
@@ -935,7 +947,7 @@ class Auth extends vgCommon
                         //add token to creation
                         $token                                      = Auth::getInstance("token");
                         $req["access.tokens.token"]                 = $token->create(self::APPID . "-" . $security["domain"]["name"] . "-" . $username . "-" . $password);
-                        $req["access.tokens.type"]                  = ($security["domain"]["security"]["token_type"]
+                        $req["access.tokens.type"]                  = (isset($security["domain"]["security"]["token_type"])
                                                                         ? $security["domain"]["security"]["token_type"]
                                                                         : $token::TYPE
                                                                     );
@@ -964,6 +976,19 @@ class Auth extends vgCommon
 
                         if(is_array($model["select"])) {
                             $data                                   = $model["select"];
+
+                            // ANAGRAPH FIX todo:: da finire con l'xml
+                            $name = self::getReq("name", false);
+                            $surname = self::getReq("surname", false);
+
+                            $data["anagraph.name"]                  = $name." ".$surname;
+                            $data["anagraph.tel"]                   = $tel;
+                            $data["anagraph.email"]                 = $email;
+
+                            $data["anagraph_person.name"]           = self::getReq("name", false);
+                            $data["anagraph_person.surname"]        = self::getReq("surname", false);
+                            // END
+
                             $data["anagraph.ID_user"]               = $insert["user"];
                             $data["anagraph.ID_domain"]             = $security["domain"]["ID"];
                             $data["anagraph.valid_email"]           = 0;
@@ -1141,12 +1166,12 @@ class Auth extends vgCommon
 
 	public static function key($scopes = null, $token = null, $opt = null) {
         if(self::DEBUG)                                             { Debug::startWatch(); }
+        if(Auth::SECURITY_LEVEL == 3 || Auth::SECURITY_LEVEL == 7) {
+            $opt                                                    = self::getOpt($opt);
+            if(!$scopes)                                            $scopes = self::getReq("scopes");
 
-        $opt                                                        = self::getOpt($opt);
-        if(!$scopes)                                                $scopes = self::getReq("scopes");
-
-        if($scopes) {
-            $security                                               = self::check(
+            if($scopes) {
+                $security                                           = self::check(
                                                                         $token
                                                                         , array(
                                                                             "exit"                  => $opt["exit"]
@@ -1160,27 +1185,27 @@ class Auth extends vgCommon
                                                                         )
                                                                     );
 
-            if(isset($security["status"]) && $security["status"] === "0") {
-                //$security                                           = self::security($opt, $scopes);
-                //if(isset($security["status"]) && $security["status"] === "0") {
-                    /*$select                                         = ($opt["fields"]
-                                                                        ? $opt["fields"]
-                                                                        : self::getData()
-                                                                    );*/
-                $select[]                                           = "ID";
-                $opt["model"]                                       = $security["user"]["acl_primary"];
+                if(isset($security["status"]) && $security["status"] === "0") {
+                    //$security                                           = self::security($opt, $scopes);
+                    //if(isset($security["status"]) && $security["status"] === "0") {
+                        /*$select                                         = ($opt["fields"]
+                                                                            ? $opt["fields"]
+                                                                            : self::getData()
+                                                                        );*/
+                    $select[]                                       = "ID";
+                    $opt["model"]                                   = $security["user"]["acl_primary"];
 
-                $anagraph                                           = self::getAnagraphByUser($security["user"]["ID"], $opt["model"], $select);
+                    $anagraph                                       = self::getAnagraphByUser($security["user"]["ID"], $opt["model"], $select);
 
-                //status 1 e 0 nella where se funziona correttamnte
-                //fare un read partendo da anagraph e discendendo nei sotto elementi access e domain
-                // verificare in insert expire che venga scritto correttamente
+                    //status 1 e 0 nella where se funziona correttamnte
+                    //fare un read partendo da anagraph e discendendo nei sotto elementi access e domain
+                    // verificare in insert expire che venga scritto correttamente
 
-                //usare per il certificato questo openssl_csr_new
-                //trovare sistema per la get con le chiavi con i punti per la registrazione
-                if(is_array($anagraph)) {
-                    if($anagraph["ID"]) {
-                        $mc                                         = self::mergeKD(
+                    //usare per il certificato questo openssl_csr_new
+                    //trovare sistema per la get con le chiavi con i punti per la registrazione
+                    if(is_array($anagraph)) {
+                        if($anagraph["ID"]) {
+                            $mc                                     = self::mergeKD(
                                                                         self::encipherKD(
                                                                             self::APPID
                                                                             , $anagraph["ID"]
@@ -1190,40 +1215,43 @@ class Auth extends vgCommon
                                                                         , $security["certificate"]
                                                                     );
 
-                        if($mc) {
-                            $res                                    = $mc;
+                            if($mc) {
+                                $res                                = $mc;
 
-                            unset($anagraph["ID"]);
-                            if(is_array($anagraph) && count($anagraph)) { $res["user"] = $anagraph; }
-                            if($security["token"]["expire"] < 0)    { $res["token"] = $security["token"]; }
+                                unset($anagraph["ID"]);
+                                if(is_array($anagraph) && count($anagraph))     { $res["user"]  = $anagraph; }
+                                if($security["token"]["expire"] < 0)            { $res["token"] = $security["token"]; }
 
-                            $res["status"]                          = "0";
-                            $res["error"]                           = "";
+                                $res["status"]                      = "0";
+                                $res["error"]                       = "";
+                            } else {
+                                $res["status"]                      = "410";
+                                $res["error"]                       = "Unknow Error";
+                            }
                         } else {
-                            $res["status"]                          = "410";
-                            $res["error"]                           = "Unknow Error";
+                            $res["status"]                          = "404";
+                            $res["error"]                           = "Unknow User";
                         }
                     } else {
-                        $res["status"]                              = "404";
-                        $res["error"]                               = "Unknow User";
+                        $res["status"]                              = "500";
+                        $res["error"]                               = "Unknow Anagraph";
                     }
-                } else {
-                    $res["status"]                                  = "500";
-                    $res["error"]                                   = "Unknow Anagraph";
-                }
-                //} else {
-                //    $res                                            = $security;
-                //}
+                    //} else {
+                    //    $res                                            = $security;
+                    //}
 
+                } else {
+                    $res["status"]                                  = $security["status"];
+                    $res["error"]                                   = $security["error"];
+                }
             } else {
-                $res["status"]                                      = $security["status"];
-                $res["error"]                                       = $security["error"];
+                $res["status"]                                      = "400";
+                $res["error"]                                       = "Scope not Set";
             }
         } else {
-            $res["status"]                                          = "400";
-            $res["error"]                                           = "Scope not Set";
+            $res["status"]                                          = "204";
+            $res["error"]                                           = "Security Level to lower";
         }
-
         if(is_array($res) && $res["status"] !== "0" && $opt["exit"])self::endScript($res);
 
         if(self::DEBUG && is_array($res))                           $res["exTime"] = Debug::stopWatch();
@@ -1269,9 +1297,11 @@ class Auth extends vgCommon
         $security                                                   = self::security($opt);
         if(isset($security["status"]) && $security["status"] === "0") {
             if($value) {
+                $validator                                          = new Validator();
+
                 switch($type) {
                     case "username";
-                        $invalid                                    = Cms::getInstance("validator")->invalidUsername($value);
+                        $invalid                                    = $validator->invalidUsername($value);
                         if(!$invalid) {
                             $count                                  = Anagraph::getInstanceNoStrict("access")->cmd("count", array(
                                                                         "users.username" => $value
@@ -1282,11 +1312,11 @@ class Auth extends vgCommon
                         }
                         break;
                     case "password";
-                        $invalid                                    = Cms::getInstance("validator")->invalidPassword($value);
+                        $invalid                                    = $validator->invalidPassword($value);
                         if($invalid)                                { $error = $invalid; }
                         break;
                     case "email";
-                        if(Cms::getInstance("validator")->isEmail($value)) {
+                        if($validator->isEmail($value)) {
                             $count                                  = Anagraph::getInstanceNoStrict("access")->cmd("count", array(
                                                                         "users.email" => $value
                                                                     ));
@@ -1296,7 +1326,7 @@ class Auth extends vgCommon
                         }
                         break;
                     case "tel";
-                        if(Cms::getInstance("validator")->isTel($value)) {
+                        if($validator->isTel($value)) {
                             $count                                  = Anagraph::getInstanceNoStrict("access")->cmd("count", array(
                                                                         "users.tel" => $value
                                                                     ));
@@ -1417,7 +1447,7 @@ die();*/
             return self::randomPassword();
         }
         if(!$password) {
-            $password = Auth::APPID . "-" . Stats::getVisitor("unique"); //todo: da togliere
+            $password = Auth::APPID . "-" . Util::getVisitor("unique"); //todo: da togliere
         }
         if(!$alg) {
             $alg = PASSWORD_DEFAULT;
@@ -1456,7 +1486,12 @@ die();*/
     }
 
     public static function isLogged($acl = null) {
-        if($acl && $acl != Auth::GUEST_GROUP_ID) {
+        $permission = (self::SECURITY_LEVEL & 2
+            ? $acl != Auth::GUEST_GROUP_ID
+            : true
+        );
+
+        if($acl && $permission) {
             self::$isLogged = $acl;
         }
 
@@ -1476,7 +1511,10 @@ die();*/
 
         return ($user->username == Auth::SUPERADMIN_USERNAME
             ? true
-            : false
+            : (self::SECURITY_LEVEL & 2
+                ? false
+                : $user->acl >= 3
+            )
         );
     }
 
@@ -1598,18 +1636,47 @@ die();*/
     public static function getAnagraphByUser($ID_user, $ext = null, $select = null) {
         $model                                                      = self::getReqBySchema($ext, $select);
         if($model["select"]) {
-            $anagraph                                                   = Anagraph::getInstanceNoStrict()->read(
-                                                                            $model["select"]
-                                                                            , array(
-                                                                                "ID_user"       => $ID_user
-                                                                            )
-                                                                        );
+            $anagraph                                               = Anagraph::getInstanceNoStrict()->read(
+                                                                        $model["select"]
+                                                                        , array(
+                                                                            "ID_user"       => $ID_user
+                                                                        )
+                                                                    );
 
             if(is_array($anagraph["user"]) && !$anagraph["user"]["acl_primary"]) {
-                $anagraph["user"]                                       = array_replace($anagraph["user"], self::getUserDefault("user"));
+                $anagraph["user"]                                   = array_replace(self::getUserDefault("user"), $anagraph["user"]);
             }
         }
         return $anagraph;
+    }
+
+    public static function getUser($ID_user) {
+        $select                                             = array(
+                                                                "access.users.*"
+                                                            );
+        if(self::SECURITY_LEVEL & 2) {
+            $select[]                                       = "access.groups.*";
+        }
+        if(self::SECURITY_LEVEL & 1) {
+            $select["access.tokens.token"]                  = "name";
+            $select[]                                       = "access.tokens.expire";
+            $select[]                                       = "access.tokens.type";
+        }
+
+        $user                                               = Anagraph::getInstanceNoStrict("access")->read(
+                                                                $select
+                                                                , array(
+                                                                    "ID" => $ID_user
+                                                                )
+                                                            );
+        if(is_array($user) && !$user["acl_primary"]) {
+            $user                                           = array_replace(self::getUserDefault("user"), $user);
+        }
+
+        return ($user
+            ? array("user" => $user)
+            : null
+        );
     }
     public static function setUser($permission = null) {
         if(self::isLogged()) {
@@ -1731,6 +1798,7 @@ die();*/
 
     }
 
+
     private static function getUserDefault($key = null) {
         $anagraph["user"]["acl"]                                = Auth::GUEST_GROUP_ID;
         $anagraph["user"]["acl_primary"]                        = Auth::GUEST_GROUP_NAME;
@@ -1811,7 +1879,7 @@ die();*/
 
 
         if(!$user["last_login"]) { //todo:da eliminare analitics e inserire in cms::getInstance("analitics")
-            analytics_set_event('/registrazione/first-login', "Step 3 - First login");
+            // analytics_set_event('/registrazione/first-login', "Step 3 - First login");
         }
         /**
          * todo: da aggiungere i log
@@ -1904,35 +1972,40 @@ die();*/
         static $res                                                 = null;
 
         if($res === null) {
-            if($domain) {
-                if(!$domain["client"]["disable_csrf"]
-                    && $domain["security"]["csr_url"]
-                    && $domain["security"]["pkey_url"]
-                ) {
-                    require_once __DIR__ . "/AuthCertificate.php";
+            if(self::SECURITY_LEVEL & 4) {
+                if($domain) {
+                    if(!$domain["client"]["disable_csrf"]
+                        && $domain["security"]["csr_url"]
+                        && $domain["security"]["pkey_url"]
+                    ) {
+                        require_once __DIR__ . "/AuthCertificate.php";
 
-                    $certificate                                    = new AuthCertificate($domain);
+                        $certificate                                = new AuthCertificate($domain);
 
-                    $res                                            = $certificate->get($secret);
+                        $res                                        = $certificate->get($secret);
 
-/*                    $return                                         = $certificate->get($secret);
-                    if(isset($return["status"]) && $return["status"] === "0") {
-                        $res["certificate"]                         = $certificate;
+    /*                    $return                                         = $certificate->get($secret);
+                        if(isset($return["status"]) && $return["status"] === "0") {
+                            $res["certificate"]                         = $certificate;
+                            $res["status"]                              = "0";
+                            $res["error"]                               = "";
+                        } else {
+                            $res                                        = $return;
+                        }
+
+                        unset($tmp);
+    */
+                    } else {
                         $res["status"]                              = "0";
                         $res["error"]                               = "";
-                    } else {
-                        $res                                        = $return;
                     }
-
-                    unset($tmp);
-*/
                 } else {
-                    $res["status"]                                  = "0";
-                    $res["error"]                                   = "";
+                    $res["status"]                                  = "400";
+                    $res["error"]                                   = "Certicate Domain Missing";
                 }
             } else {
-                $res["status"]                                      = "400";
-                $res["error"]                                       = "Certicate Domain Missing";
+                $res["status"]                                      = "0";
+                $res["error"]                                       = "";
             }
         }
 
@@ -2337,7 +2410,7 @@ die();*/
 
                 $totp                                               = new OTPHP\TOTP("totp", self::APPID . $scope, $expire);
                 $res                                                = ($secret
-                                                                        ? true //$totp->verify($secret) //todo: da trovare una classe che funzioni
+                                                                        ? $totp->verify($secret) //todo: da trovare una classe che funzioni
                                                                         : $totp->now()
                                                                     );
         }
@@ -2511,9 +2584,11 @@ die();*/
         if(self::DEBUG
         && $username === self::SUPERADMIN_USERNAME
         && $password === self::SUPERADMIN_PASSWORD) {
-            if (Cms::getInstance("validator")->isEmail($username)) {
+            $validator                                          = new Validator();
+
+            if ($validator->isEmail($username)) {
                 $where["users.email"]                           = $username;
-            } elseif (Cms::getInstance("validator")->isTel($username)) {
+            } elseif ($validator->isTel($username)) {
                 $where["users.tel"]                             = $username;
             } else {
                 $where["users.username"]                        = $username;
@@ -2536,6 +2611,7 @@ die();*/
                                                                     )
                                                                     , $where
                                                                 );
+                if(isset($user[0]))                             { $user = null; }
             }
 
             if(!$user) {

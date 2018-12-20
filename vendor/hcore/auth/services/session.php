@@ -151,9 +151,8 @@ class authSession
         session_start();
         $session_id                                             = session_id();
 
-
-
-        $select                                                 = array(
+        if(Auth::SECURITY_LEVEL == 3 || Auth::SECURITY_LEVEL == 7) {
+            $select                                             = array(
                                                                     "anagraph.*"
                                                                     , "access.users.*"
                                                                     , "access.groups.*"
@@ -162,12 +161,16 @@ class authSession
                                                                     , "access.tokens.type"
                                                                 );
 
-        $anagraph                                               = Auth::getAnagraphByUser($ID_user, $opt["model"], $select);
+            $anagraph                                           = Auth::getAnagraphByUser($ID_user, $opt["model"], $select);
+        } else {
+            $anagraph                                           = Auth::getUser($ID_user);
+        }
+
         if(is_array($anagraph)) {
-            $anagraph["domain"]                                     = ($domain
-                                                                        ? $domain
-                                                                        : Auth::getDomain($anagraph["ID_domain"])
-                                                                    );
+                $anagraph["domain"]                             = ($domain
+                                                                    ? $domain
+                                                                    : Auth::getDomain($anagraph["ID_domain"])
+                                                                );
         }
 
         /**
@@ -202,6 +205,7 @@ class authSession
             /*
              * Set Session Data
              */
+
             $this->env(null, $anagraph);
             /*if($opt["csrf"]) {
                 $this->env(authSession::DATA_CSRF, $opt["csrf"]);

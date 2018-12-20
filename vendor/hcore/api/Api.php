@@ -82,13 +82,13 @@ class Api extends vgCommon {
                     $this->response($class_name, $method);
                 }
             } else {
-                Cms::errorDocument(401);
+                Api::errorDocument(401);
             }
         }
 
         $this->load($target, $scope, $method);
 
-        Cms::errorDocument();
+        Api::errorDocument();
     }
     private function response($class_name, $method) {
         if(self::DEBUG)                                                 { Debug::startWatch(); }

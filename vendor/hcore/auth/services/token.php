@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class authToken
 {
-    const EXPIRE                                                = "31536000"; //1year
+    const EXPIRE                                                = 31536000; //1year
     const TYPE                                                  = "live";
 
     private $auth                                               = null;
@@ -186,10 +186,16 @@ class authToken
 
                 $res                                            = $res + ($opt["refresh"] !== null
                                                                     ? $this->refresh($token["token"], $opt["refresh"], $type)
-                                                                    : array("token" => $token)
+                                                                    : array("token" => array(
+                                                                        "name"      => $token["token"]
+                                                                        , "expire"  => $token["expire"]
+                                                                    ))
                                                                 );
             } else {
-                $res                                            = array("token" => $token);
+                $res                                            = array("token" => array(
+                                                                    "name"      => $token["token"]
+                                                                    , "expire"  => $token["expire"]
+                                                                ));
                 $res["status"]                                  = "401";
                 $res["error"]                                   = "Token Expired";
             }
@@ -202,13 +208,13 @@ class authToken
                                                                                             ? $this->create(Auth::APPID . "-" . $opt["create"]["key"])
                                                                                             : $this->create(Auth::APPID . "-" . $ID_user . "-" . $type)
                                                                                         )
-                                                                    , "tokens.expire"   => ($opt["create"]["expire"]
+                                                                    , "tokens.expire"   => (isset($opt["create"]["expire"])
                                                                                             ? $opt["create"]["expire"]
-                                                                                            : $this::EXPIRE
+                                                                                            : time() + $this::EXPIRE
                                                                                         )
                                                                 );
                 $result                                         = Anagraph::getInstanceNoStrict("access")->insert($insert);
-                if(is_array($result)) {
+                if($result) {
                     $res["token"]                               = array(
                                                                     "name"              => $insert["tokens.token"]
                                                                     , "expire"          => $insert["tokens.expire"]

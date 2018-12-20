@@ -23,7 +23,7 @@
  * @link https://bitbucket.org/cmsff/vgallery
  */
 
-class Router
+class Router extends vgCommon
 {
     const PRIORITY_TOP 			                            = 0;
     const PRIORITY_VERY_HIGH	                            = 1;
@@ -38,15 +38,20 @@ class Router
 
     private $alias                                          = array();
 	private $rules                                          = array();
+	private $default                                        = array(
+
+                                                            );
+
 	private $sorted                                         = false;
     protected $controllers                                  = array(
     );
     protected $controllers_rev                              = null;
 
-    public function __construct()
+    public function __construct($default = null)
 	{
-
-        //$this->stats->setConfig($this->connectors, $this->services);
+	    if($default) {
+            $this->addRule("*", $default);
+        }
     }
 
     /**
@@ -77,13 +82,13 @@ class Router
                     try {
                         $output = call_user_func_array(array(new $destination["obj"], $destination["method"]), $this->replaceMatches($rule["matches"], $destination["params"]));
                         if(!$output) {
-                           /* $page = Cms::getInstance("page");
+                           /*$page = Cms::getInstance("page");
                             $page->addContent($output);
-                            $page->run();*/
-                            exit;
+                            $page->run();
+                            exit;*/
                         }
                     } catch (exception $exception) {
-                        Cms::errorDocument(500);
+                        Router::errorDocument(500);
                     }
                 } else if(is_callable($destination["method"])) {
                     $output = call_user_func_array($destination["method"], $this->replaceMatches($rule["matches"], $destination["params"]));
@@ -97,11 +102,11 @@ class Router
                     //return new $destination["func"](implode(",", $this->replaceMatches($rule["matches"], $destination["params"])));
                 }
             } elseif($rule["redirect"]) {
-                Cms::redirect($this->replaceMatches($rule["matches"], $destination), $rule["redirect"]);
+                Router::redirect($this->replaceMatches($rule["matches"], $destination), $rule["redirect"]);
             } elseif(is_numeric($destination) || ctype_digit($destination)) {
-                Cms::errorDocument($destination);
+                Router::errorDocument($destination);
             } else {
-                Cms::execute($destination);
+                $this->execute($destination);
             }
         }
         return $output;
@@ -160,12 +165,24 @@ class Router
                 , "destination"         => $destination
                 , "redirect"            => $redirect //null or redirect code
             );
-
-            if(!$this->setAlias($source, $rule)) {
+            if($source == "" || $source == "*" || $source == "/") {
+                $this->setDefault($rule);
+            } else if(!$this->setAlias($source, $rule)) {
                 $this->rules[$key]      = $rule;
             }
         }
     }
+
+    private function execute($path) {
+        require($this->getDiskPath($path));
+        exit;
+    }
+
+    private function setDefault($rule) {
+        $this->default                  = $rule;
+        return true;
+    }
+
     private function setAlias($source, $rule) {
         $key = rtrim(rtrim(rtrim(ltrim($source, "^"), "$"), "*"), "/");
         if(strpos($key, "*") === false && strpos($key, "+") === false && strpos($key, "(") === false && strpos($key, "[") === false) {
@@ -223,6 +240,7 @@ class Router
                     break;
                 }
             }
+
             if(!$res) {
                 $this->sort();
 
@@ -236,7 +254,10 @@ class Router
             }
         }
 
-        return $res;
+        return ($res
+            ? $res
+            : $this->default
+        );
     }
     private function regexp($rule) {
         return "#" . (strpos($rule, "[") === false && strpos($rule, "^") === false && strpos($rule, "$") === false && strpos($rule, "(") === false

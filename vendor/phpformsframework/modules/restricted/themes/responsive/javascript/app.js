@@ -186,10 +186,20 @@ ff.modules.restricted = (function () {
             }
         }
 	};
-    window.addEventListener('load', function () {
+
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-		that.init();
-	});
+        that.init();
+    }
+
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 	
 	return that;
 

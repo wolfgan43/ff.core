@@ -29,6 +29,7 @@ abstract class vgCommon
 {
     const DEBUG                         = DEBUG_MODE;
     const PROFILING                     = DEBUG_PROFILING;
+    const SITE_PATH                     = FF_SITE_PATH;
 
     const EVENT_PRIORITY_HIGH           = 1000;
     const EVENT_PRIORITY_NORMAL         = 100;
@@ -39,6 +40,7 @@ abstract class vgCommon
     const SQL_PREFIX					= "FF_DATABASE_";
 	const NOSQL_PREFIX					= "MONGO_DATABASE_";
 	const LIBS_PATH                     = "/vendor/hcore"; //base di tutte le libs
+	const LIBS_CORE_PATH                = "/vendor/hcore/core"; //base di tutte le libs
 	const LIBS_CMS_PATH                 = "/library/gallery";
 	const CONFIG_PATH                   = "/themes/site/conf";
     const JOBS_PATH                     = "/themes/site/jobs";
@@ -205,9 +207,9 @@ abstract class vgCommon
     public static function getDiskPath($what = null) {
         $path                           = "";
 		if(!self::$disk_path) {
-			self::$disk_path            = (defined("FF_DISK_PATH")
+			self::$disk_path            = (0 && defined("FF_DISK_PATH") //todo:: da salvare sul file
                                             ? FF_DISK_PATH
-                                            : str_replace(self::LIBS_PATH, "", __DIR__)
+                                            : str_replace(self::LIBS_CORE_PATH, "", __DIR__)
                                         );
 		}
 
@@ -259,6 +261,73 @@ abstract class vgCommon
 
         return self::$disk_path . $path;
 	}
+
+    /**
+     * @param $path
+     * @param bool $abs
+     * @return string
+     */
+    public static function getUrl($path, $abs = true)
+    {
+        $http 										= "http" . ($_SERVER["HTTPS"] ? "s" : "") . "://";
+        $host 										= $_SERVER["HTTP_HOST"];
+        $query 										= "";
+
+        if($path && substr($path, 0, 1) != "/") {
+            $url 									= parse_url((strpos($path, "://") === false
+                    ? $http
+                    : ""
+                ) . $path);
+
+            if($url["path"] && strpos($url["host"], ".") !== false) {
+                $http 									= $url["scheme"] . ($url["scheme"]
+                        ? "://"
+                        : ""
+                    );
+                $host 									= $url["host"];
+
+                $path 									= $url["path"];
+                $query 									= ($url["query"]
+                        ? "?"
+                        : ""
+                    ) . $url["query"];
+            } else {
+                $path 									= "/" . $path;
+            }
+        }
+
+        $alias = self::schema("alias");
+
+        //strippa il path di base per la cache
+        if(is_array($alias) && count($alias)) {
+            if($alias[$host]) {
+                $resAlias["alias"] = $alias[$host];
+                if(strpos($path, $alias[$host] . "/") === 0
+                    || $path == $alias[$host]
+                ) {
+                    $path = substr($path, strlen($alias[$host]));
+                }
+            }
+            if(strpos($host, "www.") === 0) {
+                foreach($alias AS $domain => $rule) {
+                    if(strpos($path, $rule) === 0) {
+                        $host = $domain;
+                        $path = substr($path, strlen($rule));
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        if(!$path)
+            $path = "/";
+
+        return ($abs
+                ? $http . $host
+                : ""
+            ) . $path . $query;
+    }
 
 	protected static function schema($arrSettings = null, $key = null) {
         //self::config();
@@ -586,6 +655,48 @@ abstract class vgCommon
             : self::$schema
         );
     }
+
+    public static function redirect($destination, $http_response_code = null, $headers = null, $request_uri = null)
+    {
+        if($http_response_code === null)
+            $http_response_code = 301;
+        if($request_uri === null)
+            $request_uri = $_SERVER["REQUEST_URI"];
+
+        Logs::write(" REDIRECT: " . $destination . " FROM: " . $request_uri . " REFERER: " . $_SERVER["HTTP_REFERER"], "log_redirect");
+
+        ffMedia::sendHeaders(array(
+            "cache" => "must-revalidate"
+        ));
+
+        if(strpos($destination, "/") !== 0) {
+            $destination = "http" . ($_SERVER["HTTPS"] ? "s" : "") . "://" . $destination;
+        }
+        if("http" . ($_SERVER["HTTPS"] ? "s": "") . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] != $destination) {
+            header("Location: " . $destination, true, $http_response_code);
+            if(is_array($headers) && count($headers)) {
+                foreach ($headers AS $key => $value) {
+                    header(ucfirst(str_replace(array(" ", "_"), "-", $key)) . ": " . $value);
+                }
+            }
+        } else {
+            http_response_code(400);
+        }
+
+        exit;
+    }
+
+    public static function errorDocument($code = 404, $template = null) {
+        if($template) { //todo: da estendere con un  template di default
+            echo $template;
+        }
+
+        http_response_code($code);
+        exit;
+    }
+
+
+
 
     protected function dirname($path) {
         return dirname($path);

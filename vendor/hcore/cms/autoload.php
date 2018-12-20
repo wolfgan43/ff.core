@@ -26,9 +26,6 @@
 
 spl_autoload_register(function ($class) {
     switch ($class) {
-        case "cmsFrameworkcss":
-            require("services/frameworkcss.php");
-            break;
         case "cmsPage":
             require("services/page.php");
             break;
@@ -39,7 +36,7 @@ spl_autoload_register(function ($class) {
             require("services/validator.php");
             break;
         case "Cms":
-            require($class . ".php");
+            require("Cms.php");
             break;
         default:
     }

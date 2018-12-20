@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         $token = Auth::password();
         $tpl->set_var("csrf_token", $token);
 
-        $tpl->set_var("recover_url", $config["api"]["recover"]);
+        $tpl->set_var("recover_url", Auth::SITE_PATH . $config["api"]["recover"]);
 
         if($config["domain"]) {
             $tpl->parse("SezDomain", false);

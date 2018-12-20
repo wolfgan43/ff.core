@@ -329,15 +329,18 @@ class Array2XML {
     public static function XML_TO_ARR($xmlstring)
     {
         $array = false;
+        $xmlstring = preg_replace ("/\s+</", "<", $xmlstring);
+        $xmlstring = preg_replace("/<!--.*?-->/ms","",$xmlstring);
         $xml = simplexml_load_string($xmlstring, "SimpleXMLElement", LIBXML_NOCDATA);
         if(array_key_exists("0", $xml))
             return null;
 
         if($xml) {
             $json = json_encode($xml);
+
             $json_normalized = str_replace(
-                array('"comment":{},', '"true"', '"false"', '"null"', '[{}]')
-                , array('', 'true', 'false', 'null', '[]')
+                array('"true"', '"false"', '"null"', '[{}]')
+                , array('true', 'false', 'null', '[]')
                 , $json
             );
 

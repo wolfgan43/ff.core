@@ -26,6 +26,7 @@
 
 class Kernel extends vgCommon
 {
+    const CONTENT_ROOT                                      = "/contents";
     //const LANG_DEFAULT_ID                                   = "1";
     const LANG_DEFAULT_CODE                                 = "ITA";
     //const LANG_DEFAULT_TINY_CODE                            = "it";
@@ -192,14 +193,17 @@ class Kernel extends vgCommon
         $this->checkLoadAvg();
         $this->checkAllowedPath($schema["badpath"]);
 
-        $this->router                                       = new Router();
+        $this->router                                       = new Router($this::CONTENT_ROOT);
         $this->router->addRules($schema["router"]);
 
         $page                                               = $this->router->check($this->orig_path_info);
 
         //$schema                                             = $cms->getSchema();
 
-        self::$page                                         = $this->get_page_properties($schema, $_SERVER["PATH_INFO"]);
+        self::$page                                         = $this->get_page_properties($page, $schema);
+        //if(!self::$page) {
+        //    self::$page                                     = $this->get_page_properties_old($schema, $_SERVER["PATH_INFO"]);
+        //}
         if(self::$page["root_path"] && self::$page["root_path"] == $this->root_path)    {
             $_SERVER["PATH_INFO"] = $this->orig_path_info;
         }
@@ -316,7 +320,32 @@ class Kernel extends vgCommon
 //        }
 
     }
-    private function get_page_properties($schema, $user_path = null) {
+
+    private function get_page_properties($page, $schema) {
+        $res                                                    = $schema["pages"][$page["source"]];
+        if($res) {
+            $res["user_path"]                                   = (strpos($this->path_info, $res["strip_path"]) === 0
+                                                                    ? substr($this->path_info, strlen($res["strip_path"]))
+                                                                    : $this->path_info
+                                                                );
+            if(!$res["user_path"])                              { $res["user_path"] = "/"; }
+
+            $res["db_path"]                                     = $res["user_path"];
+            $res["lang"]                                        = strtolower(self::$lang["code"]);
+            $res["type"]                                        = pathinfo($res["user_path"], PATHINFO_EXTENSION);
+
+            if(!$res["framework_css"])                          { $res["framework_css"] = $schema["pages"]["*"]["framework_css"]; }
+            if(!$res["font_icon"])                              { $res["font_icon"] = $schema["pages"]["*"]["font_icon"]; }
+
+            if(!$res["layer"])                                  { $res["layer"] = $schema["pages"]["*"]["layer"]; }
+            if(!$res["group"])                                  { $res["group"] = $res["name"]; }
+            if($schema["rule"])                                 { $page["rule"] = $schema["rule"]; }
+
+        }
+
+        return $res;
+    }
+    private function get_page_properties_old($schema, $user_path = null) {
         $user_path                                          = ($user_path
             ? $user_path
             : $this->path_info
@@ -462,6 +491,10 @@ class Kernel extends vgCommon
             ? rtrim($_SERVER["REQUEST_URI"],  $_SERVER["QUERY_STRING"])
             : $_SERVER["REQUEST_URI"]
             , "?"), "/");
+
+        if(self::SITE_PATH) {
+            $this->orig_path_info = str_replace(self::SITE_PATH, "", $this->orig_path_info);
+        }
         if(!$this->orig_path_info)                          { $this->orig_path_info = "/"; }
 
         /*$path_info                                          = ($_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest" && $_SERVER["HTTP_REFERER"]
@@ -482,7 +515,7 @@ class Kernel extends vgCommon
                 || $this->orig_path_info == $aliasname
             ) {
                 if(is_array($_GET) && count($_GET))         { $query = "?" . http_build_query($_GET); }
-                Cms::redirect($_SERVER["HTTP_HOST"] . substr($this->orig_path_info, strlen($aliasname)) . $query);
+                Kernel::redirect($_SERVER["HTTP_HOST"] . substr($this->orig_path_info, strlen($aliasname)) . $query);
             }
 
             $this->root_path                                = $aliasname;
@@ -544,7 +577,7 @@ class Kernel extends vgCommon
     private function checkLoadAvg() {
         $load = sys_getloadavg();
         if ($load[0] > 80) {
-            Cms::errorDocument(503);
+            Kernel::errorDocument(503);
             Logs::write($_SERVER, "error_server_busy");
             exit;
         }
@@ -580,7 +613,7 @@ class Kernel extends vgCommon
                             $redirect                       = preg_replace($src, $rule["destination"], $path_info);
                         }
 
-                        Cms::redirect($_SERVER["HTTP_HOST"] . $redirect);
+                        Kernel::redirect($_SERVER["HTTP_HOST"] . $redirect);
                     }
                 }
             }
@@ -600,7 +633,7 @@ class Kernel extends vgCommon
         if(!$code)                                          $code = strtoupper($_GET["lang"]);
 
         if ($code) { //todo: da completare il redirect alla pagina attuale della lingua scelta
-            //Cms::redirect(normalize_url($res["url"], HIDE_EXT, true, $lang, $prefix));
+            //Kernel::redirect(normalize_url($res["url"], HIDE_EXT, true, $lang, $prefix));
         }
     }
 
@@ -656,13 +689,21 @@ class Kernel extends vgCommon
     }
     public function run() {
         if($this->redirect) {
-            //   Cms::redirect($this->redirect);
+            //   Kernel::redirect($this->redirect);
         }
 
-        self::$session = Auth::check();
+        //todo:: da finire la gestione degli snippet dinamici
+        $snippets                                                       = array_intersect_key((array) self::$schema["snippet"], self::$page);
+        foreach ($snippets AS $snippet) {
+
+        }
+
+        if($snippets["session"]) {
+            self::$session = Auth::check();
+        }
         if($_SERVER["REMOTE_ADDR"] != $_SERVER["SERVER_ADDR"]) {
             if(self::$page["primary"]
-                && self::$page["trace"]
+                && $snippets["trace"]
                 && $_SERVER["HTTP_X_REQUESTED_WITH"] != "XMLHttpRequest"
                 && TRACE_VISITOR === true
             ) {
@@ -682,7 +723,7 @@ class Kernel extends vgCommon
                 }
             }
 
-            if(self::$page["cache"]) {
+            if($snippets["cache"]) {
                 // Cache::getInstance("page");
                 Cache::getInstance("page")->run(self::$page, self::getRequest(), self::$session);
             }
@@ -692,12 +733,16 @@ class Kernel extends vgCommon
         $router->addRules($this->router);*/
 
         $response = $this->router->run($this->orig_path_info);
-
+        if(0 && $response) {
+            $page = Cms::getInstance("page");
+            $page->addContent($output);
+            $page->run();
+        }
         //  if($response) {
        // $this->router->run("/restricted");
         //  }
 
-        Cms::errorDocument(404);
+        Kernel::errorDocument(404);
 
         /*
         switch(self::$page["group"]) {
@@ -894,8 +939,11 @@ class Kernel extends vgCommon
                 if(self::$schema["engine"][$attr["engine"]]["properties"]) {
                     $attr = array_replace(self::$schema["engine"][$attr["engine"]]["properties"], $attr);
                 }
+
+
                 //if(self::$schema["pages"][$key]) {
-                    self::$schema["pages"][$key] = array_replace((array)self::$schema["pages"][$key], $attr);
+                self::$schema["pages"][$key] = array_replace((array)self::$schema["pages"][$key], $attr);
+
                 //} else {
                   //  self::$schema["pages"][$key] = $attr;
                 //}

@@ -641,6 +641,8 @@ class frameworkCSS
         self::getFramework($framework);
         self::getFontIcon($fonticon);
         self::getButtons();
+
+        return new frameworkCSS();
     }
     public function get($value, $type, $params = array(), $framework_css = null, $font_icon = null) {
         $res = "";
@@ -665,6 +667,12 @@ class frameworkCSS
         switch($type) {
             case "button":
             case "link":
+                if(is_array($value) && !count($params)) {
+                    $params = $value;
+                    $value = false;
+                }
+
+
                 if(is_array($params) && (array_key_exists("strict", $params) || array_search("strict", $params) !== false)) {
                     if(array_key_exists("strict", $params))
                         $is_strict = true;
@@ -796,12 +804,14 @@ class frameworkCSS
 
                 $res = implode(" ", array_keys($res));
                 break;
-            case "icon":
-            case "icon-default":
             case "icon-tag":
             case "icon-link-tag":
             case "icon-link-tag-default":
-
+                if(substr($value, "0", 1) === "&") {
+                    return $value;
+                }
+            case "icon":
+            case "icon-default":
     /* Params:
         stack
         stack-equal
@@ -996,25 +1006,37 @@ class frameworkCSS
                 else
                     $res = array();
 
-                if($value === true)
+                if($value === true) {
                     $type = "row-default";
-                elseif($value)
-                    $res[$value] = true;
+                    $value = null;
+                }
 
                 if(is_array($framework_css)) {
-                    if($type == "row-default")
+                    if($type == "row-default") {
                         $framework_css["class"] = $framework_css_settings["class" . ($framework_css["is_fluid"] ? "-fluid" : "")];
-                    else if($type == "row-fluid")
+                    } else if($type == "row-fluid") {
                         $framework_css["class"] = $framework_css_settings["class-fluid"];
-                    else if($type == "row")
+                    } else if($type == "row") {
                         $framework_css["class"] = $framework_css_settings["class"];
+                    }
+                    if($framework_css["class"]["row-" . $value]) {
+                        $res[$framework_css["class"]["row-" . $value]] = true;
+                    } else {
+                        if($value) {
+                            $res[$value] = true;
+                        }
 
-                    if(strlen($framework_css["class"]["row-prefix"]))
-                        $res[$framework_css["class"]["row-prefix"]] = true;
-
-                    if(strlen($framework_css["class"]["row-postfix"]))
-                        $res[$framework_css["class"]["row-postfix"]] = true;
+                        if(strlen($framework_css["class"]["row-prefix"])) {
+                            $res[$framework_css["class"]["row-prefix"]] = true;
+                        }
+                        if(strlen($framework_css["class"]["row-postfix"])) {
+                            $res[$framework_css["class"]["row-postfix"]] = true;
+                        }
+                    }
                 } else {
+                    if($value) {
+                        $res[$value] = true;
+                    }
                     $res["line"] = true;
                 }
 
@@ -1025,6 +1047,7 @@ class frameworkCSS
             case "pagination":
             case "bar":
             case "list":
+            case "card":
                 if(isset($params["exclude"])) {
                     $exclude = $params["exclude"];
 
@@ -1132,6 +1155,12 @@ class frameworkCSS
                     , "wrap" => "row"
                     , "skip-full" => false
                     , "row-prefix" => "row"
+                    , "row-start" => "row"
+                    , "row-end" => "row"
+                    , "row-center" => "row"
+                    , "row-between" => "row"
+                    , "row-around" => "row"
+                    , "row-padding" => "row padding"
                     , "col-append" => "col-"
                     , "col-hidden" => "hidden-"
                     , "col-hidden-smallest" => ""
@@ -1148,6 +1177,12 @@ class frameworkCSS
                     , "wrap" => "row-fluid clearfix"
                     , "skip-full" => false
                     , "row-prefix" => ""
+                    , "row-start" => ""
+                    , "row-end" => ""
+                    , "row-center" => ""
+                    , "row-between" => ""
+                    , "row-around" => ""
+                    , "row-padding" => "padding"
                     , "col-append" => "col-"
                     , "col-hidden" => "hidden-"
                     , "col-hidden-smallest" => ""
@@ -1198,14 +1233,17 @@ class frameworkCSS
                     , "row-padding" => "row padding"
                     , "row-full" => "row"
                     , "group" => "row-smart"
+                    , "group-sm" => "row-smart small"
                     , "group-padding" => "row-smart padding"
                     , "label" => ""
                     , "label-inline" => "inline"
                     , "control" => ""
+                    , "control-sm" => ""
                     , "control-exclude" => array()
                     , "control-check-position" => "_pre_label"
                     , "control-prefix" => "prefix"
                     , "control-postfix" => "postfix"
+                    , "control-text" => ""
                     , "control-feedback" => "postfix-feedback"
                     , "wrap-addon" => false
                 )
@@ -1315,6 +1353,7 @@ class frameworkCSS
                 , "table" => array(
                     "container" => ""
                     , "compact" => "table-condensed"
+                    , "small" => "table table-sm"
                     , "hover" => "table-hover"
                     , "border" => "table-bordered"
                     , "oddeven" => "table-striped"
@@ -1358,6 +1397,19 @@ class frameworkCSS
                     , "footer" => "modal-footer"
                     , "button" => "close"
                     , "effect" => "fade"
+                )
+                , "card" => array(
+                    "container" => "card"
+                    , "cover-top" => "card-img-top"
+                    , "header" => "card-header"
+                    , "body" => "card-body"
+                    , "footer" => "card-footer"
+                    , "title" => "card-title"
+                    , "sub-title" => "card-subtitle"
+                    , "text" => "card-text"
+                    , "link" => "card-link"
+                    , "list-group" => "list-group list-group-flush"
+                    , "list-group-item" => "list-group-item"
                 )
                 , "util" => array(
                     "left"                          => "left"
@@ -1408,6 +1460,9 @@ class frameworkCSS
                     , "collapse" => array(
                         "link" => 'data-toggle'
                     )
+                    , "button" => array(
+                        "toggle" => 'data-toggle'
+                    )
                 )
             )
             , "bootstrap" => array(
@@ -1420,7 +1475,13 @@ class frameworkCSS
                     "container" => "container"
                     , "wrap" => "container"
                     , "skip-full" => false
-                    , "row-prefix" => "container"
+                    , "row-prefix" => "row"
+                    , "row-start" => "row"
+                    , "row-end" => "row text-right"
+                    , "row-center" => "row"
+                    , "row-between" => "row"
+                    , "row-around" => "row"
+                    , "row-padding" => "row padding"
                     , "col-prefix" => ""
                     , "col-append" => "col-"
                     , "col-hidden" => "hidden-"
@@ -1437,6 +1498,12 @@ class frameworkCSS
                     , "wrap" => "row"
                     , "skip-full" => false
                     , "row-prefix" => "row"
+                    , "row-start" => "row"
+                    , "row-end" => "row"
+                    , "row-center" => "row"
+                    , "row-between" => "row"
+                    , "row-around" => "row"
+                    , "row-padding" => "row padding"
                     , "col-prefix" => ""
                     , "col-append" => "col-"
                     , "col-hidden" => "hidden-"
@@ -1497,14 +1564,17 @@ class frameworkCSS
                     , "row-padding" => "form-group clearfix padding"
                     , "row-full" => "form-group clearfix"
                     , "group" => "input-group"
+                    , "group-sm" => "input-group input-group-sm"
                     , "group-padding" => "input-group padding"
                     , "label" => ""
                     , "label-inline" => "control-label"
                     , "control" => "form-control"
+                    , "control-sm" => "form-control form-control-sm"
                     , "control-exclude" => array("checkbox", "radio")
                     , "control-check-position" => "_in_label"
                     , "control-prefix" => "input-group-addon"
                     , "control-postfix" => "input-group-addon"
+                    , "control-text" => "input-group-text"
                     , "control-feedback" => "form-control-feedback"
                     , "wrap-addon" => false
                 )
@@ -1598,6 +1668,7 @@ class frameworkCSS
                 , "table" => array(
                     "container" => "table"
                     , "compact" => "table-condensed"
+                    , "small" => "table table-sm"
                     , "hover" => "table-hover"
                     , "border" => "table-bordered"
                     , "oddeven" => "table-striped"
@@ -1641,6 +1712,19 @@ class frameworkCSS
                     , "footer" => "modal-footer"
                     , "button" => "close"
                     , "effect" => "fade"
+                )
+                , "card" => array(
+                    "container" => "card"
+                    , "cover-top" => "card-img-top"
+                    , "header" => "card-header"
+                    , "body" => "card-body"
+                    , "footer" => "card-footer"
+                    , "title" => "card-title"
+                    , "sub-title" => "card-subtitle"
+                    , "text" => "card-text"
+                    , "link" => "card-link"
+                    , "list-group" => "list-group list-group-flush"
+                    , "list-group-item" => "list-group-item"
                 )
                 , "util" => array(
                     "left" => "pull-left"
@@ -1691,6 +1775,9 @@ class frameworkCSS
                     , "collapse" => array(
                         "link" => 'data-toggle="collapse"'
                     )
+                    , "button" => array(
+                        "toggle" => 'data-toggle="button"'
+                    )
                 )
             )
             , "bootstrap4" => array(
@@ -1701,9 +1788,15 @@ class frameworkCSS
                 )
                 , "class" => array(
                     "container" => "container"
-                    , "wrap" => "container"
+                    , "wrap" => "row"
                     , "skip-full" => false
-                    , "row-prefix" => "container"
+                    , "row-prefix" => "row"
+                    , "row-start" => "row justify-content-start"
+                    , "row-end" => "row justify-content-end"
+                    , "row-center" => "row justify-content-center"
+                    , "row-between" => "row justify-content-between"
+                    , "row-around" => "row justify-content-around"
+                    , "row-padding" => "row mb-3"
                     , "col-prefix" => ""
                     , "col-append" => "col-"
                     , "col-hidden" => "hidden-"
@@ -1720,6 +1813,12 @@ class frameworkCSS
                     , "wrap" => "row"
                     , "skip-full" => false
                     , "row-prefix" => "row"
+                    , "row-start" => "row justify-content-start"
+                    , "row-end" => "row justify-content-end"
+                    , "row-center" => "row justify-content-center"
+                    , "row-between" => "row justify-content-between"
+                    , "row-around" => "row justify-content-around"
+                    , "row-padding" => "row mb-3"
                     , "col-prefix" => ""
                     , "col-append" => "col-"
                     , "col-hidden" => "hidden-"
@@ -1767,7 +1866,7 @@ class frameworkCSS
                     , "color"       => array(
                         "default"       => "btn-default"
                         , "primary"     => "btn-primary"
-                        , "secondary"   => "btn-default"
+                        , "secondary"   => "btn-secondary"
                         , "success"     => "btn-success"
                         , "info"        => "btn-info"
                         , "warning"     => "btn-warning"
@@ -1782,14 +1881,17 @@ class frameworkCSS
                     , "row-padding" => "form-group clearfix padding"
                     , "row-full" => "form-group clearfix"
                     , "group" => "input-group"
+                    , "group-sm" => "input-group input-group-sm"
                     , "group-padding" => "input-group padding"
                     , "label" => ""
                     , "label-inline" => "control-label"
                     , "control" => "form-control"
+                    , "control-sm" => "form-control form-control-sm"
                     , "control-exclude" => array("checkbox", "radio")
                     , "control-check-position" => "_in_label"
-                    , "control-prefix" => "input-group-addon"
-                    , "control-postfix" => "input-group-addon"
+                    , "control-prefix" => "input-group-prepend"
+                    , "control-postfix" => "input-group-append"
+                    , "control-text" => "input-group-text"
                     , "control-feedback" => "form-control-feedback"
                     , "wrap-addon" => false
                 )
@@ -1883,6 +1985,7 @@ class frameworkCSS
                 , "table" => array(
                     "container" => "table"
                     , "compact" => "table-condensed"
+                    , "small" => "table table-sm"
                     , "hover" => "table-hover"
                     , "border" => "table-bordered"
                     , "oddeven" => "table-striped"
@@ -1926,6 +2029,19 @@ class frameworkCSS
                     , "footer" => "modal-footer"
                     , "button" => "close"
                     , "effect" => "fade"
+                )
+                , "card" => array(
+                    "container" => "card"
+                    , "cover-top" => "card-img-top"
+                    , "header" => "card-header"
+                    , "body" => "card-body"
+                    , "footer" => "card-footer"
+                    , "title" => "card-title"
+                    , "sub-title" => "card-subtitle"
+                    , "text" => "card-text"
+                    , "link" => "card-link"
+                    , "list-group" => "list-group list-group-flush"
+                    , "list-group-item" => "list-group-item"
                 )
                 , "util" => array(
                     "left" => "pull-left"
@@ -1976,6 +2092,9 @@ class frameworkCSS
                     , "collapse" => array(
                         "link" => 'data-toggle="collapse"'
                     )
+                    , "button" => array(
+                        "toggle" => 'data-toggle="button"'
+                    )
                 )
             )
             , "foundation" => array(
@@ -1989,6 +2108,12 @@ class frameworkCSS
                     , "wrap" => "row"
                     , "skip-full" => true
                     , "row-prefix" => "row"
+                    , "row-start" => "row"
+                    , "row-end" => "row"
+                    , "row-center" => "row"
+                    , "row-between" => "row"
+                    , "row-around" => "row"
+                    , "row-padding" => "row padding"
                     , "col-prefix" => "columns"
                     , "col-hidden" => "hide-for-"
                     , "col-hidden-smallest" => ""
@@ -2005,6 +2130,12 @@ class frameworkCSS
                     , "wrap" => "row-fluid clearfix"
                     , "skip-full" => true
                     , "row-prefix" => ""
+                    , "row-start" => ""
+                    , "row-end" => ""
+                    , "row-center" => ""
+                    , "row-between" => ""
+                    , "row-around" => ""
+                    , "row-padding" => "padding"
                     , "col-prefix" => "columns"
                     , "col-hidden" => "hide-for-"
                     , "col-hidden-smallest" => ""
@@ -2063,14 +2194,17 @@ class frameworkCSS
                     , "row-padding" => "row padding"
                     , "row-full" => "columns"
                     , "group" => "row collapse"
+                    , "group-sm" => "row"
                     , "group-padding" => "row collapse padding"
                     , "label" => ""
                     , "label-inline" => "inline right"
                     , "control" => ""
+                    , "control-sm" => ""
                     , "control-exclude" => array()
                     , "control-check-position" => "_pre_label"
                     , "control-prefix" => "prefix"
                     , "control-postfix" => "postfix"
+                    , "control-text" => ""
                     , "control-feedback" => "postfix-feedback"
                     , "wrap-addon" => true
                 )
@@ -2161,6 +2295,7 @@ class frameworkCSS
                 , "table" => array(
                     "container" => ""
                     , "compact" => "table-condensed"
+                    , "small" => "table table-sm"
                     , "hover" => "table-hover"
                     , "border" => "table-bordered"
                     , "oddeven" => "table-striped"
@@ -2204,6 +2339,19 @@ class frameworkCSS
                     , "footer" => "modal-footer"
                     , "button" => "close"
                     , "effect" => "fade"
+                )
+                , "card" => array(
+                    "container" => "card"
+                    , "cover-top" => "card-img-top"
+                    , "header" => "card-header"
+                    , "body" => "card-body"
+                    , "footer" => "card-footer"
+                    , "title" => "card-title"
+                    , "sub-title" => "card-subtitle"
+                    , "text" => "card-text"
+                    , "link" => "card-link"
+                    , "list-group" => "list-group list-group-flush"
+                    , "list-group-item" => "list-group-item"
                 )
                 , "util" => array(
                     "left" => "float-left"
@@ -2254,6 +2402,9 @@ class frameworkCSS
                     , "collapse" => array(
                         "link" => 'data-toggle' // da trovare analogo per foundation
                     )
+                    , "button" => array(
+                        "toggle" => 'data-toggle'
+                    )
                 )
             )
         );
@@ -2270,43 +2421,45 @@ class frameworkCSS
         );*/
 
     }
-
+    public static function getFrameworkName() {
+        return self::$framework["name"];
+    }
     public static function getFramework($name = null) {
-        if(strlen($name)) {
-            if($name === false) {
-                self::$framework = null;
+        if(is_array($name)) {
+            self::$framework = $name;
+        } else if($name === false) {
+            self::$framework = null;
+        } elseif(strlen($name)) {
+            if(strpos($name, "-fluid") !== false) {
+                $arrFrameworkCss = explode("-fluid", $name);
+                $framework_css_settings = self::frameworks($arrFrameworkCss[0]);
+
+                self::$framework = array(
+                    "name" => $arrFrameworkCss[0]
+                    , "is_fluid" => true
+                    , "class" => $framework_css_settings["class-fluid"]
+                );
+                self::$framework = array_replace($framework_css_settings, self::$framework);
+            } elseif(strpos($name, "-") !== false) {
+                $arrFrameworkCss = explode("-", $name);
+                $framework_css_settings = self::frameworks($arrFrameworkCss[0]);
+
+                self::$framework = array(
+                    "name" => $arrFrameworkCss[0]
+                    , "is_fluid" => false
+                    , "class" => $framework_css_settings["class"]
+                );
+                self::$framework = array_replace($framework_css_settings, self::$framework);
             } else {
-                if(strpos($name, "-fluid") !== false) {
-                    $arrFrameworkCss = explode("-fluid", $name);
-                    $framework_css_settings = self::frameworks($arrFrameworkCss[0]);
-
-                    self::$framework = array(
-                        "name" => $arrFrameworkCss[0]
-                        , "is_fluid" => true
-                        , "class" => $framework_css_settings["class-fluid"]
-                    );
-                    self::$framework = array_replace($framework_css_settings, self::$framework);
-                } elseif(strpos($name, "-") !== false) {
-                    $arrFrameworkCss = explode("-", $name);
-                    $framework_css_settings = self::frameworks($arrFrameworkCss[0]);
-
-                    self::$framework = array(
-                        "name" => $arrFrameworkCss[0]
-                        , "is_fluid" => false
-                        , "class" => $framework_css_settings["class"]
-                    );
-                    self::$framework = array_replace($framework_css_settings, self::$framework);
-                } else {
-                    $framework_css_settings = self::frameworks($name);
-                    self::$framework = array(
-                        "name" => $name
-                        , "is_fluid" => false
-                        , "class" => $framework_css_settings["class"]
-                    );
-                    self::$framework = array_replace($framework_css_settings, self::$framework);
-                }
-                unset(self::$framework["class-fluid"]);
+                $framework_css_settings = self::frameworks($name);
+                self::$framework = array(
+                    "name" => $name
+                    , "is_fluid" => false
+                    , "class" => $framework_css_settings["class"]
+                );
+                self::$framework = array_replace($framework_css_settings, self::$framework);
             }
+            unset(self::$framework["class-fluid"]);
         }
 
         return self::$framework;
@@ -2348,14 +2501,17 @@ class frameworkCSS
         );*/
     }
 
+    public static function getFontIconName() {
+        return self::$fonticon["name"];
+    }
     public static function getFontIcon($name = null) {
-        if(strlen($name)) {
-            if($name === false) {
-                self::$fonticon = null;
-            } else {
-                self::$fonticon = self::fontIcons($name);
-                self::$fonticon["name"] = $name;
-            }
+        if(is_array($name)) {
+            self::$fonticon = $name;
+        } elseif($name === false) {
+            self::$fonticon = null;
+        } elseif(strlen($name)) {
+            self::$fonticon = self::fontIcons($name);
+            self::$fonticon["name"] = $name;
         }
 
         return self::$fonticon;
