@@ -69,7 +69,7 @@ CREATE TABLE `cm_layout` (
 --
 
 INSERT INTO `cm_layout` (`ID`, `path`, `layer`, `page`, `main_theme`, `theme`, `framework_css`, `title`, `class_body`, `enable_cascading`, `reset_cascading`, `ignore_defaults`, `exclude_ff_js`, `exclude_form`, `enable_gzip`, `compact_js`, `compact_css`, `ignore_defaults_main`, `reset_css`, `reset_js`, `domains`) VALUES
-(1, '/', 'main', '', 'responsive', 'public', '', '', '', '1', '', '', '1', '1', '', '', '', '1', '', '', ''),
+(1, '/', '%', '', 'responsive', 'public', '', '', '', '1', '', '', '1', '1', '', '', '', '1', '', '', ''),
 (2, '/restricted', '', '', 'responsive', 'public', '', '', '', '1', '1', '0', '0', '', '', '', '', '0', '1', '', '');
 
 -- --------------------------------------------------------
