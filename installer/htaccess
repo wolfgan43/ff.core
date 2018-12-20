@@ -1,4 +1,7 @@
-RewriteEngine on
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTP_HOST} !^www\. [NC]
 
 AddType text/cache-manifest .manifest
 AddDefaultCharset UTF-8
@@ -32,9 +35,6 @@ RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/applets/([^/]+)/them
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/modules/([^/]+)/themes(.+)
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/cm/
 
-#install
-RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/install
-
 #media
 RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/asset
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/media
@@ -44,9 +44,6 @@ RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/static
 RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/cache
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/themes
 RewriteCond   %{REQUEST_URI}                !^[FF_SITE_PATH]/uploads
-
-#libs
-RewriteCond %{REQUEST_URI}  	            !^[FF_SITE_PATH]/vendor
 
 #root file
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/robots\.txt

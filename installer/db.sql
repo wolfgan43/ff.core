@@ -69,7 +69,7 @@ CREATE TABLE `cm_layout` (
 --
 
 INSERT INTO `cm_layout` (`ID`, `path`, `layer`, `page`, `main_theme`, `theme`, `framework_css`, `title`, `class_body`, `enable_cascading`, `reset_cascading`, `ignore_defaults`, `exclude_ff_js`, `exclude_form`, `enable_gzip`, `compact_js`, `compact_css`, `ignore_defaults_main`, `reset_css`, `reset_js`, `domains`) VALUES
-(1, '/', '%', '', 'responsive', 'public', '', '', '', '1', '', '', '1', '1', '', '', '', '1', '', '', ''),
+(1, '/', 'main', '', 'responsive', 'public', '', '', '', '1', '', '', '1', '1', '', '', '', '1', '', '', ''),
 (2, '/restricted', '', '', 'responsive', 'public', '', '', '', '1', '1', '0', '0', '', '', '', '', '0', '1', '', '');
 
 -- --------------------------------------------------------
@@ -417,7 +417,7 @@ CREATE TABLE `cm_mod_security_users` (
 --
 
 INSERT INTO `cm_mod_security_users` (`ID`, `ID_domains`, `username`, `username_slug`, `firstname`, `lastname`, `password`, `level`, `status`, `expiration`, `email`, `time_zone`, `company`, `role`, `created`, `modified`, `password_generated_at`, `temp_password`, `password_used`, `ID_packages`, `lastlogin`, `profile`, `special`, `avatar`, `tel`, `cell`) VALUES
-(1, 0, 'superadmin', '', 'Nome', 'Cognome', 'superadmin', '3', '1', '0000-00-00 00:00:00', 'mail@latuamail.it', 0, 'Azienda', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', 0, '0000-00-00 00:00:00', 0, '', '', '', '');
+(1, 0, 'superadmin', '', 'Nome', 'Cognome', '*240107317205B9F031FD583F032790289AE6F185', '3', '1', '0000-00-00 00:00:00', 'mail@latuamail.it', 0, 'Azienda', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', 0, '0000-00-00 00:00:00', 0, '', '', '', '');
 
 -- --------------------------------------------------------
 
