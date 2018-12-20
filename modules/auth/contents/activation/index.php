@@ -46,14 +46,10 @@ $cm->modules["auth"]["events"]->doEvent("on_before_login", array($config));
 $widget = Auth::widget("activation", $config);
 
 if($widget["js"]) {
-    $cm->oPage->tplAddJs("ff.modules.auth.activation", array(
-        "embed" => $widget["js"]
-    ));
+    $cm->oPage->tplAddJs("ff.modules.auth.activation", $widget["js"]);
 }
 if($widget["css"]) {
-    $cm->oPage->tplAddCss("ff.modules.auth.activation", array(
-        "embed" => $widget["css"]
-    ));
+    $cm->oPage->tplAddCss("ff.modules.auth.activation", $widget["css"]);
 }
 
 $cm->oPage->addContent($widget["html"]);

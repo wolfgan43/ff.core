@@ -101,16 +101,6 @@ class cmAuth {
             }
         }
     }
-    public function getDomainName() {
-        $domain =  Auth::get("domain")->name;
-        return ($_COOKIE["domain"]
-            ? $_COOKIE["domain"]
-            : ($domain
-                ? $domain
-                : CM_LOCAL_APP_NAME
-            )
-        );
-    }
 
     public function checkPermission($acl = null) {
         $res = $this->permissionAcl($acl);
@@ -233,6 +223,13 @@ function set_session($param_name, $param_value)
 function unset_session($param_name)
 {
     return Auth::getInstance("session")->envUnset($param_name);
+}
+
+function mod_sec_get_avatar($avatar = null, $opt = null) {
+    if($opt == MOD_SEC_USER_AVATAR_MODE) {
+        $opt = "80x80";
+    }
+    return Auth::getUserAvatar($opt, $avatar);
 }
 
 /**

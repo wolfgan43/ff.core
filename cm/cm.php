@@ -43,20 +43,6 @@ class cm extends ffCommon
                                                 , "/ff/"                => "components"
                                             )
                                         )
-                                        , "/themes/" . FF_MAIN_THEME    => array(
-                                            "filter"    => array("css", "js", "html", "jpg", "svg", "png")
-                                            , "rules" => array(
-                                                "/layouts/"             => "layouts"
-                                                , "/common/"            => "common"
-                                                , "/contents/"          => "components"
-                                                , "/widgets/"           => "widgets"
-                                                , "/css/"               => "css"
-                                                , "/javascript/"        => "js"
-                                                , "/images/"            => "images"
-                                                , "/fonts/"             => "fonts"
-                                                , "/ff/"                => "components"
-                                            )
-                                        )
                                 );
     var $content_root			= null;
 	var	$path_info 				= null;
@@ -212,18 +198,21 @@ class cm extends ffCommon
     }*/
 
     private function getLayoutParams() {
+       // $this->layout_vars = array();
+
         if(!$this->layout_vars["title"]) {
             $this->layout_vars["title"] = cm_getAppName();
         }
+
         if(!$this->layout_vars["theme"]) {
             $this->layout_vars["theme"] = cm::env("APP_THEME");
-            if($this->layout_vars["theme"] != FF_MAIN_THEME) {
-                $this->loadConfig(__PRJ_DIR__ . FF_THEME_DIR . "/" . $this->layout_vars["theme"] . "/conf/config.xml");
-            }
+           // if($this->layout_vars["theme"] != FF_MAIN_THEME) {
+             //   $this->loadConfig(__PRJ_DIR__ . FF_THEME_DIR . "/" . $this->layout_vars["theme"] . "/conf/config.xml");
+            //}
 
-            if($this->isXHR() && $_REQUEST["XHR_THEME"]) {
+           /* if($this->isXHR() && $_REQUEST["XHR_THEME"]) {
                 $this->layout_vars["theme"] = $_REQUEST["XHR_THEME"];
-            }
+            }*/
         }
 
         if(!$this->layout_vars["framework_css"]) {
@@ -238,7 +227,7 @@ class cm extends ffCommon
         return $this->layout_vars;
     }
 
-    private function loadConfig($file, $type = null) {
+    public function loadConfig($file, $type = null) {
         if(is_file($file)) {
             $fs = Filemanager::getInstance("xml");
             $config = $fs->read($file);
@@ -307,7 +296,7 @@ class cm extends ffCommon
 
 		$this->path_info 		= $_SERVER['PATH_INFO'];
 		$this->query_string 	= $_SERVER['QUERY_STRING'];
-        
+
 		// #0: verifica configurazione
 
 		// #1: normalizzazione dell'url
@@ -350,7 +339,6 @@ class cm extends ffCommon
 		}
 
 		///cacche
-
         $this->doEvent("on_after_init", array($this));
 		
 		// #3: precaricamento moduli
@@ -408,8 +396,6 @@ class cm extends ffCommon
         });
 
         $this->loadConfig(__PRJ_DIR__ . "/conf/config.xml");
-
-
 
 
 
@@ -522,23 +508,24 @@ class cm extends ffCommon
 		}*/
 
         //require additional theme (restricted)
-		ffCommon_main_theme_init();
-		
-		/*if (isset($this->layout_vars["theme"]) && $this->layout_vars["theme"] !== $this->layout_vars["main_theme"])
-		{
-			if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php"))
-				require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php";
+		//ffCommon_main_theme_init();
 
-			if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php"))
-				require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php";
-		}
-		
-		foreach ($this->modules as $key => $value)
-		{
-			if (@is_file(CM_MODULES_ROOT . "/" . $key . "/themes/" . FF_MAIN_THEME . "/ff/common." . FF_PHP_EXT))
-				require CM_MODULES_ROOT . "/" . $key . "/themes/" . FF_MAIN_THEME . "/ff/common." . FF_PHP_EXT;
-		}
-		reset($this->modules);*/
+
+        /*if (isset($this->layout_vars["theme"]) && $this->layout_vars["theme"] !== $this->layout_vars["main_theme"])
+        {
+            if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php"))
+                require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php";
+
+            if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php"))
+                require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php";
+        }
+
+        foreach ($this->modules as $key => $value)
+        {
+            if (@is_file(CM_MODULES_ROOT . "/" . $key . "/themes/" . FF_MAIN_THEME . "/ff/common." . FF_PHP_EXT))
+                require CM_MODULES_ROOT . "/" . $key . "/themes/" . FF_MAIN_THEME . "/ff/common." . FF_PHP_EXT;
+        }
+        reset($this->modules);*/
 
 
 
@@ -546,16 +533,9 @@ class cm extends ffCommon
 		//if (!isset($this->layout_vars["theme"]) || !strlen($this->layout_vars["theme"]))
 		//	$this->layout_vars["theme"] = cm_getMainTheme();
 
-
-        if ($this->isXHR() && isset($_REQUEST["XHR_THEME"]))
-        {
-            $this->layout_vars["theme"] = $_REQUEST["XHR_THEME"];
-        }
-
         $this->doEvent("on_before_page_process", array($this));
 
-
-        $this->oPage = ffCommon_ffPage_init($this->getLayoutParams(), $this->fs);
+        $this->oPage = ffTheme::factory($this->getLayoutParams(), $this->fs); //ffCommon_ffPage_init($this->getLayoutParams(), $this->fs);
         $this->oPage->addEvent("on_page_process", "cm::oPage_on_page_process");
         $this->oPage->addEvent("on_page_processed", "cm::oPage_on_page_processed", ffEvent::PRIORITY_HIGH);
 
@@ -677,6 +657,7 @@ class cm extends ffCommon
 		//ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
 
 		// caricamento dei config / common
+        /*
 		$include_script_path_parts = explode("/", $this->path_info);
 		$include_script_path_tmp = __PRJ_DIR__ . "/conf/contents";
 		$include_script_path_count = 0;
@@ -702,9 +683,9 @@ class cm extends ffCommon
 		}
 
 		unset($include_script_path_parts, $include_script_path_tmp, $include_script_path_count);
+*/
 
-
-		$this->router();
+		$this->router_run();
 
 		// LOAD SETTINGS BY COMPONENT
 		if (is_dir(__PRJ_DIR__ . "/conf/ffsettings/components"))
@@ -797,7 +778,7 @@ class cm extends ffCommon
 		exit;
 	}
 
-	private function router()  {
+	private function router_run()  {
         if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
             $this->router->matched_rules = $this->cache->get($this->path_info, "/cm/router/matches");
 
@@ -811,7 +792,6 @@ class cm extends ffCommon
             ffErrorHandler::raise("CM: no available routes!", E_USER_ERROR, $this, get_defined_vars());
 
         //ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
-
         foreach ($this->router->matched_rules as $key => $match)
         {
             $this->process_next_rule = null;
@@ -972,6 +952,7 @@ class cm extends ffCommon
                         $this->script_name = $tmp_path;
                     else
                         $this->script_name = $tmp_path . "." . FF_PHP_EXT;
+
                     $this->is_php = true;
                     $this->is_resource = false;
                     break;
@@ -2940,7 +2921,7 @@ class cm extends ffCommon
                 $arrLangKey[$ID_lang] 													= $lang_code;
             } while($db->nextRecord());
 
-            if(count($arrLangKey)) {
+            if(0 && count($arrLangKey)) {
                 $locale["rev"]["key"] 													= $arrLangKey;
 
                 $sSQL = "SELECT " . FF_SUPPORT_PREFIX . "state.*
@@ -2968,7 +2949,7 @@ class cm extends ffCommon
             }
         }
 
-        if(!$nocurrent) {
+        if(0 && !$nocurrent) { //todo: da sistemare
             $sSQL = "SELECT ip2nation.country AS country_code
 				FROM ip2nation
 				WHERE ip2nation.ip < INET_ATON(" . $db->toSql($_SERVER["REMOTE_ADDR"]) . ")

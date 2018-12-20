@@ -200,6 +200,17 @@ CREATE TABLE IF NOT EXISTS `cm_showfiles_modes` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
+DROP TABLE IF EXISTS `cm_media`;
+CREATE TABLE `cm_media` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `path` varchar(255) NOT NULL,
+  `key` varchar(50)  NOT NULL,
+  `ID_lang` int(11) NOT NULL,
+  `title` varchar(255)  NOT NULL,
+  `description` varchar(255)  NOT NULL,
+  `permalink` varchar(255)  NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `cm_showfiles_where`

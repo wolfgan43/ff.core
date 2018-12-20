@@ -240,8 +240,8 @@ class cmRestricted {
 
         $this->setContextMenu();
 
-        if(cm::env("MOD_RESTRICTED_DYNAMIC_TABS") && !defined("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID"))
-            define("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID", true);
+        //if(cm::env("MOD_RESTRICTED_DYNAMIC_TABS") && !defined("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID"))
+        //    define("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID", true);
 
         //todo: da sistemare il config con ["config"]
         $this->cm->modules["restricted"] = array_replace($this->cm->modules["restricted"], $this->config);

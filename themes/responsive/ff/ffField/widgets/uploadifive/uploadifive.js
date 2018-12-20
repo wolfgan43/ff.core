@@ -200,7 +200,7 @@ ff.ffField.uploadifive = (function () {
 				if(plugins[thisData["showFilePlugin"]]) {
 					switch(thisData["showFilePlugin"]) {
 						case "fancybox": 
-							ff.load("jquery.fancybox", function() {
+							ff.load("jquery.plugins.fancybox", function() {
 								jQuery(".fancybox").fancybox({
 									"parent" : (jQuery("#" + thisData["idComponent"]).closest(".ui-widget-overlay").length ? ".ui-widget-overlay:last" : "body")
 								});
@@ -478,9 +478,18 @@ ff.ffField.uploadifive = (function () {
 		}
 	};
 
-    window.addEventListener('load', function () {
+    /* Init obj */
+    function constructor() { // NB: called below publics
         ff.initExt(that);
-    });
+    }
+
+    if(document.readyState == "complete") {
+        //  constructor(); //va in contrasto con libLoaded
+    } else {
+        window.addEventListener('load', function () {
+            constructor();
+        });
+    }
 
 	return that;
 	

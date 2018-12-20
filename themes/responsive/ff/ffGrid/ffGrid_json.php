@@ -92,8 +92,9 @@ class ffGrid_json extends ffGrid_base
     {
         parent::__construct($page, $disk_path, $theme);
 
-		if (FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID)
-			$this->id_if = uniqid();
+		if (ffTheme::RANDOMIZE_COMP_ID) {
+            $this->id_if = uniqid();
+        }
 		
         if ($this->display_search_simple)
         {

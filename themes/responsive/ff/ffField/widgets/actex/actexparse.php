@@ -27,7 +27,6 @@ if (!$cm->isXHR()/* && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "googlebo
 //require_once("../../../../../../ff/main.php");
 //require_once("../../../../../../modules/security/common.php");
 
-//if ($plgCfg_ActiveComboEX_UseOwnSession)
 if (isset($_POST[session_name()]))
 	session_id($_POST[session_name()]);
 elseif (isset($_GET[session_name()]))

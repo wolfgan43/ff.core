@@ -76,7 +76,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         $token = Auth::password();
         $tpl->set_var("csrf_token", $token);
 
-        $tpl->set_var("activation_url", $config["api"]["activation"]);
+        $tpl->set_var("activation_url", Auth::SITE_PATH . $config["api"]["activation"]);
 
         if($config["domain"]) {
             $tpl->parse("SezDomain", false);

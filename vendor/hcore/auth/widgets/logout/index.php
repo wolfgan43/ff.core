@@ -57,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         $tpl =  new ffTemplate(dirname($filename));
         $tpl->load_file(basename($filename), "main");
 
-        $tpl->set_var("logout_url", $config["api"]["logout"]);
+        $tpl->set_var("logout_url", Auth::SITE_PATH . $config["api"]["logout"]);
 
         $anagraph = Auth::get();
         if(strlen($anagraph["name"])) {

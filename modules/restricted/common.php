@@ -9,7 +9,7 @@ class cmRestricted {
     }
 
     private function load() {
-        $this->cm = &cm::getInstance();
+        $this->cm = cm::getInstance();
 
         $this->setConfigPages($this->cm->config["pages"]);
 
@@ -17,8 +17,13 @@ class cmRestricted {
 
     }
 
-    private function setConfigMenu ($data, &$config, $father_key = null) {
+    private function setConfigMenu ($data, &$config, $father = null) {
         if(is_array($data) && count($data)) {
+            if(is_array($father)) {
+                $parent = $father["path"];
+            } else {
+                $father_key = $father;
+            }
             foreach($data AS $key => $value) {
                 if($key === "comment") {
                     continue;
@@ -54,12 +59,14 @@ class cmRestricted {
                             }
                         }
                     } else {
-                        if ($this->config["menu"][$key]["path"]) {
+                        if ($this->config["menu"][$key]["path"] && !$parent) {
                             $this->config["menu_bypath"][$this->config["menu"][$key]["path"]][] = &$config[$key];
+                        } elseif($config[$key]["path"] && $parent) {
+                            $this->config["menu_bysubpath"][$config[$key]["path"]] = array("parent" => $parent, "key" => $key);
                         }
                         if (is_array($value) && count($value)) {
                             $this->config["menu"][$key]["elements"] = array();
-                            $this->setConfigMenu($value, $this->config["menu"][$key]["elements"]);
+                            $this->setConfigMenu($value, $this->config["menu"][$key]["elements"], $this->config["menu"][$key]);
                         }
                     }
                 }
@@ -78,11 +85,11 @@ class cmRestricted {
     }
 
     private function setConfigPages($data) {
-        if(!isset($data["page"][0])) {
+        if (!isset($data["page"][0])) {
             $data["page"] = array($data["page"]);
         }
 
-        foreach($data["page"] AS $page) {
+        foreach ($data["page"] AS $page) {
             $this->setConfigPage($page);
         }
      }
@@ -123,9 +130,19 @@ class cmRestricted {
             $logo_url = $this->cm->oPage->getAsset(array("restricted", "login", "logo", "nobrand"), "images");
         }
 
-        return $logo_url;
+        return FF_SITE_PATH . $logo_url;
     }
 
+    public function getDomainName() {
+        $domain =  Auth::get("domain")->name;
+        return ($_COOKIE["domain"]
+            ? $_COOKIE["domain"]
+            : ($domain
+                ? $domain
+                : CM_LOCAL_APP_NAME
+            )
+        );
+    }
     /**
      * @param $data array(
      *      "path" => ""
@@ -161,9 +178,11 @@ class cmRestricted {
         $root_path = CM_CONTENT_ROOT;
 
         if(!is_array($data) && !$key && !$subkey) {
+            $skip_if_exist = true;
             $data = array(
                 "path" => $data
                 , "jsaction" => true
+                , "source" => "context"
             );
         }
         if(strpos($data["path"], $root_path) === 0) {
@@ -175,6 +194,13 @@ class cmRestricted {
         } else {
             $key = basename(dirname($data["path"]));
             $subkey = basename($data["path"]);
+        }
+
+        if($skip_if_exist && (
+            ($this->config["menu"][$key] && !$this->config["menu"][$key]["source"])
+            || ($this->config["menu"][$key]["elements"][$subkey] && !$this->config["menu"][$key]["elements"][$subkey]["source"])
+        )) {
+            return false;
         }
 
         $data["name"] = ($subkey
@@ -198,9 +224,11 @@ class cmRestricted {
             }
         } elseif($subkey) {
             $this->config["menu"][$key]["elements"][$subkey] = $data;
-            if($this->config["menu_bypath"][$key]["elements"][$subkey]["path"]) {
-                $this->config["menu_bypath"][$this->config["menu_bypath"][$key]["elements"][$subkey]["path"]][] = &$this->config["menu"][$key]["elements"][$subkey];
-            }
+            $this->config["menu_bysubpath"][$data["path"]] = array("parent" => $this->config["menu"][$key]["path"], "key" => $subkey);
+
+           // if($this->config["menu_bypath"][$key]["elements"][$subkey]["path"]) {
+            //    $this->config["menu_bypath"][$this->config["menu_bypath"][$key]["elements"][$subkey]["path"]][] = &$this->config["menu"][$key]["elements"][$subkey];
+            //}
         } else {
             $this->config["menu"][$key] = $data;
             if($this->config["menu"][$key]["path"]) {
@@ -240,8 +268,8 @@ class cmRestricted {
 
         $this->setContextMenu();
 
-        if(cm::env("MOD_RESTRICTED_DYNAMIC_TABS") && !defined("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID"))
-            define("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID", true);
+        //if(cm::env("MOD_RESTRICTED_DYNAMIC_TABS") && !defined("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID"))
+        //    define("FF_THEME_RESTRICTED_RANDOMIZE_COMP_ID", true);
 
         //todo: da sistemare il config con ["config"]
         $this->cm->modules["restricted"] = array_replace($this->cm->modules["restricted"], $this->config);
@@ -251,6 +279,47 @@ class cmRestricted {
 
         $this->cm->oPage->addEvent("on_tpl_layer_loaded", function($page, $tpl) {
             $cm = cm::getInstance();
+
+            /* Override Part @carmine */
+            $theme = $this->cm->oPage->getTheme();
+            $class_name = null;
+            $themeUIObject = null;
+            if (file_exists(FF_THEME_DISK_PATH . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR . $theme . "UI.php")) {
+                require_once (FF_THEME_DISK_PATH . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR . $theme . "UI.php");
+                $class_name = $theme . "UI";
+                $themeUIObject = new $class_name();
+                //ddd($themeUIObject);
+            }
+
+            if (isset($cm->modules["restricted"]["sections"]))
+            {
+                foreach ($cm->modules["restricted"]["sections"] as $key => $value)
+                {
+                    if (!isset($cm->modules["restricted"]["options"]["layout"][$key]) || strlen($cm->modules["restricted"]["options"]["layout"][$key]))
+                    {
+
+                        $method = "on_load_section_" . $key;
+
+                        if(is_callable($method)) {
+                            $value["events"]["on_load_template"] = $method;
+                        }
+
+                        if ($class_name !== null) {
+                            if (method_exists($themeUIObject, $method)) {
+                                //$value["events"]["on_load_template"] = $themeUIObject::$method();
+
+
+                                $value["override"] = $themeUIObject;
+                                $value["override_method"] = $method;
+                            }
+                        }
+
+                        $cm->oPage->addSection($key, $value);
+                    }
+                }
+                reset($cm->modules["restricted"]["sections"]);
+            }
+            /*$cm = cm::getInstance();
 
             if (isset($cm->modules["restricted"]["sections"]))
             {
@@ -265,7 +334,7 @@ class cmRestricted {
                     }
                 }
                 reset($cm->modules["restricted"]["sections"]);
-            }
+            }*/
 
             $framework_css = mod_restricted_get_framework_css();
 
@@ -293,14 +362,18 @@ class cmRestricted {
         );
     }*/
     private function setLayout() {
+        $layout_vars = array();
         $pathinfo = $this->cm->path_info;
-        do {
-            if($this->config["pages"][$pathinfo]) {
-                $this->cm->layout_vars = $this->config["pages"][$pathinfo];
-                break;
-            }
+        if($pathinfo) {
+            $pathinfo_dirname = "";
+            $arrPathinfo = explode("/", ltrim($pathinfo, "/"));
+            foreach ($arrPathinfo AS $pathinfo_name) {
+                $pathinfo_dirname .= "/" . $pathinfo_name;
 
-        } while($pathinfo != DIRECTORY_SEPARATOR && $pathinfo = dirname($pathinfo));
+                $layout_vars = array_replace($layout_vars, (array) $this->config["pages"][$pathinfo_dirname]);
+            }
+        }
+        $this->cm->layout_vars = $layout_vars;
 
         if(!$this->cm->layout_vars["layout"] && strpos($this->cm->path_info, cm::env("MOD_RESTRICTED_PATH")) === 0) {
             $this->cm->layout_vars["layout"] = cm::env("MOD_RESTRICTED_LAYOUT");
@@ -349,23 +422,42 @@ class cmRestricted {
         // Rileva la topbar e la navbar selezionata
         if ($this->cm->modules["restricted"]["sel_topbar"] === null)
         {
+
+            if($this->cm->real_path_info) {
+                $real_path_info = cm::env("MOD_RESTRICTED_PATH"). $this->cm->real_path_info;
+                do {
+                    if($this->cm->modules["restricted"]["menu_bysubpath"][$real_path_info]) {
+                        $sel_topbar_path = $this->cm->modules["restricted"]["menu_bysubpath"][$real_path_info]["parent"];
+                        $nav_key =  $this->cm->modules["restricted"]["menu_bysubpath"][$real_path_info]["key"];
+                        break;
+                    }
+
+                    $real_path_info = dirname($real_path_info);
+                } while ($real_path_info != DIRECTORY_SEPARATOR);
+            }
+/*
             $restricted_path = cm::env("MOD_RESTRICTED_PATH");
             if($this->cm->real_path_info && $this->cm->real_path_info != "/") {
                 $path_parts = explode("/", ltrim($this->cm->real_path_info, "/"), 2);
                 $restricted_path .= "/" . $path_parts[0];
             }
 
-            if($this->cm->modules["restricted"]["menu_bypath"][$restricted_path]) {
-                $this->cm->modules["restricted"]["sel_topbar"] =& $this->cm->modules["restricted"]["menu_bypath"][$restricted_path][0];
+            $sel_topbar_path = ($this->cm->modules["restricted"]["menu_bysubpath"][$restricted_path]
+                ? $this->cm->modules["restricted"]["menu_bysubpath"][$restricted_path]["parent"]
+                : $restricted_path
+            );*/
+
+
+            if($this->cm->modules["restricted"]["menu_bypath"][$sel_topbar_path]) {
+                $this->cm->modules["restricted"]["sel_topbar"] =& $this->cm->modules["restricted"]["menu_bypath"][$sel_topbar_path][0];
                 $this->cm->modules["restricted"]["sel_topbar"]["selected"] = true;
 
-
-                $nav_key = str_replace("/", "_", $path_parts[1]);
+                //$nav_key = str_replace("/", "_", $path_parts[1]);
+               // $nav_key = $this->cm->modules["restricted"]["menu_bysubpath"][$restricted_path . ($path_parts[1] ? "/" . $path_parts[1] : "")]["key"];
                 $this->cm->modules["restricted"]["sel_navbar"] = null;
                 if($this->cm->modules["restricted"]["sel_topbar"]["elements"][$nav_key]) {
                     $this->cm->modules["restricted"]["sel_navbar"] =& $this->cm->modules["restricted"]["sel_topbar"]["elements"][$nav_key];
                     $this->cm->modules["restricted"]["sel_navbar"]["selected"] = true;
-
                 }
             }
         }

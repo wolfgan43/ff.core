@@ -31,12 +31,12 @@ frameworkCSS::extend(array(
 											, "pagination" => array(
                                                "def" => array(
                                                    "class" => null
-                                                    , "col" => array(
+                                                    /*, "col" => array(
                                                             "xs" => 12
                                                             , "sm" => 10
                                                             , "md" => 12
                                                             , "lg" => 6
-                                                    )
+                                                    )*/
                                                 )
                                                 , "page" => array(
                                                     "class" => null
@@ -47,36 +47,62 @@ frameworkCSS::extend(array(
                                                     , "pagination" => "page-link"
                                                 )
                                                 , "menu" => array(
-                                                    "class" => "pages"
+                                                    "class" => null
                                                     , "pagination" => "pages"
+                                                )
+                                                , "icons" => array(
+                                                    "first" => "first"
+                                                    , "prev" => "&laquo;"
+                                                    , "next" => "&raquo;"
+                                                    , "last" => "last"
+                                                    , "prevframe" => "prev-frame"
+                                                    , "nextframe" => "next-frame"
                                                 )
 											)
 											, "choice" => array(
-												"class" => null
-												, "col" => array(
+											    "def" => array(
+                                                    "class" => "mt-1"
+                                                )
+                                                , "wrap" => array(
+                                                    "form" => "group-sm"
+                                                )
+                                                , "input" => array(
+                                                    "class" => null
+                                                    , "form" => array("control-sm")
+                                                )
+												/*, "col" => array(
 														"xs" => 0
 														, "sm" => 0
 														, "md" => 5
 														, "lg" => 2
-												)
+												)*/
 											)
 											, "totelem" => array(
-												"class" => null
-												, "col" => array(
+												"class" => "lead mt-1"
+												/*, "col" => array(
 														"xs" => 0
 														, "sm" => 2
 														, "md" => 3
 														, "lg" => 2
-												)
+												)*/
 											)
 											, "perPage" => array(
-												"class" => null
-												, "col" => array(
-														"xs" => 0
-														, "sm" => 0
-														, "md" => 4
-														, "lg" => 2
-												)
+											    "def" => array(
+                                                    "class" => null
+                                                    /*, "col" => array(
+                                                            "xs" => 0
+                                                            , "sm" => 0
+                                                            , "md" => 4
+                                                            , "lg" => 2
+                                                    )*/
+                                                )
+                                                , "wrap" => array(
+                                                    "form" => "group-sm"
+                                                )
+                                                , "select" => array(
+                                                    "class" => null
+                                                    , "form" => array("control-sm")
+                                                )
 											)
 
 	), "ffPageNavigator");
@@ -84,6 +110,9 @@ frameworkCSS::extend(array(
 
 class ffPageNavigator_html extends ffPageNavigator_base
 {
+    const MAX_RECORD                    = 100;
+    const MAX_PAGINATION                = 10;
+
 	var $framework_css					= null;
 
 	var $id_if                          = null;
@@ -133,8 +162,9 @@ class ffPageNavigator_html extends ffPageNavigator_base
 	 */
 	public function tplLoad()
 	{
-		$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
-		$this->tpl[0]->load_file($this->template_file, "main");
+        $this->tpl[0] = $this->oPage[0]->loadTemplate(pathinfo($this->template_file, PATHINFO_FILENAME));
+		//$this->tpl[0] = ffTemplate::factory($this->getTemplateDir());
+		//$this->tpl[0]->load_file($this->template_file, "main");
 
         if($this->id !== null)
             $id = $this->id;
@@ -198,12 +228,17 @@ class ffPageNavigator_html extends ffPageNavigator_base
 		// determina se è stand-alone o attaccato ad una page/componente
         if ($output_result)
 		{
-			$this->tpl[0]->pparse($section, false);
-			return true;
+			return ($this->tpl[0]->isset_block($section)
+                ? $this->tpl[0]->pparse($section, false)
+                : false
+            );
 		}
 		else
 		{
-			return $this->tpl[0]->rpparse($section, false);
+			return ($this->tpl[0]->isset_block($section)
+                ? $this->tpl[0]->rpparse($section, false)
+                : null
+            );
 		}
 	}
 
@@ -267,15 +302,20 @@ class ffPageNavigator_html extends ffPageNavigator_base
         $this->tpl[0]->set_var("callback", $this->callback);
         $this->tpl[0]->set_var("callback_params", $this->callback_params);
 
-        $this->tpl[0]->set_var("component_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["component"], $navigator_class));
+        $this->tpl[0]->set_var("component_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["component"]));
         $this->tpl[0]->set_var("component_properties", implode(" ", $navigator_properties));
         $this->tpl[0]->set_var("page_parname", $this->page_parname);
         $this->tpl[0]->set_var("current_class", $current_class);
         $this->tpl[0]->set_var("hidden_class", $hidden_class);
         $this->tpl[0]->set_var("page_item_class", $page_class);
         $this->tpl[0]->set_var("page_link_class", $page_link_class);
-        //$this->tpl[0]->set_var("loader_class", $loader_class);
 
+        $this->tpl[0]->set_var("current_page", $this->page);
+        $this->tpl[0]->set_var("totrec", $this->num_rows);
+
+
+        //$this->tpl[0]->set_var("loader_class", $loader_class);
+/*
         if(!$this->with_totelem) {
             if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
                 foreach($this->framework_css["pagination"]["def"]["col"] AS $col_key => $col_value) {
@@ -287,7 +327,8 @@ class ffPageNavigator_html extends ffPageNavigator_base
 
             //$this->tpl[0]->set_var("SectTotElem", "");
         }
-
+*/
+/*
         if(!$totpage || !$this->with_choice)
         {
             if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
@@ -298,31 +339,52 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 }
             }
         }
+*/
+        $this->process_selector($navigator_class); // do at last so variables have the correct values
 
-        if($totpage > 1)
+        if(1 || $totpage > 1)
         {
-            $this->tpl[0]->set_var("page_class", ' class="' . ($page_class ? $page_class . '"' : ""));
+            $this->tpl[0]->set_var("page_class", ($page_class ? ' class="' . $page_class . '"' : ''));
 
             if($this->with_choice)
             {
-                $choice_class["default"] = "choice";
-                $choice_class["pages"] = $this->oPage[0]->frameworkCSS->get("pages", "pagination");
-                $this->tpl[0]->set_var("choice_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["choice"], $choice_class));
-                $this->tpl[0]->set_var("choice_box_class", $this->oPage[0]->frameworkCSS->get("group", "form"));
-
-                $buffer_choice_label = '<span class="' . $this->oPage[0]->frameworkCSS->get("control-prefix", "form") . '">' . ffTemplate::_get_word_by_code("go_to_page") . '</span>';
-                $buffer_choice_tot_page = '<span class="' . $this->oPage[0]->frameworkCSS->get("control-postfix", "form") . '">' . ffTemplate::_get_word_by_code("of") . ' <span class="totpage">' . $totpage . '</span></span>';
-
-                $wrap_addon = $this->oPage[0]->frameworkCSS->get("wrap-addon", "form");
-                if($wrap_addon) {
-                    $buffer_choice_label = '<div class="' . $this->oPage[0]->frameworkCSS->get(array(3), "col") . '">' . $buffer_choice_label . '</div>';
-                    $buffer_choice_tot_page = '<div class="' . $this->oPage[0]->frameworkCSS->get(array(5), "col") . '">' . $buffer_choice_tot_page . '</div>';
-                    $this->tpl[0]->set_var("choice_input_box_class", $this->oPage[0]->frameworkCSS->get(array(4), "col"));
-                    $this->tpl[0]->parse("SectChoiceInputStart", false);
-                    $this->tpl[0]->parse("SectChoiceInputEnd", false);
+                $choice_class = $navigator_class;
+                $choice_class[] = "choice";
+                if($totpage <= $this::MAX_PAGINATION) {
+                    $choice_class[] = $hidden_class;
                 }
+                //$choice_class["default"] = "choice";
+                //$choice_class["pages"] = $this->oPage[0]->frameworkCSS->get("pages", "pagination");
+                $this->tpl[0]->set_var("choice_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["choice"]["def"], $choice_class));
+
+                $buffer_choice_label = ffTemplate::_get_word_by_code("page");
+                $buffer_choice_tot_page = ffTemplate::_get_word_by_code("of") . '&nbsp;<span class="totpage">' . $totpage . '</span>';
+                if(is_array($this->framework_css["choice"]["wrap"])) {
+                    $this->tpl[0]->set_var("choice_wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["choice"]["wrap"]) . '">');
+                    $this->tpl[0]->set_var("choice_wrap_end", '</div>');
+
+                    $buffer_choice_label = '<span class="' . $this->oPage[0]->frameworkCSS->get("control-prefix", "form") . '"><span class="' . $this->oPage[0]->frameworkCSS->get("control-text", "form") . '">' . $buffer_choice_label . '</span></span>';
+                    $buffer_choice_tot_page = '<span class="' . $this->oPage[0]->frameworkCSS->get("control-postfix", "form") . '"><span class="' . $this->oPage[0]->frameworkCSS->get("control-text", "form") . '">' . $buffer_choice_tot_page . '</span></span>';
+
+                    $wrap_addon = $this->oPage[0]->frameworkCSS->get("wrap-addon", "form");
+                    if($wrap_addon) {
+                        $buffer_choice_label = '<div class="' . $this->oPage[0]->frameworkCSS->get(array(3), "col") . '">' . $buffer_choice_label . '</div>';
+                        $buffer_choice_tot_page = '<div class="' . $this->oPage[0]->frameworkCSS->get(array(5), "col") . '">' . $buffer_choice_tot_page . '</div>';
+                        $this->tpl[0]->set_var("choice_input_box_class", $this->oPage[0]->frameworkCSS->get(array(4), "col"));
+                        $this->tpl[0]->parse("SectChoiceInputStart", false);
+                        $this->tpl[0]->parse("SectChoiceInputEnd", false);
+                    }
+                } else {
+                    $choice_tag = ($this->framework_css["choice"]["wrap"]
+                        ? $this->framework_css["choice"]["wrap"]
+                        : "label"
+                    );
+                    $this->tpl[0]->set_var("choice_wrap_start", '<' . $choice_tag . '>');
+                    $this->tpl[0]->set_var("choice_wrap_end", '</' . $choice_tag . '>');
+                }
+
                 $this->tpl[0]->set_var("current_page", $this->page);
-                $this->tpl[0]->set_var("choice_input_class", "currentpage " . $this->oPage[0]->frameworkCSS->get("control", "form") . " " . $this->oPage[0]->frameworkCSS->get("align-right", "util"));
+                $this->tpl[0]->set_var("choice_input_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["choice"]["input"], array("currentpage")));
                 $this->tpl[0]->set_var("choice_label", $buffer_choice_label);
                 $this->tpl[0]->set_var("choice_tot_page", $buffer_choice_tot_page);
 
@@ -339,7 +401,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 //	$this->tpl[0]->set_var("first_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
                 $this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, false, $this->url));
-                $this->tpl[0]->set_var("first_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get("first", "icon"));
+                $this->tpl[0]->set_var("first_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get($this->framework_css["pagination"]["icons"]["first"], "icon"));
                 //$this->tpl[0]->set_var("first_icon", $this->oPage[0]->frameworkCSS->get("nav_first", "ico-link-tag"));
                 $this->tpl[0]->parse("SectFirstButton", false);
             }
@@ -360,7 +422,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
                     $this->tpl[0]->set_var("prev_class", $loader_class . " prev");
                 else
                     $this->tpl[0]->set_var("prev_class", ($page_link_class ? $page_link_class . " " : ""). "prev");
-                $this->tpl[0]->set_var("prev_icon", "&laquo;");  //. $this->oPage[0]->frameworkCSS->get("prev", "icon-tag"));
+                $this->tpl[0]->set_var("prev_icon", $this->oPage[0]->frameworkCSS->get($this->framework_css["pagination"]["icons"]["prev"], "icon-tag"));
                 $this->tpl[0]->parse("SectPrevButton", false);
             }
 
@@ -384,7 +446,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
 
                 $this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, ($this->page == $totpage ? false : $this->page + 1), $this->url));
 
-                $this->tpl[0]->set_var("next_icon", "&raquo;"); // $this->oPage[0]->frameworkCSS->get("next", "icon-tag"));
+                $this->tpl[0]->set_var("next_icon", $this->oPage[0]->frameworkCSS->get($this->framework_css["pagination"]["icons"]["next"], "icon-tag"));
                 $this->tpl[0]->parse("SectNextButton", false);
             }
 
@@ -404,7 +466,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 //	$this->tpl[0]->set_var("last_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
                 $this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, $totpage, $this->url));
-                $this->tpl[0]->set_var("last_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get("last", "icon"));
+                $this->tpl[0]->set_var("last_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get($this->framework_css["pagination"]["icons"]["last"], "icon"));
                 //$this->tpl[0]->set_var("last_icon", $this->oPage[0]->frameworkCSS->get("nav_last", "ico-link-tag"));
                 $this->tpl[0]->parse("SectLastButton", false);
             }
@@ -419,7 +481,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 //if(count($containerClass))
                 //	$this->tpl[0]->set_var("first_frame_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
-                $this->tpl[0]->set_var("prevframe_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get("prev-frame", "icon"));
+                $this->tpl[0]->set_var("prevframe_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get($this->framework_css["pagination"]["icons"]["prevframe"], "icon"));
                 $this->tpl[0]->parse("SectPrevFrameButton", false);
 
                 //$containerClass = array();
@@ -435,15 +497,14 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 //if(count($containerClass))
                 //	$this->tpl[0]->set_var("last_frame_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
 
-                $this->tpl[0]->set_var("nextframe_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get("next-frame", "icon"));
+                $this->tpl[0]->set_var("nextframe_class", ($page_link_class ? $page_link_class . " " : "") . $this->oPage[0]->frameworkCSS->get($this->framework_css["pagination"]["icons"]["nextframe"], "icon"));
                 $this->tpl[0]->parse("SectNextFrameButton", false);
             }
 
 
             if(!$this->infinite)
             {
-                if($totpage > 1)
-                    $this->process_selector($current_class); // do at last so variables have the correct values
+                //if($totpage > 1)
 
                 if ($totpage > $this->PagePerFrame) {
                     $start_page = $this->page - floor($this->PagePerFrame / 2);
@@ -526,10 +587,15 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 }
             }
 
-            $this->tpl[0]->set_var("pagination_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pagination"]["def"]));
+            $pages_class = $navigator_class;
+            $pages_class[] = "pages";
+            if($totpage > $this::MAX_PAGINATION) {
+                $choice_class[] = $hidden_class;
+            }
+            $this->tpl[0]->set_var("pagination_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pagination"]["def"], $pages_class));
             $this->tpl[0]->set_var("pagination_menu_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pagination"]["menu"]));
             $this->tpl[0]->parse("SectNav", false);
-        } else {
+        } /*else {
             if(is_array($this->framework_css["totelem"]["col"]) && count($this->framework_css["totelem"]["col"])) {
                 $this->framework_css["totelem"] = array(
                     "col" => array(
@@ -541,12 +607,14 @@ class ffPageNavigator_html extends ffPageNavigator_base
                 , "util" => "align-right"
                 );
             }
-        }
+        }*/
 
         if($this->with_totelem) {
-            $totelem_class["default"] = "totelem";
-            $totelem_class["pages"] = $this->oPage[0]->frameworkCSS->get("pages", "pagination");
-            $this->tpl[0]->set_var("totelem_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["totelem"], $totelem_class));
+            $totelem_class = $navigator_class;
+            $totelem_class[] = "totelem";
+
+            //$totelem_class["pages"] = $this->oPage[0]->frameworkCSS->get("pages", "pagination");
+            $this->tpl[0]->set_var("totelem_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["totelem"], $totelem_class ));
             $this->tpl[0]->set_var("totelem", $this->num_rows);
             $this->tpl[0]->parse("SectTotElem", false);
         }
@@ -590,6 +658,20 @@ class ffPageNavigator_html extends ffPageNavigator_base
 	function process($section = FALSE)
 	{
         $output_result = false;
+
+        switch ($section) {
+            case "selector":
+                $this->nav_display_selector = true;
+                break;
+            case "choice":
+                $this->with_choice = true;
+                break;
+            case "totelem":
+                $this->with_totelem = true;
+                break;
+            default:
+        }
+
 		$this->tplProcess();
 
 		return $this->tplParse($section);
@@ -598,17 +680,29 @@ class ffPageNavigator_html extends ffPageNavigator_base
 	/**
 	 * Elabora la parte di selezione degli elementi totali e dell'input di selezione della pagina
 	 */
-	function process_selector($current_class)
+	function process_selector($navigator_class)
 	{
 	    $count_selector = 0;
 		if ($this->nav_display_selector && count($this->nav_selector_elements))
 		{
+            $this->tpl[0]->set_var("perpage_option_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["perPage"]["select"], array("rec-page")));
+
             $current_selector_isset = false;
-			foreach ($this->nav_selector_elements as $key => $value)
+            $this->nav_selector_elements = array(
+                floor($this->records_per_page / 2)
+                , $this->records_per_page
+            );
+
+            if($this->records_per_page * 2 < $this->num_rows) {
+                $this->nav_selector_elements[] = $this->records_per_page * 2;
+            }
+
+			foreach ($this->nav_selector_elements AS $value)
 			{
-                if($this->num_rows >= $value) {
+               // if($this->num_rows >= $value) {
                     if(!$current_selector_isset && $value >= $this->records_per_page) {
-                        $this->tpl[0]->set_var("rec_per_page_class", ' class="' . $current_class . '"');
+                       // $this->tpl[0]->set_var("rec_per_page_class", ' class="' . $current_class . '"');
+                        $this->tpl[0]->set_var("rec_per_page_class", ' selected="selected"');
                         $current_selector_isset = true;
                     } else {
                         $this->tpl[0]->set_var("rec_per_page_class", "");
@@ -617,17 +711,18 @@ class ffPageNavigator_html extends ffPageNavigator_base
                    // $this->tpl[0]->set_var("records_per_page_class", "rec-x-page-" . $value);
 				    $this->tpl[0]->parse("SectSelectorPage", true);
                     $count_selector++;
-                }
+               // }
 			}
 			reset($this->nav_selector_elements);
 		}
-		  
-        if($this->nav_selector_elements_all) {
-            if(!$current_selector_isset && $this->records_per_page >= $this->num_rows) 
-                $this->tpl[0]->set_var("rec_per_page_class", ' class="' . $current_class . '"');
-			else
-				$this->tpl[0]->set_var("rec_per_page_class", "");
 
+        if($this->nav_selector_elements_all && $this->num_rows <= $this::MAX_RECORD) {
+            if(!$current_selector_isset && $this->records_per_page >= $this->num_rows) {
+                //$this->tpl[0]->set_var("rec_per_page_class", ' class="' . $current_class . '"');
+                $this->tpl[0]->set_var("rec_per_page_class", ' selected="selected"');
+            } else {
+                $this->tpl[0]->set_var("rec_per_page_class", "");
+            }
             $this->tpl[0]->set_var("totelem", $this->num_rows);
             //$this->tpl[0]->set_var("records_per_page_all_class", "rec-x-page-all");
             $this->tpl[0]->parse("SectSelectorPageAll", false);
@@ -635,19 +730,57 @@ class ffPageNavigator_html extends ffPageNavigator_base
         }
 
         if($count_selector > 0) {
-        	$perpage_class["default"] = "perPage";
-        	$perpage_class["pages"] = $this->oPage[0]->frameworkCSS->get("pages", "pagination");
+		    $perpage_class = $navigator_class;
+		    $perpage_class[] = "perPage";
+        	//$perpage_class["default"] = "perPage";
+        	//$perpage_class["pages"] = $this->oPage[0]->frameworkCSS->get("pages", "pagination");
 
-        	$this->tpl[0]->set_var("perpage_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["perPage"], $perpage_class));
-			$this->tpl[0]->parse("SectSelector", false);
+
+
+        	$this->tpl[0]->set_var("perpage_class", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["perPage"]["def"], $perpage_class));
+
+            $buffer_perpage_label = ffTemplate::_get_word_by_code("show");
+            $buffer_perpage_items = ""; //ffTemplate::_get_word_by_code("items");
+        	if(is_array($this->framework_css["perPage"]["wrap"])) {
+                $this->tpl[0]->set_var("perpage_wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["perPage"]["wrap"]) . '">');
+                $this->tpl[0]->set_var("perpage_wrap_end", '</div>');
+
+                $buffer_perpage_label = '<div class="' . $this->oPage[0]->frameworkCSS->get("control-prefix", "form") . '"><span class="' . $this->oPage[0]->frameworkCSS->get("control-text", "form") . '">' . $buffer_perpage_label . '</span></div>';
+                if($buffer_perpage_items) {
+                    $buffer_perpage_items = '<div class="' . $this->oPage[0]->frameworkCSS->get("control-postfix", "form") . '"><span class="' . $this->oPage[0]->frameworkCSS->get("control-text", "form") . '">' . $buffer_perpage_items . '</span></div>';
+                }
+                $wrap_addon = $this->oPage[0]->frameworkCSS->get("wrap-addon", "form");
+                if ($wrap_addon) {
+                    if ($buffer_perpage_label) {
+                        $buffer_perpage_label = '<div class="' . $this->oPage[0]->frameworkCSS->get(array(3), "col") . '">' . $buffer_perpage_label . '</div>';
+                    }
+                    if ($buffer_perpage_items) {
+                        $buffer_perpage_items = '<div class="' . $this->oPage[0]->frameworkCSS->get(array(5), "col") . '">' . $buffer_perpage_items . '</div>';
+                    }
+                    $this->tpl[0]->set_var("perpage_input_box_class", $this->oPage[0]->frameworkCSS->get(array(4), "col"));
+                    $this->tpl[0]->parse("SectSelectorInputStart", false);
+                    $this->tpl[0]->parse("SectSelectorInputEnd", false);
+                }
+            } else {
+                $perpage_tag = ($this->framework_css["perPage"]["wrap"]
+                    ? $this->framework_css["perPage"]["wrap"]
+                    : "label"
+                );
+                $this->tpl[0]->set_var("perpage_wrap_start", '<' . $perpage_tag . '>');
+                $this->tpl[0]->set_var("perpage_wrap_end", '</' . $perpage_tag . '>');
+            }
+            $this->tpl[0]->set_var("perpage_label", $buffer_perpage_label);
+            $this->tpl[0]->set_var("perpage_items", $buffer_perpage_items);
+
+            $this->tpl[0]->parse("SectSelector", false);
 		} else {
-            if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
+            /*if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
                 foreach($this->framework_css["pagination"]["def"]["col"] AS $col_key => $col_value) {
                     $this->framework_css["pagination"]["def"]["col"][$col_key] = $this->framework_css["pagination"]["def"]["col"][$col_key] + $this->framework_css["perPage"]["col"][$col_key];
                     if($this->framework_css["pagination"]["def"]["col"][$col_key] > 12)
                         $this->framework_css["pagination"]["def"]["col"][$col_key] = 12;
                 }
-            }
+            }*/
             
 			$this->tpl[0]->set_var("SectSelector", "");
 		}

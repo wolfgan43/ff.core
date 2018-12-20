@@ -713,7 +713,6 @@ class Anagraph extends vgCommon
         ));
 //print_r($fields);
 
-
         if($single_service) {
             $this->getDataSingle($this->services_by_data["last"], $this->services_by_data["last_table"]);
         } else {
@@ -988,10 +987,10 @@ class Anagraph extends vgCommon
             $regs                                                                           = $this->getStorage(($data["service"] ? $data["service"] : $controller), $data["def"], array("exts" => false, "rawdata" => true))->read(
                                                                                                 ($data["where"] === true
                                                                                                     ? null
-                                                                                                    : $data["where"]
+                                                                                                    : $this->getFields($data["where"], $data["def"]["alias"])
                                                                                                 )
-                                                                                                , $data["select"]
-                                                                                                , $data["sort"]
+                                                                                                , $this->getFields($data["select"], $data["def"]["alias"])
+                                                                                                , $this->getFields($data["sort"], $data["def"]["alias"])
                                                                                                 , $limit
                                                                                             );
 

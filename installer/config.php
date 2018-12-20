@@ -80,12 +80,6 @@ session_save_path("/tmp");
 //define("FF_THEME_ADMIN", "admin");
 
 
-
-// activecomboex
-$plgCfg_ActiveComboEX_UseOwnSession = false;	/* set to true to bypass session check.
-													NB: ActiveComboEX require a session. If you disable session
-														check, ActiveComboEX do a session_start() by itself. */
-
 /* DEFAULT FORMS SETTINGS
 	this is a default array used by Forms classes to set user defined global default settings.
 	the format is:

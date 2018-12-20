@@ -39,7 +39,7 @@
         <!--<page source="^/restricted/login"               engine="console"        cache="user"    primary="true"  restricted="true"   group="login"       type="mixed" />-->
         <!--<page source="^/manage/login"                   engine="console"        cache="user"    primary="true"  restricted="true"   group="login"       type="mixed" />-->
         <page source="^/api/1.0/"                       engine="console"        cache="user"    primary="true"  restricted="false"  group="service"     type="mixed" />
-        <page source="^/api/?([^/]*)/?([^/]*)/?(.*)"    engine="api"            cache="guest"   primary="true"  restricted="false"  group="service"     type="json" />
+        <!--<page source="^/api/?([^/]*)/?([^/]*)/?(.*)"    engine="api"            cache="guest"   primary="true"  restricted="false"  group="service"     type="json" />-->
         <!--<page source="^/srv*"                           engine="cms-service"    cache="groups"  primary="false" restricted="false"  group="service"     type="json" />-->
         <page source="^/frame/*"                        engine="cms"            cache="groups"  primary="false" restricted="false"  group="service"     type="json" />
         <page source="^/admin*"                         engine="console"        cache="false"   primary="true"  restricted="true"   group="console"     type="html" />
@@ -57,26 +57,26 @@
             <get name="redirect" scope="auth" />
         </page>
         <page path="/login/social"                      get="true" />
-        <page path="/api"                               get="true" />
+        <!--<page path="/api"                               get="true" />-->
         <page path="/user"                              get="true" />
     </request>
     <snippet>
-        <session obj="Auth" method="check" />
+        <!--<session obj="Auth" method="check" />-->
         <cache obj="Cache" instance="page" method="run" params="$page, $request, $session" />
         <trace obj="Jobs" method="trace" params="$pathinfo" />
     </snippet>
     <engine>
-        <api            obj="Api"   method="request" params="$1,$2,$3"  log="notice.api"            />
-        <auth           obj="Auth"  method="widget" params="$0"         log="notice.auth"           />
+        <!--<api            obj="Api"   method="request" params="$1,$2,$3"  log="notice.api"            />-->
+        <!--<auth           obj="Auth"  method="widget" params="$0"         log="notice.auth"           />-->
         <console        path="/cm/main.php"                                                         />
         <media          path="/cm/static.php"                                                       />
         <cms-service    path="/cm/main.php"                                                         />
         <cms-search     path="/cm/main.php"                             log="notice.trace"          />
         <cms-sitemap    path="/cm/main.php"                             cache="guest"   primary="true"  restricted="false"  group="service"     type="xml" />
-        <cms-public     path="/cm/main.php"                             log="false" trace="pagaview"  cache="guest" primary="true" restricted="false"  group="public" type="html"  priority="bottom" />
+        <cms-public     path="/cm/main.php"                            session="true" log="false" trace="pagaview"  cache="guest" primary="true" restricted="false"  group="public" type="html"  priority="bottom" />
     </engine>
     <badpath>
-        <rule source="*/actexparse*"                    destination="500" log="true" />
+        <!--<rule source="*/actexparse*"                    destination="500" log="true" />-->
         <rule source="*/parsedata*"                     destination="500" log="true" />
         <rule source="*/aparsedata*"                    destination="500" log="true" />
         <rule source="*/atparsedata*"                   destination="500" log="true" />
@@ -108,7 +108,7 @@
         <rule source="wp-login*"                        destination="401" />
         <rule source="wp-*"                             destination="403" />
         <rule source="*.shtml"                          destination="403" />
-        <rule source="*[[^a-z\-0-9/\+\.\_]+]"           destination="400" />
+        <rule source="[^a-z\-0-9/\+\.\_]+"              destination="400" />
 
         <rule source="^/autodiscover/*"                 destination="404" />
     </badpath>

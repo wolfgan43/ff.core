@@ -59,7 +59,7 @@
     </router>
     <env>
         <APP_THEME value="responsive" />
-        <APP_FRAMEWORK_CSS value="bootstrap" />
+        <APP_FRAMEWORK_CSS value="bootstrap4" />
         <APP_FONT_ICON value="fontawesome" />
 
         <MOD_RESTRICTED_DYNAMIC_TABS value="false" />

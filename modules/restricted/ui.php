@@ -62,10 +62,10 @@ function on_load_section_brand($page, $tpl)
     if(Auth::isAdmin()) {
         if($logo_url) {
             $tpl->set_var("logo_url", $logo_url);
-            $tpl->set_var("logo_name", $cm->modules["auth"]["obj"]->getDomainName());
+            $tpl->set_var("logo_name", $cm->modules["restricted"]["obj"]->getDomainName());
             $tpl->parse("SectLogo", false);
         } else {
-            $tpl->set_var("host_name", $cm->modules["auth"]["obj"]->getDomainName());
+            $tpl->set_var("host_name", $cm->modules["restricted"]["obj"]->getDomainName());
         }
 
         $tpl->set_var("nav_left_class", "domain");//$cm->oPage->frameworkCSS->getClass($framework_css["fullbar"]["nav"]["left"]));

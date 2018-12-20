@@ -30,6 +30,9 @@
         </form>
     <!--EndSectFormFooter-->
 
+    <!--BeginSectJsBottom-->
+        <script<!--BeginSectJsSrcBottom--> src="{js_path}"<!--EndSectJsSrcBottom-->>{js_embed}</script>
+    <!--EndSectJsBottom-->
     <!--BeginSectFFJS-->
     <script defer="defer">
         window.addEventListener('load', function () {
@@ -106,6 +109,10 @@
             <!--BeginSectWidgetsFooters-->
                 {WidgetsContent}
             <!--EndSectWidgetsFooters-->
+
+            <!--BeginSectJsEmbed-->
+            {js_embed}
+            <!--EndSectJsEmbed-->
         });
     </script>
     <!--EndSectFFJS-->

@@ -17,19 +17,19 @@ spl_autoload_register(function ($class) {
     $php_ext = ".php";
     switch ($class) {
         case "ffEvent":
-            require(__DIR__ . "/classes/ffEvents/ffEvent" . $php_ext);
+            require("classes/ffEvents/ffEvent" . $php_ext);
             break;
         case "ffEvents":
-            require(__DIR__ . "/classes/ffEvents/ffEvents" . $php_ext);
+            require("classes/ffEvents/ffEvents" . $php_ext);
             break;
         case "ffData":
-            require(__DIR__ . "/classes/ffData/ffData" . $php_ext);
+            require("classes/ffData/ffData" . $php_ext);
             break;
         case "ffValidator":
-            require(__DIR__ . "/classes/ffValidator/ffValidator" . $php_ext);
+            require("classes/ffValidator/ffValidator" . $php_ext);
             break;
         case "ffErrorHandler":
-            require(__DIR__ . "/error_handling" . $php_ext);
+            require("error_handling" . $php_ext);
             break;
         case "ffDBAdapter":
         case "ffDBConnection":
@@ -40,31 +40,54 @@ spl_autoload_register(function ($class) {
         case "ffDBSource":
         case "ffDBTable":
         case "ffDBQuery":
-            require(__DIR__ . "/classes/ffDB/ffDBAdapter" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/ffDBConnection" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/ffDBField" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/ffDBIndex" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/ffDBRecord" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/ffDBRecordset" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/ffDBSource" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/sources/ffDBTable" . $php_ext);
-            require(__DIR__ . "/classes/ffDB/sources/ffDBQuery" . $php_ext);
+            require("classes/ffDB/ffDBAdapter" . $php_ext);
+            require("classes/ffDB/ffDBConnection" . $php_ext);
+            require("classes/ffDB/ffDBField" . $php_ext);
+            require("classes/ffDB/ffDBIndex" . $php_ext);
+            require("classes/ffDB/ffDBRecord" . $php_ext);
+            require("classes/ffDB/ffDBRecordset" . $php_ext);
+            require("classes/ffDB/ffDBSource" . $php_ext);
+            require("classes/ffDB/sources/ffDBTable" . $php_ext);
+            require("classes/ffDB/sources/ffDBQuery" . $php_ext);
             break;
         case "PHPSQLCreator":
         case "PHPSQLParser":
-            require(__DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLParser" . $php_ext);
-            require(__DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLCreator" . $php_ext);
+            require("library/PHP-SQL-Parser/src/PHPSQLParser" . $php_ext);
+            require("library/PHP-SQL-Parser/src/PHPSQLCreator" . $php_ext);
             break;
         case "ffXmlElement":
         case "ffXmlParser":
-            require(__DIR__ . "/classes/ffXml/ffXmlParser" . $php_ext); // UNDER DEVELOPMENT
-            require(__DIR__ . "/classes/ffXml/ffXmlElement" . $php_ext); // UNDER DEVELOPMENT
+            require("lasses/ffXml/ffXmlParser" . $php_ext); // UNDER DEVELOPMENT
+            require("classes/ffXml/ffXmlElement" . $php_ext); // UNDER DEVELOPMENT
+            break;
+        case "ffButton":
+            require('classes/ffButton' . $php_ext);
+            break;
+        case "ffCommon":
+            require('classes/ffCommon' . $php_ext);
+            break;
+        case "ffDetails":
+            require('classes/ffDetails' . $php_ext);
+            break;
+        case "ffField":
+            require('classes/ffField' . $php_ext);
+            break;
+        case "ffGrid":
+            require('classes/ffGrid' . $php_ext);
+            break;
+        case "ffPage":
+            require('classes/ffPage' . $php_ext);
+            break;
+        case "ffPageNavigator":
+            require('classes/ffPageNavigator' . $php_ext);
+            break;
+        case "ffRecord":
+            require('classes/ffRecord' . $php_ext);
+            break;
+        case "ffSerializable":
+            require('classes/ffSerializable' . $php_ext);
             break;
         default:
-            if (strpos($class, "ff") === 0) {
-                require(__DIR__ . '/classes/' . $class . $php_ext);
-
-            }
     }
 });
 

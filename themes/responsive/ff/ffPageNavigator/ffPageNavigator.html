@@ -1,31 +1,36 @@
 <!--BeginSectHeaders-->
 <!--EndSectHeaders-->
 
-<div class="{component_class}" {component_properties}>
-  <!--BeginSectSelector-->
-  <ul class="{perpage_class}">
-    <div class="input-group">
-      {_frame_per_page}
-      <span class="input-group-addon" id="sizing-addon1">10</span>
-      <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-        <ul class="dropdown-menu dropdown-menu-right">
-          <!--BeginSectSelectorPage-->
-    <li><a href="javascript:void(0);" class="rec-page" rel="{records_per_page}">{records_per_page}</a>
-    </li>
-    <!--EndSectSelectorPage-->
-          <!--BeginSectSelectorPageAll-->
-          <li role="separator" class="divider"></li>
-    <li><a href="javascript:void(0);" class="rec-all" rel="{totelem}">{_all}</a>
-    <!--EndSectSelectorPageAll-->
-        </ul>
-      </div>
+<div class="{component_class}">
+    <!--BeginSectSelector-->
+    <div class="{perpage_class}" {component_properties}>
+        {perpage_wrap_start}
+        {perpage_label}
+        <!--BeginSectSelectorInputStart-->
+        <div class="{perpage_input_box_class}">
+        <!--EndSectSelectorInputStart-->
+            <select class="{perpage_option_class}">
+                <!--BeginSectSelectorPage-->
+                <option value="{records_per_page}" {rec_per_page_class}>{records_per_page}</option>
+                <!--EndSectSelectorPage-->
+                <!--BeginSectSelectorPageAll-->
+                <option value="{totelem}" {rec_per_page_class}>{_all}</option>
+                <!--EndSectSelectorPageAll-->
+            </select>
+        <!--BeginSectSelectorInputEnd-->
+        </div>
+        <!--EndSectSelectorInputEnd-->
+        {perpage_items}
+        {perpage_wrap_end}
     </div>
-  </ul>
-  <!--EndSectSelector-->
+    <!--EndSectSelector-->
+
+
+
   <!--BeginSectChoice-->
-  <div class="{choice_class}">
-    <div class="{choice_box_class}"> {choice_label}
+  <div class="{choice_class}" {component_properties}>
+    {choice_wrap_start}
+    {choice_label}
       <!--BeginSectChoiceInputStart-->
       <div class="{choice_input_box_class}">
         <!--EndSectChoiceInputStart-->
@@ -33,14 +38,15 @@
         <!--BeginSectChoiceInputEnd-->
       </div>
       <!--EndSectChoiceInputEnd-->
-      {choice_tot_page} </div>
+      {choice_tot_page}
+      {choice_wrap_end}
   </div>
   <!--EndSectChoice-->
   <!--BeginSectTotElem-->
-  <div class="{totelem_class}">{_total} <span>{totelem}</span></div>
+  <div class="{totelem_class}" {component_properties}>{_total} <span class="totelem">{totelem}</span></div>
   <!--EndSectTotElem-->
   <!--BeginSectNav-->
-  <div class="{pagination_class}">
+  <div class="{pagination_class}" {component_properties}>
   <ul class="{pagination_menu_class}">
     <!--BeginSectFirstButton-->
     <li{page_class}><a href="{url}" class="{first_class}" rel="prev">{first_icon}</a>

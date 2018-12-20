@@ -543,7 +543,7 @@ class Notifier extends vgCommon
 		if($visitor) {
 			$this->visitor 						= $visitor;
 		} else {
-            $this->visitor 				        = Stats::getVisitor("unique");
+            $this->visitor 				        = Util::getVisitor("unique");
 		}
 
 		return $this->visitor;
@@ -895,10 +895,12 @@ class Notifier extends vgCommon
 				$users = array($users);
 
 			if(is_array($users) && count($users)) {
-				foreach($users AS $user) {
-                    if (Cms::getInstance("validator")->isEmail($user)) {
+                $validator = new Validator();
+
+                foreach($users AS $user) {
+                    if ($validator->isEmail($user)) {
                         $this->addTo($user, "emails");
-                    } elseif (substr($user, 0, 1) == "+" && Cms::getInstance("validator")->isTel($user)) {
+                    } elseif (substr($user, 0, 1) == "+" && $validator->isTel($user)) {
                         $this->addTo($user, "tels");
                     } elseif (is_numeric($user)) {
 						$this->addTo($user, "users");

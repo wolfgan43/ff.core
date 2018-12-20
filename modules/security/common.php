@@ -3948,3 +3948,10 @@ function mod_sec_login_tpl_load($logged, $template_file = null) {
 
 	return $tpl;
 }
+
+function ffTheme_restricted_icon($class) {
+    $cm = cm::getInstance();
+    $arrClass = explode("_", $class);
+
+    return $cm->oPage->frameworkCSS->get($arrClass[1], "icon-tag");
+}

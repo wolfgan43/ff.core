@@ -24,13 +24,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @link https://github.com/wolfgan43/vgallery
  */
 
-if(!defined("FTP_USERNAME"))                                    define("FTP_USERNAME", null);
-if(!defined("FTP_PASSWORD"))                                    define("FTP_PASSWORD", null);
+if(!defined("FTP_USERNAME"))                                        define("FTP_USERNAME", null);
+if(!defined("FTP_PASSWORD"))                                        define("FTP_PASSWORD", null);
 
 class Filemanager extends vgCommon
 {
     private static $singleton                                           = null;
     private static $storage                                             = null;
+    private static $scanExclude                                         = null;
 
     const FTP_USERNAME                                                  = FTP_USERNAME;
     const FTP_PASSWORD                                                  = FTP_PASSWORD;
@@ -171,12 +172,11 @@ class Filemanager extends vgCommon
         }
 
         if($res) {
-
-            if(!is_dir(FF_DISK_UPDIR . "/tmp"))
+            if(!is_dir(FF_DISK_UPDIR . "/tmp")) {
                 $res = @mkdir(FF_DISK_UPDIR . "/tmp", 0777);
-            elseif(substr(sprintf('%o', fileperms(FF_DISK_UPDIR . "/tmp")), -4) != "0777")
+            } elseif(substr(sprintf('%o', fileperms(FF_DISK_UPDIR . "/tmp")), -4) != "0777") {
                 $res = @chmod(FF_DISK_UPDIR . "/tmp", 0777);
-
+            }
             if($res) {
                 $res = ftp_get($conn_id, FF_DISK_UPDIR . "/tmp/" . basename($dest), $ftp_disk_path . $source, FTP_BINARY);
                 if($res) {
@@ -422,6 +422,15 @@ class Filemanager extends vgCommon
             closedir($handle);
         }
     }*/
+    public static function scanExclude($patterns) {
+        if($patterns) {
+            if ($patterns[0]) {
+                $patterns = array_fill_keys($patterns, true);
+            }
+
+            self::$scanExclude = array_replace((array)self::$scanExclude, $patterns);
+        }
+    }
     public static function scan($patterns, $what = null, $callback = null) {
         if(is_array($patterns) && !$callback) {
             $callback = $what;
@@ -467,7 +476,7 @@ class Filemanager extends vgCommon
             }
 
             if($opt["rules"] && !self::setStorage($file_info, $opt["rules"])) {
-                self::$storage["unknowns"][] = $file;
+                self::$storage["unknowns"][$file_info["basename"]] = $file;
             }
         }
     }
@@ -566,7 +575,7 @@ class Filemanager extends vgCommon
 
     private static function rglobfilter($pattern, $opt = null) {
         $final_dir = basename(dirname($pattern)); //todo:: da togliere
-        if ($final_dir == "node_modules") {
+        if (self::$scanExclude[$final_dir]) {
             return;
         }
         foreach(glob($pattern) AS $file) {
@@ -586,9 +595,15 @@ class Filemanager extends vgCommon
             $key = $file_info["filename"];
             $file = $file_info["dirname"] . "/" . $file_info["basename"];
 
-            foreach($rules AS $rule => $type) {
+            foreach($rules AS $rule => $params) {
                 if(strpos($file, $rule) !== false) {
-                    self::$storage[$type][$key] = $file;
+                    if($params["ext"] && !$params["ext"][$file_info["extension"]]) {
+                        continue;
+                    }
+                    self::$storage[is_array($params)
+                                        ? $params["type"]
+                                        : $params
+                                    ][$key] = $file;
                     return true;
                 }
             }

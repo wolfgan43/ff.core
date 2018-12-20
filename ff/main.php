@@ -18,30 +18,32 @@ if(version_compare(phpversion(), "5.4", "<"))
 
 // set default extension for php files
 define("FF_PHP_EXT", "php");
-define("FF_PHP_SUFFIX", "html");
 
 // some preprocessing for CPU saving
-define("__FF_DIR__", dirname(__DIR__));
+define("__FF_DIR__", dirname(__DIR__)); //framework dir abs
 
-if(!defined("__TOP_DIR__")) {
+if(!defined("__TOP_DIR__")) { // document root aba
     define("__TOP_DIR__", (getenv("FF_TOP_DIR") && getenv("FF_TOP_DIR") != "1"
         ? getenv("FF_TOP_DIR")
         : __FF_DIR__
     ));
 }
+if(!defined("__PRJ_DIR__")) { //app dir abs
+    define("__PRJ_DIR__", (getenv("FF_PROJECT_DIR") && getenv("FF_PROJECT_DIR") != "1"
+        ? getenv("FF_PROJECT_DIR")
+        : ($_SERVER["REDIRECT_FF_PROJECT_DIR"]
+            ? $_SERVER["REDIRECT_FF_PROJECT_DIR"]
+            : (defined("FF_DISK_PATH")
+                ? FF_DISK_PATH
+                : null
+            )
+        )
+    ));
+}
 
-/*
-define("__PRJ_DIR__", (strpos($_SERVER["REQUEST_URI"], "/domains/") === false
-    ? __TOP_DIR__
-    : $_SERVER["DOCUMENT_ROOT"] . preg_replace('/'. preg_quote($_SERVER["PATH_INFO"], '/') . '$/', '', $_SERVER["REQUEST_URI"])
-));*/
-define("__PRJ_DIR__", (getenv("FF_PROJECT_DIR") && getenv("FF_PROJECT_DIR") != "1"
-    ? getenv("FF_PROJECT_DIR")
-    : (isset($_SERVER["REDIRECT_FF_PROJECT_DIR"])
-        ? $_SERVER["REDIRECT_FF_PROJECT_DIR"]
-        : __TOP_DIR__
-    )
-));
+define("FF_BASE_PATH", str_replace($_SERVER["DOCUMENT_ROOT"], "", __FF_DIR__)); //doc root relative
+//FF_DISK_PATH  //app dir abs
+//FF_SITE_PATH //app dir relative
 
 // add ff'dirs to include path
 set_include_path(
@@ -85,6 +87,9 @@ if (!defined("FF_MAIN_THEME"))                      define("FF_MAIN_THEME", "res
 
 // Framework Classes
 require_once (__DIR__ . "/autoload." . FF_PHP_EXT);
+
+//Framework Theme Classes
+require_once (FF_THEME_DISK_PATH . "/" . FF_MAIN_THEME . "/autoload." . FF_PHP_EXT);
 
 //rewrite pathinfo
 ffRewritePathInfo();

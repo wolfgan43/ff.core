@@ -75,16 +75,16 @@ class ffRecord
 
 		if (is_null($last_res))
 		{
-            $class_name = __CLASS__ . "_" . ($page->isXHR() ? "xhr" : FF_PHP_SUFFIX);
-            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+            $class_name = __CLASS__ . "_" . ($page->isXHR() ? "xhr" : ffTheme::TYPE);
+            //$base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
 		else
 		{
-			$base_path = $last_res["base_path"];
+			//$base_path = $last_res["base_path"];
 			$class_name = $last_res["class_name"];
 		}
 		
-		require_once $base_path;
+		//require_once $base_path;
 		$tmp = new $class_name($page, $disk_path, $theme);
 		
 		$res = self::doEvent("on_factory_done", array($tmp));

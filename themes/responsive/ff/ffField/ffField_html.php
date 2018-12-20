@@ -490,10 +490,15 @@ class ffField_html extends ffField_base
 		$arrClass = array();
 
 		if(!isset($params) || !isset($params["framework_css"]) || $params["framework_css"]) {
-			if(strlen($this->framework_css["control"]["class"]))
+		    if(is_array($this->framework_css["control"]) && $this->parent_page[0]) {
+                $arrClass[] = $this->parent_page[0]->frameworkCSS->getClass($this->framework_css["control"]);
+            } elseif(!$this->framework_css["control"] && $this->parent_page[0]) {
+                $arrClass[] = $this->parent_page[0]->frameworkCSS->get("control", "form", array("exclude" => $control_type));
+            }
+            /*elseif(strlen($this->framework_css["control"]["class"]))
 				$arrClass[] = $this->framework_css["control"]["class"];
-			elseif($this->framework_css["control"]["class"] === null)
-				$arrClass[] = $this->parent_page[0]->frameworkCSS->get("control", "form", array("exclude" => $control_type));
+			elseif($this->framework_css["control"]["class"] === null && $this->parent_page[0])
+				$arrClass[] = $this->parent_page[0]->frameworkCSS->get("control", "form", array("exclude" => $control_type));*/
 		}		                                                                          
 
 		if (strlen($this->class))
@@ -634,8 +639,9 @@ class ffField_html extends ffField_base
 	 */
 	public function tplLoad($control_type)
 	{
-		$this->tpl[0] = ffTemplate::factory($this->getTemplateDir($control_type));
-		$this->tpl[0]->load_file($this->getTemplateFile($control_type), "main");
+        $this->tpl[0] = $this->parent_page[0]->loadTemplate(pathinfo($this->getTemplateFile($control_type), PATHINFO_FILENAME));
+        //$this->tpl[0] = ffTemplate::factory($this->getTemplateDir($control_type));
+		//$this->tpl[0]->load_file($this->getTemplateFile($control_type), "main");
                               
 		if ($this->parent !== null && strlen($this->parent[0]->getIDIF()))
 		{
@@ -681,7 +687,22 @@ class ffField_html extends ffField_base
 
 		return parent::getProperties($property_set);
 	}
-	
+
+    function process_textarea($id, &$value)
+    {
+        parent::process_file($id, $value);
+
+        if($this->parent_page[0] && (!$this->properties || !$this->properties["readonly"])) {
+            $this->parent_page[0]->tplAddJs("jquery.plugins.autogrow-textarea"); //todo: da fare meglio
+            $this->parent_page[0]->tplAddJs("ff.ffField.autogrow-" . $this->id, array(
+                "embed" => 'ff.pluginAddInit("jquery.plugins.autogrow-textarea", function() {
+                    var controlId = "' . $this->parent[0]->getPrefix() . $this->id . '";
+                    jQuery("#" + controlId.escapeRegExp()).autogrow();
+                    });'
+            ));
+        }
+    }
+
 	function process_file($id, &$value)
 	{
 		$this->tpl[0]->set_var("butt_del_class", $this->parent_page[0]->frameworkCSS->get($this->buttons_options["file"]["delete"]["class"], "icon"));

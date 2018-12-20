@@ -10,6 +10,7 @@ require ("hcore/core/mailer/autoload.php");
 require ("hcore/core/router/autoload.php");
 require ("hcore/core/storage/autoload.php");
 require ("hcore/core/util/autoload.php");
+require ("hcore/core/vgCommon.php");
 
 require ("hcore/api/autoload.php");
 require ("hcore/auth/autoload.php");

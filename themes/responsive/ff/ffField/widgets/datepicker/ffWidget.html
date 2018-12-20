@@ -15,7 +15,7 @@
 				var ori_handler_mouseover = element_data.events.mouseover[0].handler;
 				var ori_handler_mouseout = element_data.events.mouseout[0].handler;
 				
-				// remove handlers
+
 				inst.dpDiv.undelegate("button, .ui-datepicker-prev, .ui-datepicker-next, .ui-datepicker-calendar td a", 'mouseover');
 				inst.dpDiv.undelegate("button, .ui-datepicker-prev, .ui-datepicker-next, .ui-datepicker-calendar td a", 'mouseout');
 				inst.dpDiv.undelegate("button, .ui-datepicker-prev, .ui-datepicker-next", 'mouseover');
@@ -23,7 +23,7 @@
 				inst.dpDiv.find(".ui-datepicker-calendar tr").unbind('mouseover');
 				inst.dpDiv.find(".ui-datepicker-calendar tr").unbind('mouseout');
 				
-				// attach proper ones
+
 				if (this._get(inst, "weekSelector")) {
 					inst.dpDiv.delegate("button, .ui-datepicker-prev, .ui-datepicker-next", 'mouseover', ori_handler_mouseover);
 					inst.dpDiv.delegate("button, .ui-datepicker-prev, .ui-datepicker-next", 'mouseout', ori_handler_mouseout);
@@ -43,7 +43,7 @@
 			var date = jQuery(this).datepicker('getDate');
 			if (date) {
 				var tmp = date.getDay();
-				if (tmp == 0) { // starting with monday
+				if (tmp == 0) {
 					endDate = date;
 					startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 6);
 				} else {
@@ -71,9 +71,6 @@
 					if (jQuery.datepicker._get(inst, "weekSelector")) {
 						jQuery.datepicker.calcWeekBoundaries.apply(this, []);
 						jQuery(this).datepicker('setDate', startDate);
-						//var dateFormat = inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat;
-						//jQuery('#startDate').text(jQuery.datepicker.formatDate( dateFormat, startDate, inst.settings ));
-						//jQuery('#endDate').text(jQuery.datepicker.formatDate( dateFormat, endDate, inst.settings ));
 					}
 					inst.input.trigger("change");
 				}
@@ -124,9 +121,6 @@
 						if (jQuery.datepicker._get(inst, "weekSelector")) {
 							jQuery.datepicker.calcWeekBoundaries.apply(this, []);
 							jQuery(this).datepicker('setDate', startDate);
-							//var dateFormat = inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat;
-							//jQuery('#startDate').text(jQuery.datepicker.formatDate( dateFormat, startDate, inst.settings ));
-							//jQuery('#endDate').text(jQuery.datepicker.formatDate( dateFormat, endDate, inst.settings ));
 						}
 						inst.input.trigger("change");
 					}

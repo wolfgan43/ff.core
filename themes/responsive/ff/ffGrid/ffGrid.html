@@ -1,5 +1,6 @@
 <!--BeginSectHeaders-->
 <!--EndSectHeaders-->
+
 {outer_wrap_start}
 <{grid_tag} id="{component_id}" {component_properties}>
 	<!--BeginSectHidden-->
@@ -19,143 +20,128 @@
 		<!--EndSectHiddenField-->
 	</div>
 	<!--EndSectHidden-->
-
-	{inner_wrap_start}
-    
-	{fixed_pre_content}
-
+    {inner_wrap_start}
+    {header_wrap_start}
+	    {fixed_pre_content}
 		<!--BeginSectTitle-->
 		<h2 class="{title_class}">{discl_bt}{title}</h2>
 		<!--EndSectTitle-->
 		{fixed_title_content}
 
-		<div class="{actions_top_class}">
-			<!--BeginSectActionButtonsHeader-->
-			<!--BeginSectActionHeader-->
-			{ActionButtonHeader}
-			<!--EndSectActionHeader-->
-			<!--EndSectActionButtonsHeader-->
-			<!--BeginSectAddNew-->
-			<!--BeginSectAddNewUrl-->
-			<a href="{addnew_url}"{addnew_class}>{addnew_icon}{addnew_label}</a>
-			<!--EndSectAddNewUrl-->
-			<!--BeginSectAddNewBt-->
-				{addnew_bt}
-			<!--EndSectAddNewBt-->
-			<!--EndSectAddNew-->
-		</div>
+        <!--BeginSectDescription-->
+        <div class="{description_class}">{description}</div>
+        <!--EndSectDescription-->
+        {fixed_heading_content}
+    {header_wrap_end}
 
-	{fixed_heading_content}
-	
-    <!--BeginSectDescription-->
-    <div class="{description_class}">{description}</div>
-    <!--EndSectDescription-->
-
+    {body_wrap_start}
 	<!--BeginSectGrid-->
-    {content_wrap_start}
-		<!--BeginSectError-->
-		<div class="{error_class}">{strError}</div>
-		<!--EndSectError-->
+    <div class="{actions_top_class}" >
+        <!--BeginSectActionButtonsHeader-->
+        <!--BeginSectActionHeader-->
+        {ActionButtonHeader}
+        <!--EndSectActionHeader-->
+        <!--EndSectActionButtonsHeader-->
+        <!--BeginSectAddNew-->
+        <!--BeginSectAddNewUrl-->
+        <a href="{addnew_url}"{addnew_class}>{addnew_icon}{addnew_label}</a>
+        <!--EndSectAddNewUrl-->
+        <!--BeginSectAddNewBt-->
+        {addnew_bt}
+        <!--EndSectAddNewBt-->
+        <!--EndSectAddNew-->
 
-		<!--BeginSectSearch-->
-		<div class="{search_class}">
-			<div class="{search_box_class}">
-		        {SearchAll}
-				<!--BeginSectAdvSearch-->
-				{search_more_container_class_start}
-					<a class="{search_more_class}" href="javascript:void(0)" onclick="ff.ffGrid.advsearchToggle('{component_id}', '{hide_class}');">{search_more_label}</a>
-				{search_more_container_class_end}
-				<!--EndSectAdvSearch-->
-				{SearchButtons}
-			</div>
-		    <!--BeginSectFields-->
-			<div class="{adv_class}">
-				<!--BeginSectSearchRow-->
-				<div class="{adv_row_class}">
-				<!--BeginSectSearchCol-->
-				{control}
-				<!--EndSectSearchCol-->
-				</div>
-				<!--EndSectSearchRow-->
-				{search_fixed_after}
-				{SearchButtonsAdv}
-			</div>
-			<!--EndSectFields-->
-		</div>
-		<!--EndSectSearch-->
-		<!--BeginSectFilters-->
-		<div class="{filter_class}">
-			<ul>
-				<!--BeginSectFilter-->
-				<li>
-					<h3>{_ffGrid_filter_for}<strong>{Filter_title}</strong></h3>
-					<ul>
-						<!--BeginSectFilterRow-->
-						<!--BeginSectFilterElement-->
-						<li><a href="javascript:void(0);" onclick="{filter_action}">{FilterElement_label}</a></li>
-						<!--EndSectFilterElement-->
-						<!--BeginSectSelFilterElement-->
-						<li class="selected">{FilterElement_label}</li>
-						<!--EndSectSelFilterElement-->
-						<!--EndSectFilterRow-->
-						<!--BeginSectNoElements-->
-						<li>{_ffGrid_no_record_found}</li>
-						<!--EndSectNoElements-->
-					</ul>
-				</li>
-				<!--EndSectFilter-->
-			</ul>
-		</div>
-		<!--EndSectFilters-->
+        <!--BeginSectFilterToggle-->
+        <a class="{filter_class}" href="javascript:void(0)" {filter_properties} onclick="ff.ffGrid.advsearchToggle('{component_id}', '{hide_class}');">{filter_icon}{filter_label}</a>
+        <!--EndSectFilterToggle-->
 
-	<!--BeginSectGridTable-->
-	    <!--BeginSectPaginatorTop-->
-		<div class="{pagenavigator_top_class}">
-			{PageNavigator.selector}
-			{PageNavigator.choice}
-		</div>
-	    <!--EndSectPaginatorTop-->
+
+
+    </div>
+
+    <!--BeginSectFields-->
+    <div class="{adv_class}">
+        <!--BeginSectSearchRow-->
+        <div class="{adv_row_class}">
+            <!--BeginSectSearchCol-->
+            {control}
+            <!--EndSectSearchCol-->
+        </div>
+        <!--EndSectSearchRow-->
+        {search_fixed_after}
+        {SearchButtonsAdv}
+    </div>
+    <!--EndSectFields-->
+
+        <!--BeginSectError-->
+        <div class="{error_class}">{strError}</div>
+        <!--EndSectError-->
+
+        <div class="{table_before_class}">
+            <div class="{table_before_left_class}">
+                <!--BeginSectPaginatorTop-->
+                {PageNavigator.selector}
+                <!--EndSectPaginatorTop-->
+            </div>
+            <div class="{table_before_right_class}">
+                <!--BeginSectSearch-->
+                <div class="{search_class}">
+                    <div class="{search_box_class}">
+                        {SearchAll}
+                        <!--BeginSectAdvSearch-->
+                        <!--{search_more_container_class_start}
+                        <a class="{search_more_class}" href="javascript:void(0)" onclick="ff.ffGrid.advsearchToggle('{component_id}', '{hide_class}');">{search_more_label}</a>
+                        {search_more_container_class_end}-->
+                        <!--EndSectAdvSearch-->
+                        {SearchButtons}
+                    </div>
+                </div>
+                <!--EndSectSearch-->
+            </div>
+        </div>
+
+        <!--BeginSectAlpha-->
+        <table class="{alphanum_class}">
+            <thead>
+            <tr>
+                <th colspan="3"><a class="{alpha_selected_}" href="javascript:void(0);" onclick="{alpha_action}" rel="">{_all}</a></th>
+                <th><a class="{alpha_selected_cipher}" href="javascript:void(0);" onclick="{alpha_action}" rel="cipher" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='cipher'; jQuery(this).closest('form').submit();">0-9</a></th>
+                <th><a class="{alpha_selected_a}" href="javascript:void(0);" onclick="{alpha_action}" rel="a">a</a></th>
+                <th><a class="{alpha_selected_b}" href="javascript:void(0);" onclick="{alpha_action}" rel="b">b</a></th>
+                <th><a class="{alpha_selected_c}" href="javascript:void(0);" onclick="{alpha_action}" rel="c">c</a></th>
+                <th><a class="{alpha_selected_d}" href="javascript:void(0);" onclick="{alpha_action}" rel="d">d</a></th>
+                <th><a class="{alpha_selected_e}" href="javascript:void(0);" onclick="{alpha_action}" rel="e">e</a></th>
+                <th><a class="{alpha_selected_f}" href="javascript:void(0);" onclick="{alpha_action}" rel="f">f</a></th>
+                <th><a class="{alpha_selected_g}" href="javascript:void(0);" onclick="{alpha_action}" rel="g">g</a></th>
+                <th><a class="{alpha_selected_h}" href="javascript:void(0);" onclick="{alpha_action}" rel="h">h</a></th>
+                <th><a class="{alpha_selected_i}" href="javascript:void(0);" onclick="{alpha_action}" rel="i">i</a></th>
+                <th><a class="{alpha_selected_j}" href="javascript:void(0);" onclick="{alpha_action}" rel="j">j</a></th>
+                <th><a class="{alpha_selected_k}" href="javascript:void(0);" onclick="{alpha_action}" rel="k">k</a></th>
+                <th><a class="{alpha_selected_l}" href="javascript:void(0);" onclick="{alpha_action}" rel="l">l</a></th>
+                <th><a class="{alpha_selected_m}" href="javascript:void(0);" onclick="{alpha_action}" rel="m">m</a></th>
+                <th><a class="{alpha_selected_n}" href="javascript:void(0);" onclick="{alpha_action}" rel="n">n</a></th>
+                <th><a class="{alpha_selected_o}" href="javascript:void(0);" onclick="{alpha_action}" rel="o">o</a></th>
+                <th><a class="{alpha_selected_p}" href="javascript:void(0);" onclick="{alpha_action}" rel="p">p</a></th>
+                <th><a class="{alpha_selected_q}" href="javascript:void(0);" onclick="{alpha_action}" rel="q">q</a></th>
+                <th><a class="{alpha_selected_r}" href="javascript:void(0);" onclick="{alpha_action}" rel="r">r</a></th>
+                <th><a class="{alpha_selected_s}" href="javascript:void(0);" onclick="{alpha_action}" rel="s">s</a></th>
+                <th><a class="{alpha_selected_t}" href="javascript:void(0);" onclick="{alpha_action}" rel="t">t</a></th>
+                <th><a class="{alpha_selected_u}" href="javascript:void(0);" onclick="{alpha_action}" rel="u">u</a></th>
+                <th><a class="{alpha_selected_v}" href="javascript:void(0);" onclick="{alpha_action}" rel="v">v</a></th>
+                <th><a class="{alpha_selected_w}" href="javascript:void(0);" onclick="{alpha_action}" rel="w">w</a></th>
+                <th><a class="{alpha_selected_x}" href="javascript:void(0);" onclick="{alpha_action}" rel="x">x</a></th>
+                <th><a class="{alpha_selected_y}" href="javascript:void(0);" onclick="{alpha_action}" rel="y">y</a></th>
+                <th><a class="{alpha_selected_z}" href="javascript:void(0);" onclick="{alpha_action}" rel="z">z</a></th>
+            </tr>
+            </thead>
+        </table>
+        <!--EndSectAlpha-->
+
+        <!--BeginSectGridTable-->
 		<table class="{table_class}">
 			<!--BeginSectLabels-->
 			<thead>
-				<!--BeginSectAlpha-->						
-				<tr><th colspan="{max_colspan}">
-				<table class="alphanum">
-					<thead>
-					<tr>
-						<th><a class="{alpha_selected_}" href="javascript:void(0);" onclick="{alpha_action}" rel="">{_all}</a></th>
-                        <th><a class="{alpha_selected_cipher}" href="javascript:void(0);" onclick="{alpha_action}" rel="cipher" onclick="document.getElementById('frmAction').value='alpha'; document.getElementById('{component}alpha').value='cipher'; jQuery(this).closest('form').submit();">0-9</a></th>
-						<th><a class="{alpha_selected_a}" href="javascript:void(0);" onclick="{alpha_action}" rel="a">a</a></th>
-						<th><a class="{alpha_selected_b}" href="javascript:void(0);" onclick="{alpha_action}" rel="b">b</a></th>
-						<th><a class="{alpha_selected_c}" href="javascript:void(0);" onclick="{alpha_action}" rel="c">c</a></th>
-						<th><a class="{alpha_selected_d}" href="javascript:void(0);" onclick="{alpha_action}" rel="d">d</a></th>
-						<th><a class="{alpha_selected_e}" href="javascript:void(0);" onclick="{alpha_action}" rel="e">e</a></th>
-						<th><a class="{alpha_selected_f}" href="javascript:void(0);" onclick="{alpha_action}" rel="f">f</a></th>
-						<th><a class="{alpha_selected_g}" href="javascript:void(0);" onclick="{alpha_action}" rel="g">g</a></th>
-						<th><a class="{alpha_selected_h}" href="javascript:void(0);" onclick="{alpha_action}" rel="h">h</a></th>
-						<th><a class="{alpha_selected_i}" href="javascript:void(0);" onclick="{alpha_action}" rel="i">i</a></th>
-						<th><a class="{alpha_selected_j}" href="javascript:void(0);" onclick="{alpha_action}" rel="j">j</a></th>
-						<th><a class="{alpha_selected_k}" href="javascript:void(0);" onclick="{alpha_action}" rel="k">k</a></th>
-						<th><a class="{alpha_selected_l}" href="javascript:void(0);" onclick="{alpha_action}" rel="l">l</a></th>
-						<th><a class="{alpha_selected_m}" href="javascript:void(0);" onclick="{alpha_action}" rel="m">m</a></th>
-						<th><a class="{alpha_selected_n}" href="javascript:void(0);" onclick="{alpha_action}" rel="n">n</a></th>
-						<th><a class="{alpha_selected_o}" href="javascript:void(0);" onclick="{alpha_action}" rel="o">o</a></th>
-						<th><a class="{alpha_selected_p}" href="javascript:void(0);" onclick="{alpha_action}" rel="p">p</a></th>
-						<th><a class="{alpha_selected_q}" href="javascript:void(0);" onclick="{alpha_action}" rel="q">q</a></th>
-						<th><a class="{alpha_selected_r}" href="javascript:void(0);" onclick="{alpha_action}" rel="r">r</a></th>
-						<th><a class="{alpha_selected_s}" href="javascript:void(0);" onclick="{alpha_action}" rel="s">s</a></th>
-						<th><a class="{alpha_selected_t}" href="javascript:void(0);" onclick="{alpha_action}" rel="t">t</a></th>
-						<th><a class="{alpha_selected_u}" href="javascript:void(0);" onclick="{alpha_action}" rel="u">u</a></th>
-						<th><a class="{alpha_selected_v}" href="javascript:void(0);" onclick="{alpha_action}" rel="v">v</a></th>
-						<th><a class="{alpha_selected_w}" href="javascript:void(0);" onclick="{alpha_action}" rel="w">w</a></th>
-						<th><a class="{alpha_selected_x}" href="javascript:void(0);" onclick="{alpha_action}" rel="x">x</a></th>
-						<th><a class="{alpha_selected_y}" href="javascript:void(0);" onclick="{alpha_action}" rel="y">y</a></th>
-						<th><a class="{alpha_selected_z}" href="javascript:void(0);" onclick="{alpha_action}" rel="z">z</a></th>
-					</tr>
-					</thead>
-				</table>
-				</th></tr>
-				<!--EndSectAlpha-->						
+
 				<tr>
 					<!--BeginSectColLabel-->
 					<!--BeginSectColLabelStart-->
@@ -192,33 +178,57 @@
 			</tbody>
 			<!--EndSectGridData-->
 		</table>
-		<!--BeginSectPaginatorBottom-->
-		<div class="{pagenavigator_bottom_class}">
-			{PageNavigator.totelem}
-			{PageNavigator.nav}
-		</div>
-		<!--EndSectPaginatorBottom-->
 
-		{fixed_post_content}
 
-		<!--BeginSectActionButtons-->
-		<div class="{actions_bottom_class}">
-			<!--BeginSectAction-->
-			{ActionButton}
-			<!--EndSectAction-->
-		</div>
-		<!--EndSectActionButtons-->
+        <div class="{table_after_class}">
+            <!--BeginSectPaginatorBottom-->
+            <div class="{table_after_left_class}" >
+            {PageNavigator.totelem}
+            </div>
+            <div class="{table_after_center_class}" >
+            {PageNavigator.choice}
+            </div>
+            <div class="{table_after_right_class}" >
+            {PageNavigator.nav}
+            </div>
+            <!--EndSectPaginatorBottom-->
+        </div>
+
+
+        {fixed_post_content}
+
+
+
+
 
 	<!--EndSectGridTable-->
 
-	{content_wrap_end}
+
 	<!--EndSectGrid-->
 	<!--BeginSectNoRecords-->
-	<div class="{norecord_class}">{grid_no_record}{fixed_post_content}</div>
+	<div class="{norecord_class}">
+        {norecord_wrap_start}
+            <h4>{grid_no_record}</h4>
+            {fixed_post_content}
+        {norecord_wrap_end}
+    </div>
 	<!--EndSectNoRecords-->
 
-	{inner_wrap_end}
+
+    {body_wrap_end}
+
+    {footer_wrap_start}
+        <!--BeginSectActionButtons-->
+        <div class="{actions_bottom_class}">
+            <!--BeginSectAction-->
+            {ActionButton}
+            <!--EndSectAction-->
+        </div>
+        <!--EndSectActionButtons-->
+    {footer_wrap_end}
+    {inner_wrap_end}
 </{grid_tag}>
 {outer_wrap_end}
+
 <!--BeginSectFooters-->
 <!--EndSectFooters-->

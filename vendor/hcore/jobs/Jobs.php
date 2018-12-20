@@ -326,7 +326,7 @@ class Jobs extends vgCommon
 				$return["html"] 				            = $res["content"];
 			}
 		} else {
-		    Cms::errorDocument($res["headers"]["response_code"]);
+		    Jobs::errorDocument($res["headers"]["response_code"]);
 		}
 
 		if($return && is_array($response)) {
@@ -675,9 +675,9 @@ class Jobs extends vgCommon
      * @return bool|null
      */
     public function run($exec = false) {
-		if((filemtime(__FILE__) + $this::ANTIFLOOD) >= time()) {
-			return false;
-		}
+        if((filemtime(__FILE__) + $this::ANTIFLOOD) > time()) {
+            return false;
+        }
 		touch(__FILE__, time());
 
 		set_time_limit($this::TIMEOUT);

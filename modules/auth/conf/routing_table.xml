@@ -86,8 +86,7 @@
 		<priority>NORMAL</priority>
 		<source>^/restricted/users(.*)</source>
 		<destination>
-			<module>auth</module>
-			<url>/users$1</url>
+			<url>/vendor/hcore/auth/admin/users$1</url>
 		</destination>
 		<reverse>/restricted/users</reverse>
 	</rule>

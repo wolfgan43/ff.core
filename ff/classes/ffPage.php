@@ -75,16 +75,16 @@ class ffPage
 
         if (is_null($last_res))
         {
-            $class_name = __CLASS__ . "_" . FF_PHP_SUFFIX;
-            $base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
+            $class_name = __CLASS__ . "_" . ffTheme::TYPE;
+            //$base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
         else
         {
-            $base_path = $last_res["base_path"];
+            //$base_path = $last_res["base_path"];
             $class_name = $last_res["class_name"];
         }
 
-        require_once $base_path;
+        //require_once $base_path;
         $tmp = new $class_name($disk_path, $site_path, $page_path, $theme);
 
         $res = self::doEvent("on_factory_done", array($tmp));
@@ -616,7 +616,7 @@ abstract class ffPage_base extends ffCommon
         $last_res = end($res);
         if ($last_res === null)
         {
-            return $this->disk_path . "/themes/" . $this->getTheme();
+            return ff_getAbsDir(FF_THEME_DIR . "/" . $this->getTheme()) . FF_THEME_DIR . "/" . $this->getTheme();
         }
         else
         {
@@ -1288,15 +1288,16 @@ abstract class ffPage_base extends ffCommon
 
     private function resource($name, $type) {
         $pathinfo = $this->page_path;
+        if($pathinfo) {
+            do {
+                $file = $this->resources[$type][$name . str_replace("/", "_", $pathinfo)];
+                if ($file) {
+                    break;
+                }
 
-        do {
-            $file = $this->resources[$type][$name . str_replace("/", "_", $pathinfo)];
-            if($file) {
-                break;
-            }
-
-            $pathinfo = dirname($pathinfo);
-        } while($pathinfo != DIRECTORY_SEPARATOR);
+                $pathinfo = dirname($pathinfo);
+            } while ($pathinfo != DIRECTORY_SEPARATOR);
+        }
 
         if(!$file) {
             $file = $this->resources[$type][$name];
@@ -1305,15 +1306,14 @@ abstract class ffPage_base extends ffCommon
         return $file;
     }
 
-    public function loadTemplate($name, $type) {
+    public function loadTemplate($name, $type = "components") {
         $file = $this->resource($name, $type);
 
         if (pathinfo($file, PATHINFO_EXTENSION) == "tpl") {
             /* @CarmineRumma */
             $tpl = new ffSmarty($file);
         } else {
-            $tpl = ffTemplate::factory(dirname($file));
-            $tpl->load_file(basename($file));
+            $tpl = ffTemplate::fetch($file);
             $this->tplProcessVars(array(&$tpl));
             $this->tplSetGlobals(array(&$tpl));
         }
@@ -1329,6 +1329,6 @@ abstract class ffPage_base extends ffCommon
             }
         }
 
-        return str_replace($this->disk_path, "", $asset);
+        return ff_stripAbsDir($asset);
     }
 }

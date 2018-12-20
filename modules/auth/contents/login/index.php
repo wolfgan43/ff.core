@@ -126,17 +126,11 @@ if(Auth::islogged()) {
 }
 
 if ($widget["js"]) {
-    $cm->oPage->tplAddJs("ff.modules.auth.login", array(
-        "path" => dirname($widget["js"])
-        , "file" => basename($widget["js"])
-    ));
+    $cm->oPage->tplAddJs("ff.modules.auth.login", $widget["js"]);
 }
 
 if ($widget["css"]) {
-    $cm->oPage->tplAddCss("ff.modules.auth.login", array(
-        "path" => dirname($widget["css"])
-        , "file" => basename($widget["css"])
-    ));
+    $cm->oPage->tplAddCss("ff.modules.auth.login", $widget["css"]);
 }
 
 
