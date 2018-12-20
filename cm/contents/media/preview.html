@@ -1,0 +1,34 @@
+<div class="{container_class}">
+    <!--BeginSezThumb-->
+    <div class="uploaded-thumb">
+        <div class="icons-abs"> 
+			<a download="{media_name_normalized}" href="{view_path}{media_path}?v={media_time}" alt="download" class="{download_class}"></a>
+            <!--BeginSezAviary-->
+            <a href="javascript:void(0);" alt="modify" class="{modify_class}" onclick="
+                ff.pluginLoad('ff.ffField.aviary', '{theme_path}/ff/ffField/widgets/aviary/aviary.js', function() {
+                    ff.ffField.aviary.launch('{media_name_normalized}', '{media_path}', null, '{aviary_key}');
+                });"></a>
+            <!--EndSezAviary-->
+        </div>    
+        <a rel="group" class="{media_class}" href="{view_path}{media_path}?v={media_time}" title="{media_title}"><img width="{media_width}" height="{media_height}" class="{media_thumb_class}" id="{media_name_normalized}" src="{preview_path}{media_path}?v={media_time}" /></a>
+    </div>
+    <!--EndSezThumb-->
+    <div class="referer">
+        <ul class="{referer_container_class}">
+            <!--BeginSezRefererItem-->
+            <li class="{referer_class}"><a href="{referer_url}">{referer_name}</a></li>
+            <!--EndSezRefererItem-->
+        </ul>
+    </div>
+    <div class="{info_class}">
+        <label>{_media_name_label}</label>
+        <strong title="{media_name}">{media_name}</strong>
+		<br />
+        <label>{_media_size_label}</label>
+        <strong>{media_size}</strong>
+    </div>
+    <div class="{row_class}">
+        {media_tree_path}
+    </div>
+
+</div>
