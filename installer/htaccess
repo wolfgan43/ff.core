@@ -2,6 +2,7 @@ RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule .* https://www.ilmiosito.com [L,R=301]
 
 AddType text/cache-manifest .manifest
 AddDefaultCharset UTF-8
@@ -26,10 +27,21 @@ ErrorDocument 404                           [FF_SITE_PATH]/cm/error.php
 ErrorDocument 403                           [FF_SITE_PATH]/cm/error.php
 
 
+
+RewriteCond   %{REQUEST_URI}  	^[FF_SITE_PATH]/static
+RewriteRule   ^static/(.*)    [FF_SITE_PATH]/cm/static\.php?_ffq_=/$1 [L,QSA]
+
+RewriteCond   %{REQUEST_URI}  	^[FF_SITE_PATH]/asset
+RewriteRule   ^asset/(.*)    [FF_SITE_PATH]/cache/$1 [L]
+
+RewriteCond   %{REQUEST_URI}  	^[FF_SITE_PATH]/media
+RewriteRule   ^media/(.*)    [FF_SITE_PATH]/cache/.thumbs/$1 [L]
+
+
 #############
 # Basic rules
 #------------
-RewriteCond   %{HTTP_HOST}  	            [DOMAIN_SUB]\.[DOMAIN_NAME]\.[DOMAIN_EXT]$ [NC]
+
 #core
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/applets/([^/]+)/themes(.+)
 RewriteCond   %{REQUEST_URI}  	            !^[FF_SITE_PATH]/modules/([^/]+)/themes(.+)
