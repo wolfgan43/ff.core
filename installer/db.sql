@@ -3396,25 +3396,6 @@ INSERT INTO `ff_languages_names` (`ID`, `ID_lang`, `ID_trans`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `rel_tag_items`
---
-
-CREATE TABLE `rel_tag_items` (
-  `ID` int(11) NOT NULL,
-  `ID_tag` varchar(255) NOT NULL,
-  `ID_item` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Dump dei dati per la tabella `rel_tag_items`
---
-
-INSERT INTO `rel_tag_items` (`ID`, `ID_tag`, `ID_item`) VALUES
-(1, '1', 1);
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `support_countries`
 --
 
