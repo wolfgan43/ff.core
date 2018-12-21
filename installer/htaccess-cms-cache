@@ -1,0 +1,28 @@
+####################
+# Static Cache
+#---------------------
+RewriteCond %{REQUEST_URI}  	            !^/cache
+RewriteCond %{REQUEST_FILENAME}             !-d
+RewriteCond %{REQUEST_FILENAME}             !-f
+RewriteCond %{REQUEST_FILENAME}             !-l
+RewriteCond %{QUERY_STRING}                 ^$ [OR]
+RewriteCond %{QUERY_STRING}                 ^page=([0-9]*)$
+RewriteRule ^(.*)                           /cache/http/%{HTTP_HOST}/$0/index%1.html [L,QSA]
+
+#Static Cache By Search
+RewriteCond %{REQUEST_URI}  	            !^/cache
+RewriteCond %{REQUEST_FILENAME}             !-d
+RewriteCond %{REQUEST_FILENAME}             !-f
+RewriteCond %{REQUEST_FILENAME}             !-l
+RewriteCond %{QUERY_STRING}                 q=([a-zA-Z0-9-]+) [NC,OR]
+RewriteCond %{QUERY_STRING}                 ^.*[&]?q=([a-zA-Z0-9-]+).*&page=([0-9]*).*$ [NC]
+RewriteRule ^(.*)                           /cache/http/%{HTTP_HOST}/$0/search-%1%2.html [L,QSA]
+
+#Static Cache By Filter
+RewriteCond %{REQUEST_URI}  	            !^/cache
+RewriteCond %{REQUEST_FILENAME}             !-d
+RewriteCond %{REQUEST_FILENAME}             !-f
+RewriteCond %{REQUEST_FILENAME}             !-l
+RewriteCond %{QUERY_STRING}                 ffl=([a-zA-Z0-9-]+) [NC,OR]
+RewriteCond %{QUERY_STRING}                 ^.*[&]?ffl=([a-zA-Z0-9-]+).*&page=([0-9]*).*$ [NC]
+RewriteRule ^(.*)                           /cache/http/%{HTTP_HOST}/$0/filter-%1%2.html [L,QSA]
