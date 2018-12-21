@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configdata>
 	<menu>
-		<default path="/" hide="true" />
-		<admin path="/restricted" redir="/restricted/dashboard"  hide="true" label="Admin" />
+		<default path="/restricted/" hide="true" redir="/restricted/profile" />
+		<admin path="/restricted" redir="/restricted/profile"  hide="true" label="Admin" />
 
 
 		<!--<dashboard path="/restricted/dashboard" label="Dashboard" location="brand" />-->
