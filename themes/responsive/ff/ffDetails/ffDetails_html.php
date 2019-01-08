@@ -18,13 +18,13 @@ class ffDetails_html extends ffDetails_base
 					"xs" => 6
 					, "sm" => 6
 					, "md" => 4
-					, "lg" => 3
+					, "lg" => 2
 				)
 				, "push" => array(
 					"xs" => 6
 					, "sm" => 6
 					, "md" => 8
-					, "lg" => 8
+					, "lg" => 10
 				)
 				, "util" => "align-right"
 			)
@@ -994,7 +994,7 @@ class ffDetails_html extends ffDetails_base
 
 				
             if($this->display_rowstoadd) {
-				$this->buttons_options["addrow"]["class"] .= " " . cm_getClassByFrameworkCss("control-postfix", "form");
+				$this->buttons_options["addrow"]["class"] .= "";
                 if($this->display_new_location == "Header" || $this->display_new_location == "Both") {
 					$this->framework_css["actionsTop"]["form"] = "group";
 					$this->tpl[0]->set_var("rows_to_add_class", cm_getClassByFrameworkCss("control", "form"));

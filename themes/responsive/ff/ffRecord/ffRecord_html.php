@@ -824,7 +824,10 @@ class ffRecord_html extends ffRecord_base
 				    	$required_symbol = "";
 
 						if(($this->form_fields[$key]->get_control_type() == "checkbox" || $this->form_fields[$key]->get_control_type() == "radio") && $this->form_fields[$key]->widget == "") {
-							$control_var = cm_getClassByFrameworkCss("control-check-position", "form");
+							//
+						    // TODO: eliminato da Mirko, stampava il valore del radio dentro la variabile "content_in_label" invece che dentro la variabile "content"
+						    //$control_var = cm_getClassByFrameworkCss("control-check-position", "form");
+                            //
 							$is_combine_field = true;
 						}
 
@@ -915,6 +918,10 @@ class ffRecord_html extends ffRecord_base
 					    } else {
 					    	$control_var = "";
 					    }
+
+                        if($this->form_fields[$key]->get_control_type() == "checkbox"){
+                            $this->tpl[0]->set_var("label", "");
+                        }
 				    } 
 
 				    /**

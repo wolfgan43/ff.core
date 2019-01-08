@@ -625,7 +625,7 @@ INSERT INTO `ff_international` (`ID`, `ID_lang`, `word_code`, `description`, `is
 (104, 1, 'category_code', '', 1, '0000-00-00 00:00:00'),
 (105, 1, 'mod_keeng_search_for', '', 1, '0000-00-00 00:00:00'),
 (106, 1, 'userinfo', '', 1, '0000-00-00 00:00:00'),
-(107, 1, 'user_profile', '', 1, '0000-00-00 00:00:00'),
+(107, 1, 'user_profile', 'Profilo Utente', 1, '0000-00-00 00:00:00'),
 (108, 1, 'ffDetail_general', '', 1, '0000-00-00 00:00:00'),
 (109, 1, 'category_ID_category', '', 1, '0000-00-00 00:00:00'),
 (110, 1, 'utenti_username', '', 1, '0000-00-00 00:00:00'),

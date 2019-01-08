@@ -1957,6 +1957,10 @@ abstract class ffField_base extends ffCommon
 
 		$this->tpl[0]->set_var("id", ffCommon_specialchars($id));
 		$this->tpl[0]->set_var("value", ffCommon_specialchars($this->checked_value->getValue($this->get_app_type(), $this->get_locale())));
+        if($this->encode_entities)
+            $this->tpl[0]->set_var("Label", ffCommon_specialchars($this->label));
+        else
+            $this->tpl[0]->set_var("Label", ffCommon_specialchars($id));
 
 		if ($value->getValue($this->get_app_type(), $this->get_locale()) == $this->checked_value->getValue($this->get_app_type(), $this->get_locale()))
 			$this->tpl[0]->set_var("Checked", "checked=\"checked\"");
