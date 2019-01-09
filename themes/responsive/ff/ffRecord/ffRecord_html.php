@@ -920,7 +920,7 @@ class ffRecord_html extends ffRecord_base
 					    }
 
                         if($this->form_fields[$key]->get_control_type() == "checkbox"){
-                            $this->tpl[0]->set_var("label", "");
+                            $this->tpl[0]->set_var("label_class", "hidden");
                         }
 				    } 
 

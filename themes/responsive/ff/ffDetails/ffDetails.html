@@ -15,7 +15,7 @@
     {fixed_pre_content}
 
         <!--BeginSectTitle-->
-        <h3 class="{title_class}">{discl_bt}{title}</h3>
+        <h2 class="{title_class}">{discl_bt}{title}</h2>
         <!--EndSectTitle-->
         {fixed_title_content}
 
@@ -43,27 +43,27 @@
 			<!--EndSectFormTitle-->
 
 			<!--BeginSectFormField-->
-			<!--BeginSectWrapStart-->
-			<div class="{wrap_class}">
-			<!--EndSectWrapStart-->
-			{field_container_start}
-				{content_pre_label}
-				<!--BeginSectGroupLabel-->
-					{label_prefix}
-					<label{label_class} for="{label_for}"{label_properties}>
-						{content_in_label}
-						{label}
-					</label>
-					<!--BeginSectDescriptionLabel-->
-					<span class="description">{description}</span>
-					<!--EndSectDescriptionLabel-->
-					{label_postfix}
-				<!--EndSectGroupLabel-->
-				{content}
-			{field_container_end}
-			<!--BeginSectWrapEnd-->
-			</div>
-			<!--EndSectWrapEnd-->
+            <!--BeginSectWrapStart-->
+            <div class="{wrap_class}">
+                <!--EndSectWrapStart-->
+                {field_container_start}
+                {content_pre_label}
+                <!--BeginSectGroupLabel-->
+                {label_prefix}
+                <label {label_class} for="{label_for}"{label_properties}>
+                    {label}
+                    <!--BeginSectDescriptionLabel-->
+                    <div class="description help-block">{description}</div>
+                    <!--EndSectDescriptionLabel-->
+                    {content_in_label}
+                </label>
+                {label_postfix}
+                <!--EndSectGroupLabel-->
+                {content}
+                {field_container_end}
+                <!--BeginSectWrapEnd-->
+            </div>
+            <!--EndSectWrapEnd-->
 			<!--EndSectFormField-->
         {fixed_post_row}
 		<!--EndSectFormRow-->

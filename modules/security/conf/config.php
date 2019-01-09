@@ -77,7 +77,7 @@ if (!defined("MOD_SEC_PASSWORD_RECOVER_INTERVAL"))		define ("MOD_SEC_PASSWORD_RE
 if (!defined("MOD_SEC_PASSWORD_RECOVER_SUCCESS"))		define ("MOD_SEC_PASSWORD_RECOVER_SUCCESS", false); // se true, visualizza un messaggio di completamento dell'operazione, se false esegue un redirect al login
 
 if (!defined("MOD_SEC_USER_AVATAR"))		define ("MOD_SEC_USER_AVATAR",		"avatar");
-if (!defined("MOD_SEC_USER_AVATAR_MODE"))	define ("MOD_SEC_USER_AVATAR_MODE",	"");
+if (!defined("MOD_SEC_USER_AVATAR_MODE"))	define ("MOD_SEC_USER_AVATAR_MODE",	"100-100");
 if (!defined("MOD_SEC_USER_FIRSTNAME"))		define ("MOD_SEC_USER_FIRSTNAME",	"firstname");
 if (!defined("MOD_SEC_USER_LASTNAME"))		define ("MOD_SEC_USER_LASTNAME",	"lastname");
 if (!defined("MOD_SEC_USER_COMPANY"))		define ("MOD_SEC_USER_COMPANY",		"company");

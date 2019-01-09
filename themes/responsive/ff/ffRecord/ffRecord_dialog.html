@@ -41,23 +41,23 @@
 				<!--BeginSectGroupRow-->
 				<!--BeginSectWrapStart-->
 				<div class="{wrap_class}">
-				<!--EndSectWrapStart-->
-	  			{field_container_start}
-	  				{content_pre_label}
+					<!--EndSectWrapStart-->
+					{field_container_start}
+					{content_pre_label}
 					<!--BeginSectGroupLabel-->
-						{label_prefix}
-						<label{label_class} for="{label_for}"{label_properties}> 
-							{content_in_label}
-							{label}
-						</label>
+					{label_prefix}
+					<label {label_class} for="{label_for}"{label_properties}>
+						{label}
 						<!--BeginSectDescriptionLabel-->
-						<span class="description">{fielDescription}</span>
+						<div class="description help-block">{fielDescription}</div>
 						<!--EndSectDescriptionLabel-->
-						{label_postfix}
+						{content_in_label}
+					</label>
+					{label_postfix}
 					<!--EndSectGroupLabel-->
 					{content}
-	  			{field_container_end}
-				<!--BeginSectWrapEnd-->
+					{field_container_end}
+					<!--BeginSectWrapEnd-->
 				</div>
 				<!--EndSectWrapEnd-->
 	  			<!--EndSectGroupRow-->

@@ -411,6 +411,11 @@ abstract class ffField_base extends ffCommon
 	 * @var Boolean
 	 */
 	var $radio_display_label	= true;
+    /**
+     * Per la visualizzazione dei radio, true = orizzontale / false = verticale
+     * @var Boolean
+     */
+    var $radio_inline	= true;
 	/**
 	 * Per i control_type "radio", abilita l'"a capo"
 	 * @var Boolean
@@ -2545,6 +2550,15 @@ abstract class ffField_base extends ffCommon
 					$this->tpl[0]->set_var("LabelPre", "");
 					$this->tpl[0]->set_var("LabelPost", "");
 				}
+
+                if ($this->radio_inline)
+                {
+                    $this->tpl[0]->set_var("inline", "-inline");
+                }
+                else
+                {
+                    $this->tpl[0]->set_var("inline", "");
+                }
 
 				if ($this->radio_hyphen)
 				{

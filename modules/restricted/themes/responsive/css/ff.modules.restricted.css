@@ -199,7 +199,7 @@ a.-floating:hover {
 .header__top {
     margin: 0; }
 .header__top h1{
-    margin-top: 6px; }
+    margin-top: 10px; }
 .header__top .navbar-brand i {
     margin-left: 5px;
     vertical-align: middle; }
@@ -335,6 +335,12 @@ a.-floating:hover {
     position: relative;
     background: #1e88e5;
     padding: 0; }
+.sidemenu__head .text-center{
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.sidemenu__head .text-center.dropdown{
+    border: none;
+}
 .sidemenu__head__min {
     height: 85px; }
 .sidemenu__head .domain img {
@@ -829,7 +835,7 @@ MODIFICHE TEST MIRKO
 */
 .sidemenu__head .domain i {
     position: absolute;
-    top: 20px;
+    top: 24px;
     right: 1em;
     color: #fff;
 }
@@ -978,7 +984,7 @@ tbody > tr:hover {
 .header__menutoggler {
     width: 30px;
     height: 30px;
-    margin-top: 10px;
+    margin-top: 14px;
     margin-left: -20px;
     padding:0;
     background: none;
@@ -1098,6 +1104,7 @@ tbody > tr:hover {
 .sidemenu__head #panel-brand.dropdown-menu, .sidemenu__head #panel-brand .dropdown-menu{
     width: calc(100% - 40px);
     margin: 0 20px;
+    top: 42px;
     background-color: #fff;
 }
 
@@ -1147,7 +1154,8 @@ tbody > tr:hover {
 
 .sidemenu__head img.brand-logo{
     padding: 9px 0;
-    max-height:70px;
+    height:91px;
+    max-height:91px;
 }
 
 /* LAYOUT CON BARRA TOP */
@@ -1227,7 +1235,7 @@ tbody > tr:hover {
     }
 
     #content {
-        padding: 0 40px 40px 40px;
+        padding: 0 20px 40px 40px;
         min-height: 100vh;
         transition: all 0.3s;
         width: 100%;
@@ -1318,6 +1326,9 @@ tbody > tr:hover {
     margin-top: -8px;
 
     font-size: 18px; }
+.ffGrid .table td a.fa.btn{
+    margin-top: 0;
+}
 
 .ffGrid .table td a:hover {
 
@@ -1400,7 +1411,7 @@ tbody > tr:hover {
 
 .ffGrid .search a {
 
-    padding: 0 10px; }
+    padding: 6px 12px; }
 
 .ffGrid .search a:before {
 
@@ -1412,8 +1423,6 @@ tbody > tr:hover {
 
 .ffGrid .adv-search {
 
-    background: #1976d2;
-
     box-shadow: 0 3px 10px -5px #DDD;
 
     border: 1px solid #e7e7e7;
@@ -1424,22 +1433,47 @@ tbody > tr:hover {
 
     position: absolute;
 
-    width: calc(100% - 30px); }
+    width: calc(100% - 15px); }
 
 .ffGrid .adv-search .row {
 
     margin: 0; }
 
-.ffGrid .actions {
-
+.ffGrid .actions, .ffDetails .actions {
     margin-bottom: 25px; }
 .ffGrp{
     border:1px solid #ccc;
+    margin-bottom: 20px;
+}
+.ffGrp:nth-child(even){
+    margin-right: 10px;
+    width: calc(50% - 10px);
+}
+.ffGrp:nth-child(odd){
+    margin-left: 10px;
+    width: calc(50% - 10px);
+}
+.ffGrp h4{
+    margin: 0 -15px 10px -15px;
+    padding: 10px 15px;
+    line-height: 33px;
+    border-bottom: 1px solid #ccc;
+    float: left;
+    width: calc(100% + 30px);
+}
+
+.ffGrp h4 span.btn{
+    float: right;
 }
 
 .ffDetails {
 
     padding: 15px 0; }
+
+.ffDetails .actions input {
+    max-width: 50px;
+    float: right;
+}
 
 .ffDetails h3 {
 
@@ -1497,6 +1531,82 @@ tbody > tr:hover {
 }
 .ffRecord .checkbox label{
     font-size: 14px;
+}
+
+.uploaded-preview .uploaded-thumb, .uploadifive-queue-item {
+    line-height: 0;
+}
+
+/* CHECKBOX E RADIO */
+.checkbox label, .radio label, .radio-inline label{
+    padding-left: 0;
+}
+.checkbox label::after,
+.radio label::after,
+.radio-inline label::after{
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.checkbox .cr,
+.radio .cr,
+.radio-inline .cr{
+    position: relative;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    border-radius: .25em;
+    width: 1.3em;
+    height: 1.3em;
+    float: left;
+    margin-right: .5em;
+}
+
+.radio .cr,
+.radio-inline .cr{
+    border-radius: 50%;
+}
+
+.checkbox .cr .cr-icon,
+.radio .cr .cr-icon,
+.radio-inline .cr .cr-icon{
+    position: absolute;
+    font-size: .8em;
+    line-height: 0;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+}
+
+.radio .cr .cr-icon.fa.fa-check,
+.radio-inline .cr .cr-icon.fa.fa-check{
+    margin-left: 0.04em;
+}
+.checkbox label input[type="checkbox"],
+.radio label input[type="radio"],
+.radio-inline label input[type="radio"]{
+    display: none;
+}
+
+.checkbox label input[type="checkbox"] + .cr > .cr-icon,
+.radio label input[type="radio"] + .cr > .cr-icon,
+.radio-inline label input[type="radio"] + .cr > .cr-icon{
+    transform: scale(1.5);
+    opacity: 0;
+    transition: all .15s ease-in;
+}
+
+.checkbox label input[type="checkbox"]:checked + .cr > .cr-icon,
+.radio label input[type="radio"]:checked + .cr > .cr-icon,
+.radio-inline label input[type="radio"]:checked + .cr > .cr-icon{
+    transform: scale(1);
+    opacity: 1;
+}
+
+.checkbox label input[type="checkbox"]:disabled + .cr,
+.radio label input[type="radio"]:disabled + .cr,
+.radio-inline label input[type="radio"]:disabled + .cr{
+    opacity: .5;
 }
 
 .ffRecord .group-system {
@@ -1839,6 +1949,33 @@ tbody > tr:hover {
 
     opacity: 0.8; }
 
+
+/* INFO CALLOUT */
+.bs-callout-info{
+    padding: 20px;
+    margin-top: 15px;
+    border: 2px solid rgba(25,118,210,.1);
+    background-color: rgba(25,118,210,.01);
+}
+.bs-callout-info:before {
+    content: 'INFO';
+    position: absolute;
+    top: -.85em;
+    left: 15px;
+    color: #1976d2;
+    padding: 0 5px;
+    background-color: #fff;
+}
+
+.bs-callout-info.norecord{
+    background: none;
+    padding: 0;
+    border: none;
+}
+
+.bs-callout-info.norecord::before{
+    content: '';
+}
 
 
 .helper-content {
