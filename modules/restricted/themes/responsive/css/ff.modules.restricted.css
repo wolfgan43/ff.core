@@ -1435,6 +1435,12 @@ tbody > tr:hover {
 
     width: calc(100% - 15px); }
 
+.ffGrid .adv-search .fa-search::after{
+    content:'Cerca';
+    margin-left: 12px;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+
 .ffGrid .adv-search .row {
 
     margin: 0; }
@@ -1445,13 +1451,9 @@ tbody > tr:hover {
     border:1px solid #ccc;
     margin-bottom: 20px;
 }
-.ffGrp:nth-child(even){
-    margin-right: 10px;
-    width: calc(50% - 10px);
-}
-.ffGrp:nth-child(odd){
-    margin-left: 10px;
-    width: calc(50% - 10px);
+.ffGrp{
+    margin-right: 20px;
+    width: calc(50% - 20px);
 }
 .ffGrp h4{
     margin: 0 -15px 10px -15px;
@@ -1507,6 +1509,10 @@ tbody > tr:hover {
     padding: 15px 0;
 
     overflow: hidden; }
+
+.description.help-block{
+    margin-bottom: 0;
+}
 
 .ffRecord h2 {
 
@@ -1952,29 +1958,19 @@ tbody > tr:hover {
 
 /* INFO CALLOUT */
 .bs-callout-info{
-    padding: 20px;
-    margin-top: 15px;
-    border: 2px solid rgba(25,118,210,.1);
-    background-color: rgba(25,118,210,.01);
-}
-.bs-callout-info:before {
-    content: 'INFO';
-    position: absolute;
-    top: -.85em;
-    left: 15px;
-    color: #1976d2;
-    padding: 0 5px;
-    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
 }
 
 .bs-callout-info.norecord{
     background: none;
     padding: 0;
     border: none;
-}
-
-.bs-callout-info.norecord::before{
-    content: '';
 }
 
 
