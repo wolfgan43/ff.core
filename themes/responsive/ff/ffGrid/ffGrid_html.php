@@ -1105,7 +1105,7 @@ class ffGrid_html extends ffGrid_base
 
 					// display label to
 					if($this->search_fields[$key]->interval_to_label)
-						$buffer = '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_to_src">' . ffCommon_specialchars($this->search_fields[$key]->interval_to_label). '</label>'; 
+						$buffer = '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_to_src">' . ffCommon_specialchars($this->search_fields[$key]->interval_to_label). '</label>';
 					
 					// display control to
 					$buffer .= $this->search_fields[$key]->process($this->search_fields[$key]->id . "_to_src", $this->search_fields[$key]->interval_to_value);
@@ -1113,8 +1113,8 @@ class ffGrid_html extends ffGrid_base
 				else
 				{
 					// display label
-					if($this->search_fields[$key]->label)
-						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_src">' . ffCommon_specialchars($this->search_fields[$key]->label). '</label>'; 
+					if($this->search_fields[$key]->label && $this->search_fields[$key]->control_type != "checkbox")
+						$buffer .= '<label for="' . $this->id . "_" . $this->search_fields[$key]->id . '_src">' . ffCommon_specialchars($this->search_fields[$key]->label). '</label>';
 					
 					// display control
 					$buffer .= $this->search_fields[$key]->process($this->search_fields[$key]->id . "_src");
