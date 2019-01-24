@@ -202,6 +202,11 @@ __ff : true, /* used to recognize ff'objects */
 	
 	dialogs.get(id).instance = jQuery('#ffWidget_dialog_container_' + id);
 	dialogs.get(id).widget = jQuery('#ffWidget_dialog_' + id);
+
+    jQuery(".resize", dialogs.get(id).widget).on('click', function () {
+    	jQuery(dialogs.get(id).widget).toggleClass("modal-full");
+    });
+
 	jQuery(".close", dialogs.get(id).widget).on('click', function () {
 		that.onClose(id);
 	});
