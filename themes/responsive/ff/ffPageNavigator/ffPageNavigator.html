@@ -3,25 +3,25 @@
 
 <div class="{component_class}" {component_properties}>
   <!--BeginSectSelector-->
-  <ul class="{perpage_class}">
+  <div class="{perpage_class}">
     <div class="input-group">
-      {_frame_per_page}
-      <span class="input-group-addon" id="sizing-addon1">10</span>
-      <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-        <ul class="dropdown-menu dropdown-menu-right">
-          <!--BeginSectSelectorPage-->
-    <li><a href="javascript:void(0);" class="rec-page" rel="{records_per_page}">{records_per_page}</a>
-    </li>
-    <!--EndSectSelectorPage-->
-          <!--BeginSectSelectorPageAll-->
-          <li role="separator" class="divider"></li>
-    <li><a href="javascript:void(0);" class="rec-all" rel="{totelem}">{_all}</a>
-    <!--EndSectSelectorPageAll-->
-        </ul>
-      </div>
+        <span class="input-group-addon" id="sizing-addon1">10</span>
+        <div class="input-group-btn" aria-describedby="sizing-addon1">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <!--BeginSectSelectorPage-->
+            <li><a href="javascript:void(0);" class="rec-page" rel="{records_per_page}">{records_per_page}</a>
+            </li>
+            <!--EndSectSelectorPage-->
+                  <!--BeginSectSelectorPageAll-->
+                  <li role="separator" class="divider"></li>
+            <li><a href="javascript:void(0);" class="rec-all" rel="{totelem}">{_all}</a>
+            <!--EndSectSelectorPageAll-->
+          </ul>
+        </div>
+        <p>{_frame_per_page}</p>
     </div>
-  </ul>
+  </div>
   <!--EndSectSelector-->
   <!--BeginSectChoice-->
   <div class="{choice_class}">

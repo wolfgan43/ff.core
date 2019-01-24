@@ -76,6 +76,17 @@ Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 	width: 0;
 }*/
 
+.uploadifive-queue-item {
+	position: relative;
+	height: 10px!important;
+}
+.uploadifive-queue-item .filename{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 10;
+}
+
 .uploadifive LABEL { display:block; }
 /*.uploadifive>DIV { display:inline-block; }*/
 
@@ -86,7 +97,7 @@ Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 	color:#c6c6c6;
 	transition:border-width 0.3s, color 0.3s;
 	cursor:pointer !important;
-	float:left;
+	display: inline-block;
 	margin-right:0.3em;
 }
 
@@ -98,11 +109,19 @@ Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 
 .uploadifive-button INPUT { cursor:pointer; height:100% !important; line-height:1 !important; }
 
+.uploadifive > div{
+	display: inline;
+}
+.uploadifive-button{
+	display: inline-block!important;
+	float: left;
+	margin-right: 10px;
+}
 .uploaded-thumb,
 .uploadifive-queue-item {
 	display:inline-block;
 	position:relative;
-	box-shadow:0 0 5px rgba(0,0,0,0.2);
+	border: 1px solid #c6c6c6 ;
 	overflow:hidden;
 	text-align:center;
 }
@@ -124,6 +143,8 @@ Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 .uploadifive-queue-item {
 	margin-right:10px !important;
 	margin-bottom:10px !important;
+	width: 100px;
+	height: 100px;
 }
 
 .uploadifive-queue-item.error { margin-bottom:0 !important; padding:0 !important; }

@@ -164,6 +164,7 @@ function eventButtons(id) {
                 //jQuery(".last", this).addClass("disabled");
             }  
             jQuery(".rec-page, .rec-all", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.changeRecPerPage);
+
         }
         jQuery(".currentpage", this).bind("keydown.ff.ffPageNavigator", {"id" : id}, that.goPage);
         if (navigators[id].start_page > 1) {
@@ -359,6 +360,7 @@ __ff : true, // used to recognize ff'objects
             navigators[ev.data.id].callback(ev.data.id, navigators[ev.data.id].callbackParams);
 		} else {
             that.goToPage(ev, null, navigators[ev.data.id].rec_per_page);
+            jQuery("#sizing-addon1").html(recPerPage);
 		}
     }
 },

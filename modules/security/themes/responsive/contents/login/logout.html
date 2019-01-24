@@ -1,11 +1,16 @@
-<div id="ffLoginBox" class="{container_class}">
+<div class="dialog--nux">
+<div id="ffLoginBox" class="inner-box col-lg-4 col-lg-offset-4" align="center">
     {inner_wrap_start}
         <div class="inner-box">
             <!--BeginSectLogoPre-->
-            <div class="{logo_class}"><!--BeginSectLogoImgPre--><img src="{logo_login}" /><!--EndSectLogoImgPre--></div>
-            <!--EndSectLogoPre-->  
+            <div class="{logo_class}">
+                <!--BeginSectLogoImgPre-->
+                <img src="{logo_login}" />
+                <!--EndSectLogoImgPre-->
+            </div>
+            <!--EndSectLogoPre-->
             <!--BeginSectLogout-->
-            <div class="{logout_class}">
+            <div class="{logout_class} dialog--nux-content">
                 <!--BeginSectLogoutTitle-->
                 <h2>{logout_title}</h2>
                 <!--EndSectLogoutTitle--> 
@@ -33,18 +38,18 @@
                     <a class="{logout_button_class}" href="javascript:void(0);" onclick="ff.modules.security.submit('logout', 'ffLoginBox', this);">{_logout_confirm}</a>
                 </div>
                 <!--EndSectStandardLogout-->
-                <!--BeginSectLogoutLinks-->
-                <div class="{link_class}"> 
-                    <!--BeginSectLogoutBack-->
-                    <a class="{back_class}" href="{back_url}">{_back_to_site}</a>
-                    <!--EndSectLogoutBack-->
-                </div>        
-                <!--EndSectLogoutLinks-->
             </div>
+            <!--BeginSectLogoutLinks-->
+            <div class="{link_class}">
+                <!--BeginSectLogoutBack-->
+                <a class="{back_class}" href="{back_url}">{_back_to_site}</a>
+                <!--EndSectLogoutBack-->
+            </div>
+            <!--EndSectLogoutLinks-->
             <!--EndSectLogout-->
             <!--BeginSectLogoPost-->
             <div class="{logo_class}"><!--BeginSectLogoImgPost--><img src="{logo_login}" /><!--EndSectLogoImgPost--></div>
             <!--EndSectLogoPost-->
         </div>  
     {inner_wrap_end}
-</div>
+</div></div>

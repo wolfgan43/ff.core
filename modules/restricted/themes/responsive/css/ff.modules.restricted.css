@@ -1,4 +1,11 @@
+/*
+/ FONT
+ */
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500);
+
+html, body, #frmMain, .actions a.btn.fa, .input-group-addon input.btn, .input-group-addon .btn.btn-primary, .ffGrid .table td a.btn.fa, .ffGrid .adv-search .fa-search::after {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
 /*
 * Include constant, skin variables, and utility
 */
@@ -123,7 +130,7 @@ body,
 #frmMain {
     min-height: 100%;
     min-height: 100vh;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"; }
+}
 
 a {
     color: #1976d2;
@@ -146,6 +153,8 @@ html::-webkit-scrollbar-thumb {
 
 .fa {
     text-rendering: optimizeLegibility; }
+.fa-warning {
+    display: block; }
 
 a.-floating {
     display: none;
@@ -182,8 +191,6 @@ a.-floating:hover {
 .-active {
     border: 1px solid yellow !important; }
 
-.actions a.btn.fa {
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"; }
 .actions a.btn.fa:before {
     font-family: FontAwesome;
     margin-right: 12px;
@@ -616,56 +623,6 @@ a.-floating:hover {
         height: auto; }
     .sidemenu__head .input-group {
         display: none; } }
-/* COMMENTO MIRKO
-@media (min-width: 768px) and (max-width: 992px) {
-  .sidemenu .adminmenu ul li {
-    display: block; }
-  .sidemenu ul.navbar-nav {
-    overflow: visible; }
-    .sidemenu ul.navbar-nav > li {
-      text-align: center;
-      position: relative; }
-      .sidemenu ul.navbar-nav > li > a > span {
-        display: none; }
-      .sidemenu ul.navbar-nav > li > a i {
-        margin-right: 0; }
-      .sidemenu ul.navbar-nav > li .nav-controls {
-        display: none; }
-      .sidemenu ul.navbar-nav > li .collapse {
-        position: absolute;
-        right: -100%;
-        width: 250px;
-        top: 0;
-        left: 110%;
-        background: #1e88e5;
-        text-align: left; }
-        .sidemenu ul.navbar-nav > li .collapse .nav-controls {
-          display: block; }
-
-  .-inverse ul.navbar-nav > li .collapse {
-    background: #263238; } }
-.button-menu-mobile {
-  background: #1e88e5;
-  border: none;
-  color: #fff;
-  font-size: 32px;
-  line-height: 70px;
-  height: 70px;
-  width: 70px;
-  padding: 0 25px;
-  float: left;
-  margin-left: -15px; }
-
-.cmppanel {
-  visibility: hidden;
-  height: 100%;
-  position: fixed;
-  background: #1e88e5;
-  overflow: auto; }
-  @media (min-width: 768px) {
-    .cmppanel {
-      right: -25%; } }
-*/
 @media (min-width: 1200px) {
     .cmppanel {
         right: -16.333%; } }
@@ -843,6 +800,9 @@ MODIFICHE TEST MIRKO
 h1, h2, h3, h4, h5{
     font-weight:300;
 }
+h4{
+    margin-top: 0;
+}
 .sidemenu ul.nav-pills li a {
     font-size: 14px;
 }
@@ -931,10 +891,33 @@ tbody > tr:hover {
     border: 1px solid #ddd;
 }
 
+.perPage li a{
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+
+.perPage li:last-child a{
+    border: none;
+}
+.perPage p{
+    line-height: 32px;
+}
+.perPage .input-group-btn .btn{
+    -webkit-border-top-left-radius: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -moz-border-radius-topleft: 0;
+    -moz-border-radius-bottomleft: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.perPage .dropdown-menu{
+    min-width: 76px;
+    text-align: center;
+}
+
 .input-group-addon input.btn{
     border: none;
-    margin: -6px -12px;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    margin: -5px -12px -4px -12px;
 }
 
 .input-group-addon .btn.btn-primary {
@@ -943,17 +926,15 @@ tbody > tr:hover {
     border-color: #2e6da4;
     border-radius: 0 5px 5px 0;
     margin: -6px -14px;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
 
-.input-group-addon .btn.btn-primary:hover{
+.input-group-addon .btn.btn-primary:hover, .input-group-addon .btn.btn-primary:active, .input-group-addon .btn.btn-primary:focus{
     background-color: #2c699e;
     border-color: #255885;
     color: #fff;
 }
 
 .ffGrid .table td a.btn.fa{
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
     font-size: 14px;
     font-weight: 400;
     line-height: 1.42857143;
@@ -1438,7 +1419,6 @@ tbody > tr:hover {
 .ffGrid .adv-search .fa-search::after{
     content:'Cerca';
     margin-left: 12px;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
 
 .ffGrid .adv-search .row {
@@ -1471,6 +1451,10 @@ tbody > tr:hover {
 .ffDetails {
 
     padding: 15px 0; }
+
+#LangDetail, #LangDetailSEO{
+    padding: 0;
+}
 
 .ffDetails .actions input {
     max-width: 50px;
@@ -1512,11 +1496,16 @@ tbody > tr:hover {
 
 .description.help-block{
     margin-bottom: 0;
+    font-weight: normal;
 }
-
-.ffRecord h2 {
+.ffRecord .ffGrid, .ffRecord .ffGrid h2{
+    margin-top: 0;
+}
+.ffRecord h2, .ffRecord fieldset legend {
 
     font-size: 22px;
+    font-weight: 300;
+    line-height: 1.1;
 
     padding: 0;
 
@@ -1959,7 +1948,7 @@ tbody > tr:hover {
 /* INFO CALLOUT */
 .bs-callout-info{
     padding: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     border: 1px solid transparent;
     border-radius: 4px;
     color: #31708f;

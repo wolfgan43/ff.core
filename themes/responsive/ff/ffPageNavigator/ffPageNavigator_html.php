@@ -292,8 +292,6 @@ class ffPageNavigator_html extends ffPageNavigator_base
 	        {
 				$containerClass = array();
 				//$containerClass[] = $arrows_class;
-				if($this->page <= 2)
-					$containerClass[] = "hidden";
 				
 				if(count($containerClass)) 
 					$this->tpl[0]->set_var("first_arrows_class", ' class="' . implode(" " , $containerClass) . '"');
@@ -301,7 +299,13 @@ class ffPageNavigator_html extends ffPageNavigator_base
 				$this->tpl[0]->set_var("url", ffUpdateQueryString($pageparname, false, $this->url));
 	            $this->tpl[0]->set_var("first_class", cm_getClassByFrameworkCss("first", "icon"));
 	            //$this->tpl[0]->set_var("first_icon", cm_getClassByFrameworkCss("nav_first", "ico-link-tag"));
-				$this->tpl[0]->parse("SectFirstButton", false);
+                if($this->page <= 2){
+                    $this->tpl[0]->parse("SectFirstButton", false);
+                }else{
+                    $this->tpl[0]->parse("SectFirstButton", false);
+                }
+                 //   $containerClass[] = "hidden";
+
 			}
 
 			if($this->display_prev) 
