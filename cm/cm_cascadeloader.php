@@ -1874,7 +1874,11 @@ function cm_cascadeFindTemplate($path, $module = false, $raise_error = false)
 {
     $cm = cm::getInstance();
 
+    $pieces = explode("/", $cm->path_info);
+
     $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $cm->oPage->theme, $raise_error);
+    if ($module && $filename === null)
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents/" . $pieces[1]. "/" . basename($path), $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
         $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, $raise_error);
     if ($module && $filename === null)
