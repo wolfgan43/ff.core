@@ -1011,6 +1011,7 @@ var activecombo = function(params) {
 
 		var autocomp_fullsearch = false;
 		var minLength = that.options.autocomplete.limit || 0;
+		var preserve_text = that.options.autocomplete.preserve_text;
 	//jQuery("#calendar-modify_ID_customer_label").data("ui-autocomplete")._trigger("change");	
 		jQuery.fn.escapeGet(__id + "_label").autocomplete({
 			source: function( request, response ) {
@@ -1157,7 +1158,9 @@ var activecombo = function(params) {
 						$this.val(that.value_ori["desc"]);
 						that.change(false, that.value_ori["value"]);
 					} else {
-						$this.val("");
+						if (!preserve_text) {
+							$this.val("");
+						}
 						tmp_compare = "";
 					}
 				}

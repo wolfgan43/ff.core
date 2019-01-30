@@ -10,7 +10,6 @@
 * @version beta 2
 * @since beta 2
 */
-
 class ffField_html extends ffField_base
 {
 	var $framework_css					= array(
@@ -33,13 +32,11 @@ class ffField_html extends ffField_base
 											*/
                                             , "fixed_pre_content" => true // false OR array(xs,sm,md,lg)
                                             , "fixed_post_content" => true // false OR array(xs,sm,md,lg)
-
     );
 	var $url = null;
 	var $url_ajax = false;
 	var $url_parsed = null;
 	var $label_encode_entities = true;
-
 	var $buttons_options = array(
 		"file" => array(
 			"edit" => array(
@@ -52,10 +49,8 @@ class ffField_html extends ffField_base
 			)
 		)
 	);
-
 	//----------------------
 	//  Widget Settings
-
 	// Active Combo EX Stuffs
 	/**
 	 * Il padre se presente
@@ -86,14 +81,12 @@ class ffField_html extends ffField_base
 	var $actex_related_field			= "";
 	var $actex_compare_field			= "";
 	var $actex_having_field				= "";
-
 	/**
 	 * Il tipo di operazione usabile nella [WHERE]
 	 * Possibili valori '=', 'IN', 'LIKE', '<>'
 	 * @var Mixed
 	 */
 	var $actex_operation_field			= "=";
-
 	/**
 	 * Abilita o disabilita la visualizzazione dei Dialog collegati
 	 * @var Boolean
@@ -104,7 +97,6 @@ class ffField_html extends ffField_base
 	 * @var Boolean
 	 */
 	var $actex_dialog_show_add			= true; // without actex_dialog_url this is ignored
-
 	/**
 	 * Un elenco di parametri nel formato query_string da passare all'url di editing
 	 * E' possibile usare i tag speciali [[ID_DOM]] per recuperare valori dal dom,
@@ -112,12 +104,10 @@ class ffField_html extends ffField_base
 	 * @var String
 	 */
 	var $actex_dialog_add_params		= "";
-
 	/**
 	 * l'url di apertura del Dialog
 	 * @var String
 	 */
-
 	var $actex_dialog_url				= "";
 	/**
 	 * il titolo del dialog
@@ -211,6 +201,7 @@ class ffField_html extends ffField_base
 	var $actex_autocomp					= false;
 	var $actex_autocomp_ajax			= false;
 	var $actex_autocomp_limit			= 100;	
+	var $actex_autocomp_preserve_text	= false;
 	
 	var $autocomplete_service			= null;
     var $autocomplete_disabled          = false;
@@ -249,13 +240,11 @@ class ffField_html extends ffField_base
     var $autocompletetoken_concat_field		= array();
     var $autocompletetoken_concat_separator = " - ";
     var $autocompletetoken_res_limit 		= 100;
-
     var $datechooser_type_date				= "mixed";
     var $datepicker_lang					= NULL; // default to first two chars of FF_LOCALE
     var $datepicker_force_datetime			= false;
     var $datepicker_showbutton				= true;
 	var $datepicker_weekselector			= false;
-
 	// Slider
 	/**
 	 * Quante posizioni sono a disposizione dello slider
@@ -278,7 +267,6 @@ class ffField_html extends ffField_base
     						, "base_type", "Text"
     						, "multilang", false
     					);	
-
 	// gmap stuffs
 	/**
 	 * la chiave di google maps
@@ -340,7 +328,6 @@ class ffField_html extends ffField_base
 	//tiny_mce    
     var $tiny_mce_group_by_auth = false;
     var $tinymce_group = "default";
-
 	//ckeditor
 	var $ckeditor_custom_config = array();		//Altera la configurazione di base
 	var $ckeditor_theme = "default";	//Altera la struttura di ckeditor
@@ -409,7 +396,6 @@ class ffField_html extends ffField_base
     var $ckfinder_base_path = null;		// percorso assoluto della cartella degli uploads es: /var/www/miosito/uploads
 										// se omesso verra generato come segue: FF_DISK_UPDIR
     var $ckfinder_storing_path = "";	// percorso assoluto di dove verra salvato il file
-
     
     var $editarea_syntax 		= "";
     var $editarea_writable 		= true;
@@ -417,9 +403,6 @@ class ffField_html extends ffField_base
     
 	//uploadify
 	var $uploadify_use_own_session = false;
-
-
-
 	//uploadifive
     var $file_showfile_plugin = "fancybox";
     var $file_sortable = false;
@@ -427,7 +410,6 @@ class ffField_html extends ffField_base
     									// (se ckfinder_show_file non e valorizzato la preview sara disabilitata)
     
     var $placeholder = false;
-
 	//slug
 	/**
 	 * Il nome del campo slug associato 
@@ -435,30 +417,25 @@ class ffField_html extends ffField_base
 	 */
 	var $slug_title_field = null;
     var $imagepicker_title_field = null;
-
 	// List Splitter Stuffs
 	var $size = 7;
 	var $grouping_separator	= ",";							// the string used to separate groups of strings
-
 	/**
 	 * Una descrizione aggiuntiva da associare al field
 	 * @var String
 	 */
 	var $description = null;
-
 	/**
 	 * Se il campo dev'essere visualizzato dal programmatore invece che dal componente
 	 * @var Boolean
 	 */
 	var $manual_display = false;
-
 	/**
 	 * proprietà da associare all'elemento che fa il wrap dei dati
 	 * @var Array
 	 */
 	var $data_properties		= array();
 	var $data_class = "";
-
 	var $fixed_vars = array();
 	var $container_vars = array();
     
@@ -479,14 +456,12 @@ class ffField_html extends ffField_base
 	function get_control_class($control_type = null, $addit_class = null, $params = false)
 	{
 		$arrClass = array();
-
 		if(!isset($params) || !isset($params["framework_css"]) || $params["framework_css"]) {
 			if(strlen($this->framework_css["control"]["class"]))
 				$arrClass[] = $this->framework_css["control"]["class"];
 			elseif($this->framework_css["control"]["class"] === null)
 				$arrClass[] = cm_getClassByFrameworkCss("control", "form", array("exclude" => $control_type));
 		}		                                                                          
-
 		if (strlen($this->class))
 			$arrClass[] = $this->class;
 		else if(strlen($this->widget))
@@ -525,7 +500,6 @@ class ffField_html extends ffField_base
 	public function tplParse($output_result)
 	{
 		$this->tpl[0]->set_var("properties", $this->getProperties());
-
 		$fixed_pre_content = $this->fixed_pre_content;
 		$fixed_post_content = $this->fixed_post_content;
 		$buffer = $this->tpl[0]->rpparse("main", false);
@@ -558,7 +532,6 @@ class ffField_html extends ffField_base
 								);
 					if(count($arrAddonCol) < 4)
 						$arrAddonCol = array_merge($arrAddonCol, array_fill(count($arrAddonCol), 4 - count($arrAddonCol), $arrAddonCol[count($arrAddonCol) - 1]));
-
 					foreach($arrAddonCol AS $addon_col_value) {
 						$arrFieldCol[$i] = $arrFieldCol[$i] - $addon_col_value;
 						$i++;
@@ -567,12 +540,10 @@ class ffField_html extends ffField_base
 					$fixed_pre_content = '<div class="' . cm_getClassByFrameworkCss($arrAddonCol, "col") . '">' . $fixed_pre_content . '</div>';
 				}
 			}
-
 			if($fixed_post_content && $this->framework_css["fixed_post_content"]) {
 				$postfix_class = cm_getClassByFrameworkCss("control-postfix", "form");
 				if(strlen($postfix_class))
 					$fixed_post_content = '<span class="' . $postfix_class . '">' . $fixed_post_content . '</span>';
-
 				if($wrap_addon && strlen($fixed_post_content)) {
 					$i = 0;
 					$arrAddonCol = (array_key_exists("fixed_post_content", $this->framework_css)
@@ -592,7 +563,6 @@ class ffField_html extends ffField_base
 						$arrFieldCol[$i] = $arrFieldCol[$i] - $addon_col_value;
 						$i++;
 					}				
-
 					$fixed_post_content = '<div class="' . cm_getClassByFrameworkCss($arrAddonCol, "col") . '">' . $fixed_post_content . '</div>';
 				}
 					
@@ -602,13 +572,10 @@ class ffField_html extends ffField_base
 				$buffer = '<div class="' . cm_getClassByFrameworkCss($arrFieldCol, "col") . '">' . $buffer . '</div>';
 		}
 		$buffer = $fixed_pre_content . $buffer . $fixed_post_content;
-
 		if($wrap_addon !== null && !$wrap_addon)
 			$buffer = '<div class="' . cm_getClassByFrameworkCss("group", "form") . '">' . $buffer . '</div>';
-
 		if ($this->parent_page !== NULL) //code for ff.js
 			$this->parent_page[0]->tplAddJs("ff.ffField");
-
 		if ($output_result)
 		{
 			echo $buffer;
@@ -619,7 +586,6 @@ class ffField_html extends ffField_base
 			return $buffer;
 		}
 	}
-
 	/**
 	 * carica l'oggetto template dentro $tpl
 	 */
@@ -632,20 +598,15 @@ class ffField_html extends ffField_base
 		{
 			if (!$this->omit_parent_id)
 				$this->tpl[0]->set_var("container", $this->parent[0]->getPrefix());
-
 		}
-
 		if($this->parent_page !== NULL) {
 			$this->tpl[0]->set_var("keys", $this->parent_page[0]->get_params("", "", false));
 			$this->tpl[0]->set_var("query_string", $this->parent_page[0]->get_script_params());
 		}
-
 		$this->tpl[0]->set_var("site_path", ffCommon_specialchars($this->site_path));
 		$this->tpl[0]->set_var("page_path", ffCommon_specialchars($this->page_path));
-
 		//if (!strlen($this->widget))
 			$this->tpl[0]->set_var("class", ffCommon_specialchars($this->get_control_class($control_type)));
-
         if (is_array($this->fixed_vars) && count($this->fixed_vars))
         {
             foreach ($this->fixed_vars as $key => $value)
@@ -654,7 +615,6 @@ class ffField_html extends ffField_base
             }
             reset($this->fixed_vars);
         }
-
 		$res = $this->doEvent("on_tpl_load", array(&$this));
 	}
 	
@@ -663,13 +623,11 @@ class ffField_html extends ffField_base
 		if ($property_set === null)
 		{
 			$property_set = $this->properties;
-
 			if ($this->placeholder === true)
 				$property_set["placeholder"] = ffCommon_specialchars($this->label);
 			else if($this->placeholder)
 				$property_set["placeholder"] = $this->placeholder;
 		}
-
 		return parent::getProperties($property_set);
 	}
 	
@@ -677,7 +635,6 @@ class ffField_html extends ffField_base
 	{
 		$this->tpl[0]->set_var("butt_del_class", cm_getClassByFrameworkCss($this->buttons_options["file"]["delete"]["class"], "icon"));
 		$this->tpl[0]->set_var("butt_del_label", $this->buttons_options["file"]["delete"]["label"]);
-
 		$this->tpl[0]->set_var("butt_edit_class", cm_getClassByFrameworkCss($this->buttons_options["file"]["edit"]["class"], "icon"));
 		$this->tpl[0]->set_var("butt_edit_label", $this->buttons_options["file"]["edit"]["label"]);
 		
@@ -693,7 +650,6 @@ class ffField_html extends ffField_base
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["container"]["row"] = $resolution_large_to_small;
 	}	
-
 	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true, $align = "right") 
 	{
 		$this->framework_css["label"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
@@ -711,7 +667,6 @@ class ffField_html extends ffField_base
 			);
 		}	
 	}
-
 	function setWidthControl($resolution_large_to_small) 
 	{
 		$this->framework_css["control"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
@@ -721,10 +676,8 @@ class ffField_html extends ffField_base
 	{
 		if(isset($properties["col"]))
 			$properties["col"] = ffCommon_setClassByFrameworkCss($properties["col"]);
-
 		$this->framework_css["label"] = array_replace($this->framework_css["label"], $properties);
 	}	
-
 	function setControlProperties($properties) 
 	{
 		if(isset($properties["col"]))
