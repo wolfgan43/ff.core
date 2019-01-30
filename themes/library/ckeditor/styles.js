@@ -30,7 +30,7 @@ CKEDITOR.stylesSet.add( 'default', [
 	{ name: 'Preformatted Text',element: 'pre' },
 	{ name: 'Address',			element: 'address' },
 	*/
-
+	/*
 	{ name: 'Italic Title',		element: 'h2', styles: { 'font-style': 'italic' } },
 	{ name: 'Subtitle',			element: 'h3', styles: { 'color': '#aaa', 'font-style': 'italic' } },
 	{
@@ -41,7 +41,7 @@ CKEDITOR.stylesSet.add( 'default', [
 			background: '#eee',
 			border: '1px solid #ccc'
 		}
-	},
+	},*/
 
 	/* Inline Styles */
 
@@ -56,9 +56,13 @@ CKEDITOR.stylesSet.add( 'default', [
 	{ name: 'Subscript',		element: 'sub' },
 	{ name: 'Superscript',		element: 'sup' },
 	*/
+    { name: 'Colore Primario',			element: 'p', attributes: { 'class': 'primary-color' } },
+    { name: 'Colore Secondario',		element: 'p', attributes: { 'class': 'secondary-color' } },
+    { name: 'Colore Terzario',			element: 'p', attributes: { 'class': 'third-color' } },
 
+/*
 	{ name: 'Marker',			element: 'span', attributes: { 'class': 'marker' } },
-
+*/
 	{ name: 'Big',				element: 'big' },
 	{ name: 'Small',			element: 'small' },
 	{ name: 'Typewriter',		element: 'tt' },
