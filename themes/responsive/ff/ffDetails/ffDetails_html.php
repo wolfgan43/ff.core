@@ -102,7 +102,7 @@ frameworkCSS::extend(array(
 					)
 					, "pane-item" => array(
 						"class" => null
-						, "tab" => "pane-item-effect" // pane-item-effect OR pane-item
+						, "tab" => "pane-item" // pane-item-effect OR pane-item
 					)
 				)
 			)
@@ -164,17 +164,6 @@ class ffDetails_html extends ffDetails_base
 	 */
 	public $description = null;
 
-	/**
-	 * Se dev'essere utilizzata la widget "disclosure panels"
-	 * @var Boolean
-	 */
-	var $widget_discl_enable = false;
-	/**
-	 * Se il pannello dev'essere aperto di default
-	 * @var Boolean
-	 */
-	var $widget_def_open = false;
-	
 	/**
 	 * Forza il dettaglio ad agire usando le funzioni Ajax
 	 * @var Boolean
@@ -705,7 +694,7 @@ class ffDetails_html extends ffDetails_base
 				    /**
 				    * Row Class
 				    */
-				    $container_class["default"] = $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false)); 
+				    $container_class["default"] = $this->form_fields[$key]->get_control_class(null, array("framework_css" => false, "control_type" => false));
 				    
 					if($primary_field != $key) {
 					    if(is_array($this->form_fields[$key]->framework_css["container"]["col"]) 
@@ -1035,7 +1024,7 @@ class ffDetails_html extends ffDetails_base
             $this->tpl[0]->set_var("SectNewFooter", "");
         }
 		
-		if(!count($this->main_record[0]->tabs) && (strlen($this->title) || $this->widget_discl_enable)) {
+		if(!count($this->main_record[0]->tabs) && strlen($this->title)) {
 			$this->tpl[0]->set_var("title", ffCommon_specialchars($this->title));
 			$this->tpl[0]->set_var("title_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["title"]));
 			$this->tpl[0]->parse("SectTitle", false);
@@ -1207,17 +1196,7 @@ class ffDetails_html extends ffDetails_base
 
 		return $sError;
 	}
-	/**
-	 * Elabora l'azione. L'azione viene ereditata dall'oggetto record padre
-	 * @return Mixed Il risultato del processing
-	 */
-	function process_action()
-	{
-		if ($this->frmAction == "detail_addrows")
-			$this->widget_def_open = true;
 
-		return parent::process_action();
-	}
 
 	/**
 	 * Prepara i pulsanti standard del dettaglio

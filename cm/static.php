@@ -46,7 +46,6 @@ if(strpos($_SERVER["HTTP_HOST"], "static.") === 0) {
     $site_path = "";
 }
 
-
 $path_info = ($site_path
     ? substr($_SERVER["PATH_INFO"], strlen($site_path))
     : $_SERVER["PATH_INFO"]

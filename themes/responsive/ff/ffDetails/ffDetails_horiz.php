@@ -101,18 +101,6 @@ class ffDetails_horiz extends ffDetails_base
 	public $description = null;
 
 	/**
-	 * Se dev'essere utilizzata la widget "disclosure panels"
-	 * @var Boolean
-	 */
-	var $widget_discl_enable = false;
-	
-	/**
-	 * Se il pannello dev'essere aperto di default
-	 * @var Boolean
-	 */
-	var $widget_def_open = false;
-
-	/**
 	 * Se le azioni del dettaglio devono essere eseguite in ajax
 	 * @var Boolean
 	 */
@@ -312,7 +300,7 @@ class ffDetails_horiz extends ffDetails_base
 					* se inserito in block modify detail le checkbox si vedono male
 					*/
 
-					//$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false));
+					//$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, array("framework_css" => false, "control_type" => false));
 
                     if (strlen($class))
                         $class = "class=\"" . $class . "\"";
@@ -556,7 +544,7 @@ class ffDetails_horiz extends ffDetails_base
 						/*
 						* se inserito in block modify detail le checkbox si vedono male
 						*/
-						//$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false));					    
+						//$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, array("framework_css" => false, "control_type" => false));
 
 					    if (strlen($class))
 					        $class = "class=\"" . $class . "\"";
@@ -828,7 +816,7 @@ class ffDetails_horiz extends ffDetails_base
 		} else {
 			$this->tpl[0]->set_var("SectNewHeader", "");
             $this->tpl[0]->set_var("SectNewFooter", "");
-			if(strlen($this->title) || $this->widget_discl_enable)
+			if(strlen($this->title))
 				$this->tpl[0]->parse("SectTitle", false);
 			else
 				$this->tpl[0]->set_var("SectTitle", "");
@@ -967,18 +955,7 @@ class ffDetails_horiz extends ffDetails_base
 
 		return $sError;
 	}
-	/**
-	 * Elabora l'azione. L'azione viene ereditata dall'oggetto record padre
-	 * @return Mixed Il risultato del processing
-	 */
-	function process_action()
-	{
-		if ($this->frmAction == "detail_addrows")
-			$this->widget_def_open = true;
 
-		return parent::process_action();
-	}
-	
 	/**
 	 * Prepara i pulsanti standard del dettaglio
 	 * al momento l'unico pulsante di default è quello di cancellazione

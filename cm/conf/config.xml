@@ -31,24 +31,27 @@
             <layouts path="/restricted/docs/layouts" label="Layouts" icon="object-group" />
 
             <tables path="/restricted/docs/tables" label="Tables" description="questa e una descrizione di prova" readonly="h4" badge="5" icon="table" actions="/restricted/docs/tables/data_tables" />
-            <tables_basic path="/restricted/docs/tables/basic" label="Basic Tables" actions="/restricted/docs/tables/basic" />
             <tables_data path="/restricted/docs/tables/data_tables" label="Data Tables" />
             <tables_widgets path="/restricted/docs/tables/widgets" label="Widgets" />
 
             <forms path="/restricted/docs/forms" label="Forms" description="Questa è una descrizione di prova" readonly="h4" badge="4" icon="pencil" actions="" />
-            <forms_controls path="/restricted/docs/forms/controls" label="Controls" badge="basic" />
-            <forms_controls_maps path="/restricted/docs/forms/controls/maps" label="Maps" />
-            <forms_controls_widgets path="/restricted/docs/forms/controls/widgets" label="Advanced Controls" badge="12" />
-            <forms_controls_uploads path="/restricted/docs/forms/controls/uploads" label="File Uploads" />
-            <forms_layouts path="/restricted/docs/forms/layouts" label="Form Layouts" badge="4" actions="/restricted/docs/forms/layouts" />
-            <forms_datatable path="/restricted/docs/forms/datatable" label="Form + DataTable" actions="/restricted/docs/forms/datatable" />
+            <forms_advanced path="/restricted/docs/forms/advanced" label="Form Advanced" />
+            <forms_select path="/restricted/docs/forms/controls/actex" label="Select" />
+            <forms_uploads path="/restricted/docs/forms/controls/uploads" label="File Uploads" />
+            <forms_editors path="/restricted/docs/forms/controls/editors" label="Editors" />
             <forms_validation path="/restricted/docs/forms/validation" label="Form Validation" />
+            <forms_wizard path="/restricted/docs/forms/wizard" label="Form Wizard" />
+            <tabs path="/restricted/docs/tabs" label="Tabs" />
+            <tabs_linked path="/restricted/docs/tabs/linked" label="Tabs Linked" />
+            <tabs_group path="/restricted/docs/tabs/group" label="Tabs Group" />
+            <tabs_page path="/restricted/docs/tabs/page" label="Tabs Page" />
+
 
 
             <ui path="/restricted/docs/ui" label="UI Kit" description="Questa è una descrizione di prova" readonly="h4"  icon="briefcase" actions="" />
             <ui_cards path="/restricted/docs/ui/cards" label="Cards" />
             <ui_buttons path="/restricted/docs/ui/buttons" label="Buttons" description="Questa è una descrizione di prova" />
-            <ui_modal path="/restricted/docs/ui/modal" label="Modal" />
+            <ui_modals path="/restricted/docs/ui/modals" label="Modals" />
             <ui_tabs path="/restricted/docs/ui/tabs" label="Tabs" />
             <ui_notifications path="/restricted/docs/ui/notifications" label="Notificatinons" />
 
@@ -56,6 +59,7 @@
             <ui_general path="/restricted/docs/ui/general" label="General" />
             <ui_typography path="/restricted/docs/ui/typography" label="Typography" />
             <ui_icons path="/restricted/docs/ui/icons" label="Icons" />
+            <ui_dragula path="/restricted/docs/ui/dragula" label="Dragula" />
             <ui_media path="/restricted/docs/ui/media" label="Media" />
         </docs>
         <media path="/restricted/media" label="Media" location="brand" acl="3" />

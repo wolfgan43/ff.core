@@ -131,10 +131,26 @@ __ff : "ff.ffRecord", // used to recognize ff'objects
     function constructor() { // NB: called below publics
         ff.initExt(that);
         ff.addEvent({"event_name" : "onClearComponent", "func_name" : that.onClearComponent});
+
+        jQuery(document).on("click.activebuttons", ".activebuttons", function() {
+            if(jQuery(this).is("a")) {
+
+                jQuery(this).attr("data-class", jQuery(this).attr("class"));
+                jQuery(this).attr("class", jQuery(this).attr("class").substring(0, jQuery(this).attr("class").indexOf("activebuttons") - 1));
+                jQuery(this).addClass("activatedbuttons");
+                jQuery(this).prepend('<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-eclipse"><path ng-attr-d="{{config.pathCmd}}" ng-attr-fill="{{config.color}}" stroke="none" d="M10 50A40 40 0 0 0 90 50A40 42 0 0 1 10 50" fill="#cacaca" transform="rotate(269.759 50 51)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 51;360 50 51" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></path></svg>');
+            }
+            jQuery(this).css({"opacity": "0.6", "pointer-events": "none"});
+
+            if(!jQuery(this).is("a"))
+                jQuery(this).attr("disabled", "disabled");
+        });
     }
 
     if(document.readyState == "complete") {
-        //  constructor(); //va in contrasto con libLoaded
+    	if(!ff.ffRecord) {
+            constructor(); //va in contrasto con libLoaded
+        }
     } else {
         window.addEventListener('load', function () {
             constructor();

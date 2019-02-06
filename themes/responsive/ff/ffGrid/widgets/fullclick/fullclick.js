@@ -7,7 +7,7 @@ window.addEventListener('load', function () {
                     return this.each(function () {
                         jQuery("TR.clickable").css("cursor", "pointer");
 
-                        jQuery(document).on("click.ff.ffGrid.fullclick", "TR.clickable .ffField:not(.clickable)", function (e) {
+                        jQuery(document).on("click.ff.ffGrid.fullclick", "TR.clickable > TD:not(.clickable)", function (e) {
                             var $table = jQuery(this).closest("TABLE");
                             var target = e.target || e.srcElement;
                             if ($table.data("isDragging")
@@ -19,6 +19,7 @@ window.addEventListener('load', function () {
                                 || jQuery(target).is("button")
                                 || jQuery(target).is("[onclick]")
                                 || jQuery(target).parent().is("[onclick]")
+                                || jQuery(this).hasClass("disableClick")
                             )
                                 return;
 
@@ -34,7 +35,7 @@ window.addEventListener('load', function () {
                             }
                         });
 
-                        jQuery(document).on("click.ff.ffGrid.fullclick", "TR .ffField.clickable", function (e) {
+                        jQuery(document).on("click.ff.ffGrid.fullclick", "TR > TD.clickable", function (e) {
                             var $table = jQuery(this).closest("TABLE");
                             var target = e.target || e.srcElement;
                             if ($table.data("isDragging")
@@ -46,6 +47,7 @@ window.addEventListener('load', function () {
                                 || jQuery(target).is("button")
                                 || jQuery(target).is("[onclick]")
                                 || jQuery(target).parent().is("[onclick]")
+                                || jQuery(this).hasClass("disableClick")
                             )
                                 return;
 

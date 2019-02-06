@@ -39,78 +39,63 @@ $config = array(
         , "registration"    => null
         , "activation"      => null
     )
-    , "title"               => array(
-        "enable"            => false
-        , "value"           => "login_title"
-    )
-    , "subtitle"               => array(
-        "enable"            => false
-        , "value"           => "login_subtitle"
-    )
-    , "domain"              => cm::env("MOD_SEC_MULTIDOMAIN")
-    , "stay_connect"        => cm::env("MOD_SECURITY_SESSION_PERMANENT")
+    , "domain"              => cm::env("MOD_AUTH_MULTIDOMAIN")
+    , "stay_connect"        => cm::env("MOD_AUTH_SESSION_PERMANENT")
     , "referer"             => $_SERVER["HTTP_REFERER"]
     , "redirect"            => $_SERVER["HTTP_REFERER"]
     , "tpl_path"            => null
+    , "logo_path"           => $cm->oPage->getAsset("logo", "images")
     , "registration"        => array(
-        "enable"            => cm::env("MOD_SEC_REGISTRATION")
+        "enable"            => cm::env("MOD_AUTH_REGISTRATION")
         , "path"            => $cm->router->getRuleById("mod_auth_registration")->reverse
     )
     , "recover"             => array(
-        "username"          => array(
-            "enable"        => cm::env("MOD_SEC_USERNAME_RECOVER_USERNAME")
-            , "path"        => $cm->router->getRuleById("mod_auth_recover")->reverse . "/username"
+        "account"          => array(
+            "enable"        => cm::env("MOD_AUTH_RECOVER_ACCOUNT")
+            , "path"        => $cm->router->getRuleById("mod_auth_recover")->reverse . "/account"
         )
         , "password"        => array(
-            "enable"        => cm::env("MOD_SEC_PASSWORD_RECOVER")
+            "enable"        => cm::env("MOD_AUTH_RECOVER_PASSWORD")
             , "path"        => $cm->router->getRuleById("mod_auth_recover")->reverse . "/password"
         )
     )
     , "social"              => array(
         "facebook"          => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_FACEBOOK")
-            , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/facebook"
             , "icon"        => $cm->oPage->frameworkCSS->get("facebook", "icon")
             , "name"        => "Facebook"
-            , "title"       => "mod_auth_social_facebook"
         )
         , "gplus"           => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_GPLUS")
-            , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/gplus"
             , "icon"        => $cm->oPage->frameworkCSS->get("gplus", "icon")
             , "name"        => "GooglePlus"
-            , "title"       => "mod_auth_social_gplus"
         )
         , "twitter"         => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_TWITTER")
-            , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/twitter"
             , "icon"        => $cm->oPage->frameworkCSS->get("twitter", "icon")
             , "name"        => "Twitter"
-            , "title"       => "mod_auth_social_twitter"
         )
         , "linkedin"        => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_LINKEDIN")
-            , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/linkedin"
             , "icon"        => $cm->oPage->frameworkCSS->get("linkedin", "icon")
             , "name"        => "Linkedin"
-            , "title"       => "mod_auth_social_linkedin"
         )
-        , "dribble"         => array(
+        , "dribbble"         => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_DRIBBLE")
-            , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/dribble"
-            , "icon"        => $cm->oPage->frameworkCSS->get("dribble", "icon")
+            , "icon"        => $cm->oPage->frameworkCSS->get("dribbble", "icon")
             , "name"        => "Dribble"
-            , "title"       => "mod_auth_social_dribble"
         )
         , "ff"              => array(
             "enable"        => cm::env("MOD_SEC_SOCIAL_FF")
             , "path"        => $cm->router->getRuleById("mod_auth_social")->reverse . "/ff"
             , "icon"        => $cm->oPage->frameworkCSS->get("cube", "icon")
             , "name"        => "FormsFramework"
-            , "title"       => "mod_auth_social_ff"
         )
     )
 );
+
+$cm->oPage->title = "Login" . " - " . $cm->oPage->title;
+$cm->oPage->class_body = "login-page";
 
 $res = $cm->modules["auth"]["events"]->doEvent("on_before_login", array($config));
 $rc = end($res);

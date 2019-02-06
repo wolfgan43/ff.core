@@ -343,14 +343,7 @@ class cmRestricted {
             $tpl->set_var("nav_left_class", $this->cm->oPage->frameworkCSS->getClass($framework_css["layer"]["nav"]["left"]));
             $tpl->set_var("nav_right_class", $this->cm->oPage->frameworkCSS->getClass($framework_css["layer"]["nav"]["right"]));
 
-            $tpl->set_var("page-title", ($page->title == cm_getAppName()
-                ? ucwords(str_replace("-", " ", basename($this->cm->path_info)))
-                : str_replace(" - " . cm_getAppName(), "", $page->title)
-            ));
-            $tpl->set_var("CM_LOCAL_APP_NAME", ffCommon_specialchars(cm_getAppName()));
-            if (cm::env("MOD_RESTRICTED_DEVELOPER")) {
-                $tpl->parse("SectFooter", false);
-            }
+
         });
     }
     /*public function getTemplatePath($filename, $base_path = __DIR__) {

@@ -21,6 +21,7 @@
 						'js_deps' => 
 						array (
 							'.init' => array (
+							    "type" => "libs",
 								'embed' => "var CKEDITOR_BASEPATH = document.location.protocol + '//' + window.location.hostname + '" . FF_BASE_PATH . "/themes/library/ckeditor/';",
 								'priority' => CM::LAYOUT_PRIORITY_NORMAL,
 								'js_deps' => 

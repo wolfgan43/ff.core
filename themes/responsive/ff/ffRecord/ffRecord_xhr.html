@@ -2,23 +2,16 @@
 <!--EndSectHeaders-->
 {outer_wrap_start}
 <{record_tag} {component_properties}> 
-	<div class="hidden"> 
-		<input type="hidden" id="{component}detailaction" name="{component}detailaction" value="" />
-		<!--BeginSectHiddenField-->
-		<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
-		<!--EndSectHiddenField-->
-	</div>
-	
+	<!--BeginSectHiddenField-->
+	<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
+	<!--EndSectHiddenField-->
+
 	{inner_wrap_start}
 	
-	<!--BeginSectTitle-->
-	<h2 class="{title_class}">{discl_bt}{record_title}</h2>
-	<!--EndSectTitle-->
-	{fixed_pre_content}
 
-	<!--BeginSectDescription-->
-	<div class="{info_class}">{record_description}</div>
-	<!--EndSectDescription-->
+	{fixed_pre_content}
+	{title}
+	{subtitle}
 
 	<!--BeginSectError-->
 	<div class="{error_class}">{strError}</div>
@@ -28,43 +21,21 @@
 		{form_default}
 		{form_tabs}
 		<!--BeginSectGroup-->
-		<!--BeginSectGroupStart-->
-		<fieldset class="{group_class}">
-			<!--BeginSectGroupTitle--> 
+		{group_pre_content}
+	<!--BeginSectGroupStart-->
+		<fieldset {group_class}>
+			<!--BeginSectGroupTitle-->
 			<legend{title_properties}>{GroupTitle}</legend>
 			<!--EndSectGroupTitle-->
-		<!--EndSectGroupStart-->
-		    {group_pre_content}
+	<!--EndSectGroupStart-->
 			<!--BeginSectGroupDescription-->
-			<div class="desc">{GroupDescription}</div>
+			<div{description_properties}>{GroupDescription}</div>
 			<!--EndSectGroupDescription-->
-				<!--BeginSectGroupRow-->
-				<!--BeginSectWrapStart-->
-				<div class="{wrap_class}">
-				<!--EndSectWrapStart-->
-	  			{field_container_start}
-	  				{content_pre_label}
-					<!--BeginSectGroupLabel-->
-						{label_prefix}
-						<label{label_class} for="{label_for}"{label_properties}> 
-							{content_in_label}
-							{label}
-						</label>
-						<!--BeginSectDescriptionLabel-->
-						<span class="description">{fielDescription}</span>
-						<!--EndSectDescriptionLabel-->
-						{label_postfix}
-					<!--EndSectGroupLabel-->
-					{content}
-	  			{field_container_end}
-				<!--BeginSectWrapEnd-->
-				</div>
-				<!--EndSectWrapEnd-->
-	  			<!--EndSectGroupRow-->
-		    {group_post_content}
-        <!--BeginSectGroupEnd-->
+			{content}
+	<!--BeginSectGroupEnd-->
 		</fieldset>
-		<!--EndSectGroupEnd-->
+	<!--EndSectGroupEnd-->
+		{group_post_content}
 		<!--EndSectGroup-->
 
 		<!--BeginSectRequiredNote-->

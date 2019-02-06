@@ -68,7 +68,7 @@ class ffWidget_dragsort extends ffCommon
 		$grid->addEvent("on_before_parse_row", "ffWidget_dragsort::on_before_parse_row", ffEvent::PRIORITY_HIGH, 0, null, null, array(&$this, $options["resource_id"], $key_field));
 		$grid->use_paging = false;
 		$grid->use_order = false;
-		$grid->framework_css["table"]["class"] .= " draggable";
+		$grid->framework_css["table"]["def"]["class"] .= " draggable";
 		
 		$this->tpl[$tpl_id]->set_var("component_id", $grid->getIDIF());
 		$this->tpl[$tpl_id]->set_var("resource_id", $options["resource_id"]);

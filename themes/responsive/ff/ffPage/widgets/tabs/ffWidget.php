@@ -1,5 +1,122 @@
 <?php
 
+frameworkCSS::extend(array(
+    "tabs" => array(
+            "default" => array(
+                "outer_wrap" => null
+                , "menu" => array(
+                    "class" => "mb-3"
+                    , "tab" => "menu"
+                )
+            )
+            , "pills" => array(
+                "outer_wrap" => null
+                , "menu" => array(
+                    "class" => "bg-light mb-3"
+                    , "tab" => "menu-pills"
+                )
+            )
+            , "pills-justified" => array(
+                "outer_wrap" => null
+                , "menu" => array(
+                    "class" => "bg-light mb-3"
+                    , "tab" => "menu-pills-justified"
+                )
+            )
+            , "bordered" => array(
+                "outer_wrap" => null
+                , "menu" => array(
+                    "class" => "mb-3"
+                    , "tab" => "menu-bordered"
+                )
+            )
+            , "bordered-justified" => array(
+                "outer_wrap" => null
+                , "menu" => array(
+                    "class" => "mb-3"
+                    , "tab" => "menu-bordered-justified"
+                )
+            )
+            , "left" => array(
+                "outer_wrap" => array(
+                    "container" => array(
+                        "row" => true
+                    )
+                    , "menu" => array(
+                        "col" => array(
+                            "xs" => 12
+                            , "sm" => 12
+                            , "md" => 4
+                            , "lg" => 3
+                        )
+                    )
+                    , "pane" => array(
+                        "col" => array(
+                            "xs" => 12
+                            , "sm" => 12
+                            , "md" => 8
+                            , "lg" => 9
+                        )
+                    )
+                )
+                , "menu" => array(
+                    "class" => null
+                    , "tab" => "menu-vertical"
+                )
+            )
+            , "right" => array(
+                "outer_wrap" => array(
+                    "container" => array(
+                        "row" => true
+                    )
+                , "menu" => array(
+                        "col" => array(
+                            "xs" => 12
+                            , "sm" => 12
+                            , "md" => 4
+                            , "lg" => 3
+                        )
+                    )
+                , "pane" => array(
+                        "col" => array(
+                            "xs" => 12
+                            , "sm" => 12
+                            , "md" => 8
+                            , "lg" => 9
+                        )
+                    )
+                )
+                , "menu" => array(
+                    "class" => null
+                    , "tab" => "menu-vertical-right"
+                )
+            )
+        )
+        , "outer_wrap" => null
+        , "menu" => null
+		/*, "menu" => array(
+			"class" => null
+			//, "tab" => null //menu OR menu-vertical OR menu-vertical-right
+			, "wrap_menu" => null	// null OR array(xs, sm, md, lg)
+			, "wrap_pane" => null	// null OR array(xs, sm, md, lg)
+		)*/
+		, "menu-item" => array(
+			"class" => null
+			, "tab" => "menu-item"
+		)
+        , "menu-item-link" => array(
+            "class" => null
+            , "tab" => "menu-item-link"
+        )
+		, "pane" => array(
+			"class" => null
+			, "tab" => "pane"
+		)
+		, "pane-item" => array(
+			"class" => null
+			, "tab" => "pane-item" // pane-item-effect OR pane-item
+		)
+), "ffWidget_tabs");
 class ffWidget_tabs extends ffCommon
 {
 
@@ -30,32 +147,15 @@ class ffWidget_tabs extends ffCommon
 
 	var $processed_id	= array();
 	var $tab_mode 		= "top"; //top OR left OR right
- 	var $framework_css = array(
-		"menu" => array(
-			"class" => null
-			//, "tab" => null //menu OR menu-vertical OR menu-vertical-right
-			, "wrap_menu" => null	// null OR array(xs, sm, md, lg)
-			, "wrap_pane" => null	// null OR array(xs, sm, md, lg)
-		)
-		, "menu-item" => array(
-			"class" => null
-			, "tab" => "menu-item"
-		)
-		, "pane" => array(
-			"class" => null
-			, "tab" => "pane"
-		)
-		, "pane-item" => array(
-			"class" => null
-			, "tab" => "pane-item-effect" // pane-item-effect OR pane-item
-		)
-	);
+ 	var $framework_css  = null;
 
 	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
 	{
-		$this->get_defaults();
+        $this->get_defaults();
 
-		$this->oPage = array(&$oPage);
+        $this->framework_css = frameworkCSS::findComponent("ffWidget_tabs");
+
+        $this->oPage = array(&$oPage);
 
 		if ($source_path !== null)
 			$this->source_path = $source_path;
@@ -110,10 +210,10 @@ class ffWidget_tabs extends ffCommon
 //		if($id == "MainRecord")
 //ffErrorHandler::raise("ASD", E_USER_ERROR, null, get_defined_vars());
 		if(!$framework_css["name"]) {
-			$this->oPage[0]->tplAddJs("jquery-ui");
-			$this->oPage[0]->tplAddJs("ff.history");
+            $oPage->tplAddJs("jquery-ui");
+            $oPage->tplAddJs("ff.history");
 			if($oPage->jquery_ui_theme) {
-				$this->oPage[0]->tplAddCss("jquery-ui.tabs");
+                $oPage->tplAddCss("jquery-ui.tabs");
 			}		
 		}
 		
@@ -125,7 +225,7 @@ class ffWidget_tabs extends ffCommon
 		* Tab init
 		*/
 		if($this->tab_mode) {
-            $wrap_tab_need = false;
+            /*$wrap_tab_need = false;
             $default_wrap_menu = array(
                 "xs" => 4
                 , "sm" => 3
@@ -137,36 +237,81 @@ class ffWidget_tabs extends ffCommon
                 , "sm" => 9
                 , "md" => 9
                 , "lg" => 10
-            );
+            );*/
 
-			if($this->tab_mode === true)
-				$this->tab_mode = "default";
+			/*if($this->tab_mode === true) {
+                $this->tab_mode = "default";
+            }*/
 
-			switch($this->tab_mode) {
+            $tab_mode                           = ($this->framework_css["tabs"][$this->tab_mode]
+                                                    ? $this->tab_mode
+                                                    : "default"
+                                                );
+
+            $this->framework_css["menu"]        = $this->framework_css["tabs"][$tab_mode]["menu"];
+            $this->framework_css["outer_wrap"]  = $this->framework_css["tabs"][$tab_mode]["outer_wrap"];
+
+
+            $tab_position                       = ($tab_mode == "right"
+                                                    ? "Bottom"
+                                                    : ""
+                                                );
+            $floating_tabs                      = ($tab_mode == "default"
+                                                    ? true
+                                                    : false
+                                                );
+
+            $first_menu_current = $oPage->frameworkCSS->get("menu-current", "tab");
+            if (strpos($this->framework_css["pane-item"]["tab"], "effect") === false) {
+                $first_pane_current = $oPage->frameworkCSS->get("pane-current", "tab");
+            } else {
+                $first_pane_current = $oPage->frameworkCSS->get("pane-current-effect", "tab");
+            }
+
+			/*switch($this->tab_mode) {
+                case "right":
+                case "left":
+                $this->framework_css["menu"] = $this->framework_css["tab-" . $this->tab_mode]["menu"];
+                $this->framework_css["outer_wrap"] = $this->framework_css["left"]["outer_wrap"];
+			        break;
 				case "right":
-					$wrap_tab_need = $this->oPage[0]->frameworkCSS->get("menu-vertical-wrap", "tab");
+					$wrap_tab_need = $oPage->frameworkCSS->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical-right";
 					$tab_position = "Bottom";
 					break;
 				case "left":
-					$wrap_tab_need = $this->oPage[0]->frameworkCSS->get("menu-vertical-wrap", "tab");
+					$wrap_tab_need = $oPage->frameworkCSS->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical";
 					break;
+                case "pills":
+                    $this->framework_css["menu"] = $this->framework_css["tab-pills"]["menu"];
+                    break;
+                case "pills-justified":
+                    $this->framework_css["menu"] = $this->framework_css["tab-pills-justified"]["menu"];
+                    break;
+                case "bordered":
+                    $this->framework_css["menu"] = $this->framework_css["tab-bordered"]["menu"];
+                    break;
+                case "bordered-justified":
+                    $this->framework_css["menu"] = $this->framework_css["tab-bordered-justified"]["menu"];
+                    break;
 				default:
 					$floating_tabs = true;
 					if($_REQUEST["XHR_CTX_TYPE"] == "dialog") {
-						$this->framework_css["menu"]["class"] = "ffTab";
+                        $this->framework_css["tab-default"]["menu"]["class"] .= " ffTab";
 					}
-				case "top":
-					$this->framework_css["menu"]["tab"] = "menu";
-			}
+                case "top":
+                    $this->framework_css["menu"] = $this->framework_css["tab-default"]["menu"];
+			}*/
 
-			$first_menu_current = $this->oPage[0]->frameworkCSS->get("menu-current", "tab");
-			if(strpos($this->framework_css["pane-item"]["tab"], "effect") === false) {
-				$first_pane_current = $this->oPage[0]->frameworkCSS->get("pane-current", "tab");
-			} else {
-				$first_pane_current = $this->oPage[0]->frameworkCSS->get("pane-current-effect", "tab");
-			}
+			/*if( 0 && $oPage->isXHR()) {
+                $first_menu_current = $oPage->frameworkCSS->get("menu-current", "tab");
+                if (strpos($this->framework_css["pane-item"]["tab"], "effect") === false) {
+                    $first_pane_current = $oPage->frameworkCSS->get("pane-current", "tab");
+                } else {
+                    $first_pane_current = $oPage->frameworkCSS->get("pane-current-effect", "tab");
+                }
+            }*/
 		}
         //ffErrorHandler::raise("AD", E_USER_WARNING  , $oPage->components[$component], get_defined_vars());
 
@@ -199,9 +344,10 @@ class ffWidget_tabs extends ffCommon
                         $title = $subvalue["data"]->label;
                 }
 
+                //todo: da verificare. non usato in page o record. Forse usato in detail
                 if(is_array($subvalue["menu"]) && count($subvalue["menu"]))
                 {
-                    $default_menu = $this->framework_css["menu"];
+                    //$default_menu = $this->framework_css["tabs"]["default"];
                     foreach($subvalue["menu"] AS $mode => $items)
                     {
                         if(count($items) <= 1)
@@ -210,26 +356,31 @@ class ffWidget_tabs extends ffCommon
                         if($oPage->components[$component] instanceof ffRecord_base && $oPage->components[$component]->tabs == $mode)
                             break;
 
-                        if($mode == "right") {
-                            $default_menu["tab"] = "menu-vertical-right";
-                        } else {
-                            $default_menu["tab"] = "menu-vertical";
-                        }
+                        $subTab = ($mode == "right"
+                            ? $this->framework_css["tabs"]["right"]
+                            : $this->framework_css["tabs"]["left"]
+                        );
 
 
-                        $wrap_menu_start    =  '<div class="' . $this->oPage[0]->frameworkCSS->get($default_wrap_menu, "col") . '">'
-                            . '<ul ' . $this->oPage[0]->frameworkCSS->getClass($default_menu, null, true) . $this->oPage[0]->frameworkCSS->get("menu", "data", "tab") . '>';
+
+                        $wrap_menu_start    =  '<div ' . $oPage->frameworkCSS->getClass($subTab["outer_wrap"]["menu"], null, true) . '>'
+                            . '<ul ' . $oPage->frameworkCSS->getClass($subTab["menu"], null, true) . $oPage->frameworkCSS->get("menu", "data", "tab") . '>';
                         $wrap_menu_end      = '</ul></div>';
 
                         $menu = $wrap_menu_start;
-                        $menu_current = true;
+                        //$menu_current = 0 && $oPage->isXHR();
                         foreach ($items AS $key => $item)
                         {
-                            $menu_current = ($menu_current === true
-                                ? array("current" => $this->oPage[0]->frameworkCSS->get("menu-current", "tab"))
+                            /*$menu_current = ($menu_current === true
+                                ? array("current" => $oPage->frameworkCSS->get("menu-current", "tab"))
                                 : null
-                            );
-                            $menu .= '<li ' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["menu-item"], $menu_current, true) . '><a href="#tabmenu-' . $key . '" ' . $this->oPage[0]->frameworkCSS->get("menu-link", "data", "tab") . ' data-link="'  . ffCommon_url_rewrite($item) . '">' . $item . '</a></li>';
+                            );*/
+                            $menu .= '<li ' . $oPage->frameworkCSS->getClass($this->framework_css["menu-item"], null /*$menu_current*/, true) . '>'
+                                . '<a href="#tabmenu-' . $key . '"'
+                                    . ' ' . $oPage->frameworkCSS->getClass($this->framework_css["menu-item-link"], null /*$menu_current*/, true)
+                                    . ' ' . $oPage->frameworkCSS->get("menu-link", "data", "tab")
+                                    . ' data-link="'  . ffCommon_url_rewrite($item) . '">' . $item
+                                . '</a></li>';
                         }
 
                         if($mode == "right") {
@@ -243,24 +394,24 @@ class ffWidget_tabs extends ffCommon
                     }
                 }
 
-                if(is_array($subvalue["data"]))
+                if(is_array($subvalue["data"])) {
                     $data = $subvalue["data"];
-                else
+                } else {
                     $data[] = $subvalue["data"];
-
-                $pane_current = true;
+                }
+                //$pane_current = 0 && $oPage->isXHR();
                 foreach($data AS $key => $content)
                 {
                     $wrap_pane_item_start = "";
                     $wrap_pane_item_end = "";
                     if($enable_menu)
                     {
-                        $pane_current = ($pane_current === true
-                            ? array("current" => $this->oPage[0]->frameworkCSS->get("pane-current-effect", "tab"))
+                       /* $pane_current = ($pane_current === true
+                            ? array("current" => $oPage->frameworkCSS->get("pane-current-effect", "tab"))
                             : null
-                        );
+                        );*/
 
-                        $wrap_pane_item_start = '<div id="tabmenu-' . $key . '" ' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane-item"], $pane_current, true) . $this->oPage[0]->frameworkCSS->get("pane-item", "data", "tab") . '>';
+                        $wrap_pane_item_start = '<div id="tabmenu-' . $key . '" ' . $oPage->frameworkCSS->getClass($this->framework_css["pane-item"], null /*$pane_current*/, true) . $oPage->frameworkCSS->get("pane-item", "data", "tab") . '>';
                         $wrap_pane_item_end = '</div>';
                     }
 
@@ -279,13 +430,15 @@ class ffWidget_tabs extends ffCommon
 
                 if($enable_menu)
                 {
-                    $wrap_pane_start    = '<div class="' . $this->oPage[0]->frameworkCSS->get($default_wrap_pane, "col") . '">'
-                        . '<div ' . $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane"], null, true) . $this->oPage[0]->frameworkCSS->get("pane", "data", "tab") . '>';
+                    $wrap_pane_start    = '<div ' . $oPage->frameworkCSS->getClass($subTab["outer_wrap"]["pane"], null, true) . '>'
+                        . '<div ' . $oPage->frameworkCSS->getClass($this->framework_css["pane"], null, true) . $oPage->frameworkCSS->get("pane", "data", "tab") . '>';
                     $wrap_pane_end      = '</div></div>';
 
-                    $output = $menu_left . $wrap_pane_start . $output . $wrap_pane_end . $menu_right;
-                }
+                    $wrap_container_start = '<div ' . $oPage->frameworkCSS->getClass($subTab["outer_wrap"]["container"], null, true) . '>';
+                    $wrap_container_end   = '</div>';
 
+                    $output = $menu_left . $wrap_container_start . $wrap_pane_start . $output . $wrap_pane_end . $wrap_container_end . $menu_right;
+                }
 
                 if(!$title)
                     $title = $subkey;
@@ -302,14 +455,17 @@ class ffWidget_tabs extends ffCommon
                 */
                 if($this->tab_mode)
                 {
-                    $this->tpl[$tpl_id]->set_var("tab_pane_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane"], null, true) . $this->oPage[0]->frameworkCSS->get("pane", "data", "tab"));
-                    $this->tpl[$tpl_id]->set_var("tab_pane_item_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . $this->oPage[0]->frameworkCSS->get("pane-item", "data", "tab"));
 
-                    $this->tpl[$tpl_id]->set_var("tab_menu_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["menu"], null, true) . $this->oPage[0]->frameworkCSS->get("menu", "data", "tab"));
-                    $this->tpl[$tpl_id]->set_var("tab_menu_item_properties", $this->oPage[0]->frameworkCSS->getClass($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
-                    $this->tpl[$tpl_id]->set_var("tab_menu_link_properties", $this->oPage[0]->frameworkCSS->get("menu-link", "data", "tab") . ' data-link="' . ffCommon_url_rewrite($title) . '"');
+                    $this->tpl[$tpl_id]->set_var("tab_pane_properties", $oPage->frameworkCSS->getClass($this->framework_css["pane"], null, true) . $oPage->frameworkCSS->get("pane", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_pane_item_properties", $oPage->frameworkCSS->getClass($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . $oPage->frameworkCSS->get("pane-item", "data", "tab"));
+
+                    $this->tpl[$tpl_id]->set_var("tab_menu_properties", $oPage->frameworkCSS->getClass($this->framework_css["menu"], null, true) . $oPage->frameworkCSS->get("menu", "data", "tab"));
+                    $this->tpl[$tpl_id]->set_var("tab_menu_item_properties", $oPage->frameworkCSS->getClass($this->framework_css["menu-item"], null, true));
+                    $this->tpl[$tpl_id]->set_var("tab_menu_link_properties", $oPage->frameworkCSS->getClass($this->framework_css["menu-item-link"], array("current" => $first_menu_current), true)
+                        . ' ' . $oPage->frameworkCSS->get("menu-link", "data", "tab")
+                        . ' data-link="' . ffCommon_url_rewrite($title) . '"'
+                    );
                 }
-
                 $first_menu_current = "";
                 $first_pane_current = "";
 
@@ -322,6 +478,22 @@ class ffWidget_tabs extends ffCommon
 		/**
 		* Tab container
 		*/
+		if($this->framework_css["outer_wrap"]) {
+            $this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . $oPage->frameworkCSS->getClass($this->framework_css["outer_wrap"]["menu"], "col") . '">');
+            $this->tpl[$tpl_id]->set_var("tab_menu_wrap_end", '</div>');
+
+            $this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . $oPage->frameworkCSS->getClass($this->framework_css["outer_wrap"]["pane"], "col") . '">');
+            $this->tpl[$tpl_id]->set_var("tab_pane_wrap_end", '</div>');
+
+
+            $this->tpl[$tpl_id]->set_var("tab_row_wrap_start", '<div class="' . $oPage->frameworkCSS->getClass($this->framework_css["outer_wrap"]["container"]) . '">');
+            $this->tpl[$tpl_id]->set_var("tab_row_wrap_end", '</div>');
+        }
+
+        $this->tpl[$tpl_id]->parse("SectHeaderTab" . $tab_position, false);
+
+
+/*
 		if($this->tab_mode && !($oPage->isXHR() && !isset($_REQUEST["XHR_CTX_TYPE"]) && $this->tab_mode == "top")) {
 			if(!$this->framework_css["menu"]["wrap_menu"] && $wrap_tab_need)
 				$this->framework_css["menu"]["wrap_menu"] = $default_wrap_menu;
@@ -330,16 +502,22 @@ class ffWidget_tabs extends ffCommon
 				$this->framework_css["menu"]["wrap_pane"] = $default_wrap_pane;
 			
 			if($this->framework_css["menu"]["wrap_menu"]) {
-				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->get($this->framework_css["menu"]["wrap_menu"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . $oPage->frameworkCSS->get($this->framework_css["menu"]["wrap_menu"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_end", '</div>');
 			}
 			if($this->framework_css["menu"]["wrap_pane"]) {
-				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->get($this->framework_css["menu"]["wrap_pane"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . $oPage->frameworkCSS->get($this->framework_css["menu"]["wrap_pane"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_end", '</div>');
 			}
 
 	        $this->tpl[$tpl_id]->parse("SectHeaderTab" . $tab_position, false);
-		}		
+            if($wrap_tab_need) {
+                $this->tpl[$tpl_id]->set_var("tab_row_wrap_start", '<div class="' . $oPage->frameworkCSS->get("", "row") . '">');
+                $this->tpl[$tpl_id]->set_var("tab_row_wrap_send", '</div>');
+            }
+
+
+		}		*/
 
 		$this->tpl[$tpl_id]->parse("SectBinding", true);
 		if(!$oPage->isXHR() && $floating_tabs) {

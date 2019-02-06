@@ -155,17 +155,6 @@ class ffDetails_drag extends ffDetails_base
 	 */
 	public $description = null;
 
-	/**
-	 * Se dev'essere utilizzata la widget "disclosure panels"
-	 * @var Boolean
-	 */
-	var $widget_discl_enable	= false;
-	/**
-	 * Se il pannello dev'essere aperto di default
-	 * @var Boolean
-	 */
-	var $widget_def_open		= false;
-
 	//var $doAjax	= true;
 
 	/**
@@ -489,7 +478,7 @@ class ffDetails_drag extends ffDetails_base
 					if ($this->form_fields[$key]->required) {
 						$class = $class . (strlen($class) ? " " : "") . "required";
 					}
-					$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, null, array("framework_css" => false, "control_type" => false));
+					$class = $class . (strlen($class) ? " " : "") . $this->form_fields[$key]->get_control_class(null, array("framework_css" => false, "control_type" => false));
 					if(strlen($class)) {
 						$this->tpl[0]->set_var("container_class", " " . $class);
 					} else {
@@ -658,7 +647,7 @@ class ffDetails_drag extends ffDetails_base
             $this->tpl[0]->set_var("SectNewHeader", "");
             $this->tpl[0]->set_var("SectNewFooter", "");
             */
-            if(strlen($this->title) || $this->widget_discl_enable)
+            if(strlen($this->title))
                 $this->tpl[0]->parse("SectTitle", false);
             else
                 $this->tpl[0]->set_var("SectTitle", "");
@@ -725,18 +714,7 @@ class ffDetails_drag extends ffDetails_base
 
 		return $sError;
 	}
-	/**
-	 * Elabora l'azione. L'azione viene ereditata dall'oggetto record padre
-	 * @return Mixed Il risultato del processing
-	 */
-	function process_action()
-	{
-		if ($this->frmAction == "detail_addrows")
-			$this->widget_def_open = true;
 
-		return parent::process_action();
-	}
-	
 	public function structProcess($tpl)
 	{
 		if ($this->id_if !== null)

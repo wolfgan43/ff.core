@@ -102,12 +102,17 @@ abstract class ffCommon extends ffClassChecks
 
 		if ($name === null)
 			$name = get_class($this);
-		
+
 		if (isset(self::$ff_global_setting[$name]) && is_array(self::$ff_global_setting[$name]) && count(self::$ff_global_setting[$name]))
 		{
             $this->get_defaults_walkarray($this, self::$ff_global_setting[$name]);
 		}
 	}
+
+    protected function randID($name = null) {
+        static $rnd = 1;
+        return $name . "-" . $rnd++;
+    }
 
     public function getAbsPath($path = null)
     {

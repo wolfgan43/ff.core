@@ -68,7 +68,7 @@ frameworkCSS::extend(array(
                                                 )
                                                 , "input" => array(
                                                     "class" => null
-                                                    , "form" => array("control-sm")
+                                                    , "form" => array("control", "size-sm")
                                                 )
 												/*, "col" => array(
 														"xs" => 0
@@ -101,7 +101,7 @@ frameworkCSS::extend(array(
                                                 )
                                                 , "select" => array(
                                                     "class" => null
-                                                    , "form" => array("control-sm")
+                                                    , "form" => array("control", "size-sm")
                                                 )
 											)
 

@@ -89,33 +89,6 @@ class ffGrid_xls extends ffGrid_base
     var $label_selected_class_last    = "";
 
     /**
-     * Se visualizzare l'url di editing sulla griglia
-     * @var Boolean
-     */
-    var $display_edit_url        = true;            // display edit record url (on fields)
-    var $display_edit_url_alt   = "";
-    /**
-     * Se visualizzare il pulsante di editing sulla griglia
-     * @var Boolean
-     */
-    var $display_edit_bt        = false;        // display edit record button
-    /**
-     * Se visualizzare il pulsante di cancellazione sulla griglia
-     * @var Boolean
-     */
-    var $display_delete_bt        = true;            // display delete record button. This cause use of dialog.
-    /**
-     * Se il pulsante di editing dev'essere visibile sulla riga processata attualmente
-     * @var Boolean
-     */
-    var $visible_edit_bt        = true;            // display edit record button record per record
-    /**
-     * Se il pulsante di eliminazione dev'essere visibile sulla riga processata attualmente
-     * @var Boolean
-     */
-    var $visible_delete_bt        = true;            // display delete record button record per record
-
-    /**
      * Il simbolo usato per visualizzare i campi valuta
      * @var String
      */
@@ -155,12 +128,6 @@ class ffGrid_xls extends ffGrid_base
     public $description = null;
 
     public $no_record_label = null;
-
-    /**
-     * Se la widget "disclosure panels" dev'essere abilitata di default
-     * @var Boolean
-     */
-    var $widget_discl_enable = false;
 
     private $parsed_fields         = 0;
     

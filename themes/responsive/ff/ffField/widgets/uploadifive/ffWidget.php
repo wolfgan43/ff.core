@@ -65,7 +65,7 @@ class ffWidget_uploadifive extends ffCommon
 
 	}
 	
-	function process($id, &$value, ffField_base &$Field)
+	function process($id, &$value, ffField_html &$Field)
 	{
 		global $plgCfg_uploadifive_UseOwnSession;
 		//$Field->parent_page[0]->tplAddCss("jquery.uploadifive", "uploadifive.css", FF_SITE_PATH	 . "/themes/library/plugins/jquery.uploadifive");
@@ -82,7 +82,7 @@ class ffWidget_uploadifive extends ffCommon
 				if($Field->file_show_filename)
                 	$Field->file_show_filesize = true;
 
-				$Field->process_file($id, $value);
+				//$Field->process_file($id, $value);
 				if (count($Field->parent) && is_subclass_of($Field->parent[0], "ffDetails_base")) {
 					$suffix_start = "";
 					$suffix_target = "[name]";
@@ -96,7 +96,7 @@ class ffWidget_uploadifive extends ffCommon
 				}
 				break;
 			default:
-				$Field->process_label($id, $value);
+				//$Field->process_label($id, $value);
 		}
 
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
@@ -351,7 +351,8 @@ class ffWidget_uploadifive extends ffCommon
         $this->tpl[$tpl_id]->parse("SectBinding", true);
 
         //$Field->tpl[0]->set_var("id", $id);
-        $this->tpl[$tpl_id]->set_var("control", $Field->tpl[0]->rpparse("main", false));
+
+        $this->tpl[$tpl_id]->set_var("control", $Field->parse());
         return $this->tpl[$tpl_id]->rpparse("SectControl", FALSE);
     }
 	

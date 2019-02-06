@@ -33,7 +33,6 @@ class ffGrid_json extends ffGrid_base
      * Se visualizzare l'url di editing sulla griglia
      * @var Boolean
      */
-    var $display_edit_url        = true;            // display edit record url (on fields)
     var $display_edit_url_alt   = "";
     /**
      * Se visualizzare il pulsante di editing sulla griglia
@@ -45,17 +44,7 @@ class ffGrid_json extends ffGrid_base
      * @var Boolean
      */
     var $display_delete_bt        = true;            // display delete record button. This cause use of dialog.
-    /**
-     * Se il pulsante di editing dev'essere visibile sulla riga processata attualmente
-     * @var Boolean
-     */
-    var $visible_edit_bt        = true;            // display edit record button record per record
-    /**
-     * Se il pulsante di eliminazione dev'essere visibile sulla riga processata attualmente
-     * @var Boolean
-     */
-    var $visible_delete_bt        = true;            // display delete record button record per record
-	
+
     public $no_record_label = null;
 
     /**
@@ -466,12 +455,12 @@ class ffGrid_json extends ffGrid_base
                                                     );
                     }
 					
-                    if ($this->display_edit_url || ($this->visible_edit_bt && $this->display_edit_bt))
+                    if ($this->record_url)
                     {
 						$this->json_result["data"][$i]["url"]["modify"] = $modify_url;
 					}
 
-                    if ($this->visible_delete_bt && $this->display_delete_bt)
+                    if ($this->record_url && $this->display_delete_bt)
                     {
 						$this->json_result["data"][$i]["url"]["delete"] = $delete_url;
 					}
@@ -517,7 +506,7 @@ class ffGrid_json extends ffGrid_base
 							$this->json_result["data"][$i]["grid"][$key]["url"] = ffProcessTags($this->grid_fields[$key]->url, $this->key_fields, $this->grid_fields, "normal", $this->parent[0]->get_params(), $_SERVER['REQUEST_URI'], $this->parent[0]->get_globals(), null, $this->db[0]);
 						}
 
-						if ($this->grid_fields[$key]->url === "" || $this->grid_fields[$key]->control_type != "" || !$this->display_edit_url)
+						if ($this->grid_fields[$key]->url === "" || $this->grid_fields[$key]->control_type != "" || !$this->record_url)
 						{
 						}
 						else
@@ -530,7 +519,7 @@ class ffGrid_json extends ffGrid_base
 							}
 						}
                         
-						if (!($this->grid_fields[$key]->url === "" || $this->grid_fields[$key]->control_type != "" || !$this->display_edit_url))
+						if (!($this->grid_fields[$key]->url === "" || $this->grid_fields[$key]->control_type != "" || !$this->record_url))
 						{
 							$tmp_url = null;
 							if ($this->grid_fields[$key]->url === null)

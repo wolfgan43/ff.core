@@ -105,7 +105,9 @@ class ffRecord
  */
 abstract class ffRecord_base extends ffCommon
 {
-	// ----------------------------------
+    const NAME                  = "ffr";
+
+    // ----------------------------------
 	//  PUBLIC VARS (used for settings)
 
 	/**
@@ -509,7 +511,7 @@ abstract class ffRecord_base extends ffCommon
 	 * Contiene gli ffField da gestire
 	 * @var array()
 	 */
-	var $contents				= array();
+	//var $contents				= array();
 
 	/**
 	 * Contiene gli ffField da gestire
@@ -627,6 +629,7 @@ abstract class ffRecord_base extends ffCommon
 		$this->page_path = $page->page_path;
 		$this->disk_path = $disk_path;
 		$this->theme = $theme;
+		$this->resources[] = crc32($this->page_path);
 
 		if ($this->db === null)
 			$this->db[0] = ffDB_Sql::factory();
@@ -645,51 +648,145 @@ abstract class ffRecord_base extends ffCommon
 	 */
 	public function addContent($content, $group = null, $id = null)
 	{
-		if ($id === null)
-			$id = uniqid(time(), true);
-		
 		if ($content !== null)
 		{
-			if (is_object($content)	&& is_subclass_of($content, "ffField_base"))
-			{
-				$id = $content->id;
-				$content->parent = array(&$this);
-				$content->cont_array =& $this->form_fields;
+            if (
+                is_object($content)
+                && (
+                    is_subclass_of($content, "ffGrid_base")
+                    || is_subclass_of($content, "ffRecord_base")
+                    || is_subclass_of($content, "ffDetails_base")
+                    || is_subclass_of($content, "ffField_base")
+                    || is_subclass_of($content, "ffButton_base")
+                    || is_subclass_of($content, "ffPageNavigator_base")
+                )
+            ) {
+                if ($id === null) {
+                    if (!$content->id) {
+                        $content->id = $this->randID($content::NAME);
+                    }
 
-				$this->form_fields[$id] = $content;
-				$this->form_fields[$id]->group = $group;
-			}
-			
-			if (is_object($content)	&& is_subclass_of($content, "ffDetails_base"))
-			{
-				$content->main_record = array(&$this);
-				$this->detail[$content->id] = $content;
-			}
+                    $id = $content->id;
+                }
+                if (is_subclass_of($content, "ffField_base")) {
+                    $content->parent = array(&$this);
+                    $content->cont_array =& $this->form_fields;
 
-			if (is_object($content)	&& is_subclass_of($content, "ffGrid_base"))
-			{
-				$id = $content->id;
-			}
+                    $this->form_fields[$id] = $content;
+                    $this->form_fields[$id]->group = $group;
+                } elseif (is_subclass_of($content, "ffDetails_base")) {
+                    $this->hidden_fields["detailaction"] = new ffData("");
+                    $content->main_record = array(&$this);
+                    $this->detail[$id] = $content;
+                }
+            }
 
-			if ($group === null)
+			if ($id === null) {
+                $id = $this->randID("content");
+            }
+
+            if(!$group) {
+                $group = "_main_";
+            }
+
+            $this->addGroup($group, array(
+                "contents" => array(
+                    $id => $content
+                )
+            ));
+
+			/*if ($group === null)
 			{
-				$this->contents[(string)$id]["data"] = $content;
-				$this->contents[(string)$id]["group"] = $group;
+				//$this->contents[$id]["data"] = $content;
+				//$this->contents[$id]["group"] = $group;
+
+				$this->addGroup("_main_", array(
+                    "contents" => array(
+                        $id => $content
+                    )
+                ));
+
 			}
 			else
 			{
-				$this->groups[$group]["contents"][(string)$id]["data"] = $content;
-			}
+			    $this->addGroup($group, array(
+			        "contents" => array(
+			            $id => $content
+                    )
+                ));
+			}*/
 		}
 		elseif ($group === true)
 		{
-			$this->contents[(string)$id]["data"] = $content;
-			$this->contents[(string)$id]["group"] = $group;
+		    $this->addGroup($group);
+
+
 		}
 		else
 			ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
 	}
 
+    /**
+     * @param $key
+     * @param array|null $params
+     * 	    hide_title
+            fixed_pre_content
+            fixed_post_content
+            class
+            title
+            primary_field
+            description
+            tab
+     */
+    public function addGroup($key, Array $params = null) {
+        static $last_tab_key            = null;
+        static $tabs_excluded           = array();
+
+        if($key != "_main_") {
+           /* if(is_array($params["tab"])) {
+                $tab_key = ($params["tab"]["title"]
+                    ? $params["tab"]["title"]
+                    : $key
+                );
+            } else */if(is_string($params["tab"])) {
+                $tab_key                = (strlen($params["tab"])
+                                            ? $params["tab"]
+                                            : $key
+                                        );
+            } elseif(is_bool($params["tab"])) {
+                $tab_key                = ($last_tab_key
+                                            ? $last_tab_key
+                                            : $key
+                                        );
+
+            } else {
+                $tab_key                = $key;
+            }
+            $this->tabs["contents"][$tab_key]["groups"][$key] = $key;
+            $last_tab_key               = $tab_key;
+            if($tab_key != $key) {
+                $tabs_excluded[$key]    = $tab_key;
+            }
+
+            if($tabs_excluded[$key] && $this->tabs["contents"][$key]) {
+                unset($this->tabs["contents"][$key]);
+            }
+        }
+
+	    if(!isset($params["title"]) && !$this->groups[$key]) {
+	        $params["title"]            = ucfirst($key);
+        }
+
+        $contents = $params["contents"];
+        $params["contents"] = (array) $this->groups[$key]["contents"];
+        if(is_array($contents) && count($contents)) {
+            foreach ($contents AS $id => $content) {
+                $params["contents"][$id]["data"] = $content;
+            }
+        }
+
+        $this->groups[$key]             = $params;
+    }
 	/**
 	 * Aggiunge il campo chiave a ffRecord
 	 * @param ffField Il Field che farà da key field all'interno di ffRecord

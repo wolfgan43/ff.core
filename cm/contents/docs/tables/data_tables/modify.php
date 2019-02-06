@@ -24,7 +24,6 @@
  *  @link https://github.com/wolfgan43/vgallery
  */
 
-$db = ffDB_Sql::factory();
 /**
  * Inizializzazione dell'oggetto ffRecord,
  * $oRecord è lo standard, ma può essere usato qualsiasi nome,
@@ -32,12 +31,15 @@ $db = ffDB_Sql::factory();
  */
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->tab = true;
+//$oRecord->framework_css["component"]["type"] = null;
+$oRecord->setWidthComponent(array(6));
+//$oRecord->tab = "right";
 /**
  * ID dell'oggetto.
  * Se questo oggetto è in relazione con un altro (modifica) è importante che questo campo coincida
  * con il record_ID del campo originale
  */
-$oRecord->id = "UsersModify";
+//$oRecord->id = "UsersModify";
 /**
  * resources è un array che viene popolato con gli ID degli oggetti su cui si sta lavorando
  */
@@ -46,6 +48,7 @@ $oRecord->resources[] = $oRecord->id;
  * Titolo dell'oggetto record
  */
 $oRecord->title = ffTemplate::_get_word_by_code("user_modify");
+$oRecord->description = ffTemplate::_get_word_by_code("user_modify");
 /**
  * Tabella da cui vengono prese e/o salvate le informazioni.
  * Può essere dichiarata una sola tabella, se i dati arrivano da più fonti la gestione
@@ -106,8 +109,7 @@ $oField->addValidator("email");
  * se non compilato restituirà  un errore
  */
 $oField->required = true;
-$oField->setWidthComponent(array(6,7,8,9, 10));
-
+$oField->setWidthComponent(array(9,8,7,6));
 $oRecord->addContent($oField, "Altro");
 
 $oField = ffField::factory($cm->oPage);
@@ -118,9 +120,57 @@ $oField->label = ffTemplate::_get_word_by_code("tel");
  * Indica l'obbligatorietà  del campo in questione,
  * se non compilato restituirà  un errore
  */
-$oField->setWidthComponent(array(6,7,8,9, 10));
-
+$oField->setWidthComponent(array(9,8,7,6));
 $oRecord->addContent($oField, "Altro");
+
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "username2";
+$oField->label = ffTemplate::_get_word_by_code("username");
+/**
+ * Indica l'obbligatorietà  del campo in questione,
+ * se non compilato restituirà  un errore
+ */
+$oField->required = true;
+$oRecord->addContent($oField, "Altro");
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "username3";
+$oField->label = ffTemplate::_get_word_by_code("username");
+/**
+ * Indica l'obbligatorietà  del campo in questione,
+ * se non compilato restituirà  un errore
+ */
+$oField->required = true;
+$oRecord->addContent($oField, "Altro2");
+
+
+
+$oField = ffField::factory($cm->oPage);
+$oField->id = "username3";
+$oField->label = ffTemplate::_get_word_by_code("username");
+/**
+ * Indica l'obbligatorietà  del campo in questione,
+ * se non compilato restituirà  un errore
+ */
+$oField->required = true;
+$oRecord->addContent($oField);
+
+
+$oRecord->addGroup(array(
+    "title" => "Altro"
+    , "width" => array(6)
+));
+
+
+$oRecord->addGroup("Altro2", array(
+    "title" => "cia"
+    , "tab" => "Altro"
+    , "width" => array(6)
+    //, "fixed_pre_content" => "asdasd"
+    //, "fixed_post_content" => "asdasd"
+    , "description" => "adpoasdmiopasdmiop op "
+));
 
 /**
  * Viene innestato l'oggetto $oRecord all'interno della pagina

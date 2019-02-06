@@ -30,7 +30,6 @@ $oRecord->addEvent("on_do_action", "ModSecChangePassword_on_do_action");
 $oRecord->addEvent("on_done_action", "ModSecChangePassword_on_done_action");
 $oRecord->allow_delete = false;
 $oRecord->allow_insert = false;
-$oRecord->widget_discl_enable = false;
 $oRecord->buttons_options["cancel"]["display"] = false;
 
 if (MOD_SEC_MULTIDOMAIN && !MOD_SEC_MULTIDOMAIN_EXTERNAL_DB)

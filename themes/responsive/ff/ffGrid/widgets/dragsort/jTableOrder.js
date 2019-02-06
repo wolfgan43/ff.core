@@ -16,7 +16,7 @@
                         return;
 					$table.find("> thead > tr > :first").attr("colspan", 2);
 					$table.find("> tbody > tr").not("tr tr").each(function (index) {
-						jQuery(this).prepend('<td></td>');
+						jQuery(this).prepend('<td class="disableClick"></td>');
                         if(sort_params.data[index] !== undefined)
 						    jQuery(this).data("sort_id", sort_params.data[index].toString());
 					});

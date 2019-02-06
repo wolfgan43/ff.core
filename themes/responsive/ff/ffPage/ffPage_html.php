@@ -23,10 +23,53 @@
  *  @license http://opensource.org/licenses/gpl-3.0.html
  *  @link https://github.com/wolfgan43/vgallery
  */
+frameworkCSS::extend(array(
+    "group" => array(
+        "inner_wrap" => array(
+            "card" => "container"
+        )
+        , "header_wrap" => array(
+            "card" => "header"
+        )
+        , "body_wrap" => array(
+            "card" => "body"
+        )
+        , "footer_wrap" => array(
+            "card" => "footer"
+        )
+    )
+    , "widget" => array(
+        "tab" => array(
+            "menu" => array(
+                "class" => null
+                //, "tab" => null //menu OR menu-vertical OR menu-vertical-right
+                , "wrap_menu" => null	// null OR array(xs, sm, md, lg)
+                , "wrap_pane" => null	// null OR array(xs, sm, md, lg)
+            )
+            , "menu-item" => array(
+                "class" => null
+                , "tab" => "menu-item"
+            )
+            , "pane" => array(
+                "class" => null
+                , "tab" => "pane"
+            )
+            , "pane-item" => array(
+                "class" => null
+                , "tab" => "pane-item" // pane-item-effect OR pane-item
+            )
+        )
+    )
+), "ffPage");
+
 
 class ffPage_html extends ffPage_base
 {
-	/**
+    const JS_POSITION           = "Bottom";
+
+    var $framework_css = null;
+
+    /**
 	 * Il suffisso della dir del layer
 	 * il file HTML si chiamerà layer_$layer.html
 	 * posizionato sotto la dir del tema, sottodir "layers"
@@ -56,82 +99,7 @@ class ffPage_html extends ffPage_base
 	 */
 	var $use_own_js				= false;
 
-	var $favicons               = array(
-        "favicon" => array(
-	        "rel"       => "shortcut icon"
-            , "sizes"   => "16x16"
-            , "href"    => null
-        )
-	    , "apple-touch-icon-57x57" => array(
-	        "rel"       => "apple-touch-icon"
-            , "sizes"   => "57x57"
-            , "href"    => null
-        )
-        , "apple-touch-icon-60x60" => array(
-	        "rel"       => "apple-touch-icon"
-            , "sizes"   => "60x60"
-            , "href"    => null
-        )
-        , "apple-touch-icon-72x72" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "72x72"
-            , "href"    => null
-        )
-        , "apple-touch-icon-76x76" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "76x76"
-            , "href"    => null
-        )
-        , "apple-touch-icon-114x114" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "114x114"
-            , "href"    => null
-        )
-        , "apple-touch-icon-120x120" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "120x120"
-            , "href"    => null
-        )
-        , "apple-touch-icon-144x144" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "144x144"
-            , "href"    => null
-        )
-        , "apple-touch-icon-152x152" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "152x152"
-            , "href"    => null
-        )
-        , "apple-touch-icon-180x180" => array(
-            "rel"       => "apple-touch-icon"
-            , "sizes"   => "180x180"
-            , "href"    => null
-        )
-        , "icon-192x192" => array(
-            "rel"       => "icon"
-            , "type"    => "image/png"
-            , "sizes"   => "192x192"
-            , "href"    => null
-        )
-        , "icon-32x32" => array(
-            "rel"       => "icon"
-            , "type"    => "image/png"
-            , "sizes"   => "32x32"
-            , "href"    => null
-        )
-        , "icon-96x96" => array(
-            "rel"       => "icon"
-            , "type"    => "image/png"
-            , "sizes"   => "96x96"
-            , "href"    => null
-        )
-        , "icon-16x16" => array(
-            "rel"       => "icon"
-            , "type"    => "image/png"
-            , "sizes"   => "16x16"
-            , "href"    => null
-        )
-    );
+	var $favicons               = null;
 
 	/**
 	 * Javascript di default del framework
@@ -266,11 +234,20 @@ class ffPage_html extends ffPage_base
     public $class_body             = null;
 	public $properties_body        = null;
 
+
+	private $tab_available          = array("pills", "pills-justified", "bordered", "bordered-justified", "left", "right");
     /**
      * Abilita i tab
-     * @var Boolean
+     * @var true | false | pills | pills-justified | bordered | bordered-justified | left | right | top | default
      */
-    public $tab				= true;// false OR top OR left OR right
+    public $tab				= false;
+
+    /**
+     * Una collezione dei tabs presenti nella pagina
+     * @var Array
+     */
+    protected $tabs				= array();
+
 	/**
 	 * Il risultato JSON della pagina
 	 * @var Array
@@ -298,6 +275,30 @@ class ffPage_html extends ffPage_base
 	var $above_the_fold = null;
 
 
+    /**
+     * @return ffPage_html
+     */
+    public static function getInstance()
+    {
+        return self::$singleton;
+    }
+
+
+    /**
+     * il costruttore di ffPage richiede, come ogni altro elemento del framework, il passaggio delle variabili
+     * che determinano i percorsi utilizzati negli automatismi.
+     * Oltre a impostare i corretti valori di default, il costruttore non esegue altre operazioni degne di nota.
+     *
+     * @param string $site_path il percorso assoluto su web del sito
+     * @param string $disk_path il percorso assoluto su disco
+     * @param string $page_path il percorso relativo al sito della pagina
+     */
+    public function __construct($disk_path, $site_path, $page_path, $theme)
+    {
+        parent::__construct($disk_path, $site_path, $page_path, $theme);
+
+        $this->framework_css = frameworkCSS::findComponent("ffPage");
+    }
 
 
     /**
@@ -530,6 +531,12 @@ class ffPage_html extends ffPage_base
         } elseif($params) {
             $path                                       = dirname($params);
             $file                                       = basename($params);
+        }
+
+        if(is_array($params["loaded"]) && count($params["loaded"])) {
+            foreach ($params["loaded"] AS $exclude_css) {
+                $this->exclude_css[$exclude_css] = true;
+            }
         }
 
         if(!$priority) {
@@ -947,9 +954,16 @@ class ffPage_html extends ffPage_base
 			if (ffIsset($params, "priority"))			$priority = $params["priority"];
 			if (ffIsset($params, "index"))				$index = $params["index"];
 			if (ffIsset($params, "version"))			$version = $params["version"];
+			if (ffIsset($params, "type"))			    $type = $params["type"];
         } elseif($params) {
             $path                                       = dirname($params);
             $file                                       = basename($params);
+        }
+
+        if(is_array($params["loaded"]) && count($params["loaded"])) {
+		    foreach ($params["loaded"] AS $exclude_js) {
+                $this->exclude_js[$exclude_js] = true;
+            }
         }
 
         if(!$priority) {
@@ -1131,6 +1145,7 @@ class ffPage_html extends ffPage_base
 				$exclude_compact = (ffIsset($lib_data, "exclude_compact") ? $lib_data["exclude_compact"] : false);
 				$priority = (ffIsset($lib_data, "priority") ? $lib_data["priority"] : cm::LAYOUT_PRIORITY_HIGH);
 				$index = (ffIsset($lib_data, "index") ? $lib_data["index"] : 0);
+                $type = (ffIsset($lib_data, "type") ? $lib_data["type"] : 0);
 			}
 		}
 
@@ -1189,6 +1204,7 @@ class ffPage_html extends ffPage_base
 					, "counter" => $this->js_counter * -1
 					, "version" => $lib_version
 					, "deps" => $deps
+                    , "type" => $type
 				);
 		}
 
@@ -1680,7 +1696,7 @@ class ffPage_html extends ffPage_base
 	{
 		$this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
 
-		$this->tpl[0]->set_var("title", strip_tags($this->title));
+		$this->tpl[0]->set_var("title", strip_tags($this->getTitle() . " - " . cm_getAppName()));
 		$this->tpl[0]->set_var("properties_body", $this->getProperties());
 
 		if ($this->canonical)
@@ -1695,7 +1711,12 @@ class ffPage_html extends ffPage_base
                 $this->tplAddTag("favicon", $value);
             }
         }
-
+        if(!$this->page_meta["viewport"]) {
+		    $this->tplAddMeta(array(
+		        "name" => "viewport"
+                , "content" => "width=device-width, initial-scale=1.0"
+            ));
+        }
 
         /*if ($this->use_own_js)
         {
@@ -1729,7 +1750,12 @@ class ffPage_html extends ffPage_base
                 $this->tpl[0]->set_var("SectFFJS", "");*/
 
 		$this->doEvent("on_tpl_parsed_header", array($this, $this->tpl[0]));
-		if ($this->isXHR())
+
+        $this->output_buffer["headers"] = preg_replace('/\s+/', ' ', $this->output_buffer["headers"]);
+        $this->output_buffer["footers"] = preg_replace('/\s+/', ' ', $this->output_buffer["footers"]);
+        $this->output_buffer["html"] = preg_replace('/\s+/', ' ', $this->output_buffer["html"]);
+
+        if ($this->isXHR())
 		{
 			if ($this->getXHRFormat() === false)
 			{
@@ -1737,18 +1763,16 @@ class ffPage_html extends ffPage_base
 			}
 			//die($this->tpl[0]->rpparse("SectHeaders", false));
 
-            $this->output_buffer["headers"] .= $this->tpl[0]->rpparse("SectHeaders", false);
-            $this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
+    //        $this->output_buffer["headers"] .= $this->tpl[0]->rpparse("SectHeaders", false);
+    //        $this->output_buffer["footers"] .= $this->tpl[0]->rpparse("SectFooters", false);
 
-            $this->output_buffer["headers"] = preg_replace('/\s+/', ' ', $this->output_buffer["headers"]);
-            $this->output_buffer["footers"] = preg_replace('/\s+/', ' ', $this->output_buffer["footers"]);
-            $this->output_buffer["html"] = preg_replace('/\s+/', ' ', $this->output_buffer["html"]);
 
 			cm::jsonParse(array_merge($this->json_result, $this->output_buffer), $output_result);
 		}
 		else
 		{
-			$this->tpl[0]->set_var("content", $this->output_buffer["html"]);
+
+            $this->tpl[0]->set_var("content", $this->output_buffer["html"]);
 
 
 			/*if (strlen($this->output_buffer["headers"]))
@@ -1799,26 +1823,29 @@ class ffPage_html extends ffPage_base
                     }
                 }
             } else {
-                if (preg_replace('/\s+/', '', $this->output_buffer["headers"])) {
+                /*if (preg_replace('/\s+/', '', $this->output_buffer["headers"])) {
                     $this->tplAddJs("ff.headers", array(
                         "embed" => $this->output_buffer["headers"]
                     ));
+                }*/
+                if (strlen($this->output_buffer["headers"])) {
+                    $this->tpl[0]->set_var("WidgetsContent", preg_replace('/\s+/', ' ', $this->output_buffer["headers"]));
+                    $this->tpl[0]->parse("SectWidgetsFooters", true);
                 }
-
                 if (strlen($this->output_buffer["footers"])) {
-                    $this->tpl[0]->set_var("WidgetsContent", $this->output_buffer["footers"]);
+                    $this->tpl[0]->set_var("WidgetsContent", preg_replace('/\s+/', ' ', $this->output_buffer["footers"]));
                     $this->tpl[0]->parse("SectWidgetsFooters", true);
                 }
 
-                if($this->compact_js) {
+                /*if($this->compact_js) {
                     $this->tplAddJs("ff.init", array(
                         "embed" => $this->tpl[0]->rpparse("SectFFJS", false)
                         , "priority" => cm::LAYOUT_PRIORITY_HIGH
                         , "index" => -1000
                     ));
-                } else {
+                } else {*/
                     $this->tpl[0]->parse("SectFFJS", false);
-                }
+                //}
             }
         }
     }
@@ -1875,9 +1902,14 @@ class ffPage_html extends ffPage_base
         if (is_array($tmp))
         {
             //if ($this->isXHR()) {
-            $output                         = preg_replace('/\s+/', ' ', $tmp["html"]);
-            $this->output_buffer["headers"] = preg_replace('/\s+/', ' ', $this->output_buffer["headers"] . $tmp["headers"]);
-            $this->output_buffer["footers"] = preg_replace('/\s+/', ' ', $this->output_buffer["footers"] . $tmp["footers"]);
+//            $output                         = preg_replace('/\s+/', ' ', $tmp["html"]);
+//            $this->output_buffer["headers"] = preg_replace('/\s+/', ' ', $this->output_buffer["headers"] . $tmp["headers"]);
+//            $this->output_buffer["footers"] = preg_replace('/\s+/', ' ', $this->output_buffer["footers"] . $tmp["footers"]);
+
+            $output                         = $tmp["html"];
+            $this->output_buffer["headers"] = $this->output_buffer["headers"] . $tmp["headers"];
+            $this->output_buffer["footers"] = $tmp["footers"] . $this->output_buffer["footers"];
+
 
             /*}
             else
@@ -1949,6 +1981,77 @@ class ffPage_html extends ffPage_base
 				$this->output_buffer = array("html" => $this->output_buffer, "headers" => "", "footers" => "");
 			}
 
+            $buffer = array();
+            if (isset($this->groups["_main_"])) {
+                //$main_group = $this->groups["_main_"];
+
+                $buffer[] = $this->tplDisplayGroup($this->groups["_main_"], false);
+                unset($this->groups["_main_"]);
+                //$this->groups = array_merge(array("_main_" => $main_group), $this->groups);
+            }
+
+            if ($this->tab)
+            {
+                $this->widgetLoad("tabs", null, $this);
+
+                $this->tabs["tab_mode"] = ($this->tab !== true && in_array($this->tab, $this->tab_available)
+                    ? $this->tab
+                    : $this->tab_available[0]
+                );
+
+                $this->tabs["framework_css"] = $this->framework_css["widget"]["tab"];
+                if(is_array($this->tabs["contents"]) && count($this->tabs["contents"])) {
+                    foreach($this->tabs["contents"] AS $tab_key => $tab) {
+                        if(is_array($tab["groups"]) && count($tab["groups"])) {
+                            foreach($tab["groups"] AS $group_key) {
+                                frameworkCSS::colsWrapper("row-page-" . $tab_key
+                                    , $this->tabs["contents"][$tab_key]["data"]
+                                    , $this->groups[$group_key]["framework_css"]["container"]["col"]["lg"]
+                                    , $this->tplDisplayGroup($group_key, false)
+                                    , count($tab["groups"])
+                                );
+
+                                //$this->tabs["contents"][$tab_key]["data"][$group_key] = $this->tplDisplayGroup($group_key, ($tab_key == $group_key));
+
+                                if($this->groups[$group_key]["current"]) {
+                                    $this->tabs["current"] = $tab_key;
+                                }
+                            }
+
+                        }
+                    }
+                    $buffer[] = $this->widgets["tabs"]->process("page", $this->tabs, $this);
+
+                }
+                /*if (isset($this->groups["_main_"])) {
+                    $this->tpl[0]->set_var("form_default", $this->tplDisplayGroup($this->groups["_main_"]));
+                }*/
+            }
+            else
+            {
+              //  if($this->title) {
+                //    $this->tpl[0]->parse("SectTitle", false);
+               // }
+
+                if(is_array($this->groups) && count($this->groups)) {
+//                    $count_group = count($this->groups);
+                    foreach($this->groups AS $group_key => $group_value) {
+                        //$buffer[] = $this->tplDisplayGroup($group_key);
+                        $buffer[] = $this->tplDisplayGroup($group_key);
+                    }
+
+                    //$this->tpl[0]->set_var("form_default", $this->tplDisplayGroup($main_group));
+                    //$this->tpl[0]->set_var("form_tabs", implode("", $buffer));
+                }
+            }
+
+            $this->output_buffer["html"]	.= implode("", $buffer);
+
+
+
+
+			/*
+            $buffer = array();
 			foreach ($this->contents as $key => $content)
 			{
 				if ($this->getXHRFormat() === "json")
@@ -2002,12 +2105,24 @@ class ffPage_html extends ffPage_base
 				}
 				else
 				{
-                    $this->output_buffer["html"]	.= $this->tplProcessData($content["data"]);
+
+                    frameworkCSS::colsWrapper("row-page"
+                        , $buffer
+                        , $content["width"]["lg"]
+                        , $this->tplProcessData($content["data"])
+                        , count($this->contents)
+                    );
+
+                    //$this->output_buffer["html"]	.= $this->tplProcessData($content["data"]);
 				}
 			}
 			reset($this->contents);
 
-			$rc = $this->doEvent("on_fixed_process_before", array(&$this));
+
+            $this->output_buffer["html"]	.= implode("", $buffer);
+            */
+
+            $rc = $this->doEvent("on_fixed_process_before", array(&$this));
 			if ($this->getXHRFormat() === false)
 				$this->output_buffer["html"] = $this->fixed_pre_content . $this->output_buffer["html"] . $this->fixed_post_content;
 
@@ -2018,6 +2133,55 @@ class ffPage_html extends ffPage_base
 			}
 		}
 	}
+
+	private function tplDisplayGroup($group_key, $use_framework_css = true) {
+	    $group = (is_array($group_key)
+            ? $group_key
+            : $this->groups[$group_key]
+        );
+
+        $buffer = array();
+        if (is_array($group["contents"]) && count($group["contents"])) {
+            $count_group = count($group["contents"]);
+            foreach ($group["contents"] AS $contents) {
+                frameworkCSS::colsWrapper("row-page-" . $group_key
+                    , $buffer
+                    , $contents["data"]->framework_css["outer_wrap"]["col"]["lg"]
+                    , $this->tplProcessData($contents["data"])
+                    , $count_group
+                );
+            }
+        }
+        $content = implode("", $buffer);
+        if($use_framework_css) {
+            if($group["framework_css"]["inner_wrap"]) {
+                $card_start = '<div class="' . $this->frameworkCSS->getClass($group["framework_css"]["inner_wrap"]) . '">';
+                $card_end = '</div>';
+            }
+            if($group["framework_css"]["header_wrap"]
+                && ($group["title"] || $group["description"])
+            ) {
+                $card_header = '<div class="' . $this->frameworkCSS->getClass($group["framework_css"]["header_wrap"]) . '">';
+                if($group["title"]) {
+                    $card_header .= '<h2>' . $group["title"] . '</h2>';
+                }
+                if($group["description"]) {
+                    $card_header .= '<small>' . $group["description"] . '</small>';
+                }
+                $card_header .= '</div>';
+            }
+            if($group["framework_css"]["body_wrap"]) {
+                $card_body_start = '<div class="' . $this->frameworkCSS->getClass($group["framework_css"]["body_wrap"]) . '">';
+                $card_body_end = '</div>';
+            }
+            if(0 && $group["framework_css"]["footer_wrap"]) {
+                $card_footer = '<div class="' . $this->frameworkCSS->getClass($group["framework_css"]["footer_wrap"]) . '">';
+                $card_footer .= '</div>';
+            }
+        }
+
+        return $card_start . $card_header . $card_body_start . $content . $card_body_end . $card_footer . $card_end;
+    }
 
 	/**
 	 * In base al contenuto, recupera di dati d'elaborazione ad esso associati
@@ -2087,8 +2251,10 @@ class ffPage_html extends ffPage_base
 		{
 			return $content;
 		}
-		else
-			ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
+		else {
+		    $pippo = $this;
+            ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
+        }
 	}
 
 	/**
@@ -2222,9 +2388,12 @@ class ffPage_html extends ffPage_base
 
         if(is_array($this->tpl_layer[0]->DVars) && count($this->tpl_layer[0]->DVars)) {
             $vars = array_diff_key($this->tpl_layer[0]->DVars, $this->tpl_layer[0]->ParsedBlocks);
+
             foreach($vars AS $var => $index) {
                 if(strpos($var, ".html") > 0) {
                     $this->tpl_layer[0]->set_var($var, $this->loadTemplate(basename($var, ".html"), "common")->rpparse("main", false));
+                } elseif(is_callable("section_controller_" . $var)) {
+                    $this->tpl_layer[0]->set_var($var, call_user_func_array("section_controller_" . $var, array($this)));
                 }
             }
         }
@@ -2236,6 +2405,27 @@ class ffPage_html extends ffPage_base
     {
 
     }
+
+    public function getTitle() {
+        $cm = cm::getInstance();
+
+        $title = (!$this->title
+            ? ucwords(str_replace("-", " ", ($cm->modules["restricted"]["sel_navbar"]["label"]
+                ? $cm->modules["restricted"]["sel_navbar"]["label"]
+                : basename($cm->path_info))
+            ))
+            : $this->title
+        );
+
+
+        //$tpl->set_var("CM_LOCAL_APP_NAME", ffCommon_specialchars(cm_getAppName()));
+        /*if (cm::env("MOD_RESTRICTED_DEVELOPER")) {
+            $tpl->parse("SectFooter", false);
+        }*/
+
+        return $title;
+    }
+
    /**
 	 * Elabora i CSS
 	 * Da richiamare ad ogni aggiunta di CSS se si aggiungono CSS dinamicamente post-elaborazione
@@ -2776,7 +2966,7 @@ class ffPage_html extends ffPage_base
 	 */
     public function parse_js()
     {
-        $position = "Bottom";
+
 
         $this->tpl[0]->set_var("SectJs", "");
         $this->tpl[0]->set_var("SectAsyncJsPlugin", "");
@@ -2821,6 +3011,7 @@ class ffPage_html extends ffPage_base
 
 				$static_init = true;
 
+
 				if ($key === "ff.init")
 				{
 					$ffjs_queue = $js_queue_key;
@@ -2843,6 +3034,23 @@ class ffPage_html extends ffPage_base
 					}
 					else
 					{
+                        switch ($value["type"]) {
+                            case "libs":
+                                $position = $this::JS_POSITION;
+                                break;
+                            case "libsHeader":
+                                $position = "";
+
+                                break;
+                            case "libsFooter":
+                                $position = "Bottom";
+                                break;
+                            default:
+                                $position = false;
+
+                        }
+
+
 						$this->tpl[0]->set_var("lib_tag", $key);
 						$this->tpl[0]->set_var("lib_type", "js");
 						$this->tpl[0]->set_var("lib_deps", $this->libDepsToString($value["deps"]));
@@ -2854,10 +3062,10 @@ class ffPage_html extends ffPage_base
 						//$this->tpl[0]->parse("SectLibs", false);
 
                         $this->tpl[0]->set_var("js_embed", $value["embed"]);
-                        if($this->isXHR()) {
-                            $this->tpl[0]->parse("SectJsEmbed", false);
-                            $this->tpl[0]->set_var("SectJsSrc", "");
-                            $this->tpl[0]->parse("SectJs", true);
+                        if($this->isXHR() || $position !== false) {
+                           // $this->tpl[0]->parse("SectJsEmbed", false);
+                            $this->tpl[0]->set_var("SectJsSrc" . $position, "");
+                            $this->tpl[0]->parse("SectJs" . $position, true);
                         } else {
                             $this->tpl[0]->parse("SectJsEmbed", true);
                         }
@@ -3179,7 +3387,7 @@ class ffPage_html extends ffPage_base
 					if ($this->isXHR())
 					{
 						$this->tpl[0]->parse("SectJsSrc", false);
-						$this->tpl[0]->set_var("SectJsEmbed", "");
+						//$this->tpl[0]->set_var("SectJsEmbed", "");
 						$this->tpl[0]->parse("SectJs", true);
 					}
 					else
@@ -3190,11 +3398,26 @@ class ffPage_html extends ffPage_base
 						}
 						else
 						{
+                            switch ($value["type"]) {
+                                case "libs":
+                                    $position = $this::JS_POSITION;
+                                    break;
+                                case "libsHeader":
+                                    $position = "";
+                                    break;
+                                case "libsFooter":
+                                    $position = "Bottom";
+                                    break;
+                                default:
+                                    $position = $this::JS_POSITION;
+
+                            }
+
 							$this->tpl[0]->parse("SectJsSrc" . $position, false);
 							if($value["async"]) {
                                // $this->tpl[0]->parse("SectJSAsync", false);
                             }
-							$this->tpl[0]->set_var("SectJsEmbed", "");
+							//$this->tpl[0]->set_var("SectJsEmbed", "");
 							$this->tpl[0]->parse("SectJs" . $position, true);
 							if (!$static_init/* && ffIsset($alldeps, $key)*/)
 							{
@@ -3398,11 +3621,10 @@ class ffPage_html extends ffPage_base
 	 */
 	public function addContent($content, $group = null, $id = null, $options = array())
 	{
-	    if(is_array($id) && !$options) {
+	   /* if(is_array($id) && !$options) {
 	       $options = $id;
 	       $id = null;
         }
-
         if($this->tab && $group === "tabs" && !$this->groups["tabs"]) {
             $this->widgetLoad("tabs");
             parent::addContent(null, true, "tabs");
@@ -3410,7 +3632,7 @@ class ffPage_html extends ffPage_base
 		{
             //$options["tab_mode"] = $this->tab;
             $this->widgetLoad("tabs");
-        }
+        }*/
 		parent::addContent($content, $group, $id, $options);
 
 		if ($content !== null)
@@ -3442,6 +3664,63 @@ class ffPage_html extends ffPage_base
 		}
 	}
 
+    /**
+     * @param $key
+     * @param array|null $params
+     * 	    hide_title
+            fixed_pre_content
+            fixed_post_content
+            class
+            title
+            primary_field
+            description
+            tab
+     */
+	public function addGroup($key, Array $params = null) {
+        if(is_array($key) ) {
+            $params                     = $key;
+            $key                        = ($params["title"]
+                                            ? $params["title"]
+                                            : $this->randID("page-group")
+                                        );
+        }
+
+        if(is_array($params["width"])) {
+            $params["framework_css"]["container"]["col"]    = frameworkCSS::setResolution($params["width"]);
+        } elseif(strlen($params["width"])) {
+            $params["framework_css"]["container"]["class"]  = $params["width"];
+        }
+
+        $params["framework_css"]        = array_replace_recursive(($this->groups[$key]["framework_css"]
+                                            ? $this->groups[$key]["framework_css"]
+                                            : $this->framework_css["group"]
+                                        ), (array) $params["framework_css"]);
+
+        parent::addGroup($key, $params);
+    }
+
+	/**
+	 * Aggiunge un nuovo Tab con un tag specifico
+	 * @param String $name
+	 */
+	public function addTab($name)
+	{
+		if(!$this->tab)
+			$this->tab = true;
+
+		if (!isset($this->tabs["contents"][$name]))
+			$this->tabs["contents"][$name] = array();
+	}
+
+	/**
+	 * Imposta il titolo di un tab
+	 * @param String $name il tag del tab
+	 * @param String $title
+	 */
+	public function setTabTitle($name, $title)
+	{
+		$this->tabs["contents"][$name]["title"] = $title;
+	}
 	function process_params()
 	{
 		if (ffTheme::RANDOMIZE_COMP_ID && count($this->components))
@@ -3676,12 +3955,7 @@ class ffPage_html extends ffPage_base
 						$this->components_buffer[$item]["headers"] = $this->components[$item]->process_headers();
 						$this->components_buffer[$item]["footers"] = $this->components[$item]->process_footers();
 
-						/*if (property_exists($this->components[$item], "widget_activebt_enable") && $this->components[$item]->widget_activebt_enable && !isset($this->widgets["activebuttons"])) {
-                            $this->widgetLoad("activebuttons");
-                        }
-						if (property_exists($this->components[$item], "widget_discl_enable") && $this->components[$item]->widget_discl_enable && !isset($this->widgets["disclosures"])) {
-                            $this->widgetLoad("disclosures");
-                        }*/
+                        //$this->contents[$item]["width"] = $this->components[$item]->framework_css["outer_wrap"]["col"];
 
 						$ret = $this->componentWidgetsProcess($tmp_id_if);
 						$this->components_buffer[$item]["headers"] .= $ret["headers"];

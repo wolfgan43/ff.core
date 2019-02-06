@@ -130,7 +130,9 @@ class ffButton
  */
 abstract class ffButton_base extends ffCommon
 {
-	// ----------------------------------
+    const NAME                  = "ffb";
+
+    // ----------------------------------
 	//  PUBLIC VARS (used for settings)
 	var $framework_css					= array(
 											"addon" => null // null OR prefix OR postfix

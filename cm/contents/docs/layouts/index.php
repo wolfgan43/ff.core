@@ -23,6 +23,8 @@
  *  @license http://opensource.org/licenses/gpl-3.0.html
  *  @link https://github.com/wolfgan43/vgallery
  */
+$dbStruct = Orm::get("access", "users");
+
 
 $layout = ($_REQUEST["layout"]
     ? $_REQUEST["layout"]
@@ -35,7 +37,7 @@ $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->id = "LayoutModify";
 $oRecord->resources[] = $oRecord->id;
 $oRecord->skip_action = true;
-$oRecord->src_table = "cm_mod_security_users";
+$oRecord->src_table = $dbStruct["table"]["name"];
 $oRecord->hide_all_controls = true;
 
 $oField = ffField::factory($cm->oPage);

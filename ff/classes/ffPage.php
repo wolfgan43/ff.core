@@ -29,7 +29,8 @@ if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_C
 
 class ffPage
 {
-    static protected $events = null;
+    private static $singleton = null;
+    protected static $events = null;
 
     public function __construct()
     {
@@ -85,12 +86,15 @@ class ffPage
         }
 
         //require_once $base_path;
-        $tmp = new $class_name($disk_path, $site_path, $page_path, $theme);
+        self::$singleton = new $class_name($disk_path, $site_path, $page_path, $theme);
 
-        $res = self::doEvent("on_factory_done", array($tmp));
+        $res = self::doEvent("on_factory_done", array(self::$singleton));
 
-        return $tmp;
+        return self::$singleton;
     }
+
+
+
 }
 
 /**
@@ -208,7 +212,7 @@ abstract class ffPage_base extends ffCommon
      */
     var $buttons					= array();
     /**
-     * i componenti aggiunti alla pagina tramite addContent o addComponent (ffGrid, ffRecord, ffDetails)
+     * i componenti aggiunti alla pagina tramite addContent (ffGrid, ffRecord, ffDetails)
      * @var array()
      */
     var $components				= array();
@@ -365,31 +369,35 @@ abstract class ffPage_base extends ffCommon
                 )
             )
             {
-                if ($id === null)
-                    $id = $content->id;
+                if ($id === null) {
+                    if(!$content->id) {
+                        $content->id = $this->randID($content::NAME);
+                    }
 
+                    $id = $content->id;
+                }
                 if (is_subclass_of($content, "ffPageNavigator_base"))
                 {
                     $content->parent = array(&$this);
-                    $this->objects[$content->id] = $content;
+                    $this->objects[$id] = $content;
                     return;
                 }
                 elseif (is_subclass_of($content, "ffField_base"))
                 {
                     $content->parent_page = array(&$this);
-                    $this->fields[$content->id] = $content;
+                    $this->fields[$id] = $content;
                     $content->cont_array =& $this->fields;
                 }
                 elseif (is_subclass_of($content, "ffButton_base"))
                 {
                     $content->parent_page = array(&$this);
-                    $this->buttons[$content->id] = $content;
+                    $this->buttons[$id] = $content;
                 }
                 else
                 {
                     $content->parent = array(&$this);
-                    $this->components[$content->id] = $content;
-                    $this->params[$content->id] = array();
+                    $this->components[$id] = $content;
+                    $this->params[$id] = array();
                 }
 
                 if (is_array($content->widget_deps) && count($content->widget_deps))
@@ -407,6 +415,7 @@ abstract class ffPage_base extends ffCommon
 
                 if ($content->use_own_location || !$content->display)
                     return;
+
             } elseif(is_string($content)) {
                 if(strpos($content, "/") === 0 && is_file($content)) {
                     $content = file_get_contents($content);
@@ -419,6 +428,22 @@ abstract class ffPage_base extends ffCommon
                 }
             }
 
+
+            if ($id === null) {
+                $id = $this->randID("content");
+            }
+
+            if(!$group) {
+                $group = "_main_";
+            }
+
+            $this->addGroup($group, array(
+                "contents" => array(
+                    $id => $content
+                )
+            ));
+
+            /*
             if ($id === null)
                 $id = uniqid(time(), true);
 
@@ -433,10 +458,13 @@ abstract class ffPage_base extends ffCommon
                 if (isset($options["title"]))
                     $this->groups[$group]["contents"][(string)$id]["title"] = $options["title"];
             }
-
+*/
         }
         elseif ($group === true)
         {
+            $this->addGroup($group);
+
+/*
             if ($id === null)
                 $id = (string)uniqid(time(), true);
 
@@ -449,36 +477,80 @@ abstract class ffPage_base extends ffCommon
             if (isset($options["tab_mode"]))
                 $this->groups[$id]["tab_mode"] = $options["tab_mode"];
             if (isset($options["vars"]))
-                $this->groups[$id]["vars"] = $options["vars"];
-        }
-        else
+                $this->groups[$id]["vars"] = $options["vars"];*/
+        } else {
             ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
-
+        }
 
         //ffErrorHandler::raise("Unhandled Content", E_USER_WARNING, $this, get_defined_vars());
     }
 
     /**
-     * DEPRECATA!!! USARE addContent()
-     *		Aggiunge un componente alla pagina, facendo si che sia processato.
-     * 		Ogni componente deve avere un id univoco (componente->id) o ffPage sovrascriver?? l'istanza.
-     * 		E' bene ricordare che il componente viene memorizzato tramite un riferimento.
-     * 		Questo significa che modifiche successive alla variabile contenente l'oggetto saranno applicate
-     * 		anche all'istanza presente nella collezione.
-     * @param pComponent $component una variabile oggetto contenente un componente di Forms
-     * 		(ffGrid, ffRecord, ffDetails, ffCalendar)
+     * @param $key
+     * @param array|null $params
+     * 	    hide_title
+            fixed_pre_content
+            fixed_post_content
+            class
+            title
+            primary_field
+            description
+            tab
      */
-    function addComponent($component)
-    {
-        if (
-            !is_subclass_of($component, "ffGrid_base")
-            && !is_subclass_of($component, "ffRecord_base")
-            && !is_subclass_of($component, "ffDetails_base")
-        )
-            ffErrorHandler::raise("Wrong call to addComponent: object must be a Forms Component", E_USER_ERROR, $this, get_defined_vars());
+    public function addGroup($key, Array $params = null) {
+        static $last_tab_key            = null;
+        static $tabs_excluded           = array();
 
-        $this->addContent($component);
+        if($key != "_main_") {
+            /* if(is_array($params["tab"])) {
+                 $tab_key = ($params["tab"]["title"]
+                     ? $params["tab"]["title"]
+                     : $key
+                 );
+             } else */
+            if (is_string($params["tab"])) {
+                $tab_key                = (strlen($params["tab"])
+                                            ? $params["tab"]
+                                            : $key
+                                        );
+            } elseif (is_bool($params["tab"])) {
+                $tab_key                = ($last_tab_key
+                                            ? $last_tab_key
+                                            : $key
+                                        );
+
+            } else {
+                $tab_key                = $key;
+            }
+
+            $this->tabs["contents"][$tab_key]["groups"][$key] = $key;
+            $last_tab_key               = $tab_key;
+            if ($tab_key != $key) {
+                $tabs_excluded[$key]    = $tab_key;
+            }
+
+            if ($tabs_excluded[$key] && $this->tabs["contents"][$key]) {
+                unset($this->tabs["contents"][$key]);
+            }
+        }
+
+	    if(!isset($params["title"])) {
+	        $params["title"]            = ucfirst($key);
+        }
+
+        $contents = $params["contents"];
+        $params["contents"] = (array) $this->groups[$key]["contents"];
+        if(is_array($contents) && count($contents)) {
+            foreach ($contents AS $id => $content) {
+                $params["contents"][$id]["data"] = $content;
+            }
+        }
+
+        $this->groups[$key]             = $params;
     }
+
+
+
 
     /**
      * aggiunge alla pagina un riferimento a componenti non presenti nella pagina medesima, ma i cui parametri
@@ -608,7 +680,7 @@ abstract class ffPage_base extends ffCommon
     /**
      * Questa funzione restituisce la directory dove sono contenuti i temi del sito web.
      *
-     * @return La directory dei temi.
+     * @return string
      */
     function getThemeDir()
     {

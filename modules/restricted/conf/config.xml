@@ -63,7 +63,6 @@
         <APP_FONT_ICON value="fontawesome" />
 
         <MOD_RESTRICTED_DYNAMIC_TABS value="false" />
-        <MOD_RESTRICTED_DEVELOPER value="true" />
         <MOD_RESTRICTED_LOGO_PATH value="null" />
         <MOD_RESTRICTED_PATH value="/restricted" />
         <MOD_RESTRICTED_LAYOUT value="restricted" />

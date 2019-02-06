@@ -13,7 +13,7 @@ class ffButton_html extends ffButton_base
 	var $container_properties	= "";
 	var $data_class			= "";
 	var $data_properties		= array();
-	var $widget_activebt_enable = false;
+	//var $widget_activebt_enable = false;
 	
 	var $fixed_pre_content = "";
 	var $fixed_post_content = "";
@@ -131,13 +131,13 @@ class ffButton_html extends ffButton_base
 		$this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
 		$this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
 		
-		if(strpos($this->get_class(), "activebuttons") !== false) {
+		/*if(strpos($this->get_class(), "activebuttons") !== false) {
 			$this->widget_activebt_enable = true;
 
 			if($this->parent !== NULL && property_exists($this->parent[0], "widget_activebt_enable")) {
 				$this->parent[0]->widget_activebt_enable = true;
 			}
-		}
+		}*/
 		
 		$this->tpl[0]->set_var("properties", $this->getProperties());
 

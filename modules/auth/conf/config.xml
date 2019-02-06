@@ -49,8 +49,8 @@
 	<env>
 		<MOD_AUTH_USER_AVATAR value="100x100" />
 		<MOD_AUTH_MULTIDOMAIN value="false" />
-		<MOD_AUTH_USERNAME_RECOVER_USERNAME value="false" />
-		<MOD_AUTH_PASSWORD_RECOVER value="false" />
+		<MOD_AUTH_RECOVER_ACCOUNT value="false" />
+		<MOD_AUTH_RECOVER_PASSWORD value="true" />
 		<MOD_AUTH_SOCIAL_FACEBOOK value="true" />
 		<MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_ID value="" />
 		<MOD_AUTH_SOCIAL_FACEBOOK_CLIENT_SECRET value="" />
@@ -85,14 +85,13 @@
 		<MOD_AUTH_SOCIAL_FF_CLIENT_SECRET value="" />
 		<MOD_AUTH_SOCIAL_FF_CLIENT_REDIRECT value="" />
 
-		<MOD_AUTH_SESSION_PERMANENT value="false" />
+		<MOD_AUTH_SESSION_PERMANENT value="true" />
 		<MOD_AUTH_COOKIE_SHARE value="true" />
-		<MOD_AUTH_REGISTRATION value="false" />
+		<MOD_AUTH_REGISTRATION value="true" />
         <MOD_AUTH_GUEST_GROUP_NAME value="guests" />
         <MOD_AUTH_GUEST_GROUP_ID value="2" />
         <MOD_AUTH_GUEST_USER_NAME value="guest" />
         <MOD_AUTH_GUEST_USER_ID value="2" />
         <MOD_AUTH_BRAND_ACL value="3" />
-        <MOD_AUTH_BRAND_LOGO value="" />
 	</env>
 </configdata>

@@ -223,6 +223,8 @@ function ffPage_seo_optimize($oPage)
                 //$imgNodeClass = $imgNode->getAttribute("class");
                 //if(CM_CACHE_IMG_LAZY_LOAD && strpos($imgNodeClass, "lazy fake") !== false)
                 //	continue;
+                $imgNodeSrc = null;
+                $imgNodeSrcSet = null;
                 $imgNodeClass = $imgNode->getAttribute("class");
                 $enable_lazy = CM_CACHE_IMG_LAZY_LOAD && strpos($imgNodeClass, "nolazy") === false;
                 if($imgNode->hasAttribute("data-src")) {
@@ -234,16 +236,60 @@ function ffPage_seo_optimize($oPage)
 				} elseif($imgNode->hasAttribute("src")) {
                     $imgNodeSrc = $imgNode->getAttribute("src");
                     $imgNodeSrcExt = substr($imgNodeSrc, -4);
-                    if($enable_lazy && ($imgNodeSrcExt == ".jpg" || $imgNodeSrcExt == ".png" || $imgNodeSrcExt == ".gif")) {
-                        $imgNode->removeAttribute("src");
-                        $imgNode->setAttribute("data-src", $imgNodeSrc);
-                    } else {
-						$enable_lazy = false;
+                    if($enable_lazy && $imgNodeSrcExt != ".jpg" && $imgNodeSrcExt != ".png" && $imgNodeSrcExt != ".gif") {
+                        $enable_lazy = false;
 					}
                 }
+                if($imgNode->hasAttribute("data-srcset")) {
+                    $imgNodeSrcSet = $imgNode->getAttribute("data-srcset");
+                } elseif($imgNode->hasAttribute("srcset")) {
+                    $imgNodeSrcSet = $imgNode->getAttribute("srcset");
+                }
 
-				if(strpos($imgNodeSrc, "/") !== 0 && strpos($imgNodeSrc, "http") !== 0)
-					continue;
+                if(CM_CACHE_PATH_CONVERT_SHOWFILES) {
+                    $imgNodeSrc = cmCache_convert_imagepath_to_showfiles($imgNodeSrc, $imgNode->getAttribute("width"), $imgNode->getAttribute("height"));
+                    if($imgNodeSrcSet) {
+                        $imgNodeSrcSet = explode(",", $imgNodeSrcSet);
+                        if(is_array($imgNodeSrcSet) && count($imgNodeSrcSet)) {
+                            $arrSrcSetNew = array();
+                            foreach($imgNodeSrcSet AS $srcset_key => $srcset) {
+                                $arrSrcSet = explode(" ", trim($srcset));
+                                $arrSrcSetNew[] = cmCache_convert_imagepath_to_showfiles($arrSrcSet[0]) . " " . $arrSrcSet[1];
+                            }
+
+                            $imgNodeSrcSet = implode(", ", $arrSrcSetNew);
+                            if(!$imgNode->hasAttribute("sizes"))
+                                $imgNode->setAttribute("sizes", "100vw");
+                        }
+                    }
+                }
+
+                $imgNode->removeAttribute("src");
+                $imgNode->removeAttribute("srcset");
+                $imgNode->removeAttribute("data-src");
+                $imgNode->removeAttribute("data-srcset");
+                if($enable_lazy) {
+                    $imgNode->setAttribute("src", "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==");
+                    if($imgNodeSrc) {
+                        $imgNode->setAttribute("data-src", $imgNodeSrc);
+                    }
+                    if($imgNodeSrcSet) {
+                        $imgNode->setAttribute("data-srcset", $imgNodeSrcSet);
+                    }
+                    if (strpos($imgNodeClass, "lazy") === false) {
+                        $imgNode->setAttribute("class", ($imgNodeClass ? $imgNodeClass . " " : "") . "lazy");
+                    }
+                } else {
+                    if($imgNodeSrc) {
+                        $imgNode->setAttribute("src", $imgNodeSrc);
+                    }
+                    if($imgNodeSrcSet) {
+                        $imgNode->setAttribute("srcset", $imgNodeSrcSet);
+                    }
+                }
+
+                /*if(strpos($imgNodeSrc, "/") !== 0 && strpos($imgNodeSrc, "http") !== 0)
+                    continue;
 
                 if(CM_CACHE_PATH_CONVERT_SHOWFILES) {
                     if($imgNode->hasAttribute("srcset") && strlen($imgNode->getAttribute("srcset")))
@@ -271,7 +317,7 @@ function ffPage_seo_optimize($oPage)
                     $imgNode->setAttribute("src", "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==");
                     if(strpos($imgNodeClass, "lazy") === false)
                         $imgNode->setAttribute("class", ($imgNodeClass ? $imgNodeClass . " " : "") . "lazy");
-                }
+                }*/
                 if($imgNode->hasAttributes() && strlen($imgNodeSrc)) {
                     if($imgNode->hasAttribute("style")) {
                         $arrImgStyle = explode(";", $imgNode->getAttribute("style"));
@@ -386,7 +432,7 @@ function ffPage_seo_optimize($oPage)
             $oPage->css_buffer["default"][]["content"] =  '
 				IMG.lazy {border: 1px solid #cacaca;}
 				.lazyloader { border: 1px solid #cacaca;}
-				.lazyloader + IMG.lazy, .lazyloader + PICTURE { display:none;}';
+				.lazyloader + IMG.lazy, .lazyloader + PICTURE, .lazyloader + FIGURE { display:none;}';
         }
     }
 

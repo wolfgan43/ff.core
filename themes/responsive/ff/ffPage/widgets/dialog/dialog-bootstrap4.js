@@ -212,9 +212,11 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 	var tmp = '<div id="ffWidget_dialog_' + id + '" class="ff-modal modal fade" role="dialog">'
 				 +  '<div class="modal-dialog' + (tmp_params["class"] || "") + '">'
 				 +    '<div class="modal-content">'
-				 +      '<div class="modal-header">'
-				 +        '<h5 class="modal-title">' + (title || "") + '</h5>'
-				 +        '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>'
+				 +      '<div class="modal-header d-block">'
+				 + 		  '<div class="d-flex">'
+				 +          '<h3 class="modal-title">' + (title || "") + '</h3>'
+				 +          '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>'
+				 +		  '</div>'
 				 +      '</div>'
 				 +      '<div id="ffWidget_dialog_container_' + id + '" class="modal-body clearfix">' + (data || "") + '</div>'
 				 +      '<div class="modal-footer"></div>'
@@ -696,15 +698,16 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 	if(countDetail && !countRecord)
 		return;
 
-	if(jQuery(".dialogTitle", instance).length) {
-		jQuery(".modal-title").addClass(jQuery(".dialogTitle:first", instance).attr("class")).removeClass("dialogTitle");
+	if(jQuery(".card-title", instance).length) {
+		jQuery(".modal-title").addClass(jQuery(".card-title:first", instance).attr("class")).removeClass("card-title");
 /*		jQuery(".dialogTitle:first", instance).appendTo(jQuery(".modal-title", widget).empty()).attr("class", "dlgTitle");
 */		
-		jQuery(".modal-title", widget).html(jQuery(".dialogTitle:first", instance).html());
-		jQuery(".dialogTitle:first", instance).remove();
+		jQuery(".modal-title", widget).html(jQuery(".card-title:first", instance).html());
+		jQuery(".card-title:first", instance).remove();
 	}
 	
-	var calloutTargetClass = "modal-header";
+	//var calloutTargetClass = "modal-header";
+
 	//tabs groups
 	/*if(jQuery(".dialogSubTitleTab", instance).length) { //da eliminare
 		var startSel = 0;
@@ -742,16 +745,18 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 		jQuery(".modal-header", widget).addClass("noborder");
 		
 		calloutTargetClass = "modal-tabs";
-	} else*/ if(jQuery(".ffTab", instance).length) { 	//tabs responsive
+	} else*/
+	/*if(jQuery(".ffTab", instance).length) { 	//tabs responsive
 		jQuery(".ffTab", instance).insertAfter(jQuery(".modal-header", widget)).wrapAll('<div class="modal-tabs" />');
 		jQuery(".modal-header", widget).addClass("noborder");
-		
-		calloutTargetClass = "modal-tabs";
-	}
 
-	if(jQuery(".dialogSubTitle", instance).length) {
-		jQuery(".dialogSubTitle", instance).insertAfter(jQuery("." + calloutTargetClass, widget)).removeClass("dialogSubTitle").wrapAll('<div class="modal-callout" />');
-	}
+		calloutTargetClass = "modal-tabs";
+	}*/
+
+    if(jQuery(".card-subtitle", instance).length) {
+        jQuery(".modal-header .d-flex", widget).after('<small class="modal-title">' + jQuery(".card-subtitle", instance).html() + '</small>');
+        jQuery(".card-subtitle", instance).remove();
+    }
 
 
 	

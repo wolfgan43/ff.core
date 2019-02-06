@@ -2,79 +2,55 @@
 <!--EndSectHeaders-->
 {outer_wrap_start}
 <{record_tag} {component_properties}> 
-	<div class="hidden">
-		<input type="hidden" id="{component}detailaction" name="{component}detailaction" value="" />
-		<!--BeginSectHiddenField-->
-		<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
-		<!--EndSectHiddenField-->
-	</div>
+	<!--BeginSectHiddenField-->
+	<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
+	<!--EndSectHiddenField-->
 
     {inner_wrap_start}
+	{header_wrap_start}
+		{fixed_pre_content}
 
-	<!--BeginSectTitle-->
-	<h2 class="{title_class}">{discl_bt}{record_title}</h2>
-	<!--EndSectTitle-->
-	{fixed_pre_content}
+		{title}
+		{subtitle}
 
-	<!--BeginSectDescription-->
-	<div class="{info_class}">{record_description}</div>
-	<!--EndSectDescription-->
+	{header_wrap_end}
 
-	<!--BeginSectError-->
-	<div class="{error_class}">{strError}</div>
-	<!--EndSectError-->
+    {body_wrap_start}
+		<!--BeginSectError-->
+		<div class="{error_class}">{strError}</div>
+		<!--EndSectError-->
 
-    {content_wrap_start}
 		{form_default}
 		{form_tabs}
 		<!--BeginSectGroup-->
-		<!--BeginSectGroupStart-->
-		<fieldset class="{group_class}">
+		{group_pre_content}
+	<!--BeginSectGroupStart-->
+		<fieldset {group_class}>
 			<!--BeginSectGroupTitle--> 
 			<legend{title_properties}>{GroupTitle}</legend>
 			<!--EndSectGroupTitle-->
-		<!--EndSectGroupStart-->
-            {group_pre_content}
 			<!--BeginSectGroupDescription-->
-			<div class="desc">{GroupDescription}</div>
+			<p{description_properties}>{GroupDescription}</p>
 			<!--EndSectGroupDescription-->
-			<!--BeginSectGroupRow-->
-			<!--BeginSectWrapStart-->
-			<div class="{wrap_class}">
-			<!--EndSectWrapStart-->
-			{field_container_start}
-				{content_pre_label}
-				<!--BeginSectGroupLabel-->
-					{label_prefix}
-					<label{label_class} for="{label_for}"{label_properties}>
-						{content_in_label}
-						{label}
-					</label>
-					<!--BeginSectDescriptionLabel-->
-					<span class="description">{fielDescription}</span>
-					<!--EndSectDescriptionLabel-->
-					{label_postfix}
-				<!--EndSectGroupLabel-->
-				{content}
-			{field_container_end}
-			<!--BeginSectWrapEnd-->
-			</div>
-			<!--EndSectWrapEnd-->
-			<!--EndSectGroupRow-->
-            {group_post_content}
-        <!--BeginSectGroupEnd-->
+	<!--EndSectGroupStart-->
+
+			{content}
+	<!--BeginSectGroupEnd-->
 		</fieldset>
-		<!--EndSectGroupEnd-->
+	<!--EndSectGroupEnd-->
+		{group_post_content}
 		<!--EndSectGroup-->
 
 		<!--BeginSectRequiredNote-->
 		{_require_note}
 		<!--EndSectRequiredNote-->
-    {content_wrap_end}
-	<!--BeginSectControls-->
-	<div class="{actions_class}">{ActionButtons}{ActionButtonCancel}</div>
-	<!--EndSectControls-->
-	{fixed_post_content}
+		{fixed_post_content}
+    {body_wrap_end}
+	{footer_wrap_start}
+		<!--BeginSectControls-->
+		<div class="{actions_class}">{ActionButtons}{ActionButtonCancel}</div>
+		<!--EndSectControls-->
+	{footer_wrap_end}
 
     {inner_wrap_end}
 </{record_tag}>

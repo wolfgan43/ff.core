@@ -105,7 +105,9 @@ class ffGrid
  */
 abstract class ffGrid_base extends ffCommon
 {
-	// ----------------------------------
+    const NAME                  = "ffg";
+
+    // ----------------------------------
 	//  PUBLIC VARS (used for settings)
 
 	/**
@@ -843,6 +845,12 @@ abstract class ffGrid_base extends ffCommon
 		 if($rc !== null)
 		 	return;
 
+        if($this->record_id) {
+            $this->resources[] = $this->record_id;
+        }
+        if($this->record_url) {
+            $this->resources[] = crc32($this->record_url);
+        }
 		// display error
 		if($this->tpl !== null)
 		{
@@ -851,10 +859,10 @@ abstract class ffGrid_base extends ffCommon
 			// process all section
 	        $this->initControls();
 
+            $this->process_search();
+            $this->process_action_buttons_header();
 			$this->process_action_buttons();
-	        $this->process_action_buttons_header();
 
-			$this->process_search();
 			$this->process_alpha();
 			$this->process_hidden();
 		}
@@ -1464,7 +1472,7 @@ abstract class ffGrid_base extends ffCommon
 
 		//$this->process_labels(); 	// also do order, because order is embedded with labels
 
-		if($this->tpl !== null)
+		/*if($this->tpl !== null)
 		{
 			if ($this->display_new) // done at this time due to maxspan
 			{
@@ -1482,15 +1490,12 @@ abstract class ffGrid_base extends ffCommon
 								$this->parent[0]->get_globals() . $this->addit_insert_record_param .
 								"ret_url=" . rawurlencode($_SERVER['REQUEST_URI']);
 				}
+
 				$this->tpl[0]->set_var("addnew_url", ffCommon_specialchars($temp_url));
 				$this->tpl[0]->parse("SectAddNew", false);
 				$this->tpl[0]->set_var("SectNotAddNew", "");
 			}
-			else
-			{
-				$this->tpl[0]->set_var("SectAddNew", "");
-			}
-		}
+		}*/
 
         if (strlen($this->processed_SQL))
         {
@@ -1571,77 +1576,7 @@ abstract class ffGrid_base extends ffCommon
 		reset($this->grid_fields);
 	}
 
-	/**
-	 * action buttons processing function
-	 * called by process_interface()
-	 */
-	function process_action_buttons()
-	{
-		if (!$this->display_actions)
-		{
-			$this->tpl[0]->set_var("SectActionButtons", "");
-			return;
-		}
 
-		$count = 0;
-		if (is_array($this->action_buttons) && count($this->action_buttons))
-		{
-			foreach ($this->action_buttons as $key => $FormButton)
-			{
-				if (!isset($this->buttons_options[$key]["display"]) || $this->buttons_options[$key]["display"] !== false)
-				{
-					$this->tpl[0]->set_var("ActionButton", $this->action_buttons[$key]->process());
-					$this->tpl[0]->parse("SectAction", true);
-					$count++;
-				}
-			}
-			reset($this->action_buttons);
-			$this->tpl[0]->parse("SectActionButtons", false);
-		}
-		
-		if ($count)
-			$this->tpl[0]->parse("SectActionButtons", false);
-		else
-		{
-			$this->tpl[0]->set_var("SectAction", "");
-			$this->tpl[0]->set_var("SectActionButtons", "");
-		}
-	}
-    /**
-     * action buttons processing function
-     * called by process_interface()
-     */
-    function process_action_buttons_header()
-    {
-        if (!$this->display_actions)
-        {
-            $this->tpl[0]->set_var("SectActionButtonsHeader", "");
-            return;
-        }
-
-		$count = 0;
-        if (is_array($this->action_buttons_header) && count($this->action_buttons_header))
-        {
-            foreach ($this->action_buttons_header as $key => $FormButton)
-            {
-				if (!isset($this->buttons_options[$key]["display"]) || $this->buttons_options[$key]["display"] !== false)
-				{
-					$this->tpl[0]->set_var("ActionButtonHeader", $this->action_buttons_header[$key]->process());
-					$this->tpl[0]->parse("SectActionHeader", true);
-					$count++;
-				}
-            }
-            reset($this->action_buttons_header);
-        }
-		
-		if ($count)
-			$this->tpl[0]->parse("SectActionButtonsHeader", false);
-        else
-        {
-            $this->tpl[0]->set_var("SectActionHeader", "");
-            $this->tpl[0]->set_var("SectActionButtonsHeader", "");
-        }
-    }
 
 	/**
 	 * action processing function

@@ -214,10 +214,7 @@ function on_load_section_breadcrumb($page, $tpl, $attr)
 		}
 	}
 
-	$tpl->set_var("page-title", ($page->title == cm_getAppName()
-		? ucwords(str_replace("-", " ", basename($cm->path_info)))
-		: str_replace(" - " . cm_getAppName(), "", $page->title)
-	));
+	$tpl->set_var("page-title", $page->getTitle());
 
 }
 function on_load_section_favorite($page, $tpl, $attr)
@@ -926,4 +923,9 @@ function on_load_section_rightcol($page, $tpl, $attr) {
     {
         $tpl->parse("SectMenu", false);
     }
+}
+
+
+function section_controller_title($page) {
+    return $page->getTitle();
 }

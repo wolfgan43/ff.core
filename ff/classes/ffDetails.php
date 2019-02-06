@@ -104,7 +104,9 @@ class ffDetails
  */
 abstract class ffDetails_base extends ffCommon
 {
-	// ----------------------------------
+    const NAME                  = "ffd";
+
+    // ----------------------------------
 	//  PUBLIC VARS (used for settings)
 
 	/**

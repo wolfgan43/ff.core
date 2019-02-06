@@ -51,7 +51,7 @@ ff.ffField.uploadifive = (function () {
 			data[component]["tmpnameComponent"] = document.getElementById(component + params.tmpname);
 			data[component]["deleteComponent"] 	= document.getElementById(component + params.sufdel);
 			
-			data[component]["idComponent"] 		= component.replace(/[^a-zA-Z0-9]+/g,'');
+			data[component]["idComponent"] 		= component.replace(/[^a-zA-Z0-9_\-]+/g,'');
 
 			if(!data[component]["width"])
 				data[component]["width"] = 100;

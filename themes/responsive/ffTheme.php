@@ -538,7 +538,83 @@ class ffTheme {
 
     protected $ffDefaults                       = array(
                                                     "ffPage" => array(
-                                                        "default_js" => array(
+                                                        "favicons" => array(
+                                                            "favicon" => array(
+                                                                "rel"       => "shortcut icon"
+                                                                , "sizes"   => "16x16"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-57x57" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "57x57"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-60x60" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "60x60"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-72x72" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "72x72"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-76x76" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "76x76"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-114x114" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "114x114"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-120x120" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "120x120"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-144x144" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "144x144"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-152x152" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "152x152"
+                                                                , "href"    => null
+                                                            )
+                                                            , "apple-touch-icon-180x180" => array(
+                                                                "rel"       => "apple-touch-icon"
+                                                                , "sizes"   => "180x180"
+                                                                , "href"    => null
+                                                            )
+                                                            , "icon-192x192" => array(
+                                                                "rel"       => "icon"
+                                                                , "type"    => "image/png"
+                                                                , "sizes"   => "192x192"
+                                                                , "href"    => null
+                                                            )
+                                                            , "icon-32x32" => array(
+                                                                "rel"       => "icon"
+                                                                , "type"    => "image/png"
+                                                                , "sizes"   => "32x32"
+                                                                , "href"    => null
+                                                            )
+                                                            , "icon-96x96" => array(
+                                                                "rel"       => "icon"
+                                                                , "type"    => "image/png"
+                                                                , "sizes"   => "96x96"
+                                                                , "href"    => null
+                                                            )
+                                                            , "icon-16x16" => array(
+                                                                "rel"       => "icon"
+                                                                , "type"    => "image/png"
+                                                                , "sizes"   => "16x16"
+                                                                , "href"    => null
+                                                            )
+                                                        )
+                                                        , "default_js" => array(
                                                             "jquery" => null
                                                             , "ff.page" => null
                                                         )

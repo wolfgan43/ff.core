@@ -42,12 +42,13 @@ $cm->oPage->addContent(__DIR__ . "/media.html", "tabs", array(
     )
     , "title" => "Static"
 ));
+/*
 $cm->oPage->addContent(__DIR__ . "/media.html", "tabs", array(
     "vars" => array(
         "{site_path}" => FF_SITE_PATH
         , "/media" => "/cm/showfiles.php"
     )
     , "title" => "Showfiles"
-));
+));*/
 
 

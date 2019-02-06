@@ -1,6 +1,5 @@
 <!--BeginSectHeaders-->
 <!--EndSectHeaders-->
-
 {outer_wrap_start}
 <{grid_tag} id="{component_id}" {component_properties}>
 	<!--BeginSectHidden-->
@@ -23,25 +22,28 @@
     {inner_wrap_start}
     {header_wrap_start}
 	    {fixed_pre_content}
-		<!--BeginSectTitle-->
-		<h2 class="{title_class}">{discl_bt}{title}</h2>
-		<!--EndSectTitle-->
+        {title}
 		{fixed_title_content}
 
-        <!--BeginSectDescription-->
-        <div class="{description_class}">{description}</div>
-        <!--EndSectDescription-->
+        {description}
+
         {fixed_heading_content}
     {header_wrap_end}
 
     {body_wrap_start}
 	<!--BeginSectGrid-->
+
+    <!--BeginSectError-->
+    <div class="{error_class}">{strError}</div>
+    <!--EndSectError-->
+
+    <!--BeginSectActionButtonsHeader-->
     <div class="{actions_top_class}" >
-        <!--BeginSectActionButtonsHeader-->
         <!--BeginSectActionHeader-->
         {ActionButtonHeader}
         <!--EndSectActionHeader-->
-        <!--EndSectActionButtonsHeader-->
+        {ActionAddNew}
+
         <!--BeginSectAddNew-->
         <!--BeginSectAddNewUrl-->
         <a href="{addnew_url}"{addnew_class}>{addnew_icon}{addnew_label}</a>
@@ -54,13 +56,11 @@
         <!--BeginSectFilterToggle-->
         <a class="{filter_class}" href="javascript:void(0)" {filter_properties} onclick="ff.ffGrid.advsearchToggle('{component_id}', '{hide_class}');">{filter_icon}{filter_label}</a>
         <!--EndSectFilterToggle-->
-
-
-
     </div>
+    <!--EndSectActionButtonsHeader-->
 
-    <!--BeginSectFields-->
-    <div class="{adv_class}">
+    <!--BeginSectSearch-->
+    {wrap_search_start}
         <!--BeginSectSearchRow-->
         <div class="{adv_row_class}">
             <!--BeginSectSearchCol-->
@@ -70,13 +70,9 @@
         <!--EndSectSearchRow-->
         {search_fixed_after}
         {SearchButtonsAdv}
-    </div>
-    <!--EndSectFields-->
-
-        <!--BeginSectError-->
-        <div class="{error_class}">{strError}</div>
-        <!--EndSectError-->
-
+    {wrap_search_end}
+    <!--EndSectSearch-->
+    <!--BeginSectBeforeTable-->
         <div class="{table_before_class}">
             <div class="{table_before_left_class}">
                 <!--BeginSectPaginatorTop-->
@@ -84,22 +80,10 @@
                 <!--EndSectPaginatorTop-->
             </div>
             <div class="{table_before_right_class}">
-                <!--BeginSectSearch-->
-                <div class="{search_class}">
-                    <div class="{search_box_class}">
-                        {SearchAll}
-                        <!--BeginSectAdvSearch-->
-                        <!--{search_more_container_class_start}
-                        <a class="{search_more_class}" href="javascript:void(0)" onclick="ff.ffGrid.advsearchToggle('{component_id}', '{hide_class}');">{search_more_label}</a>
-                        {search_more_container_class_end}-->
-                        <!--EndSectAdvSearch-->
-                        {SearchButtons}
-                    </div>
-                </div>
-                <!--EndSectSearch-->
+                {omniSearch}
             </div>
         </div>
-
+    <!--EndSectBeforeTable-->
         <!--BeginSectAlpha-->
         <table class="{alphanum_class}">
             <thead>
@@ -138,6 +122,7 @@
         <!--EndSectAlpha-->
 
         <!--BeginSectGridTable-->
+        <div class="{table_reasponsive_class}">
 		<table class="{table_class}">
 			<!--BeginSectLabels-->
 			<thead>
@@ -178,8 +163,8 @@
 			</tbody>
 			<!--EndSectGridData-->
 		</table>
-
-
+        </div>
+        <!--BeginSectAfterTable-->
         <div class="{table_after_class}">
             <!--BeginSectPaginatorBottom-->
             <div class="{table_after_left_class}" >
@@ -193,7 +178,7 @@
             </div>
             <!--EndSectPaginatorBottom-->
         </div>
-
+        <!--EndSectAfterTable-->
 
         {fixed_post_content}
 
@@ -202,7 +187,6 @@
 
 
 	<!--EndSectGridTable-->
-
 
 	<!--EndSectGrid-->
 	<!--BeginSectNoRecords-->
@@ -214,11 +198,10 @@
     </div>
 	<!--EndSectNoRecords-->
 
-
     {body_wrap_end}
 
     {footer_wrap_start}
-        <!--BeginSectActionButtons-->
+            <!--BeginSectActionButtons-->
         <div class="{actions_bottom_class}">
             <!--BeginSectAction-->
             {ActionButton}

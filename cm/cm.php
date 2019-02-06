@@ -200,9 +200,9 @@ class cm extends ffCommon
     private function getLayoutParams() {
        // $this->layout_vars = array();
 
-        if(!$this->layout_vars["title"]) {
-            $this->layout_vars["title"] = cm_getAppName();
-        }
+        //if(!$this->layout_vars["title"]) {
+        ///    $this->layout_vars["title"] = cm_getAppName();
+        //}
 
         if(!$this->layout_vars["theme"]) {
             $this->layout_vars["theme"] = cm::env("APP_THEME");
@@ -222,7 +222,7 @@ class cm extends ffCommon
             $this->layout_vars["font_icon"] = cm::env("APP_FONT_ICON");
         }
 
-        $this->layout_vars["title"] = str_replace("[CM_LOCAL_APP_NAME]", cm_getAppName(), $this->layout_vars["title"]);
+        //$this->layout_vars["title"] = str_replace("[CM_LOCAL_APP_NAME]", cm_getAppName(), $this->layout_vars["title"]);
 
         return $this->layout_vars;
     }

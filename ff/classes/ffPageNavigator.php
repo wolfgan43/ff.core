@@ -130,7 +130,9 @@ class ffPageNavigator
  */
 abstract class ffPageNavigator_base extends ffCommon
 {
-	// ----------------------------------
+    const NAME                  = "ffn";
+
+    // ----------------------------------
 	//  PUBLIC VARS (used for settings)
 
 	/**

@@ -23,6 +23,32 @@
  *  @license http://opensource.org/licenses/gpl-3.0.html
  *  @link https://github.com/wolfgan43/vgallery
  */
+$dbStruct = Orm::get("access", "users");
+
+
+//$oRecord = ffRecord::factory($cm->oPage);
+
+
+$oField = ffField::factory($cm->oPage);
+$oField->type = "file";
+$oField->label = "Inserisci il tuo Avatar";
+$oField->widget = "uploadifive";
+$oField->file_storing_path = FF_DISK_UPDIR . "/docs/record";
+
+$cm->oPage->addContent($oField);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 $db = ffDB_Sql::factory();
 /**
@@ -55,14 +81,13 @@ $oRecord->hide_all_controls = true;
  * Può essere dichiarata una sola tabella, se i dati arrivano da più fonti la gestione
  * verrà delegata negli eventi
  */
-$oRecord->src_table = "cm_mod_security_users";
+$oRecord->src_table = $dbStruct["table"]["name"];
 
 /**
  * Aggiunta dei tab
  */
 //$oRecord->tab = true;
 
-$oRecord->auto_wrap = false;
 /**
  * Inizializzazione dell'oggetto ffField,
  * elemento base di tutte le sovrastrutture del framework (grid, record e detail)
