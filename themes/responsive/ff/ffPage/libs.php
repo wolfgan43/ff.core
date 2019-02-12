@@ -197,8 +197,8 @@ return array(
 			"empty" => true
 			, "css_defs" => array(
 				"fontawesome" => array(
-					"path" => "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css"
-					, "file" => "font-awesome.min.css"
+					"path" => "https://use.fontawesome.com/releases/v5.7.1/css"
+					, "file" => "all.css"
 					, "index" => 175
                     , "css_loads" => array(
                         ".ff" => array(

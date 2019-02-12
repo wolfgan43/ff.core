@@ -213,8 +213,8 @@ ff.modal = (function () {
                 "append": ""
             }
             , "fontawesome": {
-                "css": window.location.protocol + "://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css",
-                "prefix": "fa",
+                "css": "https://use.fontawesome.com/releases/v5.7.1/css/all.css",
+                "prefix": "fas",
                 "postfix": "",
                 "prepend": "fa-",
                 "append": ""

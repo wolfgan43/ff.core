@@ -851,7 +851,7 @@ function cm_getFontIcon_settings($name = null) {
 	        , "append" => ""
 	    )
 	    , "fontawesome" => array(
-	        "prefix" => "fa"
+	        "prefix" => "fas"
 	        , "postfix" => ""
 	        , "prepend" => "fa-"
 	        , "append" => ""

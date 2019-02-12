@@ -3,7 +3,7 @@
  */
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500);
 
-html, body, #frmMain, .actions a.btn.fa, .input-group-addon input.btn, .input-group-addon .btn.btn-primary, .ffGrid .table td a.btn.fa, .ffGrid .adv-search .fa-search::after {
+html, body, #frmMain, .actions a.btn.fa, .actions a.btn.fas, .input-group-addon input.btn, .input-group-addon .btn.btn-primary, .ffGrid .table td a.btn.fa, .ffGrid .table td a.btn.fas, .ffGrid .adv-search .fa-search::after {
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
 /*
@@ -159,7 +159,7 @@ html::-webkit-scrollbar-thumb {
 .container-fluid.-rightview * {
     transition: all 0.25s linear; }
 
-.fa {
+.fa, .fas {
     text-rendering: optimizeLegibility; }
 .fa-warning {
     display: block; }
@@ -199,7 +199,8 @@ a.-floating:hover {
 .-active {
     border: 1px solid yellow !important; }
 
-.actions a.btn.fa:before {
+.actions a.btn.fa:before,
+.actions a.btn.fas:before{
     font-family: FontAwesome;
     margin-right: 12px;
 }
@@ -410,18 +411,23 @@ a.-floating:hover {
     opacity: 0.8;
     margin-right: 15px;
     vertical-align: middle; }
-.sidemenu ul li i.fa {
+.sidemenu ul li i.fa,
+.sidemenu ul li i.fas {
     display: none; }
-.sidemenu ul li a, .sidemenu ul li div {
+.sidemenu ul li a:not(.fas), .sidemenu ul li div {
     color: #FFF;
     font-weight: 300;
     opacity: 0.8;
     transition: all 0.25s ease-in;
     padding: 15px 18px 15px 18px; }
+.sidemenu ul li a .nav-controls{
+    font-weight: normal;
+}
 .sidemenu ul li a:focus, .sidemenu ul li a:hover, .sidemenu ul li div:focus, .sidemenu ul li div:hover {
     opacity: 1;
     background-color: #20262d; }
-.sidemenu ul li a.fa, .sidemenu ul li a.fa-2x, .sidemenu ul li div.fa, .sidemenu ul li div.fa-2x {
+.sidemenu ul li a.fa, .sidemenu ul li a.fa-2x, .sidemenu ul li div.fa, .sidemenu ul li div.fa-2x,
+.sidemenu ul li a.fas, .sidemenu ul li a.fas-2x, .sidemenu ul li div.fas, .sidemenu ul li div.fas-2x{
     font-size: 1em; }
 .sidemenu ul li p {
     font-size: 9px;
@@ -475,26 +481,28 @@ a.-floating:hover {
     padding: 0; }
 .sidemenu ul.-withicons li h4 {
     padding: 15px 18px 15px 54px; }
-.sidemenu ul.-withicons li a, .sidemenu ul.-withicons li div {
+.sidemenu ul.-withicons li a:not(.fas), .sidemenu ul.-withicons li div {
     color: #FFF;
     font-weight: 300;
     opacity: 1;
     transition: all 0.25s ease-in;
     padding: 15px 18px 15px 54px; }
-.sidemenu ul.-withicons li a i.fa, .sidemenu ul.-withicons li div i.fa {
+.sidemenu ul.-withicons li a i.fa, .sidemenu ul.-withicons li div i.fa,
+.sidemenu ul.-withicons li a i.fas, .sidemenu ul.-withicons li div i.fas{
     display: inline-block;
     width: 0;
     height: 18px;
     margin-left: -36px;
     margin-right: 36px; }
-.sidemenu ul.-withicons li ul.nav-pills li a, .sidemenu ul.-withicons li ul.nav-pills li div, .sidemenu ul.-withicons li ul.nav-pills li p {
+.sidemenu ul.-withicons li ul.nav-pills li a:not(.fas), .sidemenu ul.-withicons li ul.nav-pills li div, .sidemenu ul.-withicons li ul.nav-pills li p {
     color: #FFF;
     font-weight: 300;
     opacity: 0.6;
     transition: all 0.25s ease-in;
     padding: 15px 18px 15px 60px;
     background-position: 30px 10px; }
-.sidemenu ul.-withicons li ul.nav-pills li a i.fa, .sidemenu ul.-withicons li ul.nav-pills li div i.fa, .sidemenu ul.-withicons li ul.nav-pills li p i.fa {
+.sidemenu ul.-withicons li ul.nav-pills li a i.fa, .sidemenu ul.-withicons li ul.nav-pills li div i.fa, .sidemenu ul.-withicons li ul.nav-pills li p i.fa,
+.sidemenu ul.-withicons li ul.nav-pills li a i.fas, .sidemenu ul.-withicons li ul.nav-pills li div i.fas, .sidemenu ul.-withicons li ul.nav-pills li p i.fas{
     display: inline-block;
     width: 0;
     height: 18px;
@@ -552,7 +560,7 @@ a.-floating:hover {
 .sidemenu ul.nav-pills li .nav-controls {
     position: absolute;
     right: 15px;
-    top: 10px;
+    top: 13px;
     display: inline-block; }
 .sidemenu ul.nav-pills li .nav-controls a {
     padding: 5px 0;
@@ -668,7 +676,8 @@ a.-floating:hover {
 .cmppanel ul li a:focus, .cmppanel ul li a:hover {
     background: none;
     opacity: 1; }
-.cmppanel ul li a.fa, .cmppanel ul li a.fa-2x {
+.cmppanel ul li a.fa, .cmppanel ul li a.fa-2x,
+.cmppanel ul li a.fas, .cmppanel ul li a.fas-2x{
     font-size: 1em; }
 .cmppanel ul li span:first-child {
     display: block; }
@@ -942,7 +951,8 @@ tbody > tr:hover {
     color: #fff;
 }
 
-.ffGrid .table td a.btn.fa{
+.ffGrid .table td a.btn.fa,
+.ffGrid .table td a.btn.fas{
     font-size: 14px;
     font-weight: 400;
     line-height: 1.42857143;
@@ -1308,7 +1318,8 @@ tbody > tr:hover {
 
     vertical-align: middle; }
 
-.ffGrid .table td a.fa {
+.ffGrid .table td a.fa,
+.ffGrid .table td a.fas{
 
     margin: 0 8px;
 
@@ -1323,7 +1334,8 @@ tbody > tr:hover {
 
     text-decoration: none; }
 
-.ffGrid .table td a i.fa {
+.ffGrid .table td a i.fa,
+.ffGrid .table td a i.fa{
 
     margin: 0 8px;
 
@@ -1582,7 +1594,9 @@ tbody > tr:hover {
 }
 
 .radio .cr .cr-icon.fa.fa-check,
-.radio-inline .cr .cr-icon.fa.fa-check{
+.radio-inline .cr .cr-icon.fa.fa-check,
+.radio .cr .cr-icon.fas.fa-check,
+.radio-inline .cr .cr-icon.fas.fa-check{
     margin-left: 0.04em;
 }
 .checkbox label input[type="checkbox"],
@@ -1660,13 +1674,15 @@ tbody > tr:hover {
 
     border-radius: 0; }
 
-.pagenav .pagination li a.fa {
+.pagenav .pagination li a.fa,
+.pagenav .pagination li a.fas{
 
     padding: 3px 5px;
 
     color: #1e88e5; }
 
-.pagenav .pagination li a.fa:hover {
+.pagenav .pagination li a.fa:hover,
+.pagenav .pagination li a.fas:hover{
 
     color: white; }
 
@@ -2578,13 +2594,16 @@ small.block{
 .missing{
     color:red!important;
 }
-td a.fa{
+td a.fa,
+td a.fas{
     position:relative;
 }
-i.fa{
+i.fa,
+i.fas{
     margin-right: 12px;
 }
-td a.fa:link span, td a.fa:hover span, td a.fa:visited span {
+td a.fa:link span, td a.fa:hover span, td a.fa:visited span,
+td a.fas:link span, td a.fas:hover span, td a.fas:visited span{
     position: absolute;
     bottom: -3px;
     right: -3px;
