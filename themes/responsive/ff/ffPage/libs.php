@@ -200,12 +200,12 @@ return array(
 					"path" => "https://use.fontawesome.com/releases/v5.7.1/css"
 					, "file" => "all.css"
 					, "index" => 175
-                    , "css_loads" => array(
+                    /*, "css_loads" => array(
                         ".ff" => array(
                             "path" => FF_THEME_DIR . "/" . CM_LOADED_THEME . "/css"
                             , "file" => "ff-fontawesome.css"
                         )
-                    )
+                    )*/
 				)
 				, "glyphicons" => array(
 					"path" => "/themes/responsive/css"
@@ -241,12 +241,12 @@ return array(
 					, "css_deps" => array(
 						//"fonticons.fontawesome" => null
 					)
-					, "css_loads" => array(
+					/*, "css_loads" => array(
 						".ff" => array(
 							"path" => FF_THEME_DIR . "/" . CM_LOADED_THEME . "/css"
 							, "file" => "ff-bootstrap.css"
 						)
-					)
+					)*/
 				)
 			)
 		)
