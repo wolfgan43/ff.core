@@ -1,6 +1,8 @@
 <?php
 if (!defined("MOD_SEC_MULTIDOMAIN")) define ("MOD_SEC_MULTIDOMAIN", false);
 if (!defined("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB")) define ("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB", false);
+if (!defined("LOGIN_MULTIDOMAIN")) define ("LOGIN_MULTIDOMAIN", false);
+if (!defined("DOMAIN")) define ("DOMAIN", false);
 if (!defined("MOD_SEC_GROUPS")) define ("MOD_SEC_GROUPS", false);
 if (!defined("MOD_SEC_LOGO")) define ("MOD_SEC_LOGO", "Pre");   // Pre o Post
 if (!defined("MOD_SEC_LOGO_PATH")) define ("MOD_SEC_LOGO_PATH", null); //relative path

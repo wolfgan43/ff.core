@@ -807,9 +807,9 @@ function mod_sec_process_login(&$tpl, $logged, $sError = null)
 			$tpl->set_var("recover_class", cm_getClassByDef($framework_css["login"]["standard"]["recover"]));
 		    $tpl->set_var("recover", (string)$mod_sec_recover->reverse);
 			$tpl->parse("SectRecoverPassword", false);
-		} 
+		}
 
-		if(MOD_SEC_LOGIN_REGISTER_URL && $mod_sec_register)
+        if(defined("MOD_SEC_LOGIN_REGISTER_URL") && MOD_SEC_LOGIN_REGISTER_URL && $mod_sec_register)
 		{
 			$count_links++;
 		    if(is_string(MOD_SEC_LOGIN_REGISTER_URL))
