@@ -201,8 +201,12 @@ a.-floating:hover {
 
 .actions a.btn.fa:before,
 .actions a.btn.fas:before{
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight:bold;
     margin-right: 12px;
+}
+.fas.input-group-addon{
+    font-weight:bold;
 }
 
 .header {
@@ -1416,7 +1420,8 @@ tbody > tr:hover {
 
 .ffGrid .search a:before {
 
-    margin-right: 0; }
+    margin-right: 0;
+    font-weight: bold;}
 
 .ffGrid .search:not(a) {
 
