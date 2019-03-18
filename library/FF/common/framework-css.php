@@ -1644,7 +1644,7 @@ function cm_getFFButtonDefault() {
     , "ActionButtonDelete"    => array(
             "default" => "danger"
         , "addClass" => ""
-        , "icon" => "trash-alt"
+        , "icon" => "times"
         , "class" => "delete"
         )
     , "ActionButtonCancel"    => array(
@@ -1666,7 +1666,7 @@ function cm_getFFButtonDefault() {
     , "delete"         => array(
             "default" => "danger"
         , "addClass" => "activebuttons"
-        , "icon" => "trash-alt"
+        , "icon" => "times"
         )
     , "cancel"         => array(
             "default" => "link"
@@ -1727,12 +1727,12 @@ function cm_getFFButtonDefault() {
     , "deleterow"    => array(
             "default" => "danger"
         , "addClass" => "delete"
-        , "icon" => "trash-alt"
+        , "icon" => "times"
         )
     , "deletetabrow"    => array(
             "default" => null
         , "addClass" => "delete"
-        , "icon" => "trash-alt"
+        , "icon" => "times"
         )
         //ffDetail    
     , "addrow"         => array(

@@ -472,7 +472,7 @@ class ffWidget_actex extends ffCommon
         $action_class = "actex-actions";
         
         $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));    
-        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("trash-o", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("times", "icon"));
         $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon"));    
         $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon")); 
         $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));       
