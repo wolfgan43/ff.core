@@ -443,6 +443,10 @@ function ffRecord_dialog_on_done_action_output_results(ffRecord_base $record, $f
 * FRAMEWORK CSS Load JS / CSS Base
 */
 function ffPage_on_layout_init($oPage, $layout_vars) {
+    // MODIFICA DANIELE DIELLA
+    if (cm::getInstance()->layout_vars["ignore_defaults_main"])
+        return;
+    // FINE MODIFICA
     $framework_css = cm_getFrameworkCss(FF_THEME_FRAMEWORK_CSS);
     $font_icon = cm_getFontIcon(FF_THEME_FONT_ICON);
 

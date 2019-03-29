@@ -163,9 +163,9 @@
             , "callout" => "danger"
         )
         , "icons" => array(
-			"caret-collapsed" => cm_getClassByFrameworkCss("chevron-right", "icon")
-			, "caret" => cm_getClassByFrameworkCss("chevron-down", "icon")
-			, "settings" => cm_getClassByFrameworkCss("cog", "icon")
+			"caret-collapsed" => cm_getClassByFrameworkCss("far fa-chevron-right", "icon")
+			, "caret" => cm_getClassByFrameworkCss("far fa-chevron-down", "icon")
+			, "settings" => cm_getClassByFrameworkCss("far fa-cog", "icon")
 		)
     );
 

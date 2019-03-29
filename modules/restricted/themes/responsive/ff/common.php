@@ -218,9 +218,9 @@
 		)
 		, "current" => cm_getClassByFrameworkCss("current", "util")
 		, "icons" => array(
-			"caret-collapsed" => "menu-caret " . cm_getClassByFrameworkCss("chevron-right", "icon")
-			, "caret" => "menu-caret " . cm_getClassByFrameworkCss("chevron-right", "icon", array("rotate-90"))
-			, "settings" => cm_getClassByFrameworkCss("cog", "icon")
+			"caret-collapsed" => "menu-caret " . cm_getClassByFrameworkCss("fas fa-chevron-right", "icon")
+			, "caret" => "menu-caret " . cm_getClassByFrameworkCss("fas fa-chevron-right", "icon", array("rotate-90"))
+			, "settings" => cm_getClassByFrameworkCss("fas fa-cog", "icon")
 		)
 		, "logo" => array(
 			"class" => "brand-logo"

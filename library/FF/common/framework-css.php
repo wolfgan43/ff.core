@@ -851,9 +851,9 @@ function cm_getFontIcon_settings($name = null) {
         , "append" => ""
         )
     , "fontawesome" => array(
-            "prefix" => "fas"
+            "prefix" => ""
         , "postfix" => ""
-        , "prepend" => "fa-"
+        , "prepend" => ""
         , "append" => ""
         )
     );
@@ -1645,7 +1645,7 @@ function cm_getFFButtonDefault() {
             "default" => "danger"
         , "addClass" => ""
         , "icon" => "times"
-        , "class" => "delete"
+        , "class" => "far fa-delete"
         )
     , "ActionButtonCancel"    => array(
             "default" => "link"
@@ -1666,12 +1666,12 @@ function cm_getFFButtonDefault() {
     , "delete"         => array(
             "default" => "danger"
         , "addClass" => "activebuttons"
-        , "icon" => "times"
+        , "icon" => "fas fa-times"
         )
     , "cancel"         => array(
             "default" => "link"
         , "addClass" => ""
-        , "icon" => "times"
+        , "icon" => "fas fa-times"
         )
     , "print"         => array(
             "default" => "default"
@@ -1682,17 +1682,17 @@ function cm_getFFButtonDefault() {
     , "search"         => array(
             "default" => "primary"
         , "addClass" => "search"
-        , "icon" => "search"
+        , "icon" => "fas fa-search"
         )
     , "searchadv"         => array(
             "default" => "primary"
         , "addClass" => "search"
-        , "icon" => "search"
+        , "icon" => "fas fa-search"
         )
     , "more"         => array(
             "default" => "link"
         , "addClass" => "more"
-        , "icon" => "caret-down"
+        , "icon" => "fas fa-caret-down"
         )
     , "export"         => array(
             "default" => "default"
@@ -1717,7 +1717,7 @@ function cm_getFFButtonDefault() {
     , "addnew"        => array(
             "default" => "primary"
         , "addClass" => "addnew"
-        , "icon" => "plus"
+        , "icon" => "fas fa-plus"
         )
     , "editrow"     => array(
             "default" => "link"
@@ -1727,18 +1727,18 @@ function cm_getFFButtonDefault() {
     , "deleterow"    => array(
             "default" => "danger"
         , "addClass" => "delete"
-        , "icon" => "times"
+        , "icon" => "fas fa-times"
         )
     , "deletetabrow"    => array(
             "default" => null
         , "addClass" => "delete"
-        , "icon" => "times"
+        , "icon" => "fas fa-times"
         )
         //ffDetail    
     , "addrow"         => array(
             "default" => "primary"
         , "addClass" => ""
-        , "icon" => "plus"
+        , "icon" => "fas fa-plus"
         )
         //ffPageNavigator
     , "first"         => array(
@@ -1787,7 +1787,7 @@ function cm_getFFButtonDefault() {
     , "preview"      => array(
             "default" => "link"
         , "addClass" => "preview"
-        , "icon" => "search"
+        , "icon" => "fas fa-search"
         )
     , "preview-email"=> array(
             "default" => "link"
@@ -1968,7 +1968,7 @@ function cm_getFFButtonDefault() {
     , "vg-search"    => array(
             "default" => "link"
         , "addClass" => "search"
-        , "icon" => "search"
+        , "icon" => "fas fa-search"
         , "font_icon" => array("prepend" => "vg-", "prefix" => "vg")
         )
     , "vg-login"    => array(
