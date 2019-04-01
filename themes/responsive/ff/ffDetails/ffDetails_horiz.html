@@ -1,7 +1,7 @@
 <!--BeginSectHeaders-->
 <!--EndSectHeaders-->
 {outer_wrap_start}
-<div id="{component_id}" class="{component_class}"> 
+<div id="{component_id}" class="{component_class} col-xs-12">
     <div id="{component_id}_hidden" class="hidden">
         <input type="hidden" id="{component_id}_rows" name="{component_id}_rows" value="{rows}" />
         <input type="hidden" id="{component_id}_delete_row" name="{component_id}_delete_row" value="" />
@@ -24,11 +24,13 @@
 		<!--EndSectTitle-->
 		{fixed_title_content}
         <!--BeginSectNewHeader-->
-		<div class="actions top text-right">
+		<div class="actions top text-right input-group">
 			<!--BeginSectRowToAddHeaderDefault-->
-			<input type="text" onkeyup="ff.submitProcessKey(null, '{component_id}_addrow_header');" name="{component_id}_rowstoadd_header_default_{rowstoadd_default_field}" />
+			<input class="form-control input" type="text" onkeyup="ff.submitProcessKey(null, '{component_id}_addrow_header');" name="{component_id}_rowstoadd_header_default_{rowstoadd_default_field}" />
 			<!--EndSectRowToAddHeaderDefault-->
+			<span class="input-group-btn">
             <a id="{component_id}_addrow_header" class="{addrow_class}" href="javascript:void(0);" onclick="<!--BeginSectHeaderTabUrl-->tabs_form_url('tabs_{tab_id}', {tab_number});<!--EndSectHeaderTabUrl--> {submit_action}">{addrow_icon}{addrow_label}</a>
+			</span>
 			<!--BeginSectNewHeaderQta-->
 			<input id="{component_id}_rowstoadd" name="{component_id}_rowstoadd" type="text" value="1" class="detailQTA"/>
 			<label>{_addrow_num_col}</label>

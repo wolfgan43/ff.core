@@ -9,6 +9,25 @@ html, body, #frmMain, .actions a.btn.fa, .actions a.btn.fas, .input-group-addon 
 .ffGrid .table td a.btn.fas:before{
     font-family: "Font Awesome 5 Free";
 }
+
+.autocomplete-wrap ul.token-input-list-facebook {
+    display: block;
+    width: 100%!important;
+    height: 34px!important;
+    padding: 6px 12px!important;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
 /*
 * Include constant, skin variables, and utility
 */
@@ -499,7 +518,8 @@ a.-floating:hover {
     transition: all 0.25s ease-in;
     padding: 15px 18px 15px 54px; }
 .sidemenu ul.-withicons li a i.fa, .sidemenu ul.-withicons li div i.fa,
-.sidemenu ul.-withicons li a i.fas, .sidemenu ul.-withicons li div i.fas{
+.sidemenu ul.-withicons li a i.fas, .sidemenu ul.-withicons li div i.fas,
+.sidemenu ul.-withicons li a i.far, .sidemenu ul.-withicons li div i.far{
     display: inline-block;
     width: 0;
     height: 18px;
@@ -513,7 +533,8 @@ a.-floating:hover {
     padding: 15px 18px 15px 60px;
     background-position: 30px 10px; }
 .sidemenu ul.-withicons li ul.nav-pills li a i.fa, .sidemenu ul.-withicons li ul.nav-pills li div i.fa, .sidemenu ul.-withicons li ul.nav-pills li p i.fa,
-.sidemenu ul.-withicons li ul.nav-pills li a i.fas, .sidemenu ul.-withicons li ul.nav-pills li div i.fas, .sidemenu ul.-withicons li ul.nav-pills li p i.fas{
+.sidemenu ul.-withicons li ul.nav-pills li a i.fas, .sidemenu ul.-withicons li ul.nav-pills li div i.fas, .sidemenu ul.-withicons li ul.nav-pills li p i.fas,
+.sidemenu ul.-withicons li ul.nav-pills li a i.far, .sidemenu ul.-withicons li ul.nav-pills li div i.far, .sidemenu ul.-withicons li ul.nav-pills li p i.far{
     display: inline-block;
     width: 0;
     height: 18px;
@@ -1480,10 +1501,6 @@ tbody > tr:hover {
     float: right;
 }
 
-.ffDetails {
-
-    padding: 15px 0; }
-
 #LangDetail, #LangDetailSEO{
     padding: 0;
 }
@@ -1918,9 +1935,7 @@ tbody > tr:hover {
 
 .ff-modal .ffRecord,
 
-.ff-modal .ffGrid,
-
-.ff-modal .ffDetails {
+.ff-modal .ffGrid{
 
     margin: 0;
 
