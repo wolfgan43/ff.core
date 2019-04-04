@@ -179,10 +179,12 @@ class ffWidget_autocompletetoken extends ffCommon
         $this->tpl[$tpl_id]->set_var("limit", $Field->autocompletetoken_limit);
 
         if($Field->autocompletetoken_combo) {
-            $this->tpl[$tpl_id]->set_var("combo_class", "autocompletetoken-combo " . cm_getClassByFrameworkCss("caret-down", "icon"));
+            $this->tpl[$tpl_id]->set_var("combo_class", cm_getClassByFrameworkCss("btn fas fa-caret-down", "icon"));
+            $this->tpl[$tpl_id]->set_var("input-group", "input-group");
         	$this->tpl[$tpl_id]->parse("SectCombo", false);
 		} else {
             $this->tpl[$tpl_id]->set_var("minLength", $Field->autocompletetoken_minLength);
+            $this->tpl[$tpl_id]->set_var("input-group", "");
 			$this->tpl[$tpl_id]->set_var("SectCombo", "");
 		}
 		

@@ -10,11 +10,23 @@ html, body, #frmMain, .actions a.btn.fa, .actions a.btn.fas, .input-group-addon 
     font-family: "Font Awesome 5 Free";
 }
 
+.ffGrid .table td.fit,
+.ffGrid .table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
+
+fieldset{
+    float: left;
+    width: 100%;
+    padding: 0;
+}
+
 .autocomplete-wrap ul.token-input-list-facebook {
     display: block;
     width: 100%!important;
     height: 34px!important;
-    padding: 6px 12px!important;
+    padding: 0!important;
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
@@ -28,9 +40,48 @@ html, body, #frmMain, .actions a.btn.fa, .actions a.btn.fas, .input-group-addon 
     -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
-/*
-* Include constant, skin variables, and utility
-*/
+
+li.token-input-token-facebook {
+    height: 26px!important;
+    line-height: 23px!important;
+}
+
+li.token-input-token-facebook .image{
+    display: inline-block;
+    float: left;
+    height: 24px!important;
+    width: 24px!important;
+}
+
+.token-input-dropdown-facebook li{
+    display: block;
+    float: left;
+    width: 100%;
+}
+.token-input-dropdown-facebook li span{
+    display: inline-block;
+    float: left;
+    height: 24px!important;
+    width: 24px!important;
+}
+.token-input-dropdown-facebook li .name{
+    height: 24px!important;
+    line-height: 24px!important;
+    padding-left: 6px;
+    float: left;
+}
+.token-input-dropdown-facebook{
+    position: absolute!important;
+    top: 34px;
+    left: 0;
+    z-index: 100!important;
+}
+.autocomplete-wrap{
+    position: relative;
+}
+    /*
+    * Include constant, skin variables, and utility
+    */
 html, body, div, span, applet, object, iframe,
 p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -53,11 +104,14 @@ table, caption, tbody, tfoot, thead, tr, th, td {
     height: 100%;
     margin: 0;
 }
-
+/*
 .input-group-addon.fas, .btn.fas{
     font-weight: normal;
 }
-
+*/
+.btn.fas{
+    font-weight: 900;
+}
 ul {
     list-style: none; }
 
@@ -1351,7 +1405,8 @@ tbody > tr:hover {
     vertical-align: middle; }
 
 .ffGrid .table td a.fa,
-.ffGrid .table td a.fas{
+.ffGrid .table td a.fas,
+.ffGrid .table td a.far{
 
     margin: 0 8px;
 
@@ -2007,10 +2062,23 @@ tbody > tr:hover {
     border-color: #bce8f1;
 }
 
+.bs-callout{
+    padding: 15px;
+    margin-bottom: 30px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
 .bs-callout-info.norecord{
     background: none;
     padding: 0;
     border: none;
+}
+.ui-menu-item{
+    border: 1px solid transparent;
+}
+.ui-state-focus{
+
 }
 
 
@@ -2625,15 +2693,18 @@ small.block{
     color:red!important;
 }
 td a.fa,
-td a.fas{
+td a.fas,
+td a.far{
     position:relative;
 }
 i.fa,
-i.fas{
+i.fas,
+td a.far{
     margin-right: 12px;
 }
 td a.fa:link span, td a.fa:hover span, td a.fa:visited span,
-td a.fas:link span, td a.fas:hover span, td a.fas:visited span{
+td a.fas:link span, td a.fas:hover span, td a.fas:visited span,
+td a.far:link span, td a.far:hover span, td a.far:visited span{
     position: absolute;
     bottom: -3px;
     right: -3px;

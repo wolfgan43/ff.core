@@ -11,7 +11,7 @@ $options = mod_security_get_settings($cm->path_info);
 
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->id = "MainRecord";
-$oRecord->title = ffTemplate::_get_word_by_code("user_profile");
+$cm->oPage->title = "Modifica Profilo";
 $oRecord->src_table = $options["table_name"];
 $oRecord->allow_delete = false;
 $oRecord->buttons_options["cancel"]["display"] = false;

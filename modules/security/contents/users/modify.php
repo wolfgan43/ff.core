@@ -3,7 +3,7 @@ $options = mod_security_get_settings($cm->path_info);
 
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->id = "ModSecUtenti";
-$oRecord->title = "Utenti";
+$cm->oPage->title = "Gestione Utente";
 $oRecord->src_table = $options["table_name"];
 $oRecord->addEvent("on_done_action", "ModSecUtenti_on_done_action");
 $oRecord->addEvent("on_do_action", "ModSecUtenti_on_do_action");

@@ -23,7 +23,7 @@
 <div class="{actex_container}"> 
 	{dialogaddlink}
 	<span id="actex_{container}{id}" class="{data_class}" {data_properties}></span>
-	<span class="{actions_class}">
+	<div class="{actions_class}">
 		<!--BeginSectDebug-->
 			<a class="{icon_debug}" href="#" onclick="window.open('{innerURL}&data_src={data_src}', '_blank')"></a>
 		<!--EndSectDebug-->
@@ -32,7 +32,7 @@
 		<!--BeginSectCombo-->
 			<a class="{icon_caret_down}" id="actex_{container}{id}_combo"></a>
 		<!--EndSectCombo-->
-	</span>
+	</div>
 </div>
 <!--BeginSectMulti-->
 <ul class="{actex_multi_container}">
@@ -95,7 +95,6 @@ ff.pluginAddInit("ff.ffField.actex", function () {
 				"enable"			: {autocomp_enable}
 				, "ajax"			: {autocomp_ajax}
 				, "limit"			: "{autocomp_limit}"
-				, "preserve_text"	: "{autocomp_preserve_text}"
 			}
             <!--BeginSezPlugin-->
             , "plugin" : {

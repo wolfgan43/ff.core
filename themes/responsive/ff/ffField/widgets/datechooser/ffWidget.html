@@ -16,14 +16,14 @@
 <div class="{container_class}" {properties}>
 	<input type="hidden" id="{container}{id}" name="{container}{id}" value="{value}"/>
 	
-	<div class="{day_class}">
-		<select id="{container}day_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_day}</option></select> 
+	<div class="{day_class} clearfix padding">
+		<select class="form-control" id="{container}day_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_day}</option></select>
 	</div>
 	<div class="{month_class}">
-		<select id="{container}month_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_month}</option></select>
+		<select class="form-control" id="{container}month_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_month}</option></select>
 	</div>
-	<div class="{year_class}">
-		<select id="{container}year_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_year}</option></select>
+	<div class="{year_class} clearfix padding">
+		<select class="form-control" id="{container}year_{id}" onchange="ff.ffField.datechooser.change('{container}{id}', '{container}day_{id}', '{container}month_{id}', '{container}year_{id}')"><option value="0">{_year}</option></select>
 	</div>
 </div>
 <!--EndSectControl-->

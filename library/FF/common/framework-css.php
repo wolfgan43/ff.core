@@ -450,11 +450,11 @@ function cm_getFrameworkCss_settings($name = null) {
             )
         , "callout" => array(
                 "default"       => "bs-callout"
-            , "primary"     => "bs-callout bs-callout-primary"
-            , "success"     => "bs-callout bs-callout-success"
-            , "info"        => "bs-callout bs-callout-info"
-            , "warning"     => "bs-callout bs-callout-warning"
-            , "danger"      => "bs-callout bs-callout-danger"
+            , "primary"     => "bs-callout bs-callout-primary bg-primary"
+            , "success"     => "bs-callout bs-callout-success bg-success"
+            , "info"        => "bs-callout bs-callout-info bg-info"
+            , "warning"     => "bs-callout bs-callout-warning bg-warning"
+            , "danger"      => "bs-callout bs-callout-danger bg-danger"
             )
         , "pagination" => array(
                 "align-left" => "text-left"
@@ -1721,12 +1721,12 @@ function cm_getFFButtonDefault() {
         )
     , "editrow"     => array(
             "default" => "link"
-        , "addClass" => "edit"
-        , "icon" => "pencil"
+        , "addClass" => "edit btn"
+        , "icon" => "fas fa-pencil-alt"
         )
     , "deleterow"    => array(
             "default" => "danger"
-        , "addClass" => "delete"
+        , "addClass" => "delete btn"
         , "icon" => "fas fa-times"
         )
     , "deletetabrow"    => array(
@@ -1743,24 +1743,24 @@ function cm_getFFButtonDefault() {
         //ffPageNavigator
     , "first"         => array(
             "default" => "link"
-        , "addClass" => "first"
+        , "addClass" => "fas fa-angle-double-left"
         , "icon" => "step-backward"
         )
     , "last"         => array(
             "default" => "link"
-        , "addClass" => "last"
+        , "addClass" => "fas fa-angle-double-right"
         , "icon" => "step-forward"
         )
     , "prev"         => array(
             "default" => "link"
         , "addClass" => "prev"
-        , "icon" => "play"
+        , "icon" => "fas fa-angle-left"
         , "params" => "flip-horizontal"
         )
     , "next"         => array(
             "default" => "link"
         , "addClass" => "next"
-        , "icon" => "play"
+        , "icon" => "fas fa-angle-right"
         )
     , "prev-frame"   => array(
             "default" => "link"

@@ -2,13 +2,15 @@
 <!--EndSectHeaders-->
 
 <!--BeginSectControl-->
-<div class="autocomplete-wrap">
+<div class="autocomplete-wrap {input-group}">
 	<!--BeginSectControlLabel-->
 	<label>{autocompletetoken_label}</label> 
 	<!--EndSectControlLabel-->
-	<input type="text" id="{prefix}{container}{id}" name="{prefix}{container}{id}" class="autocompletetoken{class}" value="{selected_value}" {properties} />
+	<input type="text" id="{prefix}{container}{id}" name="{prefix}{container}{id}" class="autocompletetoken{class} form-control" value="{selected_value}" {properties} />
 	<!--BeginSectCombo-->
-		<a class="{combo_class}" href="javascript:void(0);" onclick="jQuery('#{container}{id_encoded}').focus(); jQuery('#{container}{id_encoded}').parent().find('input').keydown(); "></a>
+	<div class="input-group-btn">
+		<a class="{combo_class} btn" href="javascript:void(0);" onclick="jQuery('#{container}{id_encoded}').focus(); jQuery('#{container}{id_encoded}').parent().find('input').keydown(); "></a>
+	</div>
 	<!--EndSectCombo-->
 	<!--BeginSectDebug--><a href="#" onclick="window.open('{service}{srv_data}', '_blank')">[debug]</a><!--EndSectDebug-->
 </div>
@@ -43,7 +45,7 @@
                         return "<li>" 
                                     + (item.image !== undefined 
                                     	? 	'<span class="image">'
-                                    			+ (item.image ? "<img src='" + item.image + "' title='" + item.name + "' width=50 height=50 />" : "") 
+                                    			+ (item.image ? "<img src='" + item.image + "' title='" + item.name + "' width=24 height=24 />" : "")
                                     		+ '</span>'
                                     	: ""
                                     )
@@ -64,7 +66,7 @@
                     return "<li>" 
                                 + (item.image !== undefined 
                                     ? 	'<span class="image">'
-                                    		+ (item.image ? "<img src='" + item.image + "' title='" + item.name + "' width=50 height=50 />" : "") 
+                                    		+ (item.image ? "<img src='" + item.image + "' title='" + item.name + "' width=24 height=24 />" : "")
                                     	+ '</span>'
                                     : ""
                                 )
