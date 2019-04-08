@@ -185,6 +185,7 @@ var activecombo = function(params) {
 				var rc = true;
 				that.childs.each(function (a, child) {
 					rc &= ff.ffField.actex.getInstance(child).refill(reset_childs ? null : undefined);
+					
 				});
 				return rc;
 			} else {
@@ -1011,7 +1012,6 @@ var activecombo = function(params) {
 
 		var autocomp_fullsearch = false;
 		var minLength = that.options.autocomplete.limit || 0;
-		var preserve_text = that.options.autocomplete.preserve_text;
 	//jQuery("#calendar-modify_ID_customer_label").data("ui-autocomplete")._trigger("change");	
 		jQuery.fn.escapeGet(__id + "_label").autocomplete({
 			source: function( request, response ) {
@@ -1158,9 +1158,7 @@ var activecombo = function(params) {
 						$this.val(that.value_ori["desc"]);
 						that.change(false, that.value_ori["value"]);
 					} else {
-						if (!preserve_text) {
-							$this.val("");
-						}
+						$this.val("");
 						tmp_compare = "";
 					}
 				}

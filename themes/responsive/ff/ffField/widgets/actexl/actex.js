@@ -914,11 +914,6 @@ var activecombo = function(params) {
 				"event_name"	: "refill",
 				"event_params"	: [__id, node.get(0)]
 			});
-			
-			/*if (ff.ffField.actexl.clickTarget && ff.ffField.actexl.clickTarget.id === __id) {
-				console.log(jQuery("#" + __id).get(0));
-				jQuery("#" + __id).click();
-			}*/
 	}
 
 	}; /* public's end */
@@ -1519,8 +1514,9 @@ __ff : true, /* used to recognize ff'objects*/
 },
 
 "onUpdateField" : function (component, key, field, retData) {
-	if (field.widget != "actex")
+    if (field.widget != "actexl") {
 		return;
+	}
 
 	if (component !== undefined) {
 		switch (ff.struct.get("comps").get(component).type) {
@@ -1533,8 +1529,8 @@ __ff : true, /* used to recognize ff'objects*/
 				break;
 
 			default:
-				if (that.exists(component + "_" + key)) ajaxUpdate(component + "_" + key, field);
-		} 
+                if (that.exists(component + "_" + key)) ajaxUpdate(component + "_" + key, retData);
+		}
 	} else {
 		if (that.exists(key)) ajaxUpdate(key, field);
 	}
@@ -1544,6 +1540,17 @@ __ff : true, /* used to recognize ff'objects*/
 
 /* privates */
 
+function ajaxUpdate (id, retData) {
+	var inst = that.getInstance(id);
+
+	ajaxChainBlock(inst);
+	inst.refill((inst.insert_mode ? retData.insert_id : undefined), undefined, true);
+
+	if (inst.insert_mode !== false)
+		that.insertModeOff(id);
+};
+
+/*
 function ajaxUpdate (id, field) {
 	var inst = that.getInstance(id);
 	var chainupdate = ff.ajax.getChainUpdate();
@@ -1557,7 +1564,7 @@ function ajaxUpdate (id, field) {
 	
 	if (inst.insert_mode !== false)
 		that.insertModeOff(id);
-};
+};*/
 
 function ajaxChainBlock (inst) {
 	if (inst.childs.length) {
