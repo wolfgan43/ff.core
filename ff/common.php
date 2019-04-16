@@ -1891,8 +1891,9 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 							}
 						}
 
-						if ($component->form_fields[$key]->file_make_dir)
+						if ($component->form_fields[$key]->file_make_dir) {
 							@mkdir($storing_path, $component->form_fields[$key]->file_chmod, true);
+						}
 
 						if(is_array($arrFileTmpValue) && count($arrFileTmpValue))
 						{
@@ -1904,11 +1905,22 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 									$tmp_filename = $component->form_fields[$key]->getFileFullPath($real_file_value, false);
 									if(!array_key_exists($tmp_filename, $arrFile))
 									{
+										if ($component->form_fields[$key]->file_temp_path=="" && FF_DISK_UPDIR != "") {
+											$temp_path = FF_DISK_UPDIR . "/" . $component->form_fields[$key]->file_tmpname;
+										} else {
+											$temp_path = $component->form_fields[$key]->getFileFullPath($arrFileTmpValue[$file_key]);
+										}
+										
+										//die($temp_path . " - " . $tmp_filename . " - " . $component->form_fields[$key]->file_temp_path);
+										/*if ($temp_path == $tmp_filename) {
+											$temp_path = $component->form_fields[$key]->getFileBasePath().$component->form_fields[$key]->file_temp_path.$component->form_fields[$key]->file_tmpname;
+										}
+										*/
 										@rename(
-												$component->form_fields[$key]->getFileFullPath($arrFileTmpValue[$file_key])
-												, $tmp_filename
-											);
-
+											$temp_path
+											, $tmp_filename
+										);
+												
 										if (!is_file($tmp_filename))
 											ffErrorHandler::raise("UPLOAD ERROR: " . $tmp_filename, E_USER_ERROR, $component, get_defined_vars());
 

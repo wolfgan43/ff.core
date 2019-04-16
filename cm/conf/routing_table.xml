@@ -10,6 +10,16 @@
         <reverse>/actexparse</reverse>
         <index>999</index>
     </rule>
+    <rule id="actexlparse">
+        <priority>HIGH</priority>
+        <source>/actexlparse$</source>
+        <destination>
+            <url>[MAIN_THEME]/ff/ffField/widgets/actexl/actexparse</url>
+            <toplevel />
+        </destination>
+        <reverse>/actexlparse</reverse>
+        <index>999</index>
+    </rule>
     <rule id="parsedata">
         <priority>HIGH</priority>
         <source>/parsedata$</source>

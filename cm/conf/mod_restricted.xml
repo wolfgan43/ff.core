@@ -2,38 +2,6 @@
 <configdata>
 	<menu>
 		<!--<ds path="/restricted/ds" label="Data Storage" location="brand" acl="3" />-->
-		<docs path="/restricted/docs" label="Docs (under development)" acl="3" icon="book">
-			<pages path="/restricted/docs/pages" label="Pages" icon="file"></pages>
-			<layouts path="/restricted/docs/layouts" label="Layouts" icon="object-group"></layouts>
-
-			<tables path="/restricted/docs/tables" label="Tables" description="questa e una descrizione di prova" readonly="h4" badge="5" icon="table" actions="/restricted/docs/tables/data_tables"></tables>
-			<tables_basic path="/restricted/docs/tables/basic" label="Basic Tables" actions="/restricted/docs/tables/basic" icon="th"></tables_basic>
-			<tables_data path="/restricted/docs/tables/data_tables" label="Data Tables" icon="th-large"></tables_data>
-			<tables_widgets path="/restricted/docs/tables/widgets" label="Widgets" icon="object-group"></tables_widgets>
-
-			<forms path="/restricted/docs/forms" label="Forms" description="Questa è una descrizione di prova" readonly="h4" badge="4" icon="list" actions=""></forms>
-			<forms_controls path="/restricted/docs/forms/controls" label="Controls" badge="basic" icon="exclamation"></forms_controls>
-			<forms_controls_maps path="/restricted/docs/forms/controls/maps" label="Maps" icon="map-marker-alt"></forms_controls_maps>
-			<forms_controls_widgets path="/restricted/docs/forms/controls/widgets" label="Advanced Controls" badge="12" icon="object-group"></forms_controls_widgets>
-			<forms_controls_uploads path="/restricted/docs/forms/controls/uploads" label="File Uploads" icon="upload"></forms_controls_uploads>
-			<forms_layouts path="/restricted/docs/forms/layouts" label="Form Layouts" badge="4" actions="/restricted/docs/forms/layouts" icon="layer-group"></forms_layouts>
-			<forms_datatable path="/restricted/docs/forms/datatable" label="Form + DataTable" actions="/restricted/docs/forms/datatable" icon="th-large"></forms_datatable>
-			<forms_validation path="/restricted/docs/forms/validation" label="Form Validation" icon="star"></forms_validation>
-
-
-			<ui path="/restricted/docs/ui" label="UI Kit" description="Questa è una descrizione di prova" readonly="h4"  icon="briefcase" actions=""></ui>
-			<ui_cards path="/restricted/docs/ui/cards" label="Cards" icon="id-card"></ui_cards>
-			<ui_buttons path="/restricted/docs/ui/buttons" label="Buttons" description="Questa è una descrizione di prova" icon="square"></ui_buttons>
-			<ui_modal path="/restricted/docs/ui/modal" label="Modal" icon="object-ungroup"></ui_modal>
-			<ui_tabs path="/restricted/docs/ui/tabs" label="Tabs" icon="ellipsis-h"></ui_tabs>
-			<ui_notifications path="/restricted/docs/ui/notifications" label="Notificatinons" icon="exclamation-triangle"></ui_notifications>
- 
-			<ui_grid path="/restricted/docs/ui/grid" label="Grid" icon="th"></ui_grid>
-			<ui_general path="/restricted/docs/ui/general" label="General" icon="th"></ui_general>
-			<ui_typography path="/restricted/docs/ui/typography" label="Typography" icon="font"></ui_typography>
-			<ui_icons path="/restricted/docs/ui/icons" label="Icons" icon="helicopter"></ui_icons>
-			<ui_media path="/restricted/docs/ui/media" label="Media" icon="images"></ui_media>
-		</docs>
 		<media path="/restricted/media" label="Media" location="brand" acl="3" />
 		<!--<sqlgui path="/restricted/sqlgui" label="SQL GUI" icon="database" location="brand" redir="/restricted/sqlgui/sqldirect" acl="3">
 			<sqldirect label="SQL Direct"  />

@@ -1238,7 +1238,7 @@ abstract class ffDetails_base extends ffCommon
 										}
 									}
 
-									$res = $this->form_fields[$key]->doEvent("on_get_from_db", array(&$this, $this->recordset_ori[$i][$key]));
+									$res = $this->hidden_fields[$key]->doEvent("on_get_from_db", array(&$this, $this->recordset_ori[$i][$key]));
 									$rc = end($res);
 									if ($rc !== null)
 										$this->recordset_ori[$i][$key] = $rc;
