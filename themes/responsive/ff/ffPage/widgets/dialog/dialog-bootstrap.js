@@ -3,12 +3,10 @@
  *    dialog page' plugin namespace
  */
 ff.ffPage.dialog = (function () {
-
 // inits
 var firstDialog = null;
 var unique = null;
 //overflow manage
-
 ff.pluginAddInit("ff.ajax", function () {
 	ff.ajax.addEvent({
 		"event_name" : "onUpdateContent"
@@ -16,7 +14,6 @@ ff.pluginAddInit("ff.ajax", function () {
 			if (params.ctx && ff.ffPage.dialog.exist(params.ctx) && params.component === undefined) {
 				if (!ff.ffPage.dialog.get(params.ctx).instance) 
 					ff.ffPage.dialog.makeInstance(params.ctx);
-
 				ff.ffPage.dialog.removeDlgBt(params.ctx, data);
 			}
 		}
@@ -43,25 +40,18 @@ ff.pluginAddInit("ff.ajax", function () {
 		}
 	});
 }, "a65c581e-64d9-473d-a166-c1848cas23cb");
-
-
-
 /* privates */
 var dialogs		= ff.hash();
 /*var inits_by_dlg = ff.hash();
 var inits_by_wdg = ff.hash();
-
 function initsReset(id) {
 	inits_by_dlg.set(id, ff.hash());
 	ff.ffPage.dialog.needInit(id, false);
 }*/
-
 var that = { /* publics */
 __ff : true, /* used to recognize ff'objects */
-
 "dialog_params"        : ff.hash(),
 /*"dialog_deps"        : ff.hash(),*/
-
 "addDialog" : function (params) {
 	/** mod di alex **/
 	if(unique === null && params.unique) {
@@ -69,7 +59,6 @@ __ff : true, /* used to recognize ff'objects */
 	}
 	unique = null;
 	/** fine mod di alex **/
-
 	if (that.dialog_params.isset(params.id))
 		return;	
 	
@@ -84,30 +73,24 @@ __ff : true, /* used to recognize ff'objects */
     });
 	
 	ff.ajax.ctxAdd(params.id, that, "dialog");
-
     that.doEvent({
         "event_name"    : "onAddDialog",
         "event_params"    : [params.id]
     });
 },
-
 "get" : function (id) {
     return dialogs.get(id);
 },
-
 "exist" : function (id) {
 	return that.dialog_params.isset(id);
 },
-
 "getInstance" : function (id) {
     return dialogs.get(id).instance;
 },
-
 "replaceHTML" : function (id, data) {
 	that.getInstance(id).html(data["html"]);
 	ff.ffPage.dialog.makeDlgBt(id, data);
 },
-
 "param" : function (id, param, value) {
     if (value !== undefined)
         that.dialog_params.get(id)[param] = value;
@@ -129,7 +112,6 @@ __ff : true, /* used to recognize ff'objects */
 	var widget = dialogs.get(id).widget;
 	var width = dialogs.get(id).params.width;
 	var widthClass = "";
-
 	if(width) {
 		if(parseInt(width) > 600)
 			widthClass = "modal-lg";
@@ -139,14 +121,11 @@ __ff : true, /* used to recognize ff'objects */
 		widthClass = that.getDimensions(instance);	
 	}
 	
-
-
 	if(widthClass)
 		jQuery(".modal-dialog", widget).addClass(widthClass);
 	
 	var wh = jQuery(window).height();
 	var height = jQuery(".modal-dialog", widget).height();
-
 	//if(wh > (height * 2)) {
 	//	jQuery(".modal-dialog", widget).css("margin-top", ((wh - height) / 2));
 	//}
@@ -156,7 +135,6 @@ __ff : true, /* used to recognize ff'objects */
 	if(id === undefined) {
 		id = dialogs.keys[dialogs.keys.length - 1];
 	}
-
 	var widget = dialogs.get(id).widget;
 	
 	if(!widget.hasClass("in")) {
@@ -170,20 +148,15 @@ __ff : true, /* used to recognize ff'objects */
 		});		
 	}
 	that.adjSize(id);
-
 	return true;
 },
-
 "makeInstance" : function (id, data, title) {
 	//overflow manage
 	if (firstDialog === null) {
 		jQuery("body").addClass("modal-open");
 		firstDialog = id;
 	}
-
 	var tmp_params = that.dialog_params.get(id) || {};
-
-	
 	var tmp = '<div id="ffWidget_dialog_' + id + '" class="ff-modal modal fade" role="dialog">'
 				 +  '<div class="modal-dialog' + (tmp_params["class"] || "") + '">'
 				 +    '<div class="modal-content">'
@@ -202,18 +175,15 @@ __ff : true, /* used to recognize ff'objects */
 	
 	dialogs.get(id).instance = jQuery('#ffWidget_dialog_container_' + id);
 	dialogs.get(id).widget = jQuery('#ffWidget_dialog_' + id);
-
     jQuery(".resize", dialogs.get(id).widget).on('click', function () {
     	jQuery(dialogs.get(id).widget).toggleClass("modal-full");
     });
-
 	jQuery(".close", dialogs.get(id).widget).on('click', function () {
 		that.onClose(id);
 	});
 	
 	return dialogs.get(id).instance;
 },
-
 "doOpen" : function (id, url, title, preserveIstance, elemHighlight) {
 //unique = null;
 	var html = undefined;
@@ -221,14 +191,12 @@ __ff : true, /* used to recognize ff'objects */
 		html = id;
 		id = new Date().getTime();
 	}
-
 	if(unique && dialogs.keys.length) {
 		preserveIstance = true;
 		if(!url)
 			url = that.dialog_params.get(id)["url"];
 		if(!title)
 			title = that.dialog_params.get(id)["title"];
-
 		id = unique;
 	}
 	if(that.dialog_params.get(id) !== undefined) {
@@ -236,18 +204,14 @@ __ff : true, /* used to recognize ff'objects */
             that.dialog_params.get(id)["url"] = url;
 		else
             url = that.dialog_params.get(id)["url"];
-
         if (title !== undefined && title.length > 0)
             that.dialog_params.get(id)["title"] = title;
 		else
             title = that.dialog_params.get(id)["title"];
     }
-
 	that.updateCursor(id, that.dialog_params.get(id)["url"]);
-
     if (dialogs.get(id) && dialogs.get(id).instance) {
 	    var widget = dialogs.get(id).widget;
-
         if(dialogs.get(id).params.current_url != url && preserveIstance) {
 			var breadCrumbs = dialogs.get(id).breadCrumbs;
         	var actionBack = false;
@@ -271,14 +235,12 @@ __ff : true, /* used to recognize ff'objects */
         }
         return;
     }
-
  	dialogs.set(id, {
 		"instance"	: null,
 		"params"	: jQuery.extend(true, {}, that.dialog_params.get(id)), 
 	    "elemHighlight" : elemHighlight,
 		"breadCrumbs": []
 	});	
-
 	if(url) {
 		ff.ajax.ctxGet(id).reset();
 	    dialogs.get(id).params.current_url = dialogs.get(id).params.url;
@@ -307,15 +269,12 @@ __ff : true, /* used to recognize ff'objects */
 		that.refresh(id);
 	}
 },
-
 "close" : function (id) {
 	if(id === undefined) {
 		id = dialogs.keys[dialogs.keys.length - 1];
 	}
-
 	that.onClose(id);
 },
-
 "onSuccess" : function (data, customdata) {
     var id = customdata.id;
 	var instance = dialogs.get(id).instance;
@@ -331,7 +290,6 @@ __ff : true, /* used to recognize ff'objects */
     
     if(dialogs.get(id).elemHighlight)
         jQuery(dialogs.get(id).elemHighlight).addClass("ff-modal-highlight");
-
     /**
      *    data.close
      *        true = chiude il dialog
@@ -346,13 +304,10 @@ __ff : true, /* used to recognize ff'objects */
      *    data.url
      *        cambia l'url del dialog su redirect interno
      */
-
     if (customdata.callback)
         customdata.callback(id, data);
-
     if (data.callback)
         eval(data.callback);
-
     if (data["close"]) {
         that.close(id);
 	} else if (data["url"]) {
@@ -362,14 +317,12 @@ __ff : true, /* used to recognize ff'objects */
 		ff.ffRecord.cursor.reload(id);		
     } else {
 		that.makeDlgBt(id, data);
-
         if (data["html"]) {
 			if (!ff.ajax.ctxGet(id).needInit() && dialogs.get(id) !== undefined ) {
 				//jQuery(widget).modal({backdrop: false});
 				that.refresh(id);
 			}
         }
-
 		if (!ff.ajax.ctxGet(id).needInit()) {
             ff.ffPage.dialog.refresh(id, true);
         } else {
@@ -379,24 +332,20 @@ __ff : true, /* used to recognize ff'objects */
     }
     return true;
 },
-
 "onClose" : function (id, hide) {
     if(dialogs.get(id).elemHighlight)
         jQuery(dialogs.get(id).elemHighlight).removeClass("ff-modal-highlight");
     
     if (dialogs.get(id).params.params && dialogs.get(id).params.params.persistent)
         return;
-
     if (dialogs.get(id).params.callback) {
         eval(dialogs.get(id).params.callback);
     }
-
     ff.struct.get("comps").each(function (componentid, component) {
         if (component.ctx === id) {
             ff.clearComponent(componentid);
         }
     });
-
     ff.struct.get("fields").each(function (key, field) {
         if (field.ctx !== undefined && field.ctx === id) {
             ff.doEvent({
@@ -409,7 +358,6 @@ __ff : true, /* used to recognize ff'objects */
 	
     dialogs.get(id).widget.remove();
     dialogs.unset(id);
-
     if(ff.ajax.ctxGet(id))
 		ff.ajax.ctxGet(id).reset();
 	
@@ -417,13 +365,11 @@ __ff : true, /* used to recognize ff'objects */
 		jQuery("body").removeClass("modal-open");
 		firstDialog = null;
 	}
-
     that.doEvent({
         "event_name": "onClose"
         , "event_params" : [id]
     });
 },
-
 "doAction" : function (id, action, component, detailaction, action_param, addit_fields) {
     that.param(id, "lastaction", action);
     
@@ -433,10 +379,8 @@ __ff : true, /* used to recognize ff'objects */
             break;
         default:
         	var widget = dialogs.get(id).widget;
-
 			ff.ajax.ctxGet(id).reset();
             that.doEvent({"event_name": "doAction", "event_params" : [id, action, component, detailaction, action_param]});
-
             var fields = ff.getFields(widget, id);
             fields.push(
                 {name: "frmAction", value: component + action}
@@ -446,13 +390,11 @@ __ff : true, /* used to recognize ff'objects */
                     {name: component + "detailaction", value: detailaction}
                 );
             }
-
             if (action == "detail_delete") {
                 fields.push(
                     {name: detailaction + "_delete_row", value: action_param}
                 );
             }
-
             if(addit_fields) {
                 for(var i in addit_fields) {
                     fields.push(addit_fields[i]);
@@ -477,13 +419,11 @@ __ff : true, /* used to recognize ff'objects */
             break;
     }
 },
-
 "goToUrl" : function (id, url) {
 	ff.ajax.ctxGet(id).reset();
 	
     dialogs.get(id).params.current_url = url;
 	that.updateCursor(id, url);
-
     ff.ajax.doRequest({
          "url"                : that.parseUrl(id, dialogs.get(id).params.current_url),
          "type"                : "GET",
@@ -501,7 +441,6 @@ __ff : true, /* used to recognize ff'objects */
          "doredirects"        : dialogs.get(id).params.doredirects
     });
 },
-
 "doRequest" : function (id, params) {
     /**
      * params
@@ -520,7 +459,6 @@ __ff : true, /* used to recognize ff'objects */
 	ff.ajax.ctxGet(id).reset();
 	
 	var fields = (params.fields === undefined ? jQuery(":input", widget).not("input:checkbox:not(:checked)").not("input:radio:not(:checked)") : params.fields);
-
     if (params.action) {
         fields.push(
             {"name": "frmAction", "value": params.action}
@@ -532,18 +470,14 @@ __ff : true, /* used to recognize ff'objects */
             {"name": params.detailaction + "detailaction", "value": params.component}
         );
     }
-
     if (params.action_param !== undefined) {
         fields.push(
             {"name": params.component + "_delete_row", "value": params.action_param}
         );
     }
-
     var url = (params.url !== undefined ? params.url : null);
-
     if (!url && params.component && ff.struct.get("comps").get(params.component) !== undefined)
         url = ff.struct.get("comps").get(params.component).url;
-
     if (!url)
         url = dialogs.get(id).params.current_url;
         
@@ -567,28 +501,23 @@ __ff : true, /* used to recognize ff'objects */
          "doredirects"        	: dialogs.get(id).params.doredirects
     });
 },
-
 "parseUrl" : function (id, url) {
     var parsedurl = url;
-
     /*if (parsedurl.indexOf('?') > -1) {
         if (parsedurl.substring(parsedurl.length - 1) != "&")
             parsedurl += "&";
         parsedurl += "XHR_THEME=dialog";
     } else
         parsedurl += "?XHR_THEME=dialog";*/
-
     var regTags = /\[\[([a-zA-Z0-9_\-\[\](?!\]))]+)\]\]/g;
     var ret;
     while ((ret = regTags.exec(url)) !== null) {
         var tmp = ret[1].replace(/\[/g, "\\[").replace(/\]/g, "\\]");  
         var encodeTmp = false;
-
         if(tmp.indexOf("_ENCODE") > 0) {
             tmp = tmp.replace("_ENCODE", "");
             encodeTmp = true;
         }
-
         if(tmp.indexOf("_TEXT") > 0) {
             if(jQuery("#" + tmp.replace("_TEXT", "")).is("select")) {
                 parsedurl = parsedurl.replace(ret[0], (encodeTmp ? encodeURIComponent(jQuery("#" + tmp.replace("_TEXT", "") + " option:selected").text()) : jQuery("#" + tmp.replace("_TEXT", "") + " option:selected").text()), "g");                            
@@ -599,10 +528,8 @@ __ff : true, /* used to recognize ff'objects */
             parsedurl = parsedurl.replace(ret[0], (encodeTmp ? encodeURIComponent(jQuery("#" + tmp).val()) : jQuery("#" + tmp).val()), "g");    
         }
     }
-
     if (dialogs.get(id).params.params !== undefined)
     {
-
 /*        for (i in dialogs.get(id).params.params) {
             parsedurl += "&" + i + "=" + jQuery("#" + dialogs.get(id).params.params[i]).val();
         }*/
@@ -612,7 +539,6 @@ __ff : true, /* used to recognize ff'objects */
 "removeDlgBt" : function(id, data) {
 	var instance = dialogs.get(id).instance;
 	var widget = dialogs.get(id).widget;
-
 	if(data["html"].indexOf("dialogSubTitleTab")) {
 		jQuery(".modal-tabs", widget).remove();
 	}
@@ -622,7 +548,6 @@ __ff : true, /* used to recognize ff'objects */
 	if(data["html"].indexOf("dialogActionsPanel top")) {
 		jQuery(".dlgTopPanel", widget).remove();
 	}
-
 	if(data["html"].indexOf("dialogActionsPanel")) {
 		jQuery(".dlgBottomPanel", widget).remove();
 	}
@@ -630,7 +555,6 @@ __ff : true, /* used to recognize ff'objects */
 "makeDlgBt" : function(id, data) {
 	var instance = dialogs.get(id).instance;
 	var widget = dialogs.get(id).widget;
-
 	var countRecord = 0;
 	var countGrid = 0;
 	var countDetail = 0;
@@ -672,7 +596,6 @@ __ff : true, /* used to recognize ff'objects */
 	}
 	if(countDetail && !countRecord)
 		return;
-
 	if(jQuery(".dialogTitle", instance).length) {
 		jQuery(".modal-title").addClass(jQuery(".dialogTitle:first", instance).attr("class")).removeClass("dialogTitle");
 /*		jQuery(".dialogTitle:first", instance).appendTo(jQuery(".modal-title", widget).empty()).attr("class", "dlgTitle");
@@ -691,30 +614,23 @@ __ff : true, /* used to recognize ff'objects */
 			var activeClass = "";
 			if(jQuery(this).hasClass("active")) {
 				startSel = i;
-
 				jQuery(this).removeClass("active");
 			}
 			var depClass = jQuery(this).attr("class").replace("dep-", "dlg-");
 			var depId = "bs-" + depClass;
-
 			tabPane[depClass] = true;
 			//jQuery(this).parent().addClass("dlg-tab " + depClass); 
 			jQuery(".dlg-tab." + depClass, instance);//.addClass("tabbable");
-
 			return '<li class="dialogSubTitleTab"><a href="#' + depId + '" data-toggle="tab">' + jQuery(this).html() + '</a></li>';
 		});
-
 		jQuery(".dlg-tab", instance).wrapAll('<div class="tab-content" />');
-
 		for(var depClass in tabPane) {
 			var depId = "bs-" + depClass;
 			jQuery("." + depClass, instance).wrapAll('<div class="tab-pane fade" id="' + depId + '" />')
 		
 		}
-
 		jQuery("LI.dialogSubTitleTab:eq(" + startSel + ")", widget).addClass("active");
 		jQuery(".tab-content .tab-pane:eq(" + startSel + ")", instance).addClass("active in");
-
 		jQuery(".dialogSubTitleTab", instance).insertAfter(jQuery(".modal-header", widget)).removeClass("dialogSubTitleTab").wrapAll('<div class="modal-tabs" />').wrapAll('<ul class="nav nav-tabs" />');
 		jQuery(".modal-header", widget).addClass("noborder");
 		
@@ -725,12 +641,9 @@ __ff : true, /* used to recognize ff'objects */
 		
 		calloutTargetClass = "modal-tabs";
 	}
-
 	if(jQuery(".dialogSubTitle", instance).length) {
 		jQuery(".dialogSubTitle", instance).insertAfter(jQuery("." + calloutTargetClass, widget)).removeClass("dialogSubTitle").wrapAll('<div class="modal-callout" />');
 	}
-
-
 	
     var skipForceBt = jQuery(".nav.nav-tabs > LI", widget).length;
 	if(jQuery(".dialogActionsPanel.top", instance).length) {
@@ -739,11 +652,9 @@ __ff : true, /* used to recognize ff'objects */
 		if(!countRecord && countGrid == 1)
 			jQuery(".dialogActionsPanel.top:not(.force)", instance).appendTo(jQuery(".modal-header", widget)).addClass("dlgTopPanel").removeClass("dialogActionsPanel top");
 	}
-
 	if(jQuery(".dialogActionsPanel:not(.top)", instance).length) {
         if(!skipForceBt)
 		    jQuery(".dialogActionsPanel.force", instance).appendTo(jQuery(".modal-footer", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel force");
-
 		if(countRecord) {
 			jQuery(".dialogActionsPanel:not(.force):last", instance).appendTo(jQuery(".modal-footer", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
 		} else if(countGrid == 1) {
@@ -766,7 +677,6 @@ __ff : true, /* used to recognize ff'objects */
 				$(".modal-title", widget).contents().filter(function () {
 				     return this.nodeType === 3; 
 				}).remove();
-
 				jQuery('<ol class="breadcrumb">' + breadCrumbs + '<li>' + pageTitle + '</li>' + '</ol>').appendTo(jQuery(".modal-title", widget));
 			}
 		}
@@ -782,11 +692,8 @@ __ff : true, /* used to recognize ff'objects */
 		};
 	}
 }
-
 }; /* publics' end */
-
 return that;
-
 /* code's end. */
 })();	
 	

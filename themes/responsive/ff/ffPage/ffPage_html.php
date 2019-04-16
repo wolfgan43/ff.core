@@ -3701,7 +3701,7 @@ class ffPage_html extends ffPage_base
 				$this->properties_body["class"] = $this->class_body;
 		}
 
-		if (is_array($this->properties_body) && count($this->properties_body))
+		if (is_array($this->properties_body) && count(properties_body))
 		{
 			foreach ($this->properties_body as $key => $value)
 			{

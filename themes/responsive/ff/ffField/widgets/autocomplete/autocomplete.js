@@ -128,8 +128,12 @@ __ff : true, /* used to recognize ff'objects*/
 
             var stripChar = unescape(params.stripChar);
             if(prefix) {
-                jQuery("#" + control).val( ff.ffField.autocomplete.recalc( jQuery(this).val(), control, readOnly ) );
-            }
+				if(params.suggest_only) {
+					jQuery("#" + control).val(jQuery("#" + control).attr("data-user"));
+				} else {
+					jQuery("#" + control).val( ff.ffField.autocomplete.recalc( jQuery(this).val(), control, readOnly ) );
+				}
+			}
             if(stripChar.length > 0) {
                 patt = new RegExp(stripChar);
                 jQuery(this).val(jQuery(this).val().replace(patt, ''));
@@ -142,14 +146,22 @@ __ff : true, /* used to recognize ff'objects*/
 	        			//jQuery("#" + prefix + control).attr("data-placeholder", "");
 	        		//}
 				//}
-	            jQuery("#" + control).val("");
+	            if(params.suggest_only) {
+					jQuery("#" + control).val(jQuery("#" + control).attr("data-user"));
+				} else {
+					jQuery("#" + control).val("");
+				}
 			} else if(!enableMulti && jQuery("#suggest_" + control).val().toLowerCase().indexOf(jQuery("#" + prefix + control).val().toLowerCase()) !== 0) {
 				jQuery("#suggest_" + control).val("");
 				//jQuery("#" + control).val("");
 			}  
 
-			if(!enableMulti)
+			if(!enableMulti) {
 				jQuery("#" + control).attr("data-user", jQuery("#" + prefix + control).val());
+			}
+			if(param.suggest_only) {
+				jQuery("#" + control).val(jQuery("#" + prefix + control).val());
+			}
         })
         .keydown(function(event) {
            /* if ( event.keyCode === jQuery.ui.keyCode.TAB &&
@@ -166,7 +178,11 @@ __ff : true, /* used to recognize ff'objects*/
 
 			//jQuery("#" + control).attr("data-user", null);
 			if(!enableMulti && !jQuery("#" + prefix + control).val())
-        		jQuery("#suggest_" + control).val("");        	
+        		jQuery("#suggest_" + control).val("");
+			
+			if(params.suggest_only) {
+				jQuery("#" + control).val(jQuery("#" + control).attr("data-user"));
+			}
         })
         .blur(function(event) {
         	//if(!enableMulti)
@@ -279,8 +295,12 @@ __ff : true, /* used to recognize ff'objects*/
             },
             search: function(event, ui) { 
                 if(prefix) {
-                    jQuery("#" + control).val( ff.ffField.autocomplete.recalc( this.value, control, readOnly ) );
-                }
+					if(params.suggest_only) {
+						jQuery("#" + control).val(jQuery("#" + control).attr("data-user"));
+					} else {
+						jQuery("#" + control).val( ff.ffField.autocomplete.recalc( this.value, control, readOnly ));
+					}
+				}
                 if(!enableMulti) {
                 	//jQuery("#" + prefix + control).attr("data-placeholder", jQuery("#" + prefix + control).attr("placeholder"));
                 	//jQuery("#" + prefix + control).attr("placeholder", "");

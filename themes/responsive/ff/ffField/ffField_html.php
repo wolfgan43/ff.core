@@ -97,6 +97,10 @@ class ffField_html extends ffField_base
 	 * @var Boolean
 	 */
 	var $actex_dialog_show_add			= true; // without actex_dialog_url this is ignored
+	var $actex_dialog_params = array();
+	var $actex_more_buttons = "";
+	var $actex_reset_value				= true;
+	
 	/**
 	 * Un elenco di parametri nel formato query_string da passare all'url di editing
 	 * E' possibile usare i tag speciali [[ID_DOM]] per recuperare valori dal dom,
@@ -222,6 +226,7 @@ class ffField_html extends ffField_base
 	var $autocomplete_hide_result_on_query_empty = false;
 	var $autocomplete_res_limit 		= 100;
 	var $autocomplete_image_field 		= "image";
+	var $autocomplete_suggest_only 		= false;
 	
     var $autocompletetoken_minLength 		= 3;
     var $autocompletetoken_delay 			= 300;

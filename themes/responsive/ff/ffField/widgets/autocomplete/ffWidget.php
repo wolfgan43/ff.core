@@ -99,7 +99,6 @@ class ffWidget_autocomplete extends ffCommon
 			$db =& $Field->db[0];
 		else
 			$db =& $this->db[0];
-
 		//if($Field->parent_page[0]->jquery_ui_theme) {
 			$Field->parent_page[0]->tplAddCss("jquery-ui.autocomplete");
 		//}		
@@ -181,7 +180,7 @@ class ffWidget_autocomplete extends ffCommon
 		} else {
             $arrID = array();
             $arrValue = explode(",", $value->getValue($Field->get_app_type(), $Field->get_locale()));
-            
+
             if(is_array($arrValue) && count($arrValue)) {
                 foreach($arrValue AS $value_part) {
                     if($Field->extended_type == "Selection") {
@@ -304,7 +303,6 @@ class ffWidget_autocomplete extends ffCommon
 //               $this->tpl[$tpl_id]->set_var("selected_id", $value->getValue($Field->get_app_type(), $Field->get_locale()));
 //               $this->tpl[$tpl_id]->set_var("selected_value", $value->getValue($Field->get_app_type(), $Field->get_locale()));                
             }
-
 		   	$this->tpl[$tpl_id]->set_var("selected_id", implode(",", array_keys($arrID)));
 			$this->tpl[$tpl_id]->set_var("selected_value", implode(",", $arrID));
 		}
@@ -354,6 +352,11 @@ class ffWidget_autocomplete extends ffCommon
         else
             $this->tpl[$tpl_id]->set_var("combo", "false");
 
+        if($Field->autocomplete_suggest_only)
+            $this->tpl[$tpl_id]->set_var("suggest_only", "true");
+        else
+            $this->tpl[$tpl_id]->set_var("suggest_only", "false");
+		
         $this->tpl[$tpl_id]->set_var("strip_char", urlencode($Field->autocomplete_strip_char));
         
         $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("more", "icon"));    

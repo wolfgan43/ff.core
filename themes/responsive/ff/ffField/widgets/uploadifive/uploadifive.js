@@ -4,11 +4,9 @@ ff.ffField.uploadifive = (function () {
 	var plugins = {
 		"fancybox" : {}
 	};		
-
 	var basePathKC = "/themes/library/kcfinder";
 	var data = {};
 	
-
 	var that = { /* publics*/
 		__ff : true, /* used to recognize ff'objects*/
 		
@@ -40,19 +38,15 @@ ff.ffField.uploadifive = (function () {
             data[component]["height"]           = params.height;
             
             data[component]["aviary"]			= params.aviary;
-
             data[component]["icons"]            = params.icons;
-
 			data[component]["previewPath"]		= ff.site_path + previewPath
 			data[component]["baseUrlKC"]		= params.baseUrlKC;
-
 			data[component]["startComponent"] 	= document.getElementById(component + params.start);
 			data[component]["targetComponent"] 	= document.getElementById(component + params.target);
 			data[component]["tmpnameComponent"] = document.getElementById(component + params.tmpname);
 			data[component]["deleteComponent"] 	= document.getElementById(component + params.sufdel);
 			
 			data[component]["idComponent"] 		= component.replace(/[^a-zA-Z0-9]+/g,'');
-
 			if(!data[component]["width"])
 				data[component]["width"] = 100;
 			if(!data[component]["height"])
@@ -62,20 +56,16 @@ ff.ffField.uploadifive = (function () {
                 data[component]["modelThumb"] = data[component]["width"] + "x" + data[component]["height"];  
 		
 		    var thisData = data[component];
-
             jQuery(thisData["startComponent"]).attr("id", thisData["idComponent"]);
             
             
             
             /*jQuery(thisData["startComponent"]).parent().find(".preview").prepend('<div class="uploadifiveQueue" id="' + thisData["idComponent"] + 'Queue"></div>');*/
-
 			var previewUrl = '';
 			
-
 			jQuery("#" + thisData["idComponent"]).parent().find(".preview").attr("id", "uploadifive_" + thisData["idComponent"]);
 			jQuery("#" + thisData["idComponent"]).parent().find(".preview").addClass("uploadifiveQueueItem");
 			jQuery("#" + thisData["idComponent"]).parent().find(".preview").find(".cancel").addClass(thisData["icons"]["cancel"]);
-
 			if(!jQuery("#uploadifive_" + thisData["idComponent"] + "_preview").length) {
 				var previewElem = jQuery("#" + thisData["idComponent"]).parent().find(".uploaded-preview");
 				if(previewElem.length) {
@@ -86,7 +76,6 @@ ff.ffField.uploadifive = (function () {
                             if(jQuery("> a", this).length) {
 							    var showFileClass = "";
 							    var showFileDetail = "";
-
 							    if(thisData["modelThumb"] == '') {
 							        previewUrl = thisData["previewPath"] /*+ relativePath*/;
 								} else {
@@ -97,14 +86,12 @@ ff.ffField.uploadifive = (function () {
 							    } else {
 								    showFileClass = "origin-file";
 							    }
-
                                // jQuery("> a", this).addClass(showFileClass);
 /*                                da mettere nel record e fare gestione dialog
 							    var descBlock = jQuery("> a", this).attr("title");
 							    var fileValue = jQuery("> a img", this).attr("src");
 							    var showFileDetail = jQuery("> a", this).attr("href");
 							    var fileValueNormalized = fileValue.replace(/[^a-zA-Z0-9]+/g,'');
-
 							    if(thisData["showFilePath"]) {
 							    	showFileClass = " dialog.ajax";
 								    showFileDetail = thisData["showFilePath"] + '/' + fileValue.replace(previewUrl, "").trim("/");
@@ -139,7 +126,6 @@ ff.ffField.uploadifive = (function () {
                                 jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function () {
                                     inputThumb.push(jQuery(this).data("url"));
                                 });
-
                                 jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
                             } else {
                                 var $container = jQuery("#uploadifive_" + thisData["idComponent"] + "_preview");
@@ -153,9 +139,7 @@ ff.ffField.uploadifive = (function () {
                                     });
                                     position += 1;
                                 });
-
                                 toBeSent.push({name: "resource", value: 'uploadifive'});
-
 								ff.load("ff.ajax", function () {
 									ff.ajax.blockUI();
 									jQuery.ajax({
@@ -168,10 +152,7 @@ ff.ffField.uploadifive = (function () {
 											jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function () {
 												inputThumb.push(jQuery(this).data("url"));
 											});
-
 											jQuery(thisData["targetComponent"]).val(inputThumb.join(","));
-
-
 											ff.ajax.unblockUI();
 										}
 									});
@@ -187,13 +168,11 @@ ff.ffField.uploadifive = (function () {
 			}
 			
 			
-
 			var scriptData = {};
 			scriptData['sess'] = thisData["dataSrc"];
 			scriptData['folder'] = thisData["folder"];
 			if(thisData["fileExt"])
 				scriptData['fileExt'] = thisData["fileExt"].replace(/\|/gi, ",");
-
 			scriptData['fileNormalize'] = (thisData["fileNormalize"] ? "1" : "");
 			
 			if(thisData["showFilePlugin"]) {
@@ -240,9 +219,7 @@ ff.ffField.uploadifive = (function () {
 						if (dt.types.contains && !dt.types.contains ('Files')) return //FF
 						if (dt.types.indexOf && dt.types.indexOf ('Files') == -1) return //Chrome
 						//if ($.browser.webkit) dt.dropEffect = 'copy';
-
 						jQuery("#uploadifive-" + thisData["idComponent"]).addClass("dropzone");
-
 					};
 					function dragLeave() {
 					    jQuery("#uploadifive-" + thisData["idComponent"]).removeClass("dropzone");
@@ -255,7 +232,6 @@ ff.ffField.uploadifive = (function () {
 		        onSelect		 	: function(queue) {
 					if(!thisData["multi"])
 		        		ff.ffField.uploadifive.del(component);
-
 		        	jQuery("DIV.actions .activebuttons").attr("disabled", "disabled").css({ "opacity" : "0.6" });
 				},
 				onCancel : function() {
@@ -263,7 +239,6 @@ ff.ffField.uploadifive = (function () {
 				},
 		        onUploadComplete : function(fileObj, response) {
 		        	jQuery("DIV.actions .activebuttons").removeAttr("disabled").css({ "opacity" : "1" });
-
 		        	var previewBlock = '';
 		        	var strResponse = '';
 		        	var editBlock = '';
@@ -288,7 +263,6 @@ ff.ffField.uploadifive = (function () {
 		},
 		"del" : function(component, container) {
 			var thisData = data[component];
-
 			if(container) {
 				if(jQuery("#uploadifive_" + thisData["idComponent"] + "_preview ." + container).hasClass("tmp")) {
 					jQuery.post(thisData["basePath"] + '/uploadifive.php', 'delaction=' + jQuery("#uploadifive_" + thisData["idComponent"] +"_preview ." + container).data("url") + "&" + 'sess' + "=" + thisData["dataSrc"] + "&folder=" + thisData["folder"], function(data) {
@@ -298,7 +272,6 @@ ff.ffField.uploadifive = (function () {
 			} else {
 				jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .noimg:first").remove();	
 			}
-
 			var inputElem = [];
 			var inputTmpElem = [];
 			jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function() {
@@ -319,7 +292,6 @@ ff.ffField.uploadifive = (function () {
 				jQuery(thisData["tmpnameComponent"]).val("");
 				//jQuery(thisData["deleteComponent"]).val("");
 			}
-
 			return ;
 		},
 		"openKCFinder" : function (component, urlSelect) {
@@ -329,11 +301,9 @@ ff.ffField.uploadifive = (function () {
 		            var arrUrl = url.trim("/").split("/");
 					if(arrUrl[0] == "uploads")
 						arrUrl.shift();
-
 					ff.ffField.uploadifive.setFileField(component, "/" + arrUrl.join("/"), arrUrl[arrUrl.length -1]);
 		        }
 		    };
-
 		    window.open(ff.base_path + basePathKC + '/browse.php?type=&dir=' + urlSelect, 'kcfinder_textbox',
 		        'status=0, toolbar=0, location=0, menubar=0, directories=0, ' +
 		        'resizable=1, scrollbars=0, width=800, height=600'
@@ -371,12 +341,10 @@ ff.ffField.uploadifive = (function () {
 	        if(thisData["writable"]) {
 	            strResponse = '<input type="text" id="' + thisData["targetComponent"] + '" name="' + thisData["targetComponent"] + '" value="' + fileValueOut + '" />';
 	        }
-
 			if(thisData["previewJs"]) {
 				var showFileClass = "";
 				var showFileDetail = "";
 		        var descBlock = '';
-
 				if(thisData["showFile"]) {
 					if(byteSize)
 						descBlock = ' title="' + fileValueOut + ' (' + byteSize + suffix + ')' + '"';
@@ -388,7 +356,6 @@ ff.ffField.uploadifive = (function () {
 				} else {
 					previewUrl =thisData["previewPath"] + "/" + thisData["modelThumb"] /*+ relativePath*/;
 				}
-
 				if(thisData["showFilePlugin"]) {
 					showFileClass = thisData["showFilePlugin"];
 				} else {
@@ -410,7 +377,6 @@ ff.ffField.uploadifive = (function () {
             
 			if(thisData["aviary"])
 				editBlock = '<a href="javascript:void(0);" alt="modify" class="' + thisData["icons"]["aviary"] + '" onclick="ff.load(\'ff.ffField.aviary\', function() { ff.ffField.aviary.launch(\'' + fileValueNormalized + '\', \'' + fileValue + '\', \'' + thisData["aviary"]["img_hash"] + '\', \'' + thisData["aviary"]["key"] + '\', \'' + thisData["aviary"]["tools"] + '\', \'' + thisData["aviary"]["theme"] + '\', \'' + thisData["aviary"]["version"] + '\', \'' + thisData["aviary"]["post_url"] + '\'); });"></a>';
-
 			cancelBlock = '<a href="javascript:ff.ffField.uploadifive.del(\'' + component + '\', \'' + fileValueNormalized + '\');" alt="delete" class="' + thisData["icons"]["cancel"] + '"></a>';
 				
 			if(editBlock || cancelBlock)
@@ -422,10 +388,8 @@ ff.ffField.uploadifive = (function () {
 							+ previewBlock
 							+ strResponse
 						+ '</div>';
-
 			if(fileObj)				
 				jQuery(fileObj["queueItem"]).remove();
-
 			if(jQuery("#uploadifive_" + thisData["idComponent"] + "_preview ." + fileValueNormalized).length) {
 				var oldDataValue = jQuery("#uploadifive_" + thisData["idComponent"] + "_preview ." + fileValueNormalized).data("url");
 				var inputElemOld = jQuery(thisData["targetComponent"]).val().split(",");
@@ -444,7 +408,6 @@ ff.ffField.uploadifive = (function () {
 				else 
 					jQuery("#uploadifive_" + thisData["idComponent"] + "_preview").html(itemBlock);
 			}
-
 			var inputElem = [];
 			var inputTmpElem = [];
 			jQuery("#uploadifive_" + thisData["idComponent"] + "_preview .uploaded-thumb").each(function() {
