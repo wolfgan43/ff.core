@@ -206,7 +206,8 @@ class ffField_html extends ffField_base
 	var $actex_autocomp_ajax			= false;
 	var $actex_autocomp_limit			= 100;	
 	var $actex_autocomp_preserve_text	= false;
-	
+
+
 	var $autocomplete_service			= null;
     var $autocomplete_disabled          = false;
     var $autocomplete_minLength         = 3;
@@ -240,6 +241,7 @@ class ffField_html extends ffField_base
     var $autocompletetoken_limit 			= "null";
     var $autocompletetoken_delimiter 		= ",";
     var $autocompletetoken_label 			= "";
+    var $autocompletetoken_attr 					= null;
     //var $autocompletetoken_service 			= null;
     var $autocompletetoken_combo            = false;
     var $autocompletetoken_concat_field		= array();

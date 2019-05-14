@@ -77,6 +77,8 @@ if (MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "usernam
 	$oField = ffField::factory($cm->oPage);
 	$oField->id = "username";
 	$oField->label = "Username";
+
+    $oField->encode_entities = false;
 	$oGrid->addContent($oField);
 }
 
@@ -257,6 +259,16 @@ $cm->oPage->addContent($oGrid);
 
 function MainGrid_on_before_parse_row($oComponent)
 {
+    $cm = cm::getInstance();
+    if(isset($oComponent->grid_fields["username"])) {
+        if(mod_sec_get_avatar($user_permission["avatar"], MOD_SEC_USER_AVATAR_MODE)) {
+            $avatar_url=mod_sec_get_avatar($user_permission["avatar"], MOD_SEC_USER_AVATAR_MODE);
+            if($oComponent->db[0]->getField("avatar", "Text", true)!="") {
+                $avatar_url=$cm->oPage->site_path."/media/48-48".$oComponent->db[0]->getField("avatar", "Text", true);
+            }
+        }
+        $oComponent->grid_fields["username"]->setValue('<img src="'.$avatar_url.'" width="48" class="img-circle img-thumbnail" title="'.$oComponent->db[0]->getField("username", "Text", true).'" alt="Avatar di '.$oComponent->db[0]->getField("username", "Text", true).'" /> '. $oComponent->db[0]->getField("username", "Text", true));
+    }
 	$db = $oComponent->db[0];
 
 	if (

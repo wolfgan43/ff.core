@@ -91,7 +91,7 @@ if(strlen(MOD_SEC_USER_AVATAR) && !mod_security_is_defined_field(MOD_SEC_USER_AV
 	$oField->file_temp_path = FF_DISK_UPDIR . "/users";
     $oField->file_max_size = 5000000;
     $oField->file_full_path = true;
-	if(get_session("UserLevel") > 1)
+	if(get_session("UserLevel") >= 1)
 	{
 		$oField->widget = "uploadifive";
 	} 
