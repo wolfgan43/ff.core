@@ -1702,17 +1702,17 @@ function cm_getFFButtonDefault() {
     , "sort"    => array(
             "default" => "link"
         , "addClass" => "sort"
-        , "icon" => "sort"
+        , "icon" => "fas fa-sort"
         )
     , "sort-asc"    => array(
             "default" => "link"
         , "addClass" => "sort asc"
-        , "icon" => "sort-asc"
+        , "icon" => "fas fa-sort-down"
         )
     , "sort-desc"   => array(
             "default" => "link"
         , "addClass" => "sort desc"
-        , "icon" => "sort-desc"
+        , "icon" => "fas fa-sort-up"
         )
     , "addnew"        => array(
             "default" => "primary"

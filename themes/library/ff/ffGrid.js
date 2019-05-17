@@ -36,8 +36,8 @@ var that = { // publics
 __ff : true, // used to recognize ff'objects
 "icons" : {
 	"sort" : "fa-sort"
-	, "sortAsc" : "fa-sort-asc"
-	, "sortDesc" : "fa-sort-desc"
+	, "sortAsc" : "fa-sort-down"
+	, "sortDesc" : "fa-sort-up"
 },
 "class" : {
 	"current" : "active"
