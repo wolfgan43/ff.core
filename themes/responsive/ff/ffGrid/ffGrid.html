@@ -84,27 +84,40 @@
 		</div>
 		<!--EndSectSearch-->
 		<!--BeginSectFilters-->
-		<div class="{filter_class}">
-			<ul>
+		<!--script>
+            $( window ).load(function() {
+                $('button[data-toggle="dropdown"] i').html($('.dropdown-menu .disabled').html() + ' <span class="caret"></span>');
+                console.log();
+                $(".dropdown-menu li a").click(function(){
+                    var selText = $(this).text();
+                    $(this).closest('div').find('button[data-toggle="dropdown"] i').html($(this).closest('div').find('button[data-toggle="dropdown"] i').html(selText + ' <span class="caret"></span>'));
+                });
+            });
+		</script-->
+		<div class="{filter_class} btn-group" role="group">
+			<!--ul-->
 				<!--BeginSectFilter-->
-				<li>
-					<h3>{_ffGrid_filter_for}<strong>{Filter_title}</strong></h3>
-					<ul>
+			<div class="btn-group" role="group">
+					<!--h3>{_ffGrid_filter_for}<strong>{Filter_title}</strong></h3-->
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<strong>{Filter_title}:</strong> <i></i>
+					</button>
+					<ul class="dropdown-menu">
 						<!--BeginSectFilterRow-->
 						<!--BeginSectFilterElement-->
 						<li><a href="javascript:void(0);" onclick="{filter_action}">{FilterElement_label}</a></li>
 						<!--EndSectFilterElement-->
 						<!--BeginSectSelFilterElement-->
-						<li class="selected">{FilterElement_label}</li>
+						<li class="disabled">zxcv {FilterElement_label}</li>
 						<!--EndSectSelFilterElement-->
 						<!--EndSectFilterRow-->
 						<!--BeginSectNoElements-->
 						<li>{_ffGrid_no_record_found}</li>
 						<!--EndSectNoElements-->
 					</ul>
-				</li>
+			</div>
 				<!--EndSectFilter-->
-			</ul>
+			<!--/ul-->
 		</div>
 		<!--EndSectFilters-->
 
