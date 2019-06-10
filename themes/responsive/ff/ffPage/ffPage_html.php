@@ -1414,8 +1414,9 @@ class ffPage_html extends ffPage_base
             $tpl[0]->set_var("group", $user->acl_primary);
             $tpl[0]->parse("SectGroup", false);
         }
-
-		$tpl[0]->set_var("encoded_this_url", rawurlencode($_SERVER['REQUEST_URI']));
+        // AGGIUNTO MIRKO
+        $tpl[0]->set_var("encoded_restricted_url", rawurlencode(MOD_SEC_RESTRICTED_URL));
+        $tpl[0]->set_var("encoded_this_url", rawurlencode($_SERVER['REQUEST_URI']));
 
 		foreach ($this->global_params as $key => $value)
 		{

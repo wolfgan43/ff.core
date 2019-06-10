@@ -1171,6 +1171,8 @@ class cm extends ffCommon
 						$this->tpl_content->set_var("theme", $this->oPage->theme);
 						$this->tpl_content->set_var("ret_url", $_REQUEST["ret_url"]);
 						$this->tpl_content->set_var("encoded_ret_url", rawurlencode($_REQUEST["ret_url"]));
+                        // AGGIUNTO MIRKO
+						$this->tpl_content->set_var("encoded_restricted_url", rawurlencode(MOD_SEC_RESTRICTED_URL));
 						$this->tpl_content->set_var("encoded_this_url", rawurlencode($_SERVER["REQUEST_URI"]));
 						//$this->preloadApplets($this->tpl_content);
 

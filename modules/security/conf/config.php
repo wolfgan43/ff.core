@@ -1,4 +1,5 @@
 <?php
+if (!defined("MOD_SEC_RESTRICTED_URL")) define ("MOD_SEC_RESTRICTED_URL", FF_SITE_PATH."/restricted");
 if (!defined("MOD_SEC_MULTIDOMAIN")) define ("MOD_SEC_MULTIDOMAIN", false);
 if (!defined("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB")) define ("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB", false);
 if (!defined("LOGIN_MULTIDOMAIN")) define ("LOGIN_MULTIDOMAIN", false);

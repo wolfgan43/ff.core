@@ -3515,6 +3515,8 @@ function modsec_OAuth2Error($response)
 
     $tpl->set_var("ret_url",			$_REQUEST["ret_url"]);
     $tpl->set_var("encoded_ret_url",	rawurlencode($_REQUEST["ret_url"]));
+    // AGGIUNTO MIRKO
+    $tpl->set_var("encoded_restricted_url",	rawurlencode(MOD_SEC_RESTRICTED_URL));
     $tpl->set_var("encoded_this_url",	rawurlencode($cm->oPage->getRequestUri()));
     $tpl->set_var("query_string",		$_SERVER["QUERY_STRING"]);
     $tpl->set_var("path_info",			$_SERVER["PATH_INFO"]);
