@@ -895,8 +895,8 @@ MODIFICHE TEST MIRKO
 */
 .sidemenu__head .domain i {
     position: absolute;
-    top: 24px;
-    right: 1em;
+    top: 12px;
+    right: 0px;
     color: #fff;
 }
 /* TITOLI */
