@@ -159,9 +159,10 @@ __ff : true, /* used to recognize ff'objects*/
 			if(!enableMulti) {
 				jQuery("#" + control).attr("data-user", jQuery("#" + prefix + control).val());
 			}
+			/*
 			if(param.suggest_only) {
 				jQuery("#" + control).val(jQuery("#" + prefix + control).val());
-			}
+			}*/
         })
         .keydown(function(event) {
            /* if ( event.keyCode === jQuery.ui.keyCode.TAB &&
@@ -293,7 +294,7 @@ __ff : true, /* used to recognize ff'objects*/
                     }, response);               
                 }
             },
-            search: function(event, ui) { 
+            search: function(event, ui) {
                 if(prefix) {
 					if(params.suggest_only) {
 						jQuery("#" + control).val(jQuery("#" + control).attr("data-user"));
@@ -313,7 +314,7 @@ __ff : true, /* used to recognize ff'objects*/
                     return false;
                 }*/
             },
-			response: function(event, ui) { 
+			response: function(event, ui) {
 				if(!enableMulti) {
             		if(jQuery("#" + prefix + control).val().length && ui.content[0] && ui.content[0].label.toLowerCase().indexOf(jQuery("#" + prefix + control).val().toLowerCase()) === 0) {
 		                jQuery("#suggest_" + control).val(ui.content[0].label.toLowerCase());

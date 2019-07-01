@@ -1073,7 +1073,7 @@ class ffGrid_html extends ffGrid_base
 							if (isset($_REQUEST["XHR_CTX_ID"]))
 								$this->tpl[0]->set_var("filter_action", "ff.ajax.ctxDoRequest('" . $_REQUEST["XHR_CTX_ID"] . "', {'action' : 'filter', 'component' :'" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) . "'})");
 							else
-								$this->tpl[0]->set_var("filter_action", "ff.ajax.doRequest({'action' : 'filter', 'component' : '" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) . "'});");
+								$this->tpl[0]->set_var("filter_action", "console.log('mirko-" . $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) . "'); ff.ajax.doRequest({'action' : 'filter', 'component' : '" . $this->getIDIF() . "', '" . $this->getPrefix() . $this->search_fields[$key]->id . "_src' : '" . $item_key->getValue($this->search_fields[$key]->get_app_type(), $this->search_fields[$key]->get_locale()) . "','section'    : 'GridData'});");
 							
 							$this->tpl[0]->parse("SectFilterElement", false);
 							$this->tpl[0]->set_var("SectSelFilterElement", "");
