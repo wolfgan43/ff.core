@@ -28,9 +28,9 @@ $res = $cm->modules["restricted"]["events"]->doEvent("get_domain");
 $rc = end($res);
 if ($rc)
 	$globals->DomainID = $rc;
-else if (is_callable("mod_security_get_domain") && MOD_SEC_MULTIDOMAIN)
+else if (is_callable("mod_auth_get_domain"))
 {
-	$globals->DomainID = mod_security_get_domain();
+	$globals->DomainID = mod_auth_get_domain();
 }
 else
 	$globals->DomainID = 0;

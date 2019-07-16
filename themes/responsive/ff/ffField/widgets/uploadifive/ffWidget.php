@@ -207,7 +207,7 @@ class ffWidget_uploadifive extends ffCommon
 		if(!strlen($folder))
 			$folder = "/";
 
-		if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID) { //if(session_status() == PHP_SESSION_NONE) {
+		if(Auth::isLogged()) { //if(session_status() == PHP_SESSION_NONE) {
 			if ($plgCfg_uploadifive_UseOwnSession || $Field->actex_use_own_session) 
 				session_start();
 			$ff = get_session("ff");
@@ -217,7 +217,7 @@ class ffWidget_uploadifive extends ffCommon
 
         if($Field->extended_type == "File") {
 			//$this->tpl[$tpl_id]->set_var("base_url", $folder);
-			if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID) {//if(session_status() == PHP_SESSION_NONE) {
+			if(Auth::isLogged()) {//if(session_status() == PHP_SESSION_NONE) {
 				$ff["uploadifive"][$tmp]["folder"] = $folder;
 				$ff["uploadifive"][$tmp]["base_path"] = $base_path;
 				
@@ -225,7 +225,7 @@ class ffWidget_uploadifive extends ffCommon
 			}			
 
 			$this->tpl[$tpl_id]->set_var("folder", $folder);
-			$this->tpl[$tpl_id]->set_var("size_limit", $Field->file_max_size);
+			$this->tpl[$tpl_id]->set_var("size_limit", ($Field->file_max_size ? $Field->file_max_size: 1800000));
 			
 			$file_ext = "";
 			if(is_array($Field->file_allowed_mime) && count($Field->file_allowed_mime)) 
@@ -235,9 +235,9 @@ class ffWidget_uploadifive extends ffCommon
 					if(strlen($file_ext))
 						$file_ext .= "|";
 					if (strpos($file_allowed_mime_value, "/"))
-						$file_ext .= ffMimeTypeByExtension(substr($file_allowed_mime_value, strpos($file_allowed_mime_value, "/") + 1));
+						$file_ext .= ffMedia::getMimeTypeByExtension(substr($file_allowed_mime_value, strpos($file_allowed_mime_value, "/") + 1));
 					else
-						$file_ext .= ffMimeTypeByExtension($file_allowed_mime_value);
+						$file_ext .= ffMedia::getMimeTypeByExtension($file_allowed_mime_value);
 				}
 			}
 			if(strlen($file_ext))
@@ -268,10 +268,10 @@ class ffWidget_uploadifive extends ffCommon
 			$this->tpl[$tpl_id]->set_var("size_limit", 0);
 			$this->tpl[$tpl_id]->set_var("file_ext", "null"); 
 		}
-		$this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("cancel", "icon"));
-        $this->tpl[$tpl_id]->set_var("aviary_class", cm_getClassByFrameworkCss("crop", "icon"));  
-        $this->tpl[$tpl_id]->set_var("upload_class", cm_getClassByFrameworkCss("upload", "icon"));
-        $this->tpl[$tpl_id]->set_var("upload_icon", cm_getClassByFrameworkCss("upload", "icon-tag", "lg"));
+		$this->tpl[$tpl_id]->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("cancel", "icon"));
+        $this->tpl[$tpl_id]->set_var("aviary_class", Cms::getInstance("frameworkcss")->get("crop", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_class", Cms::getInstance("frameworkcss")->get("upload", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_icon", Cms::getInstance("frameworkcss")->get("upload", "icon-tag", "lg"));
         
 		if($Field->file_multi) {
 			$this->tpl[$tpl_id]->set_var("multi", "true");
@@ -330,7 +330,7 @@ class ffWidget_uploadifive extends ffCommon
 					&& count($Field->file_edit_params[$Field->file_edit_type])
 					&& $Field->file_edit_type == "Aviary"
 				) {
-					if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID) {//if(session_status() == PHP_SESSION_NONE) {
+					if(Auth::isLogged()) {//if(session_status() == PHP_SESSION_NONE) {
 						$ff["aviary"][$tmp]["folder"] = $folder;
 						$ff["aviary"][$tmp]["base_path"] = $base_path;
 					}					
@@ -350,7 +350,7 @@ class ffWidget_uploadifive extends ffCommon
 			}
 		}
 		
-		if(session_id() != '' && get_session("UserNID") != MOD_SEC_GUEST_USER_ID)//if(session_status() == PHP_SESSION_NONE)
+		if(Auth::isLogged())//if(session_status() == PHP_SESSION_NONE)
 			set_session("ff", $ff);
 
         //$this->tpl[0]->set_var("properties", $Field->getProperties());

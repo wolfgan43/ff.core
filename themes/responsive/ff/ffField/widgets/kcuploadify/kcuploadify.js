@@ -118,7 +118,7 @@ ff.ffField.kcuploadify = (function () {
 			}
 
 			var scriptData = {};
-			scriptData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
+			//scriptData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
 			
             jQuery("#" + idComponent).uploadify({
 		        'uploader'       : this.basePathUF + '/uploadify.swf',
@@ -266,9 +266,9 @@ ff.ffField.kcuploadify = (function () {
 				else
 					fileDelete = this.baseUrlUF + '/' + jQuery(tmpnameComponent).val();
 				*/
-				fileDelete = jQuery(tmpnameComponent).val();
+				var fileDelete = jQuery(tmpnameComponent).val();
 				
-				jQuery.post(this.basePathUF + '/uploadify.php', 'delaction=' + fileDelete + "&" + ff.modules.security.session.session_name + "=" + ff.modules.security.session_id() + "&folder=" + this.dataSrc, function(data) {
+				jQuery.post(this.basePathUF + '/uploadify.php', 'delaction=' + fileDelete /*+ "&" + ff.modules.security.session.session_name + "=" + ff.modules.security.session_id()*/ + "&folder=" + this.dataSrc, function(data) {
 				}, "json");
 				
 

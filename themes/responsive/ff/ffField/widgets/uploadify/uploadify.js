@@ -111,7 +111,7 @@ ff.ffField.uploadify = (function () {
                 }
 
 			var scriptData = {};
-			scriptData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
+			//scriptData[ff.modules.security.session.session_name] = ff.modules.security.session_id();
 
 		    jQuery("#" + idComponent).uploadify({
                 'uploader'       : this.basePath + '/uploadify.swf',
@@ -260,9 +260,9 @@ ff.ffField.uploadify = (function () {
 				else
 					fileDelete = this.baseUrl + '/' + jQuery(tmpnameComponent).val();
 				*/
-				fileDelete = jQuery(tmpnameComponent).val();
+				var fileDelete = jQuery(tmpnameComponent).val();
 					
-				jQuery.post(this.basePath + '/uploadify.php', 'delaction=' + fileDelete + "&" + ff.modules.security.session.session_name + "=" + ff.modules.security.session_id() + "&folder=" + this.dataSrc, function(data) {
+				jQuery.post(this.basePath + '/uploadify.php', 'delaction=' + fileDelete /*+ "&" + ff.modules.security.session.session_name + "=" + ff.modules.security.session_id()*/ + "&folder=" + this.dataSrc, function(data) {
 				}, "json");
 				
 				jQuery(tmpnameComponent).val("");

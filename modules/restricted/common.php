@@ -8,22 +8,20 @@ $cm->modules["restricted"]["layout_bypath"] = array();
 
 if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
 {
-	$mod_res_globals = ffGlobals::getInstance("__mod_restricted__");
-	// calculate hash
-	
-	$cache = ffCache::getInstance(CM_CACHE_ADAPTER);
-	$restricted_options			= $cache->get("__mod_restricted_options" . mod_res_get_hash() . "__", $ffcache_success);
-	$restricted_menu			= $cache->get("__mod_restricted_menu" . mod_res_get_hash() . "__", $ffcache_success);
-	$restricted_layout_bypath	= $cache->get("__mod_restricted_layout_bypath" . mod_res_get_hash() . "__", $ffcache_success);
-	$restricted_settings		= $cache->get("__mod_restricted_settings" . mod_res_get_hash() . "__", $ffcache_success);
+    $cache = ffCache::getInstance();
+    // calculate hash
+    $cache_key = (MOD_RES_MEM_CACHING_BYPATH
+        ? $cm->path_info
+        : "default"
+    );
 
-	if ($ffcache_success)
+    $cm->modules["restricted"]["options"]           = $cache->get($cache_key, "/cm/mod/restricted/options");
+    $cm->modules["restricted"]["menu"]              = $cache->get($cache_key, "/cm/mod/restricted/menu");
+    $cm->modules["restricted"]["layout_bypath"]     = $cache->get($cache_key, "/cm/mod/restricted/layout_bypath");
+    $cm->modules["restricted"]["settings"]          = $cache->get($cache_key, "/cm/mod/restricted/settings");
+
+    if (is_array($cm->modules["restricted"]["menu"]) && count($cm->modules["restricted"]["menu"]))
 	{
-		$cm->modules["restricted"]["options"]		= unserialize($restricted_options);
-		$cm->modules["restricted"]["menu"]			= unserialize($restricted_menu);
-		$cm->modules["restricted"]["layout_bypath"]	= unserialize($restricted_layout_bypath);
-		$cm->modules["restricted"]["settings"]		= unserialize($restricted_settings);
-
 		foreach ($cm->modules["restricted"]["menu"] as $key => $value)
 		{
 			$cm->modules["restricted"]["menu_bypath"][$value["path"]][] =& $cm->modules["restricted"]["menu"][$key];
@@ -41,10 +39,22 @@ if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING)
 	}
 }
 
-if (!$ffcache_success)
+if (!$cm->modules["restricted"]["menu"])
 {
 	$cm->addEvent("on_load_module", "mod_restricted_cm_on_load_module");
-	if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING) $cm->addEvent("on_modules_loaded", "mod_restricted_cm_on_modules_loaded");
+    if (CM_ENABLE_MEM_CACHING && MOD_RES_MEM_CACHING) {
+        $cache = ffCache::getInstance();
+        // calculate hash
+        $cache_key = (MOD_RES_MEM_CACHING_BYPATH
+            ? $cm->path_info
+            : "default"
+        );
+
+        $cache->set($cache_key, $cm->modules["restricted"]["options"], "/cm/mod/restricted/options");
+        $cache->set($cache_key, $cm->modules["restricted"]["menu"], "/cm/mod/restricted/menu");
+        $cache->set($cache_key, $cm->modules["restricted"]["layout_bypath"], "/cm/mod/restricted/layout_bypath");
+        $cache->set($cache_key, $cm->modules["restricted"]["settings"], "/cm/mod/restricted/settings");
+    }
 
 	$tmp = cm_confCascadeFind(FF_DISK_PATH, "", "mod_restricted.xml");
 	if (is_file($tmp))
@@ -75,29 +85,16 @@ function mod_restricted_load_by_path()
 function mod_restricted_cm_on_load_module($cm, $mod)
 {
 	$tmp = cm_confCascadeFind(CM_MODULES_ROOT . "/" . $mod . "/conf", "/modules/" . $mod, "mod_restricted.xml");
+
 	if (is_file($tmp))
 		mod_restricted_load_config($tmp);
 }
 
-function mod_restricted_cm_on_modules_loaded($cm)
-{
-	$cache = ffCache::getInstance(FF_CACHE_ADAPTER);
-	$mod_res_globals = ffGlobals::getInstance("__mod_restricted__");
-	$cache->set("__mod_restricted_options" . mod_res_get_hash() . "__", null, serialize($cm->modules["restricted"]["options"]));
-	$cache->set("__mod_restricted_menu" . mod_res_get_hash() . "__", null, serialize($cm->modules["restricted"]["menu"]));
-	$cache->set("__mod_restricted_layout_bypath" . mod_res_get_hash() . "__", null, serialize($cm->modules["restricted"]["layout_bypath"]));
-	$cache->set("__mod_restricted_settings" . mod_res_get_hash() . "__", null, serialize($cm->modules["restricted"]["settings"]));
-}
-
 function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 {
-	if ($db === null)
-		$db = ffDb_Sql::factory();
-	elseif (is_array($db))
-		$db =& $db[0];
-
-	if (!is_object($db))
-		ffErrorHandler::raise("invalid db object", E_USER_ERROR, null, get_defined_vars());
+	if ($db === null) {
+        $db = ffDb_Sql::factory();
+    }
 
 	$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "mod_restricted_settings WHERE name = " . $db->toSql(new ffData($name));
 
@@ -107,16 +104,13 @@ function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 		$rc = end($res);
 		if ($rc)
 			$DomainID = $rc;
-		else if (is_callable("mod_security_get_domain") && MOD_SEC_MULTIDOMAIN)
+		else if (is_callable("mod_auth_get_domain"))
 		{
-			$DomainID = mod_security_get_domain();
+			$DomainID = mod_auth_get_domain();
 		}
 	}	
 	
-	if ($DomainID !== null)
-	{
-		$sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
-	}
+    $sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
 
 	$db->query($sSQL);
 	if ($db->nextRecord())
@@ -131,13 +125,9 @@ function mod_restricted_get_setting($name, $DomainID = null, $db = null)
 
 function mod_restricted_get_all_setting($DomainID = null, $db = null)
 {
-    if ($db === null)
+    if ($db === null) {
         $db = ffDb_Sql::factory();
-    elseif (is_array($db))
-        $db =& $db[0];
-
-    if (!is_object($db))
-        ffErrorHandler::raise("invalid db object", E_USER_ERROR, null, get_defined_vars());
+    }
 
     $sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "mod_restricted_settings WHERE 1 ";
 
@@ -147,16 +137,13 @@ function mod_restricted_get_all_setting($DomainID = null, $db = null)
 		$rc = end($res);
 		if ($rc)
 			$DomainID = $rc;
-		else if (is_callable("mod_security_get_domain") && MOD_SEC_MULTIDOMAIN)
-		{
-			$DomainID = mod_security_get_domain();
-		}
+        else if (is_callable("mod_auth_get_domain"))
+        {
+            $DomainID = mod_auth_get_domain();
+        }
 	}	
 	
-    if ($DomainID !== null)
-    {
-        $sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
-    }
+    $sSQL .= " AND ID_domains = " . $db->toSql($DomainID);
 
     $db->query($sSQL);
     if ($db->nextRecord())
@@ -176,16 +163,9 @@ function mod_restricted_get_all_setting($DomainID = null, $db = null)
 
 function mod_restricted_set_setting($name, $value, $DomainID = null, $db = null)
 {
-	if ($db === null)
-		$db = ffDb_Sql::factory();
-	elseif (is_array($db))
-		$db =& $db[0];
-
-    if (!is_object($db))
-        ffErrorHandler::raise("invalid db object", E_USER_ERROR, null, get_defined_vars());
-	
-    
-    
+	if ($db === null) {
+        $db = ffDb_Sql::factory();
+    }
 
 	if ($DomainID === null)
 	{
@@ -193,9 +173,9 @@ function mod_restricted_set_setting($name, $value, $DomainID = null, $db = null)
 		$rc = end($res);
 		if ($rc)
 			$DomainID = $rc;
-		else if (is_callable("mod_security_get_domain") && MOD_SEC_MULTIDOMAIN)
+		else if (is_callable("mod_auth_get_domain"))
 		{
-			$DomainID = mod_security_get_domain();
+			$DomainID = mod_auth_get_domain();
 		}
 	}	
 	
@@ -239,10 +219,15 @@ function mod_restricted_load_config($file)
 	$cm = cm::getInstance();
 	
 	$xml = new SimpleXMLElement("file://" . $file, null, true);
-	
+
     static $sect_compare;
     if($sect_compare == "" && strpos($file, FF_DISK_PATH . "/conf/contents") === 0) {
         $sect_compare = ffCommon_dirname(substr($file, strlen(FF_DISK_PATH . "/conf/contents"))); 
+    }
+
+    //carica le env relative al modulo
+    if (isset($xml->env)) {
+        $cm->load_env_by_xml($xml->env);
     }
 
 	if (isset($xml->menu) && count($xml->menu->children()))
@@ -599,9 +584,7 @@ function mod_restricted_checkacl_bylevel($acl, $level = null, $usernid = null, $
 		}
 	}
 	
-/*	if (defined("MOD_SECURITY_SESSION_STARTED") && $level == 3)
-		return true;
-*/	
+
 	if (in_array(get_session("UserLevel"), $acl))
 		return true;
 }
@@ -688,22 +671,4 @@ function mod_res_access_denied($confirm_url = null)
 	}
 	
 	access_denied($confirm_url, FF_SITE_PATH . $res_path . "/dialog");
-}
-
-function mod_res_get_hash()
-{
-	$cm = cm::getInstance();
-	
-	if (MOD_RES_MEM_CACHING_BYPATH)
-		$hash .= "_" . $cm->path_info;
-	/*if (MOD_RES_MEM_CACHING_BYDOMAIN && function_exists("mod_security_get_domain"))
-		$hash .= "_" . mod_security_get_domain();
-	if (MOD_RES_MEM_CACHING_BYUSER && defined("MOD_SECURITY_SESSION_STARTED"))
-		$hash .= "_" . get_session("UserNID");
-	if (MOD_RES_MEM_CACHING_BYUSERLEVEL && defined("MOD_SECURITY_SESSION_STARTED"))
-		$hash .= "_" . get_session("UserLevel");
-	if (MOD_RES_MEM_CACHING_BYPROFILE && MOD_SEC_PROFILING && defined("MOD_SECURITY_SESSION_STARTED"))
-		$hash .= "_" . mod_sec_getprofile_byuser(get_session("UserNID"));*/
-	
-	return $hash;
 }

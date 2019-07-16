@@ -46,15 +46,6 @@
 		</destination>
 		<reverse>/login</reverse>
 	</rule>
-	<rule id="mod_auth_logout">
-		<priority>VERY_HIGH</priority>
-		<source>/logout$</source>
-		<destination>
-			<module>auth</module>
-			<url>/logout$1</url>
-		</destination>
-		<reverse>/logout</reverse>
-	</rule>
     <rule id="mod_auth_social">
         <priority>VERY_HIGH</priority>
 		<source>^/login/social(/[^/]*)?(/[^/]*)?$</source>
@@ -63,7 +54,16 @@
             <url>/social$1$2</url>
         </destination>
         <reverse>/login/social</reverse>
-    </rule> 
+    </rule>
+	<rule id="mod_auth_activation">
+		<priority>NORMAL</priority>
+		<source>/activation(.*)</source>
+		<destination>
+			<module>auth</module>
+			<url>/activation$1</url>
+		</destination>
+		<reverse>/activation</reverse>
+	</rule>
 	<rule id="mod_auth_recover">
 		<priority>NORMAL</priority>
 		<source>/recover(.*)</source>

@@ -194,7 +194,7 @@ function initEvents(key) {
 }
 
 function initLibs(ref, path) {
-	for (property in ref) {
+	for (var property in ref) {
 		if (typeof(ref[property]) === "object" && ref[property].__ff === true) {
 			var found = false;
 			that.libs.each(function(key,value){
@@ -327,7 +327,7 @@ var that = { // publics
 
 "argsAsArray" : function (args) {
 	var arrArgs = [];
-	for (p in args) {
+	for (var p in args) {
 		if (args.hasOwnProperty(p))
 			arrArgs.push(args[p]);
 	}
@@ -526,12 +526,15 @@ var that = { // publics
 		}
 		plugins_loads.set(id, []);
 	}
-	pluginInit(id);
 	plugins.set(id, true);
 },
 
 "pluginAddInit" : function (id, callback, uuid) {
-	if (uuid !== undefined) {
+
+    ff.pluginAddInitLoad(id, callback, uuid);
+
+
+/*	if (uuid !== undefined) {
 		if (inits_uuid.isset(uuid) !== undefined)
 			return;
 		else
@@ -544,12 +547,12 @@ var that = { // publics
 
 		plugins_inits.get(id).push(callback);
 	} else
-		callback();
+		callback();*/
 },
 
 "CSSload" : function(link, callback) {
     var cssLoaded = false;
-    if(!step) step = {};
+    if(!step) var step = {};
 
     try {
         if (link.sheet && link.sheet.cssRules.length > 0 ) {
@@ -653,7 +656,7 @@ var that = { // publics
 
 "addLoadEvent" : function (func) {
 	var oldonload = window.onload;
-	if (typeof window.onload != 'function') {
+	if (typeof window.onload !== 'function') {
 		window.onload = func;
 	} else {
 		window.onload = function() {
@@ -664,11 +667,15 @@ var that = { // publics
 		}
 	}
 },
+"module" : function(name) {
+	ff.pluginLoad("ff.modules." + name, "/modules/" + name + "/themes/javascript/ff.modules." + name + ".js", undefined, false);
 
+    return ff["modules"][name];
+},
 "submitProcessKey" : function (e, button) {
     if (null == e)
         e = window.event;
-    if (e.keyCode == 13)  {
+    if (e.keyCode === 13)  {
     	document.getElementById(button).focus();
         document.getElementById(button).click();
         return false;
@@ -677,11 +684,11 @@ var that = { // publics
 
 "clearComponent" : function (component) {
 	if (ff.struct.get(component) !== undefined) {
-		if (ff.struct.get(component).type == "ffGrid")
+		if (ff.struct.get(component).type === "ffGrid")
 			if(ff.ffPageNavigator !== undefined) {
 				try {
 					ff.ffPageNavigator.deleteNavigator(component);
-				} catch (e) {};
+				} catch (e) {}
 			}
 		ff.struct.get(component).fields.each( function (key, field) {
 			ff.doEvent({
@@ -738,16 +745,22 @@ var that = { // publics
     switch(type) {
 		case "Android":
 			res = navigator.userAgent.match(/Android/i);
+			break;
 		case "BlackBerry":
 			res = navigator.userAgent.match(/BlackBerry/i);
+            break;
 		case "iOS":
 			res = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            break;
 		case "iPad":
 			res = navigator.userAgent.match(/iPad/i);
+            break;
 		case "Opera":
 			res = navigator.userAgent.match(/Opera Mini/i);
+            break;
 		case "Windows":
 			res = navigator.userAgent.match(/IEMobile/i);
+            break;
 		default:		
 			res = navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i);	
     }
@@ -999,7 +1012,7 @@ var that = { // publics
 		var l = tmp_keys.length;
 
 		for (var i = 0; i < l; i++) {
-			$rc = func(tmp_keys[i], tmp_values[i], i);
+			var $rc = func(tmp_keys[i], tmp_values[i], i);
 			if ($rc)
 				break;
 		}

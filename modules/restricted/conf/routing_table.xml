@@ -8,15 +8,15 @@
 			<url>/settings$1</url>
 		</destination>
 	</rule>
-	<rule id="restricted">
+	<rule>
 		<priority>HIGH</priority>
-		<source>^/(.*)</source>
+		<source>^/restricted(.*)</source>
 		<destination>
 			<module>restricted</module>
 			<url>/layout$0</url>
 		</destination>
 		<process_next />
 		<accept_path_info />
-		<reverse>/</reverse>
+		<reverse>/restricted</reverse>
 	</rule>
 </configdata>

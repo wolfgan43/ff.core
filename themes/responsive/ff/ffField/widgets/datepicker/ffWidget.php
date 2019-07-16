@@ -159,7 +159,7 @@ class ffWidget_datepicker extends ffCommon
 			$this->tpl[$tpl_id]->set_var("class", $this->class);
 
         $Field->framework_css["fixed_post_content"] = array(2);         
-        $Field->fixed_post_content = '<a href="javascript:void(0);" onclick="$(\'#' . $Field->parent[0]->id . "_" . $id . '\').datepicker(\'show\');" class="' . cm_getClassByFrameworkCss("calendar", "icon") . '"></a>';
+        $Field->fixed_post_content = '<a href="javascript:void(0);" onclick="$(\'#' . $Field->parent[0]->id . "_" . $id . '\').datepicker(\'show\');" class="' . Cms::getInstance("frameworkcss")->get("calendar", "icon") . '"></a>';
         /*messo nel css */ //$Field->properties["style"] = "position: relative; z-index: 100000;"; //workground per far funzionare il datepicker dentro le dialog modali
             
         if($Field->min_year)

@@ -82,8 +82,8 @@ class ffWidget_listgroup extends ffCommon
 		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 		//$this->tpl[$tpl_id]->set_var("class", ($this->class ? (" " . $this->class) : ""));
 		//$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
-        $this->tpl[$tpl_id]->set_var("add_class", cm_getClassByFrameworkCss("plus", "icon"));
-        $this->tpl[$tpl_id]->set_var("remove_class", cm_getClassByFrameworkCss("minus", "icon"));
+        $this->tpl[$tpl_id]->set_var("add_class", Cms::getInstance("frameworkcss")->get("plus", "icon"));
+        $this->tpl[$tpl_id]->set_var("remove_class", Cms::getInstance("frameworkcss")->get("minus", "icon"));
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);

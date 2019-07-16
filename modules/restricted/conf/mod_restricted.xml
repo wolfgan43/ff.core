@@ -6,9 +6,9 @@
 				senza però visualizzare navigazione
 		-->
 		<default path="/" hide="true" />
-		<admin path="/admin" label="Admin">
+		<!--<admin path="/admin" label="Admin">
 			<settings path="/admin/settings" label="Settings" />
-		</admin>
+		</admin>-->
 	</menu>
 	<sections>
 		<top>

@@ -111,13 +111,13 @@ class ffDB_Sql
  			die("function \"$name\" not found on class " . __CLASS__);
 	}
 
-	static public function __callStatic ($name, $arguments)
+	/*static public function __callStatic ($name, $arguments)
 	{
  		if ($this->useFormsFramework)
  			ffErrorHandler::raise("function \"$name\" not found on class " . get_class($this), E_USER_ERROR, $this, get_defined_vars());
  		else
  			die("function \"$name\" not found on class " . get_class($this));
-	}
+	}*/
 
 	// STATIC EVENTS MANAGEMENT
 	static public function addEvent($event_name, $func_name, $priority = null, $index = 0, $break_when = null, $break_value = null, $additional_data = null)

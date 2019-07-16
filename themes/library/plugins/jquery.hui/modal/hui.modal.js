@@ -31,23 +31,23 @@
 
 
         var foundation_opt_defaults = {
-          "data-animation-in": '',
-          "data-animation-out": '',
-          "data-show-delay": 1500,
-          "data-hide-delay": 0,
-          "data-close-on-click": true,
-          "data-close-on-esc": true,
-          "data-multiple-opened": true,
-          "data-v-offset":0, //Distance, in pixels, the modal should push down from the top of the screen.
-          "data-h-offset":0, //Distance, in pixels, the modal should push in from the side of the screen.
-          "data-full-screen": false,
-          "data-btm-offset-pct": 0, // Percentage of screen height the modal should push up from the bottom of the view.
-          "data-overlay": true , // Allows the modal to generate an overlay div, which will cover the view when modal opens.
-          "data-reset-on-close": false,
-          "data-deep-link": false, // Allows the modal to alter the url on open/close, and allows the use of the `back` button to close modals. ALSO, allows a modal to auto-maniacally open on page load IF the hash === the modal's user-set id.
-          "data-update-history": false, // Update the browser history with the open modal
-          "data-append-to": "body", // 	Allows the modal to append to custom div.
-          "data-additional-overlay-classes": "",
+            "data-animation-in": '',
+            "data-animation-out": '',
+            "data-show-delay": 1500,
+            "data-hide-delay": 0,
+            "data-close-on-click": true,
+            "data-close-on-esc": true,
+            "data-multiple-opened": true,
+            "data-v-offset":0, //Distance, in pixels, the modal should push down from the top of the screen.
+            "data-h-offset":0, //Distance, in pixels, the modal should push in from the side of the screen.
+            "data-full-screen": false,
+            "data-btm-offset-pct": 0, // Percentage of screen height the modal should push up from the bottom of the view.
+            "data-overlay": true , // Allows the modal to generate an overlay div, which will cover the view when modal opens.
+            "data-reset-on-close": false,
+            "data-deep-link": false, // Allows the modal to alter the url on open/close, and allows the use of the `back` button to close modals. ALSO, allows a modal to auto-maniacally open on page load IF the hash === the modal's user-set id.
+            "data-update-history": false, // Update the browser history with the open modal
+            "data-append-to": "body", // 	Allows the modal to append to custom div.
+            "data-additional-overlay-classes": "",
         };
 
         var defaults = {
@@ -118,21 +118,21 @@
             },
             template: '<p>This is test popup content!</p>',
             footer: {
-              class: '',
-              buttonsContainerClass: '',
-              buttons: [
-                /*
-                {
-                  text: "Procedi",
-                  icon: "<i class='fa fa-icon></i>' || <img src='' />",
-                  url: ''
-                  class: 'primary',
-                  callback: function (){
-                    alert('callback');
-                  }
-                }
-                */
-              ]
+                class: '',
+                buttonsContainerClass: '',
+                buttons: [
+                    /*
+                    {
+                      text: "Procedi",
+                      icon: "<i class='fa fa-icon></i>' || <img src='' />",
+                      url: ''
+                      class: 'primary',
+                      callback: function (){
+                        alert('callback');
+                      }
+                    }
+                    */
+                ]
             },
             mobile: {
                 hideSubtitle: false,
@@ -182,20 +182,20 @@
                         deactivate();
                     }
                 } else if ($(e.target).is('.pmModal-close')) {
-                        e.preventDefault();
-                        deactivate();
+                    e.preventDefault();
+                    deactivate();
                 }
             }
 
 
             function _buildLoader() {
                 var $loader =   '<div class="hui-loader" >' +
-                                  '<div class="load-three-bounce">' +
-                                    '<div class="load-child bounce1"></div>' +
-                                    '<div class="load-child bounce2"></div>' +
-                                    '<div class="load-child bounce3"></div>' +
-                                  '</div>' +
-                                '</div>';
+                    '<div class="load-three-bounce">' +
+                    '<div class="load-child bounce1"></div>' +
+                    '<div class="load-child bounce2"></div>' +
+                    '<div class="load-child bounce3"></div>' +
+                    '</div>' +
+                    '</div>';
                 if (options.url && options.ajax.loader === true) {
                     $("body").append($loader);
                 }
@@ -222,14 +222,15 @@
 
 
             function cssAnimate(animationName, callback) {
-              var animationEnd = getAnimationEnd();
+                var animationEnd = getAnimationEnd();
 
-              this.addClass('animated ' + animationName).one(animationEnd, function() {
-                $(this).removeClass('animated ' + animationName);
-                if (typeof callback === 'function') callback();
-              });
+                this.addClass('animated ' + animationName).one(animationEnd, function() {
+                    $(this).removeClass('animated ' + animationName);
+                    console.log('onanimationend');
+                    if (typeof callback === 'function') callback();
+                });
 
-              return this;
+                return this;
             }
 
             function getTemplate (callback){
@@ -299,26 +300,26 @@
                 if (options.footerBlockSelector !== '') {
                     // Override Footer Behaviour
 
-                   if($(options.footerBlockSelector, $blockRes).length > 0) {
-                       _tempFooterBlock = $(options.footerBlockSelector, $blockRes).html();
-                       $blockRes.find(options.footerBlockSelector).remove();
-                   } else {
-                       buildDebug(" (blockOverride) footerBlockSelector " + options.footerBlockSelector + " not found in response", "warn");
-                   }
-
-                   /*
-                    $("<div class='hidden' id='hui--temp'>" + responseHtml + "</div>").appendTo($('body'));
-                    if ($("#hui--temp").find(options.footerBlockSelector).length > 0){
-                        _tempFooterBlock = $("#hui--temp").find(options.footerBlockSelector).html();
-                        $("#hui--temp").find(options.footerBlockSelector).remove();
-                        var $htmlWithoutFooterBlock = $("#hui--temp").html();
-                        $("#hui--temp").remove();
-                        //callback($htmlWithoutFooterBlock);
-                        _blockRes = $htmlWithoutFooterBlock;
+                    if($(options.footerBlockSelector, $blockRes).length > 0) {
+                        _tempFooterBlock = $(options.footerBlockSelector, $blockRes).html();
+                        $blockRes.find(options.footerBlockSelector).remove();
                     } else {
                         buildDebug(" (blockOverride) footerBlockSelector " + options.footerBlockSelector + " not found in response", "warn");
-                        //callback(responseHtml);
-                    }*/
+                    }
+
+                    /*
+                     $("<div class='hidden' id='hui--temp'>" + responseHtml + "</div>").appendTo($('body'));
+                     if ($("#hui--temp").find(options.footerBlockSelector).length > 0){
+                         _tempFooterBlock = $("#hui--temp").find(options.footerBlockSelector).html();
+                         $("#hui--temp").find(options.footerBlockSelector).remove();
+                         var $htmlWithoutFooterBlock = $("#hui--temp").html();
+                         $("#hui--temp").remove();
+                         //callback($htmlWithoutFooterBlock);
+                         _blockRes = $htmlWithoutFooterBlock;
+                     } else {
+                         buildDebug(" (blockOverride) footerBlockSelector " + options.footerBlockSelector + " not found in response", "warn");
+                         //callback(responseHtml);
+                     }*/
                 }
 
                 callback($blockRes.html());
@@ -349,24 +350,24 @@
 
                     if (_optObject.icon != '') {
                         _hHtml += '<div class="hui-img-header" >' +
-                                    _optObject.icon +
-                                 '</div>';
+                            _optObject.icon +
+                            '</div>';
                     }
                     if (options.showClose) {
                         _hHtml += "<a class='close-button' data-close aria-label='" + options.showCloseText + "' title='" + options.showCloseText + "' type='button'>" +
-                                            "<span aria-hidden='true'>&times;</span>" +
-                                  "</a>";
+                            "<span aria-hidden='true'>&times;</span>" +
+                            "</a>";
                     }
                     _hHtml += '<div class="hui-titles">' +
-                                '<div>' +
-                                    '<div class="title">' + _optObject.title + '</div>';
-                                    if (_optObject.subtitle != '') {
-                                        _hHtml += '<div class="subtitle">' + _optObject.subtitle + '</div>';
-                                    }
+                        '<div>' +
+                        '<div class="title">' + _optObject.title + '</div>';
+                    if (_optObject.subtitle != '') {
+                        _hHtml += '<div class="subtitle">' + _optObject.subtitle + '</div>';
+                    }
                     _hHtml +=    '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>';
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
                 }
                 return _hHtml;
             }
@@ -404,15 +405,28 @@
                 if (options.mobile.hideSubtitle == true) {
                     extraClasses.push('m-hd-st');
                 }
-                $html += "<div class='reveal hui-modal " + extraClasses.join(' ') + " " + options.baseClass + "' id='" + genModalID() + "' " +
-                    " data-additional-overlay-classes='test' " +
-                    " data-append-to='" + options.globalContainerSelector + "' style='" + _style.join(';') + "' >";
+
+                var cached = false;
+                if (options.id) {
+                    if ($("#" + options.id).length > 0) {
+                        cached = true;
+                        $html = $("#" + options.id).html();
+                    }
+                }
+                if (!cached) {
+                    $html += "<div class='reveal hui-modal " + extraClasses.join(' ') + " " + options.baseClass + "' id='" + genModalID() + "' " +
+                        " data-additional-overlay-classes='test' " +
+                        " data-append-to='" + options.globalContainerSelector + "' style='" + _style.join(';') + "' >";
+                }
 
                 _buildLoader();
                 getTemplate( function (response){
                     var res;
 
                     var _jsonRes = {};
+
+
+
                     if (options.ajax.type == "html") {
                         response = options.onRender(response);
                         res = response;
@@ -432,128 +446,136 @@
                         });
                     }
 
-
-                    // HEADER --------------------------------------------------------------------------------------------
-
-                    if (_tempHeaderBlock) {
-                        $html += '<div class="hui-header-container ' + options.header.class + '" >';
-                        $html += _tempHeaderBlock;
-                        if (options.showClose) {
-                            $html += "<a class='close-button inj' data-close aria-label='" + options.showCloseText + "' title='" + options.showCloseText + "' type='button'>" +
-                                        "<span aria-hidden='true'>&times;</span>" +
-                                     "</a>";
-                        }
-                        $html += "</div>";
-                    } else {
-                        if (options.ajax.type == "json" && _jsonRes && _jsonRes.header) {
-                            $html += _buildHeader(true, _jsonRes.header);
+                    if (!cached) {
+                        // HEADER --------------------------------------------------------------------------------------------
+                        if (_tempHeaderBlock) {
+                            $html += '<div class="hui-header-container ' + options.header.class + '" >';
+                            $html += _tempHeaderBlock;
+                            if (options.showClose) {
+                                $html += "<a class='close-button inj' data-close aria-label='" + options.showCloseText + "' title='" + options.showCloseText + "' type='button'>" +
+                                    "<span aria-hidden='true'>&times;</span>" +
+                                    "</a>";
+                            }
+                            $html += "</div>";
                         } else {
-                            $html += _buildHeader();
-                        }
-                    }
-
-                    // BODY ----------------------------------------------------------------------------------------------
-                    var _bodyID = genRandom();
-                    $html += "<div class='hui-body' id='" + _bodyID + "' >" + _tempBodyBlock + "</div>";
-                    if (options.maxHeight > 0) {
-                        $("body").addClass("hui-mheight");
-                        $("<style type='text/css' >#"+_bodyID+"{ height:" + options.maxHeight + "px; }</style>").appendTo("head");
-                    }
-                    // FOOTER --------------------------------------------------------------------------------------------
-                    var _footerClass = options.footer.class || "";
-                    var _footerContainerClass = options.footer.buttonsContainerClass || "hui-footer-buttons";
-
-                    if (_tempFooterBlock) {
-                        // Override Footer Behaviour
-                        $html +=  "<div class='hui-footer " + _footerClass + "' >";
-                        $html +=  "<div class='" + _footerContainerClass + "' >";
-                        $html += _tempFooterBlock;
-                        $html += "</div>";
-                    } else {
-                        //if (options.ajax.type == "json" && options.footer && options.footer.buttons.length > 0) {
-                        if (options.ajax.type == "json" && _jsonRes && _jsonRes.footer) {
-                            $html +=  "<div class='hui-footer " + _footerClass + "' >";
-                            if (_jsonRes.footer.buttons) {
-                                $html +=  "<div class='" + _footerContainerClass + "' >";
-                                $(_jsonRes.footer.buttons).each( function (i, item){
-                                    var _class      = item.class || "button";
-                                    var _text       = item.text;
-                                    var _icon       = item.icon || "";
-                                    var _url        = item.url;
-                                    var _callback   = item.onClick;
-                                    var _id         = 'hui-footer-' + genRandom();
-                                    var _dismissOnClick   = item.dismissOnClick;
-
-                                    $html +=  "<a class=\"" + _class + "\" id='" + _id + "' " + (_url ? 'href="' + _url + '" ' : '') + ">" + _icon + " " + _text + "</a>";
-
-                                    if(_callback ||_dismissOnClick) {
-                                        $(document).on("click", "#" + _id, function (e) {
-                                            e.preventDefault();
-                                            e.stopImmediatePropagation();
-                                            if (_callback) {
-                                                eval(_callback);
-                                            } else if (_dismissOnClick == true) {
-                                                //_instance.close();
-                                                close();
-                                            }
-                                        });
-                                    }
-                                });
-                                $html += "</div>";
+                            if (options.ajax.type == "json" && _jsonRes && _jsonRes.header) {
+                                $html += _buildHeader(true, _jsonRes.header);
+                            } else {
+                                $html += _buildHeader();
                             }
+                        }
 
+                        // BODY ----------------------------------------------------------------------------------------------
 
-                        //} else if (res && res.footer) {
-                        } else if (options.footer) {
+                        var _bodyID = genRandom();
+                        $html += "<div class='hui-body' id='" + _bodyID + "' >" + _tempBodyBlock + "</div>";
+                        if (options.maxHeight > 0) {
+                            $("body").addClass("hui-mheight");
+                            $("<style type='text/css' >#"+_bodyID+"{ height:" + options.maxHeight + "px; }</style>").appendTo("head");
+                        }
+
+                        // FOOTER --------------------------------------------------------------------------------------------
+                        var _footerClass = options.footer.class || "";
+                        var _footerContainerClass = options.footer.buttonsContainerClass || "hui-footer-buttons";
+
+                        if (_tempFooterBlock) {
+                            // Override Footer Behaviour
                             $html +=  "<div class='hui-footer " + _footerClass + "' >";
-                            if (typeof options.footer.buttons !== 'undefined') {
-                                $html +=  "<div class='" + _footerContainerClass + "' >";
-                                $(options.footer.buttons).each( function (i, item){
-                                    var _class      = item.class || "button";
-                                    var _text       = item.text;
-                                    var _icon       = item.icon || "";
-                                    var _url        = item.url;
-                                    var _callback   = item.callback;
-                                    var _dismissOnClick   = item.dismissOnClick;
-                                    var _id         = 'hui-footer-' + genRandom();
-                                    $html +=  "<a class=\"" + _class + "\" id='" + _id + "' " + (_url ? 'href="' + _url + '" ' : '') + ">" + _icon + " " + _text + "</a>";
+                            $html +=  "<div class='" + _footerContainerClass + "' >";
+                            $html += _tempFooterBlock;
+                            $html += "</div>";
+                        } else {
+                            //if (options.ajax.type == "json" && options.footer && options.footer.buttons.length > 0) {
+                            if (options.ajax.type == "json" && _jsonRes && _jsonRes.footer) {
+                                $html +=  "<div class='hui-footer " + _footerClass + "' >";
+                                if (_jsonRes.footer.buttons) {
+                                    $html +=  "<div class='" + _footerContainerClass + "' >";
+                                    $(_jsonRes.footer.buttons).each( function (i, item){
+                                        var _class      = item.class || "button";
+                                        var _text       = item.text;
+                                        var _icon       = item.icon || "";
+                                        var _url        = item.url;
+                                        var _callback   = item.onClick;
+                                        var _id         = 'hui-footer-' + genRandom();
+                                        var _dismissOnClick   = item.dismissOnClick;
 
-                                    if(_callback ||_dismissOnClick) {
-                                        $(document).on("click", "#" + _id, function (e) {
-                                            e.preventDefault();
-                                            e.stopImmediatePropagation();
-                                            if (_callback) {
-                                                if(jQuery.isFunction(_callback)) {
-                                                    _callback.call(this);
-                                                } else {
-                                                    eval(_callback);
+                                        $html +=  "<a class=\"" + _class + "\" id='" + _id + "' " + (_url ? 'href="' + _url + '" ' : '') + ">" + _icon + " " + _text + "</a>";
+
+                                        if(_callback ||_dismissOnClick) {
+                                            $(document).on("click", "#" + _id, function (e) {
+                                                e.preventDefault();
+                                                e.stopImmediatePropagation();
+                                                if (_callback) {
+                                                    if(jQuery.isFunction(_callback)) {
+                                                        _callback.call(this);
+                                                    } else {
+                                                        eval(_callback);
+                                                    }
+                                                } else if (_dismissOnClick == true) {
+                                                    //_instance.close();
+                                                    close();
                                                 }
-                                            } else if (_dismissOnClick == true) {
-                                                //_instance.close();
-                                                close();
-                                            }
-                                        });
-                                    }
-                                });
-                                $html += "</div>";
+                                            });
+                                        }
+                                    });
+                                    $html += "</div>";
+                                }
+
+
+                                //} else if (res && res.footer) {
+                            } else if (options.footer) {
+                                $html +=  "<div class='hui-footer " + _footerClass + "' >";
+                                if (typeof options.footer.buttons !== 'undefined') {
+                                    $html +=  "<div class='" + _footerContainerClass + "' >";
+                                    $(options.footer.buttons).each( function (i, item){
+                                        var _class      = item.class || "button";
+                                        var _text       = item.text;
+                                        var _icon       = item.icon || "";
+                                        var _url        = item.url;
+                                        var _callback   = item.callback;
+                                        var _dismissOnClick   = item.dismissOnClick;
+                                        var _id         = 'hui-footer-' + genRandom();
+                                        $html +=  "<a class=\"" + _class + "\" id='" + _id + "' " + (_url ? 'href="' + _url + '" ' : '') + ">" + _icon + " " + _text + "</a>";
+
+                                        if(_callback ||_dismissOnClick) {
+                                            $(document).on("click", "#" + _id, function (e) {
+                                                e.preventDefault();
+                                                e.stopImmediatePropagation();
+                                                if (_callback) {
+                                                    _callback.call(this);
+                                                } else if (_dismissOnClick == true) {
+                                                    //_instance.close();
+                                                    close();
+                                                }
+                                            });
+                                        }
+                                    });
+                                    $html += "</div>";
+                                }
                             }
                         }
-                    }
-                    //$html +=  "<a class=\"button\" >AVANTI</a>";
-                    $html +=  "</div>";
-                    // Footer - end
-                    $html +=  "</div>";
-
-                    if (options.wrapperClass) {
+                        //$html +=  "<a class=\"button\" >AVANTI</a>";
                         $html +=  "</div>";
-                    }
+                        // Footer - end
+                        $html +=  "</div>";
 
-                    if (options.onBlurContainer !== '') {
-                        $(options.onBlurContainer).addClass('hui-blur');
-                    }
+                        if (options.wrapperClass) {
+                            $html +=  "</div>";
+                        }
+
+                        if (options.onBlurContainer !== '') {
+                            $(options.onBlurContainer).addClass('hui-blur');
+                        }
+                    } // End if !cached
+
 
                     setTimeout ( function (){
-                        $($html).appendTo($(options.globalContainerSelector));
+                        if (!cached) {
+                            $($html).appendTo($(options.globalContainerSelector));
+                        } else {
+                            $(".hui-body", "#" + options.id).empty();
+                            $(".hui-body", "#" + options.id).html(_tempBodyBlock);
+                        }
                         bindListeners();
                         open();
                     }, options.animation.delay);
@@ -602,7 +624,19 @@
                 var $close_button = $('.close-button', $handler);
                 var $overlay = $handler.parent();
 
-                //$(document).on('click', $close_button , function (e){
+                $handler.find("input[type='checkbox'], input[type='radio']").on("mousedown fromlabel", function (e){
+                    e.preventDefault();
+                    this.checked = !this.checked;
+                    //$(this).prop("checked", true);
+                });
+                $handler.find("label[for]").bind("click", function (e){
+                    e.preventDefault();
+                    var $which = $(this).attr("for");
+                    var checked = $("#" + $which).is(":checked");
+                    $("#" + $which).prop("checked", !checked);
+                    //$(this).prop("checked", true);
+                });
+
                 $close_button.bind('click' , function (e){
                     e.preventDefault();
                     e.stopImmediatePropagation();
@@ -614,11 +648,11 @@
                         e.preventDefault();
 
                         if (e.target.id == getModalSelector() || $(e.target).parents("#" + getModalSelector()).length) {
-                          //alert("Inside div");
+                            //alert("Inside div");
                         } else {
-                          //alert("Outside div");
-                          e.stopImmediatePropagation();
-                          close();
+                            //alert("Outside div");
+                            e.stopImmediatePropagation();
+                            close();
                         }
                         //
                     });
@@ -642,10 +676,12 @@
                 options.onOpening(this);
                 if (options.animation.in !== '') {
                     //setTimeout ( function (){
-                        cssAnimate.call($('#' + getModalSelector()), options.animation.in, function (){
-                            //$('#' + getModalSelector()).removeClass("comingIn");
-                            $("body").addClass("hui-modal-open");
-                        });
+                    $('#' + getModalSelector()).parent().addClass("show");
+                    cssAnimate.call($('#' + getModalSelector()), options.animation.in, function (){
+                        //$('#' + getModalSelector()).removeClass("comingIn");
+
+                        $("body").addClass("hui-modal-open");
+                    });
                     //}, options.animation.delay);
                 } else {
                     $("body").addClass("hui-modal-open");
@@ -665,6 +701,7 @@
                         $("body").removeClass("hui-modal-open");
                         $("body").removeClass("hui-ready");
                         $("body").removeClass("hui-scroll hui-mheight");
+                        $('#' + getModalSelector()).off(getAnimationEnd());
                     });
                 } else {
                     $("body").removeClass("hui-modal-open");
@@ -700,9 +737,9 @@
 
 
                     $html +=  "<div class=\"modal-footer\">" +
-                                "<button type=\"button\" class=\"btn btn-primary\">Save changes</button>" +
-                                "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>" +
-                              "</div>";
+                        "<button type=\"button\" class=\"btn btn-primary\">Save changes</button>" +
+                        "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>" +
+                        "</div>";
                     $html += "</div>";
                     $html += "</div>";
                     $html += "</div>";
@@ -756,6 +793,7 @@
                 }
 
                 var type = options.type;
+
                 var method = "activate_" + type + "Popup";
                 //console.log(method);
                 eval(method)();
@@ -819,22 +857,22 @@
     };
 
 
-      //  The   _   ___ ___
-      //       /_\ | _ \_ _|
-      //      / _ \|  _/| |
-      //     /_/ \_\_| |___|
-      //
-      $.huiModal = {};
+    //  The   _   ___ ___
+    //       /_\ | _ \_ _|
+    //      / _ \|  _/| |
+    //     /_/ \_\_| |___|
+    //
+    $.huiModal = {};
 
 
-      $.huiModal.unbind = function($obj){
+    $.huiModal.unbind = function($obj){
         var seq = $obj.data('plugin_' + pluginName);
 
         if ( typeof seq === 'undefined' )
-          return;
+            return;
 
         $obj.removeData('plugin_' + pluginName);
 
-      };
+    };
 
 }));

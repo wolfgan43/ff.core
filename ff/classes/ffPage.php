@@ -21,6 +21,10 @@
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
+
+if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_CACHING", false);
+
+
 class ffPage
 {
 	static protected $events = null;
@@ -66,7 +70,7 @@ class ffPage
 	public static function factory($disk_path, $site_path, $page_path, $theme = null, $variant = null)
 	{
 		if ($theme === null)
-			$theme = FF_LOADED_THEME;
+			$theme = CM_DEFAULT_THEME;
 	
 		$res = self::doEvent("on_factory", array($disk_path, $site_path, $page_path, $theme, $variant));
 		$last_res = end($res);
@@ -302,6 +306,7 @@ abstract class ffPage_base extends ffCommon
 	 */
 	var $params_processed		= false;
 
+	var $use_cache              = FF_ENABLE_MEM_PAGE_CACHING;
 	/**
 	 * L'istanza all'oggetto cache
 	 * @var ffMemCache
@@ -344,9 +349,9 @@ abstract class ffPage_base extends ffCommon
 		$this->page_path = $page_path;
 		$this->theme = $theme;
 
-		if (FF_ENABLE_MEM_PAGE_CACHING === true)
+		if ($this->use_cache)
 		{
-			$this->cache = ffCache::getInstance(FF_CACHE_ADAPTER);
+			$this->cache = ffCache::getInstance();
 			$this->request_key = sha1($_SERVER["REQUEST_URI"] . "_" . serialize($_REQUEST));
 		}
 	}
@@ -419,6 +424,16 @@ abstract class ffPage_base extends ffCommon
 				
 				if ($content->use_own_location || !$content->display)
 					return;
+            } elseif(is_string($content)) {
+                if(strpos($content, "/") === 0 && is_file($content)) {
+                    $content = file_get_contents($content);
+                }
+
+                $content = ffTranslator::process($content);
+
+                if(is_array($options["vars"]) && count($options["vars"])) {
+                    $content = str_replace(array_keys($options["vars"]), array_values($options["vars"]), $content);
+                }
 			}
 
 			if ($id === null)
@@ -1015,8 +1030,8 @@ abstract class ffPage_base extends ffCommon
 
 		require_once($realpath . "/ffWidget." . FF_PHP_EXT);
 
-		$temp = "";
-		eval("\$temp = new ffWidget_$name(\$this, \$source_path);");
+        $widget_name = "ffWidget_" . $name;
+		$temp = new $widget_name($this, $source_path);
 		$this->widgets[$name] = $temp;
 		if (is_array($this->widgets[$name]->widget_deps) && count($this->widgets[$name]->widget_deps))
 		{

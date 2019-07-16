@@ -158,7 +158,7 @@ class ffWidget_autocomplete extends ffCommon
 						$icon_rel = "";
 					}
 
-            		$this->tpl[$tpl_id]->set_var("icon_class", cm_getClassByFrameworkCss($icon_name, "icon", array("class" => ($icon_class ? $icon_class : ""))));
+            		$this->tpl[$tpl_id]->set_var("icon_class", Cms::getInstance("frameworkcss")->get($icon_name, "icon", array("class" => ($icon_class ? $icon_class : ""))));
 
             		if($icon_rel)
             			$this->tpl[$tpl_id]->set_var("icon_rel", ' rel="' . $icon_rel . '"');
@@ -170,14 +170,14 @@ class ffWidget_autocomplete extends ffCommon
         			}
 				}
 				if($Field->autocomplete_combo && !$actex_combo_found) {
-            		$this->tpl[$tpl_id]->set_var("icon_class", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => "actex-combo")));
+            		$this->tpl[$tpl_id]->set_var("icon_class", Cms::getInstance("frameworkcss")->get("caret-down", "icon", array("class" => "actex-combo")));
         			$this->tpl[$tpl_id]->parse("SectIcon", true);
 				}
 				
-				$this->tpl[$tpl_id]->set_var("combo_class", cm_getClassByFrameworkCss("control-feedback", "form"));
+				$this->tpl[$tpl_id]->set_var("combo_class", Cms::getInstance("frameworkcss")->get("control-feedback", "form"));
 				$this->tpl[$tpl_id]->parse("SectMultiIcons", false);
         	} else {
-            	$this->tpl[$tpl_id]->set_var("combo_class", cm_getClassByFrameworkCss($icon, "icon", array("class" => cm_getClassByFrameworkCss("control-feedback", "form") . ($Field->autocomplete_combo ? " actex-combo" : ""))));
+            	$this->tpl[$tpl_id]->set_var("combo_class", Cms::getInstance("frameworkcss")->get($icon, "icon", array("class" => Cms::getInstance("frameworkcss")->get("control-feedback", "form") . ($Field->autocomplete_combo ? " actex-combo" : ""))));
         		$this->tpl[$tpl_id]->parse("SectCombo", false);
 			}
 		}
@@ -368,10 +368,10 @@ class ffWidget_autocomplete extends ffCommon
 
         $this->tpl[$tpl_id]->set_var("strip_char", urlencode($Field->autocomplete_strip_char));
         
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("more", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon"));        
-        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", Cms::getInstance("frameworkcss")->get("more", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_plus", Cms::getInstance("frameworkcss")->get("plus", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_minus", Cms::getInstance("frameworkcss")->get("minus", "icon"));        
+        $this->tpl[$tpl_id]->set_var("icon_loader", Cms::getInstance("frameworkcss")->get("spinner", "icon-tag", "spin"));
         
         
 		$this->tpl[$tpl_id]->set_var("SectData", "");

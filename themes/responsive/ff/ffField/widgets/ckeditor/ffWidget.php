@@ -153,9 +153,9 @@ class ffWidget_ckeditor extends ffCommon
             $this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->getValue($Field->get_app_type(), $Field->get_locale())));
         $this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-        if($Field->ckeditor_group_by_auth && MOD_SEC_GROUPS) {
-            $user_permission = get_session("user_permission");
-            $ckeditor_group = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($user_permission["primary_gid_name"]));
+        if($Field->ckeditor_group_by_auth) {
+            $user = Auth::get("user");
+            $ckeditor_group = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($user->acl_primary));
         } else {
         	$ckeditor_group = $Field->ckeditor_group;
         }
@@ -180,7 +180,7 @@ class ffWidget_ckeditor extends ffCommon
 		} else {
 			$this->tpl[$tpl_id]->set_var("widget_brmode", "false");	
 		}
-        
+
         $this->tpl[$tpl_id]->parse("SectBinding", true);
 
         return $this->tpl[$tpl_id]->rpparse("SectControl", FALSE);
@@ -189,10 +189,10 @@ class ffWidget_ckeditor extends ffCommon
 	function get_component_headers($id)
 	{
 		if ($this->oPage !== NULL) { //code for ff.js
-            $this->oPage[0]->tplAddJs("ff.lib.ckeditor", "ckeditor.js", FF_THEME_DIR . "/library/ckeditor", false, false, null, true);
+            /*$this->oPage[0]->tplAddJs("ff.lib.ckeditor", "ckeditor.js", FF_THEME_DIR . "/library/ckeditor", false, false, null, true);
             $this->oPage[0]->tplAddJs("ff.lib.ckeditor.adapters.jquery", "jquery.js", FF_THEME_DIR . "/library/ckeditor/adapters", false, false, null, true);
             $this->oPage[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
-			$this->oPage[0]->tplAddJs("ff.ffField.ckeditor", "ckeditor.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/ckeditor");
+			$this->oPage[0]->tplAddJs("ff.ffField.ckeditor", "ckeditor.js", FF_THEME_DIR . "/responsive/ff/ffField/widgets/ckeditor");*/
 		}
 
 		if (!isset($this->tpl[$id]))

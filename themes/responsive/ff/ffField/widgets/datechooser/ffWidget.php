@@ -109,24 +109,24 @@ class ffWidget_datechooser extends ffCommon
 			$this->framework_css["container"]["class"] = $this->class;
 
 		if($this->framework_css["container"]["row"])
-			$this->tpl[$tpl_id]->set_var("container_class", cm_getClassByFrameworkCss("row", "form", $this->framework_css["container"]["class"]));
+			$this->tpl[$tpl_id]->set_var("container_class", Cms::getInstance("frameworkcss")->get("row", "form", $this->framework_css["container"]["class"]));
 		elseif($this->framework_css["container"]["col"])
-			$this->tpl[$tpl_id]->set_var("container_class", cm_getClassByFrameworkCss($this->framework_css["container"]["col"], "col", array("class" => $this->framework_css["container"]["class"])));
+			$this->tpl[$tpl_id]->set_var("container_class", Cms::getInstance("frameworkcss")->get($this->framework_css["container"]["col"], "col", array("class" => $this->framework_css["container"]["class"])));
 		elseif($this->framework_css["container"]["class"])
 			$this->tpl[$tpl_id]->set_var("container_class", $this->framework_css["container"]["class"]);
 
 		if($this->framework_css["day"]["col"])
-			$this->tpl[$tpl_id]->set_var("day_class", cm_getClassByFrameworkCss($this->framework_css["day"]["col"], "col",  array("class" => $this->framework_css["day"]["class"])));
+			$this->tpl[$tpl_id]->set_var("day_class", Cms::getInstance("frameworkcss")->get($this->framework_css["day"]["col"], "col",  array("class" => $this->framework_css["day"]["class"])));
 		elseif($this->framework_css["day"]["class"])
 			$this->tpl[$tpl_id]->set_var("day_class", $this->framework_css["day"]["class"]);
 
 		if($this->framework_css["month"]["col"])
-			$this->tpl[$tpl_id]->set_var("month_class", cm_getClassByFrameworkCss($this->framework_css["month"]["col"], "col",  array("class" => $this->framework_css["month"]["class"])));
+			$this->tpl[$tpl_id]->set_var("month_class", Cms::getInstance("frameworkcss")->get($this->framework_css["month"]["col"], "col",  array("class" => $this->framework_css["month"]["class"])));
 		elseif($this->framework_css["month"]["class"])
 			$this->tpl[$tpl_id]->set_var("month_class", $this->framework_css["month"]["class"]);
 
 		if($this->framework_css["year"]["col"])
-			$this->tpl[$tpl_id]->set_var("year_class", cm_getClassByFrameworkCss($this->framework_css["year"]["col"], "col",  array("class" => $this->framework_css["year"]["class"])));
+			$this->tpl[$tpl_id]->set_var("year_class", Cms::getInstance("frameworkcss")->get($this->framework_css["year"]["col"], "col",  array("class" => $this->framework_css["year"]["class"])));
 		elseif($this->framework_css["year"]["class"])
 			$this->tpl[$tpl_id]->set_var("year_class", $this->framework_css["year"]["class"]);
 				

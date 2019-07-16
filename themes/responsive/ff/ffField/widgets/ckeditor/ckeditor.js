@@ -1,17 +1,17 @@
 ff.ffField.ckeditor = (function () {
 	/* privates*/
 	var events = false;
-	
+
 	var that = { /* publics*/
 		__ff : true, /* used to recognize ff'objects*/
 		"init" : function(id, brmode, theme, skin, lang, toolbar, custom_config) {
 
-			if (!events) { 
+			if (!events) {
 				ff.addEvent({"event_name" : "onClearField", "func_name" : that.onClearComponent});
 				ff.addEvent({"event_name" : "getFields", "func_name" : that.onUpdate});
 				events = true;
 			}
-			
+
 			var config = {};
 			config.allowedContent                           = true;
 			config.enterMode                                = CKEDITOR.ENTER_P;
@@ -41,9 +41,9 @@ ff.ffField.ckeditor = (function () {
 			config.youtube_related = true;
 			config.youtube_older = false;
 			config.youtube_privacy = false;
-			config.find_highlight 					= { 
+			config.find_highlight 					= {
 				element : 'span',
-				styles : { 
+				styles : {
 					'background-color' : '#ff0',
 					'color' : '#000'
 				}
@@ -80,7 +80,7 @@ ff.ffField.ckeditor = (function () {
 				':)', ':(', ';)', ':D', ':/', ':P',
 				'', '', '', '', '', '',
 				'', ';(', '', '', '', '',
-				'', ':kiss', '' 
+				'', ':kiss', ''
 			]; /*The description to be used for each of the smileys defined in the CKEDITOR.smiley_images setting. Each entry in this array list must match its relative pair in the CKEDITOR.smiley_images setting. */
 			config.smiley_images					= [
 				'regular_smile.gif','sad_smile.gif','wink_smile.gif','teeth_smile.gif','confused_smile.gif','tounge_smile.gif',
@@ -92,21 +92,21 @@ ff.ffField.ckeditor = (function () {
 			config.startupFocus						= false; /*Sets whether the editor should have the focus when the page loads. */
 			config.startupMode						= 'wysiwyg'; /*The mode to load at the editor startup. It depends on the plugins loaded. By default, the "wysiwyg" and "source" modes are available. */
 			config.theme							= theme; /* The theme to be used to build the UI. */
-			config.toolbar							= 
+			config.toolbar							=
                                 [
                                             { name: 'document', items : [ 'mode', 'document', 'doctools' ] },
                                             { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','-','Undo','Redo' ] },
                                             { name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
-                                            { name: 'links', items : [ 'Link','Unlink','Anchor', '-','Image', 'oembed' ] }, 
-                                            { name: 'insert', items : [ 'Table','HorizontalRule','SpecialChar','PageBreak'] }, 
+                                            { name: 'links', items : [ 'Link','Unlink','Anchor', '-','Image', 'oembed' ] },
+                                            { name: 'insert', items : [ 'Table','HorizontalRule','SpecialChar','PageBreak'] },
                                             { name: 'tools', items : [ 'Maximize', '-','Source', '-', 'Preview',  'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
                                             { name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
                                             { name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote','Align' ] },
                                             { name: 'styles', items : [ 'Styles','Format' ] },
                                             { name: 'bootstrap', items : [ 'WidgetTemplateMenu' ]}
                                 ],
-                        
-                         
+
+
 			config.toolbar_default 					= toolbar,
 			config.toolbarCanCollapse				= false; /*Whether the toolbar can be collapsed by the user. If disabled, the collapser button will not be displayed. */
 			config.toolbarLocation					= 'top'; /*The "theme space" to which rendering the toolbar. For the default theme, the recommended options are "top" and "bottom". */
@@ -114,21 +114,21 @@ ff.ffField.ckeditor = (function () {
 			config.undoStackSize					= 20; /*The number of undo steps to be saved. The higher this setting value the more memory is used for it. */
 			config.filebrowserBrowseUrl 			= ff.site_path + '/themes/library/kcfinder/browse.php?type:';
 			config.filebrowserImageBrowseUrl 		= ff.site_path + '/themes/library/kcfinder/browse.php?type:';
-			config.filebrowserFlashBrowseUrl 		= ff.site_path + '/themes/library/kcfinder/browse.php?type:'; 
+			config.filebrowserFlashBrowseUrl 		= ff.site_path + '/themes/library/kcfinder/browse.php?type:';
 			config.filebrowserUploadUrl 			= ff.site_path + '/themes/library/kcfinder/upload.php?type:';
 			config.filebrowserImageUploadUrl 		= ff.site_path + '/themes/library/kcfinder/upload.php?type:';
 			config.filebrowserFlashUploadUrl 		= ff.site_path + '/themes/library/kcfinder/upload.php?type:';
-                        
+
 			/*config.width							= '100%'; /* The editor width in CSS size format or pixel integer.*/
-			
+
 			if(0 && brmode)
 				config.enterMode 					= CKEDITOR.ENTER_BR;
-					
+
 			if (custom_config === undefined)
 				custom_config = {};
-			
+
 			jQuery.extend(config, custom_config);
-                        
+
                         CKEDITOR.dtd.$removeEmpty['a'] = false;
                         CKEDITOR.dtd.$removeEmpty['div'] = false;
                         CKEDITOR.dtd.$removeEmpty['i'] = false;
@@ -137,11 +137,12 @@ ff.ffField.ckeditor = (function () {
 					"event_name"	: "onCreate",
 					"event_params"	: [document.getElementById(event.editor.element.getId())]
 				});
+
 				ff.doEvent({
 					"event_name" : "initIFElement"
 					, "event_params" : [id, "ckeditor"]
 				});
-			});			
+			});
 
 			jQuery("#" + id.replace(/\[/g, "\\[").replace(/\]/g, "\\]")).each(function(index, textarea) {
 				if (CKEDITOR.instances[textarea.id])
@@ -149,21 +150,20 @@ ff.ffField.ckeditor = (function () {
 
 				CKEDITOR.replace(textarea, config);
 				/*jQuery(textarea).ckeditor(config);*/
-				
-	
+
+
 			});
 
-				
 			/*CKEDITOR.appendTo(jQuery("." + selectorClass).attr("id"));
- 			CKEDITOR.replaceAll(function( textarea, config ) 
+ 			CKEDITOR.replaceAll(function( textarea, config )
  			{
  				if(textarea.className != selectorClass || CKEDITOR.instances[textarea.id])
  					return false;
- 					
+
  			});
 
  			CKEDITOR.add;*/
-		}, 
+		},
 		"onClearComponent" : function (component, key, field) {
 			if (field.widget == "ckeditor") {
 				var instances = ff.struct.get(component).widgets;
@@ -172,10 +172,10 @@ ff.ffField.ckeditor = (function () {
 						if(CKEDITOR.instances[value["id"]] !== undefined) {
 							CKEDITOR.remove(value["id"]);
 							delete CKEDITOR.instances[value["id"]];
-						}				
+						}
 					});
 				}
-/*			
+/*
 				switch (ff.struct.get(component).type) {
 					case "ffDetails":
 						var rows = parseInt(jQuery("#" + component + " .box2").length);
@@ -184,9 +184,9 @@ ff.ffField.ckeditor = (function () {
 							if(CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"] !== undefined) {
 								CKEDITOR.remove(component + "_recordset[" + i + "][" + key + "]");
 								delete CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"];
-								//CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"].destroy();	
+								//CKEDITOR.instances[component + "_recordset[" + i + "][" + key + "]"].destroy();
 							}
-							 
+
 						}
 						break;
 
@@ -223,7 +223,7 @@ ff.ffField.ckeditor = (function () {
 				}
 			});
 		}
-		
+
 	}; /* publics' end*/
 
 	return that;

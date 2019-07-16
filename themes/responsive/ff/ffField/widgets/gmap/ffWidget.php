@@ -77,18 +77,18 @@ class ffWidget_gmap
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-		$this->tpl[$tpl_id]->set_var("container_class", cm_getClassByFrameworkCss("group", "form"));
+		$this->tpl[$tpl_id]->set_var("container_class", Cms::getInstance("frameworkcss")->get("group", "form"));
 
-		$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
+		$wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
 		if($wrap_addon) {
-			$this->tpl[$tpl_id]->set_var("wrap_start", '<div class="' . cm_getClassByFrameworkCss(array(10), "col") . '">');
-			$this->tpl[$tpl_id]->set_var("wrap_middle", '</div><div class="' . cm_getClassByFrameworkCss(array(2), "col") . '">');
+			$this->tpl[$tpl_id]->set_var("wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get(array(10), "col") . '">');
+			$this->tpl[$tpl_id]->set_var("wrap_middle", '</div><div class="' . Cms::getInstance("frameworkcss")->get(array(2), "col") . '">');
 			$this->tpl[$tpl_id]->set_var("wrap_end", '</div>');
 		}
-		$this->tpl[$tpl_id]->set_var("search_class", cm_getClassByFrameworkCss("control", "form"));
-		$this->tpl[$tpl_id]->set_var("search_bt_class", cm_getClassByFrameworkCss("search", "link") . " " . cm_getClassByFrameworkCss("control-postfix", "form") . " " . cm_getClassByFrameworkCss("search", "icon"));
+		$this->tpl[$tpl_id]->set_var("search_class", Cms::getInstance("frameworkcss")->get("control", "form"));
+		$this->tpl[$tpl_id]->set_var("search_bt_class", Cms::getInstance("frameworkcss")->get("search", "link") . " " . Cms::getInstance("frameworkcss")->get("control-postfix", "form") . " " . Cms::getInstance("frameworkcss")->get("search", "icon"));
 
-		$this->tpl[$tpl_id]->set_var("map_class", cm_getClassByFrameworkCss(array(12), "col"));
+		$this->tpl[$tpl_id]->set_var("map_class", Cms::getInstance("frameworkcss")->get(array(12), "col"));
 
 		
         if(strlen($Field->widget_path))

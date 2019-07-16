@@ -1612,7 +1612,7 @@ abstract class ffDetails_base extends ffCommon
                                         && substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
                                     ) {
 									    //if($this->form_fields[$key]->getFileBasePath() === null)
-										//    $this->form_fields[$key]->getFileBasePath() = FF_DISK_PATH . "/uploads";
+										//    $this->form_fields[$key]->getFileBasePath() = FF_DISK_UPDIR;
 
 									    //if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset[$i][$key]->getValue()))
 										    //$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileTempPath(false)) . "/" . basename($this->recordset[$i][$key]->getValue()));
@@ -2715,7 +2715,7 @@ abstract class ffDetails_base extends ffCommon
 	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
 		else

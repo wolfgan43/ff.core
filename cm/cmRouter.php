@@ -18,43 +18,42 @@
  */
 class cmRouter extends ffCommon
 {
-	private static $instances = null;
-	
-	const PRIORITY_TOP 			= 0;
-	const PRIORITY_VERY_HIGH	= 1;
-	const PRIORITY_HIGH			= 2;
-	const PRIORITY_NORMAL 		= 3;
-	const PRIORITY_LOW			= 4;
-	const PRIORITY_VERY_LOW		= 5;
-	const PRIORITY_BOTTOM 		= 6;
-	const PRIORITY_DEFAULT 		= cmRouter::PRIORITY_NORMAL;
-	
-	public $rules 			= array();
-	public $named_rules 	= array();
-	public $matched_rules 	= null;
-	public $counter			= 0;
-	
-	private function __construct()
-	{
-	}
-	
-	private function __clone()
-	{
-	}
-	
-	public static function getInstance($name = null)
-	{
-		if ($name == null)
-			$name = "default";
-		
-		if (self::$instances === null)
-			self::$instances = array();
-		
-		if (!isset(cmRouter::$instances[$name]))
-			cmRouter::$instances[$name] = new cmRouter();
-			
-		return cmRouter::$instances[$name];
-	}
+    private static $instances   = array();
+
+    const PRIORITY_TOP 			= 0;
+    const PRIORITY_VERY_HIGH	= 1;
+    const PRIORITY_HIGH			= 2;
+    const PRIORITY_NORMAL 		= 3;
+    const PRIORITY_LOW			= 4;
+    const PRIORITY_VERY_LOW		= 5;
+    const PRIORITY_BOTTOM 		= 6;
+    const PRIORITY_DEFAULT 		= cmRouter::PRIORITY_NORMAL;
+
+    public $rules 			    = array();
+    public $named_rules 	    = array();
+    public $matched_rules 	    = null;
+    public $counter			    = 0;
+
+    public $ordered		        = false;
+
+    private $bucket             = null;
+
+    private function __construct($name = null)
+    {
+        $this->bucket = ($name ? $name : "router");
+    }
+
+    private function __clone()
+    {
+    }
+
+    public static function getInstance($name = "router")
+    {
+        if (!isset(cmRouter::$instances[$name]))
+            cmRouter::$instances[$name] = new cmRouter($name);
+
+        return cmRouter::$instances[$name];
+    }
 	
 	public function getRuleById($id)
 	{
@@ -194,21 +193,33 @@ class cmRouter extends ffCommon
 
 		$this->addElementRule($rule);
 	}
-	
+    public function loadMem() {
+        $router                             = false;
+        $cache                              = ffCache::getInstance();
+
+        $router                             = $cache->get("cm/" . $this->bucket ."/rules");
+        if($router !== false) {
+            $this->router->rules            = $router;
+            $this->router->named_rules      = $this->cache->get("cm/" . $this->bucket . "/named_rules");
+            $this->router->ordered          = true;
+        }
+
+        return (bool) $router;
+    }
 	public function loadFile($file)
 	{
-		$xml = new SimpleXMLElement("file://" . $file, null, true);
-		
-		if (count($xml->rule))
-		{
-			foreach ($xml->rule as $key => $rule)
-			{
-				if ($key == "comment")
-					continue;
-				
-				$this->addElementRule($rule);
-			}
-		}
+        if(is_file($file)) {
+            $xml = new SimpleXMLElement("file://" . $file, null, true);
+
+            if (count($xml->rule)) {
+                foreach ($xml->rule as $key => $rule) {
+                    if ($key == "comment")
+                        continue;
+
+                    $this->addElementRule($rule);
+                }
+            }
+        }
 		return;
 	}
 	
@@ -342,20 +353,38 @@ class cmRouter extends ffCommon
 						$rc |= $sub_rc;
 					}
 				}
-				
+
 				if ($rc)
 				{
 					if (strlen((string)$attrs["id"]))
 						$this->matched_rules[(string)$attrs["id"]] = array("rule" => $value, "params" => $matches);
 					else
 						$this->matched_rules[] = array("rule" => $value, "params" => $matches);
-				}
+                }
 			}
 			reset($this->rules[$i]);
 
+
 		}
 	}
-	
+
+
+	public function getMatchedRules($key) {
+
+	    if(is_array($this->matched_rules) && count($this->matched_rules)) {
+	        foreach ($this->matched_rules AS $name => $router) {
+                if(isset($router["rule"]->$key)) {
+                    $res = (array) $router["rule"]->$key;
+                    unset($res["__tostring"]);
+                    unset($res["__attributes"]);
+                    break;
+                }
+            }
+        }
+
+       return $res;
+    }
+
 	static function getRuleAttrs($rule)
 	{
 		if (get_class($rule) == "ffSerializable")

@@ -56,10 +56,7 @@ function cm_showfiles_get_abs_url($path = null) {
 
 	if(!$showfiles)
 	{
-		if(CM_CACHE_PATH_CONVERT_SHOWFILES && CM_MEDIACACHE_SHOWPATH)
-			$showfiles = CM_MEDIACACHE_SHOWPATH;
-		else
-			$showfiles = CM_SHOWFILES;
+        $showfiles = CM_SHOWFILES;
 
 		if(substr(strtolower($showfiles), 0, 7) != "http://"
 			&& substr(strtolower($showfiles), 0, 8) != "https://"
@@ -74,14 +71,8 @@ function cm_showfiles_get_abs_url($path = null) {
 
 function cm_getMainTheme()
 {
-	/*if (defined("CM_LOADED_THEME"))
-		return CM_LOADED_THEME;
-	else if (defined("CM_DEFAULT_THEME"))
-		return CM_DEFAULT_THEME;
-	else*/ if (defined("FF_LOADED_THEME"))
-		return FF_LOADED_THEME;
-	/*else if (defined("FF_DEFAULT_THEME"))
-		return FF_DEFAULT_THEME;*/
+	if (defined("FF_DEFAULT_THEME"))
+		return FF_DEFAULT_THEME;
 	else
 		ffErrorHandler::raise("CM API: can't guess Main Theme", E_USER_ERROR, null, get_defined_vars());
 }
@@ -165,7 +156,7 @@ function cm_urls_to_abs($urls, $source)
 				}
 				elseif(strpos($relative_buffer_path, "/uploads") === 0)
 				{
-					$relative_buffer_path = CM_MEDIACACHE_SHOWPATH . substr($relative_buffer_path, strlen("/uploads"));
+					$relative_buffer_path = CM_SHOWFILES . substr($relative_buffer_path, strlen("/uploads"));
 				}
 
 				$tmp_css_link_replaced[$url] = $relative_buffer_path;
@@ -182,10 +173,7 @@ function cm_convert_url_in_abs_by_content($content, $source)
 		, "{showfiles}"
 	), array(
 		FF_SITE_PATH
-		, (CM_MEDIACACHE_SHOWPATH
-			? CM_MEDIACACHE_SHOWPATH
-			: CM_SHOWFILES
-		)
+		, CM_SHOWFILES
 	), $content);
 
 	$tmp_css_url = cm_extract_css_urls($content);

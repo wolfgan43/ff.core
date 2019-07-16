@@ -38,22 +38,9 @@
 	error_reporting(E_ALL ^ E_NOTICE);
 
 	//da cambiare senno esplode l'activecombo
-	if(!defined("MOD_SECURITY_SESSION_STARTED")) { 
-		mod_security_check_session();  
 
-		//session_name("ckf_" . session_name());
-	/*	if (!mod_security_check_session(false)) {
-			mod_security_create_session(MOD_SEC_GUEST_USER_NAME, MOD_SEC_GUEST_USER_ID);
-		}
-	*/
-	}
-	
-	if(!defined("MAX_UPLOAD"))
-		define("MAX_UPLOAD", 10000000);
-	if(!defined("DISK_UPDIR"))
-		define("DISK_UPDIR", $disk_path . "/upload");
-	if(!defined("AREA_GALLERY_SHOW_ADDNEW"))
-		define("AREA_GALLERY_SHOW_ADDNEW", true);
+	if(!defined("FF_DISK_UPDIR"))
+		define("FF_DISK_UPDIR", $disk_path . "/upload");
 	if(!defined("THUMB_CACHE_PATH"))
 		define("THUMB_CACHE_PATH", "_thumb");
 	
@@ -70,14 +57,14 @@
     if($mcFileManagerConfig == "" || strlen($src_page_url)) {
         //FormsTriggerError("E_USER_ERROR", E_USER_ERROR, NULL, get_defined_vars());
          
-        if(is_dir(DISK_UPDIR . $user_path)) {
-            $actual_path = DISK_UPDIR . $user_path;
+        if(is_dir(FF_DISK_UPDIR . $user_path)) {
+            $actual_path = FF_DISK_UPDIR . $user_path;
         } else {
-            $actual_path = DISK_UPDIR;
+            $actual_path = FF_DISK_UPDIR;
         }        
         
         $general_tools = "refresh,copy,paste,selectall,unselectall,view,download,addfavorite,removefavorite";
-        if(AREA_GALLERY_SHOW_ADDNEW) {
+        if(Auth::env("AREA_GALLERY_SHOW_ADDNEW")) {
             $general_tools .= ",createdir,createdoc,upload,rename,cut,delete,insert";
         }
 
@@ -111,7 +98,7 @@
 	    // General file system options
 	    $mcFileManagerConfig['filesystem'] = "Moxiecode_LocalFileImpl";
 	    $mcFileManagerConfig['filesystem.path'] =  stripslash($actual_path); // 'files'; // absolute or relative from this script path.
-	    $mcFileManagerConfig['filesystem.rootpath'] = stripslash(DISK_UPDIR . ROOT_PATH); //'files'; // absolute or relative from this script path.
+	    $mcFileManagerConfig['filesystem.rootpath'] = stripslash(FF_DISK_UPDIR . ROOT_PATH); //'files'; // absolute or relative from this script path.
 	    $mcFileManagerConfig['filesystem.datefmt'] = "Y-m-d H:i";
 	    $mcFileManagerConfig['filesystem.include_directory_pattern'] = '';
 	    $mcFileManagerConfig['filesystem.exclude_directory_pattern'] = '/^' . THUMB_CACHE_PATH . '$/i'; //|^' . GALLERY_TPL_PATH . '$
@@ -130,7 +117,7 @@
 	    $mcFileManagerConfig['filesystem.allow_override'] = "*";
 
 	    // Upload options
-	    $mcFileManagerConfig['upload.maxsize'] = floor(MAX_UPLOAD / 1000) . "KB"; //"10MB";
+	    $mcFileManagerConfig['upload.maxsize'] = floor(Auth::env("MAX_UPLOAD") / 1000) . "KB"; //"10MB";
 	    $mcFileManagerConfig['upload.overwrite'] = true;
 	    $mcFileManagerConfig['upload.include_file_pattern'] = '';
 	    $mcFileManagerConfig['upload.exclude_file_pattern'] = '/[^a-zA-Z0-9_\.-]/';

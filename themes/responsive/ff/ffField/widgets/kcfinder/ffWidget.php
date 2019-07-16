@@ -114,7 +114,7 @@ class ffWidget_kcfinder extends ffCommon
 		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 		//$this->tpl[$tpl_id]->set_var("class", $this->class);
 		//$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
-        $this->tpl[$tpl_id]->set_var("browse_class", cm_getClassByFrameworkCss("search", "icon"));
+        $this->tpl[$tpl_id]->set_var("browse_class", Cms::getInstance("frameworkcss")->get("search", "icon"));
 
         if(strlen($Field->widget_path))
             $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
@@ -217,7 +217,7 @@ class ffWidget_kcfinder extends ffCommon
             }
 		} else {
 			if($Field->ckfinder_base_path === null)
-				$Field->ckfinder_base_path = FF_DISK_PATH . "/uploads";
+				$Field->ckfinder_base_path = FF_DISK_UPDIR;
 			
 			$base_path = $Field->ckfinder_base_path;
 
@@ -271,8 +271,8 @@ class ffWidget_kcfinder extends ffCommon
 			$this->tpl[$tpl_id]->set_var("writable", "false");						
 		}
 
-        $this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("deleterow", "icon"));
-        $this->tpl[$tpl_id]->set_var("aviary_class", cm_getClassByFrameworkCss("editrow", "icon"));
+        $this->tpl[$tpl_id]->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("deleterow", "icon"));
+        $this->tpl[$tpl_id]->set_var("aviary_class", Cms::getInstance("frameworkcss")->get("editrow", "icon"));
 
 		$this->tpl[$tpl_id]->set_var("type_model", $Field->uploadifive_model);
 		$this->tpl[$tpl_id]->set_var("thumb_model", $Field->uploadifive_model_thumb);

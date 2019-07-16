@@ -42,8 +42,8 @@ if (isset($_SESSION["userdata"]))
 			{
 				// try to refresh token
 				$api_ret = common_oauth_api_call("/refreshtoken", array(
-					"client_id" => MOD_SEC_SOCIAL_FF_CLIENT_ID,
-					"client_secret" => MOD_SEC_SOCIAL_FF_CLIENT_SECRET,
+					"client_id" => Cms::env("MOD_AUTH_SOCIAL_FF_CLIENT_ID"),
+					"client_secret" => Cms::env("MOD_AUTH_SOCIAL_FF_CLIENT_SECRET"),
 					"refresh_token" => $_SESSION["refresh_token"]
 				));
 

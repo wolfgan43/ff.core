@@ -8,6 +8,7 @@
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
+
 if (!defined("CM_MAIN_INIT"))
 {
 	// DEBUG expressions
@@ -31,9 +32,6 @@ if (!defined("CM_MAIN_INIT"))
 	if (!is_dir(CM_CONTENT_ROOT))
 		ffErrorHandler::raise("CM: missing content dir: " . CM_CONTENT_ROOT, E_USER_ERROR, null, get_defined_vars());
 	
-	if (defined("FF_DEFAULT_THEME"))
-		ffErrorHandler::raise("CM: avoid set FF_DEFAULT_THEME in config.php, use CM_DEFAULT_THEME in /conf/cm/config.php", E_USER_ERROR, null, get_defined_vars());
-
 	// ..from conf
 	if (@is_file(FF_DISK_PATH . "/conf/cm/config." . FF_PHP_EXT))
 		require FF_DISK_PATH . "/conf/cm/config." . FF_PHP_EXT;
@@ -51,21 +49,7 @@ if (!defined("CM_MAIN_INIT"))
 {
 	require(__DIR__ . "/../ff/main.php");
 }*/
-spl_autoload_register(function ($class) {
-    switch ($class) {
-        case "PHPMailer":
-            require(__TOP_DIR__ . "/library/phpmailer/class.phpmailer." . FF_PHP_EXT);
-            break;
-        case "PHPExcel":
-            require(__TOP_DIR__ . "/library/PHPexcel/class.PHPexcel." . FF_PHP_EXT);
-            break;
-        default:
-            if (strpos($class, "cm") === 0) {
-                require(__DIR__ . '/' . $class . '.' . FF_PHP_EXT);
-            }
-    }
-
-});
+require_once (__DIR__ . "/autoload." . FF_PHP_EXT);
 
 // load classes
 //require(__DIR__ . "/cmRouter." . FF_PHP_EXT);

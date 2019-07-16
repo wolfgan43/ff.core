@@ -161,10 +161,10 @@ class ffWidget_autocompletex extends ffCommon
 			$this->tpl[$tpl_id]->set_var("service", "'" . $Field->actex_service . "'");
 
 
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("more", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon")); 
-        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));       
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", Cms::getInstance("frameworkcss")->get("more", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_plus", Cms::getInstance("frameworkcss")->get("plus", "icon"));    
+        $this->tpl[$tpl_id]->set_var("icon_minus", Cms::getInstance("frameworkcss")->get("minus", "icon")); 
+        $this->tpl[$tpl_id]->set_var("icon_loader", Cms::getInstance("frameworkcss")->get("spinner", "icon-tag", "spin"));       
 
         if($Field->autocomplete_combo) {
         	$this->tpl[$tpl_id]->parse("SectCombo", false);

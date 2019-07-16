@@ -751,8 +751,8 @@ class ffPage_html extends ffPage_base
 	 */
 	protected function tplProcessVars($tpl)
 	{
-		$framework_css = cm_getFrameworkCss();
-		$font_icon = cm_getFontIcon();
+		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
+		$font_icon = Cms::getInstance("frameworkcss")->getFontIcon();
 
 		$tpl[0]->set_var("site_path", $this->site_path);
 		$tpl[0]->set_var("language", FF_LOCALE);
@@ -771,18 +771,12 @@ class ffPage_html extends ffPage_base
 
 		$tpl[0]->set_var("layer", $this->layer);
         $tpl[0]->set_var("lazy_img", (CM_CACHE_IMG_LAZY_LOAD ? "true" : "false"));
-		$tpl[0]->set_var("showfiles", (CM_MEDIACACHE_SHOWPATH ? CM_MEDIACACHE_SHOWPATH : CM_SHOWFILES));
-        
-        if(MOD_SEC_GROUPS) 
-		{
-            $user_permission = get_session("user_permission");    
-            if(strlen($user_permission["primary_gid_name"]))
-            {
-                $tpl[0]->set_var("group", $user_permission["primary_gid_name"]);
-                $tpl[0]->parse("SectGroup", false);
-            }
-        }    
-        
+		$tpl[0]->set_var("showfiles", CM_SHOWFILES);
+
+		$user = Auth::get("user");
+        $tpl[0]->set_var("group", $user->acl_primary);
+        $tpl[0]->parse("SectGroup", false);
+
 		$tpl[0]->set_var("encoded_this_url", rawurlencode($_SERVER['REQUEST_URI']));
 
 		foreach ($this->global_params as $key => $value)
@@ -911,7 +905,7 @@ class ffPage_html extends ffPage_base
 			if ($output_result)
 			{
 				$this->tpl[0]->pparse("main", false);
-			} 
+			}
 			else 
 			{
 				return $this->tpl[0]->rpparse("main", false);
@@ -1890,8 +1884,19 @@ class ffPage_html extends ffPage_base
 	 */
 	public function addContent($content, $group = null, $id = null, $options = array())
 	{
-		if ($content === null && ($group === true))
-			$this->widgetLoad("tabs");
+        if(is_array($id) && !$options) {
+            $options = $id;
+            $id = null;
+        }
+
+        if($group === "tabs" && !$this->groups["tabs"]) {
+            $this->widgetLoad("tabs");
+            parent::addContent(null, true, "tabs");
+        } elseif ($content === null && $group === true)
+        {
+            //$options["tab_mode"] = $this->tab;
+            $this->widgetLoad("tabs");
+        }
 			
 		parent::addContent($content, $group, $id, $options);
 	}
@@ -1954,16 +1959,11 @@ class ffPage_html extends ffPage_base
 					}
 					reset($this->components[$item]->widget_deps);
 				}
-				$success = false;
-				if (FF_ENABLE_MEM_PAGE_CACHING && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
-					$res = $this->cache->get($this->request_key . "_" . $item, $success);
-				if ($success)
-				{
-					$this->components_buffer[$item] = $res;
-					//$ret = $this->componentWidgetsProcess($item);
-				}
-				else
-					$this->components[$item]->process();
+                if ($this->use_cache && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
+                    $this->components_buffer[$item] = $this->cache->get($this->request_key . "_" . $item, "/ff/req");
+
+                if (!$this->components_buffer[$item])
+                    $this->components[$item]->process();
 			}
 			reset($components_keys);
 		}
@@ -2042,7 +2042,7 @@ class ffPage_html extends ffPage_base
 						$this->components_buffer[$item]["headers"] .= $ret["headers"];
 						$this->components_buffer[$item]["footers"] .= $ret["footers"];
 
-						if (FF_ENABLE_MEM_PAGE_CACHING && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
+						if ($this->use_cache && isset($this->components[$item]->cache_get_resources) && count($this->components[$item]->cache_get_resources))
 						{
 							call_user_func_array(array($this->cache, "set"),
 									array_merge(
@@ -2107,12 +2107,13 @@ class ffPage_html extends ffPage_base
 			
 		$this->tplProcessBounceComponents();
 
-		$rc = $this->doEvent("on_after_process_components", array(&$this));
-
-		if (strlen($this->layer) && !$this->isXHR())
-			$this->tplProcessLayout();
+        if (strlen($this->layer) && !$this->isXHR()) {
+            $this->tplProcessLayout();
+        }
 
 		$this->tplProcess();
+
+        $rc = $this->doEvent("on_page_processed", array(&$this));
 
 		if (!($this->isXHR() && $this->getXHRComponent()))
 			$this->widgetsProcess();
@@ -2322,7 +2323,6 @@ class ffPage_html extends ffPage_base
 					$buffer .= $key . "=\"" . $value . "\"";
 				}
 			}
-			reset($property_set);
 		}
 		if($buffer)
 			return " " . $buffer;

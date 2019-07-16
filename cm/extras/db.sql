@@ -185,7 +185,6 @@ CREATE TABLE IF NOT EXISTS `cm_showfiles_modes` (
   `wmk_enable` char(1) NOT NULL,
   `wmk_image` varchar(255) NOT NULL,
   `wmk_alignment` varchar(255) NOT NULL,
-  `format_jpg_quality` int(3) NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 

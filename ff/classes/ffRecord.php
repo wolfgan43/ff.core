@@ -20,6 +20,8 @@
  * @license http://opensource.org/licenses/gpl-3.0.html
  * @link http://www.formsphpframework.com
  */
+if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_CACHING", false);
+
 class ffRecord
 {
 	static protected $events = null;
@@ -631,7 +633,9 @@ abstract class ffRecord_base extends ffCommon
 	 * URL completo della pagina ffRecord
 	 * @var String
 	 */
-	var $url					= "";					
+	var $url					= "";
+
+    var $use_cache              = FF_ENABLE_MEM_PAGE_CACHING;
 
 	var $record_exist 			= false;
 	var $first_access 			= false;
@@ -663,6 +667,7 @@ abstract class ffRecord_base extends ffCommon
 	abstract protected 	function 	tplDisplayControls	();
 	abstract public 	function 	tplDisplayError		($sError = null);
 
+
 	var $json_result = array();
 	
 	// ---------------------------------------------------------------
@@ -688,7 +693,7 @@ abstract class ffRecord_base extends ffCommon
 		if ($this->db === null)
 			$this->db[0] = ffDb_Sql::factory();
 
-		if(FF_ENABLE_MEM_PAGE_CACHING)
+		if($this->use_cache)
 			$this->addEvent("on_done_action", "ffRecord_reset_cache", ffEvent::PRIORITY_HIGH);
 	}
 
@@ -2228,7 +2233,7 @@ abstract class ffRecord_base extends ffCommon
 								$sSQL
 							);
 		$sSQL = str_replace(	"[USERNID]",
-								$this->db[0]->toSql(new ffData(get_session("UserNID"), "Number", "ISO9075")),
+								$this->db[0]->toSql(new ffData(Auth::get("user")->id, "Number", "ISO9075")),
 								$sSQL
 							);
 		foreach ($this->key_fields as $key => $FormField)
@@ -2306,7 +2311,7 @@ abstract class ffRecord_base extends ffCommon
 	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+			$this->framework_css["component"]["grid"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["component"]["grid"] = $resolution_large_to_small;
 		else
@@ -2318,7 +2323,7 @@ function ffRecord_reset_cache($oRecord, $frmAction)
 {
 	if (strlen($frmAction) && count($oRecord->cache_clear_resources))
 	{
-		$cache = ffCache::getInstance(FF_CACHE_ADAPTER);
+		$cache = ffCache::getInstance();
 		call_user_func_array(
 				array($cache, "clear")
 				, $oRecord->cache_clear_resources

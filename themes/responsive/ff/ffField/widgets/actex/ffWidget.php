@@ -200,7 +200,7 @@ class ffWidget_actex extends ffCommon
 							//, "callback"	=> (count($Field->resources) ? "ff.ffField.actex.dialog_success('" . $prefix . $id . "', '" . $Field->resources[0] . "')" : "")
 							, "tpl_id"		=> $tpl_id
 							, "addjs"		=> "javascript:ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
-							, "class"		=> cm_getClassByFrameworkCss("addnew", "icon", array("class" => "hidden " . cm_getClassByFrameworkCss("control-prefix", "form")))
+							, "class"		=> Cms::getInstance("frameworkcss")->get("addnew", "icon", array("class" => "hidden " . Cms::getInstance("frameworkcss")->get("control-prefix", "form")))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogaddlink"
 						)
 					, $Field->parent_page[0]
@@ -261,7 +261,7 @@ class ffWidget_actex extends ffCommon
 							/*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_edit_" . $Field->parent[0]->id . "_" . $Field->id . "')"
 							, "tpl_id"		=> $tpl_id
-							, "class"		=> cm_getClassByFrameworkCss("editrow", "icon", array("class" => "hidden"))
+							, "class"		=> Cms::getInstance("frameworkcss")->get("editrow", "icon", array("class" => "hidden"))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogeditlink"
 						)
 					, $Field->parent_page[0]
@@ -335,7 +335,7 @@ class ffWidget_actex extends ffCommon
 							/*, "name"		=> '<img alt="delete" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_delete .'"' . (strlen($Field->actex_dialog_title_delete)  ? ' title="' . $Field->actex_dialog_title_delete . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_delete_" . $Field->parent[0]->id . "_" . $Field->id . "')"
 							, "tpl_id"		=> $tpl_id
-							, "class"		=> cm_getClassByFrameworkCss("deleterow", "icon", array("class" => "hidden"))
+							, "class"		=> Cms::getInstance("frameworkcss")->get("deleterow", "icon", array("class" => "hidden"))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogdeletelink"
 						)
 					, $Field->parent_page[0]
@@ -486,11 +486,11 @@ class ffWidget_actex extends ffCommon
 
         $action_class = "actex-actions";
         
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));    
-        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("trash-o", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon"));    
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon")); 
-        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));       
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", Cms::getInstance("frameworkcss")->get("caret-down", "icon", array("class" => ("actex-combo"))));
+        $this->tpl[$tpl_id]->set_var("icon_delete", Cms::getInstance("frameworkcss")->get("trash-o", "icon"));
+        $this->tpl[$tpl_id]->set_var("icon_plus", Cms::getInstance("frameworkcss")->get("plus", "icon"));
+        $this->tpl[$tpl_id]->set_var("icon_minus", Cms::getInstance("frameworkcss")->get("minus", "icon"));
+        $this->tpl[$tpl_id]->set_var("icon_loader", Cms::getInstance("frameworkcss")->get("spinner", "icon-tag", "spin"));
 		if($Field->actex_autocomp) {
 			$this->tpl[$tpl_id]->parse("SectCombo", false);
 			$action_class .= " nopadding";
@@ -498,13 +498,13 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->set_var("SectCombo", "");
 		}
 
-        $this->tpl[$tpl_id]->set_var("actex_container", cm_getClassByFrameworkCss("group", "form", "actex-wrapper"));	
+        $this->tpl[$tpl_id]->set_var("actex_container", Cms::getInstance("frameworkcss")->get("group", "form", "actex-wrapper"));
         $this->tpl[$tpl_id]->set_var("data_class", "actex" . (strlen($Field->data_class) ? " " : "") . $Field->data_class);
-        $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("control-feedback", "form", $action_class));	
+        $this->tpl[$tpl_id]->set_var("actions_class", Cms::getInstance("frameworkcss")->get("control-feedback", "form", $action_class));
 
-        $this->tpl[$tpl_id]->set_var("actex_multi_container", cm_getClassByFrameworkCss("group", "list", "actex-multi"));	
-        $this->tpl[$tpl_id]->set_var("actex_multi_item", cm_getClassByFrameworkCss("item", "list"));	
-        $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "list"));	
+        $this->tpl[$tpl_id]->set_var("actex_multi_container", Cms::getInstance("frameworkcss")->get("group", "list", "actex-multi"));
+        $this->tpl[$tpl_id]->set_var("actex_multi_item", Cms::getInstance("frameworkcss")->get("item", "list"));
+        $this->tpl[$tpl_id]->set_var("actex_multi_badge", Cms::getInstance("frameworkcss")->get("badge", "list"));
 
         if(is_array($Field->actex_plugin) 
         	&& count($Field->actex_plugin)
@@ -915,7 +915,7 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->parse("SectBindingFoot", true);
 
 		if ($this->display_debug) {
-			$this->tpl[$tpl_id]->set_var("icon_debug", cm_getClassByFrameworkCss("bug", "icon"));    
+			$this->tpl[$tpl_id]->set_var("icon_debug", Cms::getInstance("frameworkcss")->get("bug", "icon"));
 			$this->tpl[$tpl_id]->parse("SectDebug", false);
 		} /*else {
 			$this->tpl[$tpl_id]->set_var("SectDebug", "");

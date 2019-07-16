@@ -147,7 +147,7 @@ class ffWidget_checkgroup
 					$class = $class . ($class ? " " : "") . "off";				
 				}
 				
-				$class .= " " . cm_getClassByFrameworkCss("", "row-default");
+				$class .= " " . Cms::getInstance("frameworkcss")->get("", "row-default");
 				$class .= " checkbox";
 
 				$this->tpl[$tpl_id]->set_var("class", $class);

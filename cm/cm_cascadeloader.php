@@ -377,6 +377,7 @@ function remove_dom_namespace($doc, $ns) {
                     	continue;
 
                     if(CM_CACHE_PATH_CONVERT_SHOWFILES) {
+
                         if($imgNode->hasAttribute("srcset") && strlen($imgNode->getAttribute("srcset")))
                         {
                             $imgNodeSrcSet = explode(",", $imgNode->getAttribute("srcset"));
@@ -468,7 +469,7 @@ function remove_dom_namespace($doc, $ns) {
                                         && strpos($img_src, "?") !== false
                                     )
                                 ) {
-                                    switch (ffMimeTypeByExtension(ffGetFilename($img_src, false)))
+                                    switch (ffMedia::getMimeTypeByExtension(ffGetFilename($img_src)))
                                     {
                                         case "image/jpeg":
                                         case "image/png":
@@ -571,10 +572,6 @@ function remove_dom_namespace($doc, $ns) {
 	$oPage->tpl[0]->set_var("content", $content);
 }
 function cmCache_normalizeUrl($content) {
-	if(CM_CACHE_PATH_CONVERT_SHOWFILES && CM_MEDIACACHE_SHOWPATH) {
-	//	$arrFind[] 			= CM_SHOWFILES . "/";
-	//	$arrReplace[] 		= CM_MEDIACACHE_SHOWPATH . "/";
-	}
 	if($_SERVER["HTTPS"]) {
 		$arrFind[] 			= 'http://' . $_SERVER["HTTP_HOST"];
 		$arrReplace[] 		= 'https://' .  $_SERVER["HTTP_HOST"];
@@ -590,23 +587,20 @@ function cmCache_normalizeUrl($content) {
 
 function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = null)
 {
-    $showfiles = (CM_MEDIACACHE_SHOWPATH
-        ? CM_MEDIACACHE_SHOWPATH
-        : CM_SHOWFILES
-    );
+    $showfiles = CM_SHOWFILES;
 
     $image = pathinfo($src);
 	if(strpos($src, FF_SITE_PATH . FF_THEME_DIR . '/') === 0)
 	{
 
-	} elseif(strpos($src, FF_SITE_PATH . FF_UPDIR . '/') === 0)
+	} elseif(strpos($src, FF_SITE_UPDIR . '/') === 0)
     {
         $mode = "";
         if($width > 0 && $height > 0)
             $mode = "-" . $width . "x" . $height;
 
         $src = str_replace(
-            FF_SITE_PATH . FF_UPDIR . '/'
+            FF_SITE_UPDIR . '/'
             , $showfiles . '/'
             , $image["dirname"] . "/" . $image["filename"] . $mode . "." . $image["extension"]
         );
@@ -616,8 +610,6 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
         $showfiles_orig = null;
         if(strpos($src, CM_SHOWFILES . '/') === 0)
             $showfiles_orig = CM_SHOWFILES . '/';
-        if(strpos($src, FF_SITE_PATH . CM_SHOWFILES . '/') === 0)
-            $showfiles_orig = FF_SITE_PATH . CM_SHOWFILES . '/';
         if(strpos($src, FF_SITE_PATH . "/cm/showfiles" . '/') === 0)
             $showfiles_orig = FF_SITE_PATH . "/cm/showfiles" . '/';
         if(strpos($src, FF_SITE_PATH . "/cm/showfiles.php" . '/') === 0)
@@ -661,7 +653,7 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
 			}
 
 
-            if($is_mode) // is_file(FF_DISK_PATH . FF_UPDIR . $imageOrig["dirname"] . "/" . $imageOrig["basename"])
+            if($is_mode) // is_file(FF_DISK_UPDIR . $imageOrig["dirname"] . "/" . $imageOrig["basename"])
             {
                 $imageOrig["mode"] = "-" . $imageOrig["mode"];
             }
@@ -690,7 +682,7 @@ function cmCache_convert_imagepath_to_showfiles($src, $width = null, $height = n
 function cmCache_writeLog($data, $filename = "log") //writeLog
 {
 	if(DEBUG_LOG === true) {
-		$log_path = CM_CACHE_PATH . "/logs";
+		$log_path = CM_CACHE_DISK_PATH . "/logs";
 		if(!is_dir($log_path))
 			mkdir($log_path, 0777, true);
 
@@ -853,8 +845,8 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
 
                         if (!isset($css_buffer_path[$css_buffer_key]["__missing__"]))
                         {
-                            $css_file_key .= $css_buffer_path[$css_buffer_key]["path"];
                             $tmp_mtime = filemtime($css_buffer_path[$css_buffer_key]["path"]);
+                            $css_file_key .= $css_buffer_path[$css_buffer_key]["path"] . "-" . $tmp_mtime;
                             if ($tmp_mtime > $max_mtime)
                                 $max_mtime = $tmp_mtime;
                         }
@@ -963,121 +955,6 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
 
                         if(strlen($tmp_css_data))
                         {
-                            /*$server_url = "http://" . $_SERVER["HTTP_HOST"];
-                            $server_url_http = "http://" . $_SERVER["HTTP_HOST"];
-
-                            if((substr(strtolower($css_buffer_value["path"]), 0, 7) != "http://" && substr(strtolower($css_buffer_value["path"]), 0, 8) != "https://" && substr($css_buffer_value["path"], 0, 2) != "//") && file_exists($css_buffer_value["path"]))
-                            {
-                                preg_match("/@import[\s]+url[\s]*\([\s]*\"?[\s]*([^\"\)]+)[\s]*\"?[\s]*\)\;?/", $tmp_css_data, $matches, PREG_OFFSET_CAPTURE, $offset);
-                                while (0 !== ($rc = preg_match("/@import[\s]+url[\s]*\([\s]*\"?[\s]*([^\"\)]+)[\s]*\"?[\s]*\)/", $tmp_css_data, $matches, PREG_OFFSET_CAPTURE, $offset)))
-                                {
-                                    $match = $matches[1][0];
-
-                                    // normalize url
-                                    if (strpos($match, "http://") === 0)
-                                    {
-                                        $match = substr($match, strlen("http://"));
-                                    }
-                                    elseif (strpos($match, "https://") === 0)
-                                    {
-                                        $match = substr($match, strlen("https://"));
-                                    }
-                                    if (strpos($match, $_SERVER["HTTP_HOST"]) === 0)
-                                    {
-                                        $match = substr($match, strlen($_SERVER["HTTP_HOST"]));
-                                    }
-                                    if (strlen(FF_SITE_PATH) && strpos($match, FF_SITE_PATH) === 0)
-                                    {
-                                        $match = substr($match, strlen(FF_SITE_PATH));
-                                    }
-
-                                    // check file existance on locale accessible path
-                                    if (strpos($match, "/") === 0)
-                                        $final_file = realpath(FF_DISK_PATH . $match);
-                                    else
-                                        $final_file = realpath(ffCommon_dirname($css_buffer_value["path"]) . "/" . $match);
-
-                                    if (strlen($final_file) && strpos($final_file, FF_DISK_PATH) === 0 && file_exists($final_file))
-                                    {
-                                        $tmp_import = file_get_contents($final_file);
-                                        $tmp_css_data = substr($tmp_css_data, 0, $matches[0][1]) . $tmp_import . substr($tmp_css_data, $matches[0][1] + strlen($matches[0][0]));
-                                        $offset = $matches[0][1];
-                                        continue;
-                                    }
-
-                                    $offset = $matches[0][1] + strlen($matches[0][0]);
-                                }
-                            }
-        */
-
-                           /* $tmp_css_data = str_replace("{site_path}", FF_SITE_PATH, $tmp_css_data);
-                            $tmp_css_data = str_replace("{showfiles}", CM_SHOWFILES, $tmp_css_data);
-                            $tmp_css_url = cm_extract_css_urls($tmp_css_data);
-
-                            if(is_array($tmp_css_url))
-                            {
-								$tmp_css_link_replaced = cm_urls_to_abs($tmp_css_url, $css_buffer_value["path"]);
-								$tmp_css_data = str_replace(array_keys($tmp_css_link_replaced), array_values($tmp_css_link_replaced), $tmp_css_data);
-
-                                $tmp_css_link_replaced = array();
-                                foreach($tmp_css_url AS $tmp_css_url_value)
-                                {
-                                    if(isset($tmp_css_link_replaced[$tmp_css_url_value]))
-                                        continue;
-                                    
-                                    if(substr($tmp_css_url_value, 0, 1) != "/"
-                                        && (substr(strtolower($tmp_css_url_value), 0, 7) != "http://"
-                                            && substr(strtolower($tmp_css_url_value), 0, 8) != "https://"
-                                            && substr($tmp_css_url_value, 0, 2) != "//")
-                                    ) {
-                                        $arrBufferPath = parse_url(ffcommon_dirname($css_buffer_value["path"]) . "/" . $tmp_css_url_value);
-                                       // echo "<pre>"; print_r($arrBufferPath); 
-                                        if(substr(strtolower($css_buffer_value["path"]), 0, 7) == "http://"
-                                            || substr(strtolower($css_buffer_value["path"]), 0, 8) == "https://"
-                                            || substr($css_buffer_value["path"], 0, 2) == "//"
-                                        )
-                                            $relative_buffer_path = cm_canonicalize($arrBufferPath["scheme"] . "://" . $arrBufferPath["host"] . $arrBufferPath["path"])
-                                                . (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
-                                                . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
-                                        else {
-                                            $relative_buffer_path = substr(realpath($arrBufferPath["path"]), strlen(FF_DISK_PATH))
-                                                . (array_key_exists("query", $arrBufferPath) ? "?" . $arrBufferPath["query"] : "")
-                                                . (array_key_exists("fragment", $arrBufferPath) ? "#" . $arrBufferPath["fragment"] : "");
-                                            
-                                                $relative_buffer_path = str_replace("\\.rep\\ff" , "", $relative_buffer_path); // @CarmineRumma
-                                                $relative_buffer_path = str_replace("\\.rep\\vgallery" , "", $relative_buffer_path); // @CarmineRumma
-                                               
-                                        }
-                                        
-                                        if(strpos($relative_buffer_path, FF_THEME_DIR) === 0)
-                                        {
-                                            
-                                            if(file_exists(FF_DISK_PATH . FF_THEME_DIR . "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")))))
-                                            {
-                                                $relative_buffer_path =  "/" . $oPage->theme . substr($relative_buffer_path, strpos($relative_buffer_path, "/", strlen(FF_THEME_DIR . "/")));
-                                            }
-                                            else
-                                            {
-                                                $relative_buffer_path = substr($relative_buffer_path, strlen(FF_THEME_DIR));
-                                            }
-
-                                            $relative_buffer_path = FF_SITE_PATH . FF_THEME_DIR . $relative_buffer_path;
-                                        }
-                                        elseif(strpos($relative_buffer_path, "/uploads") === 0)
-                                        {
-                                            $relative_buffer_path = CM_MEDIACACHE_SHOWPATH . substr($relative_buffer_path, strlen("/uploads"));
-                                        }
-
-                                        if($relative_buffer_path)
-                                            $tmp_css_data = str_replace($tmp_css_url_value, $relative_buffer_path, $tmp_css_data);
-
-                                        $tmp_css_link_replaced[$tmp_css_url_value] = true;
-                                    }
-                                }
-                            } elseif(strpos($css_buffer_value["path"], FF_THEME_DISK_PATH) === 0) {
-                                $arrBufferPath = explode("/", str_replace(FF_THEME_DISK_PATH . "/", "", $css_buffer_value["path"]));
-                                $tmp_css_data = str_replace("../", FF_THEME_DIR . "/" . $arrBufferPath[0] . "/", $tmp_css_data);
-                            }*/
 							$tmp_css_data = cm_convert_url_in_abs_by_content($tmp_css_data, $css_buffer_value["path"]);
 
                             if(strpos($css_buffer_value["path"], ".min.css") === false)
@@ -1139,9 +1016,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                         }
                     }
 
-                    if(CM_SHOWFILES_FORCE_PATH && CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
+                    if(CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer))
                     { //manupolazione percorsi dei file media per avere la gestione della cache
-                        $str_css_buffer = str_replace(FF_SITE_PATH . FF_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
+                        $str_css_buffer = str_replace(FF_SITE_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                      //   if(CM_CSSCACHE_RENDER_THEME_PATH)
                        //     $str_css_buffer = str_replace(FF_SITE_PATH . THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                     }
@@ -1167,8 +1044,8 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
                     if ($uncompressed)
                         $str_css_buffer = file_get_contents($uncompressed_file);
 
-                    if(CM_SHOWFILES_FORCE_PATH && CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer)) { //manupolazione percorsi dei file media per avere la gestione della cache
-                        $str_css_buffer = str_replace(FF_SITE_PATH . FF_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
+                    if(CM_CSSCACHE_RENDER_PATH && strlen($str_css_buffer)) { //manupolazione percorsi dei file media per avere la gestione della cache
+                        $str_css_buffer = str_replace(FF_SITE_UPDIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                        // if(CM_CSSCACHE_RENDER_THEME_PATH)
                          //   $str_css_buffer = str_replace(FF_SITE_PATH . FF_THEME_DIR . '/', CM_SHOWFILES . '/', $str_css_buffer);
                     }
@@ -1376,8 +1253,9 @@ function ffPage_on_tpl_parsed(ffPage_base $oPage)
 
                         if (!isset($oPage->js_buffer[$js_buffer_key]["__missing__"]))
                         {
-                            $js_file_key .= $oPage->js_buffer[$js_buffer_key]["path"];
-							$tmp_mtime = filemtime($oPage->js_buffer[$js_buffer_key]["path"]);
+                            $tmp_mtime = filemtime($oPage->js_buffer[$js_buffer_key]["path"]);
+
+                            $js_file_key .= $oPage->js_buffer[$js_buffer_key]["path"] . "-" . $tmp_mtime;
                             if ($tmp_mtime > $max_mtime)
                                 $max_mtime = $tmp_mtime;
                         }

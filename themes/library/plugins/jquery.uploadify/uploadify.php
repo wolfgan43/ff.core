@@ -106,7 +106,7 @@ if($valid_session)
 		//per motivi di sicurezza e stata dismessa l'opzione
 		//Se si vuole usare l'upload senza sessione usare uploadifive
 		$folder = "/";
-		$base_path = FF_DISK_PATH . FF_UPDIR;
+		$base_path = FF_DISK_UPDIR;
 	}
 }
 else
@@ -120,7 +120,7 @@ else
 	//per motivi di sicurezza e stata dismessa l'opzione
 	//Se si vuole usare l'upload senza sessione usare uploadifive
 	$folder = $_REQUEST['folder'];
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = FF_DISK_UPDIR;
 }
 
 if(is_array($res)) {
@@ -129,13 +129,13 @@ if(is_array($res)) {
 
 }
 
-if(strpos($folder, FF_UPDIR) === 0)
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+if(strpos($folder, FF_SITE_UPDIR) === 0)
+	$base_path = FF_DISK_UPDIR;
 elseif(strpos($folder, FF_THEME_DIR) === 0)
 	$base_path = FF_DISK_PATH . FF_THEME_DIR;
 
 if(!strlen($base_path))
-	$base_path = FF_DISK_PATH . FF_UPDIR;
+	$base_path = FF_DISK_UPDIR;
 
 
 //ffErrorHandler::raise("as", E_USER_ERROR, null, get_defined_vars());
@@ -194,11 +194,9 @@ if(!empty($_FILES))
 		if(is_file($base_path . $real_file))
 		{
 			@chmod($base_path . $real_file, 0777);
-			$mimetype = ffMimeTypeByFilename($base_path . $real_file);
-			if(function_exists("ffImageOptimize") && CM_SHOWFILES_OPTIMIZE && strpos($mimetype, "image") === 0) 
-				ffImageOptimize($base_path . $real_file, $mimetype);
+            ffMedia::optimize($base_path . $real_file);
 
-			$res["name"] = basename($real_file); 
+			$res["name"] = basename($real_file);
 			$res["path"] = ffCommon_dirname($real_file); 
 			$res["fullpath"] = $real_file;
 			$res["status"] = true;			

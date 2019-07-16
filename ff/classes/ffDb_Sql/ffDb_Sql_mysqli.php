@@ -72,6 +72,7 @@ class ffDB_Sql
 	
 	var $fields			= null;
 	var $fields_names	= null;
+	var $field_primary  = null;
 
 	private $num_rows = null;
 	private $useFormsFramework		= false;
@@ -250,6 +251,7 @@ class ffDB_Sql
 		$this->num_rows		= null;
 		$this->fields		= null;
 		$this->fields_names	= null;
+        $this->field_primary= null;
 		$this->buffered_affected_rows = null;
 		$this->buffered_insert_id = null;
 	}
@@ -360,7 +362,7 @@ class ffDB_Sql
 				$rc = is_object($this->link_id);
 			}
 
-			if (!$rc || $this->checkError())
+			if (!$rc || mysqli_connect_errno())
 			{
 				if ($this->halt_on_connect_error)
 					$this->errorHandler("Connection failed to host " . $this->host);
@@ -444,9 +446,11 @@ class ffDB_Sql
 			if (!$this->selectDb())
 				return false;
 		}*/
+        if(Cms::PROFILING) {
+            Cms::getInstance("debug")->dumpCaller($Query_String);
+        }
 
 		$this->freeResult();
-		
 		$this->debugMessage("Execute = " . $Query_String);
 		
 		$this->query_id = @mysqli_query($this->link_id, $Query_String);
@@ -513,7 +517,7 @@ class ffDB_Sql
 	 * @param StdClass|Object|null $obj
 	 * @return array|bool|null|object
 	 */
-	function getRecordset($obj = null)
+	function getRecordset_old($obj = null)
 	{
 		if (!$this->query_id)
 		{
@@ -531,17 +535,70 @@ class ffDB_Sql
 			$this->errorHandler("fetch_assoc_error");
 			return false;
 		}
-		
 		return $res;
-	}	
-	
-	/**
+	}
+
+    /**
+     * @param StdClass|Object|null $obj
+     * @return array|bool|null|object
+     */
+    function getRecordset($obj = null)
+    {
+        if (!$this->query_id)
+        {
+            $this->errorHandler("eachAll called with no query pending");
+            return false;
+        }
+
+        if ($obj != null) {
+            $res = @mysqli_fetch_object($this->query_id, $obj);
+        } else {
+            $row = 0;
+            while ($record = @mysqli_fetch_assoc($this->query_id)) {
+                $res[($record[$this->field_primary] ? $record[$this->field_primary] : $row++)] = $record;
+            }
+
+        }
+
+        if ($res === null && $this->checkError())
+        {
+            $this->errorHandler("fetch_assoc_error");
+            return false;
+        }
+        return $res;
+    }
+
+    /**
 	 * Esegue una query 
 	 * @param String La query da eseguire
 	 * @return L'id della query eseguita 
 	 */
-	function query($Query_String)
+	function query($query)
 	{
+	    if(is_array($query)) {
+            $Query_String                                   = "SELECT "
+                                                                . ($query["limit"]["calc_found_rows"]
+                                                                    ? " SQL_CALC_FOUND_ROWS "
+                                                                    : ""
+                                                                ) . $query["select"] . "  
+                                                                FROM " .  $query["from"] . "
+                                                                WHERE " . $query["where"]
+                                                                . ($query["sort"]
+                                                                    ? " ORDER BY " . $query["sort"]
+                                                                    : ""
+                                                                )
+                                                                . ($query["limit"]
+                                                                    ? " LIMIT " . (is_array($query["limit"])
+                                                                        ? $query["limit"]["skip"] . ", " . $query["limit"]["limit"]
+                                                                        : $query["limit"]
+                                                                    )
+                                                                    : ""
+                                                                );
+        } else {
+            $Query_String                                   = $query;
+        }
+
+
 		if ($Query_String == "")
 			$this->errorHandler("Query invoked With blank Query String");
 
@@ -555,9 +612,11 @@ class ffDB_Sql
 			if (!$this->selectDb())
 				return false;
 		}*/
+        if(Cms::PROFILING) {
+            Cms::getInstance("debug")->dumpCaller($Query_String);
+        }
 
 		$this->freeResult();
-
 		$this->debugMessage("query = " . $Query_String);
 
 		$this->query_id = @mysqli_query($this->link_id, $Query_String);
@@ -572,17 +631,43 @@ class ffDB_Sql
 			$this->fields_names = array();
 			if (is_object($this->query_id))
 			{
-				while($tmp = mysqli_fetch_field($this->query_id))
+				while($meta = mysqli_fetch_field($this->query_id))
 				{
-					$this->fields[$tmp->name] = $tmp;
-					$this->fields_names[] = $tmp->name;
-				}
+					$this->fields[$meta->name] = $meta;
+					$this->fields_names[] = $meta->name;
+                    if ($meta->flags & MYSQLI_PRI_KEY_FLAG) {
+                        $this->field_primary = $meta->name;
+                    }
+                }
 				mysqli_field_seek($this->query_id, 0);
 			}
 		}
 
 		return $this->query_id;
 	}
+
+	function cmd($query, $name = "count") {
+        $res = null;
+
+        if(Cms::PROFILING) {
+            Cms::getInstance("debug")->dumpCaller($query);
+        }
+	    switch ($name) {
+            case "count":
+                $query["select"] = "COUNT(ID) AS count";
+                $this->query($query);
+                if($this->nextRecord()) {
+                    $res = $this->record["count"];
+                }
+                break;
+            default:
+                $this->errorHandler("Command not supported");
+
+        }
+
+        return $res;
+    }
+
 
 	function multiQuery($Query_String)
 	{
@@ -1136,12 +1221,16 @@ class ffDB_Sql
 
 	function checkError()
 	{
-		$this->error = @mysqli_error($this->link_id);
-		$this->errno = @mysqli_errno($this->link_id);
-		if ($this->errno)
-			return true;
-		else
-			return false;
+        if(is_object($this->link_id)) {
+            $this->error = @mysqli_error($this->link_id);
+            $this->errno = @mysqli_errno($this->link_id);
+            if ($this->errno)
+                return true;
+            else
+                return false;
+        } else {
+            return true;
+        }
 	}
 	
 	function errorHandler($msg)

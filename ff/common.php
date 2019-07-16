@@ -10,91 +10,31 @@
  * @link http://www.formsphpframework.com
  */
 
+
+/**
+ * get parent'dir, no matter if windows or linux
+ * @param type $path
+ * @return string
+ */
+function ffCommon_dirname($path)
+{
+    $res = dirname($path);
+    if(dirname("/") == "\\")
+        $res = str_replace("\\", "/", $res);
+
+    if($res == ".")
+        $res = "";
+
+    return $res;
+}
 //------------------------------------------------------------------------------------
 // http header "location" wrapper
 //------------------------------------------------------------------------------------
-function ffAutoload() {
-	static $loaded = false;
-	if(!$loaded) {
-		spl_autoload_register(function ($class) {
-			switch ($class) {
-				case "ffDB_Sql":
-				case "ffDb_Sql":
-					require(__DIR__ . "/classes/ffDb_Sql/ffDb_Sql_" . FF_DB_INTERFACE . "." . FF_PHP_EXT);
-
-					break;
-				case "ffDB_MongoDB":
-				case "ffDb_MongoDB":
-					require(__DIR__ . "/classes/ffDB_Mongo/ffDb_MongoDB." . FF_PHP_EXT);
-					break;
-				case "ffEvent":
-					require(__DIR__ . "/classes/ffEvents/ffEvent." . FF_PHP_EXT);
-					break;
-				case "ffEvents":
-					require(__DIR__ . "/classes/ffEvents/ffEvents." . FF_PHP_EXT);
-					break;
-				case "ffData":
-					require(__DIR__ . "/classes/ffData/ffData." . FF_PHP_EXT);
-					break;
-				case "ffValidator":
-					require(__DIR__ . "/classes/ffValidator/ffValidator." . FF_PHP_EXT);
-					break;
-				case "ffCache":
-					require(__DIR__ . "/classes/ffCache/ffCacheAdapter." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffCache/ffCache." . FF_PHP_EXT);
-					break;
-				case "ffImage":
-				case "ffCanvas":
-				case "ffText":
-				case "ffThumb":
-					require(__DIR__ . "/classes/ffImage/ffImage." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffImage/ffCanvas." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffImage/ffText." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffImage/ffThumb." . FF_PHP_EXT);
-					break;
-				case "ffErrorHandler":
-					require(__DIR__ . "/error_handling." . FF_PHP_EXT);
-					break;
-				case "ffDBAdapter":
-				case "ffDBConnection":
-				case "ffDBField":
-				case "ffDBIndex":
-				case "ffDBRecord":
-				case "ffDBRecordset":
-				case "ffDBSource":
-				case "ffDBTable":
-				case "ffDBQuery":
-					require(__DIR__ . "/classes/ffDB/ffDBAdapter." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/ffDBConnection." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/ffDBField." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/ffDBIndex." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/ffDBRecord." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/ffDBRecordset." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/ffDBSource." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/sources/ffDBTable." . FF_PHP_EXT);
-					require(__DIR__ . "/classes/ffDB/sources/ffDBQuery." . FF_PHP_EXT);
-					break;
-				case "PHPSQLCreator":
-				case "PHPSQLParser":
-					require(__DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLParser." . FF_PHP_EXT);
-					require(__DIR__ . "/library/PHP-SQL-Parser/src/PHPSQLCreator." . FF_PHP_EXT);
-					break;
-				case "ffXmlElement":
-				case "ffXmlParser":
-					require(__DIR__ . "/classes/ffXml/ffXmlParser." . FF_PHP_EXT); // UNDER DEVELOPMENT
-					require(__DIR__ . "/classes/ffXml/ffXmlElement." . FF_PHP_EXT); // UNDER DEVELOPMENT
-					break;
-				default:
-					if (strpos($class, "ff") === 0) {
-						require(__FF_DIR__ . '/classes/' . $class . '.' . FF_PHP_EXT);
-					}
-			}
-		});
-		$loaded = true;
-	}
-}
 function ffRedirect($destination, $http_response_code = null, $add_params = null, $response = array())
 {
+    if(!$destination)
+        $destination = "/";
+    //ffErrorHandler::raise("asd", E_USER_ERROR, null, get_defined_vars());
     if ($add_params !== null)
     {
         $parts = explode("#", $destination);
@@ -469,38 +409,16 @@ function ffCommon_url_rewrite_strip_word($testo, $strip_words, $char_sep = '-')
     return $testo;
 
 }
-function ffCommon_url_rewrite($testo, $char_sep = '-')
+function ffCommon_url_rewrite($testo, $char_sep = '-', $remove_hypens = FF_URLREWRITE_REMOVEHYPENS)
 {
-    //$testo = ffCommon_toggle_hypens($testo);
-    $testo = ffCommon_remove_accents($testo);
+    if ($remove_hypens)
+        $testo = ffCommon_remove_hypens($testo);
+    $testo = mb_strtolower($testo);
 
-    $testo = strtolower($testo);
-
-    //$testo = preg_replace('([^a-z0-9\-]+)', ' ', $testo);
     $testo = preg_replace('/[^\p{L}0-9\-]+/u', ' ', $testo);
     $testo = trim($testo);
     $testo = preg_replace('/ +/', $char_sep, $testo);
-    $testo = preg_replace('/-+/', $char_sep, $testo);
-    /*do {
-        $testo = str_replace("--", "-", $testo, $count);
-    } while ($count > 0);*/
-    return $testo;
-}
-
-function ffCommon_toggle_hypens($testo)
-{
-
-    //convert to slug
-    $testo = ffCommon_charset_decode($testo);
-    $testo = html_entity_decode($testo, ENT_QUOTES);
-
-    $testo = preg_replace("([\xC0-\xC5\xE0-\xE5]+)", "a", $testo);
-    $testo = preg_replace("([\xC8-\xCB\xE8-\xEB]+)", "e", $testo);
-    $testo = preg_replace("([\xCC-\xCF\xEC-\xEF]+)", "i", $testo);
-    $testo = preg_replace("([\xD2-\xD6\xF2-\xF6]+)", "o", $testo);
-    $testo = preg_replace("([\xD9-\xDC\xF9-\xFC]+)", "u", $testo);
-    $testo = preg_replace("([\x9F\xDD\xFD\xFF]+)", "y", $testo);
-
+    $testo = preg_replace('/' . preg_quote($char_sep) . '+/', $char_sep, $testo);
     return $testo;
 }
 
@@ -538,7 +456,7 @@ function ffCommon_utf8_for_xml($string)
  * @param string $string Text that might have accent characters
  * @return string Filtered string with replaced "nice" characters.
  */
-function ffCommon_remove_accents($string) {
+function ffCommon_remove_hypens($string) {
     if ( !preg_match('/[\x80-\xff]/', $string) )
         return $string;
 
@@ -852,24 +770,7 @@ function ffCommon_array_merge_2(&$array, &$array_i)
  *  @return array Resulting array, once all have been merged
  */
 
-function ffCommon_array_merge_n()
-{
-    // Initialization of the resulting array:
-    $array = array();
 
-    // Arrays to be merged (function's arguments):
-    $arrays = func_get_args();
-
-    // Merging of each array with the resulting one:
-    foreach ($arrays as $array_i)
-    {
-        if (is_array($array_i))
-        {
-            ffCommon_array_merge_2($array, $array_i);
-        }
-    }
-    return $array;
-}
 
 function ffCommon_url_normalize($url, $strip_slashes = false)
 {
@@ -899,83 +800,6 @@ function ffCommon_url_stripslashes($url)
     return $url;
 }
 
-function ffMimeType($file, $fake_filename = null, $default = "text/plain")
-{
-    $mimetype = ffMimeContentType($file, $default);
-
-    if ($mimetype == "text/plain" || $mimetype == "application/x-empty" || !strlen($mimetype))
-    {
-        if ($fake_filename !== null)
-            $mimetype = ffMimeTypeByFilename($fake_filename, $default);
-        if ($mimetype == "text/plain" || !strlen($mimetype))
-            $mimetype = ffMimeTypeByFilename($file, $default);
-    }
-
-    if (strlen($mimetype))
-        return $mimetype;
-    else
-        return $default;
-}
-
-function ffMimeContentType($filename, $default = "text/plain")
-{
-    if (!strlen($filename))
-        ffErrorHandler::raise("ffMimeContentType invoked without file..", E_USER_ERROR, null, get_defined_vars());
-
-    if (class_exists("finfo"))
-    {
-        $result = new finfo();
-        $mimetype = $result->file($filename, FILEINFO_MIME_TYPE);
-    }
-    else if (function_exists("mime_content_type"))
-    {
-        $mimetype = mime_content_type($filename);
-    }
-
-    if ($mimetype == "text/plain" || !strlen($mimetype))
-    {
-        $s = file_get_contents($filename, null, null, null, 3);
-        if (bin2hex(substr($s, 0, 2)) == '1f8b' ) { $mimetype = "gzip"; }
-        if (substr($s, 0, 3) == 'BZh'){ $mimetype = "bzip2"; }
-    }
-
-    if (strlen($mimetype))
-        return $mimetype;
-    else
-        return $default;
-}
-
-function ffMimeTypeByFilename($filename, $default = "text/plain")
-{
-    $extension = (($extension = pathinfo($filename, PATHINFO_EXTENSION)) === "" ? null : $extension);
-    if ($extension !== null)
-        return ffMimeTypeByExtension($extension, $default);
-    else
-        return $default;
-}
-
-function ffMimeTypeByExtension($extension, $default = "text/plain")
-{
-    global $ffMimeTypes;
-
-    $extension = strtolower($extension);
-    if (isset($ffMimeTypes[$extension]))
-        return $ffMimeTypes[$extension];
-    else
-        return $default;
-}
-
-function ffExtensionByMimeType($type, $default = null)
-{
-    global $ffMimeTypes;
-
-    $count_mime = array_count_values($ffMimeTypes);
-    if ($count_mime[$type] == 1)
-    {
-        return array_search($type, $ffMimeTypes);
-    }
-    return $default;
-}
 function ffGetFilename($path, $return_name = true)
 {
     $file_ext = pathinfo($path, PATHINFO_EXTENSION);
@@ -989,127 +813,6 @@ function ffGetFilename($path, $return_name = true)
         return $res;
     else
         return $file_ext;
-}
-
-function output_header($file, $disposition = "inline", $fake_filename = null, $default = "text/plain", $expires = null, $max_age = null, $force_mime = false, $force_compression = false, $size = null)
-{
-    $compressed = false;
-    $try_by_name = false;
-    $pragma = "!invalid";
-
-    // try to detect compression
-    $mimetype = ffMimeContentType($file, $default);
-    if ($mimetype == "text/plain" || !strlen($mimetype))
-    {
-        $try_by_name = true;
-        $mimetype = ffMimeTypeByFilename($file, $default);
-    }
-
-    if(strpos($mimetype, "gzip") !== false)
-        $compressed = true;
-
-    if ($force_mime === true)
-        $mimetype = $default;
-    else if (strlen($force_mime) && strpos($mimetype, $force_mime) !== false)
-        $mimetype = $default;
-    else if ($compressed)
-    {
-        $mimetype = "";
-        // try to detect real mimetype
-        if ($fake_filename !== null) // fake filename before everything
-            $mimetype = ffMimeTypeByFilename($fake_filename, $default);
-        if ($mimetype == "text/plain" || !strlen($mimetype))
-        {
-            if (!$try_by_name)
-                $mimetype = ffMimeTypeByFilename($file, $default);
-            else
-            {
-                // try to get away gz extension
-                $file = substr_replace($file, "", -3);
-                $mimetype = ffMimeTypeByFilename($file, $default);
-            }
-        }
-    }
-    else
-    {
-        if ($fake_filename !== null) // fake filename before everything
-            $mimetype = ffMimeTypeByFilename($fake_filename, $default);
-        if ($mimetype == "text/plain" || !strlen($mimetype))
-            $mimetype = ffMimeTypeByFilename($file, $default);
-    }
-
-    if(CM_PAGECACHE_KEEP_ALIVE)
-        header("Connection: Keep-Alive");
-
-    if ($compressed || $force_compression)
-        header("Content-Encoding: gzip");
-
-    //$fsize = filesize($file);
-    if ($fake_filename === null)
-        $fake_filename = basename($file);
-
-    header("Content-type: $mimetype");
-
-    if(strlen($disposition))
-        header("Content-Disposition: $disposition; filename=" . rawurlencode($fake_filename));
-
-    if ($expires !== false)
-    {
-        if ($expires === null)
-        {
-            $day = 7;
-            if(strpos($mimetype, "image") !== false)
-                $day = 30;
-
-            //$expires = filemtime($file) + (60 * 60 * 24 * 7);
-            $expires = time() + (60 * 60 * 24 * $day);
-        }
-        elseif ($expires < 0)
-        {
-            $expires = time() - $expires;
-        }
-        $exp_gmt = gmdate("D, d M Y H:i:s", $expires) . " GMT";
-        header("Expires: $exp_gmt");
-    }
-
-    if ($max_age !== false)
-    {
-        $mod_gmt = gmdate("D, d M Y H:i:s", time()) . " GMT";
-        header("Last-Modified: $mod_gmt");
-
-        if ($max_age === null)
-        {
-            $hour = 1;
-            if(strpos($mimetype, "image") !== false)
-                $hour = 24;
-
-            $max_age = 60 * 60 * $hour;
-            header("Cache-Control: public, max-age=$max_age");
-        }
-        else
-        {
-            header("Cache-Control: public, max-age=$max_age");
-        }
-    }
-
-    if($expires === false && $max_age === false)
-    {
-        header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-        $pragma = "no-cache";
-    }
-
-    header("Pragma: " . $pragma);
-    if ($size === null)
-        header("Content-Length: " . filesize($file));
-    else
-        header("Content-Length: " . $size);
-
-    if($mimetype == "text/css" || $mimetype == "application/x-javascript")
-    {
-        header("Vary: Accept-Encoding");
-    }
-
-    header("ETag: " . md5($file . filemtime($file)));
 }
 
 function ffCommon_partial_in_array($needle, $haystack)
@@ -1528,471 +1231,6 @@ function ffCommon_jsonenc_encodeString($string)
 
     return $string;
 }
-
-$ffMimeTypes = array(
-    "3dm" => "x-world/x-3dmf"
-, "3dmf" => "x-world/x-3dmf"
-, "a" => "application/octet-stream"
-, "aab" => "application/x-authorware-bin"
-, "aam" => "application/x-authorware-map"
-, "aas" => "application/x-authorware-seg"
-, "abc" => "text/vnd.abc"
-, "acgi" => "text/html"
-, "afl" => "video/animaflex"
-, "ai" => "application/postscript"
-, "aif" => "audio/aiff"
-, "aifc" => "audio/aiff"
-, "aiff" => "audio/aiff"
-, "aim" => "application/x-aim"
-, "aip" => "text/x-audiosoft-intra"
-, "ani" => "application/x-navi-animation"
-, "aos" => "application/x-nokia-9000-communicator-add-on-software"
-, "aps" => "application/mime"
-, "arc" => "application/octet-stream"
-, "arj" => "application/arj"
-, "art" => "image/x-jg"
-, "asf" => "video/x-ms-asf"
-, "asm" => "text/x-asm"
-, "asp" => "text/asp"
-, "asx" => "application/x-mplayer2"
-, "au" => "audio/basic"
-, "avi" => "application/x-troff-msvideo"
-, "avs" => "video/avs-video"
-, "bcpio" => "application/x-bcpio"
-, "bin" => "application/mac-binary"
-, "bm" => "image/bmp"
-, "bmp" => "image/bmp"
-, "boo" => "application/book"
-, "book" => "application/book"
-, "boz" => "application/x-bzip2"
-, "bsh" => "application/x-bsh"
-, "bz" => "application/x-bzip"
-, "bz2" => "application/x-bzip2"
-, "c" => "text/plain"
-, "c++" => "text/plain"
-, "cat" => "application/vnd.ms-pki.seccat"
-, "cc" => "text/plain"
-, "ccad" => "application/clariscad"
-, "cco" => "application/x-cocoa"
-, "cdf" => "application/cdf"
-, "cer" => "application/pkix-cert"
-, "cha" => "application/x-chat"
-, "chat" => "application/x-chat"
-, "class" => "application/java"
-, "com" => "application/octet-stream"
-, "conf" => "text/plain"
-, "cpio" => "application/x-cpio"
-, "cpp" => "text/x-c"
-, "cpt" => "application/mac-compactpro"
-, "crl" => "application/pkcs-crl"
-, "crt" => "application/pkix-cert"
-, "csh" => "application/x-csh"
-, "css" => "text/css"
-, "cxx" => "text/plain"
-, "dcr" => "application/x-director"
-, "deepv" => "application/x-deepv"
-, "def" => "text/plain"
-, "der" => "application/x-x509-ca-cert"
-, "dif" => "video/x-dv"
-, "dir" => "application/x-director"
-, "dl" => "video/dl"
-, "doc" => "application/msword"
-, "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-, "dot" => "application/msword"
-, "dotx" =>	"application/vnd.openxmlformats-officedocument.wordprocessingml.template"
-, "dp" => "application/commonground"
-, "drw" => "application/drafting"
-, "dump" => "application/octet-stream"
-, "dv" => "video/x-dv"
-, "dvi" => "application/x-dvi"
-, "dwf" => "drawing/x-dwf (old)"
-, "dwg" => "application/acad"
-, "dxf" => "application/dxf"
-, "dxr" => "application/x-director"
-, "el" => "text/x-script.elisp"
-, "elc" => "application/x-bytecode.elisp"
-, "env" => "application/x-envoy"
-, "eps" => "application/postscript"
-, "es" => "application/x-esrehber"
-, "etx" => "text/x-setext"
-, "evy" => "application/envoy"
-, "exe" => "application/octet-stream"
-, "f" => "text/plain"
-, "f77" => "text/x-fortran"
-, "f90" => "text/plain"
-, "fdf" => "application/vnd.fdf"
-, "fif" => "application/fractals"
-, "fli" => "video/fli"
-, "flo" => "image/florian"
-, "flx" => "text/vnd.fmi.flexstor"
-, "fmf" => "video/x-atomic3d-feature"
-, "for" => "text/plain"
-, "fpx" => "image/vnd.fpx"
-, "frl" => "application/freeloader"
-, "funk" => "audio/make"
-, "g" => "text/plain"
-, "g3" => "image/g3fax"
-, "gif" => "image/gif"
-, "gl" => "video/gl"
-, "gsd" => "audio/x-gsm"
-, "gsm" => "audio/x-gsm"
-, "gsp" => "application/x-gsp"
-, "gss" => "application/x-gss"
-, "gtar" => "application/x-gtar"
-, "gz" => "application/x-compressed"
-, "gzip" => "application/x-gzip"
-, "h" => "text/plain"
-, "hdf" => "application/x-hdf"
-, "help" => "application/x-helpfile"
-, "hgl" => "application/vnd.hp-hpgl"
-, "hh" => "text/plain"
-, "hlb" => "text/x-script"
-, "hlp" => "application/hlp"
-, "hpg" => "application/vnd.hp-hpgl"
-, "hpgl" => "application/vnd.hp-hpgl"
-, "hqx" => "application/binhex"
-, "hta" => "application/hta"
-, "htc" => "text/x-component"
-, "htm" => "text/html"
-, "html" => "text/html"
-, "htmls" => "text/html"
-, "htt" => "text/webviewhtml"
-, "htx" => "text/html"
-, "ice" => "x-conference/x-cooltalk"
-, "ico" => "image/x-icon"
-, "idc" => "text/plain"
-, "ief" => "image/ief"
-, "iefs" => "image/ief"
-, "iges" => "application/iges"
-, "igs" => "application/iges"
-, "ima" => "application/x-ima"
-, "imap" => "application/x-httpd-imap"
-, "inf" => "application/inf"
-, "ins" => "application/x-internett-signup"
-, "ip" => "application/x-ip2"
-, "isu" => "video/x-isvideo"
-, "it" => "audio/it"
-, "iv" => "application/x-inventor"
-, "ivr" => "i-world/i-vrml"
-, "ivy" => "application/x-livescreen"
-, "jam" => "audio/x-jam"
-, "jav" => "text/plain"
-, "java" => "text/plain"
-, "jcm" => "application/x-java-commerce"
-, "jfif" => "image/jpeg"
-, "jfif-tbnl" => "image/jpeg"
-, "jpe" => "image/jpeg"
-, "jpeg" => "image/jpeg"
-, "jpg" => "image/jpeg"
-, "jps" => "image/x-jps"
-, "js" => "application/x-javascript"
-, "jut" => "image/jutvision"
-, "kar" => "audio/midi"
-, "ksh" => "application/x-ksh"
-, "la" => "audio/nspaudio"
-, "lam" => "audio/x-liveaudio"
-, "latex" => "application/x-latex"
-, "lha" => "application/lha"
-, "lhx" => "application/octet-stream"
-, "list" => "text/plain"
-, "lma" => "audio/nspaudio"
-, "log" => "text/plain"
-, "lsp" => "application/x-lisp"
-, "lst" => "text/plain"
-, "lsx" => "text/x-la-asf"
-, "ltx" => "application/x-latex"
-, "lzh" => "application/octet-stream"
-, "lzx" => "application/lzx"
-, "m" => "text/plain"
-, "m1v" => "video/mpeg"
-, "m2a" => "audio/mpeg"
-, "m2v" => "video/mpeg"
-, "m3u" => "audio/x-mpequrl"
-, "man" => "application/x-troff-man"
-, "map" => "application/x-navimap"
-, "mar" => "text/plain"
-, "mbd" => "application/mbedlet"
-, "mc$" => "application/x-magic-cap-package-1.0"
-, "mcd" => "application/mcad"
-, "mcf" => "image/vasa"
-, "mcp" => "application/netmc"
-, "me" => "application/x-troff-me"
-, "mht" => "message/rfc822"
-, "mhtml" => "message/rfc822"
-, "mid" => "application/x-midi"
-, "midi" => "application/x-midi"
-, "mif" => "application/x-frame"
-, "mime" => "message/rfc822"
-, "mjf" => "audio/x-vnd.audioexplosion.mjuicemediafile"
-, "mjpg" => "video/x-motion-jpeg"
-, "mm" => "application/base64"
-, "mme" => "application/base64"
-, "mod" => "audio/mod"
-, "moov" => "video/quicktime"
-, "mov" => "video/quicktime"
-, "movie" => "video/x-sgi-movie"
-, "mp2" => "audio/mpeg"
-, "mp3" => "audio/mpeg3"
-, "mpa" => "audio/mpeg"
-, "mpc" => "application/x-project"
-, "mpe" => "video/mpeg"
-, "mpeg" => "video/mpeg"
-, "mpg" => "audio/mpeg"
-, "mpga" => "audio/mpeg"
-, "mpp" => "application/vnd.ms-project"
-, "mpt" => "application/x-project"
-, "mpv" => "application/x-project"
-, "mpx" => "application/x-project"
-, "mrc" => "application/marc"
-, "ms" => "application/x-troff-ms"
-, "mv" => "video/x-sgi-movie"
-, "my" => "audio/make"
-, "mzz" => "application/x-vnd.audioexplosion.mzz"
-, "nap" => "image/naplps"
-, "naplps" => "image/naplps"
-, "nc" => "application/x-netcdf"
-, "ncm" => "application/vnd.nokia.configuration-message"
-, "nif" => "image/x-niff"
-, "niff" => "image/x-niff"
-, "nix" => "application/x-mix-transfer"
-, "nsc" => "application/x-conference"
-, "nvd" => "application/x-navidoc"
-, "o" => "application/octet-stream"
-, "oda" => "application/oda"
-, "omc" => "application/x-omc"
-, "omcd" => "application/x-omcdatamaker"
-, "omcr" => "application/x-omcregerator"
-, "p" => "text/x-pascal"
-, "p10" => "application/pkcs10"
-, "p12" => "application/pkcs-12"
-, "p7a" => "application/x-pkcs7-signature"
-, "p7c" => "application/pkcs7-mime"
-, "p7m" => "application/pkcs7-mime"
-, "p7r" => "application/x-pkcs7-certreqresp"
-, "p7s" => "application/pkcs7-signature"
-, "part" => "application/pro_eng"
-, "pas" => "text/pascal"
-, "pbm" => "image/x-portable-bitmap"
-, "pcl" => "application/vnd.hp-pcl"
-, "pct" => "image/x-pict"
-, "pcx" => "image/x-pcx"
-, "pdb" => "chemical/x-pdb"
-, "pdf" => "application/pdf"
-, "pfunk" => "audio/make"
-, "pgm" => "image/x-portable-graymap"
-, "pic" => "image/pict"
-, "pict" => "image/pict"
-, "pkg" => "application/x-newton-compatible-pkg"
-, "pko" => "application/vnd.ms-pki.pko"
-, "pl" => "text/plain"
-, "plx" => "application/x-pixclscript"
-, "pm" => "image/x-xpixmap"
-, "pm4" => "application/x-pagemaker"
-, "pm5" => "application/x-pagemaker"
-, "png" => "image/png"
-, "pnm" => "application/x-portable-anymap"
-, "pot" => "application/mspowerpoint"
-, "potx" => "application/vnd.openxmlformats-officedocument.presentationml.template"
-, "pov" => "model/x-pov"
-, "ppa" => "application/vnd.ms-powerpoint"
-, "ppm" => "image/x-portable-pixmap"
-, "pps" => "application/mspowerpoint"
-, "ppsx" => "application/vnd.openxmlformats-officedocument.presentationml.slideshow"
-, "ppt" => "application/mspowerpoint"
-, "pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-, "ppz" => "application/mspowerpoint"
-, "pre" => "application/x-freelance"
-, "prt" => "application/pro_eng"
-, "ps" => "application/postscript"
-, "psd" => "application/octet-stream"
-, "pvu" => "paleovu/x-pv"
-, "pwz" => "application/vnd.ms-powerpoint"
-, "py" => "text/x-script.phyton"
-, "pyc" => "applicaiton/x-bytecode.python"
-, "qcp" => "audio/vnd.qcelp"
-, "qd3" => "x-world/x-3dmf"
-, "qd3d" => "x-world/x-3dmf"
-, "qif" => "image/x-quicktime"
-, "qt" => "video/quicktime"
-, "qtc" => "video/x-qtc"
-, "qti" => "image/x-quicktime"
-, "qtif" => "image/x-quicktime"
-, "ra" => "audio/x-pn-realaudio"
-, "ram" => "audio/x-pn-realaudio"
-, "rar" => "application/x-rar-compressed"
-, "ras" => "application/x-cmu-raster"
-, "rast" => "image/cmu-raster"
-, "rexx" => "text/x-script.rexx"
-, "rf" => "image/vnd.rn-realflash"
-, "rgb" => "image/x-rgb"
-, "rm" => "application/vnd.rn-realmedia"
-, "rmi" => "audio/mid"
-, "rmm" => "audio/x-pn-realaudio"
-, "rmp" => "audio/x-pn-realaudio"
-, "rng" => "application/ringing-tones"
-, "rnx" => "application/vnd.rn-realplayer"
-, "roff" => "application/x-troff"
-, "rp" => "image/vnd.rn-realpix"
-, "rpm" => "audio/x-pn-realaudio-plugin"
-, "rt" => "text/richtext"
-, "rtf" => "application/rtf"
-, "rtx" => "application/rtf"
-, "rv" => "video/vnd.rn-realvideo"
-, "s" => "text/x-asm"
-, "s3m" => "audio/s3m"
-, "saveme" => "application/octet-stream"
-, "sbk" => "application/x-tbook"
-, "scm" => "application/x-lotusscreencam"
-, "sdml" => "text/plain"
-, "sdp" => "application/sdp"
-, "sdr" => "application/sounder"
-, "sea" => "application/sea"
-, "set" => "application/set"
-, "sgm" => "text/sgml"
-, "sgml" => "text/sgml"
-, "sh" => "application/x-bsh"
-, "shar" => "application/x-bsh"
-, "shtml" => "text/html"
-, "sid" => "audio/x-psid"
-, "sit" => "application/x-sit"
-, "skd" => "application/x-koan"
-, "skm" => "application/x-koan"
-, "skp" => "application/x-koan"
-, "skt" => "application/x-koan"
-, "sl" => "application/x-seelogo"
-, "smi" => "application/smil"
-, "smil" => "application/smil"
-, "snd" => "audio/basic"
-, "sol" => "application/solids"
-, "spc" => "application/x-pkcs7-certificates"
-, "spl" => "application/futuresplash"
-, "spr" => "application/x-sprite"
-, "sprite" => "application/x-sprite"
-, "src" => "application/x-wais-source"
-, "ssi" => "text/x-server-parsed-html"
-, "ssm" => "application/streamingmedia"
-, "sst" => "application/vnd.ms-pki.certstore"
-, "step" => "application/step"
-, "stl" => "application/sla"
-, "stp" => "application/step"
-, "sv4cpio" => "application/x-sv4cpio"
-, "sv4crc" => "application/x-sv4crc"
-, "svf" => "image/vnd.dwg"
-, "svr" => "application/x-world"
-, "swf" => "application/x-shockwave-flash"
-, "t" => "application/x-troff"
-, "talk" => "text/x-speech"
-, "tar" => "application/x-tar"
-, "tbk" => "application/toolbook"
-, "tcl" => "application/x-tcl"
-, "tcsh" => "text/x-script.tcsh"
-, "tex" => "application/x-tex"
-, "texi" => "application/x-texinfo"
-, "texinfo" => "application/x-texinfo"
-, "text" => "application/plain"
-, "tgz" => "application/gnutar"
-, "tif" => "image/tiff"
-, "tiff" => "image/tiff"
-, "tr" => "application/x-troff"
-, "tsi" => "audio/tsp-audio"
-, "tsp" => "application/dsptype"
-, "tsv" => "text/tab-separated-values"
-, "turbot" => "image/florian"
-, "txt" => "text/plain"
-, "uil" => "text/x-uil"
-, "uni" => "text/uri-list"
-, "unis" => "text/uri-list"
-, "unv" => "application/i-deas"
-, "uri" => "text/uri-list"
-, "uris" => "text/uri-list"
-, "ustar" => "application/x-ustar"
-, "uu" => "application/octet-stream"
-, "uue" => "text/x-uuencode"
-, "vcd" => "application/x-cdlink"
-, "vcs" => "text/x-vcalendar"
-, "vda" => "application/vda"
-, "vdo" => "video/vdo"
-, "vew" => "application/groupwise"
-, "viv" => "video/vivo"
-, "vivo" => "video/vivo"
-, "vmd" => "application/vocaltec-media-desc"
-, "vmf" => "application/vocaltec-media-file"
-, "voc" => "audio/voc"
-, "vos" => "video/vosaic"
-, "vox" => "audio/voxware"
-, "vqe" => "audio/x-twinvq-plugin"
-, "vqf" => "audio/x-twinvq"
-, "vql" => "audio/x-twinvq-plugin"
-, "vrml" => "application/x-vrml"
-, "vrt" => "x-world/x-vrt"
-, "vsd" => "application/x-visio"
-, "vst" => "application/x-visio"
-, "vsw" => "application/x-visio"
-, "w60" => "application/wordperfect6.0"
-, "w61" => "application/wordperfect6.1"
-, "w6w" => "application/msword"
-, "wav" => "audio/x-wav"
-, "wb1" => "application/x-qpro"
-, "wbmp" => "image/vnd.wap.wbmp"
-, "web" => "application/vnd.xara"
-, "wiz" => "application/msword"
-, "wk1" => "application/x-123"
-, "wmf" => "windows/metafile"
-, "wml" => "text/vnd.wap.wml"
-, "wmlc" => "application/vnd.wap.wmlc"
-, "wmls" => "text/vnd.wap.wmlscript"
-, "wmlsc" => "application/vnd.wap.wmlscriptc"
-, "word" => "application/msword"
-, "wp" => "application/wordperfect"
-, "wp5" => "application/wordperfect"
-, "wp6" => "application/wordperfect"
-, "wpd" => "application/wordperfect"
-, "wq1" => "application/x-lotus"
-, "wri" => "application/mswrite"
-, "wrl" => "application/x-world"
-, "wrz" => "model/vrml"
-, "wsc" => "text/scriplet"
-, "wsrc" => "application/x-wais-source"
-, "wtk" => "application/x-wintalk"
-, "xbm" => "image/x-xbitmap"
-, "xdr" => "video/x-amt-demorun"
-, "xgz" => "xgl/drawing"
-, "xif" => "image/vnd.xiff"
-, "xl" => "application/excel"
-, "xla" => "application/excel"
-, "xlb" => "application/excel"
-, "xlc" => "application/excel"
-, "xld" => "application/excel"
-, "xlk" => "application/excel"
-, "xll" => "application/excel"
-, "xlm" => "application/excel"
-, "xls" => "application/excel"
-, "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-, "xlt" => "application/excel"
-, "xltx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.template"
-, "xlv" => "application/excel"
-, "xlw" => "application/excel"
-, "xm" => "audio/xm"
-, "xml" => "application/xml"
-, "xmz" => "xgl/movie"
-, "xpix" => "application/x-vnd.ls-xpix"
-, "xpm" => "image/x-xpixmap"
-, "x-png" => "image/png"
-, "xsr" => "video/x-amt-showrun"
-, "xwd" => "image/x-xwd"
-, "xyz" => "chemical/x-pdb"
-, "z" => "application/x-compress"
-, "zip" => "application/x-compressed"
-, "zoo" => "application/octet-stream"
-, "zsh" => "text/x-script.zsh"
-, "eot" => "application/vnd.ms-fontobject"
-, "ttf" => "application/x-font-ttf"
-, "otf" => "application/octet-stream"
-, "woff" => "application/x-font-woff"
-, "svg" => "image/svg+xml"
-, "rss" => "application/rss+xml"
-, "json" => "application/json"
-);
 
 function ffCommon_crossDomains($trustDomains, $add_header = false, $domain = null)
 {
@@ -2474,38 +1712,32 @@ function ffHTTP_getHeader($hname = "content-type")
         return false;
 }
 
-function ffCommon_theme_init($theme)
+function ffCommon_theme_init($theme = FF_MAIN_THEME)
 {
-    if (defined("FF_LOADED_THEME"))
+    static $loaded = false;
+    if (!$loaded)
     {
-        if ($theme !== FF_LOADED_THEME)
-            ffErrorHandler::raise ("Main theme already loaded", E_USER_ERROR, NULL, get_defined_vars());
-    }
-    else
-        define("FF_LOADED_THEME", $theme);
+        if(!defined("FF_DEFAULT_THEME"))            define("FF_DEFAULT_THEME", $theme);
 
-    if (!defined("FF_THEME_INIT"))
-    {
         if (
-            !is_dir(FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME)
-            ||	!is_dir(FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME . "/ff")
+            !is_dir(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME)
+            ||	!is_dir(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff")
         )
-            ffErrorHandler::raise("FORMS FRAMEWORK: Wrong default theme dir: " . FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME, E_USER_ERROR, null, get_defined_vars());
+            ffErrorHandler::raise("FORMS FRAMEWORK: Wrong default theme dir: " . FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME, E_USER_ERROR, null, get_defined_vars());
 
         // Load other configs..
 
         // ..theme
-        if (@is_file(FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME . "/ff/config.php"))
-            require FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME . "/ff/config.php";
+        if (@is_file(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/config.php"))
+            require FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/config.php";
 
-        define("FF_THEME_INIT", true);
-        if (defined("FF_THEME_ONLY_INIT"))
-            return;
+        if (@is_file(FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/common.php"))
+            require FF_THEME_DISK_PATH . "/" . FF_DEFAULT_THEME . "/ff/common.php";
+
+        $loaded = true;
     }
-
-    if (@is_file(FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME . "/ff/common.php"))
-        require FF_THEME_DISK_PATH . "/" . FF_LOADED_THEME . "/ff/common.php";
 }
+
 
 function ffIsset($array, $key)
 {
@@ -2714,185 +1946,6 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "") {
         foreach($addit_SQL AS $addit_SQL_value) {
             $component->db[0]->execute($addit_SQL_value);
         }
-    }
-}
-
-function ffCommon_get_image_params($mode = null) {
-    static $imgParams = null;
-    //die("ENTRO");
-    if(!is_array($imgParams))
-    {
-        $ffcache_modes_success = false;
-        if (FF_ENABLE_MEM_SHOWFILES_CACHING)
-        {
-            $cache = ffCache::getInstance(CM_CACHE_ADAPTER);
-
-            if(!isset($_REQUEST["__nocache__"]))
-                $imgParams = $cache->get("__showfiles_modes__", $ffcache_modes_success);
-        }
-        if (!$ffcache_modes_success)
-        {
-            $imgParams = array();
-
-            $db = ffDb_Sql::factory();
-            $db->query("SELECT * FROM " . CM_TABLE_PREFIX . "showfiles_modes WHERE 1");
-            if ($db->nextRecord())
-            {
-                do
-                {
-                    $ID_mode = $db->getField("ID", "Number", true);
-                    $mode_key = ffCommon_url_rewrite($db->getField("name", "Text", true));
-
-                    $imgParams["thumb"][$mode_key]["ID"] 							= $ID_mode;
-                    $imgParams["thumb"][$mode_key]["name"] 							= $mode_key;
-                    $imgParams["thumb"][$mode_key]["last_update"] 					= $db->getField("last_update", "Number", true);
-                    $imgParams["thumb"][$mode_key]["dim_x"] 						= $db->getField("dim_x", "Number", true);
-                    $imgParams["thumb"][$mode_key]["dim_y"] 						= $db->getField("dim_y", "Number", true);
-                    $imgParams["thumb"][$mode_key]["max_x"] 						= $db->getField("max_x", "Number", true);
-                    $imgParams["thumb"][$mode_key]["max_y"] 						= $db->getField("max_y", "Number", true);
-                    $imgParams["thumb"][$mode_key]["bgcolor"] 						= $db->getField("bgcolor", "Text", true);
-                    $imgParams["thumb"][$mode_key]["alpha"] 						= $db->getField("alpha", "Number", true);
-                    $imgParams["thumb"][$mode_key]["mode"] 							= $db->getField("mode", "Text", true);
-                    $imgParams["thumb"][$mode_key]["when"] 							= $db->getField("when", "Text", true);
-                    $imgParams["thumb"][$mode_key]["alignment"] 					= $db->getField("alignment", "Text", true);
-                    $imgParams["thumb"][$mode_key]["theme"] 						= $db->getField("theme", "Text", true);
-                    $imgParams["thumb"][$mode_key]["format"] 						= $db->getField("format", "Text", true);
-                    if(!$imgParams["thumb"][$mode_key]["format"])
-                        $imgParams["thumb"][$mode_key]["format"] = "jpg";
-
-                    $imgParams["thumb"][$mode_key]["format_jpg_quality"] 			= $db->getField("format_jpg_quality", "Number", true);
-                    if(!$imgParams["thumb"][$mode_key]["format_jpg_quality"] > 0)
-                        $imgParams["thumb"][$mode_key]["format_jpg_quality"] 		= 77;
-
-                    $imgParams["thumb"][$mode_key]["wmk_enable"] 					= $db->getField("wmk_enable", "Number", true);
-                    $imgParams["thumb"][$mode_key]["wmk_image"] 					= $db->getField("wmk_image", "Text", true);
-                    $imgParams["thumb"][$mode_key]["wmk_alignment"] 				= $db->getField("wmk_alignment", "Text", true);
-
-                    if ($imgParams["thumb"][$mode_key]["wmk_enable"])
-                    {
-                        $imgParams["thumb"][$mode_key]["wmk_enable"] = false;
-                        if(strlen($imgParams["thumb"][$mode_key]["wmk_image"]))
-                        {
-                            if(is_file(FF_DISK_PATH . "/uploads/showfiles/" . $ID_mode . "/watermarks/" . $imgParams["thumb"][$mode_key]["wmk_image"]))
-                            {
-                                $imgParams["thumb"][$mode_key]["wmk_file"] 			= FF_DISK_PATH . "/uploads/showfiles/" . $ID_mode . "/watermarks/" . $imgParams["thumb"][$mode_key]["wmk_image"];
-                                $imgParams["thumb"][$mode_key]["wmk_enable"] 		= true;
-                            }
-                        }
-                    }
-
-                    if(CM_SHOWFILES_EXTEND)
-                    {
-                        /***
-                         * EXTEND Params
-                         */
-                        $imgParams["thumb"][$mode_key]["transparent"] 				= $db->getField("transparent", "Number", true);
-                        $imgParams["thumb"][$mode_key]["resize"] 					= $db->getField("resize", "Number", true);
-                        $imgParams["thumb"][$mode_key]["frame_size"] 				= $db->getField("frame_size", "Number", true);
-                        $imgParams["thumb"][$mode_key]["frame_color"] 				= $db->getField("frame_color", "Text", true);
-
-
-                        $imgParams["thumb"][$mode_key]["enable_thumb_image_dir"] 	= $db->getField("enable_thumb_image_dir", "Number", true);
-                        $imgParams["thumb"][$mode_key]["enable_thumb_image_file"] 	= $db->getField("enable_thumb_image_file", "Number", true);
-                        $imgParams["thumb"][$mode_key]["wmk_alpha"] 				= $db->getField("wmk_alpha", "Number", true);
-                        $imgParams["thumb"][$mode_key]["wmk_mode"] 					= $db->getField("wmk_mode", "Text", true);
-
-
-                        $imgParams["thumb"][$mode_key]["shortdesc"] 				= $db->getField("shortdesc", "Text", true);
-                        $imgParams["thumb"][$mode_key]["enable_thumb_word_dir"] 	= $db->getField("enable_thumb_word_dir", "Number", true);
-                        $imgParams["thumb"][$mode_key]["enable_thumb_word_file"] 	= $db->getField("enable_thumb_word_file", "Number", true);
-                        $imgParams["thumb"][$mode_key]["word_color"] 				= $db->getField("word_color", "Text", true);
-                        $imgParams["thumb"][$mode_key]["word_type"] 				= $db->getField("word_type", "Text", true);
-                        $imgParams["thumb"][$mode_key]["word_align"] 				= $db->getField("word_align", "Text", true);
-                        $imgParams["thumb"][$mode_key]["word_size"] 				= $db->getField("word_size", "Number", true);
-
-                        $imgParams["thumb"][$mode_key]["max_upload"] 				= $db->getField("max_upload", "Number", true);
-                        $imgParams["thumb"][$mode_key]["force_icon"] 				= $db->getField("force_icon", "Text", true);
-                        $imgParams["thumb"][$mode_key]["allowed_ext"] 				= $db->getField("allowed_ext", "Text", true);
-                    }
-
-                    $imgParams["keys"][$ID_mode] = $mode_key;
-                } while($db->nextRecord());
-            }
-
-            if(FF_ENABLE_MEM_SHOWFILES_CACHING)
-                $cache->set("__showfiles_modes__", null, $imgParams);
-        }
-    }
-
-    if($mode !== null && is_numeric($mode))
-        return $imgParams["thumb"][$imgParams["keys"][$mode]];
-    elseif($mode !== null && strlen($mode))
-        return $imgParams["thumb"][$mode];
-    else
-        return $imgParams["thumb"];
-}
-
-
-function ffImageOptimize($filename, $mimetype = null, $params = array())
-{
-    $optiBin = array(
-        "image/jpeg" => array(
-            "convert" => null
-        , "JpegTran" => array(
-                "path" 		=> "/usr/bin/jpegtran"
-            	, "cmd" 	=> ' -optimize -progressive -copy none '
-            )
-        , "JpegOptim" => array(
-                "path" 		=> "/usr/bin/jpegoptim"
-            	, "cmd" 	=> ' --strip-all --all-progressive '
-            )
-        )
-    , "image/png" => array(
-    	"OptiPng" => array(
-                "path" 		=> '/usr/bin/optipng'
-            	, "cmd" 	=> ' -i0 -o2 '
-            )
-        , "PngOut" => array(
-                "path" 		=> '/usr/bin/pngout'
-            	, "cmd" 	=> ' -s0 -q -y '
-            )
-        , "AdvPng" => array(
-                "path" 		=> ''
-            	, "cmd" 	=> ' -z -4 -i20 -- '
-            )
-        , "PngCrush" => array(
-                "path" 		=> ''
-            	, "cmd" 	=> ' -rem gAMA -rem cHRM -rem iCCP -rem sRGB -brute -l 9 -max -reduce -m 0 -q '
-            )
-        , "PngQuant" => array(
-                "path" 		=> ''
-            	, "cmd" 	=> ' --speed 1 --ext=.png --force '
-            )
-        )
-    , "image/gif" => array(
-            "Gifsicle" => array(
-                "path" 		=> ''
-            	, "cmd" 	=> ' -b -O2 '
-            )
-        )
-    );
-    $optiBin = array_replace_recursive($optiBin, $params);
-
-    if(!$mimetype)
-        $mimetype = ffMimeTypeByFilename($filename);
-
-    if(isset($optiBin[$mimetype])) {
-        if($optiBin[$mimetype]["convert"])
-			$cmd[] = 'convert -strip -quality ' . $optiBin[$mimetype]["convert"] . '% ' . $filename . " " . $filename . ";";
-
-        foreach($optiBin[$mimetype] AS $optim) {
-            if($optim["path"])
-                $cmd[] = $optim["path"] . $optim["cmd"] . $filename;
-        }
-
-		$shell_cmd = 'nice -n 13 ' . implode(' || ', $cmd) . ' > /dev/null 2>/dev/null & ';
-
-		@shell_exec($shell_cmd);
-		//@shell_exec("(" . $shell_cmd . ") > /dev/null 2>/dev/null &");
-//echo $shell_cmd;
-//exit;
-		//@shell_exec("nohup nice -n 13 " . $shell_cmd . " > /dev/null 2>&1");
     }
 }
 

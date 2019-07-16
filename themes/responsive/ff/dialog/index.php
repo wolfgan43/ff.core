@@ -86,15 +86,15 @@ if (function_exists("cm_moduleCascadeFindTemplate"))
 }
 else
 {
-	$tpl = ffTemplate::factory(ffCommon_dirname(__FILE__));
+	$tpl = ffTemplate::factory(__DIR__);
 	$tpl->load_file("form.html", "main");
 }
  
-$tpl->set_var("confirm_class", cm_getClassByFrameworkCss("ActionButtonDelete", "button", "activebuttons"));
-$tpl->set_var("cancel_class", cm_getClassByFrameworkCss("ActionButtonCancel", "button"));
+$tpl->set_var("confirm_class", Cms::getInstance("frameworkcss")->get("ActionButtonDelete", "button", "activebuttons"));
+$tpl->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("ActionButtonCancel", "button"));
  
-$tpl->set_var("message_class", cm_getClassByFrameworkCss("warning", "icon", "5x"));
-$tpl->set_var("message_icon", cm_getClassByFrameworkCss("warning", "icon-tag", "5x"));
+$tpl->set_var("message_class", Cms::getInstance("frameworkcss")->get("warning", "icon", "5x"));
+$tpl->set_var("message_icon", Cms::getInstance("frameworkcss")->get("warning", "icon-tag", "5x"));
 $tpl->set_var("site_path", FF_SITE_PATH);
 $tpl->set_var("theme", $cm->oPage->getTheme()); // TOCHECK
 

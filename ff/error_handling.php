@@ -10,6 +10,7 @@
  * @link http://www.formsphpframework.com
  */
 
+if (!defined("FF_ERRORS_MAXRECURSION"))             define("FF_ERRORS_MAXRECURSION", NULL);
 if (!defined("FF_ERRORS_HANDLED"))				define("FF_ERRORS_HANDLED", E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE /*| E_ERROR | E_WARNING*/);
 if (!defined("FF_ERROR_HANDLER_SUPPRESS_MASK"))	define("FF_ERROR_HANDLER_SUPPRESS_MASK", 0); // wich errors must be ignored. 0 to disable
 if (!defined("FF_ERROR_HANDLER_HIDE"))			define("FF_ERROR_HANDLER_HIDE", false);
@@ -593,8 +594,9 @@ EOD
 				self::out("true<br />");
 			else if (is_string($value))
 			{
+
 				if (strpos(strtolower($key), "password") === FALSE)
-					self::out('"' . ffCommon_specialchars($value) . "\"<br />");
+					self::out('"' . htmlspecialchars($value) . "\"<br />");
 				else
 					self::out("<b>PROTECTED</b><br />");
 			}

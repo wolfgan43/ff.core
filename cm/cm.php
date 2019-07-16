@@ -16,8 +16,9 @@
  */
 class cm extends ffCommon
 {
-	static $singleton 			= null;
-	
+	private static $singleton 			= null;
+	private static  $env                = array();
+
 	static protected $_events = null;
 	
 	const LAYOUT_PRIORITY_TOPLEVEL		= 1; // special, only one
@@ -26,7 +27,8 @@ class cm extends ffCommon
 	const LAYOUT_PRIORITY_LOW			= 4;
 	const LAYOUT_PRIORITY_FINAL			= 5; // special, only one
 	const LAYOUT_PRIORITY_DEFAULT		= cm::LAYOUT_PRIORITY_NORMAL;
-		
+
+	var $config                 = array();
 	var $content_root			= null;
 	var	$path_info 				= null;
 	var $real_path_info			= null;
@@ -69,7 +71,7 @@ class cm extends ffCommon
 	 */
 	var $cache					= null;
 
-	var $applets_components 	= array();
+	//var $applets_components 	= array();
 	var $loaded_applets 		= array();
 	var $modules				= array();
 	
@@ -111,7 +113,9 @@ class cm extends ffCommon
 
 		return self::$singleton;
 	}
-	
+
+
+
 	/**
 	* EVENTS OVERRIDING
 	*/
@@ -143,26 +147,110 @@ class cm extends ffCommon
 	{
 		return self::_addEvent($event_name, $func_name, $priority, $index, $break_when, $break_value, $additional_data);
 	}
-	
+
+    /**
+     * Env
+     */
+    public static function env($name, $value = null) {
+        if($value !== null) {
+            self::$env[$name] = $value;
+        }
+
+        return self::$env[$name];
+    }
+
+    public function load_env($envs) {
+        foreach ($envs as $key => $env) {
+            self::$env[$key] = $env["value"];
+        }
+    }
+	public function load_env_by_xml(SimpleXMLElement $xml) {
+        if (isset($xml) && count($xml->children()))
+        {
+            foreach ($xml->children() as $key => $properties)
+            {
+                $attrs = $properties->attributes();
+                $value = (string) $attrs["value"];
+                switch ($value) {
+                    case "false":
+                        $value = false;
+                        break;
+                    case "true":
+                        $value = true;
+                        break;
+                    default:
+                }
+
+                self::env($key, $value);
+            }
+        }
+    }
+
+    private function loadConfig($file, $type = null) {
+        if(is_file($file)) {
+            $fs = Filemanager::getInstance("xml");
+            $config = $fs->read($file);
+
+            if(is_array($config["env"]) && count($config["env"])) {
+                foreach ($config["env"] AS $key => $value) {
+                    $config["env"][$key] = ($value["@attributes"]
+                        ? $value["@attributes"]
+                        : $value
+                    );
+                }
+            }
+            if($config["env"]) {
+                $this->load_env($config["env"]);
+            }
+            if($type && !isset($this->config[$type])) {
+                $this->config[$type] = array();
+            }
+            if($type) {
+                $ref = &$this->config[$type];
+            } else {
+                $ref = &$this->config;
+            }
+
+            if(is_array($config) && count($config)) {
+                foreach ($config AS $name => $params) {
+                    if($name) {
+                        $ref[$name] = array_replace((array)$ref[$name], $params);
+                    }
+                }
+            }
+        }
+    }
+
+    private function loadORM($entry) {
+        if (@is_file(CM_MODULES_ROOT . "/" . $entry . "/ds/common.php")) {
+            require CM_MODULES_ROOT . "/" . $entry . "/ds/common.php";
+        }
+        if (@is_dir(CM_MODULES_ROOT . "/" . $entry . "/ds/sources"))
+        {
+            $itGroup = new DirectoryIterator(CM_MODULES_ROOT . "/" . $entry . "/ds/sources");
+            foreach($itGroup as $fiGroup)
+            {
+                if($fiGroup->isDot() || $fiGroup->isDir())
+                    continue;
+
+                require($fiGroup->getPathname());
+            }
+        }
+    }
+
 	/**
 	* Main Process Fucntion (use only once per session)
 	* 
 	*/
 	public function process()
 	{
+
 		if (CM_ENABLE_MEM_CACHING)
 		{
-			$this->cache = ffCache::getInstance(CM_CACHE_ADAPTER);
+			$this->cache = ffCache::getInstance();
 			if (isset($_REQUEST["__CLEARCACHE__"]))
 				$this->cache->clear();
 		}
-
-		/*$request_hash = $_SERVER["REQUEST_URI"] . sha1(serialize($_REQUEST));
-		$request_cache = $this->cache->get($request_hash, $request_success);
-
-		if ($request_success)
-			die($request_cache);
-*/
 
 		$this->path_info 		= $_SERVER['PATH_INFO'];
 		$this->query_string 	= $_SERVER['QUERY_STRING'];
@@ -174,11 +262,12 @@ class cm extends ffCommon
 		$this->path_info = ffCommon_url_normalize($this->path_info);
 		$this->path_info = ffCommon_url_stripslashes($this->path_info);
 
-		if (!strlen($this->path_info) || $this->path_info == "/")
-		{
-			$this->path_info = "/index";
-			$_SERVER['PATH_INFO'] = $this->path_info;
-		}
+        if (!strlen($this->path_info) || $this->path_info == "/")  //todo: da verificare se serve. Con la cache in home, la cache si sfonda
+        {
+            $this->path_info = "/index";
+            if (CM_URL_NORMALIZE)
+                $_SERVER['PATH_INFO'] = $this->path_info;
+        }
 		
 		// STATIC CACHE
 		if (CM_PAGECACHE && !$this->isXHR() && !isset($_REQUEST["__nocache__"]) && !isset($_REQUEST["__debug__"]) && !defined("CM_DONT_RUN") && strpos($this->path_info, "sitemap.xml") === false)
@@ -314,7 +403,7 @@ class cm extends ffCommon
 						if ($cache_file["compressed"] !== false)
 							header("Content-Encoding: " . $cache_file["compressed"]);
 
-						$mime_type = ffMimeTypeByExtension($cache_file["file_parts"][1], "text/html");
+						$mime_type = ffMedia::getMimeTypeByExtension($cache_file["file_parts"][1], "text/html");
 						if ($mime_type == "text/html")
 							$mime_type .= "; charset=UTF-8";
 						header("Content-type: " . $mime_type);
@@ -350,7 +439,7 @@ class cm extends ffCommon
 		}
 
 		$this->doEvent("on_before_init", array($this));
-		
+
 		if (FF_ORM_ENABLE)
 		{
 			if (@is_file(FF_DISK_PATH . "/ds/common.php"))
@@ -368,7 +457,7 @@ class cm extends ffCommon
 				}
 			}
 		}
-		
+
 		// #2: inizializzazione classi
 
 		$ff = ffGlobals::getInstance("ff");
@@ -376,47 +465,116 @@ class cm extends ffCommon
 			ffErrorHandler::raise("Errore Critico (Rebecca)", E_USER_ERROR, get_included_files(), get_defined_vars());
 		}
 		$ff->events->addEvent("onRedirect", "cm::onRedirect");
-		
-		if (CM_ENABLE_MEM_CACHING)
-		{
-			$router_rules = $this->cache->get("__cm_router_rules__", $ffcache_router_success);
-			$router_namedrules = $this->cache->get("__cm_router_namedrules__", $ffcache_router_success);
-			if ($ffcache_router_success)
-			{
-				$this->router->rules = unserialize($router_rules);
-				$this->router->named_rules = unserialize($router_namedrules);
-			}
-		}
-		if (!$ffcache_router_success)
-		{
-			$this->router->loadFile(cm_confCascadeFind(ffCommon_dirname(__FILE__) . "/conf", "/cm", "routing_table.xml"));
+        if(CM_ENABLE_MEM_CACHING)
+            $router_loaded = $this->router->loadMem();
 
-			if (is_file(FF_DISK_PATH . "/conf/routing_table.xml"))
-				$this->router->loadFile(FF_DISK_PATH . "/conf/routing_table.xml");
-		}
-		
-		if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE)
-		{
-			$router_rules = $this->cache->get("__cm_router_cacherules__", $ffcache_cacherouter_success);
-			$router_namedrules = $this->cache->get("__cm_router_cachenamedrules__", $ffcache_cacherouter_success);
-			if ($ffcache_cacherouter_success)
-			{
-				$this->cache_router->rules = unserialize($router_rules);
-				$this->cache_router->named_rules = unserialize($router_namedrules);
-			}
-		}
-		if (ALLOW_PAGECACHE && !$ffcache_cacherouter_success)
-		{
-			$this->cache_router->loadFile(cm_confCascadeFind(ffCommon_dirname(__FILE__) . "/conf", "/cm", "cache_routing_table.xml"));
+        if (!$router_loaded)
+        {
+            $this->router->loadFile(cm_confCascadeFind(__DIR__ . "/conf", "/cm", "routing_table.xml"));
 
-			if (is_file(FF_DISK_PATH . "/conf/cache_routing_table.xml"))
-				$this->cache_router->loadFile(FF_DISK_PATH . "/conf/cache_routing_table.xml");
-		}
+            if (is_file(__PRJ_DIR__ . "/conf/routing_table.xml"))
+                $this->router->loadFile(__PRJ_DIR__. "/conf/routing_table.xml");
+        }
+
+        if(ALLOW_PAGECACHE) {
+            if(CM_ENABLE_MEM_CACHING)
+                $cache_router_loaded = $this->cache_router->loadMem();
+
+            if (!$cache_router_loaded)
+            {
+                $this->cache_router->loadFile(cm_confCascadeFind(__DIR__ . "/conf", "/cm", "cache_routing_table.xml"));
+
+                if (is_file(__PRJ_DIR__ . "/conf/cache_routing_table.xml"))
+                    $this->cache_router->loadFile(__PRJ_DIR__ . "/conf/cache_routing_table.xml");
+            }
+        }
 
         $this->doEvent("on_after_init", array($this));
-		
+
 		// #3: precaricamento moduli
 
+        $this->loadConfig(__DIR__ . "/conf/config.xml");
+        $this->loadConfig(FF_DISK_PATH . "/conf/config.xml");
+
+        $modules = new DirectoryIterator(CM_MODULES_ROOT);
+        foreach($modules as $module)
+        {
+            if($module->isDot()) {
+                continue;
+            }
+            $entry = $module->getBasename();
+
+            if (!isset($this->modules[$entry])) {
+                $this->modules[$entry] = array();
+            }
+
+            if (!isset($this->modules[$entry]["events"])) {
+                $this->modules[$entry]["events"] = new ffEvents();
+            }
+
+            $this->loadConfig(CM_MODULES_ROOT . "/" . $entry . "/conf/config.xml");
+            $this->loadConfig(FF_DISK_PATH . "/conf/modules/" . $entry . "/config.xml");
+            //todo: da togliere in futuro
+            if (@is_file(__PRJ_DIR__ . "/conf/modules/" . $entry . "/config." . FF_PHP_EXT))
+                require __PRJ_DIR__ . "/conf/modules/" . $entry . "/config." . FF_PHP_EXT;
+
+            //todo: da togliere in futuro
+            if (@is_file(CM_MODULES_ROOT . "/" . $entry . "/conf/config." . FF_PHP_EXT))
+                require CM_MODULES_ROOT . "/" . $entry . "/conf/config." . FF_PHP_EXT;
+
+
+            if (is_file(CM_MODULES_ROOT . "/" . $entry . "/autoload." . FF_PHP_EXT)) {
+                require CM_MODULES_ROOT . "/" . $entry . "/autoload." . FF_PHP_EXT;
+            }
+
+            if (!$router_loaded) {
+                //todo: da eliminare is_file nel futuro
+                if(is_file(FF_DISK_PATH . "/conf/modules/" . $entry . "/routing_table.xml")) {
+                    $this->router->loadFile(FF_DISK_PATH . "/conf/modules/" . $entry . "/routing_table.xml");
+                } else {
+                    $this->router->loadFile(CM_MODULES_ROOT . "/" . $entry . "/conf/routing_table.xml");
+                }
+                if(ALLOW_PAGECACHE) {
+                    //todo: da eliminare is_file nel futuro
+                    if(is_file(FF_DISK_PATH . "/conf/modules/" . $entry . "/cache_routing_table.xml")) {
+                        $this->router->loadFile(FF_DISK_PATH . "/conf/modules/" . $entry . "/cache_routing_table.xml");
+                    } else {
+                        $this->router->loadFile(CM_MODULES_ROOT . "/" . $entry . "/conf/cache_routing_table.xml");
+                    }
+                }
+            }
+
+            if (is_file(CM_MODULES_ROOT . "/" . $entry . "/common." . FF_PHP_EXT)) {
+                require CM_MODULES_ROOT . "/" . $entry . "/common." . FF_PHP_EXT;
+            }
+
+            if (FF_ORM_ENABLE) {
+                $this->loadORM($entry);
+            }
+
+            $res = $this->doEvent("on_load_module", array($this, $entry));
+        }
+
+
+/*
+        echo "cm_config";
+        print_r($this->config);
+        echo "cm";
+        print_r(cm::$env);
+
+
+        echo "cms";
+        print_r(cms::$env);
+        echo "auth";
+        print_r(Auth::$env);
+        echo "profiles";
+        print_r(Auth::$profiles);
+        echo "packages";
+        print_r(Auth::$packages);
+
+        print_r($_SESSION);*/
+
+        /*
 		$d = dir(CM_MODULES_ROOT);
 		while (false !== ($entry = $d->read()))
 		{
@@ -435,33 +593,38 @@ class cm extends ffCommon
 			if (@is_file(CM_MODULES_ROOT . "/" . $entry . "/conf/config." . FF_PHP_EXT))
 				require CM_MODULES_ROOT . "/" . $entry . "/conf/config." . FF_PHP_EXT;
 
-			if (!$ffcache_router_success && $routing_file = cm_confCascadeFind(CM_MODULES_ROOT . "/" . $entry . "/conf", "/modules/" . $entry, "routing_table.xml"))
+            if (@is_file(CM_MODULES_ROOT . "/" . $entry . "/autoload." . FF_PHP_EXT))
+                require CM_MODULES_ROOT . "/" . $entry . "/autoload." . FF_PHP_EXT;
+
+			if (!$router_loaded && $routing_file = cm_confCascadeFind(CM_MODULES_ROOT . "/" . $entry . "/conf", "/modules/" . $entry, "routing_table.xml"))
 				$this->router->loadFile($routing_file);
-			if (ALLOW_PAGECACHE && !$ffcache_cacherouter_success && $routing_file = cm_confCascadeFind(CM_MODULES_ROOT . "/" . $entry . "/conf", "/modules/" . $entry, "cache_routing_table.xml"))
+			if (ALLOW_PAGECACHE && !$router_loaded && $routing_file = cm_confCascadeFind(CM_MODULES_ROOT . "/" . $entry . "/conf", "/modules/" . $entry, "cache_routing_table.xml"))
 				$this->cache_router->loadFile($routing_file);
 
 		}
-		$d->close();
+		$d->close();*/
 
-		if (CM_ENABLE_MEM_CACHING && !$ffcache_router_success)
-		{
-			$this->cache->set("__cm_router_rules__", null, serialize($this->router->rules), "__cm_router__");
-			$this->cache->set("__cm_router_namedrules__", null, serialize($this->router->named_rules), "__cm_router__");
-		}
-		if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE && !$ffcache_cacherouter_success)
-		{
-			$this->cache->set("__cm_router_cacherules__", null, serialize($this->cache_router->rules), "__cm_router__");
-			$this->cache->set("__cm_router_cachenamedrules__", null, serialize($this->cache_router->named_rules), "__cm_router__");
-		}
-
+        if (CM_ENABLE_MEM_CACHING && !$router_loaded)
+        {
+            $this->router->orderRules();
+            $this->cache->set("cm/router/rules", $this->router->rules);
+            $this->cache->set("cm/router/named_rules", $this->router->named_rules);
+        }
+        if (CM_ENABLE_MEM_CACHING && ALLOW_PAGECACHE && !$cache_router_loaded)
+        {
+            $this->cache_router->orderRules();
+            $this->cache->set("cm/cache_router/rules", $this->cache_router->rules);
+            $this->cache->set("cm/cache_router/named_rules", $this->cache_router->named_rules);
+        }
+        /*
 		foreach ($this->modules as $key => $value)
 		{
 			if (@is_file(CM_MODULES_ROOT . "/" . $key . "/common." . FF_PHP_EXT))
 				require CM_MODULES_ROOT . "/" . $key . "/common." . FF_PHP_EXT;
 		}
-		reset($this->modules);
-
-		foreach ($this->modules as $key => $value)
+		reset($this->modules);*/
+/*
+		foreach ($this->modules as $key => $value) //todo: se fatto ad oggetti e da togliere
 		{
 			if (FF_ORM_ENABLE)
 			{
@@ -483,12 +646,13 @@ class cm extends ffCommon
 
 			$res = $this->doEvent("on_load_module", array($this, $key));
 		}
-		reset($this->modules);
-	
+		reset($this->modules);*/
+
 		$res = $this->doEvent("on_modules_loaded", array($this));
 
-		if (defined("CM_DONT_RUN"))
-			return;
+		if (defined("CM_DONT_RUN")) {
+            return;
+        }
 
 		$res = $this->doEvent("on_before_cm", array($this));
 		$rc = end($res);
@@ -514,8 +678,8 @@ class cm extends ffCommon
 			define("CM_LOADED_THEME", CM_DEFAULT_THEME);
 
 		//define("FF_THEME_ONLY_INIT", true);
-		ffCommon_theme_init(CM_LOADED_THEME);
-		
+        ffCommon_theme_init(CM_LOADED_THEME);
+
 		foreach ($this->modules as $key => $value)
 		{
 			if (@is_file(CM_MODULES_ROOT . "/" . $key . "/themes/" . CM_LOADED_THEME . "/ff/common." . FF_PHP_EXT))
@@ -527,8 +691,11 @@ class cm extends ffCommon
 			$this->layout_vars["theme"] = cm_getMainTheme();
 
         $this->doEvent("on_before_page_process", array($this));
-		$this->oPage = ffPage::factory(FF_DISK_PATH, FF_SITE_PATH, $page_path, $this->layout_vars["theme"]);
+
+		$this->oPage = ffPage::factory(FF_DISK_PATH, FF_SITE_PATH, $this->oPage->page_path, $this->layout_vars["theme"]);
 		$this->oPage->addEvent("on_page_process", "cm::oPage_on_page_process");
+        //$this->oPage->addEvent("on_after_process_components", "cm::oPage_on_after_process_components", ffEvent::PRIORITY_HIGH);
+        $this->oPage->addEvent("on_page_processed", "cm::oPage_on_page_processed", ffEvent::PRIORITY_HIGH);
 
 		if (CM_IGNORE_THEME_DEFAULTS || $this->layout_vars["ignore_defaults"])
 		{
@@ -556,8 +723,8 @@ class cm extends ffCommon
         if(is_array($this->layout_vars["cdn"]["js"]) && count($this->layout_vars["cdn"]["js"]))
             $this->oPage->override_js = array_merge($this->oPage->override_js, $this->layout_vars["cdn"]["js"]);
         
-		$this->oPage->addEvent("on_tpl_load", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
-		$this->oPage->addEvent("on_tpl_layer_loaded", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
+		//$this->oPage->addEvent("on_tpl_load", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
+		//$this->oPage->addEvent("on_tpl_layer_loaded", "cm::oPage_on_process_parts", ffEvent::PRIORITY_HIGH);
 
 		if (!isset($_REQUEST["__nolayout__"]))
 		{
@@ -606,7 +773,6 @@ class cm extends ffCommon
             }
 		}
 		
-		$this->oPage->addEvent("on_after_process_components", "cm::oPage_on_after_process_components", ffEvent::PRIORITY_HIGH);
 
         $this->doEvent("on_before_routing", array($this));
 
@@ -640,23 +806,20 @@ class cm extends ffCommon
 
 		unset($include_script_path_parts, $include_script_path_tmp, $include_script_path_count);
 
-		$success = false;
-		if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE) $cm_router_matches = $this->cache->get("__cm_router_matches_" . $this->path_info . "__", $success);
-		if ($success)
-		{
-			$this->router->matched_rules = unserialize($cm_router_matches);
-		}
-		else
-		{
-			$this->router->process($this->path_info, $this->query_string, $_SERVER["HTTP_HOST"]);
-			if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE) $this->cache->set("__cm_router_matches_" . $this->path_info . "__", null, serialize($this->router->matched_rules), "__cm_router__");
-		}
+        if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
+            $this->router->matched_rules = $this->cache->get($this->path_info, "/cm/router/matches");
+
+        if (!$this->router->matched_rules) {
+            $this->router->process($this->path_info, $this->query_string, $_SERVER["HTTP_HOST"]);
+            if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
+                $this->cache->set($this->path_info, $this->router->matched_rules, "/cm/router/matches");
+        }
 
 		if (!is_array($this->router->matched_rules) && !count($this->router->matched_rules))
 			ffErrorHandler::raise("CM: no available routes!", E_USER_ERROR, $this, get_defined_vars());
 
 		//ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
-         
+
 		foreach ($this->router->matched_rules as $key => $match)
 		{
 			$this->process_next_rule = null;
@@ -724,7 +887,8 @@ class cm extends ffCommon
 				if (!is_file($file))
 					ffErrorHandler::raise("FILE NOT FOUND", E_USER_ERROR, $this, get_defined_vars());
 				
-				output_header($file);
+
+				ffMedia::sendHeaders($file);
 				readfile($file);
 				exit;
 			}
@@ -781,63 +945,70 @@ class cm extends ffCommon
 
 			do
 			{
-				$tmp_ext = pathinfo($tmp_path, PATHINFO_EXTENSION);
-				if (@is_file($doc_root . $tmp_path . "." . FF_PHP_EXT) || (@is_file($doc_root . $tmp_path) && $tmp_ext == FF_PHP_EXT))
-				{
-					$this->real_path_info = substr($tmp_url, strlen($tmp_path));
-					if(strlen($tmp_ext))
-						$this->script_name = $tmp_path;
-					else
-						$this->script_name = $tmp_path . "." . FF_PHP_EXT;
-					$this->is_php = true;
-					$this->is_resource = false;				
-					break;
-				}
-				elseif (@is_file($doc_root . $tmp_path . ".html") || (@is_file($doc_root . $tmp_path) && $tmp_ext == "html"))
-				{
-					$this->real_path_info = substr($tmp_url, strlen($tmp_path));
-					if(strlen($tmp_ext))
-						$this->script_name = $tmp_path;
-					else
-						$this->script_name = $tmp_path . ".html";
-					$this->is_php = false;
-					$this->is_resource = false;
-					break;
-				}
-				elseif (@is_file($doc_root . $tmp_path . "/index." . FF_PHP_EXT))
-				{
-					$this->real_path_info = substr($tmp_url, strlen($tmp_path));
-					$this->script_name = $tmp_path . "/index." . FF_PHP_EXT;
-					$this->is_php = true;
-					$this->is_resource = false;
-					break;
-				}
-				elseif (@is_file($doc_root . $tmp_path . "/index.html"))
-				{
-					$this->real_path_info = substr($tmp_url, strlen($tmp_path));
-					$this->script_name = $tmp_path . "/index.html";
-					$this->is_php = false;
-					$this->is_resource = false;
-					break;
-				}
-				elseif(@is_file($doc_root . $tmp_path))
-				{
-					$this->real_path_info = substr($tmp_url, strlen($tmp_path));
-					$this->script_name = $tmp_path;
-					$this->is_php = false;
-					$this->is_resource = true;
-					break;
-				}
-				
-				if ($tmp_path == "/index")
-					break;
-				if ($tmp_path != "/index")
-					$tmp_path = ffCommon_dirname($tmp_path);
-				if ($tmp_path == "/")
-				{
-					$tmp_path = "/index";
-					$tmp_url = "/index" . $tmp_url;
-				}
+                if ($tmp_path == "" || $tmp_path == "/")
+                {
+                    $tmp_path = "/index";
+                    $tmp_url = "/index" . $tmp_url;
+                }
+                if(strpos($tmp_path, "." . FF_PHP_EXT . "/") === false) {
+                    $tmp_ext = pathinfo($tmp_path, PATHINFO_EXTENSION);
+                    if (@is_file($doc_root . $tmp_path . "." . FF_PHP_EXT) || (@is_file($doc_root . $tmp_path) && $tmp_ext == FF_PHP_EXT))
+                    {
+                        $this->real_path_info = substr($tmp_url, strlen($tmp_path));
+                        if(strlen($tmp_ext))
+                            $this->script_name = $tmp_path;
+                        else
+                            $this->script_name = $tmp_path . "." . FF_PHP_EXT;
+                        $this->is_php = true;
+                        $this->is_resource = false;
+                        break;
+                    }
+                    elseif (@is_file($doc_root . $tmp_path . ".html") || (@is_file($doc_root . $tmp_path) && $tmp_ext == "html"))
+                    {
+                        $this->real_path_info = substr($tmp_url, strlen($tmp_path));
+                        if(strlen($tmp_ext))
+                            $this->script_name = $tmp_path;
+                        else
+                            $this->script_name = $tmp_path . ".html";
+                        $this->is_php = false;
+                        $this->is_resource = false;
+                        break;
+                    }
+                    elseif (@is_file($doc_root . $tmp_path . "/index." . FF_PHP_EXT))
+                    {
+                        $this->real_path_info = substr($tmp_url, strlen($tmp_path));
+                        $this->script_name = $tmp_path . "/index." . FF_PHP_EXT;
+                        $this->is_php = true;
+                        $this->is_resource = false;
+                        break;
+                    }
+                    elseif (@is_file($doc_root . $tmp_path . "/index.html"))
+                    {
+                        $this->real_path_info = substr($tmp_url, strlen($tmp_path));
+                        $this->script_name = $tmp_path . "/index.html";
+                        $this->is_php = false;
+                        $this->is_resource = false;
+                        break;
+                    }
+                    elseif(@is_file($doc_root . $tmp_path))
+                    {
+                        $this->real_path_info = substr($tmp_url, strlen($tmp_path));
+                        $this->script_name = $tmp_path;
+                        $this->is_php = false;
+                        $this->is_resource = true;
+                        break;
+                    }
+                }
+                if ($tmp_path == "/index")
+                    break;
+
+                if ($tmp_path != "/index")
+                {
+                    if (substr($tmp_path, -1) == "/")
+                        $tmp_path = substr($tmp_path, 0, -1);
+                    else
+                        $tmp_path = ffCommon_dirname($tmp_path);
+                }
 			} while (true);
 
             if(strpos($this->content_root . $this->script_name, FF_DISK_PATH . "/index.") === 0)
@@ -892,13 +1063,13 @@ class cm extends ffCommon
 							if (is_file($this->oPage->getThemeDir() . "/modules/" . $this->module . $tmp_mod_path . "/common.php"))
 								require $this->oPage->getThemeDir() . "/modules/" . $this->module . $tmp_mod_path . "/common.php";
 						}
-					}						
+					}
 				}
 				else
 				{
 					if($this->is_resource)
 					{
-						output_header($this->content_root . $this->script_name);
+						ffMedia::sendHeaders($this->content_root . $this->script_name);
 						readfile($this->content_root . $this->script_name);
 						exit;	
 					} 
@@ -911,7 +1082,7 @@ class cm extends ffCommon
 						$this->tpl_content->set_var("ret_url", $_REQUEST["ret_url"]);
 						$this->tpl_content->set_var("encoded_ret_url", rawurlencode($_REQUEST["ret_url"]));
 						$this->tpl_content->set_var("encoded_this_url", rawurlencode($_SERVER["REQUEST_URI"]));
-						$this->preloadApplets(array($this->tpl_content));
+						//$this->preloadApplets($this->tpl_content);
 
 						$this->doEvent("cm_onParseFixed", array(&$this));
 					}
@@ -930,7 +1101,7 @@ class cm extends ffCommon
 			}
 		}
 		reset($this->router->matched_rules);
-		
+
 		if (
 				strlen($this->real_path_info) &&
 				(
@@ -976,17 +1147,14 @@ class cm extends ffCommon
 
 			if ($this->cache_force_max_age === null || $this->cache_force_expire === null)
 			{
-				$success = false;
-				if (CM_ENABLE_MEM_CACHING && CM_CACHE_ROUTER_MATCH) $cm_cacherouter_matches = $this->cache->get("__cm_cacherouter_matches_" . $this->path_info . "__", $success);
-				if ($success)
-				{
-					$this->cache_router->matched_rules = unserialize($cm_cacherouter_matches);
-				}
-				else
-				{
-					$this->cache_router->process($this->path_info, $this->query_string, $_SERVER["HTTP_HOST"]);
-					if (CM_ENABLE_MEM_CACHING && CM_CACHE_ROUTER_MATCH) $this->cache->set("__cm_cacherouter_matches_" . $this->path_info . "__", null, serialize($this->cache_router->matched_rules), "__cm_router__");
-				}
+                if (CM_ENABLE_MEM_CACHING && CM_CACHE_ROUTER_MATCH)
+                    $this->cache_router->matched_rules = $this->cache->get($this->path_info, "/cm/cache_router/matches");
+
+                if (!$this->cache_router->matched_rules) {
+                    $this->cache_router->process($this->path_info, $this->query_string, $_SERVER["HTTP_HOST"]);
+                    if (CM_ENABLE_MEM_CACHING && CM_CACHE_ROUTER_MATCH)
+                        $this->cache->set($this->path_info, $this->cache_router->matched_rules, "/cm/cache_router/matches");
+                }
 
 				if (is_array($this->cache_router->matched_rules) && count($this->cache_router->matched_rules))
 				{
@@ -1026,7 +1194,7 @@ class cm extends ffCommon
 				$expires = $max_age;
 			
 			$this->doEvent("on_cache", array(&$this, &$enable_cache, &$max_age, &$expires));
-			
+
 			if ($this->cache_force_enable || $enable_cache)
 			{
 				$buffer = $this->oPage->process(false);
@@ -1055,7 +1223,7 @@ class cm extends ffCommon
 				{
 					$extension = (($extension = pathinfo($this->path_info, PATHINFO_EXTENSION)) === "" ? null : $extension);
 					if ($extension !== null)
-						$mime_type = ffMimeTypeByExtension($extension, null);
+						$mime_type = ffMedia::getMimeTypeByExtension($extension, null);
 					if ($mime_type === null)
 						$extension = null;
 				}
@@ -1068,7 +1236,7 @@ class cm extends ffCommon
 
 				if ($mime_type !== null && $extension === null)
 				{
-					$extension = ffExtensionByMimeType($mime_type, null);
+					$extension = ffMedia::getExtensionByMimeType($mime_type);
 					if ($extension === null)
 						$mime_type = null;
 				}
@@ -1102,7 +1270,7 @@ class cm extends ffCommon
 				}
 				
 				$compression = false;
-				if ($cm->oPage->compress && ffHTTP_encoding_isset("gzip"))
+				if ($this->oPage->compress && ffHTTP_encoding_isset("gzip"))
 					$compression = true;
 				
 				$rc_cache = true;
@@ -1304,7 +1472,52 @@ class cm extends ffCommon
 		}
 	}
 
-	static function oPage_on_process_parts($oPage, $tpl)
+    static function oPage_on_page_process()
+    {
+        $cm = cm::getInstance();
+
+        if ($cm->tpl_content !== null)
+        {
+            $cm->oPage->addContent($cm->tpl_content);
+        }
+
+        $cm->preloadApplets($cm->oPage->tpl[0]);
+        $cm->preloadApplets($cm->oPage->tpl_layer[0]);
+
+        foreach ($cm->oPage->sections as $key => $value)
+        {
+            $cm->preloadApplets($cm->oPage->sections[$key]["tpl"]);
+        }
+
+        foreach  ($cm->oPage->components as $key => $value)
+        {
+            $cm->preloadApplets($cm->oPage->components[$key]->tpl[0]);
+        }
+
+        foreach ($cm->oPage->contents as $key => $content)
+        {
+            if($content["data"]) {
+                $ref =& $content["data"];
+            } else {
+                $ref =& $content;
+            }
+
+            if (is_object($ref) && get_class($ref) == "ffTemplate") {
+                $cm->preloadApplets($ref);
+            } elseif (is_string($ref)) {
+                $cm->preloadAppletsContent($ref);
+            }
+        }
+    }
+    static function oPage_on_page_processed($oPage) {
+	    $cm = cm::getInstance();
+
+	    if(is_array($cm->loaded_applets) && count($cm->loaded_applets)) {
+            $oPage->output_buffer["html"] = $cm->parseAppletsContent($oPage->output_buffer["html"]);
+        }
+    }
+
+	/*static function oPage_on_process_parts($oPage, $tpl)
 	{
 		if (is_array($tpl))
 			$tpl = $tpl[0];
@@ -1333,7 +1546,7 @@ class cm extends ffCommon
 
 			$oPage->addContent($cm->tpl_content->rpparse("main", false), null, $cm->tpl_content->sTemplate);
 		}
-	}
+	}*/
 	
 	static function onRedirect($destination, $http_response_code, $add_params, $response = array())
 	{
@@ -1351,9 +1564,21 @@ class cm extends ffCommon
 
 	function preloadApplets($tpl)
 	{
-		if (is_array($tpl))
-			$tpl = $tpl[0];
-
+	    if($tpl) {
+            if (is_object($tpl) && get_class($tpl) == "ffTemplate") {
+                $applets = $tpl->getDApplets();
+                if (is_array($applets) && count($applets)) {
+                    foreach ($applets AS $appletid => $applet) {
+                        if (!isset($this->loaded_applets[$appletid])) {
+                            $this->includeApplet($applet["name"], $applet["params"], $appletid);
+                        }
+                    }
+                }
+            } else {
+                ffErrorHandler::raise("Preload Applets: Missing ffTemplate", E_USER_ERROR, null, get_defined_vars());
+            }
+        }
+/*
 		if (is_array($tpl->DVars) && count($tpl->DVars))
 		{
 			foreach ($tpl->DVars as $key => $ignore)
@@ -1361,9 +1586,9 @@ class cm extends ffCommon
 				if ($tmp = preg_match('/\[([\w\:\=\|\-]+)\]/U', $key, $matches))
 				{
 					$applet_parts = explode(":", $matches[1]);
-					
+
 					$applet = $applet_parts[0];
-					
+
 					$params = array();
 					$order_params = array();
 					if (count($applet_parts) > 1)
@@ -1405,13 +1630,14 @@ class cm extends ffCommon
 				}
 			}
 			reset($tpl->DVars);
-		}
+		}*/
 	}
 
 	function preloadAppletsContent($content)
 	{
-		$tmp = preg_match_all('/\[([\w\:\=\|\-]+)\]/U', $content, $matches);
-		
+        $regexp = '/\{\[(.+)\]\}/U';
+
+        $tmp = preg_match_all($regexp, $content, $matches);
 		if (is_array($matches[1]) && count($matches[1]))
 		{
 			foreach ($matches[1] as $key => $value)
@@ -1462,105 +1688,37 @@ class cm extends ffCommon
 	{
 		if (is_array($tpl))
 			$tpl = $tpl[0];
-		
-		if (is_array($this->loaded_applets) && count($this->loaded_applets))
-		{
-			foreach ($this->loaded_applets as $key => $value)
-			{
-				$buffer = "";
-				
-				if (isset($this->applets_components[$key]["_buffer_"]))
-				{
-					$buffer = $this->applets_components[$key]["_buffer_"];
-				}
-				else
-				{
-					$buffer = $value["buffer"];
-					
-					if (
-							is_array($this->applets_components) && count($this->applets_components) 
-							&& is_array($this->applets_components[$key]) && count($this->applets_components[$key])
-						)
-					{
-						foreach ($this->applets_components[$key] as $subkey => $subvalue)
-						{
-							if ($this->oPage->components[$subkey]->use_own_location)
-							{
-								if (strlen($this->oPage->components[$subkey]->location_name)) 
-								{
-									$tpl->set_var($this->oPage->components[$subkey]->location_name, $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"]);
-								}
-								else
-								{
-									$buffer .= $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"];
-								}
-							}
-						}
-						reset($this->applets_components[$key]);
 
-						$this->applets_components[$key]["_buffer_"] = $buffer;
-					}
-				}
-				
-				if (strlen($buffer) && ($tpl instanceof ffTemplate))
-				{
-					$tpl->set_var($key, $buffer);
-				}
-			}
-			reset($this->loaded_applets);
-		}
+		$this->preloadApplets($tpl);
+        $tpl->DBlocks[$tpl->root_element] = $this->parseAppletsContent($tpl->DBlocks[$tpl->root_element]);
 	}
 
-	function parseAppletsContent($content)
-	{
-		if (is_array($this->loaded_applets) && count($this->loaded_applets))
-		{
-			foreach ($this->loaded_applets as $key => $value)
-			{
-				$buffer = "";
+    function parseAppletsContent($content)
+    {
+        if (is_array($this->loaded_applets) && count($this->loaded_applets)) {
+            foreach ($this->loaded_applets as $key => $value) {
+                if(is_array($value["buffer"])) {
+                    $html = $value["buffer"]["html"];
+                    if($value["buffer"]["js"]) {
+                        $this->oPage->tplAddJs($key, array(
+                            "embed" => $value["buffer"]["js"]
+                        ));
+                    }
+                    if($value["buffer"]["css"]) {
+                        $this->oPage->tplAddCss($key, array(
+                            "embed" => $value["buffer"]["css"]
+                        ));
+                    }
+                } else {
+                    $html = $value["buffer"];
+                }
 
-				if (isset($this->applets_components[$key]["_buffer_"]))
-				{
-					$buffer = $this->applets_components[$key]["_buffer_"];
-				}
-				else
-				{
-					$buffer = $value["buffer"];
 
-					if (
-							is_array($this->applets_components) && count($this->applets_components)
-							&& is_array($this->applets_components[$key]) && count($this->applets_components[$key])
-						)
-					{
-						foreach ($this->applets_components[$key] as $subkey => $subvalue)
-						{
-							if ($this->oPage->components[$subkey]->use_own_location)
-							{
-								if (strlen($this->oPage->components[$subkey]->location_name))
-								{
-									$content = str_replace($this->oPage->components[$subkey]->location_name, $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"], $content);
-								}
-								else
-								{
-									$buffer .= $this->oPage->components_buffer[$subkey]["headers"] . $this->oPage->components_buffer[$subkey]["html"] . $this->oPage->components_buffer[$subkey]["footers"];
-								}
-							}
-						}
-						reset($this->applets_components[$key]);
-
-						$this->applets_components[$key]["_buffer_"] = $buffer;
-					}
-				}
-
-				if (strlen($buffer))
-				{
-					$content = str_replace("{" . $key . "}", $buffer, $content);
-				}
-			}
-			reset($this->loaded_applets);
-		}
-		return $content;
-	}
+                $content = str_replace("{" . $key . "}", $html, $content);
+            }
+        }
+        return $content;
+    }
 
 	function includeApplet($appletname, $applet_params, $appletid)
 	{
@@ -2074,17 +2232,14 @@ class cm extends ffCommon
 
 	function getLayoutByPath($layout_path)
 	{
-		if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
-		{
-			$res = $this->cache->get("__cm_getLayoutByPath_" . $layout_path . "__", $ffcache_layout_success);
-			if ($ffcache_layout_success === true)
-				return $res;
-		}
+        if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
+        {
+            $layout_vars = $this->cache->get($layout_path, "/cm/layout");
+            if ($layout_vars)
+                return $layout_vars;
+        }
 
-		if (defined("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB") && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB)
-			$db = mod_security_get_main_db();
-		else
-			$db = ffDb_Sql::factory();
+        $db = ffDB_Sql::factory();
 		
 		$layout_vars = array();
 		$layout_vars["main_theme"] = null;
@@ -2167,10 +2322,7 @@ class cm extends ffCommon
 		$db->query($sSQL);
 		if ($db->nextRecord())
 		{
-			if (defined("MOD_SEC_MULTIDOMAIN_EXTERNAL_DB") && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB)
-				$db2 = mod_security_get_main_db();
-			else
-				$db2 = ffDb_Sql::factory();
+            $db2 = ffDB_Sql::factory();
 			do
 			{
 				if($db->getField("path", "Text", true) == $layout_path || $db->getField("path", "Text", true) == str_replace("/index", "/", $layout_path))
@@ -2386,25 +2538,13 @@ class cm extends ffCommon
                 }
             } while($db->nextRecord());
 		}
-		
-		if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE) $this->cache->set("__cm_getLayoutByPath_" . $layout_path . "__", null, $layout_vars, "__cm_layout__");
+
+        if (CM_ENABLE_MEM_CACHING && CM_ENABLE_PATH_CACHE)
+            $this->cache->set($layout_path, $layout_vars, "/cm/layout");
+
 		return $layout_vars;
 	}
 
-	static function oPage_on_page_process()
-	{
-		$cm = cm::getInstance();
-
-		$cm->preloadApplets($cm->oPage->tpl[0]);
-		$cm->parseApplets($cm->oPage->tpl[0]);
-			
-		foreach  ($cm->oPage->components as $key => $value)
-		{
-			$cm->preloadApplets($cm->oPage->components[$key]->tpl[0]);
-			$cm->parseApplets($cm->oPage->components[$key]->tpl[0]);
-		}
-	}
-	
 	function isXHR()
 	{
 		if ($_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest")
@@ -2420,7 +2560,7 @@ class cm extends ffCommon
 		else
 			return false;
 	}
-	
+
 	function jsonAddResponse($data)
 	{
 		$this->json_response = array_replace_recursive($this->json_response, $data);

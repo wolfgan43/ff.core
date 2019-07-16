@@ -202,7 +202,7 @@ if (strlen($res["theme"]["value"]))
 $oRecord->addContent($oField, "general");
 
 $framework_css_multi_pairs = array();
-$framework_css_setting = cm_getFrameworkCss_settings();
+$framework_css_setting = Cms::getInstance("frameworkcss")->frameworks();
 if(is_array($framework_css_setting) && count($framework_css_setting)) {
 	foreach($framework_css_setting AS $framework_css => $framework_css_value) {
 		$framework_css_multi_pairs[$framework_css] = array(new ffData($framework_css), new ffData(ucfirst($framework_css)));
@@ -232,7 +232,7 @@ $oField->multi_pairs = $framework_css_multi_pairs;
 $oRecord->addContent($oField, "general");
 
 $font_icon_multi_pairs = array();
-$font_icon_settings = cm_getFontIcon_settings();
+$font_icon_settings = Cms::getInstance("frameworkcss")->fontIcons();
 if(is_array($font_icon_settings) && count($font_icon_settings)) {
 	foreach($font_icon_settings AS $font_icon_key => $font_icon_value) {
 		$font_icon_multi_pairs[$font_icon_key] = array(new ffData($font_icon_key), new ffData(ucfirst($font_icon_key)));
@@ -987,5 +987,5 @@ function cm_getLayoutDepsByPath($layout_path)
 function MainRecord_on_done_action(ffRecord_base $oRecord, $frmAction)
 {
 	if (CM_ENABLE_MEM_CACHING)
-		ffCache::getInstance(CM_CACHE_ADAPTER)->clear("__cm_layout__");
+		ffCache::getInstance()->clear("__cm_layout__");
 }

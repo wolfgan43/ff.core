@@ -24,12 +24,30 @@
  *  @link https://github.com/wolfgan43/vgallery
  */
 
-mod_security_check_session();
+if(!Auth::check()) {
+    $access_denied = ffTemplate::_get_word_by_code("mod_auth_login_required");
+} else {
+    $auth_settings = $cm->router->getMatchedRules("auth");
 
-/*
+    if ($auth_settings) {
+        $user = Auth::get("user");
 
-if (isset($cm->processed_rule["rule"]->options->minlevel))
-{
-	if (get_session("UserLevel") < (string)$cm->processed_rule["rule"]->options->minlevel)
-		mod_security_destroy_session(true);
-}*/
+        if ($auth_settings["profiles"] && array_search($user->acl_profile, explode(",", $auth_settings["profiles"])) === false) {
+            $access_denied = ffTemplate::_get_word_by_code("mod_auth_profile_not_authorized");
+        }
+
+        if ($auth_settings["groups"] && array_search($user->acl_primary, explode(",", $auth_settings["groups"])) === false) {
+            $access_denied = ffTemplate::_get_word_by_code("mod_auth_group_not_authorized");
+        }
+
+        if ($auth_settings["acl"] && $user->acl > $auth_settings["acl"]) {
+            $access_denied = ffTemplate::_get_word_by_code("mod_auth_access_denied");
+        }
+
+    }
+}
+
+if($access_denied) {
+    ffRedirect("/login?error=" . $access_denied);
+}
+

@@ -384,7 +384,7 @@ class ffField_html extends ffField_base
     var $ckfinder_show_file = "";		// percorso assoluto della chiamata a show_files per la preview del thumb
     									// (omettendo la porzione descritta nel db)
     var $ckfinder_base_path = null;		// percorso assoluto della cartella degli uploads es: /var/www/miosito/uploads
-										// se omesso verra generato come segue: FF_DISK_PATH . "/uploads"
+										// se omesso verra generato come segue: FF_DISK_UPDIR
     var $ckfinder_storing_path = "";	// percorso assoluto di dove verra salvato il file
 
     
@@ -463,7 +463,7 @@ class ffField_html extends ffField_base
 			if(strlen($this->framework_css["control"]["class"]))
 				$arrClass[] = $this->framework_css["control"]["class"];
 			elseif($this->framework_css["control"]["class"] === null)
-				$arrClass[] = cm_getClassByFrameworkCss("control", "form", array("exclude" => $control_type));
+				$arrClass[] = Cms::getInstance("frameworkcss")->get("control", "form", array("exclude" => $control_type));
 		}		                                                                          
 
 		if (strlen($this->class))
@@ -487,9 +487,9 @@ class ffField_html extends ffField_base
 					$arrClass[] = "picture";
 				case "input":
 					if($this->app_type == "Currency")
-						$arrClass[] = cm_getClassByFrameworkCss("align-right", "util");
+						$arrClass[] = Cms::getInstance("frameworkcss")->get("align-right", "util");
 					elseif($this->base_type == "Number")
-						$arrClass[] = cm_getClassByFrameworkCss("align-center", "util");
+						$arrClass[] = Cms::getInstance("frameworkcss")->get("align-center", "util");
 				default:
 					$arrClass[] = $control_type;
 			}
@@ -513,13 +513,13 @@ class ffField_html extends ffField_base
         if(($fixed_pre_content && $this->framework_css["fixed_pre_content"])
             || ($fixed_post_content && $this->framework_css["fixed_post_content"]))
         {
-			$wrap_addon = cm_getClassByFrameworkCss("wrap-addon", "form");
+			$wrap_addon = Cms::getInstance("frameworkcss")->get("wrap-addon", "form");
 			$arrFieldCol = ($wrap_addon
 							? array(12,12,12,12)
 							: null
 						);
 			if($fixed_pre_content && $this->framework_css["fixed_pre_content"]) {
-				$prefix_class = cm_getClassByFrameworkCss("control-prefix", "form");
+				$prefix_class = Cms::getInstance("frameworkcss")->get("control-prefix", "form");
 				if(strlen($prefix_class))
 					$fixed_pre_content = '<span class="' . $prefix_class . '">' . $fixed_pre_content . '</span>';
 				
@@ -543,12 +543,12 @@ class ffField_html extends ffField_base
 						$i++;
 					}				
 				
-					$fixed_pre_content = '<div class="' . cm_getClassByFrameworkCss($arrAddonCol, "col") . '">' . $fixed_pre_content . '</div>';
+					$fixed_pre_content = '<div class="' . Cms::getInstance("frameworkcss")->get($arrAddonCol, "col") . '">' . $fixed_pre_content . '</div>';
 				}
 			}
 
 			if($fixed_post_content && $this->framework_css["fixed_post_content"]) {
-				$postfix_class = cm_getClassByFrameworkCss("control-postfix", "form");
+				$postfix_class = Cms::getInstance("frameworkcss")->get("control-postfix", "form");
 				if(strlen($postfix_class))
 					$fixed_post_content = '<span class="' . $postfix_class . '">' . $fixed_post_content . '</span>';
 
@@ -572,18 +572,18 @@ class ffField_html extends ffField_base
 						$i++;
 					}				
 
-					$fixed_post_content = '<div class="' . cm_getClassByFrameworkCss($arrAddonCol, "col") . '">' . $fixed_post_content . '</div>';
+					$fixed_post_content = '<div class="' . Cms::getInstance("frameworkcss")->get($arrAddonCol, "col") . '">' . $fixed_post_content . '</div>';
 				}
 					
 			}
 			
 			if(is_array($arrFieldCol))
-				$buffer = '<div class="' . cm_getClassByFrameworkCss($arrFieldCol, "col") . '">' . $buffer . '</div>';
+				$buffer = '<div class="' . Cms::getInstance("frameworkcss")->get($arrFieldCol, "col") . '">' . $buffer . '</div>';
 		}
 		$buffer = $fixed_pre_content . $buffer . $fixed_post_content;
 
 		if($wrap_addon !== null && !$wrap_addon)
-			$buffer = '<div class="' . cm_getClassByFrameworkCss("group", "form") . '">' . $buffer . '</div>';
+			$buffer = '<div class="' . Cms::getInstance("frameworkcss")->get("group", "form") . '">' . $buffer . '</div>';
 
 		if ($this->parent_page !== NULL) //code for ff.js
 			$this->parent_page[0]->tplAddJs("ff.ffField", "ffField.js", FF_THEME_DIR . "/library/ff");
@@ -653,13 +653,13 @@ class ffField_html extends ffField_base
 	
 	function process_file($id, &$value)
 	{
-		$this->tpl[0]->set_var("butt_del_class", cm_getClassByFrameworkCss($this->buttons_options["file"]["delete"]["class"], "icon"));
+		$this->tpl[0]->set_var("butt_del_class", Cms::getInstance("frameworkcss")->get($this->buttons_options["file"]["delete"]["class"], "icon"));
 		$this->tpl[0]->set_var("butt_del_label", $this->buttons_options["file"]["delete"]["label"]);
 
-		$this->tpl[0]->set_var("butt_edit_class", cm_getClassByFrameworkCss($this->buttons_options["file"]["edit"]["class"], "icon"));
+		$this->tpl[0]->set_var("butt_edit_class", Cms::getInstance("frameworkcss")->get($this->buttons_options["file"]["edit"]["class"], "icon"));
 		$this->tpl[0]->set_var("butt_edit_label", $this->buttons_options["file"]["edit"]["label"]);
 		
-		$this->tpl[0]->set_var("noimg_class", " " . cm_getClassByFrameworkCss("noimg", "icon"));
+		$this->tpl[0]->set_var("noimg_class", " " . Cms::getInstance("frameworkcss")->get("noimg", "icon"));
 		
 		parent::process_file($id, $value);
 	}
@@ -667,14 +667,14 @@ class ffField_html extends ffField_base
 	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
-			$this->framework_css["container"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+			$this->framework_css["container"]["col"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["container"]["row"] = $resolution_large_to_small;
 	}	
 
 	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true) 
 	{
-		$this->framework_css["label"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+		$this->framework_css["label"]["col"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 			
 		if($reverse_control_class && is_array($this->framework_css["label"]["col"])) {
 			$this->framework_css["control"]["col"] = array(
@@ -688,6 +688,6 @@ class ffField_html extends ffField_base
 
 	function setWidthControl($resolution_large_to_small) 
 	{
-		$this->framework_css["control"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
+		$this->framework_css["control"]["col"] = $this->setClassByFrameworkCss($resolution_large_to_small);
 	}	
 }

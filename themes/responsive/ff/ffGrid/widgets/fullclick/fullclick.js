@@ -12,7 +12,9 @@
                             || jQuery(target).is("a")
                             || jQuery(target).closest("a").length
                             || jQuery(target).is("input")
+                            || jQuery(target).is("select")
                             || jQuery(target).is("textarea")
+                            || jQuery(target).is("button")
                             || jQuery(target).is("[onclick]")
                             || jQuery(target).parent().is("[onclick]")
                         )
@@ -34,7 +36,9 @@
                             || jQuery(target).is("a")
                             || jQuery(target).closest("a").length
                             || jQuery(target).is("input")
+                            || jQuery(target).is("select")
                             || jQuery(target).is("textarea")
+                            || jQuery(target).is("button")
                             || jQuery(target).is("[onclick]")
                             || jQuery(target).parent().is("[onclick]")
                         )

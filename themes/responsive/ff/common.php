@@ -1,8 +1,5 @@
 <?php
-if (!class_exists("cm"))
-	ffErrorHandler::raise("Theme responsive can be used only with CM. Change or Remove FF_DEFAULT_THEME from /config.php", E_USER_ERROR, null, get_defined_vars());
-
-require_once(FF_DISK_PATH . "/library/FF/common/framework-css.php");
+//require_once(FF_DISK_PATH . "/library/FF/common/framework-css.php");
 
 $cm = cm::getInstance();
 
@@ -223,8 +220,8 @@ function ffTheme_html_construct(&$page, $theme)
 }
 
 function ffPage_on_layout_init($oPage, $layout_vars) {
-	$framework_css = cm_getFrameworkCss(FF_THEME_FRAMEWORK_CSS);
-	$font_icon = cm_getFontIcon(FF_THEME_FONT_ICON);
+	$framework_css = Cms::getInstance("frameworkcss")->getFramework(FF_THEME_FRAMEWORK_CSS);
+	$font_icon = Cms::getInstance("frameworkcss")->getFontIcon(FF_THEME_FONT_ICON);
 
 	if(!$oPage->isXHR()) {
 		if(is_array($font_icon)) {
@@ -343,7 +340,7 @@ function ffRecord_dialog_on_done_action_output_results(ffRecord_base $record, $f
 function ffTheme_restricted_icon($class) {
 	$arrClass = explode("_", $class);
 
-	return cm_getClassByFrameworkCss($arrClass[1], "icon-tag");
+	return Cms::getInstance("frameworkcss")->get($arrClass[1], "icon-tag");
 }
 /*
 function ffTheme_responsive_oPage_getTemplateDir(ffPage_base $oPage)

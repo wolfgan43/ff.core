@@ -58,14 +58,14 @@ class ffWidget_tabs extends ffCommon
 
 		$this->style_path = $style_path;
 
-		$framework_css = cm_getFrameworkCss();
+		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
 		if(!$framework_css["name"])
 			$this->js_deps["jquery.ui"] = null;
 	}
 
 	function prepare_template($id)
 	{
-		$this->tpl[$id] = ffTemplate::factory(ffCommon_dirname(__FILE__));
+		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
 
 		$this->tpl[$id]->set_var("source_path", $this->source_path);
@@ -95,7 +95,7 @@ class ffWidget_tabs extends ffCommon
 		if(isset($data["tab_mode"]))
 			$this->tab_mode = $data["tab_mode"];
 
-		$framework_css = cm_getFrameworkCss();
+		$framework_css = Cms::getInstance("frameworkcss")->getFramework();
 		if(is_array($data["framework_css"]))
 			$this->framework_css = array_replace_recursive($this->framework_css, $data["framework_css"]);
 
@@ -118,7 +118,7 @@ class ffWidget_tabs extends ffCommon
 
 			switch($this->tab_mode) {
 				case "right":
-					$wrap_tab_need = cm_getClassByFrameworkCss("menu-vertical-wrap", "tab");
+					$wrap_tab_need = Cms::getInstance("frameworkcss")->get("menu-vertical-wrap", "tab");
 					$this->framework_css["menu"]["tab"] = "menu-vertical-right";
 					$tab_position = "Bottom";
 					$default_wrap_menu = array(
@@ -135,7 +135,7 @@ class ffWidget_tabs extends ffCommon
 										);
 					break;
 				case "left":
-					$wrap_tab_need = cm_getClassByFrameworkCss("menu-vertical-wrap", "tab");
+					$wrap_tab_need = Cms::getInstance("frameworkcss")->get("menu-vertical-wrap", "tab");
 					$default_wrap_menu = array(
 											"xs" => 4
 											, "sm" => 3
@@ -156,11 +156,11 @@ class ffWidget_tabs extends ffCommon
 				default:
 			}
 			
-			$first_menu_current = cm_getClassByFrameworkCss("menu-current", "tab");
+			$first_menu_current = Cms::getInstance("frameworkcss")->get("menu-current", "tab");
 			if(strpos($this->framework_css["pane-item"]["tab"], "effect") === false) {
-				$first_pane_current = cm_getClassByFrameworkCss("pane-current", "tab");
+				$first_pane_current = Cms::getInstance("frameworkcss")->get("pane-current", "tab");
 			} else {
-				$first_pane_current = cm_getClassByFrameworkCss("pane-current-effect", "tab");
+				$first_pane_current = Cms::getInstance("frameworkcss")->get("pane-current-effect", "tab");
 			}
 		}		
 		
@@ -217,12 +217,12 @@ class ffWidget_tabs extends ffCommon
 			*/
 			if($this->tab_mode)
 			{
-				$this->tpl[$tpl_id]->set_var("tab_pane_properties", cm_getClassByDef($this->framework_css["pane"], null, true) . cm_getClassByFrameworkCss("pane", "data", "tab"));
-				$this->tpl[$tpl_id]->set_var("tab_pane_item_properties", cm_getClassByDef($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . cm_getClassByFrameworkCss("pane-item", "data", "tab"));
+				$this->tpl[$tpl_id]->set_var("tab_pane_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane"], null, true) . Cms::getInstance("frameworkcss")->get("pane", "data", "tab"));
+				$this->tpl[$tpl_id]->set_var("tab_pane_item_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["pane-item"], array("tab-label" => ffCommon_url_rewrite($title), "current" => $first_pane_current), true) . Cms::getInstance("frameworkcss")->get("pane-item", "data", "tab"));
 				
-				$this->tpl[$tpl_id]->set_var("tab_menu_properties", cm_getClassByDef($this->framework_css["menu"], null, true) . cm_getClassByFrameworkCss("menu", "data", "tab"));
-				$this->tpl[$tpl_id]->set_var("tab_menu_item_properties", cm_getClassByDef($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
-				$this->tpl[$tpl_id]->set_var("tab_menu_link_properties", cm_getClassByFrameworkCss("menu-link", "data", "tab"));
+				$this->tpl[$tpl_id]->set_var("tab_menu_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu"], null, true) . Cms::getInstance("frameworkcss")->get("menu", "data", "tab"));
+				$this->tpl[$tpl_id]->set_var("tab_menu_item_properties", Cms::getInstance("frameworkcss")->getClass($this->framework_css["menu-item"], array("current" => $first_menu_current), true));
+				$this->tpl[$tpl_id]->set_var("tab_menu_link_properties", Cms::getInstance("frameworkcss")->get("menu-link", "data", "tab"));
 			}
 
 			$first_menu_current = "";
@@ -245,11 +245,11 @@ class ffWidget_tabs extends ffCommon
 				$this->framework_css["menu"]["wrap_pane"] = $default_wrap_pane;
 			
 			if($this->framework_css["menu"]["wrap_menu"]) {
-				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["menu"]["wrap_menu"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["menu"]["wrap_menu"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_menu_wrap_end", '</div>');
 			}
 			if($this->framework_css["menu"]["wrap_pane"]) {
-				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . cm_getClassByFrameworkCss($this->framework_css["menu"]["wrap_pane"], "col") . '">');
+				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_start", '<div class="' . Cms::getInstance("frameworkcss")->get($this->framework_css["menu"]["wrap_pane"], "col") . '">');
 				$this->tpl[$tpl_id]->set_var("tab_pane_wrap_end", '</div>');
 			}
 

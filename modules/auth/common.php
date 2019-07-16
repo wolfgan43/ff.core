@@ -24,239 +24,97 @@
  *  @link https://github.com/wolfgan43/vgallery
  */
 
-$cm = cm::getInstance();
+class cmAuth {
+    private $config = array();
+    private $domain = null;
 
-$cm->addEvent("on_load_module", "mod_security_cm_on_load_module");
-//if (isset($cm->modules["restricted"]["events"]))
-    $cm->modules["restricted"]["events"]->addEvent("on_layout_process", "mod_security_cm_on_layout_process");
-
-/***
- * Functinons
- */
-
-function mod_security_cm_on_load_module($cm, $mod)
-{
-    mod_security_load_config(); //load default xml
-    $config_file = FF_DISK_PATH . "/conf/modules/auth/config.xml";
-    if (is_file($config_file)) {
-        mod_security_load_config($config_file);
-    }
-}
-
-
-function mod_security_load_config($file = null)
-{
-    $cm = cm::getInstance();
-    if(!$file)
-        $file = __DIR__ . "/conf/config.xml";
-
-    $xml = new SimpleXMLElement("file://" . $file, null, true);
-
-    //carica le env relative al modulo
-    if (isset($xml->env)) {
-        $cm->load_env_by_xml($xml->env);
-    }
-
-    //gestisce i percorsi speciali dove non bisogna avere sessione
-    if (isset($xml->auth) && count($xml->auth->children()))
+    public function __construct()
     {
-        foreach ($xml->auth->children() as $key => $value)
-        {
-            $attrs = $value->attributes();
-            $path = (string)$attrs["path"];
-            if (!strlen($path))
-                ffErrorHandler::raise("mod_security: malformed xml (missing path parameter on auth section)", E_USER_ERROR, null, get_defined_vars());
+        $this->load();
+    }
 
-            $cm->modules["auth"]["auth_bypath"][$path] = $key;
+    private function load() {
+        $cm = cm::getInstance();
+
+        $this->setConfigAuth($cm->config["auth"]);
+        $this->setConfigUserFields($cm->config["fields"]);
+
+        Auth::addEvent("on_get_profiles", function() {
+            $cm = cm::getInstance();
+
+            if(is_array($cm->config["profiling"]) && count($cm->config["profiling"])) {
+                foreach($cm->config["profiling"] AS $name => $profile) {
+                    Auth::loadProfile($profile, $name);
+                }
+            }
+        });
+
+        Auth::addEvent("on_get_packages", function() {
+            $cm = cm::getInstance();
+
+            if(is_array($cm->config["packages"]) && count($cm->config["packages"])) {
+                foreach($cm->config["packages"] AS $name => $package) {
+                    Auth::loadPackage($package, $name);
+                }
+            }
+        });
+        Auth::addEvent("on_logged_in", function($user, $opt) {
+            Auth::env("MOD_AUTH_NOACCOUNTSCOMBO", (Auth::isAdmin()
+                ? false
+                : true
+            ));
+        });
+
+        //$cm->load_env(Auth::getPackage($this->getDomainName()));
+
+        //todo: da sistemare il config con ["config"]
+        $cm->modules["auth"] = array_replace($cm->modules["auth"], $this->config);
+    }
+    private function setConfigAuth($data) {
+        if(is_array($data) && count($data)) {
+            $this->setConfigNoAuth($data["noauth"]);
         }
     }
-    if (isset($xml->fields) && count($xml->fields->children()))
-    {
-        foreach ($xml->fields->children() as $key => $value)
-        {
-            $key = (string)$key;
 
-            if (!isset($cm->modules["auth"]["fields"][$key]))
-            {
-                $cm->modules["auth"]["fields"][$key] = array();
-
-                $attrs = $value->attributes();
-                foreach ($attrs as $subkey => $subvalue)
-                {
-                    $subkey = (string)$subkey;
-                    $subvalue = (string)$subvalue;
-
-                    $cm->modules["auth"]["fields"][$key][$subkey] = $subvalue;
-                }
-            }
-        }
-    }
-    if (isset($xml->settings) && count($xml->settings->children()))
-    {
-        foreach ($xml->settings->children() as $key => $value)
-        {
-            $attrs = $value->attributes();
-            $path = (string)$attrs["path"];
-
-            if (!strlen($path))
-                ffErrorHandler::raise("mod_security: malformed xml (missing path parameter on session section)", E_USER_ERROR, null, get_defined_vars());
-
-            $cm->modules["auth"]["settings_bypath"][$path] = $value;
-        }
-    }
-    /*
-
-
-
-        if (isset($xml->domains_fields) && count($xml->domains_fields->children()))
-        {
-            foreach ($xml->domains_fields->children() as $key => $value)
-            {
-                $key = (string)$key;
-
-                if (!isset($cm->modules["auth"]["domains_fields"][$key]))
-                {
-                    $cm->modules["auth"]["domains_fields"][$key] = array();
-
-                    $attrs = $value->attributes();
-                    foreach ($attrs as $subkey => $subvalue)
-                    {
-                        $subkey = (string)$subkey;
-                        $subvalue = (string)$subvalue;
-
-                        $cm->modules["auth"]["domains_fields"][$key][$subkey] = $subvalue;
-                    }
-                }
-            }
-        }
-
-        if (isset($xml->groups) && count($xml->groups->children()))
-        {
-            foreach ($xml->groups->children() as $key => $value)
-            {
-                $key = (string)$key;
-
-                if (!isset($cm->modules["auth"]["groups"][$key]))
-                {
-                    $cm->modules["auth"]["groups"][$key] = array();
-
-                    $attrs = $value->attributes();
-                    foreach ($attrs as $subkey => $subvalue)
-                    {
-                        $subkey = (string)$subkey;
-                        $subvalue = (string)$subvalue;
-
-                        $cm->modules["auth"]["groups"][$key][$subkey] = $subvalue;
-                    }
-                }
-            }
-        }
-
-        if (isset($xml->domains_groups) && count($xml->domains_groups->children()))
-        {
-            foreach ($xml->domains_groups->children() as $key => $value)
-            {
-                $key = (string)$key;
-
-                if (!isset($cm->modules["auth"]["domains_groups"][$key]))
-                {
-                    $cm->modules["auth"]["domains_groups"][$key] = array();
-
-                    $attrs = $value->attributes();
-                    foreach ($attrs as $subkey => $subvalue)
-                    {
-                        $subkey = (string)$subkey;
-                        $subvalue = (string)$subvalue;
-
-                        $cm->modules["auth"]["domains_groups"][$key][$subkey] = $subvalue;
-                    }
-                }
-            }
-        }
-
-        if (isset($xml->packages) && count($xml->packages->children()))
-        {
-            foreach ($xml->packages->children() as $key => $value)
-            {
-                $key = (string)$key;
-
-                if (!isset($cm->modules["auth"]["packages"][$key]))
-                {
-                    $cm->modules["auth"]["packages"][$key] = array();
-
-                    $attrs = $value->attributes();
-                    foreach ($attrs as $subkey => $subvalue)
-                    {
-                        $subkey = (string)$subkey;
-                        $subvalue = (string)$subvalue;
-
-                        $cm->modules["auth"]["packages"][$key][$subkey] = $subvalue;
-                    }
-                }
-            }
-        }
-
-        if (isset($xml->packages_groups) && count($xml->packages_groups->children()))
-        {
-            foreach ($xml->packages_groups->children() as $key => $value)
-            {
-                $key = (string)$key;
-
-                if (!isset($cm->modules["auth"]["packages_groups"][$key]))
-                {
-                    $cm->modules["auth"]["packages_groups"][$key] = array();
-
-                    $attrs = $value->attributes();
-                    foreach ($attrs as $subkey => $subvalue)
-                    {
-                        $subkey = (string)$subkey;
-                        $subvalue = (string)$subvalue;
-
-                        $cm->modules["auth"]["packages_groups"][$key][$subkey] = $subvalue;
-                    }
-                }
-            }
-        }*/
-
-    // -----------------------
-    //  profiling todo: profiling tutta da vedere
-    $cm->modules["auth"]["profiling"] = array();
-
-    if (isset($xml->profiling) && count($xml->profiling->children()))
-    {
-        // PATHS
-        if (isset($xml->profiling->paths) && isset($xml->profiling->paths->element))
-        {
-            $tmp = new ffSerializable($xml->profiling);
-
-            if (!is_array($tmp->paths->element))
-                $cm->modules["auth"]["profiling"]["paths"] = mod_sec_profiling_get_paths(array($tmp->paths->element));
-            else
-                $cm->modules["auth"]["profiling"]["paths"] = mod_sec_profiling_get_paths($tmp->paths->element);
-        }
-
-        // STATIC PROFILES
-        if (isset($xml->profiling->profiles) && count($xml->profiling->profiles->children()))
-        {
-            $cm->modules["auth"]["profiling"]["profiles"] = array();
-            foreach ($xml->profiling->profiles->children() as $key => $value)
-            {
-                $attrs = $value->attributes();
-                $id = (string)$attrs["id"];
-                $label = (string)$attrs["label"];
-                if (isset($attrs["acl"]))
-                    $acl = (string)$attrs["acl"];
-                else
-                    $acl = null;
-                $cm->modules["auth"]["profiling"]["profiles"][] = array(
-                    "id" => $id
-                , "label" => $label
-                , "acl" => $acl
+    private function setConfigUserFields ($data) {
+        if(is_array($data) && count($data)) {
+            foreach($data AS $key => $value) {
+                $this->config["fields"][$key] = ($value["@attributes"]
+                    ? $value["@attributes"]
+                    : $value
                 );
             }
+
         }
     }
+    private function setConfigNoAuth($data) {
+        if(is_array($data) && count($data)) {
+            foreach ($data AS $value) {
+                $path = ($value["@attributes"]["path"]
+                    ? $value["@attributes"]["path"]
+                    : $value["path"]
+                );
+
+                $this->config["auth_bypath"][$path] = "noauth";
+            }
+        }
+    }
+    public function getDomainName() {
+        $domain =  Auth::get("domain")->name;
+        return ($_COOKIE["domain"]
+            ? $_COOKIE["domain"]
+            : ($domain
+                ? $domain
+                : $_SERVER["HTTP_HOST"]
+            )
+        );
+    }
 }
+
+$cm = cm::getInstance();
+
+$cm->modules["auth"]["obj"] = new cmAuth();
+
 //todo: profiling da valutare
 function mod_sec_profiling_get_paths($childrens, &$elements = null, $indent = 0)
 {
@@ -303,7 +161,7 @@ function session_isset($param_name)
 
 function get_session($param_name, $bucket = null)
 { //todo: da finire con il bucket ["user"] ecc
-    $anagraph = Auth::getUser();
+    $anagraph = Auth::get();
     switch($param_name) {
         case "UserNID":
             $res = $anagraph["user"]["ID"];
@@ -355,93 +213,6 @@ function unset_session($param_name)
 /**
  * Core
  */
-function mod_security_create_session($UserID = null, $UserNID = null, $Domain = "", $DomainID = "", $permanent_session = null)
-{
-    $cm = cm::getInstance();
-
-    $ID_user = $UserNID;
-    $old_session_id = session_id();
-    if($permanent_session === null) {
-        $permanent_session = $cm::env("MOD_SECURITY_SESSION_PERMANENT");
-    }
-
-    $cm->doEvent("mod_security_on_create_session", array($UserID, $UserNID, $Domain, $DomainID, $permanent_session));
-
-    $fields = array();
-    if(is_array($cm->modules["auth"]["fields"]) && count($cm->modules["auth"]["fields"])) {
-        foreach($cm->modules["auth"]["fields"] AS $name => $params) {
-            if($params["db"])
-                $fields[] = $params["db"];
-        }
-    }
-
-    $anagraph = Auth::getInstance("session")->create($ID_user, array(
-        "permanent" => $permanent_session
-        , "fields" => $fields
-    ));
-
-    if(is_array($anagraph)) { //todo:tutto da sistemare
-        set_session("__FF_SESSION__", true);
-
-        /**
-         * Geolocalization user
-         */
-        if($cm::env("MOD_SEC_ENABLE_GEOLOCALIZATION"))
-            $locale = mod_security_get_locale();
-
-        $anagraph["lang"] = $locale["lang"];
-        $anagraph["country"] = $locale["country"];
-
-        set_session("Domain"	        , $anagraph["domain"]["name"]);
-        set_session("DomainID"	    , $anagraph["domain"]["ID"]);
-        set_session("UserNID"	        , $anagraph["user"]["ID"]);
-        set_session("UserID"	        , $anagraph["user"]["username"]);
-        set_session("UserLevel"	    , $anagraph["user"]["acl"]);
-        set_session("UserEmail"	    , $anagraph["user"]["email"]);
-        set_session("UserLang"       , $anagraph["lang"]);
-        set_session("UserCountry"    , $anagraph["country"]);
-    }
-    $cm->doEvent("mod_security_on_created_session", array($anagraph, $old_session_id, $permanent_session));
-
-    return $anagraph;
-}
-function mod_security_check_session($prompt_login = true)
-{
-    $cm = cm::getInstance();
-
-    if (isset($cm->modules["auth"]["auth_bypath"]) && count($cm->modules["auth"]["auth_bypath"]))
-    {
-        foreach ($cm->modules["auth"]["auth_bypath"] as $key => $value)
-        {
-            if  (strpos($cm->path_info, $key) === 0)
-            {
-                if ($value == "noauth")
-                {
-                    reset ($cm->modules["auth"]["auth_bypath"]);
-                    return;
-                }
-            }
-        }
-        reset ($cm->modules["auth"]["auth_bypath"]);
-    }
-    $session = Auth::getInstance("session")->check(array("minlevel" => $cm->processed_rule["rule"]->options->minlevel));
-    if ($session["status"] === "0")
-    {
-        //define ("MOD_SECURITY_SESSION_STARTED", true);
-        $cm = cm::getInstance();
-        $cm->doEvent("mod_security_on_check_session", array($prompt_login));
-        return true;
-    }
-    else
-    {
-        if ($prompt_login)
-        {
-            prompt_login();
-        }
-        else
-            return false;
-    }
-}
 function mod_security_destroy_session($promptlogin = false, $ret_url = null)
 {
     $cm = cm::getInstance();
@@ -489,7 +260,7 @@ function mod_security_get_login_path()
 {
     $cm = cm::getInstance();
 
-    $login_path = (string) $cm->router->getRuleById("mod_sec_login")->reverse;
+    $login_path = (string) $cm->router->getRuleById("mod_auth_login")->reverse;
     if (!$login_path)
         $login_path = FF_SITE_PATH . "/login";
 
@@ -579,11 +350,11 @@ function mod_security_get_settings($path_info = null)
  */
 function mod_security_cm_on_layout_process()
 {
-    $cm = cm::getInstance();
+    //$cm = cm::getInstance();
     //if (isset($cm->oPage->sections["accountpanel"]))
     //    $cm->oPage->sections["accountpanel"]["events"]->addEvent("on_process", "mod_security_cm_on_load_account");
-    if (isset($cm->oPage->sections["account"]))
-        $cm->oPage->sections["account"]["events"]->addEvent("on_process", "mod_security_cm_on_load_account");
+    //if (isset($cm->oPage->sections["account"]))
+    //    $cm->oPage->sections["account"]["events"]->addEvent("on_process", "mod_security_cm_on_load_account");
     //if (isset($cm->oPage->sections["lang"]))
     //    $cm->oPage->sections["lang"]["events"]->addEvent("on_process", "mod_security_cm_on_load_lang");
     //if (isset($cm->oPage->sections["brand"]))
@@ -592,105 +363,74 @@ function mod_security_cm_on_layout_process()
 
 function mod_security_cm_on_load_account($page, $tpl)
 {
-    if (mod_security_check_session(false))
+    if (Auth::isLogged())
     {
-        if (!MOD_SEC_MULTIDOMAIN_EXTERNAL_DB || mod_security_is_admin())
-            $db = mod_security_get_main_db();
-        else
-            $db = mod_security_get_db_by_domain(null);
-
-        $username = "";
-
-        $cm = cm::getInstance();
-
-        if ($cm->modules["auth"]["fields"]["firstname"])
-            $username .= mod_security_getUserInfo("firstname", null, $db)->getValue();
-        if ($cm->modules["auth"]["fields"]["lastname"])
-        {
-            if (strlen($username))
-                $username .= " ";
-            $username .= mod_security_getUserInfo("lastname", null, $db)->getValue();
+        $anagraph = Auth::get();
+        if(cm::env("MOD_AUTH_USER_AVATAR")) {
+            $tpl->set_var("avatar", Auth::getUserAvatar());
+            $tpl->parse("SectUserAvatar", false);
         }
-
-        if (!strlen($username))
-        {
-            if ($cm->modules["auth"]["fields"]["nickname"])
-                $username = mod_security_getUserInfo("nickname", null, $db)->getValue();
-            else if (!strlen($username) && $cm->modules["auth"]["fields"]["nominativo"])
-                $username = mod_security_getUserInfo("nominativo", null, $db)->getValue();
-            else if (!strlen($username) && $cm->modules["auth"]["fields"]["company_name"])
-                $username = mod_security_getUserInfo("company_name", null, $db)->getValue();
-            else if (!strlen($username))
-                $username = get_session("UserID");
-        }
-        if(MOD_SEC_GROUPS) {
-            $user_permission = get_session("user_permission");
-
-            if(is_array($user_permission) && array_key_exists("avatar", $user_permission) && strlen($user_permission["avatar"])) {
-                $tpl->set_var("avatar", Auth::getUserAvatar(null, $user_permission["avatar"]));
-                $tpl->parse("SectUserAvatar", false);
-            }
-        }
-
-        $tpl->set_var("nomeutente", $username);
+        $tpl->set_var("nomeutente", $anagraph["name"]);
     }
 }
 
 function mod_security_cm_on_load_brand($page, $tpl)
 {
-    if (!mod_security_check_session(false))
-        return;
-
     $cm = cm::getInstance();
 
     $framework_css = mod_restricted_get_framework_css();
-    $ID_domain = mod_security_get_domain();
+    $domain_name = mod_security_get_domain();
 
-    $tpl->set_var("logo_class", cm_getClassByDef($framework_css["logo"]));
-    if($ID_domain)
-        $host_name = get_session("Domain");
-    else
-        $host_name = CM_LOCAL_APP_NAME;
+    $tpl->set_var("logo_class", Cms::getInstance("frameworkcss")->getClass($framework_css["logo"]));
 
-    $logo_url = mod_srcurity_get_logo(MOD_RESTRICTED_LOGO_PATH, true);
 
-    if(get_session("UserLevel") >= MOD_SEC_BRAND_ACL) {
+    $logo = cm::env("MOD_AUTH_BRAND_LOGO");
+    if($logo && is_file(FF_DISK_PATH . $logo))
+        $logo_url = $logo;
+    elseif($restricted && is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png"))
+        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png";
+    elseif(is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg"))
+        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg";
+    elseif(!$restricted &&  is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.png"))
+        $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/login.png";
+    elseif(is_file(FF_THEME_DISK_PATH . "/" . cm_getMainTheme() . "/images/nobrand.svg"))
+        $logo_url = ff_getThemePath(cm_getMainTheme()) . "/" . cm_getMainTheme() . "/images/nobrand.svg";
+
+
+    if(Auth::get("user")->acl >= cm::env("MOD_AUTH_BRAND_ACL")) {
         if($logo_url) {
             $tpl->set_var("logo_url", $logo_url);
-            $tpl->set_var("logo_name", $host_name);
+            $tpl->set_var("logo_name", $domain_name);
             $tpl->parse("SectLogo", false);
         } else {
-            if($ID_domain)
-                $tpl->set_var("host_name", get_session("Domain"));
-            else
-                $tpl->set_var("host_name", CM_LOCAL_APP_NAME);
+            $tpl->set_var("host_name", $domain_name);
         }
 
-        $tpl->set_var("nav_left_class", "domain");//cm_getClassByDef($framework_css["fullbar"]["nav"]["left"]));
+        $tpl->set_var("nav_left_class", "domain");//Cms::getInstance("frameworkcss")->getClass($framework_css["fullbar"]["nav"]["left"]));
         $tpl->set_var("more_icon", '<i class="' . $framework_css["icons"]["settings"] . '"></i>');
         $tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-        $tpl->set_var("panel_class", cm_getClassByDef($framework_css["dropdown"]["container"]));
-        $tpl->set_var("panel_header_class", cm_getClassByDef($framework_css["dropdown"]["header"]));
-        $tpl->set_var("panel_body_class", cm_getClassByDef($framework_css["dropdown"]["body"]["def"]));
-        $tpl->set_var("panel_links_class", cm_getClassByDef($framework_css["dropdown"]["body"]["links"]));
-        $tpl->set_var("panel_footer_class", cm_getClassByDef($framework_css["dropdown"]["footer"]));
+        $tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
+        $tpl->set_var("panel_header_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["header"]));
+        $tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
+        $tpl->set_var("panel_links_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["links"]));
+        $tpl->set_var("panel_footer_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["footer"]));
 
         /*$mod_sec_domains = $cm->router->getRuleById("mod_sec_domains");
         if($mod_sec_domains->reverse) {
             $tpl->set_var("manage_domains", FF_SITE_PATH . $mod_sec_domains->reverse);
-            $tpl->set_var("domains_class", cm_getClassByDef($framework_css["dropdown"]["actions"]["domains"]));
+            $tpl->set_var("domains_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["domains"]));
             $tpl->parse("SectDomains", false);
         }
         $mod_sec_profiling = $cm->router->getRuleById("mod_sec_profiling");
         if($mod_sec_profiling->reverse) {
             $tpl->set_var("manage_profiling", FF_SITE_PATH . $mod_sec_profiling->reverse);
-            $tpl->set_var("profiling_class", cm_getClassByDef($framework_css["dropdown"]["actions"]["profiling"]));
+            $tpl->set_var("profiling_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["profiling"]));
             $tpl->parse("SectProfiling", false);
         }
         $mod_restricted_settings = $cm->router->getRuleById("mod_restricted_settings");
         if($mod_restricted_settings->reverse) {
             $tpl->set_var("manage_settings", FF_SITE_PATH . $mod_restricted_settings->reverse);
-            $tpl->set_var("settings_class", cm_getClassByDef($framework_css["dropdown"]["actions"]["settings"]));
+            $tpl->set_var("settings_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["actions"]["settings"]));
             $tpl->parse("SectSettings", false);
         }*/
 
@@ -703,60 +443,55 @@ function mod_security_cm_on_load_brand($page, $tpl)
 
         $tpl->parse("SectBrandName", false);
 
-        if(MOD_SEC_MULTIDOMAIN && !defined("MOD_SEC_NOACCOUNTSCOMBO"))
+        if(cm::env("MOD_AUTH_MULTIDOMAIN") && !Auth::env("MOD_AUTH_NOACCOUNTSCOMBO"))
         {
-            if (mod_security_is_admin())
-            {
-                //if(!$ID_domain)
-                //	$host_class = " hidden";
+            //if(!$ID_domain)
+            //	$host_class = " hidden";
 
-                //$tpl->set_var("host_class", cm_getClassByDef($framework_css["fullbar"]["nav"]["left"]) . $host_class);
-                //$tpl->set_var("host_name", get_session("Domain"));
-                //$tpl->set_var("host_icon", cm_getClassByFrameworkCss("external-link", "icon-tag"));
+            //$tpl->set_var("host_class", Cms::getInstance("frameworkcss")->getClass($framework_css["fullbar"]["nav"]["left"]) . $host_class);
+            //$tpl->set_var("host_name", get_session("Domain"));
+            //$tpl->set_var("host_icon", Cms::getInstance("frameworkcss")->get("external-link", "icon-tag"));
 
-                $field = ffField::factory($page);
-                $field->id = "accounts";
-                $field->base_type = "Number";
-                $field->widget = "actex";
-                $field->actex_update_from_db = true;
-                $field->multi_select_one_label = ffTemplate::_get_word_by_code("master_domain");
-                $field->source_SQL = "SELECT ID, nome FROM " . CM_TABLE_PREFIX . "mod_security_domains ORDER BY nome";
-                $mod_sec_setparams = $cm->router->getRuleById("mod_sec_setparams");
-                if($mod_sec_setparams->reverse) {
-                    $field->actex_on_change  = "function(obj, old_value, action) {
-						if(action == 'change') {
-							jQuery.get('" . $mod_sec_setparams->reverse . "?accounts=' + obj.value, function(data) {
-								if(data['id'] > 0) {
-									jQuery('#domain-title').text(data['name']);
-									jQuery('#domain-title').attr('href', 'http://' + data['name']);
-									jQuery('#domain-title').parent().removeClass('hidden');
-								} else {
-									jQuery('#domain-title').parent().addClass('hidden');
-								}
-								jQuery('body').addClass('loading');
-								window.location.reload();
-							});
-						}
-					}";
-                } else {
-                    $field->actex_on_change  = "function(obj, old_value, action) {
-						if(action == 'change') {
-							if(obj.value > 0) {
-								window.location.href = ff.urlAddParam(window.location.href, 'accounts', obj.value);
-							} else {
-								window.location.href = ff.urlAddParam(window.location.href, 'accounts').replace('accounts&', '');
-							}
-						}					
-					}";
-                }
-                $field->value = new ffData($ID_domain, "Number");
-                $field->parent_page = array(&$page);
-                $field->db = array(mod_security_get_main_db());
-                $tpl->set_var("domain_switch", $field->process());
-
-                $tpl->parse("SectMultiDomain", false);
+            $field = ffField::factory($page);
+            $field->id = "accounts";
+            $field->base_type = "Number";
+            $field->widget = "actex";
+            $field->actex_update_from_db = true;
+            $field->multi_select_one_label = ffTemplate::_get_word_by_code("master_domain");
+            $field->source_SQL = "SELECT name, name FROM " . CM_TABLE_PREFIX . "mod_security_domains ORDER BY name";
+            $mod_sec_setparams = $cm->router->getRuleById("mod_sec_setparams");
+            if($mod_sec_setparams->reverse) {
+                $field->actex_on_change  = "function(obj, old_value, action) {
+                    if(action == 'change') {
+                        jQuery.get('" . $mod_sec_setparams->reverse . "?accounts=' + obj.value, function(data) {
+                            if(data['id'] > 0) {
+                                jQuery('#domain-title').text(data['name']);
+                                jQuery('#domain-title').attr('href', 'http://' + data['name']);
+                                jQuery('#domain-title').parent().removeClass('hidden');
+                            } else {
+                                jQuery('#domain-title').parent().addClass('hidden');
+                            }
+                            jQuery('body').addClass('loading');
+                            window.location.reload();
+                        });
+                    }
+                }";
+            } else {
+                $field->actex_on_change  = "function(obj, old_value, action) {
+                    if(action == 'change') {
+                        if(obj.value > 0) {
+                            window.location.href = ff.urlAddParam(window.location.href, 'accounts', obj.value);
+                        } else {
+                            window.location.href = ff.urlAddParam(window.location.href, 'accounts').replace('accounts&', '');
+                        }
+                    }					
+                }";
             }
+            $field->value = new ffData($domain_name);
+            $field->parent_page = array(&$page);
+            $tpl->set_var("domain_switch", $field->process());
 
+            $tpl->parse("SectMultiDomain", false);
         }
         $tpl->parse("SectBrandInfo", false);
         $tpl->parse("SectBrandPanel", false);
@@ -768,21 +503,19 @@ function mod_security_cm_on_load_brand($page, $tpl)
 
 function mod_security_cm_on_load_lang($page, $tpl)
 {
-    if (!mod_security_check_session(false))
-        return;
-
     $cm = cm::getInstance();
 
     $framework_css = mod_restricted_get_framework_css();
 
     $flag_dim = "16";
-    if(MOD_SEC_GROUPS) {
-        $user_permission = get_session("user_permission");
-        $locale["lang"] = $user_permission["lang"];
-    }
-    if(!$locale["lang"])
-        $locale = mod_security_get_locale();
 
+    $user = Auth::get();
+
+    if($user["locale"]["lang"]) {
+        $locale["lang"] = $user["locale"]["lang"];
+    } else {
+        $locale = mod_security_get_locale();
+    }
     if(is_array($locale["lang"]) && count($locale["lang"])) {
         $filename = cm_cascadeFindTemplate("/css/lang-flags" . $flag_dim . ".css", "security");
         //$filename = cm_moduleCascadeFindTemplateByPath("restricted", "/css/lang-flags" . $flag_dim . ".css", $cm->oPage->theme);
@@ -794,8 +527,8 @@ function mod_security_cm_on_load_lang($page, $tpl)
 
         $tpl->set_var("flag_dim", "f" . $flag_dim);
         $tpl->set_var("toggle_properties", $framework_css["collapse"]["action"]);
-        $tpl->set_var("panel_class", cm_getClassByDef($framework_css["dropdown"]["container"]));
-        $tpl->set_var("panel_body_class", cm_getClassByDef($framework_css["dropdown"]["body"]["def"]));
+        $tpl->set_var("panel_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["container"]));
+        $tpl->set_var("panel_body_class", Cms::getInstance("frameworkcss")->getClass($framework_css["dropdown"]["body"]["def"]));
         foreach($locale["lang"] AS $code => $params) {
             if($code == "current")
                 continue;
@@ -830,116 +563,7 @@ function mod_security_cm_on_load_lang($page, $tpl)
 
 
 
-/***
- * Da controllare ma usati nel codice
- */
-function mod_security_getUserInfo($field, $ID_user = null, $db = null, $destroy_session = true)
-{
-    if ($ID_user === null)
-        $ID_user = get_session("UserNID");
-    return getUserInfo($ID_user, $field, $db, $destroy_session);
-}
 
-function getUserInfo($ID_user, $field, $db = null, $destroy_session = true) //security
-{
-    $cm = cm::getInstance();
-    if ($db === null)
-        $db = ffDb_Sql::factory();
-
-    $options = mod_security_get_settings($cm->path_info);
-    $sSQL = "SELECT 1 ";
-    if (mod_security_is_default_field($field))
-    {
-        $sSQL .= ", " . $options["table_name"] . ".`" . $field . "`";
-    }
-    else if (isset($cm->modules["auth"]["fields"]) && count($cm->modules["auth"]["fields"]))
-    {
-        foreach ($cm->modules["auth"]["fields"] as $key => $value)
-        {
-            $sSQL .= ", (SELECT 
-												" . $options["table_dett_name"] . ".value
-											FROM
-												" . $options["table_dett_name"] . "
-											WHERE
-												" . $options["table_dett_name"] . ".ID_users = " . $options["table_name"] . ".ID
-												AND " . $options["table_dett_name"] . ".field = " . $db->toSql($key) . "
-									) AS `" . $key . "`
-				";
-        }
-        reset($cm->modules["auth"]["fields"]);
-    }
-    $sSQL .= "FROM
-								" . $options["table_name"] . "
-							WHERE
-								" . $options["table_name"] . ".ID = " . $db->toSql($ID_user) . "
-		";
-
-    $db->query($sSQL);
-    if ($db->nextRecord())
-    {
-        return $db->getField($field);
-    }
-    else if ($destroy_session)
-    {
-        mod_security_destroy_session(false);
-        unset($_GET[session_name()], $_POST[session_name()], $_COOKIE[session_name()], $_REQUEST[session_name()]);
-        //ffErrorHandler::raise("mod_security: User Not Found!!!", E_USER_ERROR, null, get_defined_vars());
-    }
-    return new ffData("");
-}
-
-function mod_security_setUserInfo($field, $value, $ID_user = null, $db = null) //unused
-{
-    if ($ID_user === null)
-        $ID_user = get_session("UserNID");
-    return setUserInfo($ID_user, $field, $value, $db);
-}
-
-function setUserInfo($ID_user, $field, $value, $db = null) //unused
-{
-    $cm = cm::getInstance();
-    if ($db === null)
-        $db = ffDb_Sql::factory();
-
-    if (!isset($cm->modules["auth"]["fields"]) || !count($cm->modules["auth"]["fields"]) || !isset($cm->modules["auth"]["fields"][$field]))
-        ffErrorHandler::raise("mod_security: Field don't exists", E_USER_ERROR, null, get_defined_vars());
-
-    $options = mod_security_get_settings($cm->path_info);
-
-    if (mod_security_is_default_field($field))
-    {
-        $sSQL = "UPDATE 
-						" . $options["table_name"] . "
-					SET
-						" . $options["table_name"] . ".`" . $field . "` = " . $db->toSql($value) . "
-					WHERE
-						" . $options["table_name"] . ".ID = " . $db->toSql($ID_user) . "
-			";
-        $db->execute($sSQL);
-        if (!$db->affectedRows())
-        {
-            mod_security_destroy_session(true, $_SERVER["REQUEST_URI"]);
-        }
-    }
-    else
-    {
-        $sSQL = "SELECT ID
-                        FROM " . $options["table_dett_name"] . " 
-                        WHERE " . $options["table_dett_name"] . ".ID_users = " . $db->toSql($ID_user) . "
-                            AND " . $options["table_dett_name"] . ".field = " . $db->toSql($field);
-        $db->query($sSQL);
-        if($db->nextRecord()) {
-            $sSQL = "UPDATE " . $options["table_dett_name"] . " SET
-                        " . $options["table_dett_name"] . ".value = " . $db->toSql($value) . "
-                    WHERE " . $options["table_dett_name"] . ".ID_users = " . $db->toSql($ID_user) . "
-                        AND " . $options["table_dett_name"] . ".field = " . $db->toSql($field);
-            $db->execute($sSQL);
-        } else {
-            $sSQL = "INSERT INTO " . $options["table_dett_name"] . " (ID_users, field, value) VALUES (" . $db->toSql($ID_user) . ", " . $db->toSql($field) . ", " . $db->toSql($value) . ")";
-            $db->execute($sSQL);
-        }
-    }
-}
 
 function access_denied($confirmurl = "", $dlg_site_path = "")
 {
@@ -959,7 +583,7 @@ function access_denied($confirmurl = "", $dlg_site_path = "")
     ffDialog(false, "okonly", "_dialog_title_accessdenied", "_dialog_accessdenied", null, $confirmurl, $dlg_site_path);
 }
 
-function mod_security_get_locale($lang_default = null, $nocurrent = false) { //cache, security
+function mod_auth_get_locale($lang_default = null, $nocurrent = false) { //cache, security
     $db = ffDB_Sql::factory();
 
     $locale = array();
@@ -1057,56 +681,103 @@ function mod_security_get_locale($lang_default = null, $nocurrent = false) { //c
     return $locale;
 }
 
-function mod_security_get_domain()
-{
-    if (mod_security_check_session(false))
-    {
-        $res = cm::getInstance()->modules["auth"]["events"]->doEvent("get_domain");
-        $rc = end($res);
-        if ($rc !== null)
-            return $rc;
-
-        if ($rc = get_session("DomainID"))
-            return $rc;
-        else
-            return intval($_REQUEST["accounts"]);
-    }
-    else
-        return null;
+function mod_auth_get_domain() {
+    return ($_COOKIE["domain"]
+        ? $_COOKIE["domain"]
+        : (Auth::isLogged()
+            ? Auth::get("domain")->name
+            : $_SERVER["HTTP_HOST"]
+        )
+    );
 }
-function mod_sec_createRandomPassword($length = 8, $strength = 7)
-{
-    srand((double)microtime()*1000000);
 
-    $vowels = 'aeuy';
-    $consonants = 'bdghjmnpqrstvz';
+function create_new_user_social($arrUserInfo, $ID_domain, $public_user = false) {
+    $anagraphObject = Anagraph::getInstance();
+    $arrUser = $anagraphObject->insert(
+        array(
+            "access.users.acl" => 3  /* DA CONTROLLARE E SOSTITUIRE CON COSTANTE */
+            , "access.users.ID_domain" => $ID_domain
+            , "access.users.acl_primary" => "Utente"  /* DA CONTROLLARE E SOSTITUIRE CON COSTANTE */
+            , "access.users.expire" => 0
+            , "access.users.status" => 0
+            , "access.users.username" => $arrUserInfo["user"]["access.users.username"]
+            , "access.users.username_slug" => $arrUserInfo["user"]["access.users.username_slug"]
+            , "access.users.email" => $arrUserInfo["user"]["access.users.email"]
+            , "access.users.tel" => ""
+            , "access.users.password" => ""
+            , "access.users.avatar" => $arrUserInfo["user"]["access.users.avatar"]
+            , "access.users.created" => time()
+            , "access.users.last_update" => time()
+            , "access.users.last_login" => time()
+            , "access.users.ID_lang" => LANGUAGE_INSET_ID
+            , "access.users.SID" => ""
+            , "access.users.SID_expire" => 0
+            , "access.users.SID_device" => 0
+            , "access.users.SID_ip" => ""
+            , "access.users.SID_question" => ""
+            , "access.users.SID_answer" => ""
+            , "access.users.verified_email" => 0
+            , "access.users.verified_tel" => 0
+        )
+    );
+    $arrUserInfo["anagraph"]["anagraph.ID_user"] = $arrUser[0]["user"];
 
-    if ($strength & 1) {
-        $consonants .= 'BDGHJLMNPQRSTVWXZ';
-    }
-    if ($strength & 2) {
-        $vowels .= "AEUY";
-    }
-    if ($strength & 4) {
-        $consonants .= '23456789';
-    }
-    if ($strength & 8) {
-        $consonants .= '@#$%';
-    }
+    $ID_user = $arrUserInfo["anagraph"]["anagraph.ID_user"];
 
-    $password = '';
-    $alt = time() % 2;
-    for ($i = 0; $i < $length; $i++) {
-        if ($alt == 1) {
-            $password .= $consonants[(rand() % strlen($consonants))];
-            $alt = 0;
-        } else {
-            $password .= $vowels[(rand() % strlen($vowels))];
-            $alt = 1;
+    if($arrUserInfo["anagraph"]) {
+        if($arrUserInfo["anagraph"]["anagraph_person.name"]) {
+            $anagraph_name = $arrUserInfo["anagraph"]["anagraph_person.name"];
+        }
+        if($arrUserInfo["anagraph"]["anagraph_person.surname"]) {
+            if(strlen($anagraph_name)) {
+                $anagraph_name .= " ";
+            }
+            $anagraph_name .= $arrUserInfo["anagraph"]["anagraph_person.surname"];
+        }
+
+        if($public_user) { /* DA CONTROLLARE E SOSTITUIRE CON COSTANTE */
+            $arrUserInfo["anagraph"]["anagraph_seo.ID_lang"] = LANGUAGE_INSET_ID;
+            $arrUserInfo["anagraph"]["anagraph_seo.h1"] = $arrUserInfo["user"]["access.users.username"];
+            $arrUserInfo["anagraph"]["anagraph_seo.meta_description"] = $arrUserInfo["user"]["access.users.username"];
+            $arrUserInfo["anagraph"]["anagraph_seo.meta_title"] = $arrUserInfo["user"]["access.users.username"];
+            $arrUserInfo["anagraph"]["anagraph_seo.smart_url"] = $arrUserInfo["user"]["access.users.username_slug"];
+            $arrUserInfo["anagraph"]["anagraph_seo.parent"] = '/';
+            $arrUserInfo["anagraph"]["anagraph_seo.permalink"] = "/" . $arrUserInfo["user"]["access.users.username_slug"];
+        }
+
+        $arrUserInfo["anagraph"]["anagraph.password_alg"] = "";
+        $arrUserInfo["anagraph"]["anagraph.valid_tel"] = 0;
+        $arrUserInfo["anagraph"]["anagraph.valid_email"] = 0;
+
+        $arrUserInfo["anagraph"]["anagraph.created"] = time();
+        $arrUserInfo["anagraph"]["anagraph.last_update"] = time();
+
+        $arrUserInfo["anagraph"]["anagraph.name"] = $anagraph_name;
+        $arrUserInfo["anagraph"]["anagraph.ID_role"] = null;
+        $arrUserInfo["anagraph"]["anagraph.ID_lang"] = LANGUAGE_INSET_ID;
+        $arrUserInfo["anagraph"]["anagraph.ID_domain"] = $ID_domain;
+        $arrUserInfo["anagraph"]["anagraph.ID_type"] = 1;  /* DA CONTROLLARE E SOSTITUIRE CON COSTANTE */
+
+        foreach($arrUserInfo["anagraph"] AS $key => $register_value) {
+            $arrInsert[$key] = $register_value;
+        }
+
+        if(is_array($arrInsert) && count($arrInsert)) {
+            $anagraphObject->insert(
+                $arrInsert
+            );
         }
     }
 
-    return $password;
+    if($arrUserInfo["tokens"]) {
+        Anagraph::getInstance("access")->insert(array(
+                "tokens.ID_user" => $ID_user
+                , "tokens.type" => $arrUserInfo["tokens"]["type"]
+                , "tokens.token" => $arrUserInfo["tokens"]["token"]
+            )
+        );
+    }
+    Auth::getInstance("session")->create($ID_user);
 }
 
 /**
@@ -1125,7 +796,7 @@ function mod_sec_checkprofile_bypath($path, $others = false, $modify = false, $s
     if (!MOD_SEC_PROFILING)
         return true;
 
-    if (defined("MOD_SECURITY_SESSION_STARTED") && get_session("UserLevel") == 3)
+    if (Auth::isAdmin())
         return true;
 
     $permissions = mod_sec_getprofile_bypath($path, $profile, $usernid, $path_info);
@@ -1224,22 +895,11 @@ function mod_sec_checkperssion($permissions, $others = false, $modify = false, $
 
 function mod_sec_getprofile_bypath($path, $profile = null, $usernid = null, $path_info = null) //security
 {
-    if (MOD_SEC_MULTIDOMAIN && MOD_SEC_MULTIDOMAIN_EXTERNAL_DB && MOD_SEC_PROFILING_MAINDB)
-    {
-        $db = mod_security_get_main_db();
-        if (mod_security_get_domain())
-            $db2 = mod_security_get_db_by_domain();
-        else
-            $db2 = mod_security_get_main_db();
-    }
-    else
-    {
-        $db = ffDB_Sql::factory();
-        $db2 = ffDB_Sql::factory();
-    }
+    $db = ffDB_Sql::factory();
+    $db2 = ffDB_Sql::factory();
 
-    if ($usernid === null && defined("MOD_SECURITY_SESSION_STARTED"))
-        $usernid = get_session("UserNID");
+    if ($usernid === null && Auth::isLogged())
+        $usernid = Auth::get("user")->id;
 
     if ($usernid === null && $profile === null)
         return null;
@@ -1315,9 +975,11 @@ function mod_sec_getprofile_bypath($path, $profile = null, $usernid = null, $pat
 
 function mod_sec_getprofile_byuser($UserNID = null, $path_info = null) //security
 {
+    return null;
+
     if ($UserNID === null)
-        if (defined("MOD_SECURITY_SESSION_STARTED"))
-            $UserNID = get_session("UserNID");
+        if (Auth::isLogged())
+            $UserNID = Auth::get("user")->id;
         else
             return null;
 
@@ -1364,7 +1026,7 @@ function mod_sec_getprofile_byuser($UserNID = null, $path_info = null) //securit
 /***
  * OAUTH2
  */
-function modsec_getOauth2Server()
+function mod_auth_getOauth2Server()
 {
     if (ffIsset($_REQUEST, "__OAUTH2DEBUG__"))
     {
@@ -1412,8 +1074,8 @@ function modsec_OAuth2Error($response)
     $tpl->set_var("theme", $cm->oPage->theme);
     $tpl->set_var("http_domain", $_SERVER["HTTP_HOST"]);
 
-    $cm->preloadApplets($tpl);
-    $cm->parseApplets($tpl);
+    //$cm->preloadApplets($tpl);
+    //s$cm->parseApplets($tpl);
 
     $tpl->set_var("ret_url",			$_REQUEST["ret_url"]);
     $tpl->set_var("encoded_ret_url",	rawurlencode($_REQUEST["ret_url"]));
@@ -1441,7 +1103,7 @@ function modsec_OAuth2Error($response)
 
 function modsec_OAuth2_UserResourceController($scopeRequired, $callback)
 {
-    $server = modsec_getOauth2Server();
+    $server = mod_auth_getOauth2Server();
 
     $request = OAuth2\Request::createFromGlobals();
     $response = new OAuth2\Response();
@@ -1468,7 +1130,7 @@ function modsec_OAuth2_UserResourceController($scopeRequired, $callback)
 
 function modsec_OAuth2_ResourceController($scopeRequired, $callback)
 {
-    $server = modsec_getOauth2Server();
+    $server = mod_auth_getOauth2Server();
 
     $request = OAuth2\Request::createFromGlobals();
     $response = new OAuth2\Response();
@@ -1484,12 +1146,46 @@ function modsec_OAuth2_ResourceController($scopeRequired, $callback)
     $ret = call_user_func_array($callback, array($scopes, $request, $response, $server));
 }
 
+function mod_auth_social_get_google_client()
+{
+    $client = new Google_Client();
+
+    $client->setApplicationName(cm::env("MOD_AUTH_SOCIAL_GPLUS_APP_NAME"));
+    $client->setClientId(cm::env("MOD_AUTH_SOCIAL_GPLUS_CLIENT_ID"));
+    $client->setClientSecret(cm::env("MOD_AUTH_SOCIAL_GPLUS_CLIENT_SECRET"));
+    $client->setRedirectUri(cm::env("MOD_AUTH_SOCIAL_GPLUS_REDIRECT"));
+
+    $arrScope = explode(",", cm::env("MOD_AUTH_SOCIAL_GPLUS_SCOPE"));
+    if(is_array($arrScope) && count($arrScope)) {
+        $googleScope = array();
+        foreach($arrScope AS $scope) {
+            switch($scope) {
+                case "PLUS_LOGIN":
+                    $googleScope[] = Google_Service_Oauth2::PLUS_LOGIN;
+                    break;
+                case "PLUS_ME":
+                    $googleScope[] = Google_Service_Oauth2::PLUS_ME;
+                    break;
+                case "USERINFO_EMAIL":
+                    $googleScope[] = Google_Service_Oauth2::USERINFO_EMAIL;
+                    break;
+                case "USERINFO_PROFILE":
+                    $googleScope[] = Google_Service_Oauth2::USERINFO_PROFILE;
+                    break;
+                default:
+            }
+        }
+        $client->setScopes($googleScope);
+    }
+
+    return $client;
+}
 
 /***
  * Framework css
  */
 
-function mod_sec_get_framework_css() {
+function mod_auth_get_framework_css() {
 	$framework_css = array(
         "component" => array(
             "class" => "loginBox security nopadding"

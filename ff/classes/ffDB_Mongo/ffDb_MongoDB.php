@@ -486,6 +486,10 @@ class ffDB_MongoDB
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->insert($mongoDB["insert"]);
                     try {
+                        if(Cms::PROFILING) {
+                            Cms::getInstance("debug")->dumpCaller($mongoDB);
+                        }
+
 						$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
 					} catch (Exception $e) {
 						$this->errorHandler("Server Error: " . $e->getMessage());
@@ -518,7 +522,11 @@ class ffDB_MongoDB
                     $bulk->update($mongoDB["where"], $set, $mongoDB["options"]);
 
 					try {
-						$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                        if(Cms::PROFILING) {
+                            Cms::getInstance("debug")->dumpCaller($mongoDB);
+                        }
+
+                        $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
 					} catch (Exception $e) {
 						$this->errorHandler("Server Error: " . $e->getMessage());
 					}
@@ -540,7 +548,11 @@ class ffDB_MongoDB
                     $bulk = new MongoDB\Driver\BulkWrite;
                     $bulk->delete($mongoDB["where"], $mongoDB["options"]);
                     try {
-                    	$this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
+                        if(Cms::PROFILING) {
+                            Cms::getInstance("debug")->dumpCaller($mongoDB);
+                        }
+
+                        $this->link_id->executeBulkWrite($this->database . "." . $mongoDB["table"], $bulk);
 					} catch (Exception $e) {
 						$this->errorHandler("Server Error: " . $e->getMessage());
 					}
@@ -699,9 +711,11 @@ class ffDB_MongoDB
                         $this->query_params["options"]["limit"] = $mongoDB["limit"];
 
                     //unset($this->query_params["where"]["uid"]);
-                    //print_r($this->query_params["where"]);
-                    //die();
 					try {
+                        if(Cms::PROFILING) {
+                            Cms::getInstance("debug")->dumpCaller($this->query_params);
+                        }
+
 						$cursor = $this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]));
 						if (!$cursor)
 						{
@@ -727,7 +741,55 @@ class ffDB_MongoDB
         return $this->query_id;
 	}
 
-    
+    /**
+     * Esegue una query
+     * @param String La query da eseguire
+     * @return L'id della query eseguita
+     */
+    function cmd($query, $name = "count")
+    {
+        $cursor = null;
+        if (empty($query))
+            $this->errorHandler("Query invoked With blank Query String");
+
+        if (!$this->link_id)
+        {
+            if (!$this->connect())
+                return false;
+        }
+
+        $this->freeResult();
+        $this->debugMessage("count = " . print_r($query, true));
+
+        if(is_array($query))
+            $mongoDB = $query;
+        else
+            $mongoDB = $this->sql2mongoDB($query);
+
+        if($mongoDB["where"][$this->keyname])
+            $mongoDB["where"][$this->keyname] = $this->id2object($mongoDB["where"][$this->keyname]);
+
+        if(!$mongoDB["table"])
+            $mongoDB["table"] = $mongoDB["from"];
+
+        if(Cms::PROFILING) {
+            Cms::getInstance("debug")->dumpCaller($mongoDB);
+        }
+
+        if($mongoDB["table"])
+        {
+            // Commands
+            switch($name) {
+                case "count":
+                    $res = $this->numRows();
+                    break;
+                default:
+                    $this->errorHandler("Command not supported");
+            }
+        }
+
+        return $res;
+    }
     
 	function multiQuery($queries)
 	{
@@ -1012,18 +1074,30 @@ class ffDB_MongoDB
 	 */
 	function numRows()
 	{
-		if (!$this->query_id)
+		/*if (!$this->query_id)
 		{
 			$this->errorHandler("numRows() called with no query pending");
 			return false;
-		}
+		}*/
 		
 		if ($this->num_rows === null) {
-			try {
+            try {
+                $Command = new MongoDB\Driver\Command(array(
+                    "count" => $this->query_params["table"]
+                    , "query" => $this->query_params["where"]
+                ));
+                $cursor = $this->link_id->executeCommand($this->database, $Command);
+                $this->num_rows = $cursor->toArray()[0]->n;
+            } catch (Exception $e) {
+                $this->errorHandler("Server Error: " . $e->getMessage());
+            }
+/*
+            try {
             	$this->num_rows = iterator_count(new \IteratorIterator($this->link_id->executeQuery($this->database . "." . $this->query_params["table"], new MongoDB\Driver\Query($this->query_params["where"], $this->query_params["options"]))));
 			} catch (Exception $e) {
 				$this->errorHandler("Server Error: " . $e->getMessage());
 			}
+*/
         }
         return $this->num_rows;
 	}
@@ -1230,7 +1304,7 @@ class ffDB_MongoDB
 	{
 		if ($this->debug)
 		{
-			if ($this->HTML_reporting)
+            if ($this->HTML_reporting)
 			{
 				$tmp = "ffDB_MongoDB - Debug: $msg<br />";
 			}
@@ -1239,6 +1313,7 @@ class ffDB_MongoDB
 				$tmp = "ffDB_MongoDB - Debug: $msg\n";
 			}
 		}
+
 		if(ffDB_MongoDB::$_profile) {
 			ffDB_MongoDB::$_objProfile["total"]++;
 			ffDB_MongoDB::$_objProfile[substr($msg, strpos($msg, "=") + 1, 60)][] = $msg;

@@ -35,8 +35,6 @@ elseif (isset($_GET[session_name()]))
 elseif (isset($_COOKIE[session_name()]))
 	session_id($_COOKIE[session_name()]);
 @session_start();
-//else
-//	mod_security_check_session();
 
 $php_array = array();
 

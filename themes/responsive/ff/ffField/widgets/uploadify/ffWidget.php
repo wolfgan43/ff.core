@@ -275,7 +275,7 @@ class ffWidget_uploadify extends ffCommon
 			$this->tpl[$tpl_id]->set_var("file_ext", "null");
 		}
 
-        $this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("deleterow", "icon"));
+        $this->tpl[$tpl_id]->set_var("cancel_class", Cms::getInstance("frameworkcss")->get("deleterow", "icon"));
 		
 		$this->tpl[$tpl_id]->set_var("type_model", $Field->uploadify_model);
 		$this->tpl[$tpl_id]->set_var("thumb_model", $Field->uploadify_model_thumb);

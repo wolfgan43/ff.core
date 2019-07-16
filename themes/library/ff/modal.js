@@ -38,6 +38,9 @@ ff.modal = (function () {
                                                     "yesno" : {
 
                                                     },
+                                                    "form": {
+
+                                                    },
                                                     "callToAction" : {
                                                         "footer" : {
                                                             "buttonsContainerClass" : "text-right"
@@ -54,6 +57,11 @@ ff.modal = (function () {
                                                         }
                                                     },
                                                     "skin" : {
+                                                        "center" : {
+                                                            "header": {
+                                                                "class" : "center big"
+                                                            }
+                                                        },
                                                         "blue" : {
                                                             "header" : {
                                                                 "class" : "blue--gradient white"
@@ -79,7 +87,10 @@ ff.modal = (function () {
 
 
                                                 };
-    var defaults                                = {};/* {
+    var defaults                                = {
+        scroll: true
+
+    };/* {
         debug                                   : true,
         type                                    : '',
         animation                               : {
@@ -163,9 +174,13 @@ ff.modal = (function () {
                                                 }
     };*/
     var isUrl = function(url) {
-        return (url.indexOf("/") < 0
+        var fc = url.indexOf("/");
+        return (fc < 0
             ? false
-            : /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$|^((\\(\\[^\s\\]+)+|([A-Za-z]:(\\)?|[A-z]:(\\[^\s\\]+)+))(\\)?)$/.test(url)
+            : (fc === 0
+                ? true
+                : /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.?)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$|^((\\(\\[^\s\\]+)+|([A-Za-z]:(\\)?|[A-z]:(\\[^\s\\]+)+))(\\)?)$/.test(url)
+            )
         );
     }
     var getID = function() {
@@ -274,6 +289,7 @@ ff.modal = (function () {
     };
 
     var getClassByFrameworkCss = function(name, type, params) {
+        var res = undefined;
         switch(type) {
             case "button":
                 res = getButtonByFrameworkCss(name, params);
@@ -481,14 +497,14 @@ ff.modal = (function () {
         var url                                         = undefined;
         var ajax                                        = undefined;
         var template                                    = undefined;
-        var animation                                   = {};
+        var params                                      = params || {};
 
         if(isUrl(data)) {
             url                                         = data;
             ajax                                        = {
                                                             "data"                  : params,
                                                             "type"                  : "json",
-                                                            "loader"                : true
+                                                            "loader"                : false
                                                         };
             key                                         = url + "?" + key;
         } else {
@@ -502,7 +518,7 @@ ff.modal = (function () {
                                                             ? paramsToModel(params)
                                                             : clone(typeof params != "object" && models[params]
                                                                 ? models[params]
-                                                                : model["default"]
+                                                                : models["default"]
                                                             )
                                                         );
 
@@ -513,7 +529,7 @@ ff.modal = (function () {
                                                             "id"                    : getID(),
                                                             "url"                   : url,
                                                             "ajax"                  : ajax,
-                                                            "animation"             : (typeof params["animation"] !== undefined ? params["animation"] : {}),
+                                                            "animation"             : params["animation"],
                                                             "template"              : template,
                                                             type                    : getFrameworkCss("name"),
                                                             openOnEvent             : false,
@@ -547,7 +563,8 @@ ff.modal = (function () {
 };*/
             ff.injectCSS("jquery.hui.modal", "/themes/library/plugins/jquery.hui/modal/hui.modal.css");
             ff.pluginLoad("jquery.hui.modal", "/themes/library/plugins/jquery.hui/modal/hui.modal.js", function() {
-                jQuery(document).huiModal(dialog); //todo:: non funziona
+                console.log(dialog);
+                jQuery(document).huiModal(dialog);
             });
             /*
             url: https://dev.paginemediche.it/pro/strutture/gestione come ippocrate

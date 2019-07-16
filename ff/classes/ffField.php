@@ -84,7 +84,7 @@ class ffField
 			if ($page !== null)
 				$theme = $page->theme;
 			else
-				$theme = FF_LOADED_THEME;
+				$theme = CM_DEFAULT_THEME;
 		}
 			
 		if ($disk_path === null)
@@ -499,7 +499,7 @@ abstract class ffField_base extends ffCommon
 	var $file_normalize		= false;
 
 	/**
-	 * Percorso assoluto della cartella degli uploads (ad esempio: /var/www/website/uploads); se omesso verrà generato nel seguente modo: FF_DISK_PATH . "/uploads"
+	 * Percorso assoluto della cartella degli uploads (ad esempio: /var/www/website/uploads); se omesso verrà generato nel seguente modo: FF_DISK_UPDIR
 	 * @var Boolean
 	 */
 	var $file_base_path		= null;		
@@ -1372,7 +1372,7 @@ abstract class ffField_base extends ffCommon
 	function getFileBasePath()
 	{
 		if ($this->file_base_path === null)
-			return FF_DISK_PATH . FF_UPDIR;
+			return FF_DISK_UPDIR;
 		else
 			return $this->file_base_path;
 	}
@@ -2034,7 +2034,7 @@ abstract class ffField_base extends ffCommon
             
             $preview_url = ($this->file_temp_preview_url
                 ? $this->file_temp_preview_url
-                : str_replace(DISK_UPDIR, CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $this->file_temp_path) . "/[_FILENAME_]"
+                : str_replace(FF_DISK_UPDIR, CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $this->file_temp_path) . "/[_FILENAME_]"
             );
 			$preview_query_string	= $this->file_temp_preview_query_string;
 				
@@ -2085,7 +2085,7 @@ abstract class ffField_base extends ffCommon
             
             $preview_url = ($this->file_saved_preview_url 
                 ? $this->file_saved_preview_url
-                : str_replace(DISK_UPDIR, CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $storing_path) . "/[_FILENAME_]" 
+                : str_replace(FF_DISK_UPDIR, CM_SHOWFILES . "/" . implode("x", $this->file_thumb), $storing_path) . "/[_FILENAME_]"
             );
 			$preview_query_string	= $this->file_saved_preview_query_string;
             

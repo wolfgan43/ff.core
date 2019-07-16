@@ -72,12 +72,15 @@ class ffValidator
 
 		if (is_null($last_res))
 		{
-			$base_path = dirname(__FILE__) . "/validators";
+			$base_path = __DIR__ . "/validators";
 			$class_name = "ffValidator_" . $name;
 
 			require_once $base_path . "/" . $name . "." . FF_PHP_EXT;
-			eval("\$ret = " . $class_name . "::getInstance();");
-		}
+
+            $ret = $class_name::getInstance();
+            //eval("\$ret = " . $class_name . "::getInstance();");
+
+        }
 		else
 		{
 			$ret = $last_res;
