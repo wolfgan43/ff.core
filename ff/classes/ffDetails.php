@@ -104,6 +104,7 @@ class ffDetails
  */
 abstract class ffDetails_base extends ffCommon
 {
+    const TYPE                  = "ffDetails";
     const NAME                  = "ffd";
 
     // ----------------------------------

@@ -2,7 +2,7 @@
 	<!--BeginSectSubmit-->
 		onclick="
 		<!--BeginSectFormAction-->
-		document.getElementById('frmAction').value = '{component_action}{frmAction}';
+		jQuery(this).closest('form').find('INPUT[name=frmAction]').val('{component_action}{frmAction}');
 		<!--EndSectFormAction-->
 		<!--BeginSectFormActionUrl-->
 			jQuery(this).closest('form').action = '{form_action_url}';

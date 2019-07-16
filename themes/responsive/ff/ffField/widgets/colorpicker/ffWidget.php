@@ -25,48 +25,26 @@ class ffWidget_colorpicker extends ffCommon
     					);
 
 	// PRIVATE VARS
-	
-	var $tpl 			= null;
-	var $db				= null;
 
-	var $oPage = null;
-	var $source_path	= null;
-	var $style_path 	= null;
+    /**
+     * @var $tpl ffTemplate[]
+     */
+    private $tpl 			= null;
 
-	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
+
+	function __construct(ffPage_base $oPage = null)
 	{
-		//$this->get_defaults();
-
-		$this->oPage = array(&$oPage);
-		
-		if ($source_path !== null)
-			$this->source_path = $source_path;
-		elseif ($oPage !== null)
-			$this->source_path = $oPage->getThemePath();
-
-		$this->style_path = $style_path;
-		
-		$this->db[0] = ffDB_Sql::factory();
-
+		$this->get_defaults();
 	}
 
 	function prepare_template($id)
 	{
 		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
-
-		$this->tpl[$id]->set_var("source_path", $this->source_path);
-
-        if ($this->style_path !== null)
-			$this->tpl[$id]->set_var("style_path", $this->style_path);
-		elseif ($this->oPage !== null)
-			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-
 	}
 	
 	function process($id, &$value, ffField_base &$Field)
 	{
-
 		// THE REAL STUFF
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
@@ -86,15 +64,6 @@ class ffWidget_colorpicker extends ffCommon
 		}
 			
 		$this->tpl[$tpl_id]->set_var("id", $id);
-		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
-		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
-		$this->tpl[$tpl_id]->set_var("class", $this->class);
-		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
-
-        if(strlen($Field->widget_path))
-            $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
-        else 
-            $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/colorpicker"); 
 
 		if ($Field->contain_error && $Field->error_preserve) {
 			$this->tpl[$tpl_id]->set_var("value", trim(ffCommon_specialchars($value->ori_value), "#"));
@@ -105,7 +74,7 @@ class ffWidget_colorpicker extends ffCommon
 		}
  
 		$Field->framework_css["fixed_post_content"] = array(2);
-		$Field->fixed_post_content ='<input id="' . $container . $id . '_color" type="color" value="' .  $value_color . '" onchange="ff.ffField.colorpicker.change(this, \'' . $container . $id . '\');" />';
+		$Field->fixed_post_content ='<input id="' . $prefix . $id . '_color" type="color" value="' .  $value_color . '" onchange="ff.ffField.colorpicker.change(this, \'' . $container . $id . '\');" />';
 		$Field->properties["onkeyup"] = "ff.ffField.colorpicker.change(this, '" . $container . $id . "_color');";
 		$Field->properties["maxlength"] = '6';
 		

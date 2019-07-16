@@ -30,6 +30,10 @@ if (!defined("FF_ENABLE_MEM_PAGE_CACHING"))         define("FF_ENABLE_MEM_PAGE_C
 class ffPage
 {
     private static $singleton = null;
+
+    /**
+     * @var ffEvents
+     */
     protected static $events = null;
 
     public function __construct()
@@ -56,8 +60,9 @@ class ffPage
 
     static private function initEvents()
     {
-        if (self::$events === null)
+        if (self::$events === null) {
             self::$events = new ffEvents();
+        }
     }
 
     /**
@@ -67,7 +72,7 @@ class ffPage
      * @param string $disk_path
      * @param string $page_path
      * @param string $theme
-     * @return ffPage_base
+     * @return ffPage_html
      */
     public static function factory($disk_path, $site_path, $page_path = null, $theme = null)
     {
@@ -88,13 +93,19 @@ class ffPage
         //require_once $base_path;
         self::$singleton = new $class_name($disk_path, $site_path, $page_path, $theme);
 
-        $res = self::doEvent("on_factory_done", array(self::$singleton));
+        self::doEvent("on_factory_done", array(self::$singleton));
+
 
         return self::$singleton;
     }
 
-
-
+    /**
+     * @return ffPage_html
+     */
+    public static function &getInstance()
+    {
+        return self::$singleton;
+    }
 }
 
 /**
@@ -112,6 +123,7 @@ class ffPage
  */
 abstract class ffPage_base extends ffCommon
 {
+    const TYPE                  = "ffPage";
     // ----------------------------------
     //  PUBLIC VARS (used for settings)
 
@@ -251,7 +263,7 @@ abstract class ffPage_base extends ffCommon
 
     /**
      * il template principale della pagina
-     * @var Array ffTemplate
+     * @var ffTemplate
      */
     var $tpl					= null;
 
@@ -292,7 +304,7 @@ abstract class ffPage_base extends ffCommon
 
     /**
      * L'istanza all'oggetto cache
-     * @var ffMemCache
+     * @var ffCache
      */
     var $cache					= null;
     var $use_cache              = FF_ENABLE_MEM_PAGE_CACHING;
@@ -634,6 +646,8 @@ abstract class ffPage_base extends ffCommon
         {
             ffErrorHandler::raise("Unhandled Content", E_USER_ERROR, $this, get_defined_vars());
         }
+
+        return null;
     }
 
     /**
@@ -698,7 +712,7 @@ abstract class ffPage_base extends ffCommon
 
     /**
      * Questa funzione restituisce il percorso del tema.
-     * @return Il percorso del tema
+     * @return string
      *
      */
     function getThemePath($include_site_path = true)
@@ -813,11 +827,9 @@ abstract class ffPage_base extends ffCommon
      */
     protected function filesRecordsetNormalize($value, &$param)
     {
-        $ret = array();
-
-        if (!is_array($param))
+        if (!is_array($param)) {
             $param = array();
-
+        }
         foreach ($value as $files_key => $files_value)
         {
             foreach ($files_value as $rst_key => $rst_field)
@@ -963,9 +975,12 @@ abstract class ffPage_base extends ffCommon
             foreach ($components_keys as $key)
             {
                 $subkeys = array_keys($this->components[$key]->key_fields);
-                foreach ($subkeys as $subkey)
+                foreach ($subkeys as $subkey => $subvalue)
                 {
-                    $keys[$subkey] = $this->components[$key]->key_fields[$subkey]->getValue(null, FF_SYSTEM_LOCALE);
+                    /**
+                     * @var $subvalue ffData
+                     */
+                    $keys[$subkey] = $subvalue->getValue(null, FF_SYSTEM_LOCALE);
                 }
             }
             reset($components_keys);
@@ -1080,8 +1095,7 @@ abstract class ffPage_base extends ffCommon
         }
         else
         {
-            $realpath 		= $last_res["realpath"];
-            $source_path	= $last_res["source_path"];
+            $realpath 		= $last_res;
         }
 
        /* if ( (substr($realpath, 0, strlen(FF_DISK_PATH)) != FF_DISK_PATH) && (substr($realpath, 0, strlen(__TOP_DIR__)) != __TOP_DIR__))
@@ -1092,7 +1106,7 @@ abstract class ffPage_base extends ffCommon
         require_once($realpath . "/ffWidget." . FF_PHP_EXT);
 
         $widget_name = "ffWidget_" . $name;
-        $temp = new $widget_name($this, $source_path);
+        $temp = new $widget_name($this);
 
         $this->widgets[$name] = $temp;
         if (is_array($this->widgets[$name]->widget_deps) && count($this->widgets[$name]->widget_deps))
@@ -1133,13 +1147,13 @@ abstract class ffPage_base extends ffCommon
     /**
      * elabora le widget per il componente specifico
      * @param String $id
-     * @return String
+     * @return array
      */
     function componentWidgetsProcess($id)
     {
         $ret = array(
             "headers" => ""
-        , "footers" => ""
+            , "footers" => ""
         );
 
         if (is_array($this->widgets) && count($this->widgets))

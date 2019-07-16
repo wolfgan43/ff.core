@@ -41,7 +41,7 @@ class cmAuth {
         $this->setConfigAuth($cm->config["auth"]);
         $this->setConfigUserFields($cm->config["fields"]);
 
-        Auth::addEvent("on_get_profiles", function() {
+        Auth::hook("on_get_profiles", function() {
             $cm = cm::getInstance();
 
             if(is_array($cm->config["profiling"]) && count($cm->config["profiling"])) {
@@ -51,7 +51,7 @@ class cmAuth {
             }
         });
 
-        Auth::addEvent("on_get_packages", function() {
+        Auth::hook("on_get_packages", function() {
             $cm = cm::getInstance();
 
             if(is_array($cm->config["packages"]) && count($cm->config["packages"])) {
@@ -60,7 +60,7 @@ class cmAuth {
                 }
             }
         });
-        Auth::addEvent("on_logged_in", function($user, $opt) {
+        Auth::hook("on_logged_in", function($user, $opt) {
             Auth::env("MOD_AUTH_NOACCOUNTSCOMBO", (Auth::isAdmin()
                 ? false
                 : true

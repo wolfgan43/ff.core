@@ -3,7 +3,7 @@
 {outer_wrap_start}
 <{record_tag} {component_properties}> 
 	<!--BeginSectHiddenField-->
-	<input type="hidden" id="{component}{id}" name="{component}{id}" value="{value}" />
+	<input type="hidden" name="{component}{id}" value="{value}" />
 	<!--EndSectHiddenField-->
 
 	{inner_wrap_start}
@@ -17,7 +17,7 @@
 	<div class="{error_class}">{strError}</div>
 	<!--EndSectError-->
 
-	{content_wrap_start}
+	{body_wrap_start}
 		{form_default}
 		{form_tabs}
 		<!--BeginSectGroup-->
@@ -38,13 +38,10 @@
 		{group_post_content}
 		<!--EndSectGroup-->
 
-		<!--BeginSectRequiredNote-->
-		{_require_note}
-		<!--EndSectRequiredNote-->		
-	{content_wrap__end}
-	<!--BeginSectControls-->
-	<div class="{actions_class}">{ActionButtons}{ActionButtonCancel}</div>
-	<!--EndSectControls-->
+
+
+	{body_wrap_end}
+
 	{fixed_post_content}
 	
 	{inner_wrap_end}

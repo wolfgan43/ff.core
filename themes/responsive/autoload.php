@@ -40,6 +40,9 @@ spl_autoload_register(function ($class) {
         case "ffRecord_html":
             require("ff/ffRecord/ffRecord_html.php");
             break;
+        case "ffRecord_dialog":
+            require("ff/ffRecord/ffRecord_dialog.php");
+            break;
         case "ffRecord_xhr":
             require("ff/ffRecord/ffRecord_xhr.php");
             break;

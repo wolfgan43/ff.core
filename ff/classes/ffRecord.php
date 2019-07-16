@@ -62,20 +62,23 @@ class ffRecord
 	 * @param string $theme
 	 * @return ffRecord_base
 	 */
-	public static function factory(ffPage_base $page, $disk_path = null, $theme = null)
+	public static function factory($type = null)
 	{
-		if ($theme === null)
-			$theme = $page->theme;
-			
-		if ($disk_path === null)
-			$disk_path = $page->disk_path;
-			
-		$res = self::doEvent("on_factory", array($page, $disk_path, $theme));
+		$res = self::doEvent("on_factory", array($type));
 		$last_res = end($res);
 
 		if (is_null($last_res))
 		{
-            $class_name = __CLASS__ . "_" . ($page->isXHR() ? "xhr" : ffTheme::TYPE);
+		    switch ($_REQUEST["XHR_CTX_TYPE"]) {
+                case "dialog":
+                    $class_name = __CLASS__ . "_dialog";
+                    $suffix = "_dialog";
+                    break;
+                default:
+                    $class_name = __CLASS__ . "_" . ffTheme::TYPE;
+            }
+
+            //$class_name = __CLASS__ . "_" . ($page->isXHR() ? "xhr" : ffTheme::TYPE);
             //$base_path = $disk_path . FF_THEME_DIR . "/" . FF_MAIN_THEME . "/ff/" . __CLASS__ . "/" . $class_name . "." . FF_PHP_EXT;
         }
 		else
@@ -85,7 +88,7 @@ class ffRecord
 		}
 		
 		//require_once $base_path;
-		$tmp = new $class_name($page, $disk_path, $theme);
+		$tmp = new $class_name($suffix);
 		
 		$res = self::doEvent("on_factory_done", array($tmp));
 
@@ -105,6 +108,7 @@ class ffRecord
  */
 abstract class ffRecord_base extends ffCommon
 {
+    const TYPE                  = "ffRecord";
     const NAME                  = "ffr";
 
     // ----------------------------------
@@ -287,7 +291,7 @@ abstract class ffRecord_base extends ffCommon
 	 * Visualizza una nota che spiega $display_required
 	 * @var Boolean
 	 */
-	var $display_required_note	= false;					// display a footnote that explain the required symbol
+	var $display_required_note	= true;					// display a footnote that explain the required symbol
 
 	/**
 	 * Determina se possono essere eseguite operazioni sul DB
@@ -582,8 +586,7 @@ abstract class ffRecord_base extends ffCommon
 	var $db						= null;					// Internal DB_Sql() Object
 
 	var $groups					= null;
-	var $tplSection				= array();
-	
+
 	var $contain_error 			= false;
 
 	var $ajax 					= false;
@@ -620,16 +623,17 @@ abstract class ffRecord_base extends ffCommon
 	 * @param string $theme
 	 * @return ffRecord_base
 	 */
-	function __construct(ffPage_base $page, $disk_path, $theme)
+	function __construct()
 	{
+	    $page = ffPage::getInstance();
 		$this->get_defaults("ffRecord");
 		$this->get_defaults();
-
+//todo:: da sistemare tutto
 		$this->site_path = $page->site_path;
 		$this->page_path = $page->page_path;
-		$this->disk_path = $disk_path;
-		$this->theme = $theme;
-		$this->resources[] = crc32($this->page_path);
+		$this->disk_path = $page->disk_path;
+		$this->theme = $page->theme;
+		$this->resources[] = crc32(cm::getInstance()->path_info);
 
 		if ($this->db === null)
 			$this->db[0] = ffDB_Sql::factory();
@@ -650,17 +654,7 @@ abstract class ffRecord_base extends ffCommon
 	{
 		if ($content !== null)
 		{
-            if (
-                is_object($content)
-                && (
-                    is_subclass_of($content, "ffGrid_base")
-                    || is_subclass_of($content, "ffRecord_base")
-                    || is_subclass_of($content, "ffDetails_base")
-                    || is_subclass_of($content, "ffField_base")
-                    || is_subclass_of($content, "ffButton_base")
-                    || is_subclass_of($content, "ffPageNavigator_base")
-                )
-            ) {
+            if(is_object($content) && defined(get_class($content) . "::TYPE")) {
                 if ($id === null) {
                     if (!$content->id) {
                         $content->id = $this->randID($content::NAME);
@@ -668,13 +662,14 @@ abstract class ffRecord_base extends ffCommon
 
                     $id = $content->id;
                 }
-                if (is_subclass_of($content, "ffField_base")) {
+
+                if ($content::TYPE == "ffField") {
                     $content->parent = array(&$this);
                     $content->cont_array =& $this->form_fields;
 
                     $this->form_fields[$id] = $content;
                     $this->form_fields[$id]->group = $group;
-                } elseif (is_subclass_of($content, "ffDetails_base")) {
+                } elseif ($content::TYPE == "ffDetails") {
                     $this->hidden_fields["detailaction"] = new ffData("");
                     $content->main_record = array(&$this);
                     $this->detail[$id] = $content;
@@ -1472,9 +1467,7 @@ abstract class ffRecord_base extends ffCommon
     */
     function initControls()
     {
-		$this->tplSection["buttons"]["display"] = false;
-
-		if ($this->hide_all_controls)
+		if ($this->hide_all_controls || !$this->src_table)
 			return;
 			
 		// PREPARE DEFAULT BUTTONS
@@ -1538,7 +1531,7 @@ abstract class ffRecord_base extends ffCommon
 					} 
 					else 
 					{
-						$tmp->action_type 	= "submit";
+					    $tmp->action_type 	= "submit";
 						$tmp->ajax 			= $this->ajax;
 					}
 					
@@ -1630,9 +1623,6 @@ abstract class ffRecord_base extends ffCommon
 				}
 			}
 		}
-
-        if (is_array($this->action_buttons) && count($this->action_buttons))
-			$this->tplSection["buttons"]["display"] = true;
 	}
     
     /**

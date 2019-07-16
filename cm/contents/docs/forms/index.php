@@ -23,6 +23,7 @@
  *  @license http://opensource.org/licenses/gpl-3.0.html
  *  @link https://github.com/wolfgan43/vgallery
  */
+
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->type = "default";
 
@@ -39,83 +40,71 @@ $oRecord->title = "Input Types";
 $oRecord->description = "Most common form control, text-based input fields. Includes support for all HTML5 types: <code>text, password, datetime, datetime-local, date, month, time, week, number, email, url, search, tel, and color.</code>";
 $oRecord->framework_css["component"]["header_wrap"] = false;
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "text";
+    $oField = ffField::create("input");
     $oField->label = "Text";
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "email";
+    $oField = ffField::create("email");
     $oField->label = "Email";
     //$oField->addValidator("email");
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "password";
+    $oField = ffField::create("password");
+    //$oField->type = "password";
     $oField->label = "Password";
     //$oField->extended_type = "Password";
     //$oField->crypt_method = "mysql_password";
     $oField->default_value = new ffData("password");
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    //$oField->type = "text";
+    $oField = ffField::create("input");
     $oField->label = "Placeholder";
     $oField->placeholder = true;
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "textarea";
+    $oField = ffField::create("textarea");
     $oField->label = "Text area";
     //$oField->extended_type = "Text";
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "readonly";
+    $oField = ffField::create("readonly");
     $oField->label = "Read Only";
     //$oField->properties["readonly"] = null;
     $oField->default_value = new ffData("Readonly value");
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "disabled";
+    $oField = ffField::create("disabled");
     $oField->label = "Disabled";
     //$oField->properties["disabled"] = null;
     $oField->default_value = new ffData("Disabled value");
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "label";
+    $oField = ffField::create("label");
     $oField->label = "Static control";
     //$oField->control_type = "label";
     $oField->default_value = new ffData("email@example.com");
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    //$oField->type = "text";
+    $oField = ffField::create("input");
     $oField->id = "helpingText";
     $oField->label = "Helping text";
     $oField->placeholder = true;
     $oField->description = "A block of help text that breaks onto a new line and may extend beyond one line.";
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "search";
+    $oField = ffField::create("search");
     $oField->label = "Search";
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "tel";
+    $oField = ffField::create("tel");
     $oField->label = "Tel";
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "url";
+    $oField = ffField::create("url");
     $oField->label = "Url";
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "select";
+    $oField = ffField::create("select");
     $oField->label = "Input Select";
    // $oField->extended_type = "Selection";
     $oField->multi_select_one = false;
@@ -128,8 +117,7 @@ $oRecord->framework_css["component"]["header_wrap"] = false;
     );
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "select-multi";
+    $oField = ffField::create("select-multi");
     $oField->label = "Multiple Select";
     //$oField->extended_type = "Selection";
     //$oField->properties["multiple"] = null;
@@ -144,53 +132,50 @@ $oRecord->framework_css["component"]["header_wrap"] = false;
     $oRecord->addContent($oField, "Col2");
 
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "file";
+    $oField = ffField::create("file");
     $oField->label = "Default file input";
     //$oField->control_type = "file";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "date";
+    $oField = ffField::create("date");
     $oField->label = "Date";
     //$oField->base_type = "Date";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "month";
+    $oField = ffField::create("month");
     $oField->label = "Month";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "time";
+    $oField = ffField::create("time");
     $oField->label = "Time";
     //$oField->base_type = "Time";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "week";
+    $oField = ffField::create("week");
     $oField->label = "Week";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "datetime";
+    $oField = ffField::create("datetime");
     $oField->label = "Date time";
     //$oField->base_type = "DateTime";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "number";
+    $oField = ffField::create("number");
     $oField->label = "Number";
     //$oField->base_type = "Number";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "color";
+    $oField = ffField::create("currency");
+    $oField->label = "Currency";
+    //$oField->base_type = "Number";
+    $oField->default_value = new ffData("15.3", "Number");
+    $oRecord->addContent($oField, "Col2");
+
+    $oField = ffField::create("color");
     $oField->label = "Color";
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "range";
+    $oField = ffField::create("range");
     $oField->label = "Range";
     $oRecord->addContent($oField, "Col2");
 
@@ -201,8 +186,7 @@ $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->type = "default";
 $oRecord->framework_css["component"]["header_wrap"] = false;
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "select-custom";
+    $oField = ffField::create("select-custom");
     //$oField->extended_type = "Selection";
     //$oField->class = "custom-select";
     $oField->multi_pairs = array(
@@ -212,8 +196,7 @@ $oRecord->framework_css["component"]["header_wrap"] = false;
     );
     $oRecord->addContent($oField, "Col1");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "checkbox";
+    $oField = ffField::create("checkbox");
     //$oField->base_type = "Number";
     //$oField->control_type = "checkbox";
     $oField->label = "Check this custom checkbox";
@@ -221,8 +204,7 @@ $oRecord->framework_css["component"]["header_wrap"] = false;
     //$oField->unchecked_value = new ffData("0", "Number");
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "checkbox";
+    $oField = ffField::create("checkbox");
     //$oField->base_type = "Number";
     //$oField->control_type = "checkbox";
     $oField->label = "Check this custom checkbox";
@@ -231,8 +213,7 @@ $oRecord->framework_css["component"]["header_wrap"] = false;
     $oRecord->addContent($oField, "Col2");
 
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "radio";
+    $oField = ffField::create("radio");
     //$oField->base_type = "Number";
     $oField->label = "Label Header";
     $oField->description = "Additional Description";
@@ -244,8 +225,7 @@ $oRecord->framework_css["component"]["header_wrap"] = false;
     );
     $oRecord->addContent($oField, "Col2");
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "radio";
+    $oField = ffField::create("radio");
     //$oField->base_type = "Number";
     //$oField->control_type = "radio";
     $oField->label = "Or toggle this other custom radio";
@@ -273,7 +253,7 @@ $oRecord->type = "default";
 $oRecord->framework_css["component"]["header_wrap"] = false;
 $oRecord->setWidthComponent(6);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Small";
     $oField->placeholder = ".input-sm";
     $oField->size = "small";
@@ -281,19 +261,19 @@ $oRecord->setWidthComponent(6);
     $oRecord->addContent($oField);
 
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Normal";
     $oField->placeholder = "Normal";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Large";
     $oField->placeholder = ".input-lg";
     $oField->size = "large";
     //$oField->framework_css["user"]["field"]["control"]["form"] = array("control", "size-lg");
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Grid Sizes";
     $oField->placeholder = "col-xs-4";
     $oField->setWidthComponent("4");
@@ -310,13 +290,13 @@ $oRecord->type = "default";
 $oRecord->framework_css["component"]["header_wrap"] = false;
 $oRecord->setWidthComponent(6);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Static";
     $oField->placeholder = "Username";
     $oField->fixed_pre_content = "@";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Dropdowns";
     $oField->fixed_pre_content = array(
         "label" => "Dropdown",
@@ -329,7 +309,7 @@ $oRecord->setWidthComponent(6);
     $oRecord->addContent($oField);
 
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Buttons";
     $oField->placeholder = "Recipient's username";
     $oField->fixed_post_content = array(
@@ -339,8 +319,7 @@ $oRecord->setWidthComponent(6);
     );
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->type = "file-custom";
+    $oField = ffField::create("file-custom");
     $oField->label = "Custom file input";
     $oField->placeholder = "Choose file";
     //$oField->control_type = "file";
@@ -364,57 +343,51 @@ $oRecord->title = "Other Component";
 $oRecord->type = "default";
 $oRecord->framework_css["component"]["header_wrap"] = false;
 
-$oField = ffField::factory($cm->oPage);
-$oField->type = "code";
+$oField = ffField::create("code");
 $oField->label = "Code example";
 $oField->default_value = new ffData($html_fake);
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$oField = ffField::factory($cm->oPage);
-$oField->type = "html";
+$oField = ffField::create("html");
 $oField->label = "Html example";
 $oField->default_value = new ffData($html_fake);
 $oField->setWidthComponent(6);
 $oRecord->addContent($oField);
 
-$oField = ffField::factory($cm->oPage);
-$oField->type = "file-thumb";
+$oField = ffField::create("file-thumb");
 $oField->label = "Upload";
 $oRecord->addContent($oField);
-
-
 $cm->oPage->addContent($oRecord);
-
-
 
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->title = "Basic example";
 $oRecord->type = "default";
 $oRecord->framework_css["component"]["header_wrap"] = false;
-$oRecord->src_table = "access_users"; //todo:da togliere
 $oRecord->setWidthComponent(6);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("email");
     $oField->label = "Email address";
     $oField->placeholder = "Enter email";
     $oField->description = "We'll never share your email with anyone else.";
-    $oField->addValidator("email");
+    $oField->required = true;
+    //$oField->addValidator("email");
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("password");
     $oField->label = "Password";
     $oField->placeholder = "Password";
-    $oField->extended_type = "Password";
-    $oField->crypt_method = "mysql_password";
+    $oField->required = true;
+    //$oField->extended_type = "Password";
+    //$oField->crypt_method = "mysql_password";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("checkbox");
     $oField->label = "Check this custom checkbox";
-    $oField->base_type = "Number";
-    $oField->control_type = "checkbox";
-    $oField->checked_value = new ffData("1", "Number");
-    $oField->unchecked_value = new ffData("0", "Number");
+    //$oField->base_type = "Number";
+    //$oField->control_type = "checkbox";
+    //$oField->checked_value = new ffData("1", "Number");
+    //$oField->unchecked_value = new ffData("0", "Number");
     $oRecord->addContent($oField);
 
     $oButton = ffButton::factory($cm->oPage);
@@ -432,36 +405,39 @@ $cm->oPage->addContent($oRecord);
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->title = "Horizzontal form";
 $oRecord->type = "inline";
+$oRecord->ajax = true;
 $oRecord->framework_css["component"]["header_wrap"] = false;
-$oRecord->src_table = "access_users";
 $oRecord->setWidthComponent(6);
+$oRecord->framework_css["component"]["footer_wrap"] = false;
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("email");
     $oField->label = "Email";
     $oField->placeholder = true;
-    $oField->addValidator("email");
+    $oField->required = true;
+    //$oField->addValidator("email");
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("password");
     $oField->label = "Password";
     $oField->placeholder = true;
-    $oField->extended_type = "Password";
-    $oField->crypt_method = "mysql_password";
+    $oField->required = true;
+    //$oField->extended_type = "Password";
+    //$oField->crypt_method = "mysql_password";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("password");
     $oField->label = "Re Password";
     $oField->placeholder = true;
-    $oField->extended_type = "Password";
-    $oField->crypt_method = "mysql_password";
+    //$oField->extended_type = "Password";
+    //$oField->crypt_method = "mysql_password";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("checkbox");
     $oField->label = "Check this custom checkbox";
-    $oField->base_type = "Number";
-    $oField->control_type = "checkbox";
-    $oField->checked_value = new ffData("1", "Number");
-    $oField->unchecked_value = new ffData("0", "Number");
+    //$oField->base_type = "Number";
+    //$oField->control_type = "checkbox";
+    //$oField->checked_value = new ffData("1", "Number");
+    //$oField->unchecked_value = new ffData("0", "Number");
     $oRecord->addContent($oField);
 
     $oButton = ffButton::factory($cm->oPage);
@@ -481,19 +457,18 @@ $oRecord->title = "Inline form";
 $oRecord->description = "Use the <code>.form-inline</code> class to display a series of labels, form controls, and buttons on a single horizontal row. Form controls within inline forms vary slightly from their default states. Controls only appear inline in viewports that are at least 576px wide to account for narrow viewports on mobile devices.";
 $oRecord->type = "inline";
 $oRecord->framework_css["component"]["header_wrap"] = false;
-$oRecord->src_table = "access_users"; //todo:da togliere
 
 
-    $oField = ffField::factory($cm->oPage);
-    $oField->control_type = "label";
+    $oField = ffField::create("label");
+    //$oField->control_type = "label";
     $oField->default_value = new ffData("email@example.com");
     $oField->setWidthComponent(4);
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("password");
     $oField->placeholder = "Password";
-    $oField->extended_type = "Password";
-    $oField->crypt_method = "mysql_password";
+    //$oField->extended_type = "Password";
+    //$oField->crypt_method = "mysql_password";
     $oField->setWidthComponent(4);
     $oRecord->addContent($oField);
 
@@ -507,20 +482,20 @@ $oRecord->src_table = "access_users"; //todo:da togliere
 
 
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "auto-sizing";
     $oField->placeholder = "Jane Doe";
     $oField->setWidthComponent(4);
     $oRecord->addContent($oField);
 
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->placeholder = "Username";
     $oField->setWidthComponent(4);
     $oField->fixed_pre_content = "@";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Remember me";
     $oField->base_type = "Number";
     $oField->control_type = "checkbox";
@@ -545,43 +520,42 @@ $oRecord->title = "Form row";
 $oRecord->description = "You may also swap <code>.row</code> for <code>.form-row</code>, a variation of our standard grid row that overrides the default column gutters for tighter and more compact layouts.";
 $oRecord->type = "default";
 $oRecord->framework_css["component"]["header_wrap"] = false;
-$oRecord->src_table = "access_users"; //todo:da togliere
 
 
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("email");
     $oField->label = "Email";
     $oField->placeholder = "Email";
-    $oField->addValidator("email");
+    //$oField->addValidator("email");
     $oField->setWidthComponent(6);
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("password");
     $oField->label = "Password";
     $oField->placeholder = "Password";
-    $oField->extended_type = "Password";
-    $oField->crypt_method = "mysql_password";
+    //$oField->extended_type = "Password";
+    //$oField->crypt_method = "mysql_password";
     $oField->setWidthComponent(6);
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Address";
     $oField->placeholder = "1234 Main St";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Address 2";
     $oField->placeholder = "Apartment, studio, or floor";
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "City";
     $oField->setWidthComponent(6);
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("select");
     $oField->label = "State";
-    $oField->extended_type = "Selection";
+    //$oField->extended_type = "Selection";
     $oField->multi_select_one_label = "Choose";
     $oField->multi_pairs = array(
         array(new ffData("1"), new ffData("Option 1")),
@@ -591,17 +565,17 @@ $oRecord->src_table = "access_users"; //todo:da togliere
     $oField->setWidthComponent(4);
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("input");
     $oField->label = "Zip";
     $oField->setWidthComponent(2);
     $oRecord->addContent($oField);
 
-    $oField = ffField::factory($cm->oPage);
+    $oField = ffField::create("checkbox");
     $oField->label = "Check this custom checkbox";
-    $oField->base_type = "Number";
-    $oField->control_type = "checkbox";
-    $oField->checked_value = new ffData("1", "Number");
-    $oField->unchecked_value = new ffData("0", "Number");
+    //$oField->base_type = "Number";
+    //$oField->control_type = "checkbox";
+    //$oField->checked_value = new ffData("1", "Number");
+    //$oField->unchecked_value = new ffData("0", "Number");
     $oRecord->addContent($oField);
 
 

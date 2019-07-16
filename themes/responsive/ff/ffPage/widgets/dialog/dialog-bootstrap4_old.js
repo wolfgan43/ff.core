@@ -39,9 +39,10 @@ ff.pluginAddInit("ff.ajax", function () {
 		"event_name" : "onUpdateContent"
 		, "func_name" : function (params, data, injectid) {
 			if (params.ctx && ff.ffPage.dialog.exist(params.ctx) && params.component === undefined) {
-				if (!ff.ffPage.dialog.get(params.ctx).instance) {
-                    ff.ffPage.dialog.makeInstance(params.ctx);
-                }
+				if (!ff.ffPage.dialog.get(params.ctx).instance) 
+					ff.ffPage.dialog.makeInstance(params.ctx);
+
+				ff.ffPage.dialog.removeDlgBt(params.ctx, data);
 			}
 		}
 	});
@@ -138,25 +139,62 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
     else
         return that.dialog_params.get(id)[param];
 },
+"getDimensions" : function(elem) {
+	var width = elem.outerWidth();
+	
+	if(elem.get(0).scrollWidth > width)
+		return "modal-lg";
+},
+"adjSize" : function (id) {
+	if(id === undefined) {
+		id = dialogs.keys[dialogs.keys.length - 1];
+	}
+	
+	var instance = dialogs.get(id).instance;
+	var widget = dialogs.get(id).widget;
+	var width = dialogs.get(id).params.width;
+	var widthClass = "";
 
+	if(width) {
+		if(parseInt(width) > 600)
+			widthClass = "modal-lg";
+		else if(parseInt(width) < 500)
+			widthClass = "modal-sm";
+	} else {
+		widthClass = that.getDimensions(instance);	
+	}
+	
+
+
+	if(widthClass)
+		jQuery(".modal-dialog", widget).addClass(widthClass);
+	
+	var wh = jQuery(window).height();
+	var height = jQuery(".modal-dialog", widget).height();
+
+	//if(wh > (height * 2)) {
+	//	jQuery(".modal-dialog", widget).css("margin-top", ((wh - height) / 2));
+	//}
+	return true;
+},
 "refresh" : function (id, show) {
 	if(id === undefined) {
 		id = dialogs.keys[dialogs.keys.length - 1];
 	}
 
-	var instance = dialogs.get(id).instance;
+	var widget = dialogs.get(id).widget;
 	
-	if(!instance.hasClass("show")) {
-        instance.addClass("show");
+	if(!widget.hasClass("show")) {
+		widget.addClass("show");
 		//widget.modal({backdrop: false});
-        instance.show();
+		widget.show();
  		
  		that.doEvent({
 		    "event_name"    : "onDisplayedDialog",
 		    "event_params"    : [id]
 		});		
 	}
-	//that.adjSize(id);
+	that.adjSize(id);
 
 	return true;
 },
@@ -168,10 +206,32 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 		firstDialog = id;
 	}
 
-	jQuery("body").append('<div id="ffWidget_dialog_' + id + '" class="ff-modal modal fade" role="dialog"></div>');
-	
-	dialogs.get(id).instance = jQuery('#ffWidget_dialog_' + id);
+	var tmp_params = that.dialog_params.get(id) || {};
 
+	
+	var tmp = '<div id="ffWidget_dialog_' + id + '" class="ff-modal modal fade" role="dialog">'
+				 +  '<div class="modal-dialog' + (tmp_params["class"] || "") + '">'
+				 +    '<div class="modal-content">'
+				 +      '<div class="modal-header d-block">'
+				 + 		  '<div class="d-flex">'
+				 +          '<h3 class="modal-title">' + (title || "") + '</h3>'
+				 +          '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>'
+				 +		  '</div>'
+				 +      '</div>'
+				 +      '<div id="ffWidget_dialog_container_' + id + '" class="modal-body clearfix">' + (data || "") + '</div>'
+				 +      '<div class="modal-footer"></div>'
+				 +    '</div>'
+				 +  '</div>'
+				 + '</div>'; 				 
+	
+	jQuery("body").append(tmp);
+	
+	dialogs.get(id).instance = jQuery('#ffWidget_dialog_container_' + id);
+	dialogs.get(id).widget = jQuery('#ffWidget_dialog_' + id);
+	jQuery(".close", dialogs.get(id).widget).on('click', function () {
+		that.onClose(id);
+	});
+	
 	return dialogs.get(id).instance;
 },
 
@@ -208,6 +268,8 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
     }
 
     if (dialogs.get(id) && dialogs.get(id).instance) {
+	    var widget = dialogs.get(id).widget;
+
         if(dialogs.get(id).params.current_url != url && preserveIstance) {
 			var breadCrumbs = dialogs.get(id).breadCrumbs;
         	var actionBack = false;
@@ -221,7 +283,7 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 				}
         	}
         	if(!actionBack)
-        		breadCrumbs.push({"title":  jQuery(".modal-title", instance).text(), "url" : dialogs.get(id).params.current_url});
+        		breadCrumbs.push({"title":  jQuery(".modal-title", widget).text(), "url" : dialogs.get(id).params.current_url});
 				
             ff.ffPage.dialog.goToUrl(id, url);
         } else {
@@ -282,6 +344,7 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 "onSuccess" : function (data, customdata) {
     var id = customdata.id;
 	var instance = dialogs.get(id).instance;
+	var widget = dialogs.get(id).widget;
     if (data === null) {
         if (dialogs.get(id).params.params && dialogs.get(id).params.params.persistent)
             dialogs.get(id).params.params.persistent = false;
@@ -323,11 +386,9 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
 	} else if (data["cursor_reload"] && data["cursor_reload"] === id) {
 		ff.ffRecord.cursor.reload(id);		
     } else {
+		that.makeDlgBt(id, data);
+
         if (data["html"]) {
-            that.makeDlgBt(id, data["html"]);
-            if (data["footers"].replace(/\s+/, '')) {
-                eval(data["footers"]);
-            }
 			if (!ff.ajax.ctxGet(id).needInit() && dialogs.get(id) !== undefined ) {
 				//jQuery(widget).modal({backdrop: false});
 				that.refresh(id);
@@ -371,7 +432,7 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
         }
     });
 	
-    dialogs.get(id).instance.remove();
+    dialogs.get(id).widget.remove();
     dialogs.unset(id);
 
     if(ff.ajax.ctxGet(id))
@@ -396,12 +457,12 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
         	that.close(id);
             break;
         default:
-        	var instance = dialogs.get(id).instance;
+        	var widget = dialogs.get(id).widget;
 
 			ff.ajax.ctxGet(id).reset();
             that.doEvent({"event_name": "doAction", "event_params" : [id, action, component, detailaction, action_param]});
 
-            var fields = ff.getFields(instance, id);
+            var fields = ff.getFields(widget, id);
             fields.push(
                 {name: "frmAction", value: component + action}
             );
@@ -479,11 +540,11 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
      *    action_param
      *    fields            i campi da passare con la richiesta, se no vengono presi quelli di tutta la pagina
      */
-    var instance = dialogs.get(id).instance;
+    var widget = dialogs.get(id).widget;
     
 	ff.ajax.ctxGet(id).reset();
 	
-	var fields = (params.fields === undefined ? jQuery(":input", instance).not("input:checkbox:not(:checked)").not("input:radio:not(:checked)") : params.fields);
+	var fields = (params.fields === undefined ? jQuery(":input", widget).not("input:checkbox:not(:checked)").not("input:radio:not(:checked)") : params.fields);
 
     if (params.action) {
         fields.push(
@@ -573,36 +634,171 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
     }
     return parsedurl;
 },
-"makeDlgBt" : function(id, html) {
+"removeDlgBt" : function(id, data) {
 	var instance = dialogs.get(id).instance;
+	var widget = dialogs.get(id).widget;
 
-	if(jQuery(".modal-dialog", html)) {
-		instance.html(html);
-        jQuery(".modal-title", instance).before('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
-	} else {
-		var tmp = '<div id="ffpwd_' + id + '" class="ff-modal modal fade" role="dialog">'
-				 +  '<div class="modal-dialog' + (tmp_params["class"] || "") + '">'
-				 +    '<div class="modal-content">'
-				 +      '<div class="modal-header d-block">'
-				 + 		  '<div class="d-flex">'
-				 +          '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>'
-				 +          '<h3 class="modal-title">' + jQuery(".card-title", html).html() + '</h3>'
-        		 + 			jQuery(".card-subtitle", html).outerHTML()
-				 +		  '</div>'
-				 +      '</div>'
-				 +      '<div id="ffWidget_dialog_container_' + id + '" class="modal-body clearfix">' + html + '</div>'
-				 +      '<div class="modal-footer">' + jQuery(".card-footer", html).html() + ' </div>'
-				 +    '</div>'
-				 +  '</div>'
-				 + '</div>';
+	if(data["html"].indexOf("dialogSubTitleTab")) {
+		jQuery(".modal-tabs", widget).remove();
+	}
+	jQuery(".modal-callout", widget).remove();
+	//jQuery(".modal-breadcrumb", widget).remove();
+	
+	if(data["html"].indexOf("dialogActionsPanel top")) {
+		jQuery(".dlgTopPanel", widget).remove();
+	}
 
-        instance.html(tmp)
+	if(data["html"].indexOf("dialogActionsPanel")) {
+		jQuery(".dlgBottomPanel", widget).remove();
+	}
+},
+"makeDlgBt" : function(id, data) {
+	var instance = dialogs.get(id).instance;
+	var widget = dialogs.get(id).widget;
+
+	var countRecord = 0;
+	var countGrid = 0;
+	var countDetail = 0;
+	if(data["html"]) {
+		ff.struct.get("comps").each(function(key, value) {
+			switch(value["type"]) {
+				case "ffRecord":
+					if (value["ctx"] === id)
+						countRecord++;
+					return;
+				case "ffGrid":
+					if (value["ctx"] === id)
+						countGrid++;
+					break;
+				case "ffDetails":
+					if (value["ctx"] === id)
+						countDetail++;
+				default:
+			}
+		});	
+/*
+		struct.each(function(key, value) {
+			switch(value["type"]) {
+				case "ffRecord":
+					if(data["html"].indexOf('id="' + key + '"') >= 0)
+						countRecord++;
+					return;
+				case "ffGrid":
+					if(data["html"].indexOf('id="' + key + '"') >= 0)
+						countGrid++;
+					break;
+				case "ffDetails":
+					if(data["html"].indexOf('id="' + key + '"') >= 0)
+						countDetail++;
+				default:
+			}
+		});	
+*/
+	}
+	if(countDetail && !countRecord)
+		return;
+
+	if(jQuery(".card-title", instance).length) {
+		jQuery(".modal-title").addClass(jQuery(".card-title:first", instance).attr("class")).removeClass("card-title");
+/*		jQuery(".dialogTitle:first", instance).appendTo(jQuery(".modal-title", widget).empty()).attr("class", "dlgTitle");
+*/		
+		jQuery(".modal-title", widget).html(jQuery(".card-title:first", instance).html());
+		jQuery(".card-title:first", instance).remove();
+	}
+	
+	//var calloutTargetClass = "modal-header";
+
+	//tabs groups
+	/*if(jQuery(".dialogSubTitleTab", instance).length) { //da eliminare
+		var startSel = 0;
+		var tabPane = {};
+		jQuery(".dialogSubTitleTab", instance).replaceWith(function(i) { 
+			jQuery(this).removeClass("dialogSubTitleTab");
+			var activeClass = "";
+			if(jQuery(this).hasClass("active")) {
+				startSel = i;
+
+				jQuery(this).removeClass("active");
+			}
+			var depClass = jQuery(this).attr("class").replace("dep-", "dlg-");
+			var depId = "bs-" + depClass;
+
+			tabPane[depClass] = true;
+			//jQuery(this).parent().addClass("dlg-tab " + depClass); 
+			jQuery(".dlg-tab." + depClass, instance);//.addClass("tabbable");
+
+			return '<li class="dialogSubTitleTab"><a href="#' + depId + '" data-toggle="tab">' + jQuery(this).html() + '</a></li>';
+		});
+
+		jQuery(".dlg-tab", instance).wrapAll('<div class="tab-content" />');
+
+		for(var depClass in tabPane) {
+			var depId = "bs-" + depClass;
+			jQuery("." + depClass, instance).wrapAll('<div class="tab-pane fade" id="' + depId + '" />')
+		
+		}
+
+		jQuery("LI.dialogSubTitleTab:eq(" + startSel + ")", widget).addClass("active");
+		jQuery(".tab-content .tab-pane:eq(" + startSel + ")", instance).addClass("active in");
+
+		jQuery(".dialogSubTitleTab", instance).insertAfter(jQuery(".modal-header", widget)).removeClass("dialogSubTitleTab").wrapAll('<div class="modal-tabs" />').wrapAll('<ul class="nav nav-tabs" />');
+		jQuery(".modal-header", widget).addClass("noborder");
+		
+		calloutTargetClass = "modal-tabs";
+	} else*/
+	/*if(jQuery(".ffTab", instance).length) { 	//tabs responsive
+		jQuery(".ffTab", instance).insertAfter(jQuery(".modal-header", widget)).wrapAll('<div class="modal-tabs" />');
+		jQuery(".modal-header", widget).addClass("noborder");
+
+		calloutTargetClass = "modal-tabs";
+	}*/
+
+    if(jQuery(".card-subtitle", instance).length) {
+        jQuery(".modal-header .d-flex", widget).after('<small class="modal-title">' + jQuery(".card-subtitle", instance).html() + '</small>');
+        jQuery(".card-subtitle", instance).remove();
     }
 
-    jQuery(".close", dialogs.get(id).instance).on('click', function () {
-        that.onClose(id);
-    });
 
+	
+    var skipForceBt = jQuery(".nav.nav-tabs > LI", widget).length;
+	if(jQuery(".dialogActionsPanel.top", instance).length) {
+        if(!skipForceBt)
+		    jQuery(".dialogActionsPanel.top.force", instance).appendTo(jQuery(".modal-header", widget)).addClass("dlgTopPanel").removeClass("dialogActionsPanel top force");
+		if(!countRecord && countGrid == 1)
+			jQuery(".dialogActionsPanel.top:not(.force)", instance).appendTo(jQuery(".modal-header", widget)).addClass("dlgTopPanel").removeClass("dialogActionsPanel top");
+	}
+
+	if(jQuery(".dialogActionsPanel:not(.top)", instance).length) {
+        if(!skipForceBt)
+		    jQuery(".dialogActionsPanel.force", instance).appendTo(jQuery(".modal-footer", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel force");
+
+		if(countRecord) {
+			jQuery(".dialogActionsPanel:not(.force):last", instance).appendTo(jQuery(".modal-footer", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
+		} else if(countGrid == 1) {
+			jQuery(".dialogActionsPanel:not(.force)", instance).appendTo(jQuery(".modal-footer", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
+		} else if(!countRecord && !countGrid) {
+			jQuery(".dialogActionsPanel", instance).appendTo(jQuery(".modal-footer", widget)).addClass("dlgBottomPanel").removeClass("dialogActionsPanel");
+		}
+	}
+	
+	if(dialogs.get(id).breadCrumbs.length) {
+		var breadCrumbs = "";
+		for(var i=0; i<dialogs.get(id).breadCrumbs.length; i++) {
+			var brdUrl = 'ff.ffPage.dialog.doOpen(\'' + id + '\', \'' + dialogs.get(id).breadCrumbs[i]["url"] + '\',\'' + dialogs.get(id).breadCrumbs[i]["title"] + '\', true);';
+			breadCrumbs = breadCrumbs + '<li><a href="javascript:void(0);" onClick="' + brdUrl + '">' + dialogs.get(id).breadCrumbs[i]["title"] + '</a></li>';
+		}
+		if(breadCrumbs) { 
+		//<a href="javascript:void(0);" onClick="' + brdUrl + '" class="dlgBrdBack"></a>
+			if(!jQuery("ol.breadcrumb", widget).length) {
+				var pageTitle = jQuery(".modal-title", widget).text();
+				$(".modal-title", widget).contents().filter(function () {
+				     return this.nodeType === 3; 
+				}).remove();
+
+				jQuery('<ol class="breadcrumb">' + breadCrumbs + '<li>' + pageTitle + '</li>' + '</ol>').appendTo(jQuery(".modal-title", widget));
+			}
+		}
+	}
 },
 "updateCursor" : function (id, url) {
 	var tmp = null;
@@ -620,14 +816,9 @@ __ff : "ff.ffPage.dialog-bootstrap4", /* used to recognize ff'objects */
     /* Init obj */
     function constructor() { // NB: called below publics
         ff.initExt(that);
-        jQuery(document).keyup(function(e) {
-            if (e.key === "Escape") { // escape key maps to keycode `27`
-                jQuery(".ff-modal .close").trigger("click");
-            }
-        });
     }
 
-    if(document.readyState === "complete") {
+    if(document.readyState == "complete") {
         //  constructor(); //va in contrasto con libLoaded
     } else {
         window.addEventListener('load', function () {

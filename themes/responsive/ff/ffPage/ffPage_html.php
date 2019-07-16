@@ -276,15 +276,6 @@ class ffPage_html extends ffPage_base
 
 
     /**
-     * @return ffPage_html
-     */
-    public static function getInstance()
-    {
-        return self::$singleton;
-    }
-
-
-    /**
      * il costruttore di ffPage richiede, come ogni altro elemento del framework, il passaggio delle variabili
      * che determinano i percorsi utilizzati negli automatismi.
      * Oltre a impostare i corretti valori di default, il costruttore non esegue altre operazioni degne di nota.

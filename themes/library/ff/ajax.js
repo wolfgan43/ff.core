@@ -546,11 +546,14 @@ __ff : "ff.ajax", // used to recognize ff'objects
 	if (data["html"] !== undefined) {
 		// inserisco il nuovo contenuto
 		if (data["headers"].replace(/\s+/, '')) {
-			var tmpdiv = ff.getUniqueID();
+            eval(data["headers"]);
+
+            //var tmpdiv = ff.getUniqueID();
+            //jQuery("body").append('<script type="text/javascript" id="fftmp' + tmpdiv + '">' + data["headers"] + '</script>');
+
 			//jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["headers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
-			jQuery("body").append('<script type="text/javascript" id="fftmp' + tmpdiv + '">' + data["headers"] + '</script>');
-			//jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
-		}
+            //jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
+        }
 		
 		if(params.ctx && ctxs.get(params.ctx) !== undefined) {
 			var ctx = that.ctxGet(params.ctx);
@@ -600,10 +603,12 @@ __ff : "ff.ajax", // used to recognize ff'objects
 				jQuery("#" + params.component + "_hidden").replaceWith(data["hidden"]);
 		}
 
-		if (data["footers"].replace(/\s+/, '')) {
-			var tmpdiv = ff.getUniqueID();
-			//jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
-			jQuery("body").append('<script type="text/javascript" id="fftmp' + tmpdiv + '">' + data["footers"] + '</script>');
+		if (!params.ctx && data["footers"].replace(/\s+/, '')) {
+			eval(data["footers"]);
+			//var tmpdiv = ff.getUniqueID();
+            //jQuery("body").append('<script type="text/javascript" id="fftmp' + tmpdiv + '">' + data["footers"] + '</script>');
+
+            //jQuery("body").append('<div id="fftmp' + tmpdiv + '">' + data["footers"] + '<script type="text/javascript">jQuery("#fftmp' + tmpdiv + '").remove();</script></div>');
 			//jQuery(function () {jQuery("#fftmp" + tmpdiv).remove();});
 		}
         

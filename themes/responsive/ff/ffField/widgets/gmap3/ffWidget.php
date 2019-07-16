@@ -22,53 +22,34 @@ Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
     var $css_deps 		= array();
 
 	// PRIVATE VARS
-	
-	var $tpl 			= null;
-	var $db				= null;
 
-	var $oPage = null;
-	var $source_path	= null;
-	var $style_path = null;
+    /**
+     * @var $tpl ffTemplate[]
+     */
+    private $tpl 			= null;
 	
-	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
+	function __construct(ffPage_base $oPage = null)
 	{
 		//$this->get_defaults();
-
-		$this->oPage = array(&$oPage);
-		
-		if ($source_path !== null)
-			$this->source_path = $source_path;
-		elseif ($oPage !== null)
-			$this->source_path = $oPage->getThemePath();
-
-		$this->style_path = $style_path;
-		
-		$this->db[0] = ffDB_Sql::factory();
-
 	}
 
 	function prepare_template($id)
 	{
 		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
-
-		$this->tpl[$id]->set_var("source_path", $this->source_path);
-
-        if ($this->style_path !== null)
-			$this->tpl[$id]->set_var("style_path", $this->style_path);
-		elseif ($this->oPage !== null)
-			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-			
-		$cm = cm::getInstance();
-		if ($cm->oPage->compact_js)
-			$cm->oPage->tplAddJs("ff.ffField.gmap3.async");
-		else
-			$cm->oPage->tplAddJs("ff.ffField.gmap3.sync");			
 	}
 	
 	function process($id, &$value, ffField_base &$Field)
 	{
-		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
+        $oPage = ffPage::getInstance();
+
+        if ($oPage->compact_js) {
+            $oPage->tplAddJs("ff.ffField.gmap3.async");
+        } else {
+            $oPage->tplAddJs("ff.ffField.gmap3.sync");
+        }
+
+        if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
 			$tpl_id = $Field->parent[0]->getIDIF();
 			$prefix = $tpl_id . "_";
@@ -86,29 +67,20 @@ Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
 		}
 		
 		$this->tpl[$tpl_id]->set_var("id", $id);
-		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
-		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
-		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 		
-		$this->tpl[$tpl_id]->set_var("container_class", $this->oPage[0]->frameworkCSS->get("group", "form"));
+		$this->tpl[$tpl_id]->set_var("container_class", $oPage->frameworkCSS->get("group", "form"));
 
-		$wrap_addon = $this->oPage[0]->frameworkCSS->get("wrap-addon", "form");
+		$wrap_addon = $oPage->frameworkCSS->get("wrap-addon", "form");
 		if($wrap_addon) {
-			$this->tpl[$tpl_id]->set_var("wrap_start", '<div class="' . $this->oPage[0]->frameworkCSS->get(array(10), "col") . '">');
-			$this->tpl[$tpl_id]->set_var("wrap_middle", '</div><div class="' . $this->oPage[0]->frameworkCSS->get(array(2), "col") . '">');
+			$this->tpl[$tpl_id]->set_var("wrap_start", '<div class="' . $oPage->frameworkCSS->get(array(10), "col") . '">');
+			$this->tpl[$tpl_id]->set_var("wrap_middle", '</div><div class="' . $oPage->frameworkCSS->get(array(2), "col") . '">');
 			$this->tpl[$tpl_id]->set_var("wrap_end", '</div>');
 		}
-		$this->tpl[$tpl_id]->set_var("search_class", $this->oPage[0]->frameworkCSS->get("control", "form"));
-		$this->tpl[$tpl_id]->set_var("search_bt_class", $this->oPage[0]->frameworkCSS->get("search", "link") . " " . $this->oPage[0]->frameworkCSS->get("control-postfix", "form") . " " . $this->oPage[0]->frameworkCSS->get("search", "icon"));
+		$this->tpl[$tpl_id]->set_var("search_class", $oPage->frameworkCSS->get("control", "form"));
+		$this->tpl[$tpl_id]->set_var("search_bt_class", $oPage->frameworkCSS->get("search", "link") . " " . $oPage->frameworkCSS->get("control-postfix", "form") . " " . $oPage->frameworkCSS->get("search", "icon"));
 
-		$this->tpl[$tpl_id]->set_var("map_class", $this->oPage[0]->frameworkCSS->get(array(12), "col", "nopadding"));
-
-		
-        if(strlen($Field->widget_path))
-            $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
-        else 
-            $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/gmap3"); 
+		$this->tpl[$tpl_id]->set_var("map_class", $oPage->frameworkCSS->get(array(12), "col", "nopadding"));
 
 		$this->tpl[$tpl_id]->set_var("key", $Field->gmap_key);
 		$this->tpl[$tpl_id]->set_var("sensor", (0 ? "true" : "false"));

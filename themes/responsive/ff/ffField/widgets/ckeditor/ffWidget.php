@@ -28,14 +28,13 @@ class ffWidget_ckeditor extends ffCommon
     					);
 
 	// PRIVATE VARS
-	
-	var $tpl 			= null;
-	var $db				= null;
 
-	var $oPage = null;
-	var $source_path	= null;
-	var $style_path 	= null;
-	var $ckeditor_toolbar = array(	
+    /**
+     * @var $tpl ffTemplate[]
+     */
+    private $tpl 			= null;
+
+	var $ckeditor_toolbar = array(
 				"default" => "
 				[
 					['Source','-','Bold','Italic','Underline','-','Find','Replace','-','Cut','Copy','Paste','PasteFromWord'],
@@ -89,35 +88,15 @@ class ffWidget_ckeditor extends ffCommon
 				]" //This is the default toolbar definition used by the editor. It contains all editor features.
 			);
 
-	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
+	function __construct(ffPage_base $oPage = null)
 	{
 		$this->get_defaults();
-
-		$this->oPage = array(&$oPage);
-		
-		if ($source_path !== null)
-			$this->source_path = $source_path;
-		elseif ($oPage !== null)
-			$this->source_path = $oPage->getThemePath();
-
-		$this->style_path = $style_path;
-		
-		$this->db[0] = ffDB_Sql::factory();
-
 	}
 
 	function prepare_template($id)
 	{
 		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
-
-		$this->tpl[$id]->set_var("source_path", $this->source_path);
-
-        if ($this->style_path !== null)
-			$this->tpl[$id]->set_var("style_path", $this->style_path);
-		elseif ($this->oPage !== null)
-			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-
 	}
 	
 	function process($id, &$value, ffField_base &$Field)
@@ -141,8 +120,6 @@ class ffWidget_ckeditor extends ffCommon
 		}
 
 		$this->tpl[$tpl_id]->set_var("id", $id);
-		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
-		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
@@ -156,11 +133,6 @@ class ffWidget_ckeditor extends ffCommon
 			$this->tpl[$tpl_id]->set_var("dialog", "false");
 		}
 
-        if(strlen($Field->widget_path))
-            $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path);
-        else 
-            $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/ckeditor"); 
-        
         if ($Field->contain_error && $Field->error_preserve)
             $this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->ori_value));
         else

@@ -1,11 +1,36 @@
 <?php
+/**
+ * VGallery: CMS based on FormsFramework
+ * Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @package VGallery
+ *  @subpackage core
+ *  @author Alessandro Stucchi <wolfgan@gmail.com>
+ *  @copyright Copyright (c) 2004, Alessandro Stucchi
+ *  @license http://opensource.org/licenses/gpl-3.0.html
+ *  @link https://github.com/wolfgan43/vgallery
+ */
+
 // ----------------------------------------
 //  		FRAMEWORK FORMS vAlpha
-//		      PLUGIN DEFINITION (progressbar)
+//		      PLUGIN DEFINITION (spinner)
 //			   by Samuele Diella
 // ----------------------------------------
 
-class ffWidget_progressbar extends ffCommon
+class ffWidget_spinner extends ffCommon
 {
 
 	// ---------------------------------------------------------------
@@ -13,16 +38,17 @@ class ffWidget_progressbar extends ffCommon
 
 	var $template_file 	 = "ffWidget.html";
 	
-	var $class			= "ffWidget_progressbar";
+	var $class			= "ffWidget_spinner";
 	
 	var $widget_deps	= array();
 	
 	var $libraries		= array();
 	
-    var $js_deps		= array(
-							"jquery-ui" 		=> null
-						);		
-    var $css_deps 		= array();
+    var $js_deps = array(
+                              "jquery-ui"       => null
+						);
+    var $css_deps 		= array(
+    					);
 	// PRIVATE VARS
 
     /**
@@ -43,8 +69,6 @@ class ffWidget_progressbar extends ffCommon
 
 	function process($id, &$value, ffField_html &$Field)
 	{
-        $oPage = ffPage::getInstance();
-
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
 			$tpl_id = $Field->parent[0]->getIDIF();
@@ -53,7 +77,7 @@ class ffWidget_progressbar extends ffCommon
 				$this->prepare_template($tpl_id);
 			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
 			$this->tpl[$tpl_id]->set_var("container", $prefix);
-			//$Field->parent[0]->processed_widgets[$prefix . $id] = "progressbar";
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "spinner";
 		}
 		else
 		{
@@ -61,8 +85,6 @@ class ffWidget_progressbar extends ffCommon
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
 		}
-
-        $oPage->tplAddCss("jquery-ui.progressbar");
 
 		$this->tpl[$tpl_id]->set_var("id", $id);
 
@@ -78,7 +100,7 @@ class ffWidget_progressbar extends ffCommon
 			$this->tpl[$tpl_id]->set_var("class", $this->class);		
 			
 		$this->tpl[$tpl_id]->parse("SectBinding", true);
-		return $Field->fixed_pre_content . $this->tpl[$tpl_id]->rpparse("SectControl", FALSE) . $Field->fixed_post_content;
+		return ;
 	}
 	
 	function get_component_headers($id)

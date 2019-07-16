@@ -130,6 +130,7 @@ class ffPageNavigator
  */
 abstract class ffPageNavigator_base extends ffCommon
 {
+    const TYPE                  = "ffPageNavigator";
     const NAME                  = "ffn";
 
     // ----------------------------------

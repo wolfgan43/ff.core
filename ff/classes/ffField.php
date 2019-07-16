@@ -31,7 +31,7 @@ class ffField
 	{
 		ffErrorHandler::raise("Cannot istantiate " . __CLASS__ . " directly, use ::factory instead", E_USER_ERROR, $this, get_defined_vars());
 	}
-	
+
 	public function __clone()
 	{
 		ffErrorHandler::raise("Cannot clone " . __CLASS__ . ", use ::factory instead", E_USER_ERROR, $this, get_defined_vars());
@@ -63,6 +63,18 @@ class ffField
 		if (self::$events === null)
 			self::$events = new ffEvents();
 	}
+
+
+    /**
+     * @return ffField_html
+     */
+    public static function create($type) {
+        $class_name = __CLASS__ . "_" . ffTheme::TYPE;
+
+        return new $class_name($type);
+        //return new ffField_responsive($type);
+    }
+
 
 	/**
 	 * This method istantiate a ff_something instance based on many params
@@ -122,7 +134,7 @@ class ffField
 		}
 
 		//require_once $base_path;
-		$tmp = new $class_name($disk_path, $site_path, $page_path, $theme);
+		$tmp = new $class_name(/*$disk_path, $site_path, $page_path, $theme*/);
 		
 		$res = self::doEvent("on_factory_done", array($tmp));
 		
@@ -143,7 +155,10 @@ class ffField
  */
 abstract class ffField_base extends ffCommon
 {
+    const TYPE                  = "ffField";
     const NAME                  = "fff";
+
+    //var $type					        = null;
 
     // ----------------------------------
 	//  PUBLIC VARS (used for settings)
@@ -223,7 +238,7 @@ abstract class ffField_base extends ffCommon
 	 * mentre a null per i Field testuali.
 	 * @var Boolean
 	 */
-	var $db_transform_null		= true;
+	//var $db_transform_null		= true;
 
 	/**
 	 * Utilizzata per il campo chiave;
@@ -246,7 +261,8 @@ abstract class ffField_base extends ffCommon
 	 * Label del campo
 	 * @var String
 	 */
-	var $label			= "";		
+	var $label			= "";
+    var $description	= "";
 	
 	var $placeholder = false;
 	/**
@@ -261,14 +277,15 @@ abstract class ffField_base extends ffCommon
 	 * Utilizzato per nascondere un controllo; il controllo non è visualizzato ma è gestito.
 	 * @var Boolean
 	 */
-	var $display = true;	
-
+	var $display = true;
+    var $display_label = true;
 	/**
 	 * Esegue l'encoding delle entità HTML. Se si intende gestire
 	 * l'encoding bisogna settarlo a false.
 	 * @var Boolean
 	 */
-	var $encode_entities = true;	
+	var $encode_entities = true;
+	var $encode_label = true;
 
 	/**
 	 * contenuto fisso da pre-porre al risultato dell'elaborazione del template
@@ -286,7 +303,7 @@ abstract class ffField_base extends ffCommon
 	 * utilizzata dai componenti, determina la larghezza del contenitore che conterrà il field
 	 * @var String
 	 */
-	var $width 				= "";
+	//var $width 				= "";
 
 	//----------------------------
 	//  Specific Control Settings
@@ -394,12 +411,12 @@ abstract class ffField_base extends ffCommon
 	 * Per i control_type "radio", visualizza la label per ogni elemento
 	 * @var Boolean
 	 */
-	var $radio_display_label	= true;
+	//var $radio_display_label	= true;
 	/**
 	 * Per i control_type "radio", abilita l'"a capo"
 	 * @var Boolean
 	 */
-	var $radio_hyphen			= true;
+	//var $radio_hyphen			= true;
 	
 	var $crypt = false;
 	var $crypt_key = null;
@@ -716,31 +733,31 @@ abstract class ffField_base extends ffCommon
 	 * URL relativo al web del sito
 	 * @var String 
 	 */
-	var $site_path 		= "";
+	//var $site_path 		= "";
 
 	/**
 	 * URL relativo al disco del sito
 	 * @var String
 	 */
-	var $disk_path 		= "";
+	//var $disk_path 		= "";
 
 	/**
 	 * Cartella dove è contenuta la pagina partendo dalla root del sito
 	 * @var String
 	 */
-	var $page_path 		= "";
+	//var $page_path 		= "";
 
 	/**
 	 * Cartella del template; di default è la cartella "theme"
 	 * @var String
 	 */
-	var $template_dir	= null;
+	//var $template_dir	= null;
 
 	/**
 	 * File del template
 	 * @var String
 	 */
-	var $template_file	= "";		
+	//var $template_file	= "";
 
 	/**
 	 * utilizzato dai componenti, determina se il campo non dev'essere visualizzato nel normale
@@ -770,12 +787,6 @@ abstract class ffField_base extends ffCommon
 	var $container_class			= "";
 
 	/**
-	 * Utilizzato dai componenti, determina quante colonne deve occupare il campo in una visualizzazione tabellare
-	 * @var Number
-	 */
-	var $span			= 1;
-
-	/**
 	 * Un array di proprietà aggiuntive da settare sul campo. Nell'HTML corrisponde agli attributi
 	 * è presente una chiave speciale "style" che consente di impostare sotto-set di proprietà. Esempio:
 	 * ->properties["alt"] = "test";
@@ -800,7 +811,7 @@ abstract class ffField_base extends ffCommon
 	 * Il tema da utilizzare per il field specifico. Solitamente ereditato dall'oggetto padre
 	 * @var String
 	 */
-	var $theme			= null;
+	//var $theme			= null;
 
 	//----------------------------
 	//  Check settings
@@ -1032,7 +1043,7 @@ abstract class ffField_base extends ffCommon
 
 	/**
 	 * La classe che contiene il Field
-	 * @var array() 
+	 * @var ffRecord_html | ffGrid_html
 	 */
 	var $parent			= null;						
 
@@ -1040,7 +1051,8 @@ abstract class ffField_base extends ffCommon
 	 * Pagina contenente il Field
 	 * @var ffPage_html
 	 */
-	var $parent_page	= null;
+	var $parent_page	= null;//todo:: deprecato da togliere
+	var $page	        = null; //todo:: deprecato da togliere
 
 	/**
 	 * Se contiene un errore
@@ -1054,7 +1066,7 @@ abstract class ffField_base extends ffCommon
 	 */
 	var $preserve_ori_value		= false;
 
-	var $tpl			= null;
+	var $tpl			= null; //todo:: deprecato da togliere
 	var $db				= null;
 
 	var $cont_array		= null;						// the containing array
@@ -1078,24 +1090,24 @@ abstract class ffField_base extends ffCommon
 	var $resources_set = array();
 	var $resources_get = array();
 
-	abstract public function tplLoad($control_type);
-	abstract public function tplParse($output_result);
-	abstract public function getTemplateFile($control_type);
+	//abstract public function tplLoad($control_type);
+	//abstract public function tplParse($output_result);
+	//abstract public function getTemplateFile($control_type);
 
 	// ---------------------------------------------------------------
 	//  PUBLIC FUNCS
 	// ---------------------------------------------------------------
 
 	//  CONSTRUCTOR
-	function __construct($disk_path, $site_path, $page_path, $theme)
+	function __construct(/*$disk_path, $site_path, $page_path, $theme*/)
 	{
 		$this->get_defaults("ffField");
 		$this->get_defaults();
 
-		$this->disk_path = $disk_path;
+		/*$this->disk_path = $disk_path;
 		$this->site_path = $site_path;
 		$this->page_path = $page_path;
-		$this->theme = $theme;
+		$this->theme = $theme;*/
 
 		if ($this->value === null)
 			$this->value = new ffData();
@@ -1540,8 +1552,9 @@ abstract class ffField_base extends ffCommon
 			{
 				foreach ($this->recordset as $key => $item)
 				{
-					list($tmp, $item_key) = each($item);
-					list($tmp, $item_value) = each($item);
+                    $item_key       = $item[0];
+                    $item_value     = $item[1];
+
 
 					if ($item_key->getValue($this->get_app_type(), FF_SYSTEM_LOCALE) === $value->getValue($this->get_app_type(), FF_SYSTEM_LOCALE))
 					{

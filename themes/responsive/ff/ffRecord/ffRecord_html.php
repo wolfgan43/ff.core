@@ -66,7 +66,8 @@ frameworkCSS::extend(array(
                     "card" => "body"
                 )
                 , "footer_wrap" => array(
-                    "card" => "footer"
+                    "class" => null
+                    , "card" => "footer"
                 )
                 , "grid" => false        //false OR array(xs, sm, md, lg) OR 'row' OR 'row-fluid'
 			)
@@ -86,11 +87,7 @@ frameworkCSS::extend(array(
                 "class" => "mb-2"
                 , "card" => "sub-title"
             )
-			, "actions" => array(
-				"class" => "actions -sticky -bottom"
-				, "col" => false
-				, "util" => "align-right"
-			)
+
 			, "group" => array(
 				"container" => array(
 				    "class" => null
@@ -103,6 +100,17 @@ frameworkCSS::extend(array(
                     //, "callout" => "info"
                 )
 			)
+            , "footer" => array(
+                "def" => array(
+                    "class" => "d-flex"
+                )
+                , "require-note" => array(
+                    "class" => "align-self-center"
+                )
+                , "actions" => array(
+                    "class" => "ml-auto actions"
+                )
+            )
 			/*, "record" => array(
 				"row" => true
 			)*/
@@ -263,11 +271,11 @@ class ffRecord_html extends ffRecord_base
 	var $properties = null;
 
 
-	function __construct(ffPage_html $page, $disk_path, $theme)
+	function __construct($suffix = null)
     {
-        parent::__construct($page, $disk_path, $theme);
+        parent::__construct();
 
-        $this->framework_css = $page->frameworkCSS->findComponent("ffRecord");
+        $this->framework_css = ffPage::getInstance()->frameworkCSS->findComponent("ffRecord" . $suffix);
 
 		if (ffTheme::RANDOMIZE_COMP_ID) {
             $this->id_if = uniqid();
@@ -381,14 +389,10 @@ class ffRecord_html extends ffRecord_base
             $this->framework_css["field"] = $this->framework_css["records"]["default"];
         }
 
-        if(!$this->src_table) {
-            $this->hide_all_controls = true;
-        }
-
 		$this->tplDisplayContents();
 
 		// display selected record controls (delete, insert..)
-		$this->tplDisplayControls();
+		//$this->tplDisplayControls();
 
 		// display error
 		$this->tplDisplayError();
@@ -457,13 +461,17 @@ class ffRecord_html extends ffRecord_base
 	 */
 	public function tplParse($output_result)
 	{
-		$res = ffRecord::doEvent("on_tplParse", array(&$this, $this->tpl[0]));
-		$res = $this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
+		//$res = ffRecord::doEvent("on_tplParse", array(&$this, $this->tpl[0]));
+		$this->doEvent("on_tpl_parse", array(&$this, $this->tpl[0]));
 
-		$output_buffer = "";
+		$actions = $this->tplDisplayControls();
+        if ($this->display_required && $this->display_required_note) {
+            $require_note = '<small class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["footer"]["require-note"]) . '">' . $this->required_symbol . ' ' . ffTranslator::get_word_by_code("is required") . '</small>';
+        }
 
-		$this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
-		$this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content);
+        if($actions || $require_note) {
+            $footer = '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["footer"]["def"]) . '">' . $require_note . $actions . '</div>';
+        }
 
 		$this->tplSetFixedVars();
 
@@ -537,9 +545,10 @@ class ffRecord_html extends ffRecord_base
             $this->tpl[0]->set_var("body_wrap_end", '</div>');
         }
 
-        if($this->framework_css["component"]["footer_wrap"]
-            && ($this->tpl[0]->isset_block("SectControls"))
-        ) {
+        if($this->framework_css["component"]["footer_wrap"] && $footer) {
+            $this->tpl[0]->set_var("footer_content", $footer);
+            unset($footer);
+
             $this->tpl[0]->set_var("footer_wrap_start", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["component"]["footer_wrap"]) . '">');
             $this->tpl[0]->set_var("footer_wrap_end", '</div>');
         }
@@ -548,6 +557,9 @@ class ffRecord_html extends ffRecord_base
 		{
 			$this->tpl[0]->set_var("form_tabs", $this->parent[0]->widgets["tabs"]->process($this->getIDIF(), $this->tabs, $this->parent[0], $this->id));
 		}
+
+        $this->tpl[0]->set_var("fixed_pre_content", $this->fixed_pre_content);
+        $this->tpl[0]->set_var("fixed_post_content", $this->fixed_post_content . $footer);
 
 		$output_buffer = $this->tpl[0]->rpparse("main", false);
 
@@ -618,14 +630,6 @@ class ffRecord_html extends ffRecord_base
 			reset($this->hidden_fields);
 		}
 
-		if ($this->display_required && $this->display_required_note)
-		{
-			$this->tpl[0]->set_var("required_symbol", $this->required_symbol);
-			$this->tpl[0]->parse("SectRequiredNote", false);
-		}
-		//else
-		//	$this->tpl[0]->set_var("SectRequiredNote", "");
-
 		if ($this->tab)
 		{
 			$this->parent[0]->widgetLoad("tabs", null, $this->parent[0]);
@@ -692,189 +696,6 @@ class ffRecord_html extends ffRecord_base
                 $this->tpl[0]->set_var("form_tabs", implode("", $buffer));
             }
 		}
-
-
-
-		//$groups_tabs = array(); // conteggio gruppi per tab
-		/*if(!is_array($this->groups))
-			$this->groups = array();*/
-
-		/*$this->groups = array_merge(array("_main_" => array(
-											"class" => "default"
-											, "title" => ""
-											, "contents" => array()
-											, "data" => null
-										)
-									), $this->groups);*/
-
-
-
-		/*foreach ($this->contents as $key => $content)
-		{
-			if (!$content["group"]) {
-				$this->groups["_main_"]["contents"][$key] = $content;
-				continue;
-			}
-			//if ($this->groups[$key]["tab"])
-			//	$groups_tabs[$this->groups[$key]["tab"]]++;
-		}
-		reset($this->contents);
-
-		if(!count($this->groups["_main_"]["contents"])) {
-            unset($this->groups["_main_"]);
-        }*/
-/*
-		if (0 && is_array($this->groups) && count($this->groups))
-		{
-            $last_tab_key = "";
-			foreach($this->groups AS $group_key => $group_value)
-			{
-				if ($this->tplDisplayFields($this->groups[$group_key]["contents"], $group_key))
-				{
-					$res = $this->doEvent("on_before_parse_group", array(&$this, $group_key));
-                    $rc = end($res);
-
-					if (!$rc)
-					{
-				        $this->tpl[0]->set_var("group_pre_content", $this->groups[$group_key]["fixed_pre_content"]);
-				        $this->tpl[0]->set_var("group_post_content", $this->groups[$group_key]["fixed_post_content"]);
-
-						if($group_key == "_main_")
-						{
-							$this->tpl[0]->set_var("SectGroupStart", "");
-							$this->tpl[0]->set_var("SectGroupEnd", "");
-						}
-						else
-						{
-							//$group_class = array();
-							//$group_class["default"] = $this->parent[0]->frameworkCSS->getClass($this->framework_css["group"]["def"]);
-							//$group_class["custom"] = (strlen($this->groups[$group_key]["class"]) ? $this->groups[$group_key]["class"] : $group_key);
-
-							if(is_array($group_value["tab"])) {
-                                $tab_key = ($group_value["tab"]["title"]
-                                    ? $group_value["tab"]["title"]
-                                    : $group_key
-                                );
-                            } elseif(is_string($group_value["tab"])) {
-                                $tab_key = (strlen($group_value["tab"])
-                                    ? $group_value["tab"]
-                                    : $group_key
-                                );
-                            } elseif(is_bool($group_value["tab"])) {
-                                $tab_key = ($last_tab_key
-                                    ? $last_tab_key
-                                    : $group_key
-                                );
-
-                            } else {
-                                $tab_key = $group_key;
-                            }
-
-                            $last_tab_key = $tab_key;
-
-							if($this->groups[$group_key]["hide_title"]
-								|| (!strlen($this->groups[$group_key]["title"])
-									&& !strlen($this->groups[$group_key]["primary_field"])
-								)
-							) {
-								$this->tpl[0]->set_var("SectGroupTitle", "");
-							} else {
-								$arrTitleProperties = array();
-								$arrTitleProperties["class"]["default"] = $this->parent[0]->frameworkCSS->getClass($this->groups[$group_key]["framework_css"]["title"]);
-								$this->tpl[0]->set_var("title_properties", "");
-
-								if($group_value["primary_field"]) {
-									$arrTitleProperties["class"]["primary_field"] = "ffCheckDep";
-									$arrTitleProperties["onclick"] = "javascript:ff.ffRecord.displayFieldSetElem(this, '" . $this->getIDIF() . "_" . $group_value["primary_field"] . "');";
-								}
-
-                                if(!$group_value["primary_field"]) {
-                                    if($this->groups[$group_key]["title"] && $tab_key != $group_key) {
-                                        $this->tpl[0]->set_var("GroupTitle", $this->groups[$group_key]["title"]);
-                                    } else {
-                                        $this->tpl[0]->set_var("GroupTitle", "");
-                                    }
-                                }
-								//}
-
-
-								if(is_array($arrTitleProperties) && count($arrTitleProperties)) {
-									$str_title_properties = "";
-									foreach($arrTitleProperties AS $arrTitleProperties_key => $arrTitleProperties_value) {
-										$str_title_properties .= " " . $arrTitleProperties_key . '="' . (is_array($arrTitleProperties_value) ? implode(" ", array_filter($arrTitleProperties_value)) : $arrTitleProperties_value) . '"';
-									}
-									$this->tpl[0]->set_var("title_properties", $str_title_properties);
-								}
-								if($this->tpl[0]->getBlockContent("GroupTitle", false))  //(!$this->tab || $this->tab === "left" || $this->tab === "right") &&
-									$this->tpl[0]->parse("SectGroupTitle", false);
-								else
-									$this->tpl[0]->set_var("SectGroupTitle", "");
-							}
-
-							$this->tpl[0]->set_var("group_class", $this->parent[0]->frameworkCSS->getClass($this->groups[$group_key]["framework_css"]["container"]));
-							//$this->tpl[0]->set_var("group_class", implode(" ", array_filter($group_class)));
-
-							if(isset($this->groups[$group_key]["description"]) && strlen($this->groups[$group_key]["description"])) {
-							    $description_class = $this->parent[0]->frameworkCSS->getClass($this->groups[$group_key]["framework_css"]["description"]);
-
-                                $this->tpl[0]->set_var("description_properties", ($description_class
-                                    ? ' class="' . $description_class . '"'
-                                    : ''
-                                ));
-                                $this->tpl[0]->set_var("GroupDescription", $this->groups[$group_key]["description"]);
-								$this->tpl[0]->parse("SectGroupDescription", false);
-							} else {
-								$this->tpl[0]->set_var("SectGroupDescription", "");
-							}
-
-							$this->tpl[0]->parse("SectGroupStart", false);
-							$this->tpl[0]->parse("SectGroupEnd", false);
-						}
-
-						if ($this->tab)
-						{
-							if ($group_key == "_main_")
-								$this->groups["_main_"]["data"] .= $this->tpl[0]->rpparse("SectGroup", false);
-							else
-							{
-								if(!$this->tabs["contents"][$tab_key]["title"])
-									$this->tabs["contents"][$tab_key]["title"] = (is_array($group_value["tab"]) && $group_value["tab"]["title"]
-                                        ? $group_value["tab"]["title"]
-                                        : ($group_value["title"]
-                                            ? $group_value["title"]
-                                            : $tab_key
-                                        )
-                                    );
-
-								if($group_value["current"])
-									$this->tabs["current"] = $tab_key;
-
-                                //$this->row_wrapper("tab-" . $tab_key, $this->tabs["contents"][$tab_key]["data"], "6", $this->tpl[0]->rpparse("SectGroup", false), count($this->tabs["contents"][$tab_key][""]));
-
-
-                                $this->tabs["contents"][$tab_key]["data"][$group_key] = $this->tpl[0]->rpparse("SectGroup", false);
-                                if(is_array($group_value["tab"]) && is_array($group_value["tab"]["menu"]))
-                                    $this->tabs["contents"][$tab_key]["menu"][$group_value["tab"]["menu"]["mode"]][$group_key] = $group_value["tab"]["menu"]["title"];
-
-							}
-							$this->tpl[0]->set_var("SectGroup", "");
-						}
-						else
-						{
-							if (!$this->groups[$group_key]["hide_title"]) {
-                                $this->tpl[0]->parse("SectGroupTitle", false);
-                            }
-							$this->tpl[0]->parse("SectGroup", true);
-						}
-					}
-				}
-			}
-		}
-*/
-//print_r($this->tabs["contents"]);
-	//	die();
-		//if (isset($this->groups["_main_"]) && $this->groups["_main_"]["data"] !== null)
-		//	$this->tpl[0]->set_var("form_default", $this->groups["_main_"]["data"]);
 	}
     protected function tplDisplayGroup($group_key, $hide_title = false) {
 	    $group = (is_array($group_key)
@@ -964,39 +785,15 @@ class ffRecord_html extends ffRecord_base
 	 */
 	protected function tplDisplayFields($contents, $group_key/*, $primary_field = null*/)
 	{
-		//$this->tpl[0]->set_var("SectGroupRow", "");
-		//$this->tpl[0]->set_var("SectGroupRow_" . $group_key, "");
-
 		$this->tpl[0]->set_var("content", "");
 
-		$vars_to_reset = array();
 		$i = 0;
         $buffer = array();
-		//$wrap_count = null;
-        //$is_wrapped = false;
-       // $wrapping = 0;
-		//$count_contents = 0;
-
-		//$framework_css_field = $this->framework_css["field" . ($this->framework_css["component"]["type"] ? "-" . $this->framework_css["component"]["type"] : "")];
-        if(is_array($contents) && count($contents)) 
+        if(is_array($contents) && count($contents))
         {
 		    foreach ($contents as $key => $subvalue)
 		    {
-
-
-                //$is_wrapped = false;
-
-                //$this->tpl[0]->set_var("SectGroupLabel", "");
-				//$this->tpl[0]->set_var("field_container_start", "");
-				//$this->tpl[0]->set_var("field_container_end", "");
-				//$this->tpl[0]->set_var("content_pre_label", "");
-				//$this->tpl[0]->set_var("content_in_label", "");
-
-				
-		    	//$container_class = array();
-		    	//$container_properties = array();
                 $content = null;
-		    	//$count_contents++;
 		    	if(is_string($subvalue["data"])) {
                     $i++;
                     $content = $subvalue["data"];
@@ -1053,210 +850,13 @@ class ffRecord_html extends ffRecord_base
 				    $i++;
 
                     $subvalue["data"]->framework_css = array_replace($subvalue["data"]->framework_css, $this->framework_css["field"]);
+                    if (!$this->display_required) {
+                        $subvalue["data"]->framework_css["required"] = false;
+                    }
 
                     // EVENT HANDLER
-				    $res = $this->doEvent("on_process_field", array(&$this, $key));
+				    $this->doEvent("on_process_field", array(&$this, $key));
 
-				    // container
-				    foreach ($vars_to_reset as $field_key => $field_values)
-				    {
-					    $this->tpl[0]->set_var($field_key, "");
-				    }
-				    reset($vars_to_reset);
-				    
-				    $this->tpl[0]->set_var("container_properties", $this->form_fields[$key]->getProperties($this->form_fields[$key]->container_properties));
-
-				    if (is_array($this->form_fields[$key]->container_vars) && count($this->form_fields[$key]->container_vars))
-				    {
-					    foreach ($this->form_fields[$key]->container_vars as $field_key => $field_value)
-					    {
-						    $this->tpl[0]->set_var($field_key, $field_value);
-						    $vars_to_reset[$field_key] = true;
-					    }
-					    reset($this->form_fields[$key]->container_vars);
-				    }
-			    
-				    
-				   /* if(strlen($this->form_fields[$key]->container_class))
-					    $container_class[] = $this->form_fields[$key]->container_class;
-					else
-						$container_class[] = $this->form_fields[$key]->class;
-						*/
-				    if($this->form_fields[$key]->placeholder === true) {
-					    $this->form_fields[$key]->placeholder = ffCommon_specialchars($this->form_fields[$key]->label);
-				    }
-
-                    if (!$this->display_required) {
-                        $this->form_fields[$key]->framework_css["required"] = false;
-				    }
-
-				    //$control_var = "";
-					//$control_prefix = "";
-					//$control_postfix = "";
-					//$is_combine_field = false;
-
-
-				    // LABEL 
-				    //$label_set = false;
-				    if($this->form_fields[$key]->display_label)
-				    {
-                        /**
-                         * parte nuova
-                         */
-                        /*if ($this->display_required && $this->form_fields[$key]->required) {
-                            //$container_class["require"] = "required";
-                            $required_symbol = "*";
-                        }
-
-                        $this->form_fields[$key]->label_properties["for"] = $this->getIDIF() . "_" . $key;
-                        $html_block["label"] = '<label class="' . $this->parent[0]->frameworkCSS->getClass($framework_css_field["label"]) . '" ' . $this->form_fields[$key]->getProperties($this->form_fields[$key]->label_properties) . '>'
-                            . ($this->form_fields[$key]->encode_label
-                                ? ffCommon_specialchars($this->form_fields[$key]->label) . $required_symbol
-                                : $this->form_fields[$key]->label . $required_symbol
-                            )
-                            . "</label>";
-                        if($framework_css_field["label-wrap"]) {
-                            $html_block["label"] = '<div class="' . $this->parent[0]->frameworkCSS->getClass($framework_css_field["label-wrap"]) . '">'
-                                . $html_block["label"]
-                                . '</div>';
-                        }*/
-
-                        /**
-                         * parte nuova
-                         */
-
-/*
-					    $this->tpl[0]->set_var("label_prefix", "");
-					    $this->tpl[0]->set_var("label_postfix", "");
-				    	$required_symbol = "";
-
-						if(($this->form_fields[$key]->get_control_type() == "checkbox" || $this->form_fields[$key]->get_control_type() == "radio") && $this->form_fields[$key]->widget == "") {
-							$control_var = $this->parent[0]->frameworkCSS->get("control-check-position", "form");
-							$is_combine_field = true;
-						}
-
-					    if ($this->form_fields[$key]->description !== null)
-					    {
-						    $this->tpl[0]->set_var("fielDescription", $this->form_fields[$key]->description);
-						    $this->tpl[0]->parse("SectDescriptionLabel", false);
-	                        
-	                        $label_set = true;
-					    }	
-					    else
-					    {
-						    $this->tpl[0]->set_var("fielDescription", "");
-						    $this->tpl[0]->set_var("SectDescriptionLabel", "");
-					    }
-
-	                    if($this->form_fields[$key]->label_properties)
-	                    {
-						    $this->tpl[0]->set_var("label_properties", " " . $this->form_fields[$key]->getProperties($this->form_fields[$key]->label_properties));
-	                        $label_set = true;
-	                    }
-
-					    if ($this->display_required && $this->form_fields[$key]->required) {
-							$container_class["require"] = "required";
-							$required_symbol = "*";
-					    }
-
- 						if(strlen($this->form_fields[$key]->label)) 
-	                    {
-						    if($primary_field == $key && !$control_var) {
-						    	$prefix_label = "content_pre_";
-						    	$label_set = false; 
-						    } 
-						    else
-						    {
-						    	$prefix_label = "";
-						    	$label_set = true; 
-							}
-						    if($this->form_fields[$key]->encode_label) 	
-							    $this->tpl[0]->set_var($prefix_label . "label", ffCommon_specialchars($this->form_fields[$key]->label) . $required_symbol);
-						    else
-							    $this->tpl[0]->set_var($prefix_label . "label",$this->form_fields[$key]->label . $required_symbol);
-	                    }
-
-	                    if($label_set) {
-
-						    //Label Class
-
-
-
-
-
-
-
-						    $this->tpl[0]->set_var("label_for", $this->getIDIF() . "_" . $key);
-						    
-							$arrColumnLabel = $this->form_fields[$key]->framework_css["label"]["col"];
-							$arrColumnControl = $this->form_fields[$key]->framework_css["control"]["col"];
-							$type_label = "";
-							//if($primary_field == $key)
-							//	$type_label = "inline";
-							
-							if(!strlen($control_var))
-							{
-								if(is_array($arrColumnLabel) && count($arrColumnLabel)
-									&& is_array($arrColumnControl) && count($arrColumnControl)
-								) {
-									$this->tpl[0]->set_var("label_prefix", '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->form_fields[$key]->framework_css["label"]) . '">');
-									//$this->tpl[0]->set_var("label_prefix", '<div class="' . $this->parent[0]->frameworkCSS->get($arrColumnLabel, "col") . " " . $this->parent[0]->frameworkCSS->get("align-right", "util") . '">');
-									$this->tpl[0]->set_var("label_postfix", '</div>');
-								
-									$control_prefix = '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->form_fields[$key]->framework_css["control"]) . '">';
-									//$control_prefix = '<div class="' . $this->parent[0]->frameworkCSS->get($arrColumnControl, "col") . '">';
-									$control_postfix = '</div>';
-								   // $type_label = "inline";
-								}
-							}
-							
-							//if($this->framework_css["component"]["type"] === null && $type_label)
-							//	$this->framework_css["component"]["type"] = $type_label;
-							
-							$label_class = $this->parent[0]->frameworkCSS->get("label" . $this->framework_css["component"]["type"], "form");
-							if($this->framework_css["component"]["type"] && $is_combine_field) {
-								if($control_var == "_in_label")
-									$label_class .= ($label_class ? " " : "") . $this->parent[0]->frameworkCSS->get($arrColumnLabel, "push") . " " . $this->parent[0]->frameworkCSS->get($arrColumnControl, "col");
-								else
-									$container_class["align"] = $this->parent[0]->frameworkCSS->get("align-right", "util");
-							}
-
-							if($label_class)
-								$this->tpl[0]->set_var("label_class", ' class="' . $label_class . '"');
-							else
-								$this->tpl[0]->set_var("label_class", "");								
-					    } else {
-					    	$control_var = "";
-					    }*/
-				    } 
-
-				    /**
-				    * Row Class
-				    */
-				    /*$container_class["default"] = $this->form_fields[$key]->get_control_class(null, array("framework_css" => false, "control_type" => false));
-				    
-					if($primary_field != $key) {
-					    if(is_array($this->form_fields[$key]->framework_css["container"]["col"]) 
-				    		&& count($this->form_fields[$key]->framework_css["container"]["col"])
-					    ) {
-							$container_class["grid"] = $this->parent[0]->frameworkCSS->get($this->form_fields[$key]->framework_css["container"]["col"], "col");
-							if($this->auto_wrap && !$is_wrapped) {
-								$wrap_class = array("form-wrap");
-								if($this->form_fields[$key]->framework_css["container"]["row"]) {
-									$wrap_class[] = $this->parent[0]->frameworkCSS->get("row", "form");
-								}
-								$this->tpl[0]->set_var("wrap_class", implode(" ", array_filter($wrap_class)));
-								$is_wrapped = $this->tpl[0]->parse("SectWrapStart", false);
-							}
-
-							$wrap_count = $wrap_count + $this->form_fields[$key]->framework_css["container"]["col"]["lg"];
-						} elseif($this->form_fields[$key]->framework_css["container"]["row"]) {
-							$container_class["row"] = $this->parent[0]->frameworkCSS->get("row-padding", "form");
-							
-						}
-					}*/
-
-			    
 					// CONTROL/VALUE SECTION
 				    /**
 				    * Control Class
@@ -1290,42 +890,8 @@ class ffRecord_html extends ffRecord_base
 
 				    if (!$rc)
 				    {
-                        /**
-                         * parte nuova
-                         */
-                        /*$html_block["control"] = ($this->display_values
-                            ? $this->form_fields[$key]->getDisplayValue()
-                            : $this->form_fields[$key]->process()
-                        );
-                        if($framework_css_field["control-wrap"]) {
-                            $html_block["control"] = '<div class="' . $this->parent[0]->frameworkCSS->getClass($framework_css_field["control-wrap"]) . '">'
-                                . $html_block["control"]
-                                . '</div>';
-                        }*/
-                        /**
-                         * parte nuova
-                         */
 
-
-					    /*if (!$this->display_values || strlen($this->form_fields[$key]->control_type))
-					    {
-						    if ($this->tpl[0]->isset_var("content" . $control_var)) {
-                                $processed_field = $this->form_fields[$key]->process();
-
-                                if($control_prefix && ($this->form_fields[$key]->framework_css["fixed_pre_content"] || $this->form_fields[$key]->framework_css["fixed_post_content"])) {
-                                    $control_prefix = $control_prefix . '<div class="' . $this->parent[0]->frameworkCSS->get("group", "form") . '">';
-                                    $control_postfix = '</div>' . $control_postfix;
-                                }
-							    $this->tpl[0]->set_var("content" . $control_var, $control_prefix . $processed_field . $control_postfix);
-                            }
-					    }
-					    else
-						    $this->tpl[0]->set_var("content" . $control_var, $this->form_fields[$key]->getDisplayValue());*/
 				    }
-
-					/*if($label_set)
-						$this->tpl[0]->parse("SectGroupLabel", false);*/
-
 
 				    // Manage Fixed Sections
 				    if(!is_array($this->form_fields[$key]->value->ori_value))
@@ -1349,135 +915,14 @@ class ffRecord_html extends ffRecord_base
 
 				    $this->tpl[0]->parse("Sect_$key", false);
 
-                    /**
-                     * parte nuova
-                     */
-/*
-                    if($this->form_fields[$key]->get_control_type() == "checkbox" || $this->form_fields[$key]->get_control_type() == "radio") {
-
-                    }
-
-                    $this->tpl[0]->set_var("content", '<div class="' . $this->parent[0]->frameworkCSS->getClass($framework_css_field["def"]) . '">'
-                        . $html_block["label"]
-                        . $html_block["control"]
-                        . "</div>"
-                    );*/
-
-                  /* $this->tpl[0]->set_var("content", ($this->display_values
+                    $content = ($this->display_values
                         ? $this->form_fields[$key]->getDisplayValue()
                         : $this->form_fields[$key]->process()
-                    ));*/
-
-
-
-                        $content = ($this->display_values
-                            ? $this->form_fields[$key]->getDisplayValue()
-                            : $this->form_fields[$key]->process()
-                        );
-                        $outer_wrap = $this->form_fields[$key]->framework_css["outer_wrap"]["col"]["lg"];
-
-                    /**
-                     * parte nuova
-                     */
-
+                    );
+                    $outer_wrap = $this->form_fields[$key]->framework_css["outer_wrap"]["col"]["lg"];
 			    }
 
                 frameworkCSS::colsWrapper("content-" . $this->id . "-" . $group_key, $buffer, $outer_wrap, $content, count($contents));
-
-		    	/*
-                if($content) {
-                    if ($outer_wrap) {
-                        $is_wrapped = false;
-                        $wrap_count = $wrap_count + $outer_wrap;
-                        if ($wrap_count > 12) {
-                            $buffer[] = '</div>';
-                            $buffer[] = '<div class="' . $this->parent[0]->frameworkCSS->get("wrap", "form") . '">';
-                            $is_wrapped = true;
-                            $wrap_count = 0;
-                        } elseif ($wrap_count == $outer_wrap) { //first
-                            $buffer[] = '<div class="' . $this->parent[0]->frameworkCSS->get("wrap", "form") . '">';
-                            $is_wrapped = true;
-                        } elseif($wrap_count) {
-                            $is_wrapped = true;
-                        }
-
-                        $buffer[] = $content;
-                        if($is_wrapped && $count_contents == count($contents)) {
-                            $buffer[] = '</div>';
-                        }
-                    } else {
-                        if ($wrap_count > 0 || $is_wrapped) {
-                            $buffer[] = '</div>';
-                            $wrap_count = 0;
-                        }
-                        $buffer[] = $content;
-                    }
-                }*/
-			   /* if($wrapping) {
-                    $buffer[] = '</div>';
-                }
-                $this->tpl[0]->set_var("content", implode("", $buffer));*/
-
-
-                /**
-                 * container field
-                 */
-				/*$container_inner_start = '';
-				$container_inner_end = '';
-				if(count($container_class)) {
-					if(!$control_prefix && ($this->form_fields[$key]->framework_css["fixed_pre_content"] || $this->form_fields[$key]->framework_css["fixed_post_content"])) {
-						$wrap_addon = $this->parent[0]->frameworkCSS->get("wrap-addon", "form");
-						if($wrap_addon) { 
-							if($container_class["grid"]) {
-								$container_inner_start = '<div class="' . $this->parent[0]->frameworkCSS->get("group-padding", "form") . '">';
-								$container_inner_end = '</div>';
-							} else {
-								$container_class["row"] = $this->parent[0]->frameworkCSS->get("group-padding", "form");
-							}
-						}
-					}
-				
-				    $str_container_class = implode(" ", array_filter($container_class));
-				    if($str_container_class)
-				    	$container_properties["class"] = $str_container_class;
-				}
-				if(is_array($container_properties) && count($container_properties)) {
-					$str_container_properties = "";
-					foreach($container_properties AS $container_properties_key => $container_properties_value) {
-						
-						$str_container_properties .= " " . $container_properties_key . '="' . (is_array($container_properties_value) ? implode(" ", array_filter($container_properties_value)) : $container_properties_value) . '"';
-					}
-					$this->tpl[0]->set_var("container_properties", $str_container_properties);
-					
-					$this->tpl[0]->set_var("field_container_start", '<div' . $str_container_properties . '>' . $container_inner_start);
-					$this->tpl[0]->set_var("field_container_end", $container_inner_end . '</div>');
-				}*/
-/*
-                if($primary_field == $key && is_subclass_of($subvalue["data"], "ffField_base")) {
-					$this->tpl[0]->set_var("GroupTitle", $this->tpl[0]->ProceedTpl("SectGroupRow"));
-				} else {
-
-
-
-					if(($wrap_count >= 12 || $count_contents == count($contents)) && $is_wrapped) {
-                        $wrap_class = array("form-wrap");
-                        if($this->form_fields[$key]->framework_css["container"]["row"]) {
-                            $wrap_class[] = $this->parent[0]->frameworkCSS->get("row", "form");
-                        }
-                        $this->tpl[0]->set_var("wrap_class", implode(" ", array_filter($wrap_class)));
-                        $is_wrapped = $this->tpl[0]->parse("SectWrapStart", false);
-						$this->tpl[0]->parse("SectWrapEnd", false);
-						$wrap_count = 0;
-						$is_wrapped = false;
-					}
-
-				    $rc = $this->tpl[0]->parse("SectGroupRow_" . $group_key, true);
-				    if (!$rc) $this->tpl[0]->parse("SectGroupRow", true);
-				    
-				    $this->tpl[0]->set_var("SectWrapStart", "");
-				    $this->tpl[0]->set_var("SectWrapEnd", "");
-				}*/
-
 		    }
 		    reset($contents);
 
@@ -1492,9 +937,9 @@ class ffRecord_html extends ffRecord_base
 	 */
 	protected function tplDisplayControls()
 	{
-		if ($this->hide_all_controls || !$this->tplSection["buttons"]["display"])
+		if ($this->hide_all_controls || !count($this->action_buttons))
 		{
-			$this->tpl[0]->set_var("SectControls", "");
+			//$this->tpl[0]->set_var("SectControls", "");
 			return;
 		}
 
@@ -1517,9 +962,12 @@ class ffRecord_html extends ffRecord_base
 		}
 		reset($tmp_action_buttons);
 
+		/*
 		$this->tpl[0]->set_var("actions_class", $this->parent[0]->frameworkCSS->getClass($this->framework_css["actions"]));
 		$this->tpl[0]->set_var("ActionButtons", $buffer);
 		$this->tpl[0]->parse("SectControls", false);
+		*/
+		return '<div class="' . $this->parent[0]->frameworkCSS->getClass($this->framework_css["footer"]["actions"]) . '">' . $buffer . '</div>';
 	}
 
 	/**
@@ -1561,37 +1009,15 @@ class ffRecord_html extends ffRecord_base
 	 */
 	function initControls()
     {
-		if ($this->hide_all_controls)
-			return;
+        if ($this->hide_all_controls) {
+            return;
+        }
 
-		if(!$this->parent[0]->ret_url || $this->parent[0]->ret_url == $_SERVER["REQUEST_URI"])
-			$this->buttons_options["cancel"]["display"] = false;
+      /* if(!$this->parent[0]->ret_url || $this->parent[0]->ret_url == $_SERVER["REQUEST_URI"]) {
+            $this->buttons_options["cancel"]["display"] = false;
+        }*/
 
 		parent::initControls();
-
-		/*if (isset($this->action_buttons["ActionButtonCancel"]))
-		{
-			$tmp = $this->getActionButton("ActionButtonCancel");
-			$tmp->class = $tmp->get_class() . " cancel";
-		}
-		
-		if (isset($this->action_buttons["ActionButtonDelete"]))
-		{
-			$tmp = $this->getActionButton("ActionButtonDelete");
-			$tmp->class = $tmp->get_class() . " delete";
-		}
-
-		if (isset($this->action_buttons["ActionButtonUpdate"]))
-		{
-			$tmp = $this->getActionButton("ActionButtonUpdate");
-			$tmp->class = $tmp->get_class() . " update";
-		}
-
-		if (isset($this->action_buttons["ActionButtonInsert"]))
-		{
-			$tmp = $this->getActionButton("ActionButtonInsert");
-			$tmp->class = $tmp->get_class() . " insert";
-		}*/
 	}
 
 	/**

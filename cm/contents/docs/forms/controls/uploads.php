@@ -29,8 +29,7 @@ $dbStruct = Orm::get("access", "users");
 //$oRecord = ffRecord::factory($cm->oPage);
 
 
-$oField = ffField::factory($cm->oPage);
-$oField->type = "file";
+$oField = ffField::create("file");
 $oField->label = "Inserisci il tuo Avatar";
 $oField->widget = "uploadifive";
 $oField->file_storing_path = FF_DISK_UPDIR . "/docs/record";

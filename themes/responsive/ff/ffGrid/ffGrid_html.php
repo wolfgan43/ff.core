@@ -2011,7 +2011,7 @@ class ffGrid_html extends ffGrid_base
 		/**
 	    * Set Field Data Info
 	    */
-		if($field->data_info["field"] !== null)
+		/*if($field->data_info["field"] !== null)
 	    {
 	        $data_info = $this->db[0]->getField($field->data_info["field"], $field->data_info["base_type"], true);
 	        if(strlen($data_info))
@@ -2021,7 +2021,7 @@ class ffGrid_html extends ffGrid_base
 	            else
 	                $container_properties["title"] = strip_tags($this->db[0]->getField($field->data_info["field"], $field->data_info["base_type"], true));
 	        }
-	    }
+	    }*/
 
 
         /**
@@ -2418,7 +2418,7 @@ class ffGrid_html extends ffGrid_base
 		*  Set Label
 		*/
      	if($field->display_label) {
-			if ($field->label_encode_entities)
+			if ($field->encode_label)
 			    $buffer_label_value = ffCommon_specialchars($field->label);
 			else
 			    $buffer_label_value = $field->label;
@@ -2526,13 +2526,13 @@ class ffGrid_html extends ffGrid_base
 		if ($this->order == $field->id)
             $container_class["current"] = $this->parent[0]->frameworkCSS->get("current", "util", $this->label_selected_class);
 
-        if($field->width) {
+        /*if($field->width) {
             $container_properties["width"] = $field->width;
         }
 
 	    if($this->tpl[0]->isset_var("col_class")) {
 	        $this->tpl[0]->set_var("col_class", implode(" " , array_filter($col_class)));
-	    }
+	    }*/
 
 		$buffer = $buffer_icon . $buffer_label . $buffer_select;
 

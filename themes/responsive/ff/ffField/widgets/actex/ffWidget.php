@@ -44,55 +44,32 @@ class ffWidget_actex extends ffCommon
 	// PRIVATE VARS
 	
 	var $innerURL		= null;
-	
-	var $tpl 			= null;
-	var $db				= null;
+
+    /**
+     * @var $tpl ffTemplate[]
+     */
+	private $tpl 			= null;
 
 	var $display_debug	= false;
 
-	var $oPage 			= null;
-	var $source_path	= null;
-	var $style_path 	= null;
-	var $theme			= null;
-	
-	function __construct(ffPage_base $oPage = null, $source_path = null, $style_path = null)
+	function __construct(ffPage_base $oPage = null)
 	{
 		$this->get_defaults();
-
-		$this->oPage = array(&$oPage);
-		
-		if ($source_path !== null)
-			$this->source_path = $source_path;
-		elseif ($oPage !== null)
-			$this->source_path = $oPage->getThemePath();
-
-		$this->style_path = $style_path;
-		
-		$this->db[0] = ffDB_Sql::factory();
 	}
 
 	function prepare_template($id)
 	{
 		$this->tpl[$id] = ffTemplate::factory(__DIR__);
 		$this->tpl[$id]->load_file($this->template_file, "main");
-
-		$this->tpl[$id]->set_var("source_path", $this->source_path);
-
-        if ($this->style_path !== null)
-			$this->tpl[$id]->set_var("style_path", $this->style_path);
-		elseif ($this->oPage !== null)
-			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
-
-		/*if ($this->innerURL === null)
-			$this->tpl[$id]->set_var("innerURL", $this->source_path . "/ff/ffField/widgets/actex/parsedata." . FF_PHP_EXT);
-		else
-			$this->tpl[$id]->set_var("innerURL", $this->innerURL);*/
 	}
 
 	function process($id, &$value, ffField_base &$Field)
 	{
-	    if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
-		{
+
+        $oPage      = ffPage::getInstance();
+        $db         = ffDB_Sql::factory();
+
+	    if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF())) {
 			$tpl_id = $Field->parent[0]->getIDIF();
 			$prefix = $tpl_id . "_";
 			if (!isset($this->tpl[$tpl_id]))
@@ -100,78 +77,53 @@ class ffWidget_actex extends ffCommon
 			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
 			$this->tpl[$tpl_id]->set_var("container", $prefix);
 			//$Field->parent[0]->processed_widgets[$prefix . $id] = "actex";
-		}
-		else
-		{
-			$tpl_id = "main";
-			if (!isset($this->tpl[$tpl_id]))
-				$this->prepare_template($tpl_id);
-		}
-
-		if (isset($Field->db[0]))
-			$db =& $Field->db[0];
-		else
-			$db =& $this->db[0];
-
-		$this->tpl[$tpl_id]->set_var("SectControl", "");
-		$this->tpl[$tpl_id]->set_var("SectDataEl", "");
-
-		$this->tpl[$tpl_id]->set_var("id", $id);
-		$this->tpl[$tpl_id]->set_var("name", $Field->id);
-		$this->tpl[$tpl_id]->set_var("class", $Field->get_control_class()); 
-		
-		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
-		if($this->theme !== null) 
-			$this->tpl[$tpl_id]->set_var("theme", $this->theme);
-		else
-			$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
-
-		if ($Field->actex_autocomp) {
-			$Field->parent_page[0]->tplAddJs("jquery-ui");
-			//if($Field->parent_page[0]->jquery_ui_theme) {
-				$this->oPage[0]->tplAddCss("jquery-ui.theme");
-				$this->oPage[0]->tplAddCss("jquery-ui.menu");
-				$this->oPage[0]->tplAddCss("jquery-ui.autocomplete");
-				$this->oPage[0]->tplAddCss("jquery-ui.button");
-			//}		
-		
-			$this->tpl[$tpl_id]->set_var("autocomp_enable", "true");
 		} else {
-			$this->tpl[$tpl_id]->set_var("autocomp_enable", "false");
+			$tpl_id = "main";
+			if (!isset($this->tpl[$tpl_id])) {
+                $this->prepare_template($tpl_id);
+            }
+		}
+
+        $this->tpl[$tpl_id]->set_var("SectControl", "");
+        $this->tpl[$tpl_id]->set_var("SectDataEl", "");
+
+        $this->tpl[$tpl_id]->set_var("id", $id);
+        $this->tpl[$tpl_id]->set_var("name", $Field->id);
+        $this->tpl[$tpl_id]->set_var("class", $Field->get_control_class());
+		
+		if ($Field->actex_autocomp) {
+            $oPage->tplAddJs("jquery-ui");
+            $oPage->tplAddCss("jquery-ui.theme");
+            $oPage->tplAddCss("jquery-ui.menu");
+            $oPage->tplAddCss("jquery-ui.autocomplete");
+            $oPage->tplAddCss("jquery-ui.button");
+
+            $this->tpl[$tpl_id]->set_var("autocomp_enable", "true");
+		} else {
+            $this->tpl[$tpl_id]->set_var("autocomp_enable", "false");
 		}
 		if ($Field->actex_autocomp_ajax)
-			$this->tpl[$tpl_id]->set_var("autocomp_ajax", "true");
+            $this->tpl[$tpl_id]->set_var("autocomp_ajax", "true");
 		else
-			$this->tpl[$tpl_id]->set_var("autocomp_ajax", "false");
-		
-		$this->tpl[$tpl_id]->set_var("autocomp_limit", $Field->actex_autocomp_limit);
+            $this->tpl[$tpl_id]->set_var("autocomp_ajax", "false");
+
+        $this->tpl[$tpl_id]->set_var("autocomp_limit", $Field->actex_autocomp_limit);
 		
 		if ($Field->actex_service === null)
 		{
-			$this->tpl[$tpl_id]->set_var("service", "null");
+            $this->tpl[$tpl_id]->set_var("service", "null");
 			if ($this->innerURL !== null) {
-				$this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
-				$this->tpl[$tpl_id]->parse("SectInnerUrl", false);
+                $this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
+                $this->tpl[$tpl_id]->parse("SectInnerUrl", false);
 			}
-			/*
-			if ($this->innerURL === null)
-				$this->tpl[$tpl_id]->set_var("innerURL", $this->source_path . "/ff/ffField/widgets/actex/parsedata." . FF_PHP_EXT);
-			else
-				$this->tpl[$tpl_id]->set_var("innerURL", $this->innerURL);
-			*/
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("service", "'" . $Field->actex_service . "'");
+            $this->tpl[$tpl_id]->set_var("service", "'" . $Field->actex_service . "'");
 
 		if ($Field->actex_cache)
-			$this->tpl[$tpl_id]->set_var("use_cache", "true");
+            $this->tpl[$tpl_id]->set_var("use_cache", "true");
 		else
-			$this->tpl[$tpl_id]->set_var("use_cache", "false");
-
-        if(strlen($Field->widget_path))
-            $this->tpl[$tpl_id]->set_var("widget_path", $Field->widget_path); 
-        else 
-            $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/actex");
+            $this->tpl[$tpl_id]->set_var("use_cache", "false");
 
 		$dialog_url = $Field->actex_dialog_url;
 		$params = $Field->actex_dialog_add_params;
@@ -191,7 +143,7 @@ class ffWidget_actex extends ffCommon
 				$dialog_title = $Field->id;
 			
 			if (strpos($dialog_url, "?") === false)
-				$dialog_url .= "?" . $Field->parent_page[0]->get_globals();
+				$dialog_url .= "?" . $oPage->get_globals();
 			elseif (substr($dialog_url, -1) !== "&")
 				$dialog_url .= "&";
 			if(is_array($params) && count($params)) 
@@ -205,19 +157,19 @@ class ffWidget_actex extends ffCommon
 				}
 			}
 
-			$this->tpl[$tpl_id]->set_var("dialogaddlink", $Field->parent_page[0]->widgets["dialog"]->process(
+            $this->tpl[$tpl_id]->set_var("dialogaddlink", $oPage->widgets["dialog"]->process(
 					"actex_dlg_" . $prefix . $id
 					, array(
 							"title"			=> $dialog_title
 							, "url"			=> $dialog_url
-							/*, "name"		=> '<img alt="add" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_add .'"' . (strlen($Field->actex_dialog_title_add)  ? ' title="' . $Field->actex_dialog_title_add . '"' : '') . ' />'*/
+							/*, "name"		=> '<img alt="add" src="' . FF_SITE_PATH . '/themes/' . $oPage->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_add .'"' . (strlen($Field->actex_dialog_title_add)  ? ' title="' . $Field->actex_dialog_title_add . '"' : '') . ' />'*/
 							//, "callback"	=> (count($Field->resources) ? "ff.ffField.actex.dialog_success('" . $prefix . $id . "', '" . $Field->resources[0] . "')" : "")
 							, "tpl_id"		=> $tpl_id
 							, "addjs"		=> "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
-							, "class"		=> $this->oPage[0]->frameworkCSS->get("addnew", "icon", array("class" => "hidden " . $this->oPage[0]->frameworkCSS->get("control-prefix", "form")))
+							, "class"		=> $oPage->frameworkCSS->get("addnew", "icon", array("class" => "hidden " . $oPage->frameworkCSS->get("control-prefix", "form")))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogaddlink"
 						)
-					, $Field->parent_page[0]
+					, $oPage
 				));
 			//$this->tpl[$tpl_id]->parse("SectDialog", false);
 			
@@ -225,7 +177,7 @@ class ffWidget_actex extends ffCommon
 		}
 		else
 		{
-			$this->tpl[$tpl_id]->set_var("dialogaddlink", "");
+            $this->tpl[$tpl_id]->set_var("dialogaddlink", "");
 			//$this->tpl[$tpl_id]->set_var("SectDialog", "");
 		}
 
@@ -253,7 +205,7 @@ class ffWidget_actex extends ffCommon
 				$dialog_edit_title = $Field->id;
 
 			if (strpos($edit_url, "?") === false)
-				$edit_url .= "?" . $Field->parent_page[0]->get_globals();
+				$edit_url .= "?" . $oPage->get_globals();
 			elseif (substr($edit_url, -1) !== "&")
 				$edit_url .= "&";
 			if(is_array($params) && count($params)) 
@@ -266,18 +218,18 @@ class ffWidget_actex extends ffCommon
 						$edit_url .= $param_key . "=[[" . $param_value . "]]&";
 				}
 			}
-			$this->tpl[$tpl_id]->set_var("dialogeditlink", $Field->parent_page[0]->widgets["dialog"]->process(
+            $this->tpl[$tpl_id]->set_var("dialogeditlink", $oPage->widgets["dialog"]->process(
 					"actex_dlg_edit_" . $prefix . $id
 					, array(
 							"title"			=> $dialog_edit_title
 							, "url"			=> $edit_url
-							/*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
+							/*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $oPage->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_edit_" . $Field->parent[0]->id . "_" . $Field->id . "')"
 							, "tpl_id"		=> $tpl_id
-							, "class"		=> $this->oPage[0]->frameworkCSS->get("editrow", "icon", array("class" => "hidden"))
+							, "class"		=> $oPage->frameworkCSS->get("editrow", "icon", array("class" => "hidden"))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogeditlink"
 						)
-					, $Field->parent_page[0]
+					, $oPage
 				));
 			//$this->tpl[$tpl_id]->parse("SectDialogEdit", false);
 			
@@ -285,7 +237,7 @@ class ffWidget_actex extends ffCommon
 		}
 		else
 		{
-			$this->tpl[$tpl_id]->set_var("dialogeditlink", "");
+            $this->tpl[$tpl_id]->set_var("dialogeditlink", "");
 			//$this->tpl[$tpl_id]->set_var("SectDialogEdit", "");
 		}
 
@@ -313,7 +265,7 @@ class ffWidget_actex extends ffCommon
 				$dialog_delete_title = $Field->id;
 
 			if (strpos($delete_url, "?") === false)
-				$delete_url .= "?" . $Field->parent_page[0]->get_globals();
+				$delete_url .= "?" . $oPage->get_globals();
 			if (substr($delete_url, -1) !== "&")
 				$delete_url .= "&";
 			
@@ -346,19 +298,19 @@ class ffWidget_actex extends ffCommon
 			{
 				$dialog_delete = ffDialog(true, "yesno", $dialog_delete_title, $Field->actex_dialog_delete_message, "[CLOSEDIALOG]", $delete_url, "/dialog");
 			}
-			
-			$this->tpl[$tpl_id]->set_var("dialogdeletelink", $Field->parent_page[0]->widgets["dialog"]->process(
+
+            $this->tpl[$tpl_id]->set_var("dialogdeletelink", $oPage->widgets["dialog"]->process(
 					"actex_dlg_delete_" . $prefix . $id
 					, array(
 							"title"			=> $dialog_delete_title
 							, "url"			=> $dialog_delete
-							/*, "name"		=> '<img alt="delete" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_delete .'"' . (strlen($Field->actex_dialog_title_delete)  ? ' title="' . $Field->actex_dialog_title_delete . '"' : '') . ' />'*/
+							/*, "name"		=> '<img alt="delete" src="' . FF_SITE_PATH . '/themes/' . $oPage->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_delete .'"' . (strlen($Field->actex_dialog_title_delete)  ? ' title="' . $Field->actex_dialog_title_delete . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_delete_" . $Field->parent[0]->id . "_" . $Field->id . "')"
 							, "tpl_id"		=> $tpl_id
-							, "class"		=> $this->oPage[0]->frameworkCSS->get("deleterow", "icon", array("class" => "hidden"))
+							, "class"		=> $oPage->frameworkCSS->get("deleterow", "icon", array("class" => "hidden"))
 							, "id"			=> "actex_" . $prefix . $id . "_dialogdeletelink"
 						)
-					, $Field->parent_page[0]
+					, $oPage
 				));
 			//$this->tpl[$tpl_id]->parse("SectDialogDelete", false);
 			
@@ -366,7 +318,7 @@ class ffWidget_actex extends ffCommon
 		}
 		else
 		{
-			$this->tpl[$tpl_id]->set_var("dialogdeletelink", "");
+            $this->tpl[$tpl_id]->set_var("dialogdeletelink", "");
 			//$this->tpl[$tpl_id]->set_var("SectDialogDelete", "");
 		}
 
@@ -415,26 +367,26 @@ class ffWidget_actex extends ffCommon
 			ffErrorHandler::raise("Cannot determine child in activecombo!", E_USER_ERROR, $this, get_defined_vars());
 		
 		if ($father === null)
-			$this->tpl[$tpl_id]->set_var("father", "null");
+            $this->tpl[$tpl_id]->set_var("father", "null");
 		else
 		{
 			if ($Field->row === null)
-				$this->tpl[$tpl_id]->set_var("father", "\"" . $prefix . $father->id . $suffix . "\"");
+                $this->tpl[$tpl_id]->set_var("father", '"' . $prefix . $father->id . $suffix . '"');
 			else
-				$this->tpl[$tpl_id]->set_var("father", "\"" . $prefix . "recordset[" . $Field->row . "][" . $father->id . "]\"");
+                $this->tpl[$tpl_id]->set_var("father", '"' . $prefix . "recordset[" . $Field->row . "][" . $father->id . "]" . '"');
 		}
-			
-		$this->tpl[$tpl_id]->set_var("SectChild", "");
+
+        $this->tpl[$tpl_id]->set_var("SectChild", "");
         if ($child !== null)
 		{
 			foreach ($child as $key => $element)
 			{
 				if ($Field->row === null)
-					$this->tpl[$tpl_id]->set_var("child", ($key > 0 ? "," : "") . "\"" . $prefix . $child[$key]->id . $suffix . "\"");
+                    $this->tpl[$tpl_id]->set_var("child", ($key > 0 ? "," : "") . '"' . $prefix . $child[$key]->id . $suffix . '"');
 				else
-					$this->tpl[$tpl_id]->set_var("child", ($key > 0 ? "," : "") . "\"" . $prefix . "recordset[" . $Field->row . "][" . $child[$key]->id . "]\"");
-				$this->tpl[$tpl_id]->set_var("n", $key);
-				$this->tpl[$tpl_id]->parse("SectChild", true);
+                    $this->tpl[$tpl_id]->set_var("child", ($key > 0 ? "," : "") . '"' . $prefix . "recordset[" . $Field->row . "][" . $child[$key]->id . "]" . '"');
+                $this->tpl[$tpl_id]->set_var("n", $key);
+                $this->tpl[$tpl_id]->parse("SectChild", true);
 			}
 			reset($child);
 		}
@@ -446,50 +398,50 @@ class ffWidget_actex extends ffCommon
 		if (isset($property_set["onchange"]))
 			ffErrorHandler::raise("DEPRECATED - use ->actex_on_change instead", E_USER_ERROR, $this, get_defined_vars());
 
-		$this->tpl[$tpl_id]->set_var("properties", str_replace("'", "\'", $Field->getProperties($property_set)));
-		$this->tpl[$tpl_id]->set_var("data_properties", str_replace("'", "\'", $Field->getProperties($Field->data_properties)));
+        $this->tpl[$tpl_id]->set_var("properties", str_replace("'", "\'", $Field->getProperties($property_set)));
+        $this->tpl[$tpl_id]->set_var("data_properties", str_replace("'", "\'", $Field->getProperties($Field->data_properties)));
 		
 		if ($Field->actex_on_change !== null)
 		{
-			$this->tpl[$tpl_id]->set_var("on_change", $Field->actex_on_change);
-			$this->tpl[$tpl_id]->parse("SectEventChange", false);
+            $this->tpl[$tpl_id]->set_var("on_change", $Field->actex_on_change);
+            $this->tpl[$tpl_id]->parse("SectEventChange", false);
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("SectEventChange", "");
+            $this->tpl[$tpl_id]->set_var("SectEventChange", "");
 		
 		if ($Field->actex_on_update_bt !== null)
 		{
-			$this->tpl[$tpl_id]->set_var("on_update_bt", $Field->actex_on_update_bt);
-			$this->tpl[$tpl_id]->parse("SectEventUpdateBt", false);
+            $this->tpl[$tpl_id]->set_var("on_update_bt", $Field->actex_on_update_bt);
+            $this->tpl[$tpl_id]->parse("SectEventUpdateBt", false);
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("SectEventUpdateBt", "");
+            $this->tpl[$tpl_id]->set_var("SectEventUpdateBt", "");
 
 		if ($Field->actex_on_refill !== null)
 		{
-			$this->tpl[$tpl_id]->set_var("on_refill", $Field->actex_on_refill);
-			$this->tpl[$tpl_id]->parse("SectEventRefill", false);
+            $this->tpl[$tpl_id]->set_var("on_refill", $Field->actex_on_refill);
+            $this->tpl[$tpl_id]->parse("SectEventRefill", false);
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("SectEventRefill", "");
+            $this->tpl[$tpl_id]->set_var("SectEventRefill", "");
 		
 		if ($Field->multi_limit_select)
-			$this->tpl[$tpl_id]->set_var("limit_select", "true");
+            $this->tpl[$tpl_id]->set_var("limit_select", "true");
 		else
-			$this->tpl[$tpl_id]->set_var("limit_select", "false");
+            $this->tpl[$tpl_id]->set_var("limit_select", "false");
 
 		if (strlen($Field->properties["disabled"]))
-			$this->tpl[$tpl_id]->set_var("disabled", "true");
+            $this->tpl[$tpl_id]->set_var("disabled", "true");
 		else
-			$this->tpl[$tpl_id]->set_var("disabled", "false");
+            $this->tpl[$tpl_id]->set_var("disabled", "false");
 
         $this->tpl[$tpl_id]->set_var("separator", $Field->grouping_separator);
 
         // TODO: mettere un parametro nell'activecombo
 		if($Field->control_type == "")
-			$this->tpl[$tpl_id]->set_var("control_type", "combo");
+            $this->tpl[$tpl_id]->set_var("control_type", "combo");
 		else
-			$this->tpl[$tpl_id]->set_var("control_type", $Field->get_control_type());
+            $this->tpl[$tpl_id]->set_var("control_type", $Field->get_control_type());
 
         if ($Field->actex_add_plus)
             $this->tpl[$tpl_id]->set_var("add_plus", "true");
@@ -504,31 +456,31 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("hide_empty", "false");
 
         $action_class = "actex-actions";
-        
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", $this->oPage[0]->frameworkCSS->get("caret-down", "icon", array("class" => ("actex-combo"))));
-        $this->tpl[$tpl_id]->set_var("icon_delete", $this->oPage[0]->frameworkCSS->get("trash-o", "icon"));
-        $this->tpl[$tpl_id]->set_var("icon_plus", $this->oPage[0]->frameworkCSS->get("plus", "icon"));
-        $this->tpl[$tpl_id]->set_var("icon_minus", $this->oPage[0]->frameworkCSS->get("minus", "icon"));
-        $this->tpl[$tpl_id]->set_var("icon_loader", $this->oPage[0]->frameworkCSS->get("spinner", "icon-tag", "spin"));
+
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", $oPage->frameworkCSS->get("caret-down", "icon", array("class" => ("actex-combo"))));
+        $this->tpl[$tpl_id]->set_var("icon_delete", $oPage->frameworkCSS->get("trash-o", "icon"));
+        $this->tpl[$tpl_id]->set_var("icon_plus", $oPage->frameworkCSS->get("plus", "icon"));
+        $this->tpl[$tpl_id]->set_var("icon_minus", $oPage->frameworkCSS->get("minus", "icon"));
+        $this->tpl[$tpl_id]->set_var("icon_loader", $oPage->frameworkCSS->get("spinner", "icon-tag", "spin"));
 		if($Field->actex_autocomp) {
-			$this->tpl[$tpl_id]->parse("SectCombo", false);
+            $this->tpl[$tpl_id]->parse("SectCombo", false);
 			$action_class .= " nopadding";
 		} else {
-			$this->tpl[$tpl_id]->set_var("SectCombo", "");
+            $this->tpl[$tpl_id]->set_var("SectCombo", "");
 		}
 
-        $this->tpl[$tpl_id]->set_var("actex_container", $this->oPage[0]->frameworkCSS->get("group", "form", "actex-wrapper"));
+        $this->tpl[$tpl_id]->set_var("actex_container", $oPage->frameworkCSS->get("group", "form", "actex-wrapper"));
         $this->tpl[$tpl_id]->set_var("data_class", "actex" . (strlen($Field->data_class) ? " " : "") . $Field->data_class);
-        $this->tpl[$tpl_id]->set_var("actions_class", $this->oPage[0]->frameworkCSS->get("control-feedback", "form", $action_class));
+        $this->tpl[$tpl_id]->set_var("actions_class", $oPage->frameworkCSS->get("control-feedback", "form", $action_class));
 
-        $this->tpl[$tpl_id]->set_var("actex_multi_container", $this->oPage[0]->frameworkCSS->get("group", "list", "actex-multi"));
-        $this->tpl[$tpl_id]->set_var("actex_multi_item", $this->oPage[0]->frameworkCSS->get("item", "list"));
-        $this->tpl[$tpl_id]->set_var("actex_multi_badge", $this->oPage[0]->frameworkCSS->get("badge", "list"));
+        $this->tpl[$tpl_id]->set_var("actex_multi_container", $oPage->frameworkCSS->get("group", "list", "actex-multi"));
+        $this->tpl[$tpl_id]->set_var("actex_multi_item", $oPage->frameworkCSS->get("item", "list"));
+        $this->tpl[$tpl_id]->set_var("actex_multi_badge", $oPage->frameworkCSS->get("badge", "list"));
             
 		if ($Field->actex_reset_childs) {
-			$this->tpl[$tpl_id]->set_var("reset_childs", "true");
+            $this->tpl[$tpl_id]->set_var("reset_childs", "true");
 		} else {
-			$this->tpl[$tpl_id]->set_var("reset_childs", "false");
+            $this->tpl[$tpl_id]->set_var("reset_childs", "false");
 		}        
         
         if(is_array($Field->actex_plugin) 
@@ -538,39 +490,39 @@ class ffWidget_actex extends ffCommon
         	&& strlen($Field->actex_plugin["js"])
         ) {
 
-			$this->tpl[$tpl_id]->set_var("plugin_name", $Field->actex_plugin["name"]);	
-			$this->tpl[$tpl_id]->set_var("plugin_path", $Field->actex_plugin["path"]);	
-			$this->tpl[$tpl_id]->set_var("plugin_css", $Field->actex_plugin["css"]);	
-			$this->tpl[$tpl_id]->set_var("plugin_js", $Field->actex_plugin["js"]);	
+            $this->tpl[$tpl_id]->set_var("plugin_name", $Field->actex_plugin["name"]);
+            $this->tpl[$tpl_id]->set_var("plugin_path", $Field->actex_plugin["path"]);
+            $this->tpl[$tpl_id]->set_var("plugin_css", $Field->actex_plugin["css"]);
+            $this->tpl[$tpl_id]->set_var("plugin_js", $Field->actex_plugin["js"]);
 			if(is_array($Field->actex_plugin["params"]) && count($Field->actex_plugin["params"])) {
-				$this->tpl[$tpl_id]->set_var("plugin_params", ffCommon_jsonenc($Field->actex_plugin["params"]));	
+                $this->tpl[$tpl_id]->set_var("plugin_params", ffCommon_jsonenc($Field->actex_plugin["params"]));
 			} else {
-				$this->tpl[$tpl_id]->set_var("plugin_params", "undefined");
+                $this->tpl[$tpl_id]->set_var("plugin_params", "undefined");
 			}
-			$this->tpl[$tpl_id]->parse("SezPlugin", false);
+            $this->tpl[$tpl_id]->parse("SezPlugin", false);
         } else {
-			$this->tpl[$tpl_id]->set_var("SezPlugin", "");
+            $this->tpl[$tpl_id]->set_var("SezPlugin", "");
         }
             
         if($Field->autocomplete_label) {
-        	$this->tpl[$tpl_id]->set_var("autocomplete_label", $Field->autocomplete_label);
-        	$this->tpl[$tpl_id]->parse("SectControlLabel", false);
+            $this->tpl[$tpl_id]->set_var("autocomplete_label", $Field->autocomplete_label);
+            $this->tpl[$tpl_id]->parse("SectControlLabel", false);
 		} else {
-        	$this->tpl[$tpl_id]->set_var("SectControlLabel", "");
+            $this->tpl[$tpl_id]->set_var("SectControlLabel", "");
 		}
 
         //$default_empty = new ffData("", $Field->base_type);
 		if ($Field->multi_select_one && !$Field->multi_limit_select)
 		{
 			if ($Field->multi_select_one_val !== null)
-				$this->tpl[$tpl_id]->set_var("select_one_val", $Field->multi_select_one_val->getValue($Field->get_app_type(), $Field->get_locale()));
+                $this->tpl[$tpl_id]->set_var("select_one_val", $Field->multi_select_one_val->getValue($Field->get_app_type(), $Field->get_locale()));
 			else
-				$this->tpl[$tpl_id]->set_var("select_one_val", "");
-			$this->tpl[$tpl_id]->set_var("select_one_label", $Field->multi_select_one_label);
-			$this->tpl[$tpl_id]->set_var("select_one", "true");
+                $this->tpl[$tpl_id]->set_var("select_one_val", "");
+            $this->tpl[$tpl_id]->set_var("select_one_label", $Field->multi_select_one_label);
+            $this->tpl[$tpl_id]->set_var("select_one", "true");
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("select_one", "false");
+            $this->tpl[$tpl_id]->set_var("select_one", "false");
 			
 		if ($Field->multi_select_noone && 
 				(!$Field->multi_limit_select || 
@@ -579,17 +531,17 @@ class ffWidget_actex extends ffCommon
 			)
 		{
 			if ($Field->multi_select_noone_val !== null)
-				$this->tpl[$tpl_id]->set_var("select_noone_val", $Field->multi_select_noone_val->getValue($Field->get_app_type(), $Field->get_locale()));
+                $this->tpl[$tpl_id]->set_var("select_noone_val", $Field->multi_select_noone_val->getValue($Field->get_app_type(), $Field->get_locale()));
 			else
-				$this->tpl[$tpl_id]->set_var("select_noone_val", "");
-			$this->tpl[$tpl_id]->set_var("select_noone_label", $Field->multi_select_noone_label);
-			$this->tpl[$tpl_id]->set_var("select_noone", "true");
+                $this->tpl[$tpl_id]->set_var("select_noone_val", "");
+            $this->tpl[$tpl_id]->set_var("select_noone_label", $Field->multi_select_noone_label);
+            $this->tpl[$tpl_id]->set_var("select_noone", "true");
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("select_noone", "false");
-			
-		$this->tpl[$tpl_id]->set_var("SectData", "");
-		$this->tpl[$tpl_id]->set_var("data_src", "");		
+            $this->tpl[$tpl_id]->set_var("select_noone", "false");
+
+        $this->tpl[$tpl_id]->set_var("SectData", "");
+        $this->tpl[$tpl_id]->set_var("data_src", "");
 		$no_rec = true;
 		
 		if (strlen($tmp_sql = $Field->getSQL()) && $Field->actex_update_from_db)
@@ -639,14 +591,14 @@ class ffWidget_actex extends ffCommon
     //			set_session("actex_sql_" . $tmp, $tmp_sql);
     //			set_session("actex_field_" . $tmp, $Field->actex_related_field);
     //			set_session("actex_main_db_" . $tmp, $Field->actex_use_main_db);
-			    
-			    $this->tpl[$tpl_id]->set_var("data_src", $tmp);
-			    $this->tpl[$tpl_id]->set_var("SectData", "");
+
+                $this->tpl[$tpl_id]->set_var("data_src", $tmp);
+                $this->tpl[$tpl_id]->set_var("SectData", "");
             }
 		}
 		else if (strlen($tmp_sql))
 		{
-			$this->tpl[$tpl_id]->set_var("data_src", "");
+            $this->tpl[$tpl_id]->set_var("data_src", "");
 			$db->query($tmp_sql);
 			if ($db->nextRecord())
 			{
@@ -654,36 +606,36 @@ class ffWidget_actex extends ffCommon
 				do
 				{
 					$n++;
-					$this->tpl[$tpl_id]->set_var("n", $n);
+                    $this->tpl[$tpl_id]->set_var("n", $n);
 
 					if ($n > 0)
-						$this->tpl[$tpl_id]->set_var("data_comma", ",");
+                        $this->tpl[$tpl_id]->set_var("data_comma", ",");
 					else
-						$this->tpl[$tpl_id]->set_var("data_comma", "");
+                        $this->tpl[$tpl_id]->set_var("data_comma", "");
 
 
 					if ($father === null)
-						$this->tpl[$tpl_id]->set_var("father_value", "null");
+                        $this->tpl[$tpl_id]->set_var("father_value", "null");
 					else
 					{
 						$tmp = $db->getField($db->fields_names[0], $father->base_type);
 						//$tmp = $db->getResult(null, 0, $father->base_type);
-						$this->tpl[$tpl_id]->set_var("father_value", "\"" . str_replace('"', '\"', $tmp->getValue($father->get_app_type(), $father->get_locale())) . "\"");
+                        $this->tpl[$tpl_id]->set_var("father_value", '"' . str_replace('"', '\"', $tmp->getValue($father->get_app_type(), $father->get_locale())) . '"');
 					}
 					$tmp = $db->getField($db->fields_names[1], $Field->base_type);
 					//$tmp = $db->getResult(null, 1, $Field->base_type);
-					$this->tpl[$tpl_id]->set_var("value", str_replace('"', '\"', $tmp->getValue($Field->get_app_type(), $Field->get_locale())));
+                    $this->tpl[$tpl_id]->set_var("value", str_replace('"', '\"', $tmp->getValue($Field->get_app_type(), $Field->get_locale())));
 					$tmp = $db->getField($db->fields_names[2], $Field->multi_base_type);
 					//$tmp = $db->getResult(null, 2, $Field->multi_base_type);
-					$this->tpl[$tpl_id]->set_var("desc", str_replace('"', '\"', $tmp->getValue($Field->multi_app_type, $Field->get_locale())));
+                    $this->tpl[$tpl_id]->set_var("desc", str_replace('"', '\"', $tmp->getValue($Field->multi_app_type, $Field->get_locale())));
 
-					$this->tpl[$tpl_id]->parse("SectDataEl", true);
+                    $this->tpl[$tpl_id]->parse("SectDataEl", true);
 				}
 				while ($db->nextRecord());
-				$this->tpl[$tpl_id]->parse("SectData", false);
+                $this->tpl[$tpl_id]->parse("SectData", false);
 			}
 			else
-				$this->tpl[$tpl_id]->set_var("SectData", "");
+                $this->tpl[$tpl_id]->set_var("SectData", "");
 		}
 		else if (is_array($Field->multi_pairs) && count($Field->multi_pairs))
 		{
@@ -691,33 +643,33 @@ class ffWidget_actex extends ffCommon
 			foreach($Field->multi_pairs as $key => $item)
 			{
 				$n++;
-				$this->tpl[$tpl_id]->set_var("n", $n);
+                $this->tpl[$tpl_id]->set_var("n", $n);
 
 				if ($n > 0)
-					$this->tpl[$tpl_id]->set_var("data_comma", ",");
+                    $this->tpl[$tpl_id]->set_var("data_comma", ",");
 				else
-					$this->tpl[$tpl_id]->set_var("data_comma", "");
+                    $this->tpl[$tpl_id]->set_var("data_comma", "");
 				
 				if ($father === null) {
-					$this->tpl[$tpl_id]->set_var("father_value", "null");
+                    $this->tpl[$tpl_id]->set_var("father_value", "null");
 				} else {
-					list($item_key, $father_id) = each($item); 					
-					$this->tpl[$tpl_id]->set_var("father_value", "\"" . str_replace('"', '\"', $father_id->getValue($father->base_type, $father->get_locale())) . "\"");
+					list($item_key, $father_id) = each($item);
+                    $this->tpl[$tpl_id]->set_var("father_value", "\"" . str_replace('"', '\"', $father_id->getValue($father->base_type, $father->get_locale())) . "\"");
 				}
 
 				list($item_key, $child_id) = each($item);
 				list($item_key, $child_value) = each($item);
 
-				$this->tpl[$tpl_id]->set_var("value", str_replace('"', '\"', $child_id->getValue($Field->get_app_type(), $Field->get_locale())));
-				$this->tpl[$tpl_id]->set_var("desc", str_replace('"', '\"', $child_value->getValue($Field->multi_app_type, $Field->get_locale())));
+                $this->tpl[$tpl_id]->set_var("value", str_replace('"', '\"', $child_id->getValue($Field->get_app_type(), $Field->get_locale())));
+                $this->tpl[$tpl_id]->set_var("desc", str_replace('"', '\"', $child_value->getValue($Field->multi_app_type, $Field->get_locale())));
 
-				$this->tpl[$tpl_id]->parse("SectDataEl", true);
+                $this->tpl[$tpl_id]->parse("SectDataEl", true);
 			}
 			reset($Field->multi_pairs);
-			$this->tpl[$tpl_id]->parse("SectData", false);
+            $this->tpl[$tpl_id]->parse("SectData", false);
 		}
 		else
-			$this->tpl[$tpl_id]->set_var("SectData", "");
+            $this->tpl[$tpl_id]->set_var("SectData", "");
 
 		/*if ($Field->actex_father === null)
 			$this->tpl[$tpl_id]->set_var("father_value", "null");
@@ -737,8 +689,8 @@ class ffWidget_actex extends ffCommon
 				$value == null || !($value->getValue($Field->get_app_type(), $Field->get_locale()))
 				|| ($value->ori_value === "" && $Field->multi_select_one && $Field->multi_select_one_val === null)
 			) {
-			$this->tpl[$tpl_id]->set_var("selected_value", "null");
-			$this->tpl[$tpl_id]->set_var("selected_label", "");
+            $this->tpl[$tpl_id]->set_var("selected_value", "null");
+            $this->tpl[$tpl_id]->set_var("selected_label", "");
 		} else {
             $arrValue = explode($Field->grouping_separator, $value->getValue($Field->get_app_type(), $Field->get_locale()));
 
@@ -933,23 +885,23 @@ class ffWidget_actex extends ffCommon
 				}
             }
 
-		   	$this->tpl[$tpl_id]->set_var("selected_value", "'" . implode(",", $arrSelectedValue) . "'");
-			$this->tpl[$tpl_id]->set_var("selected_label", implode(",", $arrSelectedLabel));
-		}		
-		
+            $this->tpl[$tpl_id]->set_var("selected_value", "'" . implode(",", $arrSelectedValue) . "'");
+            $this->tpl[$tpl_id]->set_var("selected_label", implode(",", $arrSelectedLabel));
+		}
 
-		$this->tpl[$tpl_id]->set_var("SectMulti", "");
-		$this->tpl[$tpl_id]->set_var("SectMultiElem", "");
+
+        $this->tpl[$tpl_id]->set_var("SectMulti", "");
+        $this->tpl[$tpl_id]->set_var("SectMultiElem", "");
 		if($Field->actex_multi)
 		{
-			$this->tpl[$tpl_id]->set_var("multi", "true");
+            $this->tpl[$tpl_id]->set_var("multi", "true");
 			if($Field->actex_multi_sort) {
 				ksort($arrData);
 			}
 
 			if(is_array($arrData) && count($arrData)) {
 				foreach($arrData AS $data) {
-					$this->tpl[$tpl_id]->set_var("value", $data["value"]);
+                    $this->tpl[$tpl_id]->set_var("value", $data["value"]);
 					
 					$desc = $data["label"];
 					if($data["image"])
@@ -958,25 +910,25 @@ class ffWidget_actex extends ffCommon
 					if($data["url"]) {
 						$desc = '<a href="' . $data["url"] . '" target="_blank">' . $desc . '</a>';
 					}
-					$this->tpl[$tpl_id]->set_var("desc", $desc);
-					
-					$this->tpl[$tpl_id]->parse("SectMultiElem", true);
+                    $this->tpl[$tpl_id]->set_var("desc", $desc);
+
+                    $this->tpl[$tpl_id]->parse("SectMultiElem", true);
 				}
 			}
-			$this->tpl[$tpl_id]->parse("SectMulti", false);
+            $this->tpl[$tpl_id]->parse("SectMulti", false);
 		} else 
 		{
-			$this->tpl[$tpl_id]->set_var("multi", "false");
+            $this->tpl[$tpl_id]->set_var("multi", "false");
 		}
 
-		$this->tpl[$tpl_id]->parse("SectBinding", true);
+        $this->tpl[$tpl_id]->parse("SectBinding", true);
 		
         if ($father === null)
-			$this->tpl[$tpl_id]->parse("SectBindingFoot", true);
+            $this->tpl[$tpl_id]->parse("SectBindingFoot", true);
 
 		if ($this->display_debug) {
-			$this->tpl[$tpl_id]->set_var("icon_debug", $this->oPage[0]->frameworkCSS->get("bug", "icon"));
-			$this->tpl[$tpl_id]->parse("SectDebug", false);
+            $this->tpl[$tpl_id]->set_var("icon_debug", $oPage->frameworkCSS->get("bug", "icon"));
+            $this->tpl[$tpl_id]->parse("SectDebug", false);
 		} /*else {
 			$this->tpl[$tpl_id]->set_var("SectDebug", "");
 		}*/

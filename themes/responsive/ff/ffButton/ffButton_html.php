@@ -10,7 +10,7 @@ class ffButton_html extends ffButton_base
 	 * @var String
 	 */
 	var $container_class		= "";
-	var $container_properties	= "";
+	var $container_properties	= array();
 	var $data_class			= "";
 	var $data_properties		= array();
 	//var $widget_activebt_enable = false;

@@ -130,6 +130,7 @@ class ffButton
  */
 abstract class ffButton_base extends ffCommon
 {
+    const TYPE                  = "ffButton";
     const NAME                  = "ffb";
 
     // ----------------------------------

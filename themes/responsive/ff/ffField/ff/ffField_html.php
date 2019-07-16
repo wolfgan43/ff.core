@@ -23,6 +23,9 @@
  *  @license http://opensource.org/licenses/gpl-3.0.html
  *  @link https://github.com/wolfgan43/vgallery
  */
+
+namespace ff;
+
 frameworkCSS::extend(array(
         "types" => array(
             "default" => array(
@@ -252,6 +255,7 @@ frameworkCSS::extend(array(
     ), "ffField");
 
 
+
 class ffField_html extends ffField_base {
     public $framework_css			        = null;
     private $type					        = null;
@@ -259,7 +263,7 @@ class ffField_html extends ffField_base {
     public $url                             = null; //usato nelle grid
     public $url_ajax                        = null; //usato nelle grid
     public $url_parsed                      = null; //usato nelle grid
-
+    public $label_encode_entities           = null; //usato nelle grid
     public $file_showfile_plugin           = null; //usato nelle record
     public $actex_use_own_session           = null; //usato nelle record
     public $file_widget_preview           = null; //usato nelle record
@@ -541,7 +545,7 @@ class ffField_html extends ffField_base {
             }
         }
 
-        return $type;
+        $this->type = $type;
     }
 
     public function widget_process($id = null, $value = null)
@@ -590,10 +594,7 @@ class ffField_html extends ffField_base {
 
         parent::pre_process($reset, $value);
     }
-    public function process($id = null) {
-        if($id) {
-            $this->id = $id;
-        }
+    public function process($output_result = false) {
         $this->pre_process();
 
         $buffer = ($this->widget
@@ -603,7 +604,12 @@ class ffField_html extends ffField_base {
 
         ffPage::getInstance()->tplAddJs("ff.ffField");
 
-        return $buffer;
+        if ($output_result) {
+            echo $buffer;
+            return true;
+        } else {
+            return $buffer;
+        }
     }
 
     private function processFrameworkCSS() {
@@ -767,7 +773,7 @@ class ffField_html extends ffField_base {
         );
     }
 
-    protected function getControlTagData() {
+    private function getControlTagData() {
         //static $data                            = null;
 
         //if(!$data) {

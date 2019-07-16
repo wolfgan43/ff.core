@@ -84,7 +84,7 @@ $oField->id = "avatar";
 /**
  * Dichiaro la classe che conterrà il campo (è opzionale)
  */
-$oField->container_class = "avatar";
+//$oField->container_class = "avatar";
 $oField->label = ffTemplate::_get_word_by_code("avatar");
 $oField->extended_type = "File";
 $oField->widget = "uploadifive";

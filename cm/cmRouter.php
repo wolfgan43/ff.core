@@ -333,7 +333,7 @@ class cmRouter extends ffCommon
 						continue;
 				}
 
-				if (count($value->source) == 1)
+                if (!is_array($value->source))
 				{
 					$matches = array();
 					$rc = preg_match('/' . str_replace('/', '\/', $value->source) . '/', $url, $matches,  PREG_OFFSET_CAPTURE);

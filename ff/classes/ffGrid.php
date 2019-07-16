@@ -105,6 +105,7 @@ class ffGrid
  */
 abstract class ffGrid_base extends ffCommon
 {
+    const TYPE                  = "ffGrid";
     const NAME                  = "ffg";
 
     // ----------------------------------
@@ -851,6 +852,7 @@ abstract class ffGrid_base extends ffCommon
         if($this->record_url) {
             $this->resources[] = crc32($this->record_url);
         }
+
 		// display error
 		if($this->tpl !== null)
 		{

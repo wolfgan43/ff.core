@@ -1,29 +1,53 @@
 <?php
+/**
+ * VGallery: CMS based on FormsFramework
+ * Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @package VGallery
+ *  @subpackage core
+ *  @author Alessandro Stucchi <wolfgan@gmail.com>
+ *  @copyright Copyright (c) 2004, Alessandro Stucchi
+ *  @license http://opensource.org/licenses/gpl-3.0.html
+ *  @link https://github.com/wolfgan43/vgallery
+ */
+
 // ----------------------------------------
 //  		FRAMEWORK FORMS vAlpha
-//		      PLUGIN DEFINITION (timepicker)
+//		      PLUGIN DEFINITION (timechooser)
 //			   by Samuele Diella
 // ----------------------------------------
 
-class ffWidget_timepicker extends ffCommon
+class ffWidget_timechooser extends ffCommon
 {
 
 	// ---------------------------------------------------------------
 	//  PRIVATE VARS (used by code, don't touch or may be explode! :-)
 	var $template_file 	 = "ffWidget.html";
 	
-	var $class			= "ffWidget_timepicker";
+	var $class			= "ffWidget_timechooser";
 
 	var $widget_deps	= array();
-
+	
 	var $libraries		= array();
 	
     var $js_deps = array(
-		"ff.ffField.timepicker" => null
-	);
-	
-    var $css_deps = array(
-	);
+                              "ff.ffField.timechooser"       => null
+						);
+    var $css_deps 		= array(
+    					);
 
 	// PRIVATE VARS
 
@@ -46,7 +70,6 @@ class ffWidget_timepicker extends ffCommon
 	
 	function process($id, &$value, ffField_base &$Field)
 	{
-
 		// THE REAL STUFF
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
 		{
@@ -56,7 +79,7 @@ class ffWidget_timepicker extends ffCommon
 				$this->prepare_template($tpl_id);
 			$this->tpl[$tpl_id]->set_var("component", $tpl_id);
 			$this->tpl[$tpl_id]->set_var("container", $prefix);
-			//$Field->parent[0]->processed_widgets[$prefix . $id] = "timepicker";
+			//$Field->parent[0]->processed_widgets[$prefix . $id] = "timechooser";
 		}
 		else
 		{
@@ -69,25 +92,24 @@ class ffWidget_timepicker extends ffCommon
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-		$hour = 0;
-		$minute = 0;
-		$text_value = preg_replace("/[^0-9\:]+/", "", $value->getValue());
+		$year = 0;
+		$month = 0;
+		$day = 0;
 
-		$timeparts = explode(":", $text_value);
+		$timeparts = explode(":", $Field->getValue("Time", FF_SYSTEM_LOCALE));
 		if (count($timeparts) > 0)
 		{
-			$hour = intval($timeparts[0]);
-			$minute = intval($timeparts[1]);
-			$second = intval($timeparts[2]); // non gestito
+			$hours = intval($timeparts[0]);
+			$mins = intval($timeparts[1]);
 		}
 
-		$this->tpl[$tpl_id]->set_var("sel_hour", $hour);
-		$this->tpl[$tpl_id]->set_var("sel_minute", $minute);
-
+		$this->tpl[$tpl_id]->set_var("sel_hours", $hours);
+		$this->tpl[$tpl_id]->set_var("sel_mins", $mins);
+ 
 		if ($Field->contain_error && $Field->error_preserve)
 			$this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->ori_value));
 		else
-			$this->tpl[$tpl_id]->set_var("value", $hour . ":" . $minute);
+			$this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->getValue($Field->get_app_type(), $Field->get_locale())));
 
 		$this->tpl[$tpl_id]->parse("SectBinding", true);
 		return $this->tpl[$tpl_id]->rpparse("SectControl", false);
