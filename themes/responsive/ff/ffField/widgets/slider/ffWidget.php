@@ -112,8 +112,12 @@ class ffWidget_slider extends ffCommon
 			$ori_value = new ffData($value->ori_value, $Field->base_type);
 			$this->tpl[$tpl_id]->set_var("value_format", $ori_value->getValue($Field->get_app_type(), FF_LOCALE));
 		} else {
+		    /* TODO: CORREZIONE MIRKO
 			$this->tpl[$tpl_id]->set_var("value", (intval($value->getValue()) > 0 ? $value->getValue($Field->get_app_type(), FF_SYSTEM_LOCALE) : $Field->min_val));
 			$this->tpl[$tpl_id]->set_var("value_format", (intval($value->getValue()) > 0 ? $value->getValue($Field->get_app_type(), FF_LOCALE) : $Field->min_val));
+		    */
+            $this->tpl[$tpl_id]->set_var("value", ($value->getValue() != "" ? $value->getValue($Field->get_app_type(), FF_SYSTEM_LOCALE) : $Field->default_value));
+            $this->tpl[$tpl_id]->set_var("value_format", ($value->getValue() != "" ? $value->getValue($Field->get_app_type(), FF_LOCALE) : $Field->default_value));
 		}
 		$this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 		
