@@ -1635,28 +1635,36 @@ function cm_findCascadeWidget($name, $theme, $class, $id = null)
     if ($theme == cm_getMainTheme())
         ffErrorHandler::raise("CM: Unable to find Widget", E_USER_ERROR, null, get_defined_vars());
 }
-function cm_cascadeFindTemplate($path, $module = false, $raise_error = false)
+function cm_cascadeFindTemplate($path, $module = false, $raise_error = false, $pieces = false, $theme = false)
 {
     $cm = cm::getInstance();
-    $pieces = explode("/", $cm->path_info);
-    $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $cm->oPage->theme, FALSE);
+
+    if($pieces == false) {
+        $pieces = explode("/", $cm->path_info);
+        $theme = $cm->oPage->getTheme();
+    }else{
+        $pieces = explode("/", "/".$pieces);
+    }
+    $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $theme, FALSE);
+
 	if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents/" . $pieces[1]. "/" . basename($path), $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/contents/" . $pieces[1]. "/" . basename($path), $theme, FALSE);
     if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir($cm->oPage->getTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $theme, FALSE);
     if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $theme, FALSE);
     if ($filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/contents" . $cm->path_info . "/" . basename($path), $theme, FALSE);
     if ($filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(ff_getThemeDir(cm_getMainTheme()) . FF_THEME_DIR, "/modules/" . $module . $path, $theme, FALSE);
     if ($module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(ff_getModuleDir($module) . "/themes", $path, $theme, FALSE);
 	if (!$module && $filename === null)
-        $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, $path, $cm->oPage->theme, FALSE);
+        $filename = cm_moduleCascadeFindTemplate(FF_THEME_DISK_PATH, $path, $theme, FALSE);
     if($raise_error && $filename === null) {
         ffErrorHandler::raise("CM: Unable to find the Template", E_USER_ERROR, null, get_defined_vars());
     }
+
     return $filename;
 }
 function cm_resolveResourceFromTemplate($path, $source, $dest = "")
