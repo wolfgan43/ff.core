@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `xoduslab_serrcenternewsite`
+-- Database: `db_FormsFramework`
 --
 
 -- --------------------------------------------------------
@@ -550,8 +550,8 @@ INSERT INTO `ff_international` (`ID`, `ID_lang`, `word_code`, `description`, `is
 (29, 1, 'user_publish', 'Pubblica in Home Page', 0, '0000-00-00 00:00:00'),
 (30, 1, 'back_to_site', 'Torna al sito', 0, '0000-00-00 00:00:00'),
 (31, 1, 'developer_label', 'Sviluppato da ', 0, '0000-00-00 00:00:00'),
-(32, 1, 'developer_url', 'http://www.xodusweb.com', 0, '0000-00-00 00:00:00'),
-(33, 1, 'developer_name', 'XODUS New Media', 0, '0000-00-00 00:00:00'),
+(32, 1, 'developer_url', 'http://www.formsphpframework.com', 0, '0000-00-00 00:00:00'),
+(33, 1, 'developer_name', 'FormsFramework', 0, '0000-00-00 00:00:00'),
 (34, 1, 'ffGrid_addnew', 'Aggiungi', 0, '0000-00-00 00:00:00'),
 (35, 1, 'articles', 'Pagine', 0, '0000-00-00 00:00:00'),
 (36, 1, 'articles_sections', 'Sezioni', 0, '0000-00-00 00:00:00'),
@@ -4046,12 +4046,6 @@ ALTER TABLE `ff_languages_names`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indici per le tabelle `rel_tag_items`
---
-ALTER TABLE `rel_tag_items`
-  ADD PRIMARY KEY (`ID`);
-
---
 -- Indici per le tabelle `support_countries`
 --
 ALTER TABLE `support_countries`
@@ -4229,12 +4223,6 @@ ALTER TABLE `ff_languages`
 --
 ALTER TABLE `ff_languages_names`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2497;
-
---
--- AUTO_INCREMENT per la tabella `rel_tag_items`
---
-ALTER TABLE `rel_tag_items`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT per la tabella `support_countries`
