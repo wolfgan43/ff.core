@@ -82,7 +82,7 @@ class ffMedia {
     const PRJ_DIR                                                   = __PRJ_DIR__;
     const UPLOADS_DIR                                               = FF_UPDIR;
     const CACHE_DIR                                                 = CM_CACHE_PATH;
-    const MODIFY_PATH                                               = FF_SITE_PATH . "/restricted/media/modify";
+    const MODIFY_PATH                                               = "/restricted/media/modify";
 
 
 
