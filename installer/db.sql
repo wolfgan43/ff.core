@@ -1,25 +1,19 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.3
+-- version 4.9.0.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Creato il: Dic 20, 2018 alle 10:53
--- Versione del server: 5.6.41-log
--- Versione PHP: 7.2.7
+-- Host: localhost:8889
+-- Creato il: Ott 07, 2019 alle 17:22
+-- Versione del server: 5.7.26  IMPORTANT TO DISABLE: ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,NO_ZERO_DATE
+-- Versione PHP: 7.1.31
+
+-- IMPORTANT TO DISABLE =
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
--- Database: `xoduslab_serrcenternewsite`
+-- Database: `db_FormsFramework`
 --
 
 -- --------------------------------------------------------
@@ -385,28 +379,28 @@ CREATE TABLE `cm_mod_security_token` (
 
 CREATE TABLE `cm_mod_security_users` (
   `ID` int(11) NOT NULL,
-  `ID_domains` int(11) NOT NULL,
+  `ID_domains` int(11) NOT NULL DEFAULT '0',
   `username` varchar(255) NOT NULL DEFAULT '',
-  `username_slug` varchar(255) NOT NULL,
+  `username_slug` varchar(255) DEFAULT NULL,
   `firstname` varchar(255) NOT NULL,
   `lastname` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL DEFAULT '',
   `level` char(1) NOT NULL DEFAULT '',
   `status` char(1) NOT NULL,
-  `expiration` datetime NOT NULL,
+  `expiration` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `email` varchar(255) NOT NULL,
-  `time_zone` int(11) NOT NULL,
+  `time_zone` int(11) NOT NULL DEFAULT '0',
   `company` varchar(255) NOT NULL,
-  `role` int(11) NOT NULL,
+  `role` int(11) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
-  `password_generated_at` datetime NOT NULL,
-  `temp_password` varchar(255) NOT NULL,
-  `password_used` char(1) NOT NULL,
-  `ID_packages` int(11) NOT NULL,
-  `lastlogin` datetime NOT NULL,
-  `profile` int(11) NOT NULL,
-  `special` varchar(255) NOT NULL,
+  `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `password_generated_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `temp_password` varchar(255) DEFAULT NULL,
+  `password_used` char(1) DEFAULT NULL,
+  `ID_packages` int(11) NOT NULL DEFAULT '0',
+  `lastlogin` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `profile` int(11) NOT NULL DEFAULT '0',
+  `special` varchar(255) DEFAULT NULL,
   `avatar` varchar(255) NOT NULL,
   `tel` varchar(255) NOT NULL,
   `cell` varchar(255) NOT NULL
@@ -417,7 +411,7 @@ CREATE TABLE `cm_mod_security_users` (
 --
 
 INSERT INTO `cm_mod_security_users` (`ID`, `ID_domains`, `username`, `username_slug`, `firstname`, `lastname`, `password`, `level`, `status`, `expiration`, `email`, `time_zone`, `company`, `role`, `created`, `modified`, `password_generated_at`, `temp_password`, `password_used`, `ID_packages`, `lastlogin`, `profile`, `special`, `avatar`, `tel`, `cell`) VALUES
-(1, 0, 'superadmin', '', 'Nome', 'Cognome', '*240107317205B9F031FD583F032790289AE6F185', '3', '1', '0000-00-00 00:00:00', 'mail@latuamail.it', 0, 'Azienda', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', '', 0, '0000-00-00 00:00:00', 0, '', '', '', '');
+(1, 0, 'superadmin', NULL, 'Nome', 'Cognome', '*240107317205B9F031FD583F032790289AE6F185', '3', '1', '0000-00-00 00:00:00', 'mail@latuamail.it', 0, 'Azienda', 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, NULL, 0, '2019-10-07 16:39:35', 0, NULL, '', '', '');
 
 -- --------------------------------------------------------
 
@@ -431,6 +425,26 @@ CREATE TABLE `cm_mod_security_users_fields` (
   `field` varchar(255) NOT NULL,
   `value` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dump dei dati per la tabella `cm_mod_security_users_fields`
+--
+
+INSERT INTO `cm_mod_security_users_fields` (`ID`, `ID_users`, `field`, `value`) VALUES
+(75, 20, 'fax', ''),
+(74, 20, 'cap', ''),
+(73, 20, 'prov', ''),
+(72, 20, 'city', ''),
+(71, 20, 'address', ''),
+(70, 20, 'cf', ''),
+(69, 20, 'piva', ''),
+(76, 21, 'piva', ''),
+(77, 21, 'cf', ''),
+(78, 21, 'address', ''),
+(79, 21, 'city', ''),
+(80, 21, 'prov', ''),
+(81, 21, 'cap', ''),
+(82, 21, 'fax', '');
 
 -- --------------------------------------------------------
 
@@ -550,8 +564,8 @@ INSERT INTO `ff_international` (`ID`, `ID_lang`, `word_code`, `description`, `is
 (29, 1, 'user_publish', 'Pubblica in Home Page', 0, '0000-00-00 00:00:00'),
 (30, 1, 'back_to_site', 'Torna al sito', 0, '0000-00-00 00:00:00'),
 (31, 1, 'developer_label', 'Sviluppato da ', 0, '0000-00-00 00:00:00'),
-(32, 1, 'developer_url', 'http://www.xodusweb.com', 0, '0000-00-00 00:00:00'),
-(33, 1, 'developer_name', 'XODUS New Media', 0, '0000-00-00 00:00:00'),
+(32, 1, 'developer_url', 'http://www.formsphpframework.com', 0, '0000-00-00 00:00:00'),
+(33, 1, 'developer_name', 'FormsFramework', 0, '0000-00-00 00:00:00'),
 (34, 1, 'ffGrid_addnew', 'Aggiungi', 0, '0000-00-00 00:00:00'),
 (35, 1, 'articles', 'Pagine', 0, '0000-00-00 00:00:00'),
 (36, 1, 'articles_sections', 'Sezioni', 0, '0000-00-00 00:00:00'),
@@ -4046,12 +4060,6 @@ ALTER TABLE `ff_languages_names`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indici per le tabelle `rel_tag_items`
---
-ALTER TABLE `rel_tag_items`
-  ADD PRIMARY KEY (`ID`);
-
---
 -- Indici per le tabelle `support_countries`
 --
 ALTER TABLE `support_countries`
@@ -4186,13 +4194,13 @@ ALTER TABLE `cm_mod_security_token`
 -- AUTO_INCREMENT per la tabella `cm_mod_security_users`
 --
 ALTER TABLE `cm_mod_security_users`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT per la tabella `cm_mod_security_users_fields`
 --
 ALTER TABLE `cm_mod_security_users_fields`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT per la tabella `cm_showfiles`
@@ -4231,12 +4239,6 @@ ALTER TABLE `ff_languages_names`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2497;
 
 --
--- AUTO_INCREMENT per la tabella `rel_tag_items`
---
-ALTER TABLE `rel_tag_items`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT per la tabella `support_countries`
 --
 ALTER TABLE `support_countries`
@@ -4253,8 +4255,3 @@ ALTER TABLE `support_province`
 --
 ALTER TABLE `support_regioni`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
