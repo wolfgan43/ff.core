@@ -16,16 +16,28 @@ ff.ffField.timepicker = (function () {
 				control_hour.appendChild(option);
 			}
 
-			for (var i = 0; i <= 59; i++)
-			{
-				var option = document.createElement('option');
-				if (i < 10)
-					option.appendChild(document.createTextNode("0" + i));
-				else
-					option.appendChild(document.createTextNode(i));
-				option.setAttribute('value', i);
-				control_minute.appendChild(option);
-			}
+			if(document.getElementById(control_id).attributes.rel.value == 1){
+                var option00 = document.createElement('option');
+                    option00.appendChild(document.createTextNode("00"));
+                	option00.setAttribute('value', "0");
+                control_minute.appendChild(option00);
+
+                var option30 = document.createElement('option');
+					option30.appendChild(document.createTextNode("30"));
+					option30.setAttribute('value', "30");
+                control_minute.appendChild(option30);
+			}else{
+				for (var i = 0; i <= 59; i++)
+				{
+					var option = document.createElement('option');
+					if (i < 10)
+						option.appendChild(document.createTextNode("0" + i));
+					else
+						option.appendChild(document.createTextNode(i));
+					option.setAttribute('value', i);
+					control_minute.appendChild(option);
+				}
+            }
 
 			control_hour.selectedIndex = sel_hour;
 			control_minute.selectedIndex = sel_minute;

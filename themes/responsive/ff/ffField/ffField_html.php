@@ -252,6 +252,8 @@ class ffField_html extends ffField_base
     var $datepicker_force_datetime			= false;
     var $datepicker_showbutton				= true;
 	var $datepicker_weekselector			= false;
+    var $timepicker_half			= false;
+
 	// Slider
 	/**
 	 * Quante posizioni sono a disposizione dello slider

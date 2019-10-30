@@ -82,8 +82,13 @@ class ffWidget_timepicker extends ffCommon
 			if (!isset($this->tpl[$tpl_id]))
 				$this->prepare_template($tpl_id);
 		}
-			
-		$this->tpl[$tpl_id]->set_var("id", $id);
+        if ($Field->timepicker_half) {
+            $this->tpl[$tpl_id]->set_var("mode", "1");
+        }else{
+		    $this->tpl[$tpl_id]->set_var("mode", "");
+        }
+        $this->tpl[$tpl_id]->set_var("id", $id);
+        //$this->tpl[$tpl_id]->set_var("mode", );
 		$this->tpl[$tpl_id]->set_var("site_path", $Field->parent_page[0]->site_path);
 		$this->tpl[$tpl_id]->set_var("theme", $Field->getTheme());
 		$this->tpl[$tpl_id]->set_var("class", $this->class);
