@@ -19,7 +19,7 @@ ff.ffField.timepicker = (function () {
 			if(document.getElementById(control_id).attributes.rel.value == 1){
                 var option00 = document.createElement('option');
                     option00.appendChild(document.createTextNode("00"));
-                	option00.setAttribute('value', "0");
+                	option00.setAttribute('value', "00");
                 control_minute.appendChild(option00);
 
                 var option30 = document.createElement('option');
@@ -47,7 +47,7 @@ ff.ffField.timepicker = (function () {
 			var control_hour	= document.getElementById(control_hour_id);
 			var control_minute	= document.getElementById(control_minute_id);
 
-			control.value = control_hour.selectedIndex + ":" + control_minute.selectedIndex;
+			control.value = control_hour.options[control_hour.selectedIndex].value + ":" + control_minute.options[control_minute.selectedIndex].value;
 		}
 	};
 	
