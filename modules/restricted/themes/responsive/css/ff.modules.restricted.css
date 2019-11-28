@@ -2174,7 +2174,9 @@ tbody > tr:hover {
 
     background: white;
 
-    box-shadow: 0 3px 10px -5px #DDD; }
+    box-shadow: 0 3px 10px -5px #DDD;
+    z-index: 1052!important;
+}
 
 .ui-datepicker-calendar th {
 
@@ -2585,56 +2587,6 @@ input[type="color" i] {
 
     border-bottom: 2px solid #1e88e5; }
 
-
-
-.nav-tabs.tabs-left {
-
-    border-bottom: none;
-
-    border-right: 1px solid #f5f5f5;
-
-    margin-right: -15px;
-
-    margin-left: -15px; }
-
-.nav-tabs.tabs-left li {
-
-    float: none;
-
-    display: block; }
-
-.nav-tabs.tabs-left li.active a {
-
-    border: 0;
-
-    border-bottom: 1px solid #1976d2; }
-
-.nav-tabs.tabs-left li.active a:focus, .nav-tabs.tabs-left li.active a:hover {
-
-    border: 0;
-
-    border-bottom: 1px solid #1976d2;
-
-    outline: none; }
-
-.nav-tabs.tabs-left li a {
-
-    border: 0;
-
-    border-bottom: 1px solid #f5f5f5;
-
-    padding: 10px 5px 10px 0; }
-
-.nav-tabs.tabs-left li a:hover {
-
-    background: none;
-
-    border-bottom: 1px solid #1976d2; }
-
-.nav-tabs.tabs-left li:last-of-type a {
-
-    border-bottom: 0; }
-
 /**
     DIALOG
 */
@@ -2761,6 +2713,58 @@ td a.fas:link span.act-done, td a.fas:link span.act-tot{
 }
 
 /* KEENG */
+.ffDetails .nav-tabs, .tab-pane .col-xs-12 .nav-tabs{
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    border: none;
+    float: right;
+}
+.ffDetails .nav-tabs>li, .tab-pane .col-xs-12 .nav-tabs>li{
+    position: relative;
+    float: left;
+    display: inline-block;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+.ffDetails .nav-tabs>li.active, .tab-pane .col-xs-12 .nav-tabs>li.active{
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+.ffDetails .nav-tabs>li:first-child:not(:last-child):not(.dropdown-toggle), .tab-pane .col-xs-12 .nav-tabs>li:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.ffDetails .nav-tabs>li:last-child:not(:first-child), .tab-pane .col-xs-12 .nav-tabs>li:last-child:not(:first-child){
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.ffDetails .nav-tabs>li a:link, .tab-pane .col-xs-12 .nav-tabs.tabs-left li a:link, .ffDetails .nav-tabs>li a:visited, .tab-pane .col-xs-12 .nav-tabs.tabs-left li a:visited{
+    border: none!important;
+    padding: 5px 10px!important;
+}
+.ffDetails .nav-tabs>li.active, .ffDetails .nav-tabs>li.active>a, .tab-pane .col-xs-12 .nav-tabs>li.active, .tab-pane .col-xs-12 .nav-tabs>li.active>a{
+    color: #fff!important;
+}
 html{
     font-size: 32px;
 }

@@ -127,16 +127,16 @@ class ffWidget_tabs extends ffCommon
 		if($this->tab_mode) {
             $wrap_tab_need = false;
             $default_wrap_menu = array(
-                "xs" => 4
-                , "sm" => 3
-                , "md" => 3
-                , "lg" => 2
+                "xs" => 12
+                , "sm" => 12
+                , "md" => 12
+                , "lg" => 12
             );
             $default_wrap_pane = array(
-                "xs" => 8
-                , "sm" => 9
-                , "md" => 9
-                , "lg" => 10
+                "xs" => 12
+                , "sm" => 12
+                , "md" => 12
+                , "lg" => 12
             );
 
 			if($this->tab_mode === true)

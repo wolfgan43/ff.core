@@ -24,8 +24,8 @@ function process_mail($arrRequest) {
 			$mail->AddCC($ccAddress["mail"], $ccAddress["name"]);
 		}
 		
-		$mail->AddCC("diella.daniele@gmail.com", "Daniele Diella");
-		//$mail->AddCC('supporto@xoduslab.com', "Supporto");
+		//$mail->AddCC("diella.daniele@gmail.com", "Daniele Diella");
+		$mail->AddCC('notifiche@xoduslab.com', "Supporto");
 		//$res[] = $mail->Send();
 		//die(var_dump($arrRequest));
 		$res = $mail->Send();
