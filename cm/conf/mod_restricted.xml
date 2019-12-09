@@ -9,6 +9,7 @@
 
 		<layout path="/restricted/layout" label="Layout" icon="object-group" location="brand" acl="3" />
 		<showfiles path="/restricted/showfiles" label="Showfiles" icon="image" location="brand" acl="3" />
+		<language path="/restricted/language" label="Lingua" icon="world" location="brand" acl="3" />
 
 	</menu>
 	<!--<layout>

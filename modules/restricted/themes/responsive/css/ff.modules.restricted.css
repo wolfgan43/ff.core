@@ -2960,6 +2960,16 @@ p{
 }
 
 /* COLONNE E RIGHE */
+.blockcomposer .container-fluid {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+.blockcomposer .table-striped, .blockcomposer .table-striped>tbody,.blockcomposer .table-striped>tbody>tr{
+    display: block;
+}
 .blockcomposer .table-striped>tbody>tr:nth-of-type(odd), .blockcomposer .table-striped>tbody>tr:nth-of-type(even), .blockcomposer .table-striped>tbody>tr:hover td {
     background-color: #FFFFFF!important;
 }
@@ -2972,6 +2982,11 @@ p{
 }
 .blockcomposer .table>tbody>tr>td{
     border: none!important;
+    display: inline-block;
+    width: calc(100% - 76px);
+}
+.blockcomposer .table>tbody>tr>td:first-of-type, .blockcomposer .table>tbody>tr>td:last-of-type{
+    width: 30px;
 }
 .blockcomposer .table-striped > TBODY > tr{
     border-left: 5px solid #e7e7e7;
@@ -3018,7 +3033,7 @@ p{
     display: block;
     position: absolute;
     top: 30px;
-    left: -8px;
+    left: -4px;
     /*ackground-image: url(../../../../../themes/responsive/images/FormsGrid/edit.png);*/
     background-repeat: no-repeat;
     background-position: center center;

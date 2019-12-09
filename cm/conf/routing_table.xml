@@ -105,6 +105,16 @@
         <accept_path_info />
         <reverse>/restricted/media</reverse>
     </rule>
+    <rule id="language">
+        <priority>NORMAL</priority>
+        <source>/restricted/language(.*)</source>
+        <destination>
+            <url>/cm/contents/language/$1</url>
+            <toplevel />
+        </destination>
+        <accept_path_info />
+        <reverse>/restricted/language</reverse>
+    </rule>
 	<rule id="getlibs">
         <source>^/services/getlibs$</source>
         <destination>
