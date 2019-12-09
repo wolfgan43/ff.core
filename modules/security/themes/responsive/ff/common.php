@@ -178,10 +178,10 @@ function mod_srcurity_get_logo($logo = null, $restricted = false)
 
     if($logo && is_file(FF_DISK_PATH . $logo))
         $logo_url = $logo;
-    elseif($restricted && $logo && is_file(FF_DISK_PATH . "/" . $logo . "/login.png"))
-        $logo_url = FF_SITE_PATH."/media/208x73/logoapp/login.png";
-    elseif($logo && is_file(FF_DISK_PATH . "/" . $logo . "/restricted.png"))
+    elseif($restricted && $logo && is_file(FF_DISK_PATH . "/" . $logo . "/restricted.png"))
         $logo_url = FF_SITE_PATH."/media/208x73/logoapp/restricted.png";
+    elseif(!$restricted && $logo && is_file(FF_DISK_PATH . "/" . $logo . "/login.png"))
+        $logo_url = FF_SITE_PATH."/media/208x73/logoapp/login.png";
     elseif($restricted && is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png"))
         $logo_url = ff_getThemePath($cm->oPage->getTheme()) . "/" . $cm->oPage->getTheme() . "/images/logo/restricted.png";
     elseif(is_file(FF_THEME_DISK_PATH . "/" . $cm->oPage->getTheme() . "/images/logo/login.svg"))
@@ -729,7 +729,7 @@ cm::getInstance()->modules["security"]["events"]->addEvent("onTplLoad", function
 		if(MOD_SEC_LOGO_PATH === false) {
 		    $tpl->set_var("SectLogoImg" . $logo, "");
 		} else {
-            $logo_url = mod_srcurity_get_logo(MOD_SEC_LOGO_PATH, true);
+            $logo_url = mod_srcurity_get_logo(MOD_SEC_LOGO_PATH);
 
 		    $tpl->set_var("logo_login", $logo_url);
 		    $tpl->parse("SectLogoImg" . $logo, false);
