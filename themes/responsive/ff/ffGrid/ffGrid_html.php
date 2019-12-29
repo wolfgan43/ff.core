@@ -1379,7 +1379,7 @@ class ffGrid_html extends ffGrid_base
             $recordset_count = 0;
 
             $rows = $this->db[0]->numRows();
-            $srow = (($this->page - 1) * $this->records_per_page) + 1;
+            $srow = (((int)$this->page - 1) * (int)$this->records_per_page) + 1;
             do
             {
             	$arrGridData[] = $this->db[0]->record;

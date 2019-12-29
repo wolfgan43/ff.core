@@ -234,7 +234,7 @@ abstract class ffPageNavigator_base extends ffCommon
 	 * I frame suddividono le pagine in gruppi, servono ad evitare di avere un menù di navigazione troppo largo
 	 * @var Boolean
 	 */
-	var $with_frames			= true;
+	var $with_frames			= false;
 
 	/**
 	 * Abilita / Disabilita l'utilizzo dei pulsanti per andare al frame precedente / successivo;

@@ -1743,19 +1743,19 @@ function cm_getFFButtonDefault() {
         //ffPageNavigator
     , "first"         => array(
             "default" => "link"
-        , "addClass" => "fas fa-angle-double-left"
-        , "icon" => "step-backward"
+        , "addClass" => ""
+        , "icon" => "fas fa-angle-double-left"
         )
     , "last"         => array(
             "default" => "link"
-        , "addClass" => "fas fa-angle-double-right"
-        , "icon" => "step-forward"
+        , "addClass" => ""
+        , "icon" => "fas fa-angle-double-right"
         )
     , "prev"         => array(
             "default" => "link"
         , "addClass" => "prev"
         , "icon" => "fas fa-angle-left"
-        , "params" => "flip-horizontal"
+        , "params" => ""
         )
     , "next"         => array(
             "default" => "link"
@@ -1765,12 +1765,12 @@ function cm_getFFButtonDefault() {
     , "prev-frame"   => array(
             "default" => "link"
         , "addClass" => "prev-frame"
-        , "icon" => "backward"
+        , "icon" => "fas fa-step-backward"
         )
     , "next-frame"   => array(
             "default" => "link"
         , "addClass" => "next-frame"
-        , "icon" => "forward"
+        , "icon" => "fas fa-step-forward"
         )
 
         //other

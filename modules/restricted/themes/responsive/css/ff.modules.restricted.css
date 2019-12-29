@@ -1578,10 +1578,10 @@ tbody > tr:hover {
     font-size: 22px;
 
     color: #1e88e5; }
-
+/*
 .ffDetails .tab-content div, .ffDetails .col-xs-8, .clearfix.padding, .tab-pane .col-xs-8, .articledetail1 legend{
     padding:0;
-}
+}*/
 
 
 .ffDetails .head_details {
@@ -1781,6 +1781,11 @@ tbody > tr:hover {
 .pagenav .pagination li span {
 
     float: none; }
+
+.totelem.pagination {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
 
 .pagenav ul {
 

@@ -578,10 +578,10 @@ var activecombo = function(params) {
 			}
 		}
 
-		, "child_error_display" : function () {
+		, "child_error_display" : function (textStatus) {
 			var node = that.getNode();
 			if (node) {
-				node.innerHTML = 'Impossibile connettersi con il server, riprovare più tardi.';
+				node.innerHTML = 'Impossibile connettersi con il server, riprovare più tardi. ' + textStatus;
 				if(!that.options.hideEmpty || that.options.hideEmpty === true)
                     jQuery(node).show();
                 else if(that.options.hideEmpty == "all")
@@ -866,8 +866,8 @@ var activecombo = function(params) {
 		});
 	};
 	
-	function async_error() {
-		that.child_error_display();
+	function async_error(jqXHR, textStatus, errorThrown) {
+		that.child_error_display(textStatus);
 		//ff.ajax.unblockUI();
 	};
 

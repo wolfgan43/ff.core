@@ -582,7 +582,7 @@ class ffRecord_html extends ffRecord_base
                                 );
 
                             } else {
-                                $tab_key = $group_key;
+                                //$tab_key = $group_key;
                             }
 
                             $last_tab_key = $tab_key;
@@ -621,7 +621,7 @@ class ffRecord_html extends ffRecord_base
 									}
 								//}
 
-								
+
 								if(is_array($arrTitleProperties) && count($arrTitleProperties)) {
 									$str_title_properties = "";
 									foreach($arrTitleProperties AS $arrTitleProperties_key => $arrTitleProperties_value) {

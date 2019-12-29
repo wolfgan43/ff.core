@@ -219,7 +219,7 @@
 		, "current" => cm_getClassByFrameworkCss("current", "util")
 		, "icons" => array(
 			"caret-collapsed" => "menu-caret " . cm_getClassByFrameworkCss("fas fa-chevron-right", "icon")
-			, "caret" => "menu-caret " . cm_getClassByFrameworkCss("fas fa-chevron-right", "icon", array("rotate-90"))
+			, "caret" => "menu-caret " . cm_getClassByFrameworkCss("fas fa-chevron-right", "icon", array("fa-rotate-90"))
 			, "settings" => cm_getClassByFrameworkCss("fas fa-cog", "icon")
 		)
 		, "logo" => array(
