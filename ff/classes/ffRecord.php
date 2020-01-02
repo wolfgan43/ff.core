@@ -873,7 +873,7 @@ abstract class ffRecord_base extends ffCommon
 					// Build WHERE For RECORD operation
 					if (strlen($this->sWhere))
 						$this->sWhere .= " AND ";
-					$this->sWhere .= " " . $this->key_fields[$key]->get_data_source() . " = " . $this->db[0]->toSql($this->key_fields[$key]->value, $this->key_fields[$key]->base_type);
+					$this->sWhere .= " `" . $this->key_fields[$key]->get_data_source() . "` = " . $this->db[0]->toSql($this->key_fields[$key]->value, $this->key_fields[$key]->base_type);
 				}
 			}
 			reset ($this->key_fields);

@@ -154,11 +154,11 @@ function ffProcessTags($haystack, $Keys, $Data, $mode = "normal", $page_params =
 			$tmp = "";
 			foreach ($Keys as $key => $value)
 			{
-				if (is_object($value) && is_subclass_of($value, "ffField_base"))
-					$value = $value->value->getValue(null, FF_SYSTEM_LOCALE);
-				elseif (is_object($value) && get_class($value) == "ffData")
-					$value = $value->getValue(null, FF_SYSTEM_LOCALE);
-
+				if (is_object($value) && is_subclass_of($value, "ffField_base")) {
+                    $value = $value->value->getValue(null, FF_SYSTEM_LOCALE);
+                } elseif (is_object($value) && get_class($value) == "ffData") {
+                    $value = $value->getValue(null, FF_SYSTEM_LOCALE);
+                }
 				if(is_array($value))
 					continue;
 					

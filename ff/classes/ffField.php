@@ -1671,6 +1671,10 @@ abstract class ffField_base extends ffCommon
 						$tmp_value = $this->get_encoded($this->recordset[$tmp_key[0]][1]->getValue($data_type, $locale));
 				}
 			}
+
+            // EVENT HANDLER
+            $this->doEvent("on_display_value", array(&$tmp_value, $this));
+
 			return $tmp_value;
 		}
 		else
