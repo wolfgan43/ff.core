@@ -345,7 +345,9 @@ a.-floating:hover {
     margin: 0 -15px;
     padding: 8px 15px 8px 30px;
     background-color: transparent;
-    float: right; }
+    float: right;
+    white-space: nowrap;
+}
 .header__bar ol a {
     color: #1976d2; }
 .header__bar .nav-tabs {

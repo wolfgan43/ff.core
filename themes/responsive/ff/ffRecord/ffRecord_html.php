@@ -657,7 +657,7 @@ class ffRecord_html extends ffRecord_base
 								if(!$this->tabs["contents"][$tab_key]["title"])
 									$this->tabs["contents"][$tab_key]["title"] = (is_array($group_value["tab"]) && $group_value["tab"]["title"]
                                         ? $group_value["tab"]["title"]
-                                        : ($group_value["title"]
+                                        : ($group_value["title"] && $tab_key == $group_key
                                             ? $group_value["title"]
                                             : $tab_key
                                         )
