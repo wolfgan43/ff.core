@@ -142,11 +142,6 @@ class ffWidget_actexl extends ffCommon
 		else
 			$this->tpl[$tpl_id]->set_var("autocomp_enable", "false");
 
-		if ($Field->actex_autocomp_ajax)
-			$this->tpl[$tpl_id]->set_var("autocomp_ajax", "true");
-		else
-			$this->tpl[$tpl_id]->set_var("autocomp_ajax", "false");
-
 		if ($Field->actex_service === null)
 		{
 			$this->tpl[$tpl_id]->set_var("service", "null");

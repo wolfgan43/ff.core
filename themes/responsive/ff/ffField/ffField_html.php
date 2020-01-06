@@ -144,7 +144,7 @@ class ffField_html extends ffField_base
 	 * Visualizza il pulsante di eliminazione dell'elemento correntemente selezionato
 	 * @var Boolean
 	 */
-	var $actex_dialog_show_delete		= true; // without actex_dialog_delete_url this is ignored
+	var $actex_dialog_show_delete		= false; // without actex_dialog_delete_url this is ignored
 	/**
 	 * L'url del dialog di eliminazione, se omesso è uguale a $actex_dialog_edit_url
 	 * @var String
@@ -203,8 +203,7 @@ class ffField_html extends ffField_base
 	var $actex_limit					= null;
 	
 	var $actex_autocomp					= false;
-	var $actex_autocomp_ajax			= false;
-	var $actex_autocomp_limit			= 100;	
+	var $actex_autocomp_limit			= 3;
 	var $actex_autocomp_preserve_text	= false;
 
 

@@ -1594,7 +1594,7 @@ abstract class ffRecord_base extends ffCommon
 						$need_key_check = true;
 						if (strlen($tmp_where))
 							$tmp_where .= " AND ";
-						$tmp_where .= " " . $key . " = " . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type);
+						$tmp_where .= " `" . $this->form_fields[$key]->get_data_source() . "` = " . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type);
 					}
 					
 					// required or not

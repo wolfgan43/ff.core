@@ -1155,8 +1155,12 @@ var activecombo = function(params) {
 						$this.val(itm_found["desc"]);
 						that.change(false, itm_found["value"]);
 					} else if (that.value_ori["desc"]) {
-						$this.val(that.value_ori["desc"]);
-						that.change(false, that.value_ori["value"]);
+					    if(that.options.autocomplete.preserveText) {
+                            that.change(false, $this.val());
+                        } else {
+                            $this.val(that.value_ori["desc"]);
+                            that.change(false, that.value_ori["value"]);
+                        }
 					} else {
 						$this.val("");
 						tmp_compare = "";
@@ -1188,22 +1192,6 @@ var activecombo = function(params) {
 	             .append('<a href="javascript:void(0);">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>")
 	             .appendTo(ul);
 	    };
-		
-		/*if (!that.options.autocomplete.ajax) {
-			jQuery.fn.escapeGet(__id + "_label")
-				.css("margin-right", 0)
-				.after(
-					jQuery( "<a>" )
-						.addClass( icons.caret )
-						.css({"pointer-events" : "auto"})
-						.click(function() {
-							jQuery.fn.escapeGet(__id + "_label").focus();
-
-							// Pass empty string as value to search for, displaying all results
-							jQuery.fn.escapeGet(__id + "_label").autocomplete("search");
-						})
-				);
-		}*/
 	}
 
 	function drawDialogButtons () {

@@ -78,7 +78,7 @@ class ffWidget_actex extends ffCommon
 	function process($id, &$value, ffField_base &$Field)
     {
         global $plgCfg_ActiveComboEX_UseOwnSession;
-
+        $count_actions = 0;
         if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF())) {
             $tpl_id = $Field->parent[0]->getIDIF();
             $prefix = $tpl_id . "_";
@@ -120,14 +120,13 @@ class ffWidget_actex extends ffCommon
         } else {
             $this->tpl[$tpl_id]->set_var("autocomp_enable", "false");
         }
-        if ($Field->actex_autocomp_ajax)
-            $this->tpl[$tpl_id]->set_var("autocomp_ajax", "true");
-        else
-            $this->tpl[$tpl_id]->set_var("autocomp_ajax", "false");
 
         $this->tpl[$tpl_id]->set_var("autocomp_limit", $Field->actex_autocomp_limit);
 
-        $this->tpl[$tpl_id]->set_var("autocomp_preserve_text", $Field->actex_autocomp_preserve_text);
+        if ($Field->actex_autocomp_preserve_text)
+            $this->tpl[$tpl_id]->set_var("autocomp_preserve_text", "true");
+        else
+            $this->tpl[$tpl_id]->set_var("autocomp_preserve_text", "false");
 
         if ($Field->actex_service === null) {
             $this->tpl[$tpl_id]->set_var("service", "null");
@@ -160,6 +159,7 @@ class ffWidget_actex extends ffCommon
             && !$this->disable_dialog
             && strlen($Field->actex_dialog_url)
         ) {
+            $count_actions++;
             if (strlen($Field->actex_dialog_title))
                 $dialog_title = $Field->actex_dialog_title;
             elseif (strlen($Field->label))
@@ -213,6 +213,7 @@ class ffWidget_actex extends ffCommon
                 || (strpos($edit_url, "[[") !== false)
             )
         ) {
+            $count_actions++;
             if (strlen($Field->actex_dialog_edit_title))
                 $dialog_edit_title = $Field->actex_dialog_edit_title;
             elseif (strlen($Field->actex_dialog_title))
@@ -266,6 +267,7 @@ class ffWidget_actex extends ffCommon
                 || (strpos($delete_url, "[[") !== false)
             )
         ) {
+            $count_actions++;
             if (strlen($Field->actex_dialog_delete_title))
                 $dialog_delete_title = $Field->actex_dialog_delete_title;
             elseif (strlen($Field->actex_dialog_title))
@@ -433,28 +435,29 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("hide_empty", "'" . $Field->actex_hide_empty . "'");
         else
             $this->tpl[$tpl_id]->set_var("hide_empty", "false");
-        $action_class = "actex-actions input-group-btn";
+        $action_class = "actex-actions";
 
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("fa-caret-down", "icon", array("class" => ("actex-combo"))));
-        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("fa-times", "icon", "btn"));
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("fa-plus", "icon", "btn"));
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("fa-minus", "icon", "btn"));
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("fa-minus", "icon", "btn"));
-        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("fa-spinner", "icon-tag", "spin"));
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));
+        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("times", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));
+
         if ($Field->actex_autocomp) {
+            $count_actions++;
             $this->tpl[$tpl_id]->parse("SectCombo", false);
             $action_class .= " nopadding";
         } else {
             $this->tpl[$tpl_id]->set_var("SectCombo", "");
         }
 
-        if ($Field->actex_dialog_url == true){
+        if ($Field->actex_dialog_url == true || $Field->actex_autocomp){
             $this->tpl[$tpl_id]->set_var("actex_container", cm_getClassByFrameworkCss("group", "form", "actex-wrapper"));
         }else{
             $this->tpl[$tpl_id]->set_var("actex_container", "actex-wrapper");
         }
         $this->tpl[$tpl_id]->set_var("data_class", "actex" . (strlen($Field->data_class) ? " " : "") . $Field->data_class);
-        $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("component", "form", $action_class));
+        $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("control-postfix", "form", $action_class));
         $this->tpl[$tpl_id]->set_var("actex_multi_container", cm_getClassByFrameworkCss("group", "list", "actex-multi"));	
         $this->tpl[$tpl_id]->set_var("actex_multi_item", cm_getClassByFrameworkCss("item", "list"));	
         $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "list"));	
@@ -860,11 +863,17 @@ class ffWidget_actex extends ffCommon
         if ($father === null)
 			$this->tpl[$tpl_id]->parse("SectBindingFoot", true);
 		if ($this->display_debug) {
+            $count_actions++;
 			$this->tpl[$tpl_id]->set_var("icon_debug", cm_getClassByFrameworkCss("bug", "icon"));    
 			$this->tpl[$tpl_id]->parse("SectDebug", false);
 		} /*else {
 			$this->tpl[$tpl_id]->set_var("SectDebug", "");
 		}*/
+
+		if($count_actions) {
+            $this->tpl[$tpl_id]->parse("SectActions", false);
+        }
+
  		return $Field->fixed_pre_content . $this->tpl[$tpl_id]->rpparse("SectControl", false) . $Field->fixed_post_content;
 	}
 	function get_component_headers($id)
