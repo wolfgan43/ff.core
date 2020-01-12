@@ -1507,18 +1507,9 @@ tbody > tr:hover {
 
     border-right: 1px solid #e7e7e7; }
 
-.ffGrid .search a {
+.ffGrid .search a.search {
 
     padding: 6px 12px; }
-
-.ffGrid .search a:before {
-
-    margin-right: 0;
-    font-weight: bold;}
-
-.ffGrid .search:not(a) {
-
-    margin-bottom: 25px; }
 
 .ffGrid .adv-search {
 

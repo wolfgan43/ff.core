@@ -1074,7 +1074,7 @@ var activecombo = function(params) {
                 		"overflow-y"			: "auto"
                 		, "overflow-x"			: "hidden"
                 		, "position"			: "absolute"
-                		, "z-index" 			: 5 
+
 						, "background"			: "#fff"
 						, "border"				: "1px solid #ccc"
 						, "border-top-color"	: "#d9d9d9"

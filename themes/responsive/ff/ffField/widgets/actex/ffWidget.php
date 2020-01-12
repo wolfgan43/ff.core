@@ -872,6 +872,8 @@ class ffWidget_actex extends ffCommon
 
 		if($count_actions) {
             $this->tpl[$tpl_id]->parse("SectActions", false);
+        } else {
+            $this->tpl[$tpl_id]->set_var("SectActions", "");
         }
 
  		return $Field->fixed_pre_content . $this->tpl[$tpl_id]->rpparse("SectControl", false) . $Field->fixed_post_content;

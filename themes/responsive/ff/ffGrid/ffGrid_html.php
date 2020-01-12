@@ -936,7 +936,7 @@ class ffGrid_html extends ffGrid_base
 
 		$search_class["default"] = "search";
 		$this->tpl[0]->set_var("search_class", cm_getClassByDef($this->framework_css["search"], $search_class));
-		$this->tpl[0]->set_var("search_box_class", cm_getClassByFrameworkCss("group", "form"));
+		$this->tpl[0]->set_var("search_box_class", cm_getClassByFrameworkCss("group", "form", array("class" => "simple-search")));
         
 		//$this->tpl[0]->set_var("maxspan", ($this->search_cols * 2));
 		//$this->tpl[0]->set_var("search_method", $this->search_method);

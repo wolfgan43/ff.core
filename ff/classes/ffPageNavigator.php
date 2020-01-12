@@ -252,7 +252,7 @@ abstract class ffPageNavigator_base extends ffCommon
 	 * Abilita la visualizzazione del numero totale di record
 	 * @var Boolean
 	 */
-	var $with_totelem 			= false;
+	var $with_totelem 			= true;
 
 	/**
 	 * Abilita la possibilità di selezionare il numero di record per pagina
