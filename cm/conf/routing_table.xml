@@ -130,6 +130,8 @@
 			<url>$0</url>
 			<content_root>/contents</content_root>
 		</destination>
-		<!--<process_next />-->
+        <accept_path_info />
+
+        <!--<process_next />-->
 	</rule>
 </ffxml>
