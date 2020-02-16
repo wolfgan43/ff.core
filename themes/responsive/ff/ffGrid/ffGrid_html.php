@@ -2821,7 +2821,7 @@ class ffGrid_html extends ffGrid_base
 		return $rc;
     }
 	
-	function setWidthComponent($resolution_large_to_small) 
+	function setWidthComponent($resolution_large_to_small)
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
 			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);

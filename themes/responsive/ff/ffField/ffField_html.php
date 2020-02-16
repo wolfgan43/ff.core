@@ -651,12 +651,16 @@ class ffField_html extends ffField_base
 		parent::process_file($id, $value);
 	}
 	
-	function setWidthComponent($resolution_large_to_small) 
+	function setWidthComponent($resolution_large_to_small, $line_break = false)
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
 			$this->framework_css["container"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["container"]["row"] = $resolution_large_to_small;
+
+        if($line_break) {
+            $this->framework_css["line_break"] = true;
+        }
 	}	
 	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true, $align = "right") 
 	{

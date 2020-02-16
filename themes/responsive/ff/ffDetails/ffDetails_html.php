@@ -923,7 +923,7 @@ class ffDetails_html extends ffDetails_base
 				if($primary_field == $key && is_subclass_of($subvalue, "ffField_base")) {
 					$this->tpl[0]->set_var("GroupTitle", $this->tpl[0]->ProceedTpl($this->tpl[0]->DBlocks["SectFormField"]));
 				} else {
-					if(($wrap_count >= 12 || $count_contents == count($contents)) && $is_wrapped) {
+					if(($wrap_count >= 12 || $count_contents == count($contents) || !empty($this->form_fields[$key]->framework_css["line_break"])) && $is_wrapped) {
 						$this->tpl[0]->parse("SectWrapEnd", false);
 						$wrap_count = 0;
 						$is_wrapped = false;
@@ -1258,7 +1258,7 @@ class ffDetails_html extends ffDetails_base
 		}
 	}
 	
-	function setWidthComponent($resolution_large_to_small) 
+	function setWidthComponent($resolution_large_to_small)
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
 			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);

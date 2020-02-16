@@ -254,8 +254,8 @@ class ffWidget_uploadifive extends ffCommon
 		}
 		$this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("cancel", "icon"));
         $this->tpl[$tpl_id]->set_var("aviary_class", cm_getClassByFrameworkCss("crop", "icon"));  
-        $this->tpl[$tpl_id]->set_var("upload_class", cm_getClassByFrameworkCss("fas fa-upload", "icon"));
-        $this->tpl[$tpl_id]->set_var("upload_icon", cm_getClassByFrameworkCss("fas fa-upload", "icon-tag", "lg"));
+        $this->tpl[$tpl_id]->set_var("upload_class", cm_getClassByFrameworkCss("upload", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_icon", cm_getClassByFrameworkCss("upload", "icon-tag", "lg"));
         
 		if($Field->file_multi) {
 			$this->tpl[$tpl_id]->set_var("multi", "true");
