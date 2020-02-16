@@ -223,11 +223,19 @@ if(MOD_SEC_CSS_PATH !== false && isset($cm->router->matched_rules["mod_sec_login
         ? MOD_SEC_CSS_PATH
         : "/modules/security/themes/" . cm_getMainTheme() . "/css/ff.modules.security.css"
     );
+
     $cm->oPage->tplAddCss("ff.modules.security", array(
         "file" =>  basename($filename)
         , "path" => ffCommon_dirname($filename)
     ));
 
+    $filename = $cm->oPage->getThemePath() . "/css/login.css";
+    if(is_file(FF_DISK_PATH . $filename)) {
+        $cm->oPage->tplAddCss("ff.modules.security.login", array(
+            "file" =>  basename($filename)
+        , "path" => ffCommon_dirname($filename)
+        ));
+    }
 }
 
 $res = $cm->modules["security"]["events"]->doEvent("onTplLoad", array(&$tpl, $logged, &$sErrorCode, &$sError));

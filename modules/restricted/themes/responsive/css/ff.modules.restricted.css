@@ -1412,8 +1412,15 @@ tbody > tr:hover {
 
 .ffGrid .table td {
 
-    vertical-align: middle; }
-
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.ffGrid .table td.currency {
+  text-align: right;
+}
+.ffGrid .table td.number {
+    text-align: right;
+}
 .ffGrid .table td a.fa,
 .ffGrid .table td a.fas,
 .ffGrid .table td a.far{

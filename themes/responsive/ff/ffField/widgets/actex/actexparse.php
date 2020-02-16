@@ -257,8 +257,8 @@ if ($db->nextRecord())
 	do
 	{
 		$i++;
-		$php_array[$i]["value"] = ffCommon_charset_encode($db->getField($db->fields_names[0], "Text", true));
-		$php_array[$i]["desc"] = ffCommon_charset_encode($db->getField($db->fields_names[1], "Text", true));
+        $php_array[$i]["value"] = preg_replace('/[[:cntrl:]]/', '', ffCommon_charset_encode($db->getField($db->fields_names[0], "Text", true)));
+        $php_array[$i]["desc"] = preg_replace('/[[:cntrl:]]/', '', ffCommon_charset_encode($db->getField($db->fields_names[1], "Text", true)));
 		if($actex_group && $db->record[$actex_group])
 		{
 			$php_array[$i]["group"] = ffCommon_charset_encode($db->getField($actex_group, "Text", true));

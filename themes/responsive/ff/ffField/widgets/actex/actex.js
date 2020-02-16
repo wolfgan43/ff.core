@@ -581,6 +581,7 @@ var activecombo = function(params) {
 		, "child_error_display" : function (textStatus) {
 			var node = that.getNode();
 			if (node) {
+
 				node.innerHTML = 'Impossibile connettersi con il server, riprovare più tardi. ' + textStatus;
 				if(!that.options.hideEmpty || that.options.hideEmpty === true)
                     jQuery(node).show();
@@ -1082,7 +1083,7 @@ var activecombo = function(params) {
 						, "cursor"				: "pointer"
 						, "max-height"			: "300px"
 						, "top"					: $this.offset().top + $this.outerHeight() - dialogTop
-						, "width"				: $this.outerWidth()
+						, "width"				: $this.outerWidth() + 30
 					});
 
  				jQuery(".ui-menu-item", $menu).css({

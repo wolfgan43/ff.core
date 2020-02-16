@@ -203,7 +203,7 @@ class ffField_html extends ffField_base
 	var $actex_limit					= null;
 	
 	var $actex_autocomp					= false;
-	var $actex_autocomp_limit			= 3;
+	var $actex_autocomp_limit			= 0;
 	var $actex_autocomp_preserve_text	= false;
 
 

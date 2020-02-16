@@ -443,7 +443,7 @@ class ffWidget_actex extends ffCommon
         $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon", "btn"));
         $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));
 
-        if ($Field->actex_autocomp) {
+        if ($Field->actex_autocomp && !$Field->actex_autocomp_limit) {
             $count_actions++;
             $this->tpl[$tpl_id]->parse("SectCombo", false);
             $action_class .= " nopadding";
@@ -451,7 +451,7 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("SectCombo", "");
         }
 
-        if ($Field->actex_dialog_url == true || $Field->actex_autocomp){
+        if ($Field->actex_dialog_url == true || ($Field->actex_autocomp && !$Field->actex_autocomp_limit)){
             $this->tpl[$tpl_id]->set_var("actex_container", cm_getClassByFrameworkCss("group", "form", "actex-wrapper"));
         }else{
             $this->tpl[$tpl_id]->set_var("actex_container", "actex-wrapper");
