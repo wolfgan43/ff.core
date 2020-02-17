@@ -13,7 +13,7 @@ class cm extends ffCommon
     private static  $env                = array();
 
     static protected $_events = null;
-	
+
 	//const LAYOUT_PRIORITY_INERHIT		= 0; // special, get parent'
 	const LAYOUT_PRIORITY_TOPLEVEL		= 1; // special, only one
 	const LAYOUT_PRIORITY_HIGH			= 2;
@@ -32,11 +32,11 @@ class cm extends ffCommon
 	var $is_resource			= null;
 	var $module					= null;
 	var $module_path			= null;
-		
+
 	var $process_next_rule		= false;
 	var $processed_rule			= null;
 	var $processed_rule_attrs = null;
-	
+
 	//var $ff_settings_loaded		= array();
 	//var $ff_settings			= null;
 
@@ -58,7 +58,7 @@ class cm extends ffCommon
 	var $cache_force_enable		= null;
 	var $cache_force_expire		= null;
 	var $cache_force_max_age	= null;
-	
+
 	/**
 	 *
 	 * @var ffMemCache
@@ -68,7 +68,7 @@ class cm extends ffCommon
 	//var $applets_components 	= array();
 	var $loaded_applets 		= array();
 	var $modules				= array();
-	
+
 	/**
 	 *
 	 * @var ffPage_base
@@ -79,23 +79,23 @@ class cm extends ffCommon
 	 * @var ffTemplate
 	 */
 	var $tpl_content 			= null;
-	
+
 	var $json_response			= array(
 			"success" => true
 		);
-	
+
 	private function __construct()
 	{
 		if(defined("FF_URLPARAM_QUERY"))
 			ffDB_Sql::$_profile = true;
-			
+
 		$this->router = cmRouter::getInstance();
 	}
-	
+
 	private function __clone()
 	{
 	}
-	
+
 	/**
 	 *
 	 * @return cm
@@ -107,11 +107,11 @@ class cm extends ffCommon
 
 		return self::$singleton;
 	}
-	
+
 	/**
 	* EVENTS OVERRIDING
 	*/
-	
+
 	static public function _addEvent($event_name, $func_name, $priority = null, $index = 0, $break_when = null, $break_value = null, $additional_data = null)
 	{
 		self::initEvents();
@@ -123,7 +123,7 @@ class cm extends ffCommon
 		self::initEvents();
 		return self::$_events->doEvent($event_name, $event_params);
 	}
-	
+
 	static private function initEvents()
 	{
 		if (self::$_events === null)
@@ -134,7 +134,7 @@ class cm extends ffCommon
 	{
 		return self::_doEvent($event_name, $event_params);
 	}
-	
+
 	public function addEvent($event_name, $func_name, $priority = null, $index = 0, $break_when = null, $break_value = null, $additional_data = null)
 	{
 		return self::_addEvent($event_name, $func_name, $priority, $index, $break_when, $break_value, $additional_data);
@@ -213,7 +213,7 @@ class cm extends ffCommon
 
 	/**
 	* Main Process Fucntion (use only once per session)
-	* 
+	*
 	*/
 	public function process()
 	{
@@ -227,7 +227,7 @@ class cm extends ffCommon
 
 		$this->path_info 		= $_SERVER['PATH_INFO'];
 		$this->query_string 	= $_SERVER['QUERY_STRING'];
-        
+
 		// #0: verifica configurazione
 
 		// #1: normalizzazione dell'url
@@ -244,9 +244,9 @@ class cm extends ffCommon
 			if (CM_URL_NORMALIZE)
 				$_SERVER['PATH_INFO'] = $this->path_info;
 		}
-		
+
 		// STATIC CACHE
-		
+
 		$cache_avoid_match = false;
 		if (strlen(CM_PAGECACHE_AVOIDPATTERN))
 		{
@@ -260,7 +260,7 @@ class cm extends ffCommon
 				}
 			}
 		}
-		
+
 		if (
 				CM_PAGECACHE
 				&& !$this->isXHR()
@@ -273,7 +273,7 @@ class cm extends ffCommon
 			)
 		{
 			define("ALLOW_PAGECACHE", true);
-			
+
 			$cache_dir = CM_PAGECACHE_DIR;
 			if (CM_PAGECACHE_BYDOMAIN)
 			{
@@ -282,7 +282,7 @@ class cm extends ffCommon
 					$cache_domain_prefix = substr($cache_domain_prefix, 4);
 				$cache_dir .= "/" . $cache_domain_prefix;
 			}
-			
+
 			$cache_path_info = $this->path_info;
 			if (CM_PAGECACHE_GROUPHASH)
 			{
@@ -292,7 +292,7 @@ class cm extends ffCommon
 				if (CM_PAGECACHE_GROUPHASH_STRIPPATH)
 					$cache_path_info = "";
 			}
-			
+
 			if (file_exists($cache_dir))
 			{
 				if (CM_PAGECACHE_ASYNC && defined("FF_URLPARAM_GENCACHE"))
@@ -354,7 +354,7 @@ class cm extends ffCommon
 										@unlink($file);
 									}
 								}
-								
+
 								if ($cache_valid)
 									break;
 							}
@@ -384,7 +384,7 @@ class cm extends ffCommon
 								}
 							}
 						}
-						
+
 						if ($cache_valid)
 						{
 							http_response_code(304);
@@ -419,7 +419,7 @@ class cm extends ffCommon
 								$cache_file = $find_cache_file["uncompressed"];
 						}
 					}
-					
+
 					if ($cache_file !== null)
 					{
 						if ($cache_file["compressed"] !== false)
@@ -446,7 +446,7 @@ class cm extends ffCommon
 						{
 							$max_age = CM_PAGECACHE_REUSE_AGE;
 						}
-						
+
 						header("Cache-Control: public, max-age=" . $max_age);
 
 						header("ETag: " . $cache_file["filename"]);
@@ -456,7 +456,7 @@ class cm extends ffCommon
 					}
 				}
 			}
-			
+
 			// nessuna cache trovata
 			if (CM_PAGECACHE_ASYNC && !defined("FF_URLPARAM_GENCACHE") && CM_PAGECACHE_ASYNC_MISSING)
 			{
@@ -467,7 +467,7 @@ class cm extends ffCommon
 				}
 				exit;
 			}
-			
+
 			$this->cache_router = cmRouter::getInstance("__cm_cache__");
 		}
 		else
@@ -477,7 +477,7 @@ class cm extends ffCommon
 		}
 
 		$this->doEvent("on_before_init", array($this));
-		
+
 		// #2: inizializzazione classi
 
 		$ff = ffGlobals::getInstance("ff");
@@ -509,7 +509,7 @@ class cm extends ffCommon
             }
         }
         $this->doEvent("on_after_init", array($this));
-		
+
 		// #3: precaricamento moduli
         $this->loadConfig(__DIR__ . "/conf/config.xml");
         $this->loadConfig(FF_DISK_PATH . "/conf/config.xml");
@@ -647,7 +647,7 @@ class cm extends ffCommon
 					}
 				}
 			}
-					
+
 			$res = $this->doEvent("on_load_module", array($this, $key));
 		}
 		reset($this->modules);
@@ -656,7 +656,7 @@ class cm extends ffCommon
 		{
 			if (@is_file(__PRJ_DIR__ . "/ds/common.php"))
 				require __PRJ_DIR__ . "/ds/common.php";
-			
+
 			if (@is_dir(__PRJ_DIR__ . "/ds/sources"))
 			{
 				$itGroup = new DirectoryIterator(__PRJ_DIR__ . "/ds/sources");
@@ -713,7 +713,7 @@ class cm extends ffCommon
 			define("CM_LOADED_THEME", CM_DEFAULT_THEME);
 
 		ffCommon_theme_init(CM_LOADED_THEME);
-		
+
 		if (isset($this->layout_vars["theme"]) && $this->layout_vars["theme"] !== $this->layout_vars["main_theme"])
 		{
 			if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/config.php"))
@@ -722,7 +722,7 @@ class cm extends ffCommon
 			if (@is_file(FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php"))
 				require FF_THEME_DISK_PATH . "/" . $this->layout_vars["theme"] . "/ff/common.php";
 		}
-		
+
 		foreach ($this->modules as $key => $value)
 		{
 			if (@is_file(CM_MODULES_ROOT . "/" . $key . "/themes/" . CM_LOADED_THEME . "/ff/common." . FF_PHP_EXT))
@@ -734,7 +734,7 @@ class cm extends ffCommon
 			$this->layout_vars["theme"] = cm_getMainTheme();
 
         $this->doEvent("on_before_page_process", array($this));
-		
+
 		$this->oPage = ffPage::factory(ff_getThemeDir($this->layout_vars["theme"]), FF_SITE_PATH, null, $this->layout_vars["theme"]);
 		$this->oPage->addEvent("on_page_process", "cm::oPage_on_page_process");
         //$this->oPage->addEvent("on_after_process_components", "cm::oPage_on_after_process_components", ffEvent::PRIORITY_HIGH);
@@ -746,21 +746,21 @@ class cm extends ffCommon
 			$this->oPage->page_js = array();
 			$this->oPage->page_meta = array();
 		}
-		
+
 		if (strlen($this->layout_vars["title"]))
 			$this->oPage->title = str_replace("[CM_LOCAL_APP_NAME]", cm_getAppName(), $this->layout_vars["title"]);
 		else
 			$this->oPage->title = cm_getAppName();
-		
+
         if(strlen($this->layout_vars["class_body"]))
             $this->oPage->class_body = $this->layout_vars["class_body"];
-            
+
         $this->oPage->use_own_form = !$this->layout_vars["exclude_form"];
         $this->oPage->use_own_js = !$this->layout_vars["exclude_ff_js"];
         $this->oPage->compact_js = (defined("FF_URLPARAM_NOCACHE") || defined("FF_URLPARAM_DEBUG") ? false : $this->layout_vars["compact_js"]);
         $this->oPage->compact_css = (defined("FF_URLPARAM_NOCACHE") || defined("FF_URLPARAM_DEBUG") ? false : $this->layout_vars["compact_css"]);
         $this->oPage->compress = (defined("FF_URLPARAM_NOCACHE") || defined("FF_URLPARAM_DEBUG") ? false : $this->layout_vars["enable_gzip"]);
-        
+
         if(is_array($this->layout_vars["cdn"]["css"]) && count($this->layout_vars["cdn"]["css"]))
             $this->oPage->override_css = array_merge($this->oPage->override_css, $this->layout_vars["cdn"]["css"]);
         if(is_array($this->layout_vars["cdn"]["js"]) && count($this->layout_vars["cdn"]["js"]))
@@ -781,7 +781,7 @@ class cm extends ffCommon
 
 			if ($this->layout_vars["page"] != "default" && $this->layout_vars["page"] !== null)
 				$this->oPage->template_file = "ffPage_" . $this->layout_vars["page"] . ".html";
-				
+
 			if (strlen($this->layout_vars["layer"]))
 				$this->oPage->layer = $this->layout_vars["layer"];
 
@@ -791,20 +791,20 @@ class cm extends ffCommon
 				{
 					if (strlen($this->layout_vars["sect_theme"][$key]) && array_search($this->oPage->getTheme(), explode(",", $this->layout_vars["sect_theme"][$key])) === false)
 						continue;
-					
+
 					$this->oPage->addSection($key);
 					$this->oPage->sections[$key]["name"] = $value;
 				}
 				reset($this->layout_vars["sect"]);
 			}
-				
+
 			if (is_array($this->layout_vars["css"]) && count($this->layout_vars["css"]))
 			{
 				foreach ($this->layout_vars["css"] as $key => $value)
 				{
 					if (strlen($value["theme"]) && array_search($this->oPage->getTheme(), explode(",", $value["theme"])) === false)
 						continue;
-					
+
 					$this->oPage->tplAddCss($key, array(
 						"file" => $value["file"]
 						, "path" => $value["path"]
@@ -843,7 +843,7 @@ class cm extends ffCommon
                 reset($this->layout_vars["meta"]);
             }
 		}
-		
+
         $this->doEvent("on_before_routing", array($this));
 
 		// #5: elaborazione richiesta
@@ -889,7 +889,7 @@ class cm extends ffCommon
 			ffErrorHandler::raise("CM: no available routes!", E_USER_ERROR, $this, get_defined_vars());
 
 		//ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
- 
+
 		foreach ($this->router->matched_rules as $key => $match)
 		{
 			$this->process_next_rule = null;
@@ -900,9 +900,9 @@ class cm extends ffCommon
 			$this->module = null;
 
 			$this->processed_rule = $match;
-			
+
 			$match_attrs = $match["rule"]->__attributes;
-			
+
 			$this->processed_rule_attrs = $match_attrs;
 
 			if (isset($match["rule"]->destination->header))
@@ -922,13 +922,13 @@ class cm extends ffCommon
 								if(array_search($actualBrowser["majorver"], $arrBrowserVersion) !== false)
 								{
 									$skip_rule = false;
-								}								
-							} 
+								}
+							}
 							else
 							{
 								$skip_rule = false;
 							}
-						} 
+						}
 					}
 					if($skip_rule)
 						continue;
@@ -937,7 +937,7 @@ class cm extends ffCommon
 				if (isset($match["rule"]->destination->location))
 				{
 					$location = str_replace("[SITE_PATH]", FF_SITE_PATH, (string)$match["rule"]->destination->location);
-				
+
 					for ($i = 0; $i < 10; $i++)
 					{
 						$location = str_replace('$' . $i, $match["params"][$i][0], $location);
@@ -1013,13 +1013,13 @@ class cm extends ffCommon
 						$attrs = $value->__attributes;
 					else
 						$attrs = $value->attributes();
-					
+
 					$value = (string)$attrs["value"];
 					for ($i = 0; $i < 10; $i++)
 					{
 						$value = str_replace('$' . $i, $match["params"][$i][0], $value);
 					}
-					
+
 					if (strlen($value))
 					{
 						$_REQUEST[(string)$attrs["name"]] = $value;
@@ -1027,7 +1027,7 @@ class cm extends ffCommon
 
 				}
 			}*/
-			
+
 			// rileva il file giusto da caricare procedendo con test a ritroso
 			$tmp_path = $url;
 			$tmp_url = $url;
@@ -1087,10 +1087,10 @@ class cm extends ffCommon
 					$this->is_resource = true;
 					break;
 				}
-				
+
 				if ($tmp_path == "/index")
 					break;
-				
+
 				if ($tmp_path != "/index")
 				{
 					if (substr($tmp_path, -1) == "/")
@@ -1110,7 +1110,7 @@ class cm extends ffCommon
 			{
 				$path_parts = explode("/", $this->path_info);
 				$script_parts = explode("/", $this->script_name);
-				
+
 				if (
 					end($path_parts) . ".html" == end($script_parts)
 					|| end($path_parts) . "." . FF_PHP_EXT == end($script_parts)
@@ -1125,7 +1125,7 @@ class cm extends ffCommon
 					else
 						$this->oPage->page_path = $this->path_info;
 				}
-				
+
 				if ($this->is_php)
 				{
 					if (file_exists($this->content_root . $this->script_name))
@@ -1136,7 +1136,7 @@ class cm extends ffCommon
 					{
 						$this->callScript($this->content_root . $this->script_name . ".php");
 					}
-					
+
 					if ($this->module !== null)
 					{
 						$tmp_mod_parts = explode("/", $this->script_name);
@@ -1161,9 +1161,9 @@ class cm extends ffCommon
 					{
 					    ffMedia::sendHeaders($this->content_root . $this->script_name);
 						readfile($this->content_root . $this->script_name);
-						exit;	
-					} 
-					else 
+						exit;
+					}
+					else
 					{
 						$this->tpl_content = ffTemplate::factory($this->content_root);
 						$this->tpl_content->load_file($this->script_name, "main");
@@ -1185,13 +1185,13 @@ class cm extends ffCommon
 
 				if ($this->process_next_rule === null && isset($this->processed_rule["rule"]->process_next) && (string)$this->processed_rule["rule"]->process_next != "false")
 					$this->process_next_rule = true;
-					
+
 				if (!$this->process_next_rule)
 					break;
 			}
 		}
 		reset($this->router->matched_rules);
-		
+
 		if (
 				strlen($this->real_path_info) &&
 				(
@@ -1202,7 +1202,7 @@ class cm extends ffCommon
 		{
 			$this->responseCode(404);
 		}
-		
+
 		// LOAD SETTINGS BY COMPONENT
 		if (is_dir(__PRJ_DIR__ . "/conf/ffsettings/components"))
 		{
@@ -1232,21 +1232,21 @@ class cm extends ffCommon
 		if (@is_file($include_script_path_tmp . "custom_" . $this->oPage->getTheme() . "." . FF_PHP_EXT))
 			require $include_script_path_tmp . "custom_" . $this->oPage->getTheme() . "." . FF_PHP_EXT;
 		unset($include_script_path_tmp);
-		
+
 		$this->doEvent("on_before_process", array($this));
-		
+
 		$this->oPage->process_params();
 
 		if (!ffErrorHandler::$hide && (defined("FF_URLPARAM_DEBUG") || defined("FF_URLPARAM_QUERY")))
 			$this->oPage->compress = false;
 
 		if (
-				ALLOW_PAGECACHE 
-				&& $this->cache_force_enable !== false 
-				&& http_response_code() == 200 
-				&& !@file_exists($cache_dir . "/disk_fail") 
+				ALLOW_PAGECACHE
+				&& $this->cache_force_enable !== false
+				&& http_response_code() == 200
+				&& !@file_exists($cache_dir . "/disk_fail")
 				&& (
-						!CM_PAGECACHE_ASYNC 
+						!CM_PAGECACHE_ASYNC
 						|| (
 								CM_PAGECACHE_ASYNC && defined("FF_URLPARAM_GENCACHE")
 							)
@@ -1294,20 +1294,20 @@ class cm extends ffCommon
 					}
 					reset($this->cache_router->matched_rules);
 				}
-				
+
 				if ($this->cache_force_expire !== null)
 					$expires = $this->cache_force_expire;
 				if ($this->cache_force_max_age !== null)
 					$max_age = $this->cache_force_max_age;
 			}
-			
+
 			if (!is_numeric($max_age) || $max_age < 0)
 				$max_age = CM_PAGECACHE_DEFAULT_MAXAGE;
 			if (!is_numeric($expires) || $expires < 0)
 				$expires = $max_age;
-			
+
 			$this->doEvent("on_cache", array(&$this, &$enable_cache, &$max_age, &$expires));
-			
+
 			if ($this->cache_force_enable || $enable_cache)
 			{
 				$buffer = $this->oPage->process(false);
@@ -1317,7 +1317,7 @@ class cm extends ffCommon
 				$hsent = false;
 				$extension = null;
 				$charset = null;
-				
+
 				$hlist = headers_list();
 				foreach($hlist as $key => $value)
 				{
@@ -1326,12 +1326,12 @@ class cm extends ffCommon
 					{
 						$mime_type = $matches[2];
 						$hsent = true;
-						
+
 						if ($matches[4] == "charset")
 							$charset = $matches[5];
 					}
 				}
-				
+
 				if ($mime_type === null && strlen($this->path_info))
 				{
 					$extension = (($extension = pathinfo($this->path_info, PATHINFO_EXTENSION)) === "" ? null : $extension);
@@ -1359,7 +1359,7 @@ class cm extends ffCommon
 					$mime_type = "text/html";
 					$extension = "html";
 				}
-				
+
 				if ($mime_type == "text/html" && $charset === null)
 				{
 					$mime_type .= "; charset=UTF-8";
@@ -1368,27 +1368,27 @@ class cm extends ffCommon
 
 				if (!$hsent)
 					header("Content-type: " . $mime_type);
-				
+
 				// make & save cache
 				$now = time();
-				
+
 				$id = uniqid();
 				$etag = $id . "." . $extension;
 				$file = $id . "." . $extension;
 
 				$file .= "." . $max_age;
 				$etag .= "." . $max_age;
-				
+
 				$compression = false;
 				if (!CM_PAGECACHE_DISABLE_COMPRESSIONS && $this->oPage->compress && ffHTTP_encoding_isset("gzip"))
 					$compression = true;
-				
+
 				$rc_cache = true;
 
 				// when making main dir fail, don't do anything at all
 				if ($rc_cache && !is_dir($cache_dir))
 					$rc_cache = @mkdir($cache_dir, 0777, true);
-				
+
 				// write it uncompressed
 				if ($rc_cache && $find_cache_file["uncompressed"] === null && (!$compression || CM_PAGECACHE_WRITEALL))
 				{
@@ -1413,17 +1413,17 @@ class cm extends ffCommon
 								$cache_group_dir--; // reuse uncompressed' one
 							else
 								$cache_group_dir = 0;
-							
+
 							$rc_cache = cm_filecache_groupwrite(CM_PAGECACHE_DIR, $cache_dir, $cache_path_info, $file . "." . $ret["method"], $ret["data"], ($now + $expires), CM_PAGECACHE_MAXGROUPDIRS, $cache_group_dir, $cache_disk_fail);
 						}
 						else
 							$rc_cache = cm_filecache_write($cache_dir . $cache_path_info, $file . "." . $ret["method"], $ret["data"], ($now + $expires));
 					}
-					
+
 					if ($compression)
 					{
 						$buffer = $ret["data"];
-						
+
 						if ($rc_cache)
 						{
 							$file .= ".gzip"; // just to align, not really used
@@ -1431,13 +1431,13 @@ class cm extends ffCommon
 						}
 					}
 				}
-				
+
 				if ($rc_cache)
 				{
 					$this->doEvent("on_cache_write", array(&$this, $now, $compression));
 
 					header("Cache-Control: public, max-age=" . $max_age); // public: to let firefox cache over https
-					
+
 					header("ETag: " . $etag);
 				}
 
@@ -1448,14 +1448,14 @@ class cm extends ffCommon
 				exit;
 			}
 		}
-		
+
 		$buffer = null;
-		
+
 		if (CM_MIME_FORCE && !$this->isXHR())
 		{
 			$mime = null;
 			$charset = null;
-		
+
 			$hsent = ffHTTP_getHeader();
 			if ($hsent !== false)
 			{
@@ -1495,11 +1495,11 @@ class cm extends ffCommon
 			echo $buffer;
 
 		if(defined("FF_URLPARAM_QUERY"))
-			ffErrorHandler::raise("QUERY", E_USER_ERROR, null, ffDB_Sql::$_objProfile);	
-		
+			ffErrorHandler::raise("QUERY", E_USER_ERROR, null, ffDB_Sql::$_objProfile);
+
 		if (defined("FF_URLPARAM_DEBUG"))
 			ffErrorHandler::raise("DEBUG CM Process End", E_USER_ERROR, $this, get_defined_vars());
-		
+
 		/*echo "<pre>";
 		print_r(ffDB_Sql::$_objProfile);*/
 		exit;
@@ -1516,18 +1516,18 @@ class cm extends ffCommon
 
 		$cm->preloadApplets($cm->oPage->tpl[0]);
 		$cm->preloadApplets($cm->oPage->tpl_layer[0]);
-			
+
 		foreach ($cm->oPage->sections as $key => $value)
 		{
 			$cm->preloadApplets($cm->oPage->sections[$key]["tpl"]);
 		}
 		reset($cm->oPage->sections);
-		
+
 		foreach  ($cm->oPage->components as $key => $value)
 		{
 			$cm->preloadApplets($cm->oPage->components[$key]->tpl[0]);
 		}
-		
+
 		foreach ($cm->oPage->contents as $key => $content)
 		{
 		    if($content["data"]) {
@@ -1594,7 +1594,7 @@ class cm extends ffCommon
 			$oPage->addContent($cm->tpl_content->rpparse("main", false), null, $cm->tpl_content->sTemplate);
 		}
 	}*/
-	
+
 	static function onRedirect($destination, $http_response_code, $add_params, $response = array())
 	{
 		$cm = cm::getInstance();
@@ -1637,9 +1637,9 @@ class cm extends ffCommon
 				if ($tmp = preg_match('/\[([\w\:\=\|\-]+)\]/U', $key, $matches))
 				{
 					$applet_parts = explode(":", $matches[1]);
-					
+
 					$applet = $applet_parts[0];
-					
+
 					$params = array();
 					$order_params = array();
 					if (count($applet_parts) > 1)
@@ -1778,14 +1778,14 @@ class cm extends ffCommon
 			$this->loaded_applets[$appletid]["name"] = $appletname;
 			$applet_file = __PRJ_DIR__ . "/applets/" . $appletname . "/index." . FF_PHP_EXT;
 		}
-		
+
 		$cm = $this;
 
 		if (file_exists($applet_file))
 			include $applet_file;
 		else
 			ffErrorHandler::raise("APPLET NON TROVATA", E_USER_ERROR, $this, get_defined_vars());
-		
+
 		if (ffIsset($this->loaded_applets[$appletid], "comps"))
 		{
 			// LOAD SETTINGS BY COMPONENT
@@ -1809,7 +1809,7 @@ class cm extends ffCommon
 
         /** @var include $out_buffer */
         $this->loaded_applets[$appletid]["buffer"] = $out_buffer;
-		
+
 		$this->oPage->process_params();
 		return $out_buffer;
 	}
@@ -1820,17 +1820,17 @@ class cm extends ffCommon
 		$cm = $this;
 
 		$this->doEvent("on_beforeCallScript", array(&$this, $this->script_name));
-		
+
 		require $file;
-		
+
 		$this->doEvent("on_callScript", array(&$this, $this->script_name));
 	}
-	
+
 	function load_ffSettingsByPath($path_info = null)
 	{
 		if ($path_info === null)
 			$path_info = $this->path_info;
-		
+
 		if (is_file($file = rtrim(__PRJ_DIR__ . "/conf/contents" . $path_info, "/") . "/ff_settings." . $this->oPage->getTheme() . ".xml"))
 			return $this->load_ffSettings($file);
 		else if (is_file($file = rtrim(__PRJ_DIR__ . "/conf/contents" . $path_info, "/") . "/ff_settings.xml"))
@@ -1850,7 +1850,7 @@ class cm extends ffCommon
 			else
 				$file = $rc;
 		}
-		
+
 		//if (isset($this->ff_settings_loaded[$file]))
 		//	return true;
 
@@ -1874,12 +1874,12 @@ class cm extends ffCommon
 								$this->ff_settings_merge($this->oPage->$name, $this->ff_settings_process_value($value));
 							else
 								$this->oPage->$name = $this->ff_settings_process_value($value);
-							
+
 						}
 						else
 							ffErrorHandler::raise("Wrong ffPage option", E_USER_ERROR, $this, get_defined_vars());
 						break;
-					
+
 					case "event":
 						$attrs	= $value->attributes();
 
@@ -1894,7 +1894,7 @@ class cm extends ffCommon
 						$id		= (string)$attrs["id"];
 						if (!isset($this->oPage->components[$id]))
 							continue;
-							
+
 						foreach ($value as $subkey => $subvalue)
 						{
 							switch ($subkey)
@@ -1915,7 +1915,7 @@ class cm extends ffCommon
 									else
 										$this->oPage->components[$id]->$name = $this->ff_settings_process_value($subvalue);
 									break;
-								
+
 								case "ffField":
 								case "ffButton":
 									$this->ff_settings_process_element($subkey, $key, $id, $subvalue);
@@ -1923,7 +1923,7 @@ class cm extends ffCommon
 							}
 						}
 						break;
-					
+
 					case "ffField":
 					case "ffButton":
 						$this->ff_settings_process_element($key, "ffPage", null, $value);
@@ -1931,10 +1931,10 @@ class cm extends ffCommon
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	function ff_settings_process_element($type, $container_type, $container_id, $element)
 	{
 		$attrs	= $element->attributes();
@@ -1949,12 +1949,12 @@ class cm extends ffCommon
 				case "ffPage":
 					$field = $this->oPage->buttons[$field_id];
 					break;
-				
+
 				case "ffGrid":
 					if (!array_key_exists($container_id, $this->oPage->components))
 						//ffErrorHandler::raise ("ffSettings - Unknown container", E_USER_ERROR, $this, get_defined_vars());
 						return;
-				
+
 					switch ($field_type)
 					{
 						case "grid":
@@ -1975,7 +1975,7 @@ class cm extends ffCommon
 					if (!array_key_exists($container_id, $this->oPage->components))
 						//ffErrorHandler::raise ("ffSettings - Unknown container", E_USER_ERROR, $this, get_defined_vars());
 						return;
-				
+
 					switch ($field_type)
 					{
 						case "action":
@@ -1988,7 +1988,7 @@ class cm extends ffCommon
 					if (!array_key_exists($container_id, $this->oPage->components))
 						//ffErrorHandler::raise ("ffSettings - Unknown container", E_USER_ERROR, $this, get_defined_vars());
 						return;
-				
+
 					switch ($field_type)
 					{
 						case "content":
@@ -2010,7 +2010,7 @@ class cm extends ffCommon
 				if (!array_key_exists($container_id, $this->oPage->components))
 					//ffErrorHandler::raise ("ffSettings - Unknown container", E_USER_ERROR, $this, get_defined_vars());
 					return;
-				
+
 				switch ($field_type)
 				{
 					case "display":
@@ -2033,7 +2033,7 @@ class cm extends ffCommon
 		}
 		else
 			ffErrorHandler::raise("ffSettings - UNHANDLED ELEMENT", E_USER_ERROR, $this, get_defined_vars());
-		
+
 		if (!$field)
 			//ffErrorHandler::raise ("ffSettings - Unknown element", E_USER_ERROR, $this, get_defined_vars());
 			return;
@@ -2058,10 +2058,10 @@ class cm extends ffCommon
 					else
 						$field->$name = $this->ff_settings_process_value($field_value);
 					break;
-					
+
 				case "array":
 					$arr_key = (string)$field_value->arr_key;
-					
+
 					if (count($field_value->arr_value->children())) // suboptions
 					{
 						foreach ($field_value->arr_value->children() as $key_opt => $item_opt)
@@ -2097,7 +2097,7 @@ class cm extends ffCommon
 			$ori .= $new;
 			return;
 		}
-		
+
 		if (!is_array($new))
 		{
 			$ori = $new;
@@ -2197,7 +2197,7 @@ class cm extends ffCommon
 	function ff_settings_process_value($element)
 	{
 		$value = null;
-		
+
 		if (count($element->children()))
 		{
 			$value = array();
@@ -2238,7 +2238,7 @@ class cm extends ffCommon
 				$data_type	= "Text";
 			else
 				$data_type	= (string)$attrs["data_type"];
-				
+
 			if (!isset($attrs["locale"]))
 				$locale		= FF_SYSTEM_LOCALE;
 			elseif ((string)$attrs["locale"] == "FF_LOCALE")
@@ -2281,7 +2281,7 @@ class cm extends ffCommon
 		}
 
         $db = ffDB_Sql::factory();
-		
+
 		$layout_vars = array();
 		$layout_vars["main_theme"] = null;
 		$layout_vars["theme"] = null;
@@ -2301,7 +2301,7 @@ class cm extends ffCommon
 		$layout_vars["enable_gzip"] = false;
 		$layout_vars["compact_js"] = false;
 		$layout_vars["compact_css"] = false;
-		
+
 		$tmp = $layout_path;
 		$paths = "";
 		$i = 0;
@@ -2350,7 +2350,7 @@ class cm extends ffCommon
 									`" . CM_TABLE_PREFIX . "layout`
 								WHERE 1
 									" . (strlen($paths)
-										? " AND (" . $paths . ") " 
+										? " AND (" . $paths . ") "
 										: ""
 									) . "
 									AND (`" . CM_TABLE_PREFIX . "layout`.`domains` = ''
@@ -2365,8 +2365,8 @@ class cm extends ffCommon
 							`tbl_src`.`path` ASC
 					";
 	//									OR FIND_IN_SET(" . $db->toSql($_SERVER["HTTP_HOST"]) . ", `" . CM_TABLE_PREFIX . "layout`.`domains`)
-        } 
-		else 
+        }
+		else
 		{
             $sSQL = "SELECT
                         " . CM_TABLE_PREFIX . "layout.*
@@ -2374,7 +2374,7 @@ class cm extends ffCommon
                         " . CM_TABLE_PREFIX . "layout
                     WHERE 1
                         " . (strlen($paths)
-                            ? " AND (" . $paths . ") " 
+                            ? " AND (" . $paths . ") "
                             : ""
                         ) . "
                     ORDER BY path ASC";
@@ -2388,12 +2388,12 @@ class cm extends ffCommon
 			{
 				if($db->getField("path", "Text", true) == $layout_path || $db->getField("path", "Text", true) == str_replace("/index", "/", $layout_path))
 					$bMatchPath = true;
-				else 
+				else
 					$bMatchPath = false;
 
 				if(!$db->getField("enable_cascading", "Text", true) && !$bMatchPath)
 					continue;
-				
+
 				if ($db->getField("reset_cascading", "Text", true))
 				{
 					$layout_vars = array();
@@ -2458,7 +2458,7 @@ class cm extends ffCommon
 					$layout_vars["class_body"] = $db->getField("class_body", "Text", true);
 
 				$sSQL = "SELECT * FROM " . CM_TABLE_PREFIX . "layout_sect WHERE ID_layout = " . $db2->toSql($db->getField("ID")) . " ORDER BY ID";
-				
+
 				$db2->query($sSQL);
 				if ($db2->nextRecord())
 				{
@@ -2510,7 +2510,7 @@ class cm extends ffCommon
 							$priority = cm::LAYOUT_PRIORITY_DEFAULT;
 						else
 							$priority = $db2->getField("priority", "Number", true);
-						
+
 						if(strlen($db2->getField("plugin_path", "Text", true)))
 						{
 							if(file_exists(ff_getThemeDir($layout_vars["theme"]) . $db2->getField("plugin_path", "Text", true)))
@@ -2524,7 +2524,7 @@ class cm extends ffCommon
 								);
 							}
 							if(strlen($db2->getField("js_path", "Text", true)))
-							{ 
+							{
 								$layout_vars["js"][$db2->getField("name", "Text", true)] = array(
 									"path" => "/themes/" . $layout_vars["theme"] . "/javascript" . ffCommon_dirname($db2->getField("js_path", "Text", true))
 									, "file" => basename($db2->getField("js_path", "Text", true))
@@ -2544,7 +2544,7 @@ class cm extends ffCommon
 										, "priority" => $priority
 										, "index" => ($db2->getField("index", "Number", true) ? $db2->getField("index", "Number", true) : $db2->getField("order", "Number", true) * -1)
 									);
-                                } 
+                                }
                                 elseif(file_exists(ff_getThemeDir($layout_vars["theme"]) . ffCommon_dirname($db2->getField("plugin_path", "Text", true)) . "/" . basename(ffCommon_dirname($db2->getField("plugin_path", "Text", true))) . ".observe.js"))
 								{
 									$layout_vars["js"][$db2->getField("name", "Text", true) . ".observe"] = array(
@@ -2627,7 +2627,7 @@ class cm extends ffCommon
 		else
 			return false;
 	}
-	
+
 	static function getJSONP()
 	{
 		if (isset($_REQUEST["XHR_JSONP"]))
@@ -2635,29 +2635,29 @@ class cm extends ffCommon
 		else
 			return false;
 	}
-	
+
 	function jsonAddResponse($data)
 	{
 		return $this->json_response = array_replace_recursive($this->json_response, $data);
-		
+
 	}
-	
+
 	static function jsonParse($arData, $out = true, $add_newline = false, $standard_encode = false, $standard_opts = 0, $skip_event = false)
 	{
 		if (!$skip_event)
 			cm::_doEvent("jsonParse", array(&$arData, &$out, &$add_newline, &$standard_encode, &$standard_opts));
-		
+
 		if ($jsonp = cm::getJSONP())
 		{
 			$jsonp_pre = $jsonp . "(";
 			$jsonp_post = ")";
-			
+
 			if ($out)
 				header("Content-type: application/javascript; charset=utf-8");
 		}
 		elseif ($out)
 				header("Content-type: application/json; charset=utf-8");
-		
+
 		if ($standard_encode)
 		{
 			if ($out)
@@ -2671,9 +2671,9 @@ class cm extends ffCommon
 				echo $jsonp_pre . ffCommon_jsonenc($arData, false, $add_newline) . $jsonp_post;
 			else
 				return $jsonp_pre . ffCommon_jsonenc($arData, false, $add_newline) . $jsonp_post;
-		}		
+		}
 	}
-	
+
 	function getBrowser()
 	{
 	    $u_agent = $_SERVER['HTTP_USER_AGENT'];
@@ -2691,7 +2691,7 @@ class cm extends ffCommon
 	    elseif (preg_match('/windows|win32/i', $u_agent)) {
 	        $platform = 'windows';
 	    }
-	   
+
 	    // Next get the name of the useragent yes seperately and for good reason
 		if(preg_match('/iPad/i',$u_agent))
 	    {
@@ -2739,7 +2739,7 @@ class cm extends ffCommon
 	        $ub = "Netscape";
 	    }
 
-	    
+
 	    // finally get the correct version number
 	    $known = array('Version', $ub, 'other');
 	    $pattern = '#(?<browser>' . join('|', $known) .
@@ -2747,7 +2747,7 @@ class cm extends ffCommon
 	    if (!preg_match_all($pattern, $u_agent, $matches)) {
 	        // we have no matching number just continue
 	    }
-	   
+
 	    // see how many we have
 	    $i = count($matches['browser']);
 	    if ($i != 1) {
@@ -2763,10 +2763,10 @@ class cm extends ffCommon
 	    else {
 	        $version= $matches['version'][0];
 	    }
-	   
+
 	    // check if we have a number
 	    if ($version==null || $version=="") {$version="?";}
-	   
+
 	    return array(
 	        'userAgent' 	=> $u_agent
 	        , 'extendname'  => $bname
@@ -2777,7 +2777,7 @@ class cm extends ffCommon
 	        , 'pattern'    	=> $pattern
 	    );
 	}
-	
+
 	function responseCode($code, $mute = false)
 	{
 		//ffErrorHandler::raise("DEBUG", E_USER_ERROR, $this, get_defined_vars());
@@ -2786,7 +2786,7 @@ class cm extends ffCommon
 		if ($rc === null)
 		{
 			$tpl = null;
-			
+
 			if (!$mute)
 			{
 				if (is_file(__PRJ_DIR__ . "/conf/cm/extras/" . $code . ".html"))
@@ -2804,7 +2804,7 @@ class cm extends ffCommon
 			exit;
 		}
 	}
-	
+
 	static public function _layoutOrderElements(&$elements, $priority = null)
 	{
 		if ($priority)
@@ -2818,7 +2818,7 @@ class cm extends ffCommon
 		else
 		{
 			ksort($elements);
-		
+
 			for($i = CM::LAYOUT_PRIORITY_TOPLEVEL; $i <= CM::LAYOUT_PRIORITY_FINAL; $i++)
 			{
 				if (!isset($elements[$i]))
