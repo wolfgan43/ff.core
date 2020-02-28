@@ -474,6 +474,7 @@ class ffGrid_html extends ffGrid_base
 	}
 
     function addGridDisposition($ID_component, $component_type, $col = null, $row = null, $params = null) {
+        $colspan = false;
     	$default_type = array(
     		"button" => -1
     	);
@@ -503,7 +504,8 @@ class ffGrid_html extends ffGrid_base
 			);
 
 		if($col === null) {
-			$col = count($this->grid_disposition[$row]);
+            $colspan = true;
+            $col = count($this->grid_disposition[$row]);
 
 			if($this->grid_disposition_options[$component_type]["wrap_col"]  
 				&& isset($default_type[$component_type]) 
@@ -527,9 +529,13 @@ class ffGrid_html extends ffGrid_base
 
 		$params["type"] = $component_type;
 
-		$this->grid_disposition[$row][$col][$ID_component] = $params;    
-		
-		$this->grid_disposition_elem["data"][$row][$col][$component_type]++;
+		$this->grid_disposition[$row][$col][$ID_component] = $params;
+
+        if ($colspan) {
+            unset($this->grid_disposition_elem["data"][$row][$col -1]["colspan"]);
+            $this->grid_disposition_elem["data"][$row][$col]["colspan"]++;
+        }
+        $this->grid_disposition_elem["data"][$row][$col][$component_type]++;
 		$this->grid_disposition_elem[$component_type][$row]++;
 		$this->grid_disposition_elem["count"][$row]++;
     }
@@ -1873,7 +1879,7 @@ class ffGrid_html extends ffGrid_base
     {
 	    if (!is_subclass_of($field, "ffField_base"))
 	        ffErrorHandler::raise("Wrong Grid Field: must be a ffField", E_USER_ERROR, $this, get_defined_vars());
-    
+
 	    if ($field->display === false)
 	        return false;
 
@@ -2252,7 +2258,7 @@ class ffGrid_html extends ffGrid_base
 					$res = null;
 
 					if($params["type"] == "field")
-						$res = $this->parse_field($this->grid_fields[$key], $recordset_key, $modify_url, $keys, ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1]["field"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true), ($row > 1 ? true : false/*!$this->grid_fields[$key]->allow_order*/));
+						$res = $this->parse_field($this->grid_fields[$key], $recordset_key, $modify_url, $keys, ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1]["field"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true), count($this->grid_disposition_elem["count"]) > 1);
 					elseif($params["type"] == "button") {
 						if(isset($this->grid_buttons[$key]))
 							$res = $this->parse_button($this->grid_buttons[$key], $recordset_key, $rrow, $modify_url["default"], ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
@@ -2297,10 +2303,11 @@ class ffGrid_html extends ffGrid_base
 			$col_properties = $button["container_properties"];
 		}
 
-		if($col == 1 && count($this->grid_disposition_elem["data"]) > 1) {
+		if(isset($this->grid_disposition_elem["data"][$row -1 ][$col -1]["colspan"]) && count($this->grid_disposition_elem["data"]) > 1) {
 			$colspan = max($this->grid_disposition_elem["count"]) - $col_count;
-			if($colspan)
-				$col_properties["colspan"] = $colspan + 1;
+			if($colspan) {
+                $col_properties["colspan"] = $colspan + 1;
+            }
 		}	
 		/**
 		* Parse Col Vars
