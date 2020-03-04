@@ -27,10 +27,27 @@ function ffPage_on_factory($disk_path, $site_path, $page_path, $theme, $variant)
 }
 function ffGrid_on_factory($page, $disk_path, $theme, $variant)
 {
-    if (!is_null($variant) && isset($variant["path"]))
+    if (!is_null($variant) && isset($variant["path"])) {
         return null;
-    else
+    } elseif(strpos($_REQUEST["frmAction"], "_export") !== false) {
+        $base_path = $disk_path . "/themes/responsive";
+        $class_name = "ffGrid_xls";
+
+        $base_path .= "/ff/ffGrid/" . $class_name . "." . FF_PHP_EXT;
+        ffGrid::addEvent("on_before_process_interface", function($component) {
+            $arrAction = explode("_", $_REQUEST["frmAction"]);
+            if($arrAction[0] != $component->id) {
+                return false;
+            }
+        }, ffEvent::PRIORITY_DEFAULT);
+
+        return array(
+            "class_name" => $class_name,
+            "base_path" => $base_path
+        );
+    } else {
         return cm_findCascadeClass("ffGrid", $theme, null, $variant["name"]);
+    }
 }
 function ffRecord_on_factory($page, $disk_path, $theme, $variant)
 {

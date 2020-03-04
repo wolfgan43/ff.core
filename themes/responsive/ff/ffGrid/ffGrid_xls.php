@@ -451,10 +451,108 @@ class ffGrid_xls extends ffGrid_base
         // Manage various buttons
         $totfields = count($this->grid_fields);
 
-        if ($this->db[0]->query_id && $this->db[0]->nextRecord())
-        {
-        	
-			if($this->db[0]->numRows() > $this->csv_start_row) 
+        if ($this->db[0]->query_id && $this->db[0]->nextRecord()) {
+            if(1 || $this->db[0]->numRows() > $this->csv_start_row)
+            {
+                $export = "";
+                $field_export = [];
+                foreach ($this->grid_fields as $key => $FormField) {
+                    $value = $this->grid_fields[$key]->label;
+
+                    if (strlen($this->csv_field_caps)) {
+                        $value = str_replace($this->csv_field_caps, "", $value);
+                    } else {
+                        $value = str_replace($this->csv_field_sep, "", $value);
+                    }
+
+                    $value = str_replace($this->csv_row_sep, "", $value);
+                    $value = str_replace("\r", "", $value);
+
+                    $value = $this->csv_field_caps . $value . $this->csv_field_caps;
+
+                    $field_export[] = $value;
+                }
+                reset($this->grid_fields);
+
+                $export .= implode($this->csv_field_sep, $field_export) . $this->csv_row_sep;
+
+                do {
+                    $field_export = [];
+
+                    foreach ($this->grid_fields as $key => $FormField) {
+                        if ($this->use_fields_params && $this->grid_fields[$key]->control_type != "" && isset($this->recordset_values[$recordset_key][$key])) {
+                            $this->grid_fields[$key]->value = new ffData($this->recordset_values[$recordset_key][$key], $this->grid_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+                        } else {
+                            switch ($this->grid_fields[$key]->data_type) {
+                                case "db":
+                                    $this->grid_fields[$key]->value = $this->db[0]->getField($this->grid_fields[$key]->get_data_source(), $this->grid_fields[$key]->base_type);
+                                    break;
+
+                                case "callback":
+                                    $this->grid_fields[$key]->value = call_user_func($this->grid_fields[$key]->get_data_source(), $this->grid_fields, $key);
+                                    break;
+
+                                default:
+                                    if (isset($this->recordset_values[$recordset_key][$key]))
+                                        $this->grid_fields[$key]->value = new ffData($this->recordset_values[$recordset_key][$key], $this->grid_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+                                    else
+                                        $this->grid_fields[$key]->value = $this->grid_fields[$key]->getDefault(array(&$this));
+                            }
+                        }
+
+                        $value = $this->grid_fields[$key]->getValue($this->grid_fields[$key]->get_app_type(), FF_LOCALE);
+                        $value = $this->db[0]->getField($key, "Text", true);
+
+                        if (strlen($this->csv_field_caps)) {
+                            $value = str_replace($this->csv_field_caps, "", $value);
+                        } else {
+                            $value = str_replace($this->csv_field_sep, "", $value);
+                        }
+
+                        $value = str_replace($this->csv_row_sep, "", $value);
+                        $value = str_replace("\r", "", $value);
+
+                        $value = $this->csv_field_caps . $value . $this->csv_field_caps;
+
+                        $field_export[] = $value;
+                    }
+                    reset($this->grid_fields);
+
+                    $export .= implode($this->csv_field_sep, $field_export) . $this->csv_row_sep;
+
+                } while ($this->db[0]->nextRecord());
+
+
+                if(strlen($this->title)) {
+                    $filename = ffCommon_url_rewrite($this->title);
+                } else {
+                    $filename = ffCommon_url_rewrite($this->id);
+                }
+
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment;filename="' . $filename . '.csv"');
+                header('Cache-Control: max-age=0');
+
+                echo $export;
+
+                //fpassthru($handle);
+                exit;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            if($this->db[0]->numRows() > $this->csv_start_row)
 			{
 				//$handle = tmpfile(); 
 				$export = "";

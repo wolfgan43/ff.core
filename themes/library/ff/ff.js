@@ -1184,6 +1184,12 @@ var that = { // publics
         return fixed.replace('.', decimalSeparator);
      }
 },
+"currencyToNumber" : function(number, decimalSeparator, thousandsSeparator) {
+	decimalSeparator = decimalSeparator === undefined ? "." : decimalSeparator;
+	thousandsSeparator = thousandsSeparator === undefined ? "," : thousandsSeparator;
+
+	return parseFloat(number.replace(decimalSeparator, "").replace(thousandsSeparator, "."));
+},
 "isMobile" : function(type) {
 	var res = false;
 	

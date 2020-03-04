@@ -1900,8 +1900,9 @@ class ffGrid_html extends ffGrid_base
 	    /**
 	    * Set Field Symbol
 	    */
-		if(strlen($this->symbol_valuta) && $field->app_type == "Currency")
-			$buffer_symbol = $this->symbol_valuta;
+		if(strlen($this->symbol_valuta) && $field->app_type == "Currency" && !$field->fixed_pre_content && !$field->fixed_post_content) {
+            $buffer_symbol = $this->symbol_valuta;
+        }
 			
 
 		/**
