@@ -1188,7 +1188,9 @@ var that = { // publics
 	decimalSeparator = decimalSeparator === undefined ? "." : decimalSeparator;
 	thousandsSeparator = thousandsSeparator === undefined ? "," : thousandsSeparator;
 
-	return parseFloat(number.replace(decimalSeparator, "").replace(thousandsSeparator, "."));
+	let res = parseFloat(number.replace(decimalSeparator, "").replace(thousandsSeparator, "."));
+
+	return isNaN(res) ? 0 : res;
 },
 "isMobile" : function(type) {
 	var res = false;
