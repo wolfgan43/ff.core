@@ -438,9 +438,9 @@ class ffWidget_actex extends ffCommon
         $action_class = "actex-actions";
 
         $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));
-        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("times", "icon", "btn"));
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon", "btn"));
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("times", "icon", array("class" => "mr-0")));
+        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon", array("class" => "btn")));
+        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon", array("class" => "btn")));
         $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));
 
         if ($Field->actex_autocomp && !$Field->actex_autocomp_limit) {
@@ -460,7 +460,7 @@ class ffWidget_actex extends ffCommon
         $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("control-postfix", "form", $action_class));
         $this->tpl[$tpl_id]->set_var("actex_multi_container", cm_getClassByFrameworkCss("group", "list", "actex-multi"));	
         $this->tpl[$tpl_id]->set_var("actex_multi_item", cm_getClassByFrameworkCss("item", "list"));	
-        $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "list"));	
+        $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "primary"));
             
 		if ($Field->actex_reset_childs) {
 			$this->tpl[$tpl_id]->set_var("reset_childs", "true");
