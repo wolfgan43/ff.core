@@ -173,10 +173,15 @@ class ffWidget_actex extends ffCommon
                 $dialog_url .= "&";
             if (is_array($params) && count($params)) {
                 foreach ($params as $param_key => $param_value) {
-                    if ($param_value === null)
-                        $dialog_url .= $param_key . "=[[" . $prefix . $id . "]]&";
-                    else
-                        $dialog_url .= $param_key . "=[[" . $param_value . "]]&";
+                    if ($param_value === null) {
+                        if(strpos($param_key, "[") === false) {
+                            $dialog_url .= $param_key . "=[[" . $prefix . $param_key . "]]&";
+                        } else {
+                            $dialog_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+                        }
+                    } else {
+                        $dialog_url .= $param_key . "=" . $param_value . "&";
+                    }
                 }
             }
             $this->tpl[$tpl_id]->set_var("dialogaddlink", $Field->parent_page[0]->widgets["dialog"]->process(
@@ -228,10 +233,15 @@ class ffWidget_actex extends ffCommon
                 $edit_url .= "&";
             if (is_array($params) && count($params)) {
                 foreach ($params as $param_key => $param_value) {
-                    if ($param_value === null)
-                        $edit_url .= $param_key . "=[[" . $prefix . $id . "]]&";
-                    else
-                        $edit_url .= $param_key . "=[[" . $param_value . "]]&";
+                    if ($param_value === null) {
+                        if(strpos($param_key, "[") === false) {
+                            $edit_url .= $param_key . "=[[" . $prefix . $param_key . "]]&";
+                        } else {
+                            $edit_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+                        }
+                    } else {
+                        $edit_url .= $param_key . "=" . $param_value . "&";
+                    }
                 }
             }
             $this->tpl[$tpl_id]->set_var("dialogeditlink", $Field->parent_page[0]->widgets["dialog"]->process(
@@ -285,10 +295,15 @@ class ffWidget_actex extends ffCommon
                 $delete_url .= "frmAction=" . $Field->actex_dialog_delete_idcomp . "_confirmdelete&";
             if (is_array($params) && count($params)) {
                 foreach ($params as $param_key => $param_value) {
-                    if ($param_value === null)
-                        $delete_url .= $param_key . "=[[" . $prefix . $id . "]]&";
-                    else
-                        $delete_url .= $param_key . "=[[" . $param_value . "]]&";
+                    if ($param_value === null) {
+                        if(strpos($param_key, "[") === false) {
+                            $delete_url .= $param_key . "=[[" . $prefix . $param_key . "]]&";
+                        } else {
+                            $delete_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+                        }
+                    } else {
+                        $delete_url .= $param_key . "=" . $param_value . "&";
+                    }
                 }
             }
             if (method_exists($Field->parent[0], "dialog"))  // ??? obsoleto probabilmente

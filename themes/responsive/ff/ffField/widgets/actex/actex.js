@@ -1084,6 +1084,7 @@ var activecombo = function(params) {
 						, "max-height"			: "300px"
 						, "top"					: $this.offset().top + $this.outerHeight() - dialogTop
 						, "width"				: $this.outerWidth() + 30
+						, "z-index"				: 1050
 					});
 
  				jQuery(".ui-menu-item", $menu).css({
