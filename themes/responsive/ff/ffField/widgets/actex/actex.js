@@ -983,8 +983,11 @@ var activecombo = function(params) {
 	};
 
 	function updatebt () {
-		if (!jQuery.fn.escapeGet("actex_" + __id + "_dialogaddlink").length)
+		if (!jQuery.fn.escapeGet("actex_" + __id + "_dialogaddlink").length
+			&& !jQuery.fn.escapeGet("actex_" + __id + "_dialogeditlink").length
+		) {
 			return;
+		}
 
 		var res = that.doEvent({
 			"event_name"	: "updatebt",
@@ -1197,7 +1200,7 @@ var activecombo = function(params) {
 	}
 
 	function drawDialogButtons () {
-		if (ff.ffPage.dialog.dialog_params.get("actex_dlg_" + __id)) {
+		if (ff.ffPage.dialog.dialog_params.get("actex_dlg_add_" + __id)) {
 			if (!buttons.get("add") || that.options.limit_select) {
 				jQuery.fn.escapeGet("actex_" + __id + "_dialogaddlink").addClass("hidden");
 			} else {

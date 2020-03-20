@@ -152,6 +152,7 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/actex");
         $dialog_url = $Field->actex_dialog_url;
         $params = $Field->actex_dialog_add_params;
+
         if (
             $Field->actex_update_from_db
             && $Field->actex_dialog
@@ -185,14 +186,14 @@ class ffWidget_actex extends ffCommon
                 }
             }
             $this->tpl[$tpl_id]->set_var("dialogaddlink", $Field->parent_page[0]->widgets["dialog"]->process(
-                "actex_dlg_" . $prefix . $id
+                "actex_dlg_add_" . $prefix . $id
                 , array(
                     "title" => $dialog_title
                 , "url" => $dialog_url
                     /*, "name"		=> '<img alt="add" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_add .'"' . (strlen($Field->actex_dialog_title_add)  ? ' title="' . $Field->actex_dialog_title_add . '"' : '') . ' />'*/
                     //, "callback"	=> (count($Field->resources) ? "ff.ffField.actex.dialog_success('" . $prefix . $id . "', '" . $Field->resources[0] . "')" : "")
                 , "tpl_id" => $tpl_id
-                , "addjs" => "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
+                , "addjs" => "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_add_" . $prefix . $id . "');"
                 , "class" => cm_getClassByFrameworkCss("addnew", "icon", array("class" => "hidden " . cm_getClassByFrameworkCss("control-prefix", "form")))
                 , "id" => "actex_" . $prefix . $id . "_dialogaddlink"
                 )
@@ -251,6 +252,7 @@ class ffWidget_actex extends ffCommon
                 , "url" => $edit_url
                     /*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_edit_" . $Field->parent[0]->id . "_" . $Field->id . "')"
+                , "addjs" => null
                 , "tpl_id" => $tpl_id
                 , "class" => cm_getClassByFrameworkCss("editrow", "icon", array("class" => "hidden"))
                 , "id" => "actex_" . $prefix . $id . "_dialogeditlink"
@@ -258,7 +260,6 @@ class ffWidget_actex extends ffCommon
                 , $Field->parent_page[0]
             ));
             //$this->tpl[$tpl_id]->parse("SectDialogEdit", false);
-
             //$count_editable++;
         } else {
             $this->tpl[$tpl_id]->set_var("dialogeditlink", "");
@@ -327,6 +328,7 @@ class ffWidget_actex extends ffCommon
                 , "url" => $dialog_delete
                     /*, "name"		=> '<img alt="delete" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_delete .'"' . (strlen($Field->actex_dialog_title_delete)  ? ' title="' . $Field->actex_dialog_title_delete . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_delete_" . $Field->parent[0]->id . "_" . $Field->id . "')"
+                , "addjs" => null
                 , "tpl_id" => $tpl_id
                 , "class" => cm_getClassByFrameworkCss("deleterow", "icon", array("class" => "hidden"))
                 , "id" => "actex_" . $prefix . $id . "_dialogdeletelink"
