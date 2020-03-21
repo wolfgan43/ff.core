@@ -543,7 +543,7 @@ class ffWidget_actex extends ffCommon
 		$this->tpl[$tpl_id]->set_var("SectData", "");
 		$this->tpl[$tpl_id]->set_var("data_src", "");		
 		$no_rec = true;
-		
+
 		if (strlen($tmp_sql = $Field->getSQL()) && $Field->actex_update_from_db)
 		{
             if($Field->actex_service === null) 
@@ -728,11 +728,16 @@ class ffWidget_actex extends ffCommon
             		$condition = 0;
 					$field_key = ($Field->actex_compare_field ? $Field->actex_compare_field : "`" . $db->fields_names[0] . "`"); //se tolto lo 0 && da enormi problemi con il recupero del default valorizzato vedi vgallery extras modify campo ID_extended_type quando e ti tipo string gia valorizzato nel db
 					$field_key_having = ($Field->actex_having_field ? $Field->actex_having_field : $field_key);
+
+					if($Field->actex_multi && $Field->actex_operation_field == "=") {
+                        $Field->actex_operation_field = "IN";
+                    }
+
                     switch($Field->actex_operation_field)
                     {
                         case "IN":
-                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
-                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
+                            $strOperation .= " $field_key IN(" . str_replace(",", "','", $db->toSql($strCompare)) . ")";
+                            $strOperationHaving .= " $field_key_having IN(" . str_replace(",", "','", $db->toSql($strCompare)) . ")";
                             break;
                         case "FIND_IN_SET":
                             $strOperation .= " $field_key = " . $db->toSql($strCompare);
@@ -751,6 +756,8 @@ class ffWidget_actex extends ffCommon
                             $strOperation .= " $field_key = " . $db->toSql($strCompare);
                             $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
                     }
+
+
 //					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
 //					$strOperationHaving = $field_key_having . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
 					$sSQL = $Field->source_SQL;
