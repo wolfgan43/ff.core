@@ -1175,7 +1175,7 @@ var that = { // publics
 	thousandsSeparator = thousandsSeparator === undefined ? "." : thousandsSeparator;
     nDecimalDigits = nDecimalDigits === undefined ? 2 : nDecimalDigits;
 
-    var fixed = number.toFixed(nDecimalDigits), //limit/add decimal digits
+    var fixed = parseFloat(number).toFixed(nDecimalDigits), //limit/add decimal digits
         parts = new RegExp('^(-?\\d{1,3})((?:\\d{3})+)(\\.(\\d{'+ nDecimalDigits +'}))?$').exec( fixed ); //separate begin [$1], middle [$2] and decimal digits [$4]
 
     if(parts){ //number >= 1000 || number <= -1000

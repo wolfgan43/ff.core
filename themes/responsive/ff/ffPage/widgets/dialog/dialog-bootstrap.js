@@ -304,10 +304,16 @@ __ff : true, /* used to recognize ff'objects */
      *    data.url
      *        cambia l'url del dialog su redirect interno
      */
-    if (customdata.callback)
-        customdata.callback(id, data);
-    if (data.callback)
-        eval(data.callback);
+    if (customdata.callback) {
+		customdata.callback(id, data);
+	}
+    if (data.callback) {
+    	if(data.callback.indexOf("(") < 0) {
+			eval(data.callback + "(id, data)");
+		} else {
+			eval(data.callback);
+		}
+	}
     if (data["close"]) {
         that.close(id);
 	} else if (data["url"]) {
