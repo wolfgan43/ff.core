@@ -1500,6 +1500,11 @@ tbody > tr:hover {
 
     border-bottom: 0; }
 
+.ffGrid.finance tbody > tr:last-child {
+    border-top: 4px double #ddd;
+}
+
+
 .ffGrid .draggable td:first-child {
 
     background-position: 7px 50%;
