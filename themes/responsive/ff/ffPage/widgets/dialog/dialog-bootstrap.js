@@ -25,7 +25,7 @@ ff.pluginAddInit("ff.ajax", function () {
 				(params.ctx && ff.ffPage.dialog.get(params.ctx) && ff.ffPage.dialog.getInstance(params.ctx))
 				&& (params.doredirects || data["doredirects"] !== undefined)
 			) {
-				ff.ffPage.dialog.getInstance(params.ctx).dialog("close"); 
+				ff.ffPage.dialog.close(params.ctx);
 			}
 		}
 	});
@@ -282,7 +282,7 @@ __ff : true, /* used to recognize ff'objects */
     if (data === null) {
         if (dialogs.get(id).params.params && dialogs.get(id).params.params.persistent)
             dialogs.get(id).params.params.persistent = false;
-        instance && dialogs.get(id).instance.dialog("close");
+        instance && ff.ffPage.dialog.close(id);
         return false;
     }
     

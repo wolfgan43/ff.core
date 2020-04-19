@@ -1416,10 +1416,10 @@ tbody > tr:hover {
     vertical-align: middle;
     white-space: nowrap;
 }
-.ffGrid .table td.currency {
+.ffGrid .table .currency {
   text-align: right;
 }
-.ffGrid .table td.number {
+.ffGrid .table .number {
     text-align: right;
 }
 .ffGrid .table td a.fa,
@@ -2683,6 +2683,11 @@ i.fas,
 td a.far{
     margin-right: 12px;
 }
+th i.fa,
+th i.fas {
+    margin-right: 0;
+}
+
 td a.fa:link span, td a.fa:hover span, td a.fa:visited span,
 td a.fas:link span, td a.fas:hover span, td a.fas:visited span,
 td a.far:link span, td a.far:hover span, td a.far:visited span{
@@ -2723,6 +2728,12 @@ td a.fas:link span.act-done, td a.fas:link span.act-tot{
     margin-top:5px;
 }
 
+.actions.-sticky {
+    position: fixed;
+    bottom: 15px;
+    right: 0;
+    z-index: 2;
+}
 /* KEENG */
 .ffDetails .nav-tabs, .tab-pane .col-xs-12 .nav-tabs{
     position: relative;
