@@ -1,2 +1,0 @@
-<?php
-$cm->oPage->addContent(" ");

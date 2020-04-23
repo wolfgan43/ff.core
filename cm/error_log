@@ -1,1 +1,0 @@
-[10-Apr-2019 09:51:57 Europe/Rome] PHP Fatal error:  Call to a member function getField() on null in /home/xoduslab/public_html/test/stable2018-beta/modules/catalog/contents/catalog/products.php on line 693
