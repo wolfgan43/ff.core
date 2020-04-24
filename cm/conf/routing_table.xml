@@ -119,6 +119,7 @@
         <source>^/services/getlibs$</source>
         <destination>
             <url>/cm/contents/getlibs</url>
+            <toplevel />
         </destination>
         <reverse>/services/getlibs</reverse>
     </rule>
@@ -130,8 +131,6 @@
 			<url>$0</url>
 			<content_root>/contents</content_root>
 		</destination>
-        <accept_path_info />
-
-        <!--<process_next />-->
+		<!--<process_next />-->
 	</rule>
 </ffxml>

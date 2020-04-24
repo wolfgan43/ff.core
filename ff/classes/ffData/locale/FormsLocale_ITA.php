@@ -134,9 +134,9 @@ function FormsLocale_ITA_GetCurrency($oFormsData)
 			$sign = "- ";
 
 	if ($oFormsData[0]->format_currency_showdecimals)
-		return $sign . number_format( $oFormsData[0]->value_numeric_integer + round((float) $oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 2), 2, ",", ".");
+		return $sign . number_format($oFormsData[0]->value_numeric_integer + round($oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 2), 2, ",", ".");
 	else
-		return $sign . number_format($oFormsData[0]->value_numeric_integer + round((float) $oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 2), 0, ",", ".");
+		return $sign . number_format($oFormsData[0]->value_numeric_integer + round($oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 2), 0, ",", ".");
 }
 
 function FormsLocale_ITA_GetExtCurrency($oFormsData)

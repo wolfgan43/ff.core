@@ -154,11 +154,11 @@ function ffProcessTags($haystack, $Keys, $Data, $mode = "normal", $page_params =
 			$tmp = "";
 			foreach ($Keys as $key => $value)
 			{
-				if (is_object($value) && is_subclass_of($value, "ffField_base")) {
-                    $value = $value->value->getValue(null, FF_SYSTEM_LOCALE);
-                } elseif (is_object($value) && get_class($value) == "ffData") {
-                    $value = $value->getValue(null, FF_SYSTEM_LOCALE);
-                }
+				if (is_object($value) && is_subclass_of($value, "ffField_base"))
+					$value = $value->value->getValue(null, FF_SYSTEM_LOCALE);
+				elseif (is_object($value) && get_class($value) == "ffData")
+					$value = $value->getValue(null, FF_SYSTEM_LOCALE);
+
 				if(is_array($value))
 					continue;
 					
@@ -1802,6 +1802,8 @@ function ffUpdateQueryString ($key, $value, $url = null) {
 // MANAGE FILES
 function ffCommon_manage_files(&$component, $sSQL_Where = "")
 {
+	$file_actions = array();
+	
 	$addit_SQL = array();
 	$arrFile = array();
 	foreach ($component->form_fields as $key => $FormField)
@@ -1810,6 +1812,16 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 		{
 			if ($component->form_fields[$key]->base_type == "Text")
 			{
+				$res = ffGlobals::getInstance("ff")->events->doEvent("files_preprocess", array(&$component, $component->form_fields[$key]));
+				$rc = end($res);
+				if($rc !== null)
+				{
+					if (is_array($rc))
+						$file_actions = array_merge(array_values($file_actions), array_values($rc));
+
+					continue;
+				}
+
 				$storing_path = $component->form_fields[$key]->getFilePath(false);
 				
 	            if($component->form_fields[$key]->file_full_path)
@@ -1878,19 +1890,22 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 
 						$arrFileDelValue = array_diff($arrFileOriValue, $arrFileValue);
 						
-						if(is_array($arrFileDelValue) && count($arrFileDelValue))
+						if (!$component->form_fields[$key]->file_keep_old_one)
 						{
-							foreach($arrFileDelValue AS $file_key => $file_value)
+							if(is_array($arrFileDelValue) && count($arrFileDelValue))
 							{
-								if(strlen($file_value))
+								foreach($arrFileDelValue AS $file_key => $file_value)
 								{
-									$real_file_value = (basename($file_value) ? basename($file_value) : $file_value);
-									$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["count"]++;
-									$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["del"]++;
+									if(strlen($file_value))
+									{
+										$real_file_value = (basename($file_value) ? basename($file_value) : $file_value);
+										$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["count"]++;
+										$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["del"]++;
+									}
 								}
 							}
 						}
-
+						
 						if ($component->form_fields[$key]->file_make_dir) {
 							@mkdir($storing_path, $component->form_fields[$key]->file_chmod, true);
 						}
@@ -1935,16 +1950,19 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 					}
 					elseif (!strlen($component->form_fields[$key]->getValue()) && strlen($component->form_fields[$key]->value_ori->getValue()))
 					{
-						$arrFileOriValue = explode($component->form_fields[$key]->file_separator, $component->form_fields[$key]->value_ori->getValue());
-						if(is_array($arrFileOriValue) && count($arrFileOriValue))
+						if (!$component->form_fields[$key]->file_keep_old_one)
 						{
-							foreach($arrFileOriValue AS $file_key => $file_value)
+							$arrFileOriValue = explode($component->form_fields[$key]->file_separator, $component->form_fields[$key]->value_ori->getValue());
+							if(is_array($arrFileOriValue) && count($arrFileOriValue))
 							{
-								if(strlen($file_value))
+								foreach($arrFileOriValue AS $file_key => $file_value)
 								{
-									$real_file_value = (basename($file_value) ? basename($file_value) : $file_value);
-									$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["count"]++;
-									$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["del"]++;
+									if(strlen($file_value))
+									{
+										$real_file_value = (basename($file_value) ? basename($file_value) : $file_value);
+										$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["count"]++;
+										$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["del"]++;
+									}
 								}
 							}
 						}
@@ -1959,17 +1977,20 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 
 						$arrFileDelValue = array_diff($arrFileOriValue, $arrFileValue);
 												
-						if(is_array($arrFileDelValue) && count($arrFileDelValue)) {
-							foreach($arrFileDelValue AS $file_key => $file_value) {
-								if(strlen($file_value)) {
-									$real_file_value = (basename($file_value) ? basename($file_value) : $file_value);
-									$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["count"]++;
-									$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["del"]++;
-									
-									unset($arrFileValue[$file_key]);
+						if (!$component->form_fields[$key]->file_keep_old_one)
+						{
+							if(is_array($arrFileDelValue) && count($arrFileDelValue)) {
+								foreach($arrFileDelValue AS $file_key => $file_value) {
+									if(strlen($file_value)) {
+										$real_file_value = (basename($file_value) ? basename($file_value) : $file_value);
+										$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["count"]++;
+										$arrFile[$component->form_fields[$key]->getFileFullPath($real_file_value, false)]["del"]++;
+
+										unset($arrFileValue[$file_key]);
+									}
 								}
 							}
-						}						
+						}
 						if(is_array($arrFileValue) && count($arrFileValue)) {
 							foreach($arrFileValue AS $file_key => $file_value) {	
 								if(strlen($file_value)) {
@@ -2009,11 +2030,46 @@ function ffCommon_manage_files(&$component, $sSQL_Where = "")
 		}
 	}
 	
+	if (count($file_actions))
+		ffCommon_files_execute($component, $file_actions);
+	
 	if(is_array($addit_SQL) && count($addit_SQL))
 	{
 		foreach($addit_SQL AS $addit_SQL_value)
 		{
 			$component->db[0]->execute($addit_SQL_value);
+		}
+	}
+}
+
+function ffCommon_files_execute(&$comp, $file_actions)
+{
+	// EXECUTE FILES ACTIONS
+	foreach ($file_actions as $file_action)
+	{
+		switch ($file_action["type"])
+		{
+			case "move":
+				$key = $file_action["field"];
+
+				if ($comp->form_fields[$key]->file_make_dir)
+					@mkdir(ffCommon_dirname($file_action["dest"]), $comp->form_fields[$key]->file_chmod, true);
+
+				@rename(
+						$file_action["src"]
+						, $file_action["dest"]
+					);
+
+				if (!is_file($file_action["dest"]))
+					ffErrorHandler::raise("UPLOAD ERROR: " . $tmp_filename, E_USER_ERROR, $comp, get_defined_vars());
+
+				@chmod($file_action["dest"], 0777);
+				ffGlobals::getInstance("ff")->events->doEvent("file_upload", array($file_action["dest"], false, &$comp, $comp->form_fields[$key]));
+				break;
+
+			case "delete":
+				@unlink($file_action["file"]);
+				break;
 		}
 	}
 }
@@ -2327,4 +2383,131 @@ function ffArrIsset()
 
 function ffCommon_start_abs_path($n = 1) {
     return substr(FF_DISK_PATH, 0, $n);
+}
+
+function ffMimeType($file, $fake_filename = null, $default = "text/plain")
+{
+	$mimetype = ffMimeContentType($file, $default);
+	
+	if ($mimetype == "text/plain" || $mimetype == "application/x-empty" || !strlen($mimetype))
+	{
+		if ($fake_filename !== null)
+			$mimetype = ffMimeTypeByFilename($fake_filename, $default);
+		if ($mimetype == "text/plain" || !strlen($mimetype))
+			$mimetype = ffMimeTypeByFilename($file, $default);
+	}
+	
+	if (strlen($mimetype))
+		return $mimetype;
+    else
+		return $default;
+}
+
+function ffMimeContentType($filename, $default = "text/plain")
+{
+    if (!strlen($filename))
+		ffErrorHandler::raise("ffMimeContentType invoked without file..", E_USER_ERROR, null, get_defined_vars());
+		
+	if (class_exists("finfo"))
+	{
+		$result = new finfo();
+		$mimetype = $result->file($filename, FILEINFO_MIME_TYPE);
+	}
+	else if (function_exists("mime_content_type"))
+	{
+		$mimetype = mime_content_type($filename);
+	}
+
+    if ($mimetype == "text/plain" || !strlen($mimetype))
+    {
+        $s = file_get_contents($filename, null, null, null, 3);
+        if (bin2hex(substr($s, 0, 2)) == '1f8b' ) { $mimetype = "gzip"; }
+        if (substr($s, 0, 3) == 'BZh'){ $mimetype = "bzip2"; } 
+    }
+
+	if (strlen($mimetype))
+		return $mimetype;
+    else
+		return $default;
+}
+
+function ffMimeTypeByFilename($filename, $default = "text/plain")
+{
+	$extension = (($extension = pathinfo($filename, PATHINFO_EXTENSION)) === "" ? null : $extension);
+	if ($extension !== null)
+		return ffMimeTypeByExtension($extension, $default);
+	else
+		return $default;
+}
+
+function ffMimeTypeByExtension($extension, $default = "text/plain")
+{
+	global $ffMimeTypes;
+	
+	$extension = strtolower($extension);
+	if (isset($ffMimeTypes[$extension]))
+		return $ffMimeTypes[$extension];
+	else
+		return $default;
+}
+
+function ffExtensionByMimeType($type, $default = null)
+{
+	global $ffMimeTypes;
+	
+	$count_mime = array_count_values($ffMimeTypes);
+	if ($count_mime[$type] == 1)
+	{
+		return array_search($type, $ffMimeTypes);
+	}
+	return $default;
+}
+
+function ffCommon_files_set_value(&$comp, $key, &$tmpval)
+{
+	$res = ffGlobals::getInstance("ff")->events->doEvent("files_set_value", array(&$comp, $comp->form_fields[$key], $tmpval));
+	$rc = end($res);
+	if($rc !== null)
+	{
+		$tmpval->setValue($rc);
+		return;
+	}
+	
+	/*if ($comp->form_fields[$key]->base_type == "Text")
+	{*/
+		if ($comp->form_fields[$key]->file_multi) // like uploadifive // TODO: default value to be included
+		{
+			$final_value = array();
+
+			// process saved
+			if (strlen($tmpval->getValue()))
+			{
+				$final_value = array_flip(explode(",", $tmpval->getValue()));
+			}
+
+			// process temp
+			if (strlen($comp->form_fields[$key]->file_tmpname))
+			{
+				$tmp_names = explode(",", $comp->form_fields[$key]->file_tmpname);
+				foreach ($tmp_names as $file)
+				{
+					if (strpos($file, "|") !== false)
+					{
+						$tmp = explode("|", $file);
+						$final_value[$tmp[0]] = true;
+					}
+					else
+						$final_value[$file] = true;
+				}
+			}
+
+			if (count($final_value))
+				$tmpval->setValue(implode(",", array_keys($final_value)));
+			else
+				$tmpval->setValue("");
+		}
+	/*}
+	else if ($comp->form_fields[$key]->base_type == "Binary")
+	{
+	}*/
 }

@@ -1,5 +1,5 @@
 <?php
-define("CM_LOCAL_APP_NAME", "not_set");
+define("CM_LOCAL_APP_NAME", "DEV");
 if(CM_LOCAL_APP_NAME == "not_set"){
     die("Inserisci CM_LOCAL_APP_NAME in /conf/cm/config.php");
 }

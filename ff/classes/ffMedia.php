@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VGallery: CMS based on FormsFramework
  * Copyright (C) 2004-2015 Alessandro Stucchi <wolfgan@gmail.com>
@@ -1284,6 +1285,7 @@ class ffMedia {
 
     public function setPathInfo($pathinfo = null) {
         if($pathinfo) {
+			$pathinfo = explode("?", $pathinfo)[0];
             $this->pathinfo                                         = pathinfo($pathinfo);
             $this->pathinfo["orig"]                                 = $pathinfo;
 

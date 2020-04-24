@@ -234,7 +234,7 @@ abstract class ffPageNavigator_base extends ffCommon
 	 * I frame suddividono le pagine in gruppi, servono ad evitare di avere un menù di navigazione troppo largo
 	 * @var Boolean
 	 */
-	var $with_frames			= false;
+	var $with_frames			= true;
 
 	/**
 	 * Abilita / Disabilita l'utilizzo dei pulsanti per andare al frame precedente / successivo;
@@ -252,7 +252,7 @@ abstract class ffPageNavigator_base extends ffCommon
 	 * Abilita la visualizzazione del numero totale di record
 	 * @var Boolean
 	 */
-	var $with_totelem 			= true;
+	var $with_totelem 			= false;
 
 	/**
 	 * Abilita la possibilità di selezionare il numero di record per pagina

@@ -10,6 +10,9 @@
  * @link http://www.formsphpframework.com
  */
 
+set_time_limit(30);
+ini_set("max_execution_time", 30);
+
 // init framework..
 //if (!defined("FF_MAIN_INIT"))
 //{

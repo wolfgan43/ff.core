@@ -1144,7 +1144,7 @@ abstract class ffGrid_base extends ffCommon
 				$tmp_field .= "`" . $tmp_alpha_cont[$this->alpha_field]->src_table . "`.";
 
 			$tmp_field .=  "`" . $tmp_alpha_cont[$this->alpha_field]->get_data_source(false) . "`";
-            $tmp_sql = "";
+
 			switch ($this->alpha)
 			{
 				case "cipher":

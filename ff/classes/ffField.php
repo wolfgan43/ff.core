@@ -666,6 +666,8 @@ abstract class ffField_base extends ffCommon
     var $file_thumb = array("width" => 100
     						, "height" => 100
     					);
+	
+	var $file_keep_old_one = false;
     	
 	//  multi selection (combo, lists, groups)
 
@@ -1100,7 +1102,7 @@ abstract class ffField_base extends ffCommon
 	var $resources_get = array();
 
 	abstract public function tplLoad($control_type);
-	abstract public function tplParse($output_result);
+	abstract public function tplParse($output_result, $id);
 	abstract public function getTemplateFile($control_type);
 
 	// ---------------------------------------------------------------
@@ -1313,7 +1315,7 @@ abstract class ffField_base extends ffCommon
 		$pp = $this->getParentPage();
 		
 		// invoke method from ffPage
-		$pp->widgetLoad($this->widget, $pp->getThemeDir() . "/ff/ffField/widgets", $this);
+		$pp->widgetLoad($this->widget, $pp->getThemeDir() . "/ff/ffField/widgets", $this, $this->widget_options);
 		if (method_exists($pp->widgets[$this->widget], "init"))
 			$pp->widgets[$this->widget]->init(array(&$this));
 
@@ -1402,7 +1404,7 @@ abstract class ffField_base extends ffCommon
 				break;
 		}
 
-		return $this->tplParse($output_result);
+		return $this->tplParse($output_result, $id);
 	}
 
 	function getTemplateDir($control_type)
@@ -1497,6 +1499,86 @@ abstract class ffField_base extends ffCommon
 			return $file_path;
 	}
 	
+	function fileGetPaths()
+	{
+		$out = array(
+			"temp" => array(),
+			"saved" => array()
+		);
+		
+		for ($i = 0; $i < 2; $i++)
+		{
+			if ($i == 0)
+			{
+				$view_url				= ($this->file_temp_view_url ? $this->file_temp_view_url : $this->file_saved_view_url);
+				$view_query_string		= ($this->file_temp_view_query_string ? $this->file_temp_view_query_string : 
+						($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string)
+					);
+
+				$preview_url			= ($this->file_temp_preview_url ? $this->file_temp_preview_url : $this->file_saved_preview_url);
+				$preview_query_string	= ($this->file_temp_preview_query_string ? $this->file_temp_preview_query_string : 
+						($this->file_saved_preview_query_string ? $this->file_saved_preview_query_string : $this->file_query_string)
+					);
+
+			}
+			else
+			{
+				$view_url				= $this->file_saved_view_url;
+				$view_query_string		= ($this->file_saved_view_query_string ? $this->file_saved_view_query_string : $this->file_query_string);
+
+				$preview_url			= $this->file_saved_preview_url;
+				$preview_query_string	= ($this->file_saved_preview_query_string ? $this->file_saved_preview_query_string : $this->file_query_string);
+			}
+			
+			$view_url = ffProcessTags($view_url, $this->getKeysArray(), $this->getDataArray(), "normal", $this->parent_page[0]->get_params(), rawurlencode($_SERVER['REQUEST_URI']), $this->parent_page[0]->get_globals());
+			$view_query_string = ffProcessTags($view_query_string, $this->getKeysArray(), $this->getDataArray(), "normal", $this->parent_page[0]->get_params(), rawurlencode($_SERVER['REQUEST_URI']), $this->parent_page[0]->get_globals());
+
+			$preview_url = ffProcessTags($preview_url, $this->getKeysArray(), $this->getDataArray(), "normal", $this->parent_page[0]->get_params(), rawurlencode($_SERVER['REQUEST_URI']), $this->parent_page[0]->get_globals());
+			$preview_query_string = ffProcessTags($preview_query_string, $this->getKeysArray(), $this->getDataArray(), "normal", $this->parent_page[0]->get_params(), rawurlencode($_SERVER['REQUEST_URI']), $this->parent_page[0]->get_globals());
+
+			if (strlen($view_query_string) && strpos($view_query_string, "?") !== 0)
+				$view_query_string = "?" . $view_query_string;
+			if (strlen($preview_query_string) && strpos($preview_query_string, "?") !== 0)
+				$preview_query_string = "?" . $preview_query_string;
+
+			if (count($this->parent) && is_subclass_of($this->parent[0], "ffDetails_base"))
+			{
+				foreach ($this->parent[0]->fields_relationship as $key => $value)
+				{
+					$view_url = str_replace("[" . $value . "_FATHER]", $this->parent[0]->main_record[0]->key_fields[$value]->value->getValue($this->parent[0]->main_record[0]->key_fields[$value]->base_type, FF_SYSTEM_LOCALE), $view_url);
+					$preview_url = str_replace("[" . $value . "_FATHER]", $this->parent[0]->main_record[0]->key_fields[$value]->value->getValue($this->parent[0]->main_record[0]->key_fields[$value]->base_type, FF_SYSTEM_LOCALE), $preview_url);
+				}
+				reset ($this->parent[0]->fields_relationship);
+				foreach ($this->parent[0]->main_record[0]->form_fields as $el_key => $el_value)
+				{
+					if ($this->parent[0]->main_record[0]->form_fields[$el_key]->multi_fields === null)
+					{
+						$view_url = str_replace("[" . $el_key . "_FATHER]", $this->parent[0]->main_record[0]->form_fields[$el_key]->value->getValue($this->parent[0]->main_record[0]->form_fields[$el_key]->base_type, FF_SYSTEM_LOCALE), $view_url);
+						$preview_url = str_replace("[" . $el_key . "_FATHER]", $this->parent[0]->main_record[0]->form_fields[$el_key]->value->getValue($this->parent[0]->main_record[0]->form_fields[$el_key]->base_type, FF_SYSTEM_LOCALE), $preview_url);
+					}
+				}
+				reset ($this->parent[0]->main_record[0]->form_fields);
+			}
+			
+			if ($i == 0)
+			{
+				$out["temp"] = array(
+					"view" => $view_url . $view_query_string,
+					"preview" => $preview_url . $preview_query_string
+				);
+			}
+			else
+			{
+				$out["saved"] = array(
+					"view" => $view_url . $view_query_string,
+					"preview" => $preview_url . $preview_query_string
+				);
+			}
+		}
+		
+		return $out;
+	}
+
     // by Alex
 	function fileNormalize($path)
 	{
@@ -1671,10 +1753,6 @@ abstract class ffField_base extends ffCommon
 						$tmp_value = $this->get_encoded($this->recordset[$tmp_key[0]][1]->getValue($data_type, $locale));
 				}
 			}
-
-            // EVENT HANDLER
-            $this->doEvent("on_display_value", array(&$tmp_value, $this));
-
 			return $tmp_value;
 		}
 		else

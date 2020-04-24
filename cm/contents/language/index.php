@@ -31,12 +31,14 @@ $oGrid->title = "Lingue";
 $oGrid->source_SQL = "SELECT ff_languages.*
                       FROM ff_languages  
                       [WHERE]
+                      [HAVING]
                        [ORDER]";
 $oGrid->order_default = "description";
 $oGrid->record_url = $cm->oPage->site_path . $cm->oPage->page_path . "/modify";
 $oGrid->record_id = "LanguageModify";
 $oGrid->addEvent("on_before_parse_row", "Lang_on_before_parse_row");
 $oGrid->resources[] = $oGrid->record_id;
+$oGrid->use_paging = false;
 
 // Campo chiave
 $oField = ffField::factory($cm->oPage);
@@ -47,7 +49,7 @@ $oGrid->addKeyField($oField);
 // Campi visualizzazione
 $oField = ffField::factory($cm->oPage);
 $oField->id = "description";
-$oField->order_dir = "DESC";
+$oField->order_dir = "ASC";
 $oField->label = "Lingua";
 $oGrid->addContent($oField);
 

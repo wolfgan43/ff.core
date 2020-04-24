@@ -2163,6 +2163,7 @@ abstract class ffDetails_base extends ffCommon
 			if ($this->form_fields[$key]->extended_type == "File")
 			{
 				$this->form_fields[$key]->file_tmpname = $this->recordset_files[$row][$key]["tmpname"];
+				ffCommon_files_set_value($this, $key, $this->recordset[$row][$key]);
                 if($this->form_fields[$key]->file_full_path) {
                     if (
                         substr(strtolower($this->recordset[$row][$key]->getValue()), 0, 7) != "http://"
@@ -2397,6 +2398,7 @@ abstract class ffDetails_base extends ffCommon
             if ($this->form_fields[$key]->extended_type == "File")
             {
                 $this->form_fields[$key]->file_tmpname = $this->recordset_files[$row][$key]["tmpname"];
+				ffCommon_files_set_value($this, $key, $this->recordset[$row][$key]);
                 if($this->form_fields[$key]->file_full_path) {
                     if (
                         substr(strtolower($this->recordset[$row][$key]->getValue()), 0, 7) != "http://"

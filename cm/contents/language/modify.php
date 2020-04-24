@@ -17,7 +17,7 @@ if(isset($_REQUEST["frmAction"]) && isset($_REQUEST["setstatus"])) {
 
 $oRecord = ffRecord::factory($cm->oPage);
 $oRecord->id = "LanguageModify";
-$oRecord->resources[] = "LanguageModifyo";
+$oRecord->resources[] = "LanguageModify";
 $cm->oPage->title = "Lingua";
 $oRecord->src_table = "ff_languages";
 

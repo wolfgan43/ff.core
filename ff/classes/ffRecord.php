@@ -873,7 +873,7 @@ abstract class ffRecord_base extends ffCommon
 					// Build WHERE For RECORD operation
 					if (strlen($this->sWhere))
 						$this->sWhere .= " AND ";
-					$this->sWhere .= " `" . $this->key_fields[$key]->get_data_source() . "` = " . $this->db[0]->toSql($this->key_fields[$key]->value, $this->key_fields[$key]->base_type);
+					$this->sWhere .= " " . $this->key_fields[$key]->get_data_source() . " = " . $this->db[0]->toSql($this->key_fields[$key]->value, $this->key_fields[$key]->base_type);
 				}
 			}
 			reset ($this->key_fields);
@@ -926,6 +926,16 @@ abstract class ffRecord_base extends ffCommon
 				{
 					foreach ($this->form_fields as $key => $value)
 					{
+						$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
 						switch ($this->form_fields[$key]->data_type)
 						{
 							case "db":
@@ -983,6 +993,16 @@ abstract class ffRecord_base extends ffCommon
 						}
 						elseif (!isset($this->key_fields[$key]) && $this->form_fields[$key]->value_ori->getValue() === null) // ori values of key fields are retrieved before
 							$this->form_fields[$key]->value_ori = clone $this->form_fields[$key]->value;
+						
+						$res = ffRecord::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
 					}
 					reset($this->form_fields);
 				}
@@ -1009,6 +1029,16 @@ abstract class ffRecord_base extends ffCommon
 				{
 					foreach ($this->form_fields as $key => $FormField)
 					{
+						$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;						
+						
 						if (!($this->form_fields[$key]->extended_type == "Password" || (strlen($this->form_fields[$key]->compare) && !strlen($this->form_fields[$key]->data_source)))) // Password must not stored on the form
 						{
 							// value retrivied in db format (the default)
@@ -1062,6 +1092,16 @@ abstract class ffRecord_base extends ffCommon
 							elseif (!isset($this->key_fields[$key]) && $this->form_fields[$key]->value_ori->getValue() === null) // ori values of key fields are retrieved before
 								$this->form_fields[$key]->value_ori = clone $this->form_fields[$key]->value;
 						}
+						
+						$res = ffRecord::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
 					}
 					reset($this->form_fields);
 				}
@@ -1097,12 +1137,42 @@ abstract class ffRecord_base extends ffCommon
 				{
 					foreach ($this->key_fields as $key => $value)
 					{
+						$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
 						$this->key_fields[$key]->value = $this->key_fields[$key]->getDefault(array(&$this));
+						
+						$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
 					}
 					reset($this->key_fields);
 
-					foreach ($this->form_fields as $subkey => $subvalue)
+					foreach ($this->form_fields as $key => $subvalue)
 					{
+						$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
 						if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 						{
 							foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
@@ -1124,6 +1194,16 @@ abstract class ffRecord_base extends ffCommon
 							else
 								$this->form_fields[$key]->value = $this->form_fields[$key]->getDefault(array(&$this));
 						}
+						
+						$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default"));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
 					}
 					reset($this->form_fields);
 
@@ -1135,12 +1215,42 @@ abstract class ffRecord_base extends ffCommon
 					{
 						foreach ($this->key_fields as $key => $value)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+						
 							$this->key_fields[$key]->value = $this->key_fields[$key]->getDefault(array(&$this));
+							
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->key_fields);
 
 						foreach ($this->form_fields as $key => $value)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+						
 							if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 							{
 								foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
@@ -1170,6 +1280,16 @@ abstract class ffRecord_base extends ffCommon
 							}
 							else
 								$this->form_fields[$key]->value = $this->form_fields[$key]->getDefault(array(&$this));
+							
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default"));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->form_fields);
 					}
@@ -1194,6 +1314,16 @@ abstract class ffRecord_base extends ffCommon
 			{
 				foreach ($this->form_fields as $key => $FormField)
 				{
+					$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default"));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default"));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+						
 					if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 					{
 						foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
@@ -1210,6 +1340,16 @@ abstract class ffRecord_base extends ffCommon
 					}
 					else
 						$this->form_fields[$key]->value = $this->form_fields[$key]->getDefault(array(&$this));
+					
+					$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default"));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default"));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
 				}
 				reset($this->form_fields);
 			}
@@ -1218,6 +1358,16 @@ abstract class ffRecord_base extends ffCommon
 		{ // retrieve fields from Form
 			foreach ($this->form_fields as $key => $FormField)
 			{
+				$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "form"));
+				$rc = end($res);
+				if($rc !== null)
+				   continue;
+
+				$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "form"));
+				$rc = end($res);
+				if($rc !== null)
+				   continue;
+				
 				if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 				{
 					$element_data_ori = $this->parent[0]->retrieve_param($this->id, $key . "_ori");
@@ -1260,81 +1410,106 @@ abstract class ffRecord_base extends ffCommon
 						break;
 						
 					case "File":
-						$file_array 								= $this->parent[0]->retrieve_param($this->id, $this->form_fields[$key]->id . "_file");
+						$this->form_fields[$key]->value->setValue($this->parent[0]->retrieve_param($this->id, $this->form_fields[$key]->id . "_name"));
 						$this->form_fields[$key]->file_tmpname 		= $this->parent[0]->retrieve_param($this->id, $this->form_fields[$key]->id . "_tmpname");
-						if ($this->parent[0]->retrieve_param($this->id, $this->form_fields[$key]->id . "_delete") == "delete")
+						
+						$res = self::doEvent("retrieve_field_file", array(&$this, $this->form_fields[$key]));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						$res = $this->doEvent("retrieve_field_file", array(&$this, $this->form_fields[$key]));
+						$rc = end($res);
+						if($rc !== null)
+						   continue;
+						
+						if (!$this->form_fields[$key]->file_multi)
 						{
-							if (strlen($this->form_fields[$key]->file_tmpname))
-								@unlink($this->form_fields[$key]->getFileFullPath($this->form_fields[$key]->file_tmpname));
-							
-							$this->form_fields[$key]->setValue("");
-							$this->form_fields[$key]->file_tmpname = "";
-						}
-						elseif (
-								$this->parent[0]->isset_param($this->id, $this->form_fields[$key]->id . "_file")
-								&& is_array($file_array) && isset($file_array["tmp_name"]) && strlen($file_array["tmp_name"])
-							)
-						{
-							/*if (
-									is_array($this->form_fields[$key]->file_allowed_mime) && count($this->form_fields[$key]->file_allowed_mime)
-									&& array_search(mime_content_type($file_array["name"]), $this->form_fields[$key]->file_allowed_mime) === false
-								)
-								{
-									$this->strError .= "<br />Tipo di file errato per il campo " . $this->form_fields[$key]->label;
-								}
-							else*/
-							if (!$this->form_fields[$key]->file_max_size ||
-									($this->form_fields[$key]->file_max_size && $file_array["size"] <= $this->form_fields[$key]->file_max_size)
-								)
+							$file_array 								= $this->parent[0]->retrieve_param($this->id, $this->form_fields[$key]->id . "_file");
+							if ($this->parent[0]->retrieve_param($this->id, $this->form_fields[$key]->id . "_delete") == "delete")
 							{
-								if($this->form_fields[$key]->file_normalize) { 
-									$file_ext = pathinfo($file_array['name'], PATHINFO_EXTENSION); 
-									$file_basename = $file_array['name'];
-									if($file_ext)
-									    $file_array['name'] = ffCommon_url_rewrite(substr($file_basename, 0, strrpos($file_basename, "." . $file_ext))) . "." . $file_ext;
-									else
-									    $file_array['name'] = ffCommon_url_rewrite($file_basename) . "." . $file_ext;
-								}
-
 								if (strlen($this->form_fields[$key]->file_tmpname))
 									@unlink($this->form_fields[$key]->getFileFullPath($this->form_fields[$key]->file_tmpname));
 
-								if ($this->form_fields[$key]->file_avoid_temporary)
-									$tmp_name = $file_array['name'];
-								else
-									$tmp_name = "tmp_" . date("YmdHms") . "_" . uniqid(rand(), true) . "_" . $file_array['name'];
-
-								if ($this->form_fields[$key]->file_make_temp_dir)
-									@mkdir($this->form_fields[$key]->getFilePath(), $this->form_fields[$key]->file_chmod, true);
-
-								$tmp_filename = $this->form_fields[$key]->getFileFullPath($tmp_name);
-								move_uploaded_file($file_array['tmp_name'], $tmp_filename);
-								@chmod($tmp_filename, $this->form_fields[$key]->file_chmod);
-
-								if($this->form_fields[$key]->file_full_path) {
-                                    if (
-                                        substr(strtolower($this->form_fields[$key]->value->getValue()), 0, 7) != "http://"
-                                        && substr(strtolower($this->form_fields[$key]->value->getValue()), 0, 8) != "https://"
-                                        && substr($this->form_fields[$key]->value->getValue(), 0, 2) != "//"
-                                    ) {
-										$tmp_filename = str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileFullPath($tmp_name));
-									    if (file_exists($tmp_filename))
-										    $this->form_fields[$key]->value->setValue($tmp_filename);
-                                    }
-								} else 
-									$this->form_fields[$key]->value->setValue($file_array['name']);
-
-								$this->form_fields[$key]->file_tmpname = $tmp_name;
+								$this->form_fields[$key]->setValue("");
+								$this->form_fields[$key]->file_tmpname = "";
 							}
-							else
+							elseif (
+									$this->parent[0]->isset_param($this->id, $this->form_fields[$key]->id . "_file")
+									&& is_array($file_array) && isset($file_array["tmp_name"]) && strlen($file_array["tmp_name"])
+								)
 							{
-								$this->strError .= "<br />&Egrave; stato superato il limite di upload per il campo " . $this->form_fields[$key]->label;
+								/*if (
+										is_array($this->form_fields[$key]->file_allowed_mime) && count($this->form_fields[$key]->file_allowed_mime)
+										&& array_search(mime_content_type($file_array["name"]), $this->form_fields[$key]->file_allowed_mime) === false
+									)
+									{
+										$this->strError .= "<br />Tipo di file errato per il campo " . $this->form_fields[$key]->label;
+									}
+								else*/
+								if (!$this->form_fields[$key]->file_max_size ||
+										($this->form_fields[$key]->file_max_size && $file_array["size"] <= $this->form_fields[$key]->file_max_size)
+									)
+								{
+									if($this->form_fields[$key]->file_normalize) { 
+										$file_ext = pathinfo($file_array['name'], PATHINFO_EXTENSION); 
+										$file_basename = $file_array['name'];
+										if($file_ext)
+											$file_array['name'] = ffCommon_url_rewrite(substr($file_basename, 0, strrpos($file_basename, "." . $file_ext))) . "." . $file_ext;
+										else
+											$file_array['name'] = ffCommon_url_rewrite($file_basename) . "." . $file_ext;
+									}
+
+									if (strlen($this->form_fields[$key]->file_tmpname))
+										@unlink($this->form_fields[$key]->getFileFullPath($this->form_fields[$key]->file_tmpname));
+
+									if ($this->form_fields[$key]->file_avoid_temporary)
+										$tmp_name = $file_array['name'];
+									else
+										$tmp_name = "tmp_" . date("YmdHms") . "_" . uniqid(rand(), true) . "_" . $file_array['name'];
+
+									if ($this->form_fields[$key]->file_make_temp_dir)
+										@mkdir($this->form_fields[$key]->getFilePath(), $this->form_fields[$key]->file_chmod, true);
+
+									$tmp_filename = $this->form_fields[$key]->getFileFullPath($tmp_name);
+									move_uploaded_file($file_array['tmp_name'], $tmp_filename);
+									@chmod($tmp_filename, $this->form_fields[$key]->file_chmod);
+
+									if($this->form_fields[$key]->file_full_path) {
+										if (
+											substr(strtolower($this->form_fields[$key]->value->getValue()), 0, 7) != "http://"
+											&& substr(strtolower($this->form_fields[$key]->value->getValue()), 0, 8) != "https://"
+											&& substr($this->form_fields[$key]->value->getValue(), 0, 2) != "//"
+										) {
+											$tmp_filename = str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileFullPath($tmp_name));
+											if (file_exists($tmp_filename))
+												$this->form_fields[$key]->value->setValue($tmp_filename);
+										}
+									} else 
+										$this->form_fields[$key]->value->setValue($file_array['name']);
+
+									$this->form_fields[$key]->file_tmpname = $tmp_name;
+								}
+								else
+								{
+									$this->strError .= "<br />&Egrave; stato superato il limite di upload per il campo " . $this->form_fields[$key]->label;
+								}
 							}
-                        }
+						}
 						break;
 
 					default:
 				}
+				
+				$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "form"));
+				$rc = end($res);
+				if($rc !== null)
+				   continue;
+
+				$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "form"));
+				$rc = end($res);
+				if($rc !== null)
+				   continue;
 			}
 			reset($this->form_fields);
 		}
@@ -1594,7 +1769,7 @@ abstract class ffRecord_base extends ffCommon
 						$need_key_check = true;
 						if (strlen($tmp_where))
 							$tmp_where .= " AND ";
-						$tmp_where .= " `" . $this->form_fields[$key]->get_data_source() . "` = " . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type);
+						$tmp_where .= " " . $key . " = " . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type);
 					}
 					
 					// required or not
@@ -1801,21 +1976,27 @@ abstract class ffRecord_base extends ffCommon
                                     $values .= ", ";
 
                                 $tmp_type = $this->form_fields[$key]->base_type;
+								$tmpval = clone $this->form_fields[$key]->value;
 
+								if ($this->form_fields[$key]->extended_type === "File")
+								{
+									ffCommon_files_set_value($this, $key, $tmpval);
+								}
+							
                                 if ($this->form_fields[$key]->crypt_method !== null)
                                 {
                                     switch ($this->form_fields[$key]->crypt_method)
                                     {
                                         case "MD5":
-                                            $tmpval = new ffData(md5($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                            $tmpval = new ffData(md5($tmpval->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
                                             $tmp_type = "Text";
                                             break;
                                         case "mysql_password":
-                                            $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+                                            $tmpval = "PASSWORD(" . $this->db[0]->toSql($tmpval, $this->form_fields[$key]->base_type) . ")";
                                             $processed_sql_value = true;
                                             break;
                                         case "mysql_oldpassword":
-                                            $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+                                            $tmpval = new ffData($this->db[0]->mysqlOldPassword($tmpval->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
                                             $tmp_type = "Text";
                                             break;
                                         default:
@@ -1826,14 +2007,12 @@ abstract class ffRecord_base extends ffCommon
                                 {
                                     if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
                                     {
-                                        $tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
+                                        $tmpval = $tmpval->getValue(null, FF_SYSTEM_LOCALE);
                                         $tmpval = mod_sec_crypt_string($tmpval);
                                         $tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
                                         $processed_sql_value = true;
                                     }
                                 }
-                                else
-                                    $tmpval = $this->form_fields[$key]->value;
 
                                  $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
                                  $rc = end($res);
@@ -1934,9 +2113,6 @@ abstract class ffRecord_base extends ffCommon
 				if (!$this->allow_update)
 					$this->redirect($this->parent[0]->ret_url);
 
-				// MANAGE FILES
-				ffCommon_manage_files($this);
-
 				if($this->src_table) {
                     $fields = "";
                     foreach ($this->form_fields as $key => $FormField)
@@ -1973,21 +2149,27 @@ abstract class ffRecord_base extends ffCommon
                                     $fields .= ", ";
 
                                 $tmp_type = $this->form_fields[$key]->base_type;
+								$tmpval = clone $this->form_fields[$key]->value;
+
+								if ($this->form_fields[$key]->extended_type == "File")
+								{
+									ffCommon_files_set_value($this, $key, $tmpval);
+								}
 
                                 if ($this->form_fields[$key]->crypt_method !== null)
                                 {
                                     switch ($this->form_fields[$key]->crypt_method)
                                     {
                                         case "MD5":
-                                            $tmpval = new ffData(md5($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+											$tmpval = new ffData(md5($tmpval->getValue($tmp_type, FF_SYSTEM_LOCALE)));
                                             $tmp_type = "Text";
                                             break;
                                         case "mysql_password":
-                                            $tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type) . ")";
+											$tmpval = "PASSWORD(" . $this->db[0]->toSql($this->form_fields[$key]->value, $tmp_type) . ")";
                                             $processed_sql_value = true;
                                             break;
                                         case "mysql_oldpassword":
-                                            $tmpval = new ffData($this->db[0]->mysqlOldPassword($this->form_fields[$key]->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE)));
+											$tmpval = new ffData($this->db[0]->mysqlOldPassword($tmpval->getValue($tmp_type, FF_SYSTEM_LOCALE)));
                                             $tmp_type = "Text";
                                             break;
                                         default:
@@ -1998,24 +2180,22 @@ abstract class ffRecord_base extends ffCommon
                                 {
                                     if (MOD_SEC_CRYPT && $this->form_fields[$key]->crypt_modsec)
                                     {
-                                        $tmpval = $this->form_fields[$key]->value->getValue(null, FF_SYSTEM_LOCALE);
+                                        $tmpval = $tmpval->getValue(null, FF_SYSTEM_LOCALE);
                                         $tmpval = mod_sec_crypt_string($tmpval);
                                         $tmpval = "UNHEX(" . $this->db[0]->toSql(bin2hex($tmpval)) . ")";
                                         $processed_sql_value = true;
                                         $tmp_type = "Text";
                                     }
                                 }
-                                else
-                                    $tmpval = $this->form_fields[$key]->value;
 
-                                 $res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
-                                 $rc = end($res);
-                                 if ($rc !== null)
-                                 {
-                                     $tmpval = $rc;
-                                     $processed_sql_value = false;
-                                     $tmp_type = $this->form_fields[$key]->base_type;
-                                 }
+								$res = $this->form_fields[$key]->doEvent("on_store_in_db", array(&$this, &$this->form_fields[$key]));
+								$rc = end($res);
+								if ($rc !== null)
+								{
+									$tmpval = $rc;
+									$processed_sql_value = false;
+									$tmp_type = $this->form_fields[$key]->base_type;
+								}
 
                                 $fields .= "`" . $this->src_table . "`.`" . $this->form_fields[$key]->get_data_source(false) . "`"
                                             . " = "
@@ -2058,6 +2238,9 @@ abstract class ffRecord_base extends ffCommon
                             $this->db[0]->execute($sSQL);
                     }
                 }
+				
+				ffCommon_manage_files($this);
+				
 				$rc = false;
 				
 				$res = $this->doEvent("on_done_record_action", array($this, $this->frmAction));

@@ -260,7 +260,7 @@ class BounceMailHandler {
       $this->moveHard = false;
     }
     $port = $this->port . '/' . $this->service . '/' . $this->service_option;
-    set_time_limit(6000);
+    //set_time_limit(6000);
     if (!$this->testmode) {
       $this->_mailbox_link = imap_open("{".$this->mailhost.":".$port."}" . $this->boxname,$this->mailbox_username,$this->mailbox_password,CL_EXPUNGE);
     } else {
@@ -282,7 +282,7 @@ class BounceMailHandler {
    * @return boolean
    */
   function openLocal($file_path) {
-    set_time_limit(6000);
+    //set_time_limit(6000);
     if (!$this->testmode) {
       $this->_mailbox_link = imap_open("$file_path",'','',CL_EXPUNGE);
     } else {

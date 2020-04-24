@@ -420,7 +420,7 @@ abstract class ffPage_base extends ffCommon
                             $ref = $this;
                         else
                             $ref = $content;
-                        $this->widgetLoad($value["name"], $value["path"], $ref);
+                        $this->widgetLoad($value["name"], $value["path"], $ref, $value["options"]);
                     }
                     reset($content->widget_deps);
                 }
@@ -1012,10 +1012,13 @@ abstract class ffPage_base extends ffCommon
      * @param String $path il percorso della widget,
      * @param <type> $ref parametro di riferimento per l'evento di caricamento
      */
-    function widgetLoad($name, $path = null, &$ref = null)
+    function widgetLoad($name, $path = null, &$ref = null, $options = null)
     {
         if (isset($this->widgets[$name]))
+		{
+			$this->widgets[$name]->pre_process($ref, $options);
             return false;
+		}
 
         $source_path 	= null;
 
@@ -1043,11 +1046,12 @@ abstract class ffPage_base extends ffCommon
         $temp = new $widget_name($this, $source_path);
 
         $this->widgets[$name] = $temp;
+		$this->widgets[$name]->pre_process($ref, $options);
         if (is_array($this->widgets[$name]->widget_deps) && count($this->widgets[$name]->widget_deps))
         {
             foreach ($this->widgets[$name]->widget_deps as $key => $value)
             {
-                $this->widgetLoad($value["name"], $value["path"], $value["ref"]);
+                $this->widgetLoad($value["name"], $value["path"], $value["ref"], $value["options"]);
             }
             reset($this->widgets[$name]->widget_deps);
         }
