@@ -666,7 +666,7 @@ __ff : true, // used to recognize ff'objects
 				return;
 			}
 
-			top.location.href = ff.urlAddParam(data["url"], "ret_url=" + encodeURIComponent(top.location.href.replace(top.location.protocol + "//" + top.location.host, "")));
+			top.location.href = data["url"];
 			return true;
 		}
 

@@ -339,17 +339,35 @@ Released under the UploadiFive Standard License <http://www.uploadify.com/upload
                             'async' : false
                         });
                         // Send the filename to the check script
-                        var checkData = $.extend(settings.formData, {filename: file.name});
-                        $.post(settings.checkScript, checkData, function(fileExists) {
-                            file.exists = parseInt(fileExists);
-                        });
-                        if (file.exists) {
-                            if (!confirm('A file named ' + file.name + ' already exists in the upload folder.\nWould you like to replace it?')) {
-                                // If not replacing the file, cancel the upload
-                                methods.cancel.call($this, file);
-                                return true;
-                            }
-                        }
+						
+						var name_to_check = file.name;
+						
+						while (true) {
+							var checkData = $.extend(settings.formData, {filename: name_to_check});
+							$.post(settings.checkScript, checkData, function(fileExists) {
+								file.exists = parseInt(fileExists);
+							});
+							if (file.exists) {
+								var newname = prompt("Un file con lo stesso nome esiste già.\nSpecificare il nome per il nuovo file o lasciarlo invariato per sovrascriverlo:", name_to_check);
+								if (newname == null || newname == "") {
+									methods.cancel.call($this, file);
+									return true;
+								} else {
+									if (newname == name_to_check) {
+										break;
+									} else {
+										name_to_check = newname;
+									}
+								}
+							} else {
+								break;
+							}
+						}
+						
+						if (name_to_check != file.name) {
+							_file.newname = name_to_check;
+						}
+						return false;
                     }
                     // Trigger the check event
                     if (typeof settings.onCheck === 'function') {
@@ -364,7 +382,6 @@ Released under the UploadiFive Standard License <http://www.uploadify.com/upload
                         file.uploading = true;
                         $data.uploads.current++;
                         $data.uploads.attempted++;
-
                         // Create a new AJAX request
                         xhr = file.xhr = new XMLHttpRequest();
 
@@ -376,7 +393,7 @@ Released under the UploadiFive Standard License <http://www.uploadify.com/upload
                             var formData = new FormData();
 
                             // Add the form data
-                            formData.append(settings.fileObjName, file);
+                            formData.append(settings.fileObjName, file, file.newname);
 
                             // Add the rest of the formData
                             for (i in settings.formData) {
@@ -415,9 +432,7 @@ Released under the UploadiFive Standard License <http://www.uploadify.com/upload
 
                             // Send the form data (multipart/form-data)
                             xhr.send(formData);
-
                         } else {
-
                             // Send as binary
                             var reader = new FileReader();
                             reader.onload = function(e) {

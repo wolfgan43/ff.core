@@ -90,7 +90,7 @@ __ff : true, // used to recognize ff'objects
 	pComp.fields.each( function (key, field) {
 		ff.doEvent({
 			"event_name"	: "onClearField",
-			"event_params"	: [component, key, field, pComp.id + "_" + field.id]
+			"event_params"	: [component, key, field, (pComp.id || component) + "_" + (field.id || key)]
 		});
 	});
 }

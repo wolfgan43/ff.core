@@ -136,7 +136,7 @@ events : ff.hash(),
 }
 
 , "getLastRes" : function (res) {
-	if (res !== undefined && res[res.length - 1]) {
+	if (res !== undefined && res[res.length - 1] !== undefined) {
 		return res[res.length - 1];
 	} else {
 		return undefined;

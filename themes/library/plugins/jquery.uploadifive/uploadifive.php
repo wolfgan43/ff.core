@@ -175,7 +175,11 @@ if(!empty($_FILES))
 		}
 		
 		//$relativePath = "";
-		$targetFile = str_replace('//','/',$targetPath) . $_FILES['Filedata']['name'];
+        if($_FILES['Filedata']['new_name']){
+            $targetFile = str_replace('//', '/', $targetPath) . $_FILES['Filedata']['new_name'];
+        }else {
+            $targetFile = str_replace('//', '/', $targetPath) . $_FILES['Filedata']['name'];
+        }
 		// $fileTypes  = str_replace('*.','',$_REQUEST['fileext']);
 		// $fileTypes  = str_replace(';','|',$fileTypes);
 		// $typesArray = split('\|',$fileTypes);

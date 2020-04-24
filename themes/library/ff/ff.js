@@ -925,6 +925,16 @@ var that = { // publics
 	return value;
 },
 	
+isJsonString : function (str) {
+	var tmp;
+    try {
+        tmp = JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return tmp;
+},
+
 "getUniqueID" : function() {
 	return unique_ids++;
 },
@@ -1175,7 +1185,7 @@ var that = { // publics
 	thousandsSeparator = thousandsSeparator === undefined ? "." : thousandsSeparator;
     nDecimalDigits = nDecimalDigits === undefined ? 2 : nDecimalDigits;
 
-    var fixed = parseFloat(number).toFixed(nDecimalDigits), //limit/add decimal digits
+    var fixed = number.toFixed(nDecimalDigits), //limit/add decimal digits
         parts = new RegExp('^(-?\\d{1,3})((?:\\d{3})+)(\\.(\\d{'+ nDecimalDigits +'}))?$').exec( fixed ); //separate begin [$1], middle [$2] and decimal digits [$4]
 
     if(parts){ //number >= 1000 || number <= -1000
@@ -1183,14 +1193,6 @@ var that = { // publics
     }else{
         return fixed.replace('.', decimalSeparator);
      }
-},
-"currencyToNumber" : function(number, decimalSeparator, thousandsSeparator) {
-	decimalSeparator = decimalSeparator === undefined ? "." : decimalSeparator;
-	thousandsSeparator = thousandsSeparator === undefined ? "," : thousandsSeparator;
-
-	let res = parseFloat(number.replace(" ", "").replace(decimalSeparator, "").replace(thousandsSeparator, "."));
-
-	return isNaN(res) ? 0 : res;
 },
 "isMobile" : function(type) {
 	var res = false;
