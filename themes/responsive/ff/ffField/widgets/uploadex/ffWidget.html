@@ -1,0 +1,77 @@
+<!--BeginSectHeaders-->
+<!--EndSectHeaders-->
+
+<!--BeginSectFooters-->
+<script language="javascript" type="text/javascript">
+	ff.pluginAddInit("ff.ffField.uploadex", function () {
+        <!--BeginSectBinding-->
+		var tmp = ff.ffField.uploadex.factory({
+            "id"				: "{container}{id}",
+            "dataSrc"			: "{data_src}",
+	
+            "upload_script"		: {upload_script},
+			
+			"component"			: {component},
+			"ctx"				: {ctx},
+			
+			"control"			: "{suffix_control}", // file input
+			"name"				: "{suffix_name}", // field for final name
+			"tmpname"			: "{suffix_tmpname}", // field for tmp name
+			"sufdel"	        : "{suffix_delete}", // field for deleted names
+			
+			"multi"				: {file_multi},
+			"sortable"			: {sortable},
+			<!--BeginSect_sortable_options-->
+			"sortable_options"  : {sortable_options},<!--EndSect_sortable_options-->
+			"sizeLimit"			: {size_limit},
+			
+			"allow_replace"	    : {allow_replace},
+			"multi_allow_duplicates" : {multi_allow_duplicates},
+			
+            label				: "{label}", 
+			<!--BeginSectParam-->
+			{param_name}		: {param_value},<!--EndSectParam-->
+			"onclick"			: {onclick},
+			"showFilePlugin"	: {showfile_plugin}
+		});
+		<!--BeginSectImg-->
+		tmp.showPreview("{filename}", {name}, "{type}", "{bytesize}", undefined, "{preview_url}", "{view_url}");<!--EndSectImg-->
+        <!--EndSectBinding-->
+	});
+</script>
+<!--EndSectFooters-->
+
+<!--BeginSectControl-->
+{fixed_pre_content}
+
+<div class="uplex-control-container {uplex-class-button} " id="uplex_{container}{id}_container">
+	<div class="uplex-control-droparea">&nbsp;</div>
+	<input class="uplex-control-input" type="file" id="{container}{id}{suffix_control}" <!--BeginSectMulti-->multiple="multiple" <!--EndSectMulti-->/>
+</div>			
+
+<input type="hidden" id="{container}{id}{suffix_name}" 		name="{container}{id}{suffix_name}" 	value="{filename}" />
+<input type="hidden" id="{container}{id}{suffix_tmpname}" 	name="{container}{id}{suffix_tmpname}" 	value="{tmpname}" />
+<input type="hidden" id="{container}{id}{suffix_delete}" 	name="{container}{id}{suffix_delete}" 	value="" />
+
+<ul class="uplex-previews" id="uplex_{container}{id}_previews" {uplex-properties-previews}>
+	<li class="uplex-preview-item" {uplex-properties-preview-item} data-uplex-idx="[idx]">
+		<div class="icons-abs">
+			<a href="javascript:ff.ffField.uploadex.delFile('{container}{id}'[el_idx]);" alt="delete" class="del-file">X</a>
+		</div>
+		<!--BeginSectShowFileImage-->
+		<a class="view-link" shadowhref="[[view_url]]" target="_blank"><img class="uplex-preview-img" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" shadowsrc="[[preview_url]]" alt="[[name]]" {uplex-properties-preview-img}/></a>
+		<!--EndSectShowFileImage-->
+		<!--BeginSectShowFileCaption-->
+			<p class="uplex-caption" {uplex-properties-caption}>[[name]]</p>
+		<!--EndSectShowFileCaption-->
+	</li>
+</ul>
+<br clear="both" />
+<div id="uplex_{container}{id}_queue" class="uplex-queue" {uplex-properties-queue}>
+	<div class="uplex-queue-item">
+		<div class="uplex-queue-item-label" alt="[[name]]" title="[[name]]">[[name]] </div><div class="uplex-queue-error" alt="[[error_msg]]" title="[[error_msg]]">[[error_msg]]</div><div class="uplex-progressbar"><div class="uplex-progressbar-label">{_loading}</div></div><div class="uplex-queue-icons"><div class="uplex-queue-cancel">&nbsp;</div></div>
+	</div>
+</div>
+
+{fixed_post_content}
+<!--EndSectControl-->

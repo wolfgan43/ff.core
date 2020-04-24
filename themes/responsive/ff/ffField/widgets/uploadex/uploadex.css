@@ -1,0 +1,227 @@
+.uplex-control-container *, .uplex-queue * {
+	box-sizing: content-box;
+}
+.uplex-control-container {
+	margin: 0;
+	padding: 0;
+	position: relative;
+	overflow: hidden;
+}
+
+.uplex-control-input {
+	display: block;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	opacity: 0;
+	cursor:pointer !important;
+}
+
+.uplex-control-droparea {
+	display: block;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	color: transparent;
+}
+
+.uplex-style-area {
+	width: 104px;
+	height: 104px;
+}
+
+.uplex-style-area .uplex-control-input {
+	width: 104px;
+	height: 200px;
+	top: -96px;
+}
+
+.uplex-style-area .uplex-control-droparea {
+	width: 100px;
+	height: 100px;
+	border:2px dashed #c6c6c6 !important;
+	color:#c6c6c6;
+	transition:border-width 0.3s, color 0.3s;
+	cursor:pointer !important;
+	margin-right:0.3em;
+	background: url(cloud_upload.png);
+	background-size: 100%;
+}
+
+.uplex-style-button {
+	width: 108px;
+	height: 28px;
+}
+
+.uplex-style-button .uplex-control-input {
+	width: 108px;
+	height: 100px;
+	top: -72px;
+}
+
+.uplex-style-button .uplex-control-droparea {
+	width: 80px;
+	height: 20px;
+	cursor:pointer !important;
+	line-height: 20px;
+	background: #4d4d4d;
+	background-image: -webkit-linear-gradient(top, #4d4d4d, #858585);
+	background-image: -moz-linear-gradient(top, #4d4d4d, #858585);
+	background-image: -ms-linear-gradient(top, #4d4d4d, #858585);
+	background-image: -o-linear-gradient(top, #4d4d4d, #858585);
+	background-image: linear-gradient(to bottom, #4d4d4d, #858585);
+	-webkit-border-radius: 6;
+	-moz-border-radius: 6;
+	border-radius: 6px;
+	font-family: Arial;
+	color: #ffffff;
+	font-size: 14px;
+	padding: 4px 14px 4px 14px;
+	text-decoration: none;
+}
+
+.uplex-queue {
+	display: inline-block;
+	margin: 20px 20px 10px 0;
+	clear: both;
+}
+
+.row fieldset.box2 .uplex-queue {
+	margin-left: 130px;
+}
+
+.uplex-queue-error {
+	float: left;
+    width: 200px;
+    height: 20px;
+    overflow: hidden;
+    padding: 0;
+    font-size: 8pt;
+    line-height: 20px;
+    text-align: center;	
+	/*font-weight:bold;*/
+	color:red;
+	border:1px solid red;
+	background:#ffe5e5;
+}
+
+.uplex-queue-item {
+	height: 20px;
+	margin-bottom: 10px;
+	position: relative;
+	width: 425px;
+	border: 1px dashed;
+	padding: 4px;
+	padding-bottom: 6px;
+}
+
+.uplex-queue-item-label {
+    width: 195px;
+	height: 22px;
+	line-height: 22px;
+	font-size: 8pt;
+    overflow: hidden;
+	float: left;
+	margin-right: 5px;
+}
+
+.uplex-progressbar {
+	height: 20px;
+	width: 200px;
+	float: left;
+}
+
+.uplex-progressbar-label {
+	position: absolute;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #fff;
+	font-size: 8pt;
+	line-height: 20px;
+	text-align: center;
+	width: 200px;
+}
+
+.uplex-queue-icons {
+	position: absolute;
+	margin-top: 1px;
+	padding-left: 210px;
+	display: block;
+	height: 20px;
+	width: 20px;
+	opacity:0;
+	transition:opacity 0.3s;
+	left: 200px;
+}
+
+.uplex-queue-icons:hover {
+	opacity:1;
+}
+
+.uplex-queue-cancel {
+	display: block;
+	height: 20px;
+	width: 20px;
+	background:url(uploadex-sprite.png) 0 0 no-repeat;
+}
+
+.uplex-queue-cancel:hover {
+	cursor: pointer;
+	background-position:-26px 0;
+}
+
+.uplex-previews {
+	margin: 0;
+	clear: both;
+	display: inline-block;
+	list-style: none;
+}
+
+.row fieldset.box2 .uplex-previews {
+	margin-left: 110px;
+}
+
+.uplex-preview-item {
+	position: relative;
+	margin: 20px 0 0 20px;
+	float: left;
+}
+
+.uplex-preview-item .icons-abs {
+	position:absolute;
+	top:0;
+	right:0;
+	margin-right: 3px;
+	margin-top: 3px;
+	opacity:0;
+	transition:opacity 0.3s;
+}
+
+.uplex-preview-item:hover .icons-abs {
+	opacity:1;
+}
+
+.uplex-preview-item .icons-abs A {
+	display:inline-block;
+	padding:0.5em;
+	color:#fff;
+	background-color:rgba(0,0,0,0.5);
+}
+
+.uplex-preview-item .icons-abs a.del-file {
+	display:block;
+	width:20px;
+	height:20px;
+	background:url(uploadex-sprite.png) 0 0 no-repeat;
+	border: 0;
+	padding: 0;
+	color: transparent;
+}
+
+.uplex-preview-item .uploadifive-caption {
+	line-height: 20px;
+	height: 20px;
+	overflow: hidden;
+	font-size: 10pt;
+	text-overflow: clip;
+}
