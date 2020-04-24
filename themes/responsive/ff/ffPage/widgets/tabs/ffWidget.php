@@ -78,6 +78,10 @@ class ffWidget_tabs extends ffCommon
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$data, ffPage_base &$oPage, $component = null)
 	{
 		if ($component !== null)

@@ -89,6 +89,10 @@ class ffWidget_activecomboex extends ffCommon
 			$this->tpl[$id]->set_var("innerURL", $this->innerURL);*/
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		global $plgCfg_ActiveComboEX_UseOwnSession;

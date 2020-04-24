@@ -190,6 +190,7 @@ ff.ffField.uploadifive = (function () {
 				}
 			}
 		    jQuery("#" + thisData["idComponent"]).hide().uploadifive({
+                'checkScript'      : thisData["basePath"] + '/check-exists.php',
                 'uploadScript'      : thisData["basePath"] + '/uploadifive.php',
                 'formData'			: scriptData,
                 'buttonText'     	: '', 
@@ -201,6 +202,45 @@ ff.ffField.uploadifive = (function () {
                 'removeCompleted' 	: false,
 	            'width'				: thisData["width"], 
 	            'height'			: thisData["height"], 
+				'overrideEvents'    : ["onCheck"],
+				'onCheck'			: function (methods, settings, file) {
+					jQuery.ajaxSetup({
+						'async' : false
+					});
+					// Send the filename to the check script
+
+					var name_to_check = file.name;
+
+					while (true) {
+						var checkData = jQuery.extend(settings.formData, {filename: name_to_check});
+						jQuery.post(settings.checkScript, checkData, function(ret) {
+							file.exists = ret.uploadifive !== false;
+						});
+						if (/*true || */file.exists) {
+							// prompt dialog
+							
+							//break;
+							var newname = prompt("Un file con lo stesso nome esiste già.\nSpecificare il nome per il nuovo file o lasciarlo invariato per sovrascriverlo:", name_to_check);
+							if (newname == null || newname == "") {
+								methods.cancel.call($this, file);
+								return true;
+							} else {
+								if (newname == name_to_check) {
+									break;
+								} else {
+									name_to_check = newname;
+								}
+							}
+						} else {
+							break;
+						}
+					}
+
+					if (name_to_check != file.name) {
+						file.newname = name_to_check;
+					}
+					return false;
+				},
                 'queueID'        	: 'uploadifive_' + thisData["idComponent"] + "_queue", /* The optional ID of the queue container*/
 				onInit				: function() {
 					jQuery("#uploadifive-" + thisData["idComponent"]).css({
@@ -218,7 +258,7 @@ ff.ffField.uploadifive = (function () {
 						
 						if (dt.types.contains && !dt.types.contains ('Files')) return //FF
 						if (dt.types.indexOf && dt.types.indexOf ('Files') == -1) return //Chrome
-						//if ($.browser.webkit) dt.dropEffect = 'copy';
+						//if (jQuery.browser.webkit) dt.dropEffect = 'copy';
 						jQuery("#uploadifive-" + thisData["idComponent"]).addClass("dropzone");
 					};
 					function dragLeave() {

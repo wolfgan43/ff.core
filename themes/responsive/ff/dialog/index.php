@@ -39,9 +39,7 @@ $confirmurl		= $_REQUEST["confirmurl"];
 $cancelurl		= $_REQUEST["cancelurl"];
 $ret_url        = $_REQUEST["ret_url"];
 if(!$cancelurl) {
-    if(strpos($confirmurl, "[") === false) {
-        $confirmurl .= "&ret_url=" . rawurlencode($ret_url);
-    }
+    $confirmurl .= "&ret_url=" . rawurlencode($ret_url);
     $cancelurl = (isset($_REQUEST["XHR_CTX_ID"])
                     ? "[CLOSEDIALOG]"
                     : $ret_url

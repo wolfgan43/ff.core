@@ -42,6 +42,10 @@ class ffWidget_dialog extends ffCommon
 		$this->style_path = $style_path;
 	}
 
+	function pre_process($page, $options = null)
+	{
+	}
+
 	function prepare_template($id)
 	{
 		$this->tpl[$id] = ffTemplate::factory(__DIR__);
@@ -59,6 +63,7 @@ class ffWidget_dialog extends ffCommon
 
 	function process($id, $options, ffPage_base &$oPage)
 	{
+		//if ($id === "img_media")			ffErrorHandler::raise ("ASD", E_USER_ERROR, $this, get_defined_vars());
 		$tpl_id = $options["tpl_id"];
 		if (!strlen($tpl_id))
 			$tpl_id = "main";

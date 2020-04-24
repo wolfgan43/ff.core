@@ -58,6 +58,10 @@ class ffWidget_labelsort extends ffCommon
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process(ffGrid_base $grid, $options)
 	{
 		$tpl_id = $grid->getIDIF();

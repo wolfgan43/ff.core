@@ -66,6 +66,10 @@ Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
 			$cm->oPage->tplAddJs("ff.ffField.gmap3.sync");			
 	}
 	
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))

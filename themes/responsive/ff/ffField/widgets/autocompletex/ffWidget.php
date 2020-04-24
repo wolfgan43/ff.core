@@ -97,6 +97,10 @@ class ffWidget_autocompletex extends ffCommon
 		
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		global $plgCfg_autocomplete_UseOwnSession;

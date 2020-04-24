@@ -65,6 +65,10 @@ class ffWidget_ckfinder extends ffCommon
 
 	}
 	
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		$Field->file_writable = true;

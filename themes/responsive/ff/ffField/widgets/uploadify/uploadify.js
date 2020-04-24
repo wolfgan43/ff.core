@@ -217,13 +217,13 @@ ff.ffField.uploadify = (function () {
 						}
 						
                         if(previewJs)
-                            previewBlock = '<a href="' + viewUrl + '/' + fileValue + '" target="_blank" rel="' + previewUrl + '"><img id="' + component + target + '_img" class="image" src="' + previewUrl + "/" + fileValue + '" /></a>';
+                            previewBlock = '<a href="' + viewUrl + '/' + fileValue + '" rel="' + previewUrl + '"><img id="' + component + target + '_img" class="image" src="' + previewUrl + "/" + fileValue + '" /></a>';
 
                         if(showFile)
                             descBlock = '<span class="fileName">' + strResponse + ' (' + byteSize + suffix + ')' + '</span>';
 
                         if(showLink)
-                            descBlock = '<a href="' + viewUrl + fileValue + '" rel="' + previewUrl + '" target="_blank">' + strResponse + ' (' + byteSize + suffix + ')' + '</a>';
+                            descBlock = '<a href="' + viewUrl + fileValue + '" rel="' + previewUrl + '">' + strResponse + ' (' + byteSize + suffix + ')' + '</a>';
                             
                         if(model == "vertical") {
                             jQuery("#uploadify_" + idComponent).html('<span class="top">' + previewBlock + '<div class="cancel"><a href="javascript:ff.ffField.uploadify.del(\'' + component + '\');" alt="delete" class="' + icons.cancel + '"></a></div></span>' + descBlock);

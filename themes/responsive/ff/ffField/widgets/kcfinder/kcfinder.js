@@ -2,7 +2,7 @@ ff.ffField.kcfinder = (function () {
 	var idComponent = undefined;
 	var basePath = "/themes/library/kcfinder";
 	var baseUrl = "";
-	var previewPath = "/cm/showfiles.php";
+	var previewPath = "/media";
 	var previewJs = true;
 	
     var start = "";
@@ -26,7 +26,7 @@ ff.ffField.kcfinder = (function () {
 			this.previewJs			= params.previewJs;
 			this.viewUrl			= params.viewUrl;
 			this.previewUrl			= params.previewUrl;
-			this.previewPath		= ff.site_path + "/cm/showfiles.php";
+			this.previewPath		= ff.site_path + "/media";
 			this.writable           = params.writable;
 			this.modelThumb			= params.modelThumb;
 			this.showFile			= params.showFile;

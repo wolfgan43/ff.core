@@ -25,7 +25,7 @@ ff.pluginAddInit("ff.ajax", function () {
 				(params.ctx && ff.ffPage.dialog.get(params.ctx) && ff.ffPage.dialog.getInstance(params.ctx))
 				&& (params.doredirects || data["doredirects"] !== undefined)
 			) {
-				ff.ffPage.dialog.close(params.ctx);
+				ff.ffPage.dialog.getInstance(params.ctx).dialog("close"); 
 			}
 		}
 	});
@@ -282,7 +282,7 @@ __ff : true, /* used to recognize ff'objects */
     if (data === null) {
         if (dialogs.get(id).params.params && dialogs.get(id).params.params.persistent)
             dialogs.get(id).params.params.persistent = false;
-        instance && ff.ffPage.dialog.close(id);
+        instance && dialogs.get(id).instance.dialog("close");
         return false;
     }
     
@@ -304,16 +304,10 @@ __ff : true, /* used to recognize ff'objects */
      *    data.url
      *        cambia l'url del dialog su redirect interno
      */
-    if (customdata.callback) {
-		customdata.callback(id, data);
-	}
-    if (data.callback) {
-    	if(data.callback.indexOf("(") < 0) {
-			eval(data.callback + "(id, data)");
-		} else {
-			eval(data.callback);
-		}
-	}
+    if (customdata.callback)
+        customdata.callback(id, data);
+    if (data.callback)
+        eval(data.callback);
     if (data["close"]) {
         that.close(id);
 	} else if (data["url"]) {

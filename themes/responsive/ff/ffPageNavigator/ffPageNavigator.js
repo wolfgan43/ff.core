@@ -148,19 +148,19 @@ function eventButtons(id) {
                 jQuery(".next", this).unbind(".ff.ffPageNavigator");
             }
             if (navigators[id].page > 2) {
-                jQuery(".first", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.firstPage);
-                jQuery(".first", this).parent().removeClass("hidden");
+                jQuery(".step-backward", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.firstPage);
+                jQuery(".step-backward", this).parent().removeClass("hidden");
                 //jQuery(".first", this).removeClass("disabled");
             } else {
-                jQuery(".first", this).parent().addClass("hidden"); 
+                jQuery(".step-backward", this).parent().addClass("hidden");
                // jQuery(".first", this).addClass("disabled");
             }
             if (navigators[id].totpage - navigators[id].page > 1 ) {
-                jQuery(".last", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.lastPage);
-                jQuery(".last", this).parent().removeClass("hidden");
+                jQuery(".step-forward", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.lastPage);
+                jQuery(".step-forward", this).parent().removeClass("hidden");
                // jQuery(".last", this).removeClass("disabled");
             } else {
-                jQuery(".last", this).parent().addClass("hidden");
+                jQuery(".step-forward", this).parent().addClass("hidden");
                 //jQuery(".last", this).addClass("disabled");
             }  
             jQuery(".rec-page, .rec-all", this).bind("click.ff.ffPageNavigator", {"id" : id}, that.changeRecPerPage);
@@ -389,6 +389,7 @@ __ff : true, // used to recognize ff'objects
     }
 },
 "prevPage" : function (ev, callback) {
+    console.log("Pagina precedente");
     ev.preventDefault();
 	navigators[ev.data.id].page--;
 	if (!navigators[ev.data.id].infinite && navigators[ev.data.id].page < 1)
@@ -409,6 +410,7 @@ __ff : true, // used to recognize ff'objects
 	}
 },
 "nextPage" : function (ev, callback) {
+	console.log("Pagina successiva");
     ev.preventDefault();
 	navigators[ev.data.id].page++;
 	if (!navigators[ev.data.id].infinite && navigators[ev.data.id].page > navigators[ev.data.id].totpage)
@@ -427,6 +429,7 @@ __ff : true, // used to recognize ff'objects
 	}
 },
 "prevFrame" : function (ev) {
+    console.log("FRAME precedente");
     ev.preventDefault();
 	navigators[ev.data.id].start_page -= navigators[ev.data.id].page_per_frame;
 	if (navigators[ev.data.id].start_page < 1)
@@ -438,6 +441,7 @@ __ff : true, // used to recognize ff'objects
 	that.updateButtons(ev.data.id);
 },
 "nextFrame" : function (ev) {
+    console.log("FRAME successivo");
     ev.preventDefault();
 	navigators[ev.data.id].end_page += navigators[ev.data.id].page_per_frame;
 	if (navigators[ev.data.id].end_page > navigators[ev.data.id].totpage)
@@ -449,6 +453,7 @@ __ff : true, // used to recognize ff'objects
 	that.updateButtons(ev.data.id);
 },
 "firstPage" : function (ev) {
+    console.log("PRIMA PAGINA");
     ev.preventDefault();
 	navigators[ev.data.id].page = 1;
     if(navigators[ev.data.id].doAjax && navigators[ev.data.id].callback) {
@@ -465,6 +470,7 @@ __ff : true, // used to recognize ff'objects
 	});
 },
 "lastPage" : function (ev) {
+    console.log("ULTIMA PAGINA");
     ev.preventDefault();
 	navigators[ev.data.id].page = navigators[ev.data.id].totpage;
     if(navigators[ev.data.id].doAjax && navigators[ev.data.id].callback) {

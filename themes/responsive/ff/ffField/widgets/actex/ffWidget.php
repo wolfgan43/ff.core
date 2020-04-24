@@ -75,10 +75,14 @@ class ffWidget_actex extends ffCommon
 		else
 			$this->tpl[$id]->set_var("innerURL", $this->innerURL);*/
 	}
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
     {
         global $plgCfg_ActiveComboEX_UseOwnSession;
-        $count_actions = 0;
+
         if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF())) {
             $tpl_id = $Field->parent[0]->getIDIF();
             $prefix = $tpl_id . "_";
@@ -120,13 +124,14 @@ class ffWidget_actex extends ffCommon
         } else {
             $this->tpl[$tpl_id]->set_var("autocomp_enable", "false");
         }
+        if ($Field->actex_autocomp_ajax)
+            $this->tpl[$tpl_id]->set_var("autocomp_ajax", "true");
+        else
+            $this->tpl[$tpl_id]->set_var("autocomp_ajax", "false");
 
         $this->tpl[$tpl_id]->set_var("autocomp_limit", $Field->actex_autocomp_limit);
 
-        if ($Field->actex_autocomp_preserve_text)
-            $this->tpl[$tpl_id]->set_var("autocomp_preserve_text", "true");
-        else
-            $this->tpl[$tpl_id]->set_var("autocomp_preserve_text", "false");
+        $this->tpl[$tpl_id]->set_var("autocomp_preserve_text", $Field->actex_autocomp_preserve_text);
 
         if ($Field->actex_service === null) {
             $this->tpl[$tpl_id]->set_var("service", "null");
@@ -152,7 +157,6 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("widget_path", "/themes/responsive/ff/ffField/widgets/actex");
         $dialog_url = $Field->actex_dialog_url;
         $params = $Field->actex_dialog_add_params;
-
         if (
             $Field->actex_update_from_db
             && $Field->actex_dialog
@@ -160,7 +164,6 @@ class ffWidget_actex extends ffCommon
             && !$this->disable_dialog
             && strlen($Field->actex_dialog_url)
         ) {
-            $count_actions++;
             if (strlen($Field->actex_dialog_title))
                 $dialog_title = $Field->actex_dialog_title;
             elseif (strlen($Field->label))
@@ -174,26 +177,21 @@ class ffWidget_actex extends ffCommon
                 $dialog_url .= "&";
             if (is_array($params) && count($params)) {
                 foreach ($params as $param_key => $param_value) {
-                    if ($param_value === null) {
-                        if(strpos($param_key, "[") === false) {
-                            $dialog_url .= $param_key . "=[[" . $prefix . $param_key . "]]&";
-                        } else {
-                            $dialog_url .= $param_key . "=[[" . $prefix . $id . "]]&";
-                        }
-                    } else {
-                        $dialog_url .= $param_key . "=" . $param_value . "&";
-                    }
+                    if ($param_value === null)
+                        $dialog_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+                    else
+                        $dialog_url .= $param_key . "=[[" . $param_value . "]]&";
                 }
             }
             $this->tpl[$tpl_id]->set_var("dialogaddlink", $Field->parent_page[0]->widgets["dialog"]->process(
-                "actex_dlg_add_" . $prefix . $id
+                "actex_dlg_" . $prefix . $id
                 , array(
                     "title" => $dialog_title
                 , "url" => $dialog_url
                     /*, "name"		=> '<img alt="add" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_add .'"' . (strlen($Field->actex_dialog_title_add)  ? ' title="' . $Field->actex_dialog_title_add . '"' : '') . ' />'*/
                     //, "callback"	=> (count($Field->resources) ? "ff.ffField.actex.dialog_success('" . $prefix . $id . "', '" . $Field->resources[0] . "')" : "")
                 , "tpl_id" => $tpl_id
-                , "addjs" => "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_add_" . $prefix . $id . "');"
+                , "addjs" => "ff.ffField.actex.insertModeOn('" . $prefix . $id . "', '" . "actex_dlg_" . $prefix . $id . "');"
                 , "class" => cm_getClassByFrameworkCss("addnew", "icon", array("class" => "hidden " . cm_getClassByFrameworkCss("control-prefix", "form")))
                 , "id" => "actex_" . $prefix . $id . "_dialogaddlink"
                 )
@@ -219,7 +217,6 @@ class ffWidget_actex extends ffCommon
                 || (strpos($edit_url, "[[") !== false)
             )
         ) {
-            $count_actions++;
             if (strlen($Field->actex_dialog_edit_title))
                 $dialog_edit_title = $Field->actex_dialog_edit_title;
             elseif (strlen($Field->actex_dialog_title))
@@ -234,15 +231,10 @@ class ffWidget_actex extends ffCommon
                 $edit_url .= "&";
             if (is_array($params) && count($params)) {
                 foreach ($params as $param_key => $param_value) {
-                    if ($param_value === null) {
-                        if(strpos($param_key, "[") === false) {
-                            $edit_url .= $param_key . "=[[" . $prefix . $param_key . "]]&";
-                        } else {
-                            $edit_url .= $param_key . "=[[" . $prefix . $id . "]]&";
-                        }
-                    } else {
-                        $edit_url .= $param_key . "=" . $param_value . "&";
-                    }
+                    if ($param_value === null)
+                        $edit_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+                    else
+                        $edit_url .= $param_key . "=[[" . $param_value . "]]&";
                 }
             }
             $this->tpl[$tpl_id]->set_var("dialogeditlink", $Field->parent_page[0]->widgets["dialog"]->process(
@@ -252,7 +244,6 @@ class ffWidget_actex extends ffCommon
                 , "url" => $edit_url
                     /*, "name"		=> '<img alt="edit" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_edit .'" ' . (strlen($Field->actex_dialog_title_edit)  ? ' title="' . $Field->actex_dialog_title_edit . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_edit_" . $Field->parent[0]->id . "_" . $Field->id . "')"
-                , "addjs" => null
                 , "tpl_id" => $tpl_id
                 , "class" => cm_getClassByFrameworkCss("editrow", "icon", array("class" => "hidden"))
                 , "id" => "actex_" . $prefix . $id . "_dialogeditlink"
@@ -260,6 +251,7 @@ class ffWidget_actex extends ffCommon
                 , $Field->parent_page[0]
             ));
             //$this->tpl[$tpl_id]->parse("SectDialogEdit", false);
+
             //$count_editable++;
         } else {
             $this->tpl[$tpl_id]->set_var("dialogeditlink", "");
@@ -278,7 +270,6 @@ class ffWidget_actex extends ffCommon
                 || (strpos($delete_url, "[[") !== false)
             )
         ) {
-            $count_actions++;
             if (strlen($Field->actex_dialog_delete_title))
                 $dialog_delete_title = $Field->actex_dialog_delete_title;
             elseif (strlen($Field->actex_dialog_title))
@@ -296,15 +287,10 @@ class ffWidget_actex extends ffCommon
                 $delete_url .= "frmAction=" . $Field->actex_dialog_delete_idcomp . "_confirmdelete&";
             if (is_array($params) && count($params)) {
                 foreach ($params as $param_key => $param_value) {
-                    if ($param_value === null) {
-                        if(strpos($param_key, "[") === false) {
-                            $delete_url .= $param_key . "=[[" . $prefix . $param_key . "]]&";
-                        } else {
-                            $delete_url .= $param_key . "=[[" . $prefix . $id . "]]&";
-                        }
-                    } else {
-                        $delete_url .= $param_key . "=" . $param_value . "&";
-                    }
+                    if ($param_value === null)
+                        $delete_url .= $param_key . "=[[" . $prefix . $id . "]]&";
+                    else
+                        $delete_url .= $param_key . "=[[" . $param_value . "]]&";
                 }
             }
             if (method_exists($Field->parent[0], "dialog"))  // ??? obsoleto probabilmente
@@ -328,7 +314,6 @@ class ffWidget_actex extends ffCommon
                 , "url" => $dialog_delete
                     /*, "name"		=> '<img alt="delete" src="' . FF_SITE_PATH . '/themes/' . $Field->parent_page[0]->getTheme() . '/images/icons/' . $Field->actex_dialog_icon_delete .'"' . (strlen($Field->actex_dialog_title_delete)  ? ' title="' . $Field->actex_dialog_title_delete . '"' : '') . ' />'*/
 //							, "callback"	=> "ff.ffField.actex.dialog_success('" . $prefix . $id . "', 'actex_dlg_delete_" . $Field->parent[0]->id . "_" . $Field->id . "')"
-                , "addjs" => null
                 , "tpl_id" => $tpl_id
                 , "class" => cm_getClassByFrameworkCss("deleterow", "icon", array("class" => "hidden"))
                 , "id" => "actex_" . $prefix . $id . "_dialogdeletelink"
@@ -452,32 +437,31 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("hide_empty", "'" . $Field->actex_hide_empty . "'");
         else
             $this->tpl[$tpl_id]->set_var("hide_empty", "false");
-        $action_class = "actex-actions";
+        $action_class = "actex-actions input-group-btn";
 
-        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));
-        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("times", "icon", array("class" => "mr-0")));
-        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon", array("class" => "btn")));
-        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon", array("class" => "btn")));
-        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));
-
-        if ($Field->actex_autocomp && !$Field->actex_autocomp_limit) {
-            $count_actions++;
+        $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("fa-caret-down", "icon", array("class" => ("actex-combo"))));
+        $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("fa-times", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("fa-plus", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("fa-minus", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("fa-minus", "icon", "btn"));
+        $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("fa-spinner", "icon-tag", "spin"));
+        if ($Field->actex_autocomp) {
             $this->tpl[$tpl_id]->parse("SectCombo", false);
             $action_class .= " nopadding";
         } else {
             $this->tpl[$tpl_id]->set_var("SectCombo", "");
         }
 
-        if ($Field->actex_dialog_url == true || ($Field->actex_autocomp && !$Field->actex_autocomp_limit)){
+        if ($Field->actex_dialog_url == true){
             $this->tpl[$tpl_id]->set_var("actex_container", cm_getClassByFrameworkCss("group", "form", "actex-wrapper"));
         }else{
             $this->tpl[$tpl_id]->set_var("actex_container", "actex-wrapper");
         }
         $this->tpl[$tpl_id]->set_var("data_class", "actex" . (strlen($Field->data_class) ? " " : "") . $Field->data_class);
-        $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("control-postfix", "form", $action_class));
+        $this->tpl[$tpl_id]->set_var("actions_class", cm_getClassByFrameworkCss("component", "form", $action_class));
         $this->tpl[$tpl_id]->set_var("actex_multi_container", cm_getClassByFrameworkCss("group", "list", "actex-multi"));	
         $this->tpl[$tpl_id]->set_var("actex_multi_item", cm_getClassByFrameworkCss("item", "list"));	
-        $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "primary"));
+        $this->tpl[$tpl_id]->set_var("actex_multi_badge", cm_getClassByFrameworkCss("badge", "list"));	
             
 		if ($Field->actex_reset_childs) {
 			$this->tpl[$tpl_id]->set_var("reset_childs", "true");
@@ -543,7 +527,7 @@ class ffWidget_actex extends ffCommon
 		$this->tpl[$tpl_id]->set_var("SectData", "");
 		$this->tpl[$tpl_id]->set_var("data_src", "");		
 		$no_rec = true;
-
+		
 		if (strlen($tmp_sql = $Field->getSQL()) && $Field->actex_update_from_db)
 		{
             if($Field->actex_service === null) 
@@ -728,16 +712,11 @@ class ffWidget_actex extends ffCommon
             		$condition = 0;
 					$field_key = ($Field->actex_compare_field ? $Field->actex_compare_field : "`" . $db->fields_names[0] . "`"); //se tolto lo 0 && da enormi problemi con il recupero del default valorizzato vedi vgallery extras modify campo ID_extended_type quando e ti tipo string gia valorizzato nel db
 					$field_key_having = ($Field->actex_having_field ? $Field->actex_having_field : $field_key);
-
-					if($Field->actex_multi && $Field->actex_operation_field == "=") {
-                        $Field->actex_operation_field = "IN";
-                    }
-
                     switch($Field->actex_operation_field)
                     {
                         case "IN":
-                            $strOperation .= " $field_key IN(" . str_replace(",", "','", $db->toSql($strCompare)) . ")";
-                            $strOperationHaving .= " $field_key_having IN(" . str_replace(",", "','", $db->toSql($strCompare)) . ")";
+                            $strOperation .= " $field_key = " . $db->toSql($strCompare);
+                            $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
                             break;
                         case "FIND_IN_SET":
                             $strOperation .= " $field_key = " . $db->toSql($strCompare);
@@ -756,8 +735,6 @@ class ffWidget_actex extends ffCommon
                             $strOperation .= " $field_key = " . $db->toSql($strCompare);
                             $strOperationHaving .= " $field_key_having = " . $db->toSql($strCompare);
                     }
-
-
 //					$strOperation = $field_key . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
 //					$strOperationHaving = $field_key_having . " IN('" . str_replace(",", "','", $db->toSql($strCompare, "Text", false)) . "')";
 					$sSQL = $Field->source_SQL;
@@ -887,19 +864,11 @@ class ffWidget_actex extends ffCommon
         if ($father === null)
 			$this->tpl[$tpl_id]->parse("SectBindingFoot", true);
 		if ($this->display_debug) {
-            $count_actions++;
 			$this->tpl[$tpl_id]->set_var("icon_debug", cm_getClassByFrameworkCss("bug", "icon"));    
 			$this->tpl[$tpl_id]->parse("SectDebug", false);
 		} /*else {
 			$this->tpl[$tpl_id]->set_var("SectDebug", "");
 		}*/
-
-		if($count_actions) {
-            $this->tpl[$tpl_id]->parse("SectActions", false);
-        } else {
-            $this->tpl[$tpl_id]->set_var("SectActions", "");
-        }
-
  		return $Field->fixed_pre_content . $this->tpl[$tpl_id]->rpparse("SectControl", false) . $Field->fixed_post_content;
 	}
 	function get_component_headers($id)

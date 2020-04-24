@@ -65,6 +65,10 @@ class ffWidget_timechooser extends ffCommon
 
 	}
 	
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 

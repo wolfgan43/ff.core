@@ -24,6 +24,12 @@ var that = { /* publics */
 			jQuery("i", this).remove();
 			jQuery(this).removeAttr("style");
 		});
+	},
+	"activateAll" : function () {
+		jQuery('.activebuttons').removeAttr("disabled").css({ "opacity" : "1" });
+	},
+	"deactivateAll" : function () {
+		jQuery('.activebuttons').css("opacity", "0.6").attr("disabled", "disabled");
 	}
 }; /* publics' end */
 

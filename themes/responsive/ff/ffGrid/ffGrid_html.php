@@ -474,7 +474,6 @@ class ffGrid_html extends ffGrid_base
 	}
 
     function addGridDisposition($ID_component, $component_type, $col = null, $row = null, $params = null) {
-        $colspan = false;
     	$default_type = array(
     		"button" => -1
     	);
@@ -504,8 +503,7 @@ class ffGrid_html extends ffGrid_base
 			);
 
 		if($col === null) {
-            $colspan = true;
-            $col = count($this->grid_disposition[$row]);
+			$col = count($this->grid_disposition[$row]);
 
 			if($this->grid_disposition_options[$component_type]["wrap_col"]  
 				&& isset($default_type[$component_type]) 
@@ -529,13 +527,9 @@ class ffGrid_html extends ffGrid_base
 
 		$params["type"] = $component_type;
 
-		$this->grid_disposition[$row][$col][$ID_component] = $params;
-
-        if ($colspan) {
-            unset($this->grid_disposition_elem["data"][$row][$col -1]["colspan"]);
-            $this->grid_disposition_elem["data"][$row][$col]["colspan"]++;
-        }
-        $this->grid_disposition_elem["data"][$row][$col][$component_type]++;
+		$this->grid_disposition[$row][$col][$ID_component] = $params;    
+		
+		$this->grid_disposition_elem["data"][$row][$col][$component_type]++;
 		$this->grid_disposition_elem[$component_type][$row]++;
 		$this->grid_disposition_elem["count"][$row]++;
     }
@@ -942,7 +936,7 @@ class ffGrid_html extends ffGrid_base
 
 		$search_class["default"] = "search";
 		$this->tpl[0]->set_var("search_class", cm_getClassByDef($this->framework_css["search"], $search_class));
-		$this->tpl[0]->set_var("search_box_class", cm_getClassByFrameworkCss("group", "form", array("class" => "simple-search")));
+		$this->tpl[0]->set_var("search_box_class", cm_getClassByFrameworkCss("group", "form"));
         
 		//$this->tpl[0]->set_var("maxspan", ($this->search_cols * 2));
 		//$this->tpl[0]->set_var("search_method", $this->search_method);
@@ -1385,7 +1379,7 @@ class ffGrid_html extends ffGrid_base
             $recordset_count = 0;
 
             $rows = $this->db[0]->numRows();
-            $srow = (((int)$this->page - 1) * (int)$this->records_per_page) + 1;
+            $srow = (($this->page - 1) * $this->records_per_page) + 1;
             do
             {
             	$arrGridData[] = $this->db[0]->record;
@@ -1879,7 +1873,7 @@ class ffGrid_html extends ffGrid_base
     {
 	    if (!is_subclass_of($field, "ffField_base"))
 	        ffErrorHandler::raise("Wrong Grid Field: must be a ffField", E_USER_ERROR, $this, get_defined_vars());
-
+    
 	    if ($field->display === false)
 	        return false;
 
@@ -1900,9 +1894,8 @@ class ffGrid_html extends ffGrid_base
 	    /**
 	    * Set Field Symbol
 	    */
-		if(strlen($this->symbol_valuta) && $field->app_type == "Currency" && !$field->fixed_pre_content && !$field->fixed_post_content) {
-            $buffer_symbol = $this->symbol_valuta;
-        }
+		if(strlen($this->symbol_valuta) && $field->app_type == "Currency")
+			$buffer_symbol = $this->symbol_valuta;
 			
 
 		/**
@@ -2259,7 +2252,7 @@ class ffGrid_html extends ffGrid_base
 					$res = null;
 
 					if($params["type"] == "field")
-						$res = $this->parse_field($this->grid_fields[$key], $recordset_key, $modify_url, $keys, ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1]["field"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true), count($this->grid_disposition_elem["count"]) > 1);
+						$res = $this->parse_field($this->grid_fields[$key], $recordset_key, $modify_url, $keys, ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1]["field"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true), ($row > 1 ? true : false/*!$this->grid_fields[$key]->allow_order*/));
 					elseif($params["type"] == "button") {
 						if(isset($this->grid_buttons[$key]))
 							$res = $this->parse_button($this->grid_buttons[$key], $recordset_key, $rrow, $modify_url["default"], ($this->grid_disposition_elem["data"][$row - 1 ][$col - 1 ]["button"] > 1 && count($this->grid_disposition_elem["data"]) == 1 ? false : true));
@@ -2304,11 +2297,10 @@ class ffGrid_html extends ffGrid_base
 			$col_properties = $button["container_properties"];
 		}
 
-		if(isset($this->grid_disposition_elem["data"][$row -1 ][$col -1]["colspan"]) && count($this->grid_disposition_elem["data"]) > 1) {
+		if($col == 1 && count($this->grid_disposition_elem["data"]) > 1) {
 			$colspan = max($this->grid_disposition_elem["count"]) - $col_count;
-			if($colspan) {
-                $col_properties["colspan"] = $colspan + 1;
-            }
+			if($colspan)
+				$col_properties["colspan"] = $colspan + 1;
 		}	
 		/**
 		* Parse Col Vars
@@ -2829,7 +2821,7 @@ class ffGrid_html extends ffGrid_base
 		return $rc;
     }
 	
-	function setWidthComponent($resolution_large_to_small)
+	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
 			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);

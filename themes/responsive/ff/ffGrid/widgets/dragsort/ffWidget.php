@@ -59,6 +59,10 @@ class ffWidget_dragsort extends ffCommon
 			$this->tpl[$id]->set_var("query_string", "?" . $_SERVER["QUERY_STRING"]);
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process(ffGrid_base $grid, $options, $key_field)
 	{ 
 		$tpl_id = $grid->getIDIF();

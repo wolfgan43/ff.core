@@ -3088,9 +3088,9 @@ class ffPage_html extends ffPage_base
 	 * @param String $path il percorso della widget. Se omesso viene determinato in base all'oggetto di riferimento
 	 * @param Object $ref l'oggetto di riferimento, di default la pagina stessa
 	 */
-	function widgetLoad($name, $path = null, &$ref = null)
+	function widgetLoad($name, $path = null, &$ref = null, $options = null)
 	{
-		if (!parent::widgetLoad($name, $path, $ref))
+		if (!parent::widgetLoad($name, $path, $ref, $options))
 			return;
 
 		if (count($this->widgets[$name]->libraries))

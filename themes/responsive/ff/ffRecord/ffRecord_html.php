@@ -582,7 +582,7 @@ class ffRecord_html extends ffRecord_base
                                 );
 
                             } else {
-                                //$tab_key = $group_key;
+                                $tab_key = $group_key;
                             }
 
                             $last_tab_key = $tab_key;
@@ -621,7 +621,7 @@ class ffRecord_html extends ffRecord_base
 									}
 								//}
 
-
+								
 								if(is_array($arrTitleProperties) && count($arrTitleProperties)) {
 									$str_title_properties = "";
 									foreach($arrTitleProperties AS $arrTitleProperties_key => $arrTitleProperties_value) {
@@ -657,7 +657,7 @@ class ffRecord_html extends ffRecord_base
 								if(!$this->tabs["contents"][$tab_key]["title"])
 									$this->tabs["contents"][$tab_key]["title"] = (is_array($group_value["tab"]) && $group_value["tab"]["title"]
                                         ? $group_value["tab"]["title"]
-                                        : ($group_value["title"] && $tab_key == $group_key
+                                        : ($group_value["title"]
                                             ? $group_value["title"]
                                             : $tab_key
                                         )
@@ -1130,7 +1130,7 @@ class ffRecord_html extends ffRecord_base
 				if($primary_field == $key && is_subclass_of($subvalue["data"], "ffField_base")) {
 					$this->tpl[0]->set_var("GroupTitle", $this->tpl[0]->ProceedTpl("SectGroupRow"));
 				} else {
-					if(($wrap_count >= 12 || $count_contents == count($contents) || !empty($this->form_fields[$key]->framework_css["line_break"])) && $is_wrapped) {
+					if(($wrap_count >= 12 || $count_contents == count($contents)) && $is_wrapped) {
 						$this->tpl[0]->parse("SectWrapEnd", false);
 						$wrap_count = 0;
 						$is_wrapped = false;
@@ -1339,7 +1339,7 @@ class ffRecord_html extends ffRecord_base
 		return $buffer;
 	}
 	
-	function setWidthComponent($resolution_large_to_small)
+	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
 			$this->framework_css["component"]["grid"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);

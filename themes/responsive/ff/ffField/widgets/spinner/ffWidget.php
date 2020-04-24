@@ -59,6 +59,10 @@ class ffWidget_spinner extends ffCommon
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_html &$Field)
 	{
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))

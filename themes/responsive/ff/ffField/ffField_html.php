@@ -144,7 +144,7 @@ class ffField_html extends ffField_base
 	 * Visualizza il pulsante di eliminazione dell'elemento correntemente selezionato
 	 * @var Boolean
 	 */
-	var $actex_dialog_show_delete		= false; // without actex_dialog_delete_url this is ignored
+	var $actex_dialog_show_delete		= true; // without actex_dialog_delete_url this is ignored
 	/**
 	 * L'url del dialog di eliminazione, se omesso è uguale a $actex_dialog_edit_url
 	 * @var String
@@ -203,7 +203,8 @@ class ffField_html extends ffField_base
 	var $actex_limit					= null;
 	
 	var $actex_autocomp					= false;
-	var $actex_autocomp_limit			= 0;
+	var $actex_autocomp_ajax			= false;
+	var $actex_autocomp_limit			= 100;	
 	var $actex_autocomp_preserve_text	= false;
 
 
@@ -415,8 +416,57 @@ class ffField_html extends ffField_base
     var $file_showfile_plugin = "fancybox";
     var $file_sortable = false;
    
-    									// (se ckfinder_show_file non e valorizzato la preview sara disabilitata)
+    var $uploadifive_checkexists_callback = null; /* il nome di una funzione raggiungibile nello scope globale che restituisce true se il file esiste, false se non esiste.
+												     può anche restituire il percorso del file, nel caso esista.
+												 */
     
+    // uploadex
+	var $uploadex_use_own_session = false;
+	var $uploadex_force_no_session = false; // use cached file version
+	
+    var $uploadex_showfile_path = null;
+    var $uploadex_showfile_plugin = "fancybox"; // es.: "fancybox" or null
+    var $uploadex_upload_script = null; // null for default
+	
+    var $uploadex_label = "Upload";
+	
+    var $uploadex_icons_class = array(
+		"button" => "uplex-style-button" // default: uplex-style-button or uplex-style-area
+	);
+
+	var $uploadex_properties = array(
+		/*"previews" => array(
+			"style" => array(
+				"min-height" => "220px"
+			)
+		),
+		"preview-item" => array(
+			"style" => array(
+				//"width" => "200px",
+				"height" => "200px"
+			)
+		),
+		"queue" => array(
+			"style" => array(
+				"min-height" => "42px"
+			)
+		),*/
+	);
+
+	var $uploadex_show_caption = true;
+	var $uploadex_caption_properties = array(
+	);
+	
+	var $uploadex_sortable = false;
+	var $uploadex_sortable_options = array(
+		"placeholder" => "uplex-preview-item ui-state-highlight"
+		, "forcePlaceholderSize" => true
+	);
+	
+	var $uploadex_allow_replace = true;
+	var $uploadex_multi_allow_duplicates = false;
+	var $uploadex_onclick = null; // can be only a javascript function reference. If set, override plugin action (not loading)
+	
     var $placeholder = false;
 	//slug
 	/**
@@ -505,11 +555,13 @@ class ffField_html extends ffField_base
 	 * @param Boolean $output_result se true visualizza a video il risultato del processing, se false restituisce il contenuto del processing
 	 * @return Mixed può essere string o true, a seconda di output_result
 	 */
-	public function tplParse($output_result)
+	public function tplParse($output_result, $id)
 	{
 		$this->tpl[0]->set_var("properties", $this->getProperties());
 		$fixed_pre_content = $this->fixed_pre_content;
 		$fixed_post_content = $this->fixed_post_content;
+		$fixed_pre_content = str_replace("[FIELD_ID]", $id, $fixed_pre_content);
+		$fixed_post_content = str_replace("[FIELD_ID]", $id, $fixed_post_content);
 		$buffer = $this->tpl[0]->rpparse("main", false);
 		
 		$wrap_addon = null;
@@ -651,16 +703,12 @@ class ffField_html extends ffField_base
 		parent::process_file($id, $value);
 	}
 	
-	function setWidthComponent($resolution_large_to_small, $line_break = false)
+	function setWidthComponent($resolution_large_to_small) 
 	{
 		if(is_array($resolution_large_to_small) || is_numeric($resolution_large_to_small)) 
 			$this->framework_css["container"]["col"] = ffCommon_setClassByFrameworkCss($resolution_large_to_small);
 		elseif(strlen($resolution_large_to_small))
 			$this->framework_css["container"]["row"] = $resolution_large_to_small;
-
-        if($line_break) {
-            $this->framework_css["line_break"] = true;
-        }
 	}	
 	function setWidthLabel($resolution_large_to_small, $reverse_control_class = true, $align = "right") 
 	{

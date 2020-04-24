@@ -1,6 +1,6 @@
 ff.ffField.kcuploadifive = (function () {
 	var basePath = "/themes/library/plugins/jquery.uploadifive";
-	var previewPath = "/cm/showfiles.php";
+	var previewPath = "/media";
 	var plugins = {
 		"fancybox" : {}
 	};		

@@ -23,19 +23,16 @@
 <div class="{actex_container}"> 
 	{dialogaddlink}
 	<span id="actex_{container}{id}" class="{data_class}" {data_properties}></span>
-	<!--BeginSectActions-->
 	<div class="{actions_class}">
-		<!--BeginSectCombo-->
-		<a class="{icon_caret_down}" id="actex_{container}{id}_combo"></a>
-		<!--EndSectCombo-->
 		<!--BeginSectDebug-->
 			<a class="{icon_debug}" href="#" onclick="window.open('{innerURL}&data_src={data_src}', '_blank')"></a>
 		<!--EndSectDebug-->
 		{dialogeditlink}
 		{dialogdeletelink}
-
+		<!--BeginSectCombo-->
+			<a class="{icon_caret_down}" id="actex_{container}{id}_combo"></a>
+		<!--EndSectCombo-->
 	</div>
-	<!--EndSectActions-->
 </div>
 <!--BeginSectMulti-->
 <ul class="{actex_multi_container}">
@@ -96,7 +93,7 @@ ff.pluginAddInit("ff.ffField.actex", function () {
             , "use_cache"			: {use_cache}
 			, "autocomplete"		: {
 				"enable"			: {autocomp_enable}
-				, "preserveText"	: {autocomp_preserve_text}
+				, "ajax"			: {autocomp_ajax}
 				, "limit"			: "{autocomp_limit}"
 			}
             <!--BeginSezPlugin-->

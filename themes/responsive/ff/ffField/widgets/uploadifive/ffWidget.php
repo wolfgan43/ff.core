@@ -65,6 +65,10 @@ class ffWidget_uploadifive extends ffCommon
 
 	}
 	
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		global $plgCfg_uploadifive_UseOwnSession;
@@ -203,6 +207,7 @@ class ffWidget_uploadifive extends ffCommon
 			if(count($_SESSION)) {//if(session_status() == PHP_SESSION_NONE) {
 				$ff["uploadifive"][$tmp]["folder"] = $folder;
 				$ff["uploadifive"][$tmp]["base_path"] = $base_path;
+				$ff["uploadifive"][$tmp]["checkexists_callback"] = $Field->uploadifive_checkexists_callback;
 				
 				$this->tpl[$tpl_id]->set_var("data_src", $tmp);
 			}			
@@ -254,8 +259,8 @@ class ffWidget_uploadifive extends ffCommon
 		}
 		$this->tpl[$tpl_id]->set_var("cancel_class", cm_getClassByFrameworkCss("cancel", "icon"));
         $this->tpl[$tpl_id]->set_var("aviary_class", cm_getClassByFrameworkCss("crop", "icon"));  
-        $this->tpl[$tpl_id]->set_var("upload_class", cm_getClassByFrameworkCss("upload", "icon"));
-        $this->tpl[$tpl_id]->set_var("upload_icon", cm_getClassByFrameworkCss("upload", "icon-tag", "lg"));
+        $this->tpl[$tpl_id]->set_var("upload_class", cm_getClassByFrameworkCss("fas fa-upload", "icon"));
+        $this->tpl[$tpl_id]->set_var("upload_icon", cm_getClassByFrameworkCss("fas fa-upload", "icon-tag", "lg"));
         
 		if($Field->file_multi) {
 			$this->tpl[$tpl_id]->set_var("multi", "true");

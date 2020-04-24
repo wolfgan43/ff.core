@@ -65,6 +65,10 @@ class ffWidget_kcuploadify extends ffCommon
 
 	}
 	
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		global $plgCfg_kcuploadify_UseOwnSession;

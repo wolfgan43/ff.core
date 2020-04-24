@@ -75,6 +75,10 @@ class ffWidget_autocompletetoken extends ffCommon
 			
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		global $plgCfg_autocompletetoken_UseOwnSession;

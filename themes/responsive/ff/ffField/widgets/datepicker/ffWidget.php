@@ -64,6 +64,10 @@ class ffWidget_datepicker extends ffCommon
 			$this->tpl[$id]->set_var("style_path", $this->oPage[0]->getThemePath());
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_html &$Field)
 	{
 		if ($Field->parent !== null && strlen($Field->parent[0]->getIDIF()))
@@ -143,7 +147,7 @@ class ffWidget_datepicker extends ffCommon
 		if ($Field->datepicker_showbutton)
         {
 	        $Field->framework_css["fixed_post_content"] = array(2);         
-	        $Field->fixed_post_content = '<a href="javascript:void(0);" onclick="jQuery.fn.escapeGet(\'' . $Field->parent[0]->id . "_" . $id . '\').datepicker(\'show\');" class="' . cm_getClassByFrameworkCss("calendar-alt", "icon") . '"></a>';
+	        $Field->fixed_post_content = '<a href="javascript:void(0);" onclick="jQuery.fn.escapeGet(\'' . $Field->parent[0]->id . "_" . $id . '\').datepicker(\'show\');" class="' . cm_getClassByFrameworkCss("far fa-calendar-alt", "icon") . '"></a>';
 	        /*messo nel css */ //$Field->properties["style"] = "position: relative; z-index: 100000;"; //workground per far funzionare il datepicker dentro le dialog modali
         }
 		

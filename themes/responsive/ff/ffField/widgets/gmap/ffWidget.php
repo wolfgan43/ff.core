@@ -54,6 +54,10 @@ class ffWidget_gmap
 
 	}
 	
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$value, ffField_base &$Field)
 	{
 		if ($Field->parent !== null && strlen($Field->parent[0]->id))

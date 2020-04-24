@@ -66,6 +66,10 @@ class ffWidget_lifesaver extends ffCommon
 	{
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, $options, ffPage_base &$oPage)
 	{
 		$tpl_id = $options["tpl_id"];

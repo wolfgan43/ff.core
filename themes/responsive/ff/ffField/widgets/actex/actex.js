@@ -578,11 +578,10 @@ var activecombo = function(params) {
 			}
 		}
 
-		, "child_error_display" : function (textStatus) {
+		, "child_error_display" : function () {
 			var node = that.getNode();
 			if (node) {
-
-				node.innerHTML = 'Impossibile connettersi con il server, riprovare più tardi. ' + textStatus;
+				node.innerHTML = 'Impossibile connettersi con il server, riprovare più tardi.';
 				if(!that.options.hideEmpty || that.options.hideEmpty === true)
                     jQuery(node).show();
                 else if(that.options.hideEmpty == "all")
@@ -867,8 +866,8 @@ var activecombo = function(params) {
 		});
 	};
 	
-	function async_error(jqXHR, textStatus, errorThrown) {
-		that.child_error_display(textStatus);
+	function async_error() {
+		that.child_error_display();
 		//ff.ajax.unblockUI();
 	};
 
@@ -983,11 +982,8 @@ var activecombo = function(params) {
 	};
 
 	function updatebt () {
-		if (!jQuery.fn.escapeGet("actex_" + __id + "_dialogaddlink").length
-			&& !jQuery.fn.escapeGet("actex_" + __id + "_dialogeditlink").length
-		) {
+		if (!jQuery.fn.escapeGet("actex_" + __id + "_dialogaddlink").length)
 			return;
-		}
 
 		var res = that.doEvent({
 			"event_name"	: "updatebt",
@@ -1078,7 +1074,7 @@ var activecombo = function(params) {
                 		"overflow-y"			: "auto"
                 		, "overflow-x"			: "hidden"
                 		, "position"			: "absolute"
-
+                		, "z-index" 			: 5 
 						, "background"			: "#fff"
 						, "border"				: "1px solid #ccc"
 						, "border-top-color"	: "#d9d9d9"
@@ -1086,8 +1082,7 @@ var activecombo = function(params) {
 						, "cursor"				: "pointer"
 						, "max-height"			: "300px"
 						, "top"					: $this.offset().top + $this.outerHeight() - dialogTop
-						, "width"				: $this.outerWidth() + 30
-						, "z-index"				: 1050
+						, "width"				: $this.outerWidth()
 					});
 
  				jQuery(".ui-menu-item", $menu).css({
@@ -1160,12 +1155,8 @@ var activecombo = function(params) {
 						$this.val(itm_found["desc"]);
 						that.change(false, itm_found["value"]);
 					} else if (that.value_ori["desc"]) {
-					    if(that.options.autocomplete.preserveText) {
-                            that.change(false, $this.val());
-                        } else {
-                            $this.val(that.value_ori["desc"]);
-                            that.change(false, that.value_ori["value"]);
-                        }
+						$this.val(that.value_ori["desc"]);
+						that.change(false, that.value_ori["value"]);
 					} else {
 						$this.val("");
 						tmp_compare = "";
@@ -1197,10 +1188,26 @@ var activecombo = function(params) {
 	             .append('<a href="javascript:void(0);">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>")
 	             .appendTo(ul);
 	    };
+		
+		/*if (!that.options.autocomplete.ajax) {
+			jQuery.fn.escapeGet(__id + "_label")
+				.css("margin-right", 0)
+				.after(
+					jQuery( "<a>" )
+						.addClass( icons.caret )
+						.css({"pointer-events" : "auto"})
+						.click(function() {
+							jQuery.fn.escapeGet(__id + "_label").focus();
+
+							// Pass empty string as value to search for, displaying all results
+							jQuery.fn.escapeGet(__id + "_label").autocomplete("search");
+						})
+				);
+		}*/
 	}
 
 	function drawDialogButtons () {
-		if (ff.ffPage.dialog.dialog_params.get("actex_dlg_add_" + __id)) {
+		if (ff.ffPage.dialog.dialog_params.get("actex_dlg_" + __id)) {
 			if (!buttons.get("add") || that.options.limit_select) {
 				jQuery.fn.escapeGet("actex_" + __id + "_dialogaddlink").addClass("hidden");
 			} else {

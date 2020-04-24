@@ -52,6 +52,10 @@ class ffWidget_activebuttons extends ffCommon
 			$this->tpl[0]->set_var("style_path", $oPage->getThemePath());
 	}
 
+	function pre_process($obj, $options = null)
+	{
+	}
+
 	function process($id, &$data, ffPage_base &$oPage)
 	{
 	}
