@@ -995,6 +995,56 @@ tbody > tr:hover {
     color: #111;
     border: 1px solid #ddd;
 }
+.input-group .btn-link {
+        border: none!important;
+}
+.input-group .btn.btn-success{
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    border-radius: 0 4px 4px 0;
+}
+.input-group .btn.btn-success:focus,
+.input-group .btn.btn-success.focus {
+    color: #fff;
+    background-color: #449d44;
+    border-color: #255625;
+}
+.input-group .btn.btn-success:hover {
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439;
+}
+.input-group .btn.btn-success:active,
+.input-group .btn.btn-success.active{
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439;
+}
+.input-group .btn.btn-primary{
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    margin:0 5px;
+    border-radius: 4px;
+}
+.input-group .btn.btn-primary:focus,
+.input-group .btn.btn-primary.focus {
+    color: #fff;
+    background-color: #286090;
+    border-color: #122b40;
+}
+.input-group .btn.btn-primary:hover {
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74;
+}
+.input-group .btn.btn-primary:active,
+.input-group .btn.btn-primary.active{
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74;
+}
 
 .perPage li a{
     border: none;
@@ -1414,7 +1464,7 @@ tbody > tr:hover {
 .ffGrid .table td {
 
     vertical-align: middle;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
 }
 .ffGrid .table .currency {
   text-align: right;
@@ -2723,17 +2773,17 @@ td a.fas:link span.act-done, td a.fas:link span.act-tot{
     padding: 0;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
-.actions .btn{
+.actions .btn, .btn.div-right{
     margin-left:5px;
     margin-top:5px;
 }
-
+/*
 .actions.-sticky {
     position: fixed;
     bottom: 15px;
     right: 0;
     z-index: 2;
-}
+}*/
 /* KEENG */
 .ffDetails .nav-tabs, .tab-pane .col-xs-12 .nav-tabs{
     position: relative;
@@ -2981,6 +3031,114 @@ p{
     width: 100%!important;
 }
 
+.uploadex LABEL {
+    display: block;
+}
+
+.uplex-style-area {
+    width: 100px!important;
+    height: 100px!important;
+}
+
+.uploadifive-button {
+    border: 2px dashed #c6c6c6 !important;
+    color: #c6c6c6;
+    transition: border-width 0.3s, color 0.3s;
+    cursor: pointer !important;
+    display: inline-block;
+    margin-right: 0.3em;
+    display: inline-block!important;
+    float: left;
+    margin-right: 10px;
+}
+
+.uplex-style-area .uplex-control-droparea {
+    height: 96px!important;
+    line-height: 96px!important;
+    overflow: hidden!important;
+    position: relative!important;
+    text-align: center!important;
+    width: 96px!important;
+    font-size: 50px!important;
+    border: 2px dashed #c6c6c6 !important;
+    transition: border-width 0.3s, color 0.3s;
+    cursor: pointer !important;
+    background: none!important;
+    display: inline-block!important;
+    float: left!important;
+    margin-right: 10px!important;
+}
+
+.uplex-preview-item, .uploadifive-queue-item {
+    margin: 10px 10px 0 0!important;
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    position: relative;
+    border: 1px solid #c6c6c6;
+    overflow: hidden;
+    text-align: center;
+}
+.uplex-preview-item img{
+    width: 100px;
+    height: 100px;
+}
+
+.uplex-style-area .uplex-control-droparea:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    text-rendering: optimizeLegibility;
+    content: "\f093";
+}
+
+.uploadifive-button:hover, .uplex-style-area:hover .uplex-control-droparea { color:#666!important; }
+
+.image-vertical-bordered{
+    border: 1px solid #c6c6c6;
+    height: 100px;
+    width: 100px;
+    display:-ms-flexbox;
+    -ms-flex-pack:center;
+    -ms-flex-align:center;
+
+    /* Firefox */
+    display:-moz-box;
+    -moz-box-pack:center;
+    -moz-box-align:center;
+
+    /* Safari, Opera, and Chrome */
+    display:-webkit-box;
+    -webkit-box-pack:center;
+    -webkit-box-align:center;
+
+    /* W3C */
+    display:box;
+    box-pack:center;
+    box-align:center;
+}
+.image-vertical{
+    height: 100px;
+    width: 100px;
+    display:-ms-flexbox;
+    -ms-flex-pack:center;
+    -ms-flex-align:center;
+
+    /* Firefox */
+    display:-moz-box;
+    -moz-box-pack:center;
+    -moz-box-align:center;
+
+    /* Safari, Opera, and Chrome */
+    display:-webkit-box;
+    -webkit-box-pack:center;
+    -webkit-box-align:center;
+
+    /* W3C */
+    display:box;
+    box-pack:center;
+    box-align:center;
+}
+
 /* COLONNE E RIGHE */
 .blockcomposer .container-fluid {
     width: 100%;
@@ -3021,7 +3179,7 @@ p{
 }
 .blockcomposer TABLE.draggable > TBODY > TR > TD:first-child, .blockcomposer TABLE.draggable > TBODY > TR > TD.first  {
     background: none!important;
-    padding: 30px 8px 30px 0!important;
+    padding: 0px 8px 30px 0!important;
     vertical-align: top;
     border: none;
     border-left: 5px solid #e7e7e7;
@@ -3044,7 +3202,7 @@ p{
 }
 .blockcomposer TD.cel-1{
     position: relative;
-    padding: 30px 8px 30px 8px!important;
+    padding: 0px 8px 0px 8px!important;
 }
 /*
 .blockcomposer TD.cel-1 .row{
@@ -3064,7 +3222,7 @@ p{
     color: #fff;
     display: block;
     position: absolute;
-    top: 30px;
+    top: 0;
     left: 0;
     /*ackground-image: url(../../../../../themes/responsive/images/FormsGrid/edit.png);*/
     background-repeat: no-repeat;
@@ -3103,7 +3261,7 @@ p{
 }
 .blockcomposer TD.ffButton{
     background: none!important;
-    padding: 30px 0 0 0!important;
+    padding: 0!important;
     vertical-align: top;
     width: 30px!important;
 }
@@ -5854,4 +6012,69 @@ p{
     .mx-xl-auto {
         margin-left: auto !important;
     }
+}
+/*
+ GESTORE UPLOAD
+  */
+#GestoreUpload table tr{
+    display: inline-block;
+    width: 116px;
+    ovreflow:hidden;
+    position: relative;
+    margin: 0 2px;
+}
+#GestoreUpload table tr td.ffButton{
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0!important;
+}
+#GestoreUpload table tr td.ffButton a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    margin: 0!important;
+}
+#GestoreUpload table tr td.ffButton a:before {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border: 1px solid #337ab7;
+    border-radius: 4px;
+    padding: 5px;
+    color: #fff;
+    background-color: #337ab7;
+    display: none;
+}
+#GestoreUpload table tr td.ffButton:hover a:before{
+    display: block;
+}
+#GestoreUpload table thead{
+    display: none;
+}
+#GestoreUpload table tr td{
+    display: block;
+    text-align: center;
+    border: 1px solid #cccccc;
+}
+#GestoreUpload table tr td.cel-2{
+    display: block;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border: 1px solid #cccccc;
+    border-top: none;
+}
+/* USERS */
+.users{
+    line-height:48px!important;
+}
+.users img{
+    float:left;
+    margin-right:9px;
 }

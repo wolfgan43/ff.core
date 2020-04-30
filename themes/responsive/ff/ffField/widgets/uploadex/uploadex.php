@@ -62,7 +62,7 @@ if ($options === null)
 if (ffArrIsset($_REQUEST, "delaction"))
 {
 	$target_file = rtrim($options["storing_paths"]["temp"], "/") . "/" . $_REQUEST["delaction"];
-	if (file_exists($target_file))
+	if (file_exists($target_file) && !$options["keep_old_one"])
 	{
 		@unlink($target_file);
 		$res["status"] = true; // TODO: this value became useless here because overwritten

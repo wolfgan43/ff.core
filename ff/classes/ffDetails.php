@@ -948,24 +948,76 @@ abstract class ffDetails_base extends ffCommon
 					{
 						foreach ($this->key_fields as $subkey => $subvalue)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
 							if (isset($value[$subkey]))
 								$this->recordset[$i][$subkey] = $value[$subkey];
 							else
 								$this->recordset[$i][$subkey] = $this->key_fields[$subkey]->getDefault(array(&$this));
+								
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->key_fields);
 
 						foreach ($this->hidden_fields as $subkey => $subvalue)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
 							if (isset($value[$subkey]))
 								$this->recordset[$i][$subkey] = $value[$subkey];
 							else
+							{
 								$this->recordset[$i][$subkey] = $this->hidden_fields[$subkey]->getDefault(array(&$this));
+							}
+								
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->hidden_fields);
 
 						foreach ($this->form_fields as $subkey => $subvalue)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
 							if (is_array($this->form_fields[$subkey]->multi_fields) && count($this->form_fields[$subkey]->multi_fields))
 							{
 								foreach ($this->form_fields[$subkey]->multi_fields as $mul_subkey => $mul_subvalue)
@@ -986,6 +1038,16 @@ abstract class ffDetails_base extends ffCommon
 								else
 									$this->recordset[$i][$subkey] = $this->form_fields[$subkey]->getDefault(array(&$this));
 							}
+								
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $subkey, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->form_fields);
 
@@ -1056,12 +1118,42 @@ abstract class ffDetails_base extends ffCommon
 						{
 							foreach ($this->key_fields as $key => $value)
 							{
+								$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
 								$this->recordset_ori[$i][$key] = $this->db[0]->getField($this->key_fields[$key]->get_data_source(), $this->key_fields[$key]->base_type);
+								
+								$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
 							}
 							reset($this->key_fields);
 
 							foreach ($this->form_fields as $key => $value)
 							{
+								$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
 								switch ($this->form_fields[$key]->data_type)
 								{
 									case "db":
@@ -1101,11 +1193,31 @@ abstract class ffDetails_base extends ffCommon
 										$this->recordset_ori[$i][$key] = $this->form_fields[$key]->getDefault(array(&$this));
 										break;
 								}
+								
+								$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
 							}
 							reset($this->form_fields);
 
 							foreach ($this->hidden_fields as $key => $value)
 							{
+								$res = self::doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
 								switch ($this->hidden_fields[$key]->data_type)
 								{
 									case "db":
@@ -1124,6 +1236,16 @@ abstract class ffDetails_base extends ffCommon
 										$this->recordset_ori[$i][$key] = $this->hidden_fields[$key]->getDefault(array(&$this));
 										break;
 								}
+								
+								$res = self::doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $key, "db", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
 							}
 							reset($this->hidden_fields);
 							$this->recordset[$i] = $this->recordset_ori[$i];
@@ -1157,13 +1279,43 @@ abstract class ffDetails_base extends ffCommon
 					{
 						foreach ($this->key_fields as $key => $value)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
 							$this->recordset_ori[$i][$key] = $this->db[0]->getField($this->key_fields[$key]->get_data_source(), $this->key_fields[$key]->base_type);
 							$this->recordset[$i][$key] = $this->recordset_ori[$i][$key];
+								
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->key_fields);
 
 						foreach ($this->form_fields as $key => $value)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
 							if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 							{
 								foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
@@ -1218,11 +1370,31 @@ abstract class ffDetails_base extends ffCommon
 								}
 								$this->recordset[$i][$key] = $this->recordset_ori[$i][$key];
 							}
+							
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->form_fields);
 
 						foreach ($this->hidden_fields as $key => $value)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+								continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+								continue;
+
 							switch ($this->hidden_fields[$key]->data_type)
 							{
 								case "db":
@@ -1254,6 +1426,16 @@ abstract class ffDetails_base extends ffCommon
 							}
 
 							$this->recordset[$i][$key] = $this->recordset_ori[$i][$key];
+								
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $key, "db", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->hidden_fields);
 
@@ -1267,7 +1449,7 @@ abstract class ffDetails_base extends ffCommon
 			}
 		}
 		else if (!$this->main_record[0]->record_exist && $this->main_record[0]->first_access)
-		{
+		{  // set proper default values
 			if ($this->auto_populate_insert)
 			{
 				if (is_array($this->populate_insert_array) && count($this->populate_insert_array))
@@ -1277,21 +1459,71 @@ abstract class ffDetails_base extends ffCommon
 					{
 						foreach ($this->key_fields as $subkey => $subvalue)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+							
 							$this->recordset[$i][$subkey] = $this->key_fields[$subkey]->getDefault(array(&$this));
+								
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->key_fields);
 
 						foreach ($this->hidden_fields as $subkey => $subvalue)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+							
 							if (isset($value[$subkey]))
 								$this->recordset[$i][$subkey] = $value[$subkey];
 							else
 								$this->recordset[$i][$subkey] = $this->hidden_fields[$subkey]->getDefault(array(&$this));
+							
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->hidden_fields);
 
 						foreach ($this->form_fields as $subkey => $subvalue)
 						{
+							$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+							
 							if (is_array($this->form_fields[$subkey]->multi_fields) && count($this->form_fields[$subkey]->multi_fields))
 							{
 								foreach ($this->form_fields[$subkey]->multi_fields as $mul_subkey => $mul_subvalue)
@@ -1312,6 +1544,16 @@ abstract class ffDetails_base extends ffCommon
 								else
 									$this->recordset[$i][$subkey] = $this->form_fields[$subkey]->getDefault(array(&$this));
 							}
+							
+							$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
+
+							$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $subkey, "default", $i));
+							$rc = end($res);
+							if($rc !== null)
+							   continue;
 						}
 						reset($this->form_fields);
 
@@ -1378,21 +1620,71 @@ abstract class ffDetails_base extends ffCommon
 						{
 							foreach ($this->key_fields as $key => $value)
 							{
+								$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+							
 								$this->recordset[$i][$key] = $this->key_fields[$key]->getDefault(array(&$this));
+								
+								$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
 							}
 							reset($this->key_fields);
 
 							foreach ($this->hidden_fields as $key => $value)
 							{
+								$res = self::doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+								
 								if ($this->db[0]->isSetField($this->hidden_fields[$key]->get_data_source()))
 									$this->recordset[$i][$key] = $this->db[0]->getField($this->hidden_fields[$key]->get_data_source(), $this->hidden_fields[$key]->base_type);
 								else
 									$this->recordset[$i][$key] = $this->hidden_fields[$key]->getDefault(array(&$this));
+								
+								$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
 							}
 							reset($this->hidden_fields);
 
 							foreach ($this->form_fields as $key => $value)
 							{
+								$res = self::doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_before", array(&$this, $this->form_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
 								if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 								{
 									foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
@@ -1418,6 +1710,16 @@ abstract class ffDetails_base extends ffCommon
 								}
 								else
 									$this->recordset[$i][$key] = $this->form_fields[$key]->getDefault(array(&$this));
+								
+								$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
+
+								$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "default", $i));
+								$rc = end($res);
+								if($rc !== null)
+								   continue;
 							}
 							reset($this->form_fields);
 
@@ -1454,20 +1756,70 @@ abstract class ffDetails_base extends ffCommon
 			{
 				foreach ($this->key_fields as $key => $value)
 				{
+					$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+					
 					$this->recordset_ori[$i][$key] = new ffData($this->recordset_ori[$i][$key], $this->key_fields[$key]->base_type, FF_SYSTEM_LOCALE);
 					$this->recordset[$i][$key] = new ffData($this->recordset[$i][$key], $this->key_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+					
+					$res = self::doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_after", array(&$this, $this->key_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
 				}
 				reset($this->key_fields);
 
 				foreach ($this->hidden_fields as $key => $value)
 				{
+					$res = self::doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_before", array(&$this, $this->hidden_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+					
 					$this->recordset_ori[$i][$key] = new ffData($this->recordset_ori[$i][$key], $this->hidden_fields[$key]->base_type, FF_SYSTEM_LOCALE);
 					$this->recordset[$i][$key] = new ffData($this->recordset[$i][$key], $this->hidden_fields[$key]->base_type, FF_SYSTEM_LOCALE);
+					
+					$res = self::doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_after", array(&$this, $this->hidden_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
 				}
 				reset($this->hidden_fields);
 
 				foreach ($this->form_fields as $key => $value)
 				{
+					$res = self::doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_before", array(&$this, $this->key_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+					
 					if (is_array($this->form_fields[$key]->multi_fields) && count($this->form_fields[$key]->multi_fields))
 					{
 						foreach ($this->form_fields[$key]->multi_fields as $subkey => $subvalue)
@@ -1494,89 +1846,92 @@ abstract class ffDetails_base extends ffCommon
 							$this->recordset_files[$i][$key] = $this->recordset[$i][$key];
 							$this->recordset[$i][$key] = new ffData($this->recordset_files[$i][$key]["name"]);
 
-							if(is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["delete"]))
+							if (!$this->form_fields[$key]->file_multi)
 							{
-								if (strlen($this->recordset_files[$i][$key]["tmpname"]))
-									@unlink($this->form_fields[$key]->getFileFullPath($this->recordset_files[$i][$key]["tmpname"], true));
-
-								$this->recordset[$i][$key]->setValue("");
-								$this->recordset_files[$i][$key] = array();
-							}
-							elseif (is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["file"]["tmp_name"]))
-							{
-								if (!$this->form_fields[$key]->file_max_size ||
-										($this->form_fields[$key]->file_max_size && $this->recordset_files[$i][$key]["file"]["size"] <= $this->form_fields[$key]->file_max_size)
-									)
+								if(is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["delete"]))
 								{
-									if($this->form_fields[$key]->file_normalize) { 
-									    $file_ext = pathinfo($this->recordset_files[$i][$key]["file"]["name"], PATHINFO_EXTENSION); 
-									    $file_basename = $this->recordset_files[$i][$key]["file"]["name"];
-									    if($file_ext)
-									        $this->recordset_files[$i][$key]["file"]["name"] = ffCommon_url_rewrite(substr($file_basename, 0, strrpos($file_basename, "." . $file_ext))) . "." . $file_ext;
-									    else
-									        $this->recordset_files[$i][$key]["file"]["name"] = ffCommon_url_rewrite($file_basename) . "." . $file_ext;
-									}
-
 									if (strlen($this->recordset_files[$i][$key]["tmpname"]))
 										@unlink($this->form_fields[$key]->getFileFullPath($this->recordset_files[$i][$key]["tmpname"], true));
 
-									$tmp_name = "tmp_" . date("YmdHms") . "_" . uniqid(rand(), true) . "_" . $this->recordset_files[$i][$key]["file"]["name"];
-
-									if ($this->form_fields[$key]->file_make_temp_dir)
-										@mkdir($this->form_fields[$key]->getFileFullPath($this->form_fields[$key]->file_chmod, true), true);
-
-									move_uploaded_file($this->recordset_files[$i][$key]["file"]["tmp_name"], $this->form_fields[$key]->getFileFullPath($tmp_name, true));
-									@chmod($this->form_fields[$key]->getFileFullPath($tmp_name, true), 0777);
-
-									if($this->form_fields[$key]->file_full_path) {
-                                        if (
-                                            substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 7) != "http://"
-                                            && substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 8) != "https://"
-                                            && substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
-                                        ) {
-										    if(file_exists($this->form_fields[$key]->getFileFullPath($tmp_name, true)))	
-											    $this->form_fields[$key]->value->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileFullPath($tmp_name, true)));
-
-										    //if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset_files[$i][$key]["file"]["name"]))
-											    //$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileTempPath(false)) . "/" . $this->recordset_files[$i][$key]["file"]["name"]);
-                                        }
-									} else 
-										$this->recordset[$i][$key]->setValue($this->recordset_files[$i][$key]["file"]["name"]);
-										
-									$this->recordset_files[$i][$key]["tmpname"] = $tmp_name;
-									unset($this->recordset_files[$i][$key]["file"]);
+									$this->recordset[$i][$key]->setValue("");
+									$this->recordset_files[$i][$key] = array();
 								}
-								else
+								elseif (is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["file"]["tmp_name"]))
 								{
-									$this->strError .= "<br />&Egrave; stato superato il limite di upload per il campo " . $this->form_fields[$key]->label;
-								}
-							} elseif(is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["file"]["name"])) {
-								if($this->form_fields[$key]->file_full_path) {
-                                    if (
-                                        substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 7) != "http://"
-                                        && substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 8) != "https://"
-                                        && substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
-                                    ) {
-									    if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset_files[$i][$key]["file"]["name"]))
-										    $this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileFullPath($this->recordset_files[$i][$key]["file"]["name"], false)));
-                                    }
-								} else {
-									$this->recordset[$i][$key]->setValue($this->recordset_files[$i][$key]["file"]["name"]);
-								}
-							} elseif(strlen($this->recordset[$i][$key]->getValue()) && is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["tmpname"])) {
-								if($this->form_fields[$key]->file_full_path) {
-                                    if (
-                                        substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 7) != "http://"
-                                        && substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 8) != "https://"
-                                        && substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
-                                    ) {
-									    //if($this->form_fields[$key]->getFileBasePath() === null)
-										//    $this->form_fields[$key]->getFileBasePath() = FF_DISK_UPDIR;
+									if (!$this->form_fields[$key]->file_max_size ||
+											($this->form_fields[$key]->file_max_size && $this->recordset_files[$i][$key]["file"]["size"] <= $this->form_fields[$key]->file_max_size)
+										)
+									{
+										if($this->form_fields[$key]->file_normalize) { 
+											$file_ext = pathinfo($this->recordset_files[$i][$key]["file"]["name"], PATHINFO_EXTENSION); 
+											$file_basename = $this->recordset_files[$i][$key]["file"]["name"];
+											if($file_ext)
+												$this->recordset_files[$i][$key]["file"]["name"] = ffCommon_url_rewrite(substr($file_basename, 0, strrpos($file_basename, "." . $file_ext))) . "." . $file_ext;
+											else
+												$this->recordset_files[$i][$key]["file"]["name"] = ffCommon_url_rewrite($file_basename) . "." . $file_ext;
+										}
 
-									    //if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset[$i][$key]->getValue()))
-										    //$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileTempPath(false)) . "/" . basename($this->recordset[$i][$key]->getValue()));
-                                            //$this->recordset[$i][$key]->setValue("");
-                                    }
+										if (strlen($this->recordset_files[$i][$key]["tmpname"]))
+											@unlink($this->form_fields[$key]->getFileFullPath($this->recordset_files[$i][$key]["tmpname"], true));
+
+										$tmp_name = "tmp_" . date("YmdHms") . "_" . uniqid(rand(), true) . "_" . $this->recordset_files[$i][$key]["file"]["name"];
+
+										if ($this->form_fields[$key]->file_make_temp_dir)
+											@mkdir($this->form_fields[$key]->getFileFullPath($this->form_fields[$key]->file_chmod, true), true);
+
+										move_uploaded_file($this->recordset_files[$i][$key]["file"]["tmp_name"], $this->form_fields[$key]->getFileFullPath($tmp_name, true));
+										@chmod($this->form_fields[$key]->getFileFullPath($tmp_name, true), 0777);
+
+										if($this->form_fields[$key]->file_full_path) {
+											if (
+												substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 7) != "http://"
+												&& substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 8) != "https://"
+												&& substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
+											) {
+												if(file_exists($this->form_fields[$key]->getFileFullPath($tmp_name, true)))	
+													$this->form_fields[$key]->value->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileFullPath($tmp_name, true)));
+
+												//if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset_files[$i][$key]["file"]["name"]))
+													//$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileTempPath(false)) . "/" . $this->recordset_files[$i][$key]["file"]["name"]);
+											}
+										} else 
+											$this->recordset[$i][$key]->setValue($this->recordset_files[$i][$key]["file"]["name"]);
+
+										$this->recordset_files[$i][$key]["tmpname"] = $tmp_name;
+										unset($this->recordset_files[$i][$key]["file"]);
+									}
+									else
+									{
+										$this->strError .= "<br />&Egrave; stato superato il limite di upload per il campo " . $this->form_fields[$key]->label;
+									}
+								} elseif(is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["file"]["name"])) {
+									if($this->form_fields[$key]->file_full_path) {
+										if (
+											substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 7) != "http://"
+											&& substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 8) != "https://"
+											&& substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
+										) {
+											if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset_files[$i][$key]["file"]["name"]))
+												$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileFullPath($this->recordset_files[$i][$key]["file"]["name"], false)));
+										}
+									} else {
+										$this->recordset[$i][$key]->setValue($this->recordset_files[$i][$key]["file"]["name"]);
+									}
+								} elseif(strlen($this->recordset[$i][$key]->getValue()) && is_array($this->recordset_files[$i][$key]) && strlen($this->recordset_files[$i][$key]["tmpname"])) {
+									if($this->form_fields[$key]->file_full_path) {
+										if (
+											substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 7) != "http://"
+											&& substr(strtolower($this->recordset[$i][$key]->getValue()), 0, 8) != "https://"
+											&& substr($this->recordset[$i][$key]->getValue(), 0, 2) != "//"
+										) {
+											//if($this->form_fields[$key]->getFileBasePath() === null)
+											//    $this->form_fields[$key]->getFileBasePath() = FF_DISK_UPDIR;
+
+											//if(!file_exists($this->form_fields[$key]->getFileBasePath() . $this->recordset[$i][$key]->getValue()))
+												//$this->recordset[$i][$key]->setValue(str_replace($this->form_fields[$key]->getFileBasePath(), "", $this->form_fields[$key]->getFileTempPath(false)) . "/" . basename($this->recordset[$i][$key]->getValue()));
+												//$this->recordset[$i][$key]->setValue("");
+										}
+									}
 								}
 							}
 							break;
@@ -1585,6 +1940,15 @@ abstract class ffDetails_base extends ffCommon
 							$this->recordset[$i][$key] = new ffData($this->recordset[$i][$key], $this->form_fields[$key]->get_app_type(), $this->form_fields[$key]->get_locale());
 					}
 
+					$res = self::doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
+
+					$res = $this->doEvent("retrieve_field_after", array(&$this, $this->form_fields, $key, "form", $i));
+					$rc = end($res);
+					if($rc !== null)
+					   continue;
 				}
 				reset($this->form_fields);
 
