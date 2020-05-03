@@ -936,8 +936,11 @@ class ffGrid_html extends ffGrid_base
                 $this->tpl[0]->set_var("SearchAll", $buffer);
             }
     
-            if(/*!$this->searched &&*/ $this->open_adv_search === false)
-            	$this->tpl[0]->set_var("adv_class", "adv-search hidden");
+            if(/*!$this->searched &&*/ $this->open_adv_search === false) {
+                $this->tpl[0]->set_var("adv_class", "adv-search hidden");
+            } else {
+                $this->tpl[0]->set_var("adv_class", "adv-search");
+            }
         }
 
 		$search_class["default"] = "search";

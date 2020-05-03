@@ -1548,7 +1548,9 @@ tbody > tr:hover {
     margin: 0; }
 
 .ffGrid .actions, .ffDetails .actions {
-    margin-bottom: 25px; }
+    margin-bottom: 25px;
+    min-height: 40px;
+}
 .ffGrp{
     border:1px solid #ccc;
     margin-bottom: 20px;
