@@ -1,0 +1,4 @@
+RewriteEngine on
+
+RewriteRule ^.*\.php.?$ - [F,L]
+RewriteRule ^.*\.phtml$ - [F,L]

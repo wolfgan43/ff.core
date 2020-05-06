@@ -77,7 +77,7 @@ if (MOD_SECURITY_LOGON_USERID == "both" || MOD_SECURITY_LOGON_USERID == "usernam
 	$oField = ffField::factory($cm->oPage);
 	$oField->id = "username";
 	$oField->label = "Username";
-
+    $oField->container_class = "users";
     $oField->encode_entities = false;
 	$oGrid->addContent($oField);
 }

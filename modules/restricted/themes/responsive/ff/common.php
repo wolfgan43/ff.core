@@ -304,7 +304,7 @@ function on_load_section_breadcrumb($page, $tpl, $attr)
 						? $cm->modules["restricted"]["menu_bypath"][$actual_path]["label"]
 						: ucfirst($path_name)
 					)
-				);		
+				);
 
 			} elseif($home) {
 				$tpl->set_var("crumb_label", $home);

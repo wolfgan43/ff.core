@@ -24,7 +24,7 @@ ff.ffField.ckeditor = (function () {
 			config.entities_greek					= false; /*Whether to convert some symbols, mathematical symbols, and Greek letters to HTML entities. */
 			config.entities_latin					= false; /*Whether to convert some Latin characters (Latin alphabet No. 1, ISO 8859-1) to HTML entities.*/
 			config.entities_processNumerical		= true; /*Whether to convert all remaining characters, not comprised in the ASCII character table, to their relative numeric representation of HTML entity.*/
-			config.extraPlugins 					= 'pagebreak,youtube,tableresize,oembed,widget,justify,videodetector';
+			config.extraPlugins 					= 'pagebreak,youtube,tableresize,oembed,widget,justify,videodetector,dialogadvtab';
 			config.oembed_maxWidth = '560';
                         config.oembed_maxHeight = '315';
                         config.oembed_WrapperClass = 'embededContent';
@@ -91,19 +91,7 @@ ff.ffField.ckeditor = (function () {
 			config.startupFocus						= false; /*Sets whether the editor should have the focus when the page loads. */
 			config.startupMode						= 'wysiwyg'; /*The mode to load at the editor startup. It depends on the plugins loaded. By default, the "wysiwyg" and "source" modes are available. */
 			config.theme							= theme; /* The theme to be used to build the UI. */
-			config.toolbar							= 
-                                [
-                                            { name: 'document', items : [ 'mode', 'document', 'doctools' ] },
-                                            { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','-','Undo','Redo' ] },
-                                            { name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
-                                            { name: 'links', items : [ 'Link','Unlink','Anchor', '-','Image', 'Youtube', 'VideoDetector', 'oembed' ] }, 
-                                            { name: 'insert', items : [ 'Table','HorizontalRule','SpecialChar','PageBreak'] }, 
-                                            { name: 'tools', items : [ 'Maximize', '-','Source', '-', 'Preview',  'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
-                                            { name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
-                                            { name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote','Align' ] },
-                                            { name: 'styles', items : [ 'Styles','Format' ] },
-                                            { name: 'bootstrap', items : [ 'WidgetTemplateMenu' ]}
-                                ],
+			config.toolbar							= "default",
                         
                          
 			config.toolbar_default 					= toolbar,
@@ -190,6 +178,33 @@ ff.ffField.ckeditor = (function () {
 				, "event_params" : [id, "ckeditor"]
 			});
 		});
+        CKEDITOR.on('dialogDefinition', function (ev) {
+            var dialogName = ev.data.name;
+            var dialogDefinition = ev.data.definition;
+
+            if (dialogName === 'table') {
+                var addCssClass = dialogDefinition.getContents('advanced').get('advCSSClasses');
+                addCssClass['default'] = 'table';
+                var infoTab = dialogDefinition.getContents('info');
+
+                txtWidth = infoTab.get( 'txtWidth' );
+
+                txtSpace = infoTab.get( 'txtCellSpace' );
+                txtPadding = infoTab.get( 'txtCellPad' );
+                txtBorder = infoTab.get( 'txtBorder' );
+
+                txtWidth['default'] = '100%';
+                txtSpace['default'] = '';
+                txtPadding['default'] = '';
+                txtBorder['default'] = '';
+            }
+            if ( dialogName == 'link' || dialogName == 'image' )
+            {
+                var infoTab = dialogDefinition.getContents('info');
+                // remove Upload tab
+                dialogDefinition.removeContents( 'upload' );
+            }
+        });
 	});
 	
 	return that;

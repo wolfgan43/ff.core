@@ -171,10 +171,10 @@ class ffWidget_ckeditor extends ffCommon
             $this->tpl[$tpl_id]->set_var("value", ffCommon_specialchars($value->getValue($Field->get_app_type(), $Field->get_locale())));
         $this->tpl[$tpl_id]->set_var("properties", $Field->getProperties());
 
-        if(class_exists("Auth") && $Field->ckeditor_group_by_auth) {
+        /*if(class_exists("Auth") && $Field->ckeditor_group_by_auth) {
             $user = Auth::get("user");
             $ckeditor_group = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($user->acl_primary));
-        }
+        }*/
         if(!$ckeditor_group) {
         	$ckeditor_group = $Field->ckeditor_group;
         }

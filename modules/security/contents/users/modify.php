@@ -137,6 +137,13 @@ if(strlen(MOD_SEC_USER_AVATAR))
 	    $oField->file_storing_path = FF_DISK_UPDIR . "/users/" . $uid;
 	    $oField->file_temp_path = FF_DISK_UPDIR . "/users";
 	    $oField->file_max_size = 5000000;
+        $oField->file_normalize		= true;
+        $oField->file_allowed_mime = array(
+            "image/png"
+        , "image/gif"
+        , "image/jpeg"
+        , "image/jpg"
+        );
         $oField->widget = "uploadifive";
         $oField->file_full_path = true;
 	    $oRecord->addContent($oField, $account);
