@@ -995,52 +995,52 @@ tbody > tr:hover {
     color: #111;
     border: 1px solid #ddd;
 }
-.input-group .btn-link {
+.input-group .duplicated .btn-link {
         border: none!important;
 }
-.input-group .btn.btn-success{
+.input-group .duplicated .btn.btn-success{
     color: #fff;
     background-color: #5cb85c;
     border-color: #4cae4c;
     border-radius: 0 4px 4px 0;
 }
-.input-group .btn.btn-success:focus,
-.input-group .btn.btn-success.focus {
+.input-group .duplicated .btn.btn-success:focus,
+.input-group .duplicated .btn.btn-success.focus {
     color: #fff;
     background-color: #449d44;
     border-color: #255625;
 }
-.input-group .btn.btn-success:hover {
+.input-group .duplicated .btn.btn-success:hover {
     color: #fff;
     background-color: #449d44;
     border-color: #398439;
 }
-.input-group .btn.btn-success:active,
-.input-group .btn.btn-success.active{
+.input-group .duplicated .btn.btn-success:active,
+.input-group .duplicated .btn.btn-success.active{
     color: #fff;
     background-color: #449d44;
     border-color: #398439;
 }
-.input-group .btn.btn-primary{
+.input-group .duplicated .btn.btn-primary{
     color: #fff;
     background-color: #337ab7;
     border-color: #2e6da4;
     margin:0 5px;
     border-radius: 4px;
 }
-.input-group .btn.btn-primary:focus,
-.input-group .btn.btn-primary.focus {
+.input-group .duplicated .btn.btn-primary:focus,
+.input-group .duplicated .btn.btn-primary.focus {
     color: #fff;
     background-color: #286090;
     border-color: #122b40;
 }
-.input-group .btn.btn-primary:hover {
+.input-group .duplicated .btn.btn-primary:hover {
     color: #fff;
     background-color: #286090;
     border-color: #204d74;
 }
-.input-group .btn.btn-primary:active,
-.input-group .btn.btn-primary.active{
+.input-group .duplicated .btn.btn-primary:active,
+.input-group .duplicated .btn.btn-primary.active{
     color: #fff;
     background-color: #286090;
     border-color: #204d74;
@@ -6088,4 +6088,7 @@ p{
 }
 .table {
     width: 100%!important;
+}
+.fa-eye:before,.fa-eye-slash:before {
+    width: 23px;
 }

@@ -99,6 +99,16 @@ abstract class ffCommon extends ffClassChecks
 		
 		if (isset($ff_global_setting[$name]) && is_array($ff_global_setting[$name]) && count($ff_global_setting[$name]))
 		{
+			if (isset($ff_global_setting[$name]["events"]) && is_array($ff_global_setting[$name]["events"]))
+			{
+				if (count($ff_global_setting[$name]["events"])) foreach ($ff_global_setting[$name]["events"] as $params)
+				{
+					call_user_func_array(array($this, "addEvent"), $params);
+				}
+				
+				unset($ff_global_setting[$name]["events"]);
+			}
+			
             $this->get_defaults_walkarray($this, $ff_global_setting[$name]);
 		}
 	}

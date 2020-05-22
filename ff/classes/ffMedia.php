@@ -75,7 +75,7 @@ define("FF_DISABLE_CACHE", defined("DEBUG_MODE") && isset($_REQUEST["__nocache__
  * @example Da impostazioni DB (showfiles_modes): http://xoduslab.com/test/demo/domains/skeleton/static/thumb/mod_article/32/img/tiroide-malfunzionamento-esami.jpg
  * @example Cambiando il mime dell'immagine: http://xoduslab.com/test/demo/domains/skeleton/static/thumb-jpg/mod_article/32/img/tiroide-malfunzionamento-esami.png
  */
-class ffMedia {
+class ffMedia extends ffCommon {
     const STRICT                                                    = false;
 
     const DISK_PATH                                                 = FF_DISK_PATH;
@@ -576,6 +576,7 @@ class ffMedia {
                                                                         );
 
     static $singleton                                               = null;
+	static 	$exif_adjust_orientation									= true;
 
     private $basepath                                               = null;
     private $pathinfo                                               = null;
@@ -594,6 +595,12 @@ class ffMedia {
                                                                         , "disposition"     => "inline"
                                                                         , "fake_filename"   => null
                                                                     );
+
+    public function __construct($pathinfo)
+    {
+		$this->get_defaults();
+        $this->setPathInfo($pathinfo);
+    }
 
     public static function getInstance($pathinfo = null)
     {
@@ -802,6 +809,72 @@ class ffMedia {
     }
     public static function optimize($filename, $params = null) {
         if(!self::OPTIMIZE)                                         return;
+		
+		if (self::$exif_adjust_orientation)
+		{
+			$mime = ffMedia::getMimeTypeByFilename($filename);
+			$src_res = false;
+	        switch ($mime) 
+	        {
+	            case "image/jpeg":
+	                $src_res = @imagecreatefromjpeg($filename);
+	                break;
+	            case "image/png":
+	                $src_res = @imagecreatefrompng($filename);
+	                break;
+	            case "image/gif":
+	                $src_res = @imagecreatefromgif($filename);
+	                break;
+	        }
+			
+			if ($src_res !== false)
+			{
+				$exif = exif_read_data($filename);
+				if (!empty($exif['Orientation']) && in_array($exif['Orientation'], [2, 3, 4, 5, 6, 7, 8])) {
+					imagealphablending($src_res, true);
+					imagesavealpha($src_res, true);
+					
+					$overwrite = false;
+					
+					if (in_array($exif['Orientation'], [3, 4])) {
+						$overwrite = true;
+						$src_res = imagerotate($src_res, 180, 0);
+					}
+					else if (in_array($exif['Orientation'], [5, 6])) {
+						$overwrite = true;
+						$src_res = imagerotate($src_res, -90, 0);
+					}
+					else if (in_array($exif['Orientation'], [7, 8])) {
+						$overwrite = true;
+						$src_res = imagerotate($src_res, 90, 0);
+					}
+					if (in_array($exif['Orientation'], [2, 5, 7, 4])) {
+						$overwrite = true;
+						imageflip($src_res, IMG_FLIP_HORIZONTAL);
+					}
+
+					if ($overwrite)
+					{
+						switch ($mime)
+						{
+							case "image/jpeg":
+								@imagejpeg($src_res, $filename, 100);
+								break;
+
+							case "image/png":
+								@imagepng($src_res, $filename, 0);
+								break;
+
+							case "image/gif":
+								@imagegif($src_res, $filename);
+								break;
+						}
+					}
+					
+					imagedestroy($src_res);
+				}
+			}
+		}
 
         $filename_min                                               = ($params["filename_min"]
                                                                         ? $params["filename_min"]
@@ -1233,11 +1306,6 @@ class ffMedia {
         return !empty($return);
     }
 
-    public function __construct($pathinfo)
-    {
-        $this->setPathInfo($pathinfo);
-    }
-
     public function resize($mode) {
 
     }
@@ -1285,7 +1353,7 @@ class ffMedia {
 
     public function setPathInfo($pathinfo = null) {
         if($pathinfo) {
-			$pathinfo = explode("?", $pathinfo)[0];
+			$pathinfo = explode("?", rawurldecode($pathinfo))[0];
             $this->pathinfo                                         = pathinfo($pathinfo);
             $this->pathinfo["orig"]                                 = $pathinfo;
 
@@ -1686,6 +1754,8 @@ class ffMedia {
 
         }
         //if(!strlen($params["format"]))                              $params["format"] = "jpg";
+		
+		$this->doEvent("create_image", array($params));
 
         $cCanvas                                                    = new ffCanvas();
 

@@ -105,8 +105,15 @@ if (!defined("FF_SUPPORT_PREFIX"))                  define("FF_SUPPORT_PREFIX", 
 // Common Functions
 require(__FF_DIR__ . "/ff/common." . FF_PHP_EXT);
 
+$ff = ffGlobals::getInstance("ff");
+$ff->events = new ffEvents();
+$ff->showfiles_events = new ffEvents();
+
 // Load commons..
 // ...base
+if (@is_file(__TOP_DIR__ . "/common." . FF_PHP_EXT))
+	require __TOP_DIR__ . "/common." . FF_PHP_EXT;
+
 if (@is_file(__PRJ_DIR__ . "/common." . FF_PHP_EXT))
 	require __PRJ_DIR__ . "/common." . FF_PHP_EXT;
 //elseif (is_file(ffCommon_dirname($_SERVER['SCRIPT_FILENAME']) . "/common." . FF_PHP_EXT))
@@ -114,7 +121,3 @@ if (@is_file(__PRJ_DIR__ . "/common." . FF_PHP_EXT))
 
 // ..theme
 //ffCommon_theme_init(); // load commons
-
-$ff = ffGlobals::getInstance("ff");
-$ff->events = new ffEvents();
-$ff->showfiles_events = new ffEvents();

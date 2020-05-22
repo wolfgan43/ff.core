@@ -93,7 +93,12 @@ if(strlen(MOD_SEC_USER_AVATAR) && !mod_security_is_defined_field(MOD_SEC_USER_AV
     $oField->file_full_path = true;
 	if(get_session("UserLevel") >= 1)
 	{
-		$oField->widget = "uploadifive";
+		$oField->widget = "uploadex";
+        $oField->uploadex_icons_class["button"] = "uplex-style-area";
+        $oField->uploadex_label = "";
+        //$oField->widget_options["automedia_browse"] = true;
+        /*$oField->widget_options["automedia_show"] = true;*/
+        $oField->uploadex_allow_replace = false;
 	} 
 	else 
 	{

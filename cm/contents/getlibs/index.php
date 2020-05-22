@@ -19,7 +19,7 @@ if (!$cm->isXHR()/* && strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "googlebo
 
 $cm->oPage->layer = "empty";
 $cm->oPage->template_file = "ffPage_getlibs.html";
-$cm->oPage->template_dir = FF_DISK_PATH . "/cm/contents/getlibs";
+$cm->oPage->template_dir = __TOP_DIR__ . "/cm/contents/getlibs";
 $cm->oPage->js_loaded = array();
 $cm->oPage->sections = array();
 $cm->oPage->resetJS();

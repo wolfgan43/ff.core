@@ -24,7 +24,7 @@
  *  @link https://github.com/wolfgan43/vgallery
  */
 
-define("FF_ONLY_INIT", true);
+//define("FF_ONLY_INIT", true);
 require_once (dirname(__DIR__) . "/ff/main.php");
 
 if(strpos($_SERVER["PATH_INFO"], FF_SITE_PATH . "/media/") === 0) {
