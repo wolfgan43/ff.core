@@ -46,52 +46,41 @@ $arrReferer = explode("/", $referer);
 if($arrReferer[1] == "domains")
     $domain_path = "/domains/" . $arrReferer[2];
 
-/*
-$valid_session = false;
-if (isset($_POST[session_name()]))
+function uploadex_session_valid()
 {
-	$valid_session = true;
-	session_id($_POST[session_name()]);
-}
-elseif (isset($_GET[session_name()]))
-{
-	$valid_session = true;
-	session_id($_GET[session_name()]);
-}
-elseif (isset($_COOKIE[session_name()]))
-{
-	$valid_session = true;
-	session_id($_COOKIE[session_name()]);
+	$valid_session = false;
+	if (isset($_POST[session_name()]))
+	{
+		$valid_session = true;
+		session_id($_POST[session_name()]);
+	}
+	elseif (isset($_GET[session_name()]))
+	{
+		$valid_session = true;
+		session_id($_GET[session_name()]);
+	}
+	elseif (isset($_COOKIE[session_name()]))
+	{
+		$valid_session = true;
+		session_id($_COOKIE[session_name()]);
+	}
+	return $valid_session;
 }
 
-@session_start();*/
+$options = array();
 
-if(0)
+$data_src = $_REQUEST['sess'];
+if(strlen($data_src) && uploadex_session_valid())
 {
-	$ff = get_session("ff");
-	$data_src = basename($_REQUEST['sess']);
-	
-	if(
-		is_array($ff)
-		&& array_key_exists("uploadifive", $ff)
-		&& is_array($ff["uploadifive"])
-		&& array_key_exists($data_src, $ff["uploadifive"])
-	)
-	{
-		$folder = $ff["uploadifive"][$data_src]["folder"];
-		$base_path = $ff["uploadifive"][$data_src]["base_path"];
-	}
-	else
-	{
-		$folder = $_REQUEST['folder'];
-		$base_path = FF_DISK_UPDIR . $domain_path;
-	}
+	@session_start();
+
+	$ff_data = get_session("ff");
+	if (ffArrIsset($ff_data, "uploadifive", $data_src))
+		$options = $ff_data["uploadifive"][$data_src];
 }
-else
-{
-	$folder = $_REQUEST['folder'];
-	$base_path = FF_DISK_UPDIR . $domain_path;
-}
+
+$folder = $_REQUEST['folder'];
+$base_path = FF_DISK_UPDIR . $domain_path;
 
 if(strpos($folder, FF_SITE_UPDIR) === 0)
 	$base_path = FF_DISK_UPDIR . $domain_path;
@@ -157,25 +146,19 @@ else
 	$real_file = basename($targetFile);
 }
 
+$ret = false;
+
 if (file_exists($targetPath . $real_file))
-	echo 1;
-else 
-	echo 0;
-exit;
-
-/*if(is_file($base_path . $relativePath . $real_file))
 {
-	@chmod($base_path . $relativePath . $real_file, 0777);
-
-	ffMedia::optimize($base_path . $relativePath . $real_file, array("wait" => true));
-
-	$res["name"] = basename($relativePath . $real_file); 
-	$res["path"] = ffCommon_dirname($relativePath . $real_file); 
-	$res["fullpath"] = $relativePath . $real_file;
-	$res["status"] = true;			
+	$ret = $targetPath . $real_file;
+	$ret = substr($ret, strlen(FF_DISK_PATH . FF_UPDIR));
 }
-else
+else if (strlen($options["checkexists_callback"]))
 {
-	$res["error"] = ffTemplate::_get_word_by_code("upload_permission_denied");
-	$res["status"] = false;	
-}*/
+	$tmp = $targetPath . $real_file;
+	$tmp = substr($tmp, strlen(FF_DISK_PATH . FF_UPDIR));
+	$ret = call_user_func($options["checkexists_callback"], $tmp);
+}
+
+cm::jsonParse(cm::getInstance()->jsonAddResponse(array("uploadifive" => $ret)));
+exit;

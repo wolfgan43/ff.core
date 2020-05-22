@@ -371,7 +371,8 @@ Released under the UploadiFive Standard License <http://www.uploadify.com/upload
                     }
                     // Trigger the check event
                     if (typeof settings.onCheck === 'function') {
-                        settings.onCheck.call($this, file, file.exists);
+                        var ret = settings.onCheck.call($this, methods, settings, file, file.exists);
+						return ret;
                     }
                     return false;
                 }
@@ -815,9 +816,10 @@ Released under the UploadiFive Standard License <http://www.uploadify.com/upload
                                 $data.uploadFile(_file, true);
                             }
                         });
-                        if ($('#' + settings.queueID).find('.uploadifive-queue-item').not('.error, .complete').size() == 0) {
-                            $data.queueComplete();
-                        }
+						
+						if ($('#' + settings.queueID).find('.uploadifive-queue-item').not('.error, .complete').size() == 0) {
+							$data.queueComplete();
+						}
                     } else {
                         if ($data.uploads.current == 0) {
                             if ($.inArray('onError', settings.overrideEvents) < 0) {

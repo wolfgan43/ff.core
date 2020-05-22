@@ -1818,7 +1818,7 @@ function cm_getFFButtonDefault() {
     , "settings"        => array(
             "default" => "link"
         , "addClass" => "settings"
-        , "icon" => "cog"
+        , "icon" => "fas fa-cog"
         )
     , "properties"      => array(
             "default" => "link"
@@ -1872,7 +1872,7 @@ function cm_getFFButtonDefault() {
     , "vg-admin"     => array(
             "default" => "link"
         , "addClass" => "admin"
-        , "icon" => "cog"
+        , "icon" => "fas fa-cog"
         , "params" => "2x"
         )
     , "vg-restricted"=> array(
