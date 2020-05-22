@@ -59,6 +59,15 @@ if ($options === null)
 if ($options === null)
 	exitWithError("settings_not_found");
 
+$events = new ffEvents();
+if (ffArrIsset($options, "events") && count($options["events"]))
+{
+	foreach ($options["events"] as $params)
+	{
+		call_user_func_array(array($events, "addEvent"), $params);
+	}
+}
+
 if (ffArrIsset($_REQUEST, "delaction"))
 {
 	$target_file = rtrim($options["storing_paths"]["temp"], "/") . "/" . $_REQUEST["delaction"];
@@ -141,12 +150,12 @@ if (ffArrIsset($_REQUEST, "filename"))
 	$res["size"] = $tot_bytes;
 	$res["status"] = true;
 	
-	if ($options["avoid_temporary"])
+	/* disabilitato per compatibilità con Alex if ($options["avoid_temporary"])
 	{
 		$type = "saved";
 		$filename = $name;
 	}
-	else
+	else*/
 	{
 		$type = "temp";
 		$res["tmpname"] = $tmp_name; 
@@ -167,6 +176,8 @@ if (ffArrIsset($_REQUEST, "filename"))
 	
 	$res["view"] = $tmp_view;
 	$res["preview"] = $tmp_preview;
+
+	$events->doEvent("uploaded", array(&$options, &$res));
 }
 //http_response_code(403);
 echo ffCommon_jsonenc($res, true);
