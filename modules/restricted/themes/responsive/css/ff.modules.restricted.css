@@ -1057,15 +1057,7 @@ tbody > tr:hover {
     text-decoration: none;
 }
 
-.ffGrid .adv-search {
-    background: #FFF;
-    box-shadow: 0 3px 10px -5px #DDD;
-    border: 1px solid #e7e7e7;
-    padding: 10px;
-    z-index: 10;
-    position: absolute;
-    width: calc(100% - 30px);
-}
+
 
 /* BOTTONE */
 .header__menutoggler {
@@ -1524,19 +1516,21 @@ tbody > tr:hover {
 
     padding: 6px 12px; }
 
+
 .ffGrid .adv-search {
-
+    background: #FFF;
     box-shadow: 0 3px 10px -5px #DDD;
-
     border: 1px solid #e7e7e7;
-
     padding: 10px;
-
     z-index: 10;
 
-    position: absolute;
+}
 
-    width: calc(100% - 15px); }
+.ffGrid .adv-search.toggle {
+    position: absolute;
+    width: calc(100% - 15px);
+}
+
 
 .ffGrid .adv-search .fa-search::after{
     content:'Cerca';

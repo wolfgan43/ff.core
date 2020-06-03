@@ -937,7 +937,7 @@ class ffGrid_html extends ffGrid_base
             }
     
             if(/*!$this->searched &&*/ $this->open_adv_search === false) {
-                $this->tpl[0]->set_var("adv_class", "adv-search hidden");
+                $this->tpl[0]->set_var("adv_class", "adv-search toggle hidden");
             } else {
                 $this->tpl[0]->set_var("adv_class", "adv-search");
             }
