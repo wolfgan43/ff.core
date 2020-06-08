@@ -1967,7 +1967,7 @@ abstract class ffRecord_base extends ffCommon
                                 }
                                 reset ($this->form_fields[$key]->multi_fields);
                             }
-                            elseif ($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) != $this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
+                            elseif ($this->form_fields[$key]->value_ori->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE) !== $this->form_fields[$key]->value->getValue($this->form_fields[$key]->base_type, FF_SYSTEM_LOCALE))
                             {
                                 if (strlen($fields))
                                     $fields .= ", ";

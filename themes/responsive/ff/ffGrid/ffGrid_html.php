@@ -1190,7 +1190,7 @@ class ffGrid_html extends ffGrid_base
 				}
 
 				$this->tpl[0]->set_var("SearchButtons", $buffer);
-				if(!$this->searched && $this->open_adv_search === false) {
+				if( $this->open_adv_search === false) {
 					$this->search_buttons[0]->id = "searchadv";
 					unset($this->search_buttons[0]->framework_css["addon"]);
 					$this->tpl[0]->set_var("SearchButtonsAdv", '<div class="' . cm_getClassByFrameworkCss("align-right", "util"). '">' . $this->search_buttons[0]->process() . '</div>');
