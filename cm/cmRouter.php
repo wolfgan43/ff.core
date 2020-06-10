@@ -360,14 +360,14 @@ class cmRouter extends ffCommon
 						continue;
 				}
 				
-				if (count($value->source) == 1)
+				if ($value->source !== null && (is_string($value->source) || count($value->source) == 1))
 				{
 					$matches = array();
 					$rc = preg_match('/' . str_replace('/', '\/', $value->source) . '/', $url, $matches,  PREG_OFFSET_CAPTURE);
 					if($rc && isset($value->query) && strlen($value->query) && strlen($query))
 						$rc = preg_match('/' . str_replace('/', '\/', $value->query) . '/', $query, $matches,  PREG_OFFSET_CAPTURE);
 				}
-				else
+				else if (is_array($value_source))
 				{
 					$rc = false;
 					

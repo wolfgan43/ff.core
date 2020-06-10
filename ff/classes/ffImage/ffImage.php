@@ -179,7 +179,6 @@ abstract class ffImage
 						
 					case "auto":
 					default:
-						//die("asd");		
 						$this->new_res_dim_x = $max_x;
 						$this->new_res_dim_y = ceil($this->src_res_dim_y * $max_x / $this->src_res_dim_x);
 						if ($this->new_res_dim_y < $max_y)
@@ -188,7 +187,7 @@ abstract class ffImage
 							$this->new_res_dim_x = ceil($this->src_res_dim_x * $max_y / $this->src_res_dim_y);
 						}
 						
-						if ($this->src_res_dim_y > $this->src_res_dim_x)
+						/*if ($this->src_res_dim_y > $this->src_res_dim_x)
 							$this->new_res_align = "top-middle";
 /*							if (($this->new_res_dim_y = ceil($max_x * $this->src_res_dim_y / $this->src_res_dim_x)) >= $this->new_res_max_y)
 						{
@@ -200,7 +199,6 @@ abstract class ffImage
 							$this->new_res_dim_x = ceil($this->src_res_dim_x * $max_y / $this->new_res_dim_y);
 						}
 						*/
-						//die("asd1 " . $this->new_res_dim_x . " - asd2 " . $this->new_res_dim_y);
 				}
 				break;
 				

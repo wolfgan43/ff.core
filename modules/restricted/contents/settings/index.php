@@ -284,6 +284,10 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 				if (isset($subvalue->select_one))				$oField->select_one = ($subvalue->select_one == "true" ? true : false);
 				if (isset($subvalue->multi_select_one_label))	$oField->select_one = $subvalue->multi_select_one_label;
 				break;
+				
+			case "uploadex":
+				if (isset($subvalue->uploadex_automedia_show))	$oField->widget_options["automedia_show"] = ($subvalue->uploadex_automedia_show == "true" ? true : false);
+				break;
 		}
 
 		switch (strtolower($subvalue->control_type))
@@ -298,7 +302,6 @@ foreach ($cm->modules["restricted"]["settings"] as $key => $value)
 		
 		if(!strlen($oField->widget))
 			$oField->widget = $subvalue->widget;
-
 
 		$oRecord->addContent($oField, $key);
 		$added_fields++;

@@ -616,7 +616,16 @@ class ffMedia extends ffCommon {
     public static function getIcon($name, $mode = null) {
         $icon = new ffMedia(false);
         $icon->setNoImg($mode, $name);
-        $icon->renderNoImg($icon->processFinalFile(true));
+		$ret = $icon->processFinalFile(true);
+		if ($ret !== null)
+		{
+			$icon->renderNoImg($ret);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 
         //deve renderizzare l'icona
         //da fare con la gestione delle iconde di ffImafge
@@ -829,7 +838,7 @@ class ffMedia extends ffCommon {
 			
 			if ($src_res !== false)
 			{
-				$exif = exif_read_data($filename);
+				$exif = @exif_read_data($filename);
 				if (!empty($exif['Orientation']) && in_array($exif['Orientation'], [2, 3, 4, 5, 6, 7, 8])) {
 					imagealphablending($src_res, true);
 					imagesavealpha($src_res, true);
@@ -1372,12 +1381,12 @@ class ffMedia extends ffCommon {
         $final_file                                                 = $this->findSource($mode);
         if(!$final_file) {
             if (!$this->filesource && !$this::STRICT)               $this->findSourceOld($mode);
-            if (!is_file($this->basepath . $this->filesource))  $noimg = $this->setNoImg($mode);
-
-            $final_file                                             = $this->processFinalFile($noimg);
+            if (!is_file($this->basepath . $this->filesource))		$noimg = $this->setNoImg($mode);
+			
+			$final_file                                             = $this->processFinalFile($noimg);
         }
         //se noimg renderizza ed esce
-        if($noimg) {
+        if (strlen($noimg)) {
             if($this->pathinfo["dirname"] == "/") {
                 $pathinfo                                           = $this->pathinfo["filename"];
                 if($this->mode) {
@@ -1693,6 +1702,10 @@ class ffMedia extends ffCommon {
                                                                         , "format"                  => "jpg"
                                                                     );
         $params                                                     = array_replace_recursive($default_params, $params);
+		
+		if ($params["dim_x"] == 0)									$params["dim_x"] = null;
+		if ($params["dim_y"] == 0)									$params["dim_y"] = null;
+		
         $extend                                                     = true;
 
         if($extend)
@@ -1839,7 +1852,9 @@ class ffMedia extends ffCommon {
         $final_file                                                 = $this->getFinalFile();
 
         @mkdir(dirname($final_file), 0777, true);
-        $cCanvas->process($final_file);
+        $ret = $cCanvas->process($final_file);
+		
+		return $ret;
     }
 
     private function getMode() {
@@ -1936,8 +1951,11 @@ class ffMedia extends ffCommon {
                         || $fctime      <= $mode["last_update"]
                         || $fctime      <= filectime($this->basepath . $this->filesource)
                     ) {
-                        $this->createImage($mode);
-                        $this::optimize($final_file);
+                        $ret = $this->createImage($mode);
+						if ($ret)
+							$this::optimize($final_file);
+						else
+							$final_file = null;
                     }
                 } else {
                     $icon = $this->getIconPath(basename($this->filesource), true);
