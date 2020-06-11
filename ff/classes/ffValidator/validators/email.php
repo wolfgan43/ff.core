@@ -50,7 +50,7 @@ class ffValidator_email extends ffValidator_base
 		if(!strlen($email))
 			return false;
 		
-        $regex = '/^([.0-9a-z_-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,4})$/i';                              // Normal mode
+        $regex = '/^([.0-9a-z_-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,12})$/i';                              // Normal mode
         if (preg_match($regex, $email) < 1)
             return $this->get_error("invalid", $label);
             
