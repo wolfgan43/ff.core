@@ -314,7 +314,7 @@ var activecombo = function(params) {
 			var sep = that.options.separator;
 			var $node = jQuery(that.getNode());
 
-			$node.parent().next(".actex-multi").find("li[data-id='" + id + "']").remove();
+			$node.parent().next(".actex-multi").find("li[data-id='" + jQuery.fn.escape(id) + "']").remove();
 			$node.parent().next(".actex-multi").children().each(function() {
 				data["value"].push(jQuery(this).data("id"));
 				data["label"].push(jQuery(this).text());
@@ -326,8 +326,8 @@ var activecombo = function(params) {
 			var data = {"value" : [], "label" : []};
 			var $node = jQuery(that.getNode());
 			var sep = that.options.separator;
-			if(!$node.parent().next(".actex-multi").find("li[data-id='" + item.id + "']").length) {
-				$node.parent().next(".actex-multi").append('<li class="' + frameworkCSS["item"] + '" data-id="' + item.id + '"><mark>' + (item.url ? '<a href="' + item.url + '" target="_blank">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>" : (item.image ? '<img src="' + item.image + '" />' : "") + item.label) + '</mark><a href="javascript:ff.ffField.actex.del(\'' + __id + '\', \'' + item.id + '\');" class="' + frameworkCSS["badge"] + '"><i class="' + icons["delete"] + '"></i></a></li>');
+			if(!$node.parent().next(".actex-multi").find("li[data-id='" + jQuery.fn.escape(item.id) + "']").length) {
+				$node.parent().next(".actex-multi").append('<li class="' + frameworkCSS["item"] + '" data-id="' + item.id.escapeHtml() + '"><mark>' + (item.url ? '<a href="' + item.url + '" target="_blank">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>" : (item.image ? '<img src="' + item.image + '" />' : "") + item.label) + '</mark><a href="javascript:ff.ffField.actex.del(\'' + __id + '\', \'' + item.id + '\');" class="' + frameworkCSS["badge"] + '"><i class="' + icons["delete"] + '"></i></a></li>');
 				$node.parent().next(".actex-multi").children().each(function() {
 					data["value"].push(jQuery(this).data("id"));
 					data["label"].push(jQuery(this).text());

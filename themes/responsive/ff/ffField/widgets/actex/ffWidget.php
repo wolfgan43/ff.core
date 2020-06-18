@@ -703,7 +703,8 @@ class ffWidget_actex extends ffCommon
                     } 
                 }
             }
-			if(count($arrSelectedValue) && $Field->extended_type != "Selection" && strlen($Field->source_SQL)) 
+
+			if(count($arrSelectedValue) && $Field->extended_type != "Selection" && strlen($Field->source_SQL))
             {				
 				$sSQL = $Field->source_SQL;
 				$sSQL = str_replace("[AND]", "", $sSQL);
@@ -841,7 +842,7 @@ class ffWidget_actex extends ffCommon
 									}
 								}
 							} while ($db->nextRecord());
-							
+
 							if(!count($arrSelectedValue)) {
 								$arrSelectedValue = $arrOrigValue;
 								$arrSelectedLabel = $arrOrigLabel;
@@ -850,7 +851,8 @@ class ffWidget_actex extends ffCommon
 					}
 				}
             }
-		   	$this->tpl[$tpl_id]->set_var("selected_value", "'" . implode(",", $arrSelectedValue) . "'");
+
+		   	$this->tpl[$tpl_id]->set_var("selected_value", "'" . str_replace(array("'", '"'), array("\\'", '"'), (implode(",", $arrSelectedValue))) . "'");
 			$this->tpl[$tpl_id]->set_var("selected_label", implode(",", $arrSelectedLabel));
 		}		
 		
@@ -864,8 +866,9 @@ class ffWidget_actex extends ffCommon
 			}
 			if(is_array($arrData) && count($arrData)) {
 				foreach($arrData AS $data) {
-					$this->tpl[$tpl_id]->set_var("value", $data["value"]);
-					
+					$this->tpl[$tpl_id]->set_var("value_label", str_replace(array('"'), array('&quot;'), $data["value"]));
+					$this->tpl[$tpl_id]->set_var("value", str_replace(array("'", '"'), array("\\'", '&quot;'), $data["value"]));
+
 					$desc = $data["label"];
 					if($data["image"])
 						$desc = '<img src="' . $data["image"] . '" />' . $desc;

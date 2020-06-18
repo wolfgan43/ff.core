@@ -1319,10 +1319,15 @@ abstract class ffGrid_base extends ffCommon
 
 					$tmp_where_part = $this->search_fields[$key]->src_operation;
 					$tmp_where_part = str_replace("[NAME]", $tblprefix . "`" . $this->search_fields[$key]->get_data_source() . "`", $tmp_where_part);
-					$tmp_where_part = str_replace("[VALUE]", $tmp_where_value, $tmp_where_part);
+
+					if(strpos($tmp_where_part, " IN(") === false) {
+                        $tmp_where_part = str_replace("[VALUE]", $tmp_where_value, $tmp_where_part);
+                    } else {
+                        $tmp_where_part = str_replace("[VALUE]", str_replace(",", "','", $tmp_where_value), $tmp_where_part);
+                    }
 					$tmp_sql .= " " . $tmp_where_part . " ";
 
-					if (is_array($this->search_fields[$key]->src_fields) && count($this->search_fields[$key]->src_fields))
+                    if (is_array($this->search_fields[$key]->src_fields) && count($this->search_fields[$key]->src_fields))
 					 {
 						foreach ($this->search_fields[$key]->src_fields as $addfld_key => $addfld_value)
 						{
