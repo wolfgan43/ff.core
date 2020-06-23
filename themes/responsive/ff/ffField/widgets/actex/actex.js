@@ -210,8 +210,8 @@ var activecombo = function(params) {
 			
 			//var old_value = (displayed_value === undefined ? that.value : displayed_value);
 			var old_value = that.value;
-			if (new_value === undefined)
-				new_value = that.value;
+			/*if (new_value === undefined)
+				new_value = that.value;*/
 
 			if(new_value === null) {
 				if(that.options.select_one && that.options.select_one_val) {
@@ -876,7 +876,7 @@ var activecombo = function(params) {
 		var selected_value = this.mydata.selected_value;
 		var response = this.mydata.response;
 		var fullsearch = this.mydata.fullsearch;
-		var fValue = this.mydata.father_value;
+		var fValue = this.mydata.father_value || "null";
 		var id_data_src = that.getCacheDataSrc(selected_value);
         var id_source = (that.options.data_src
             ? id_data_src
@@ -892,10 +892,10 @@ var activecombo = function(params) {
 		retData = father_value ? retData.widget.actex["D" + id_source]["F" + father_value] : retData.widget.actex["D" + id_source];
 
 		that.async_refill(retData, selected_value, father_value, response, fullsearch);
-		
+
 		if (that.options.use_cache) {
 			sources.get(id_data_src).set(fValue, retData);
-			if (controls_waiting.isset(id_data_src)) 
+			if (controls_waiting.isset(id_data_src))
 				controls_waiting.get(id_data_src).each(function (k, v) {
 				var tmp = ff.ffField.actex.getInstance(v.id);
 				if (v.father_value === father_value) {

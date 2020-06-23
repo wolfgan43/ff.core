@@ -456,6 +456,7 @@ class ffWidget_actex extends ffCommon
 
         $this->tpl[$tpl_id]->set_var("icon_caret_down", cm_getClassByFrameworkCss("caret-down", "icon", array("class" => ("actex-combo"))));
         $this->tpl[$tpl_id]->set_var("icon_delete", cm_getClassByFrameworkCss("times", "icon", array("class" => "mr-0")));
+        $this->tpl[$tpl_id]->set_var("icon_edit", cm_getClassByFrameworkCss("pencil-alt", "icon", array("class" => "mr-0")));
         $this->tpl[$tpl_id]->set_var("icon_plus", cm_getClassByFrameworkCss("plus", "icon", array("class" => "btn")));
         $this->tpl[$tpl_id]->set_var("icon_minus", cm_getClassByFrameworkCss("minus", "icon", array("class" => "btn")));
         $this->tpl[$tpl_id]->set_var("icon_loader", cm_getClassByFrameworkCss("spinner", "icon-tag", "spin"));
@@ -468,9 +469,9 @@ class ffWidget_actex extends ffCommon
             $this->tpl[$tpl_id]->set_var("SectCombo", "");
         }
 
-        if ($Field->actex_dialog_url == true || ($Field->actex_autocomp && !$Field->actex_autocomp_limit)){
+        if ($Field->actex_dialog_url == true || ($Field->actex_autocomp && !$Field->actex_autocomp_limit)) {
             $this->tpl[$tpl_id]->set_var("actex_container", cm_getClassByFrameworkCss("group", "form", "actex-wrapper"));
-        }else{
+        } else {
             $this->tpl[$tpl_id]->set_var("actex_container", "actex-wrapper");
         }
         $this->tpl[$tpl_id]->set_var("data_class", "actex" . (strlen($Field->data_class) ? " " : "") . $Field->data_class);
