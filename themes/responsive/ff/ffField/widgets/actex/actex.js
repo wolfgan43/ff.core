@@ -464,7 +464,7 @@ var activecombo = function(params) {
 					if(!jQuery.fn.escapeGet(__id).length) {
 						//jQuery.fn.escapeGet(__id + "_label").autocomplete("destroy");
 						buffer += ' />';
-						buffer += '<input type="hidden" id="' + __id + '" name="' + __id + '" value="' + new_value + '" />';
+						buffer += '<input type="hidden" id="' + __id + '" name="' + __id + '" value="' + (new_value ? new_value : "") + '" />';
 
 						node.innerHTML = buffer;
 						
@@ -530,13 +530,14 @@ var activecombo = function(params) {
 	                        jQuery(node).closest(that.options.hideEmpty).show();
 				}            
 
-				if (found_value === false)
-					new_value = undefined; /*cambiandolo si perde i dati on actex multi on dom ready*/
+				//if (found_value === false)
+				//	new_value = undefined; /*cambiandolo si perde i dati on actex multi on dom ready*/
 				
 				if(!displayed_value)
 					displayed_value = new_value;
 
-				that.update(new_value);
+                if (found_value !== false)
+				    that.update(new_value);
 
 				that.doEvent({
 					"event_name"	: "refill",
@@ -729,7 +730,7 @@ var activecombo = function(params) {
 				if(!jQuery.fn.escapeGet(__id).length) {
 					//jQuery.fn.escapeGet(__id + "_label").autocomplete("destroy");
 					buffer += ' />';
-					buffer += '<input type="hidden" id="' + __id + '" name="' + __id + '" value="' + selected_value + '" />';
+					buffer += '<input type="hidden" id="' + __id + '" name="' + __id + '" value="' + (selected_value ? selected_value : "") + '" />';
 					node.innerHTML = buffer;
 					
 					autocomplete(father_value);
@@ -792,13 +793,14 @@ var activecombo = function(params) {
                     jQuery(node).closest(that.options.hideEmpty).hide();
 			}
 
-			if (found_value === false)
-				new_value = undefined; /*cambiandolo si perde i dati on actex multi on dom ready*/
+			//if (found_value === false)
+			//	new_value = undefined; /*cambiandolo si perde i dati on actex multi on dom ready*/
 
 			if(!displayed_value)
-				displayed_value = selected_value;				
+				displayed_value = selected_value;
 
-			that.update(new_value);
+			if (found_value !== false)
+			    that.update(new_value);
 
 			parent_enable();
 
