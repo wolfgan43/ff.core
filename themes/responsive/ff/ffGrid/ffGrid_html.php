@@ -1556,7 +1556,7 @@ class ffGrid_html extends ffGrid_base
 	                {
 	                    $confirmurl = $this->record_delete_url . "?" . $keys .
 	                                    $this->parent[0]->get_globals() .
-	                                    $this->addit_record_param .
+	                                    rtrim($this->addit_record_param, "&") . "&" .
 	                                    $this->record_id . "_frmAction=confirmdelete"
 	                                    /*. ($this->full_ajax || $this->ajax_delete
                                     		? ""
@@ -1584,7 +1584,7 @@ class ffGrid_html extends ffGrid_base
 	                    {
 	                        $confirmurl = $this->record_url . "?" . $keys .
 	                                    $this->parent[0]->get_globals() .
-	                                    $this->addit_record_param .
+                                        rtrim($this->addit_record_param, "&") . "&" .
 	                                    $this->record_id . "_frmAction=confirmdelete"
 	                                    /*. ($this->full_ajax || $this->ajax_delete
                                     		? ""

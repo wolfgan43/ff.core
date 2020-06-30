@@ -536,8 +536,17 @@ var activecombo = function(params) {
 				if(!displayed_value)
 					displayed_value = new_value;
 
-                if (found_value !== false)
-				    that.update(new_value);
+                if (found_value !== false) {
+					that.update(new_value);
+				} else {
+					if (first_fill) {
+						first_fill = false;
+						ff.doEvent({
+							"event_name" : "initIFElement"
+							, "event_params" : [__id, "actex"]
+						});
+					}
+				}
 
 				that.doEvent({
 					"event_name"	: "refill",
@@ -799,8 +808,17 @@ var activecombo = function(params) {
 			if(!displayed_value)
 				displayed_value = selected_value;
 
-			if (found_value !== false)
-			    that.update(new_value);
+			if (found_value !== false) {
+				that.update(new_value);
+			} else {
+				if (first_fill) {
+					first_fill = false;
+					ff.doEvent({
+						"event_name" : "initIFElement"
+						, "event_params" : [__id, "actex"]
+					});
+				}
+			}
 
 			parent_enable();
 
