@@ -207,6 +207,7 @@ class ffWidget_actex extends ffCommon
             //$this->tpl[$tpl_id]->set_var("SectDialog", "");
         }
         $edit_url = ($Field->actex_dialog_edit_url ? $Field->actex_dialog_edit_url : $Field->actex_dialog_url);
+
         $params = $Field->actex_dialog_edit_params;
         if (
             $Field->actex_update_from_db
@@ -869,7 +870,6 @@ class ffWidget_actex extends ffCommon
 				foreach($arrData AS $data) {
 					$this->tpl[$tpl_id]->set_var("value_label", str_replace(array('"'), array('&quot;'), $data["value"]));
 					$this->tpl[$tpl_id]->set_var("value", str_replace(array("'", '"'), array("\\'", '&quot;'), $data["value"]));
-
 					$desc = $data["label"];
 					if($data["image"])
 						$desc = '<img src="' . $data["image"] . '" />' . $desc;
@@ -877,11 +877,17 @@ class ffWidget_actex extends ffCommon
 						$desc = '<a href="' . $data["url"] . '" target="_blank">' . $desc . '</a>';
 					}
 					$this->tpl[$tpl_id]->set_var("desc", $desc);
-					
+                    if($edit_url) {
+                        $this->tpl[$tpl_id]->set_var("edit_id", "actex_dlg_edit_" . $prefix . $id);
+                        $this->tpl[$tpl_id]->set_var("edit_url", str_replace("[[" .  $prefix . $id . "]]", $data["value"], $edit_url));
+                        $this->tpl[$tpl_id]->parse("SectMultiElemEdit", false);
+                    }
 					$this->tpl[$tpl_id]->parse("SectMultiElem", true);
 				}
 			}
+
 			$this->tpl[$tpl_id]->parse("SectMulti", false);
+            $this->tpl[$tpl_id]->set_var("dialogeditlink", "");
 		} else 
 		{
 			$this->tpl[$tpl_id]->set_var("multi", "false");

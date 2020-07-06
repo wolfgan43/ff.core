@@ -541,10 +541,13 @@ var activecombo = function(params) {
 				} else {
 					if (first_fill) {
 						first_fill = false;
-						ff.doEvent({
-							"event_name" : "initIFElement"
-							, "event_params" : [__id, "actex"]
-						});
+						setTimeout(function() {
+							updatebt();
+							ff.doEvent({
+								"event_name" : "initIFElement"
+								, "event_params" : [__id, "actex"]
+							});
+						}, 100);
 					}
 				}
 
@@ -813,10 +816,14 @@ var activecombo = function(params) {
 			} else {
 				if (first_fill) {
 					first_fill = false;
-					ff.doEvent({
-						"event_name" : "initIFElement"
-						, "event_params" : [__id, "actex"]
-					});
+					setTimeout(function() {
+						updatebt();
+						ff.doEvent({
+							"event_name" : "initIFElement"
+							, "event_params" : [__id, "actex"]
+						});
+					}, 100);
+
 				}
 			}
 
