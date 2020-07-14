@@ -391,6 +391,11 @@ class ffTemplate
 		}
 	}
 
+	function isParsedBlock($name)
+    {
+        return !empty($this->ParsedBlocks[$name]);
+    }
+
 	function set_regexp_var($sPattern, $sValue)
 	{
 		$rc = false;

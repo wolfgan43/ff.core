@@ -604,6 +604,8 @@ class ffGrid_html extends ffGrid_base
 			$this->tpl[0]->set_var("actions_top_class", cm_getClassByDef($this->framework_css["actionsTop"], $action_top_class));
 			$this->tpl[0]->set_var("actions_bottom_class", cm_getClassByDef($this->framework_css["actionsBottom"], $action_class));
 		}
+
+
         if(strlen($this->title) || $this->widget_discl_enable) {
         	$this->tpl[0]->set_var("title_class", cm_getClassByDef($this->framework_css["title"], $title_class));
             $this->tpl[0]->set_var("title", $this->title);
@@ -1332,6 +1334,7 @@ class ffGrid_html extends ffGrid_base
                 $this->tpl[0]->parse("SectAddNewUrl", false);
                 $this->tpl[0]->set_var("SectAddNewBt", "");
             }
+
             $this->tpl[0]->parse("SectAddNew", false);
             $this->tpl[0]->set_var("SectNotAddNew", "");
         }
@@ -1343,7 +1346,12 @@ class ffGrid_html extends ffGrid_base
             else
                 $this->tpl[0]->set_var("SectNotAddNew", "");
         }
-        
+
+        if($this->tpl[0]->isParsedBlock("SectActionButtonsHeader") || $this->tpl[0]->isParsedBlock("SectAddNew")) {
+            $this->tpl[0]->parse("SectActionTop", false);
+        }
+
+
         $col_count = count($this->grid_fields);
         
         if ($this->display_edit_bt)
