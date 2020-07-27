@@ -138,7 +138,7 @@ class ffWidget_datepicker extends ffCommon
         if($Field->max_year)
             $this->tpl[$tpl_id]->set_var("max_year", $Field->max_year);
         else
-            $this->tpl[$tpl_id]->set_var("max_year", "2");
+            $this->tpl[$tpl_id]->set_var("max_year", "10");
 		
 		if ($Field->datepicker_showbutton)
         {
