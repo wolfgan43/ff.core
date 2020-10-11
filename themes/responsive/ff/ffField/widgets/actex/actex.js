@@ -1270,7 +1270,7 @@ var activecombo = function(params) {
 			buffer += ' ' + that.options.properties + ' ';
 		} else if (that.options.control_type == "label") {
 			buffer = '<input type="hidden" id="' + __id + '" name="' + __id + '" value="' + value + '" />';
-			buffer += '<span class="'  + (that.options.class.length ? that.options.class + ' ' : '') + 'label" ';
+			buffer += '<span class="'  + (that.options.class.length ? that.options.class + ' ' : '') + 'readonly" ';
 			buffer += ' ' + that.options.properties + ' >';
 		} else if(that.options.control_type == "checkbox") {
 			buffer = '<input type="hidden" id="' + __id + '" name="' + __id + '" value="' + value + '" />';
