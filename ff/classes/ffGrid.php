@@ -891,7 +891,7 @@ abstract class ffGrid_base extends ffCommon
 		{
 			foreach ($property_set as $key => $value)
 			{
-				if ($key == "style")
+				if ($key === "style")
 				{
 					if (strlen($buffer))
 						$buffer .= " ";

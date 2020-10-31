@@ -2284,7 +2284,7 @@ class ffGrid_html extends ffGrid_base
 					$col_class["cell"] = str_replace("[ID]", $key, $col_class["cell"]);
 					if(is_array($res)) {
 						$col_class = array_replace($col_class, $res["container_class"]);
-						$col_properties = $res["container_properties"];					
+						$col_properties = (array) $res["container_properties"];
 					}
 				}
 			}
@@ -2328,7 +2328,7 @@ class ffGrid_html extends ffGrid_base
 		if($this->tpl[0]->isset_var("col_class")) {
 			$this->tpl[0]->set_var("col_class", implode(" " , array_filter($col_class)));
 		} else {
-			$col_properties["class"] = implode(" " , array_filter($col_class));
+            $col_properties["class"] = implode(" " , array_filter($col_class));
 		}
 
 		$this->tpl[0]->set_var("col_properties", $this->getProperties($col_properties));
