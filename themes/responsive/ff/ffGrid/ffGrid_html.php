@@ -2665,7 +2665,7 @@ class ffGrid_html extends ffGrid_base
         if ($this->db[0]->query_id)
             $this->navigator[0]->num_rows = $this->db[0]->numRows();
 
-        if (!$this->display_navigator || !$this->use_paging || ($this->navigator[0]->num_rows <= $this->navigator[0]->records_per_page && !($this->ajax_search || $this->full_ajax)))
+        if (!$this->display_navigator || !$this->use_paging /*|| ($this->navigator[0]->num_rows <= $this->navigator[0]->records_per_page && !($this->ajax_search || $this->full_ajax))*/)
         {
             $this->tpl[0]->set_var("SectHiddenPageNavigator", "");
             $this->tpl[0]->set_var("SectPageNavigator", "");
