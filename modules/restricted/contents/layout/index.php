@@ -161,7 +161,7 @@ if ($cm->modules["restricted"]["sel_topbar"] === null)
 {
     $restricted_path = $cm->router->getRuleById("restricted")->reverse;
 
-	$path_parts = explode("/", ltrim($cm->real_path_info, "/"));
+	$path_parts = explode("/", ltrim($cm->real_path_info, "/"), 2);
 
 	if($cm->modules["restricted"]["menu_bypath"][$restricted_path . "/" . $path_parts[0]]) {
         $cm->modules["restricted"]["sel_topbar"] =& $cm->modules["restricted"]["menu_bypath"][$restricted_path . "/" . $path_parts[0]][0];
@@ -173,9 +173,14 @@ if ($cm->modules["restricted"]["sel_topbar"] === null)
         if($cm->modules["restricted"]["sel_topbar"]["elements"][$nav_key]) {
             $cm->modules["restricted"]["sel_navbar"] =& $cm->modules["restricted"]["sel_topbar"]["elements"][$nav_key];
             $cm->modules["restricted"]["sel_navbar"]["selected"] = true;
-
         }
-    }
+        foreach ($cm->modules["restricted"]["menu_bypath"][$restricted_path . "/" . $path_parts[0]] AS $menu_item) {
+            $cm->modules["restricted"]["menu"][$menu_item["name"]]["selected"] = true;
+            if($cm->modules["restricted"]["menu"][$menu_item["name"]]["elements"][$nav_key]) {
+                $cm->modules["restricted"]["menu"][$menu_item["name"]]["elements"][$nav_key]["selected"] = true;
+            }
+        }
+	}
 }
 
 if ($cm->modules["restricted"]["sel_topbar"] === null)

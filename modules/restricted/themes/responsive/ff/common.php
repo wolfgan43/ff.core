@@ -637,6 +637,12 @@ function on_load_section_topbar($page, $tpl, $attr)
             if($value["class"]) {
                 $item_class["custom"] = $value["class"];
             }
+
+            if ($value["selected"])
+            {
+                $item_class["current"] = $framework_css["current"];
+            }
+
             if($item_class) {
                 $item_properties["class"] = 'class="' . implode(" ", $item_class) . '"';
             }
@@ -978,6 +984,11 @@ function on_load_section_sidebar($page, $tpl, $attr)
             }
             if($value["class"]) {
                 $item_class["custom"] = $value["class"];
+            }
+
+            if ($value["selected"])
+            {
+                $item_class["current"] = $framework_css["current"];
             }
 
             if($item_class) {
