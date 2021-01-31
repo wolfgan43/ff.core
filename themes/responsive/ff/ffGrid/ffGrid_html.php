@@ -607,7 +607,7 @@ class ffGrid_html extends ffGrid_base
 
 
         if(strlen($this->title) || $this->widget_discl_enable) {
-        	$this->tpl[0]->set_var("title_class", cm_getClassByDef($this->framework_css["title"], $title_class));
+        	$this->tpl[0]->set_var("title_class", cm_getClassByDef($this->use_search ? $this->framework_css["title"] : $this->framework_css["search"], $title_class));
             $this->tpl[0]->set_var("title", $this->title);
             $this->tpl[0]->parse("SectTitle", false);
         } else {
