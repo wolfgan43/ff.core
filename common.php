@@ -162,6 +162,14 @@ function mod_keeng_enforce_config ($params) {
 		// default dimensions
 		$allowed_res = array(
 			//x
+            "1080" => array(
+                //y
+                "0" => true
+            ),
+            "480" => array(
+                //y
+                "0" => true
+            ),
 			"100" => array(
 				//y
 				"100" => true

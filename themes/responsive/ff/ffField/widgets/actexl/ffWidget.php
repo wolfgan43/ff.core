@@ -546,7 +546,7 @@ class ffWidget_actexl extends ffCommon
 			$this->tpl[$tpl_id]->set_var("limit_select", "true");
 		else
 			$this->tpl[$tpl_id]->set_var("limit_select", "false");
-		
+
 		if (strlen($Field->properties["disabled"]))
 			$this->tpl[$tpl_id]->set_var("disabled", "true");
 		else

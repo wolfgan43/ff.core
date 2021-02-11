@@ -144,7 +144,12 @@ if(strlen(MOD_SEC_USER_AVATAR))
         , "image/jpeg"
         , "image/jpg"
         );
-        $oField->widget = "uploadifive";
+		$oField->widget = "uploadex";
+        $oField->uploadex_icons_class["button"] = "uplex-style-area";
+        $oField->uploadex_label = "";
+        //$oField->widget_options["automedia_browse"] = true;
+        /*$oField->widget_options["automedia_show"] = true;*/
+        $oField->uploadex_allow_replace = false;
         $oField->file_full_path = true;
 	    $oRecord->addContent($oField, $account);
 	}
@@ -234,7 +239,7 @@ if (!mod_security_is_defined_field("level") && mod_sec_check_acl(MOD_SEC_ACL_LEV
 	$oField->id = "level";
 	$oField->label = "Livello";
 	$oField->extended_type = "Selection";
-	if (get_session("UserLevel") == 1)
+	if (get_session("UserLevel") == 1 || (get_session("UserNID") == $_REQUEST["keys"]["ID"]))
 	{
 		$oField->multi_pairs[] = array( new ffData("1"),  new ffData("Utente"));
 		$oField->multi_pairs[] = array( new ffData("2"),  new ffData("Admin"));
@@ -246,9 +251,10 @@ if (!mod_security_is_defined_field("level") && mod_sec_check_acl(MOD_SEC_ACL_LEV
 	{
 		$oField->required = true;
 		$oField->multi_pairs[] = array( new ffData("1"),  new ffData("Utente"));
-		$oField->multi_pairs[] = array( new ffData("2"),  new ffData("Admin"));
-		if (get_session("UserLevel") == 3)
-			$oField->multi_pairs[] = array( new ffData("3"),  new ffData("Super Admin"));
+        if (get_session("UserLevel") == 3) {
+            $oField->multi_pairs[] = array(new ffData("2"), new ffData("Admin"));
+            $oField->multi_pairs[] = array(new ffData("3"), new ffData("Super Admin"));
+        }
 	}
 	$oRecord->addContent($oField, $account);
 }

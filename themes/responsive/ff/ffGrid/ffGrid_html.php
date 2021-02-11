@@ -1715,7 +1715,7 @@ class ffGrid_html extends ffGrid_base
                     //$this->tpl[0]->set_var("RecordNumber", ($rrow + ($this->page - 1 ) * $this->records_per_page));
 
 
-                    $res = $this->doEvent("on_before_parse_record", array(&$this));
+                    $res = $this->doEvent("on_before_parse_record", array(&$this, $rrow));
 
 
 			        $row_properties = array_replace($row_properties, $this->row_properties);
