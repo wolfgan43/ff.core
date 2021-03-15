@@ -113,7 +113,7 @@ function ffDialog($returnurl, $type, $title, $message, $cancelurl, $confirmurl, 
 	$url .= "title=" 			. rawurlencode($title)
 			. "&message=" 		. rawurlencode($message)
 			. "&type=" 			. rawurlencode($type)
-			//. "&cancelurl=" 		. rawurlencode($cancelurl)
+			. "&cancelurl=" 		. rawurlencode($cancelurl)
 			. "&confirmurl=" 		. rawurlencode($confirmurl)
 		;
 	if ($returnurl)
