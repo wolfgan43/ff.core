@@ -365,10 +365,7 @@ var activecombo = function(params) {
 						opt_text = tmp_data[1];
 						found_value |= (opt_value == new_value);
 						if ((father_value == null && that.father == null) || tmp_data[0] == father_value) {
-							if (
-									!that.options.limit_select
-									|| (that.options.limit_select && opt_value == new_value)
-								) {
+							if (found_value) {
 								buffer += ' value="' + opt_value + '" ';
 								return true;
 							}
@@ -382,7 +379,7 @@ var activecombo = function(params) {
 						opt_text = tmp_data[1];
 						found_value |= (opt_value == new_value);
 						if ((father_value == null && that.father == null) || tmp_data[0] == father_value) {
-							if (!that.options.limit_select || (that.options.limit_select && opt_value == new_value)) {
+							if (found_value) {
 								buffer += opt_text;
 								return true;
 							}
@@ -634,7 +631,7 @@ var activecombo = function(params) {
 					opt_value = retData[i].value;
 					opt_text = retData[i].desc;
 					found_value |= (opt_value == selected_value);
-					if (!that.options.limit_select || (that.options.limit_select && opt_value == selected_value)) {
+					if (found_value) {
 						buffer += ' value="' + opt_value + '" ';
 						break;
 					}
@@ -646,7 +643,7 @@ var activecombo = function(params) {
 					opt_value = retData[i].value;
 					opt_text = retData[i].desc;
 					found_value |= (opt_value == selected_value);
-					if (!that.options.limit_select || (that.options.limit_select && opt_value == selected_value)) {
+					if (found_value) {
 						buffer += opt_text;
 						break;
 					}

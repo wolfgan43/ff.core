@@ -2103,6 +2103,7 @@ abstract class ffRecord_base extends ffCommon
 						$cancelurl = $_REQUEST["cancelurl"];
 					else
 						$cancelurl = $_SERVER["REQUEST_URI"];
+
 					$this->dialog(false, "yesno", $this->parent[0]->title, $this->label_delete_record, $cancelurl, $confirmurl);
 					exit;
 				/*}
