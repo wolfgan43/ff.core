@@ -1,0 +1,21 @@
+{
+  "name" : "federico.maffucci/pay-pal-integration",
+  "description" : "Package wrapper delle funzionalità messe a disposizione da PayPal SDK",
+  "type": "library",
+  "license" : "proprietary",
+  "authors": [
+    {
+      "name": "Federico Maffucci",
+      "email": "federico.maffucci@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "paypal/paypal-checkout-sdk": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+        "PayPalIntegration\\": "src/"
+    }
+  }
+}
