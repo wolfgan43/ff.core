@@ -625,6 +625,7 @@ class ffWidget_actex extends ffCommon
 					$tmp = $db->getField($db->fields_names[2], $Field->multi_base_type);
 					//$tmp = $db->getResult(null, 2, $Field->multi_base_type);
 					$this->tpl[$tpl_id]->set_var("desc", str_replace('"', '\"', $tmp->getValue($Field->multi_app_type, $Field->get_locale())));
+
 					$this->tpl[$tpl_id]->parse("SectDataEl", true);
 				}
 				while ($db->nextRecord());
@@ -879,12 +880,19 @@ class ffWidget_actex extends ffCommon
 					$this->tpl[$tpl_id]->set_var("desc", $desc);
                     if($edit_url) {
                         $this->tpl[$tpl_id]->set_var("edit_id", "actex_dlg_edit_" . $prefix . $id);
-                        $this->tpl[$tpl_id]->set_var("edit_url", str_replace("[[" .  $prefix . $id . "]]", $data["value"], $edit_url));
+                        $this->tpl[$tpl_id]->set_var("edit_url", str_replace("[[" .  $prefix . $id . "]]", $data["val   ue"], $edit_url));
                         $this->tpl[$tpl_id]->parse("SectMultiElemEdit", false);
+                    }
+
+                    if($Field->parent_page[0]->isset_param($Field->parent[0]->id, $Field->id . "_src_not") && in_array($data["value"], $Field->parent_page[0]->retrieve_param($Field->parent[0]->id, $Field->id . "_src_not"))) {
+                        $this->tpl[$tpl_id]->set_var("check_not", 'checked="checked"');
+                    } else {
+                        $this->tpl[$tpl_id]->set_var("check_not", "");
                     }
 					$this->tpl[$tpl_id]->parse("SectMultiElem", true);
 				}
 			}
+
 
 			$this->tpl[$tpl_id]->parse("SectMulti", false);
             $this->tpl[$tpl_id]->set_var("dialogeditlink", "");

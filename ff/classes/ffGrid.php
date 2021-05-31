@@ -1297,8 +1297,28 @@ abstract class ffGrid_base extends ffCommon
 			}
 			elseif ($this->search_fields[$key]->data_type != "")
 			{
-				if (strlen($this->search_fields[$key]->value->ori_value))
+                $real_value = null;
+                /**
+                 * Parte aggiunta per esclusione
+                 */
+                if ($this->parent[0]->isset_param($this->id, $this->search_fields[$key]->id . "_src_not")) {
+                    $search_params = explode(",", $this->search_fields[$key]->getValue());
+                    $search_not_params = $this->parent[0]->retrieve_param($this->id, $this->search_fields[$key]->id . "_src_not");
+                    //$this->search_fields[$key]->setValue();
+                    $real_value = implode(",", array_diff($search_params, $search_not_params));
+                    if(strpos($this->search_fields[$key]->src_operation, " IN(") !== false) {
+                        $tmp_sql .= $tblprefix . "`" . $this->search_fields[$key]->get_data_source() . "` NOT IN('" . implode("','", $this->parent[0]->retrieve_param($this->id, $this->search_fields[$key]->id . "_src_not")) . "')";
+                    } elseif(strpos($this->parent[0]->retrieve_param($this->id, $this->search_fields[$key]->id . "_src_not"), " = ") !== false) {
+                        $tmp_sql .= $tblprefix . "`" . $this->search_fields[$key]->get_data_source() . "` <> " . implode("", $this->parent[0]->retrieve_param($this->id, $this->search_fields[$key]->id . "_src_not"));
+                    }
+                }
+
+				if (strlen($this->search_fields[$key]->value->ori_value) && $real_value !== '')
 				{
+				    if(!empty($real_value)) {
+                        $tmp_sql .= " AND ";
+                    }
+
     				if (strlen($this->search_params))
         				$this->search_params .= "&";
 
@@ -1339,7 +1359,7 @@ abstract class ffGrid_base extends ffCommon
 						reset($this->search_fields[$key]->src_fields);
 						$tmp_sql .= " ) ";
 					 }
-				}
+                }
 			}
 			else
 			{

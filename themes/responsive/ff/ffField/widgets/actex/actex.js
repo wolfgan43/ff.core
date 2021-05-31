@@ -327,7 +327,10 @@ var activecombo = function(params) {
 			var $node = jQuery(that.getNode());
 			var sep = that.options.separator;
 			if(!$node.parent().next(".actex-multi").find("li[data-id='" + jQuery.fn.escape(item.id) + "']").length) {
-				$node.parent().next(".actex-multi").append('<li class="' + frameworkCSS["item"] + '" data-id="' + item.id.escapeHtml() + '"><mark>' + (item.url ? '<a href="' + item.url + '" target="_blank">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>" : (item.image ? '<img src="' + item.image + '" />' : "") + item.label) + '</mark><a href="javascript:ff.ffField.actex.del(\'' + __id + '\', \'' + item.id + '\');" class="' + frameworkCSS["badge"] + '"><i class="' + icons["delete"] + '"></i></a></li>');
+				var exclude = '<div class="badge"><label>escludi<input name="' + __id + '_not[]" type="checkbox" value="' + jQuery.fn.escape(item.id) + '"></label></div>';
+
+
+				$node.parent().next(".actex-multi").append('<li class="' + frameworkCSS["item"] + '" data-id="' + item.id.escapeHtml() + '"><mark>' + (item.url ? '<a href="' + item.url + '" target="_blank">' + (item.image ? '<img src="' + item.image + '" />' : "") + item.label + "</a>" : (item.image ? '<img src="' + item.image + '" />' : "") + item.label) + '</mark><a href="javascript:ff.ffField.actex.del(\'' + __id + '\', \'' + item.id + '\');" class="' + frameworkCSS["badge"] + '"><i class="' + icons["delete"] + '"></i></a>' + exclude + '</li>');
 				$node.parent().next(".actex-multi").children().each(function() {
 					data["value"].push(jQuery(this).data("id"));
 					data["label"].push(jQuery(this).text());
