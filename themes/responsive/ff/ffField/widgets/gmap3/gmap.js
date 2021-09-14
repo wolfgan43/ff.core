@@ -6,14 +6,28 @@ ff.ffField.gmap3 = (function () {
     var mapID;
 	var arrAddress = {};
 	var responses = {};
-	
+
+	function loadScript(key, region) {
+		var url_data = window.location.href.parseUri();
+
+		if (null === document.querySelector("script" + "[" + "src" + "^='" + url_data.protocol + "://maps.googleapis.com/maps/api/js" + "']")) {
+			var script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = url_data.protocol + "://maps.googleapis.com/maps/api/js?libraries=places&key=" + key + (region ? "&" + region : "") + "&callback=ff.ffField.gmap3.loadMaps";
+			document.body.appendChild(script);
+		} else {
+			ff.ffField.gmap3.loadMaps(true);
+		}
+	}
+
 	var that = { 
 		/* publics*/
 		__ff : true, /* used to recognize ff'objects*/
 
 		"init" : function (key, sensor, region)
 		{
-			ff.ffField.gmap3.loadMaps(true); 
+			loadScript(key, region);
+			//ff.ffField.gmap3.loadMaps(true);
 		},
 		"addData": function(data) 
 		{

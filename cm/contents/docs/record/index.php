@@ -204,7 +204,7 @@ $oField->source_SQL = "SELECT anagraph_type.ID,
 $oField->actex_update_from_db = true;
 $oField->store_in_db = false;
 $oField->actex_dialog_url = $cm->oPage->site_path . VG_SITE_ADMIN . "/ecommerce/anagraph/type/modify";
-$oField->actex_dialog_edit_params = array("keys[ID]" => null);
+$oField->actex_dialog_edit_params = array("keys[id]" => null);
 $oField->actex_dialog_delete_url = $oField->actex_dialog_url . "?frmAction=AnagraphTypeModify_confirmdelete";
 $oField->resources[] = "AnagraphTypeModify";
 $oRecord->addContent($oField); 

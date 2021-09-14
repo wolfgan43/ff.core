@@ -1,5 +1,5 @@
 <?php
-if (!count($cm->modules["restricted"]["settings"]))
+if (!@count($cm->modules["restricted"]["settings"]))
 {
 	settings_noone();
 	return;
