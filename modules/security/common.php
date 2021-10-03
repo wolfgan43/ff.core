@@ -1076,6 +1076,7 @@ function mod_security_create_session($UserID = null, $UserNID = null, $Domain = 
     $user["level"]			= intval($tmp_user_data["level"]);
     $user["email"]			= $tmp_user_data["email"];
     $user["lastlogin"]		= $db->getField("lastlogin", "DateTime", true);
+    $user["special"]		= $db->getField("special", "Text", true);
 
     if(defined("MOD_SEC_USER_AVATAR") && MOD_SEC_USER_AVATAR)
         $user["avatar"] = $tmp_user_data[MOD_SEC_USER_AVATAR];
@@ -1244,6 +1245,7 @@ function mod_security_create_session($UserID = null, $UserNID = null, $Domain = 
     set_session("UserID"	        , $user["username"]);
     set_session("UserLevel"	    , $user["level"]);
     set_session("UserEmail"	    , $user["email"]);
+    set_session("UserSpecial"	, $user["special"]);
 
     /**
      * Update LastLogin

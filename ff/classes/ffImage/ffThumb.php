@@ -55,11 +55,11 @@ class ffThumb extends ffImage
 	 * @param Int $new_res_dim_real_y Le dimensioni finali verticali della risorsa
 	 * @param resource $src_res la risorsa in cui inserire il thumbnail
 	 */
-	function ffThumb($new_res_dim_real_x = NULL, $new_res_dim_real_y = NULL, $src_res = NULL)
+	function __construct($new_res_dim_real_x = NULL, $new_res_dim_real_y = NULL, $src_res = NULL)
 	{
 		//$this->getDefaults();
 
-		$this->ffImage($new_res_dim_real_x, $new_res_dim_real_y, $src_res);
+        parent::__construct($new_res_dim_real_x, $new_res_dim_real_y, $src_res);
 	}
 		
 	/**

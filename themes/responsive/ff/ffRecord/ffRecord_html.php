@@ -866,7 +866,7 @@ class ffRecord_html extends ffRecord_base
 						    	$prefix_label = "";
 						    	$label_set = true; 
 							}
-						    if($this->form_fields[$key]->encode_label) 	
+						    if($this->form_fields[$key]->encode_label && $this->form_fields[$key]->label_encode_entities)
 							    $this->tpl[0]->set_var($prefix_label . "label", ffCommon_specialchars($this->form_fields[$key]->label) . $required_symbol);
 						    else
 							    $this->tpl[0]->set_var($prefix_label . "label",$this->form_fields[$key]->label . $required_symbol);

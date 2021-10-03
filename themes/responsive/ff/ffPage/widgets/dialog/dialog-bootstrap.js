@@ -131,12 +131,20 @@ __ff : true, /* used to recognize ff'objects */
 	//}
 	return true;
 },
+"isDisplayed" : function (id) {
+	if(id === undefined) {
+		id = dialogs.keys[dialogs.keys.length - 1];
+	}
+	var widget = dialogs.get(id).widget;
+	return widget && widget.hasClass("in");
+},
 "refresh" : function (id, show) {
 	if(id === undefined) {
 		id = dialogs.keys[dialogs.keys.length - 1];
 	}
 	var widget = dialogs.get(id).widget;
-	
+
+	that.adjSize(id);
 	if(!widget.hasClass("in")) {
 		widget.addClass("in");
 		//widget.modal({backdrop: false});
@@ -147,7 +155,10 @@ __ff : true, /* used to recognize ff'objects */
 		    "event_params"    : [id]
 		});		
 	}
-	that.adjSize(id);
+	that.doEvent({
+		"event_name"    : "onRefresh",
+		"event_params"    : [id]
+	});
 	return true;
 },
 "makeInstance" : function (id, data, title) {

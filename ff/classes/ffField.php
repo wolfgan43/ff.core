@@ -1788,8 +1788,8 @@ abstract class ffField_base extends ffCommon
 			$ret_val = call_user_func($this->default_callback, $component, $this->id);
 		else if ($this->default_value !== null)
 		{
-			if (!is_object($this->default_value) || get_class($this->default_value) != "ffData")
-				ffErrorHandler::raise("default_value must be a ffData instance", E_USER_ERROR, $this, get_defined_vars());
+			//if (!is_object($this->default_value) || get_class($this->default_value) != "ffData")
+		//		ffErrorHandler::raise("default_value must be a ffData instance", E_USER_ERROR, $this, get_defined_vars());
 			$ret_val = $this->default_value;
 		}
 		else

@@ -1608,13 +1608,21 @@ abstract class ffRecord_base extends ffCommon
 								break;
 							
 							default:
-								if (
+							    if(is_array($this->form_fields[$key]->value)) {
+                                    foreach ($this->form_fields[$key]->value as $ffValue) {
+                                        if (!strlen($ffValue->ori_value)) {
+                                            $this->contain_error = true;
+                                            break;
+                                        }
+							        }
+                                } elseif (
 									!strlen($this->form_fields[$key]->value->ori_value) &&
 									!($this->form_fields[$key]->extended_type == "Password" && $this->record_exist)
-								)
-									$this->contain_error = true;
+								) {
+                                    $this->contain_error = true;
+                                }
 						}
-						
+
 						if ($this->contain_error)
 						{
 							$this->form_fields[$key]->contain_error = true;
@@ -2293,6 +2301,9 @@ abstract class ffRecord_base extends ffCommon
 		reset($this->key_fields);
 		foreach ($this->form_fields as $key => $FormField)
 		{
+		    if (is_array($this->form_fields[$key]->value)) {
+		        continue;
+            }
 			$sSQL = str_replace(	"[" . $key . "_VALUE]",
 									$this->db[0]->toSql($this->form_fields[$key]->value, $this->form_fields[$key]->base_type),
 									$sSQL

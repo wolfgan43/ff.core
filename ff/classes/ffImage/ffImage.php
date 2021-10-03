@@ -71,7 +71,7 @@ abstract class ffImage
     
 	var $pre_processed = FALSE;
 	
-	function ffImage($new_res_dim_real_x = NULL, $new_res_dim_real_y = NULL, $src_res = NULL)
+	function __construct($new_res_dim_real_x = NULL, $new_res_dim_real_y = NULL, $src_res = NULL)
 	{
 		if($new_res_dim_real_x !== NULL)
 			$this->new_res_dim_real_x = $new_res_dim_real_x;

@@ -1893,7 +1893,7 @@ class cm extends ffCommon
 						$attrs	= $value->attributes();
 						$id		= (string)$attrs["id"];
 						if (!isset($this->oPage->components[$id]))
-							continue;
+                            break;
 
 						foreach ($value as $subkey => $subvalue)
 						{

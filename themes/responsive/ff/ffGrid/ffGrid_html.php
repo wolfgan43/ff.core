@@ -940,8 +940,10 @@ class ffGrid_html extends ffGrid_base
     
             if(/*!$this->searched &&*/ $this->open_adv_search === false) {
                 $this->tpl[0]->set_var("adv_class", "adv-search toggle hidden");
+                $this->tpl[0]->parse("SectAdvSearchClosed", false);
             } else {
-                $this->tpl[0]->set_var("adv_class", "adv-search");
+                $this->tpl[0]->set_var("adv_class", "adv-search clearfix");
+                $this->tpl[0]->parse("SectAdvSearchOpened", false);
             }
         }
 
@@ -1164,8 +1166,10 @@ class ffGrid_html extends ffGrid_base
 		
 		if($this->display_search) 
 		{
-			//$this->tpl[0]->parse("SectSearchRow", true);
-			
+		    if($this->parsed_fields) {
+                $this->tpl[0]->parse("SectSearchRow", true);
+            }
+
 			$show_section = false;
 
 			//$this->initControls();
@@ -1192,7 +1196,7 @@ class ffGrid_html extends ffGrid_base
 				}
 
 				$this->tpl[0]->set_var("SearchButtons", $buffer);
-				if( $this->open_adv_search === false) {
+				if(1 || $this->open_adv_search === false) {
 					$this->search_buttons[0]->id = "searchadv";
 					unset($this->search_buttons[0]->framework_css["addon"]);
 					$this->tpl[0]->set_var("SearchButtonsAdv", '<div class="' . cm_getClassByFrameworkCss("align-right", "util"). '">' . $this->search_buttons[0]->process() . '</div>');

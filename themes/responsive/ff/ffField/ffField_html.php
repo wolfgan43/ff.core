@@ -482,6 +482,9 @@ class ffField_html extends ffField_base
 			{
 				case "label":
 					$arrClass[] = "readonly";
+					if($this->base_type = "Number") {
+                        $arrClass[] = "text-right";
+                    }
 					break;
 				case "checkbox":
 					$arrClass[] = "check";

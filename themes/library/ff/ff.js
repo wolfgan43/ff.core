@@ -77,23 +77,35 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.split(search).join(replacement);
 };
 String.prototype.parseUri = function() {
+		try {
+			let tmp = new URL(this);
+			return {
+				"protocol" : tmp.protocol.trim(":"),
+				"host" : tmp.host,
+				"path" : tmp.pathname,
+				"source" : tmp.href,
+				"query" : tmp.search.trim("?"),
+				"anchor" : tmp.hash.trim("#"),
+			};
+		} catch (e) {
 		// parseUri 1.2.2
 		// (c) Steven Levithan <stevenlevithan.com>
 		// MIT License
 
-        var     o   = String.prototype.parseUri.options,
-                m   = o.parser[o.strictMode ? "strict" : "loose"].exec(this),
-                uri = {},
-                i   = 14;
+		var o = String.prototype.parseUri.options,
+			m = o.parser[o.strictMode ? "strict" : "loose"].exec(this),
+			uri = {},
+			i = 14;
 
-        while (i--) uri[o.key[i]] = m[i] || "";
+		while (i--) uri[o.key[i]] = m[i] || "";
 
-        uri[o.q.name] = {};
-        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-                if ($1) uri[o.q.name][$1] = $2;
-        });
+		uri[o.q.name] = {};
+		uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+			if ($1) uri[o.q.name][$1] = $2;
+		});
 
-        return uri;
+		return uri;
+	}
 };
 
 String.prototype.parseUri.options = {

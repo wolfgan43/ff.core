@@ -1194,8 +1194,12 @@ var activecombo = function(params) {
                             that.change(false, that.value_ori["value"]);
                         }
 					} else {
-						$this.val("");
-						tmp_compare = "";
+						if(that.options.autocomplete.preserveText) {
+							that.change(false, $this.val());
+						} else {
+							$this.val("");
+							tmp_compare = "";
+						}
 					}
 				}
 

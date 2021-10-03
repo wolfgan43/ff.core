@@ -27,7 +27,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
 														"xs" => 0
 														, "sm" => 0
 														, "md" => 5
-														, "lg" => 2
+														, "lg" => 3
 												)
 											)
 											, "totelem" => array(
@@ -36,7 +36,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
 														"xs" => 0
 														, "sm" => 2
 														, "md" => 3
-														, "lg" => 2
+														, "lg" => 3
 												)											
 											)
 											, "perPage" => array(
@@ -45,7 +45,7 @@ class ffPageNavigator_html extends ffPageNavigator_base
 														"xs" => 0
 														, "sm" => 0
 														, "md" => 4
-														, "lg" => 2
+														, "lg" => 3
 												)
 											)
 	
@@ -237,29 +237,37 @@ class ffPageNavigator_html extends ffPageNavigator_base
 		$this->tpl[0]->set_var("page_parname", $this->page_parname);
 		$this->tpl[0]->set_var("current_class", $current_class);
 		//$this->tpl[0]->set_var("loader_class", $loader_class);
-		
-		if(!$this->with_totelem) {
-            if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
-                foreach($this->framework_css["pagination"]["def"]["col"] AS $col_key => $col_value) {
-                    $this->framework_css["pagination"]["def"]["col"][$col_key] = $this->framework_css["pagination"]["def"]["col"][$col_key] + $this->framework_css["totelem"]["col"][$col_key];
-                    if($this->framework_css["pagination"]["def"]["col"][$col_key] > 12)
-                        $this->framework_css["pagination"]["def"]["col"][$col_key] = 12;
+
+        if($this->with_totelem && $this->with_choice) {
+            $this->framework_css["totelem"]["def"]["col"]["lg"] = 2;
+            $this->framework_css["choice"]["def"]["col"]["lg"] = 2;
+            $this->framework_css["perPage"]["def"]["col"]["lg"] = 2;
+        }
+
+
+        if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
+            foreach($this->framework_css["pagination"]["def"]["col"] AS $col_key => $col_value) {
+                $this->framework_css["pagination"]["def"]["col"][$col_key] = 12 - (
+                    $this->with_totelem
+                    ?  $this->framework_css["totelem"]["col"][$col_key]
+                    : 0
+                ) - (
+                    $this->with_choice
+                    ?  $this->framework_css["choice"]["col"][$col_key]
+                    : 0
+                ) - (
+                    1
+                    ?  $this->framework_css["perPage"]["col"][$col_key]
+                    : 0
+                );
+
+                if($this->framework_css["pagination"]["def"]["col"][$col_key] <= 0) {
+                    $this->framework_css["pagination"]["def"]["col"][$col_key] = 12;
                 }
             }
-            
-			//$this->tpl[0]->set_var("SectTotElem", "");
-		}
-				
-        if(!$totpage || !$this->with_choice) 
-        {
-            if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
-                foreach($this->framework_css["pagination"]["def"]["col"] AS $col_key => $col_value) {
-                    $this->framework_css["pagination"]["def"]["col"][$col_key] = $this->framework_css["pagination"]["def"]["col"][$col_key] + $this->framework_css["choice"]["col"][$col_key];
-                    if($this->framework_css["pagination"]["def"]["col"][$col_key] > 12)
-                        $this->framework_css["pagination"]["def"]["col"][$col_key] = 12;
-                }
-            }            
         }
+
+
         
 		if($totpage > 1) 
 		{
@@ -561,13 +569,13 @@ class ffPageNavigator_html extends ffPageNavigator_base
         	$this->tpl[0]->set_var("perpage_class", cm_getClassByDef($this->framework_css["perPage"], $perpage_class));
 			$this->tpl[0]->parse("SectSelector", false);
 		} else {
-            if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
+            /*if(is_array($this->framework_css["pagination"]["def"]["col"]) && count($this->framework_css["pagination"]["def"]["col"])) {
                 foreach($this->framework_css["pagination"]["def"]["col"] AS $col_key => $col_value) {
                     $this->framework_css["pagination"]["def"]["col"][$col_key] = $this->framework_css["pagination"]["def"]["col"][$col_key] + $this->framework_css["perPage"]["col"][$col_key];
                     if($this->framework_css["pagination"]["def"]["col"][$col_key] > 12)
                         $this->framework_css["pagination"]["def"]["col"][$col_key] = 12;
                 }
-            }
+            }*/
             
 			$this->tpl[0]->set_var("SectSelector", "");
 		}

@@ -1364,12 +1364,11 @@ tbody > tr:hover {
 */
 
 .ffGrid {
-
     margin: 15px 0;
-
     border-radius: 3px;
-
-    padding: 15px 0 5px; }
+    padding: 15px 0 5px;
+    /*overflow-x: auto;*/
+}
 
 .ffGrid h2 {
 
@@ -1512,7 +1511,7 @@ tbody > tr:hover {
 
     border-right: 1px solid #e7e7e7; }
 
-.ffGrid .search a.search {
+.ffGrid a.search {
 
     padding: 6px 12px; }
 
@@ -1523,7 +1522,6 @@ tbody > tr:hover {
     border: 1px solid #e7e7e7;
     padding: 10px;
     z-index: 10;
-
 }
 
 .ffGrid .adv-search.toggle {
