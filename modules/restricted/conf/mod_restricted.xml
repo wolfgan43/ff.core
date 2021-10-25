@@ -11,6 +11,7 @@
 	<layout>
 		<layer path="/restricted/ds" name="twocols" />
 		<nolayout path="/restricted/login" />
+		<nolayout path="/restricted/recover" />
 	</layout>
 	<sections>
 		<topbar default="true" submenu="true" icons="submenu" />

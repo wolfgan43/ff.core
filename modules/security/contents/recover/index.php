@@ -7,6 +7,8 @@ else
 	$db = mod_security_get_main_db();
 
 $cm->oPage->form_method = "post";
+if(MOD_SEC_LOGIN_FORCE_LAYER)
+    $cm->oPage->layer = MOD_SEC_LOGIN_FORCE_LAYER;
 
 if ($cm->modules["security"]["overrides"]["recover"]["tpl_file"])
 	$template_file = $cm->modules["security"]["overrides"]["recover"]["tpl_file"];
@@ -61,6 +63,27 @@ if (MOD_SECURITY_LOGON_USERID === "both" || MOD_SECURITY_LOGON_USERID === "email
 }
 
 $cm->oPage->addContent($tpl, null, "recover");
+
+
+$filename = (MOD_SEC_CSS_PATH
+    ? MOD_SEC_CSS_PATH
+    : "/modules/security/themes/" . cm_getMainTheme() . "/css/ff.modules.security.css"
+);
+
+$cm->oPage->tplAddCss("ff.modules.security", array(
+    "file" =>  basename($filename)
+, "path" => ffCommon_dirname($filename)
+));
+
+$filename = $cm->oPage->getThemePath() . "/css/login.css";
+if(is_file(FF_DISK_PATH . $filename)) {
+    $cm->oPage->tplAddCss("ff.modules.security.login", array(
+        "file" =>  basename($filename)
+    , "path" => ffCommon_dirname($filename)
+    ));
+}
+
+
 
 $frmAction = $_REQUEST["frmAction"];
 
