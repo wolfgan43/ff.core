@@ -855,9 +855,9 @@ class ffWidget_actex extends ffCommon
 				}
             }
 
-		   	$this->tpl[$tpl_id]->set_var("selected_value", "'" . str_replace(array("'", '"'), array("\\'", '"'), (implode(",", $arrSelectedValue))) . "'");
-			$this->tpl[$tpl_id]->set_var("selected_label", implode(",", $arrSelectedLabel));
-		}		
+		   	$this->tpl[$tpl_id]->set_var("selected_value", "'" . str_replace(array("'", '"'), array("\\'", '\\"'), (implode(",", $arrSelectedValue))) . "'");
+			$this->tpl[$tpl_id]->set_var("selected_label", str_replace(array("'", '"'), array("\\'", '\\"'), implode(",", $arrSelectedLabel)));
+		}
 		
 		$this->tpl[$tpl_id]->set_var("SectMulti", "");
 		$this->tpl[$tpl_id]->set_var("SectMultiElem", "");
