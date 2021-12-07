@@ -132,7 +132,7 @@ function cm_findCascadeClass($class_type, $theme, $id = null, $variant_name = nu
     if ($theme != cm_getMainTheme())
         return cm_findCascadeClass($class_type, cm_getMainTheme(), $id, $variant_name, $raise_error);
     if ($theme == cm_getMainTheme() && $raise_error)
-        ffErrorHandler::raise("CM: Unable to find Class", E_USER_ERROR, $this, get_defined_vars());
+        ffErrorHandler::raise("CM: Unable to find Class", E_USER_ERROR, null, get_defined_vars());
     else
         return null;
 }

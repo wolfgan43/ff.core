@@ -61,6 +61,15 @@ __ff : true, // used to recognize ff'objects
     jQuery(elem).parent().addClass(this.class.current);
     jQuery("i", elem).removeClass(this.icons.sort + " " + this.icons.sortAsc + " " + this.icons.sortDesc).addClass(jQuery("#" + id + "_direction").val() == "ASC" ? this.icons.sortAsc : this.icons.sortDesc);
 
+	var search = location.search;
+	search = ff.updateQueryString(search, id + "_order", jQuery("#" + id + "_order").val(), "?");
+	search = ff.updateQueryString(search, id + "_direction", jQuery("#" + id + "_direction").val(), "?");
+	if(history.pushState) {
+		history.pushState(null, null, search);
+	} else {
+		location.search = search;
+	}
+
 	if (ctx === undefined) {
 	    ff.load("ff.ajax", function() {
 			ff.ajax.doRequest({
