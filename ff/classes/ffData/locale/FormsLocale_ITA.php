@@ -147,10 +147,11 @@ function FormsLocale_ITA_GetExtCurrency($oFormsData)
 	if ($oFormsData[0]->value_sign)
 			$sign = "- ";
 
-	if ($oFormsData[0]->format_currency_showdecimals)
-		return $sign . number_format($oFormsData[0]->value_numeric_integer + round($oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 5), 5, ",", ".");
-	else
-		return $sign . number_format($oFormsData[0]->value_numeric_integer + round($oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 5), 0, ",", ".");
+	if ($oFormsData[0]->format_currency_showdecimals) {
+        return $sign . number_format($oFormsData[0]->value_numeric_integer + round( (int) $oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 5), 5, ",", ".");
+    } else {
+        return $sign . number_format($oFormsData[0]->value_numeric_integer + round((int) $oFormsData[0]->value_numeric_decimal / pow(10, strlen($oFormsData[0]->value_numeric_decimal)), 5), 0, ",", ".");
+    }
 }
 
 function FormsLocale_ITA_SetNumber($oFormsData, $value)
