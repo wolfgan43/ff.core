@@ -2136,8 +2136,6 @@ tbody > tr:hover {
     margin-bottom: 30px;
     border: 1px solid transparent;
     border-radius: 4px;
-    float:left;
-    width:100%;
 }
 
 .bs-callout-info.norecord{
@@ -3162,7 +3160,6 @@ p{
     float: left;
     width: 100%;
 }
-
 .blockcomposer .table-striped>tbody>tr:nth-of-type(odd), .blockcomposer .table-striped>tbody>tr:nth-of-type(even), .blockcomposer .table-striped>tbody>tr:hover td {
     background-color: #FFFFFF!important;
 }
@@ -3182,6 +3179,9 @@ p{
 }
 .blockcomposer .table>tbody>tr>td:first-of-type, .blockcomposer .table>tbody>tr>td:last-of-type{
     width: 30px;
+}
+.blockcomposer .table>tbody>tr:not(.clickable)>td {
+    width: auto;
 }
 .blockcomposer .table-striped > TBODY > tr{
     border-left: 5px solid #e7e7e7;
@@ -3265,10 +3265,12 @@ p{
     background-image: linear-gradient(45deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.25) 75%, rgba(0,0,0,0.25) 100%);
     background-size: 56.57px 56.57px;
 }
-.blockcomposer TD.cel-2.ffButton{
+.blockcomposer TD.cel-2.ffButton, .blockcomposer td:nth-child(3){
     margin-left: -30px;
     z-index: 100;
     position: absolute;
+    width:30px!important;
+    padding: 0;
 }
 .blockcomposer TD.ffButton{
     background: none!important;
@@ -3523,6 +3525,7 @@ p{
 .blockcomposer .offset-11 {
     margin-left: 91.666667%;
 }
+
 #ArticleDetail1_GridData > tr.clickable.ajax > td.cel-1.ffField.text > div > div > div > table > tbody > tr > td, #ArticleDetail1_GridData > tr.clickable.ajax > td.cel-1.ffField.text > div > div > div > table > tbody > tr > td{
     height: auto!important;
     width: auto!important;
@@ -6039,7 +6042,7 @@ p{
     width: 116px;
     ovreflow:hidden;
     position: relative;
-    margin: 0 2px;
+    margin: 0 2px 4px 2px;
 }
 #GestoreUpload table tr td.ffButton{
     display: block;
@@ -6087,6 +6090,8 @@ p{
     white-space: nowrap;
     border: 1px solid #cccccc;
     border-top: none;
+    direction: rtl;
+    font-size: 10px;
 }
 /* USERS */
 .users{
@@ -6102,51 +6107,8 @@ p{
 .fa-eye:before,.fa-eye-slash:before {
     width: 23px;
 }
-.bg-lunedi{
-    background: rgba(255,94,91,0.75)!important;
-}
-.bg-lunedi > td {
-    border-top: 1px solid #FF5E5B!important;
-}
-.bg-martedi{
-    background: rgba(236,155,154,0.75)!important;
-}
-.bg-martedi > td {
-    border-top: 1px solid #EC9B9A!important;
-}
-.bg-mercoledi{
-    background: rgba(216,216,216,0.75)!important;
-}
-.bg-mercoledi > td {
-    border-top: 1px solid #D8D8D8!important;
-}
-.bg-giovedi{
-    background: rgba(255,255,234,0.75)!important;
-}
-.bg-giovedi > td {
-    border-top: 1px solid #FFFFEA!important;
-}
-.bg-venerdi{
-    background: rgba(0,216,203,0.75)!important;
-}
-.bg-venerdi > td {
-    border-top: 1px solid #00CECB!important;
-}
-.bg-sabato{
-    background: rgba(128,222,153,0.75)!important;
-}
-.bg-sabato > td {
-    border-top: 1px solid #80DE99!important;
-}
-.bg-domenica{
-    background: rgba(255,237,102,0.75)!important;
-}
-.bg-domenica > td {
-    border-top: 1px solid #FFED66!important;
-}
-.border-right {
-    border-right: 1px solid #dee2e6!important;
-}
-.border-left {
-    border-left: 1px solid #dee2e6!important;
+#ModSecUtenti div.form-control{
+    border:none!important;
+    height:auto!important;
+    box-shadow:none!important;
 }

@@ -47,7 +47,7 @@ class ffValidator_url_vimeo extends ffValidator_base
 		if(!strlen($url))
 			return false;
 		
-        if(strpos($url, "player.vimeo.com/video") === false) {
+        if(strpos($url, "vimeo.com")=== false) {
             return "L'url inserito nel campo \"$label\" non è un video Vimeo";
         }
         

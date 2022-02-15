@@ -162,7 +162,30 @@ function mod_keeng_enforce_config ($params) {
 		// default dimensions
 		$allowed_res = array(
 			//x
+            "2048" => array(
+                //y
+                "815" => true
+                , "0" => true
+            ),
+            "1140" => array(
+                //y
+                "200" => true
+                , "90" => true
+            ),
             "1080" => array(
+                //y
+                "0" => true
+            ),
+            "970" => array(
+                //y
+                "250" => true,
+                "90" => true
+            ),
+            "640" => array(
+                //y
+                "360" => true
+            ),
+            "575" => array(
                 //y
                 "0" => true
             ),
@@ -170,7 +193,27 @@ function mod_keeng_enforce_config ($params) {
                 //y
                 "0" => true
             ),
-			"100" => array(
+            "349" => array(
+                //y
+                "175" => true
+            ),
+            "300" => array(
+                //y
+                "300" => true
+            ),
+            "214" => array(
+                //y
+                "285" => true
+            ),
+            "208" => array(
+                //y
+                "73" => true
+            ),
+            "107" => array(
+                //y
+                "143" => true
+            ),
+            "100" => array(
 				//y
 				"100" => true
 			),
@@ -191,48 +234,72 @@ function mod_keeng_enforce_config ($params) {
 			mod_keeng_get_allowed($cols, IMG_XL_21_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_XL_16_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_XL_4_3, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_XL_21_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_XL_16_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_XL_4_3_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_XL_1_1, $allowed_res);
 
 			// Dimensioni Immagini Grandi FULL
 			mod_keeng_get_allowed($cols, IMG_LG_21_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_LG_16_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_LG_4_3, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_LG_21_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_LG_16_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_LG_4_3_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_LG_1_1, $allowed_res);
 
 			// Dimensioni Immagini Medie FULL
 			mod_keeng_get_allowed($cols, IMG_MD_21_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_MD_16_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_MD_4_3, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_MD_21_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_MD_16_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_MD_4_3_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_MD_1_1, $allowed_res);
 
 			// Dimensioni Immagini Piccole FULL
 			mod_keeng_get_allowed($cols, IMG_SM_21_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_SM_16_9, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_SM_4_3, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_SM_21_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_SM_16_9_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_SM_4_3_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_SM_1_1, $allowed_res);
 
 			// Dimensioni Immagini Grandi CONTAINER
 			mod_keeng_get_allowed($cols, IMG_XL_21_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_XL_16_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_XL_4_3_c, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_XL_21_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_XL_16_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_XL_4_3_c_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_XL_1_1_c, $allowed_res);
 
 			// Dimensioni Immagini Grandi CONTAINER
 			mod_keeng_get_allowed($cols, IMG_LG_21_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_LG_16_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_LG_4_3_c, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_LG_21_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_LG_16_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_LG_4_3_c_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_LG_1_1_c, $allowed_res);
 
 			// Dimensioni Immagini Medie CONTAINER
 			mod_keeng_get_allowed($cols, IMG_MD_21_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_MD_16_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_MD_4_3_c, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_MD_21_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_MD_16_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_MD_4_3_c_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_MD_1_1_c, $allowed_res);
 
 			// Dimensioni Immagini Piccole CONTAINER
 			mod_keeng_get_allowed($cols, IMG_SM_21_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_SM_16_9_c, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_SM_4_3_c, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_SM_21_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_SM_16_9_c_v, $allowed_res);
+			mod_keeng_get_allowed($cols, IMG_SM_4_3_c_v, $allowed_res);
 			mod_keeng_get_allowed($cols, IMG_SM_1_1_c, $allowed_res);		
 		}
 		

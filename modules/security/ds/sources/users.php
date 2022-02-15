@@ -10,8 +10,8 @@ if(strlen(MOD_SEC_USER_FIRSTNAME)) {
 		$strKeyDescrizione .= ",";
 
 	$strKeyDescrizione .= $db->toSql(MOD_SEC_USER_FIRSTNAME);
-	
-	$strAddSearchFields .= ", (SELECT 
+	/*
+	$strAddSearchFields .= ", (SELECT
 									" . $options["table_dett_name"] . ".value
 								FROM
 									" . $options["table_dett_name"] . "
@@ -19,7 +19,8 @@ if(strlen(MOD_SEC_USER_FIRSTNAME)) {
 									" . $options["table_dett_name"] . ".ID_users = " . $options["table_name"] . ".ID
 									AND " . $options["table_dett_name"] . ".field = " . $db->toSql(MOD_SEC_USER_FIRSTNAME) . "
 							) AS firstname
-				";
+				";*/
+    $strAddSearchFields .= ", `cm_mod_security_users`.firstname AS firstname";
 }
 if(strlen(MOD_SEC_USER_LASTNAME)) {
 	if(strlen($strKeyDescrizione))
@@ -27,7 +28,7 @@ if(strlen(MOD_SEC_USER_LASTNAME)) {
 
 	$strKeyDescrizione .= $db->toSql(MOD_SEC_USER_LASTNAME);
 	
-	$strAddSearchFields .= ", (SELECT 
+	/*$strAddSearchFields .= ", (SELECT
 									" . $options["table_dett_name"] . ".value
 								FROM
 									" . $options["table_dett_name"] . "
@@ -35,7 +36,8 @@ if(strlen(MOD_SEC_USER_LASTNAME)) {
 									" . $options["table_dett_name"] . ".ID_users = " . $options["table_name"] . ".ID
 									AND " . $options["table_dett_name"] . ".field = " . $db->toSql(MOD_SEC_USER_LASTNAME) . "
 							) AS lastname
-				";
+				";*/
+    $strAddSearchFields .= ", `cm_mod_security_users`.lastname AS lastname";
 }
 
 if(strlen(MOD_SEC_USER_COMPANY)) {
@@ -57,6 +59,9 @@ if(strlen(MOD_SEC_USER_COMPANY)) {
 
 if (strlen($strKeyDescrizione))
 {
+    $addSqlDescrizione .= ", CONCAT(`cm_mod_security_users`.firstname, ' ', `cm_mod_security_users`.lastname) AS descrizione";
+
+    /*
 	$addSqlDescrizione = "			
 			, (SELECT 
 					GROUP_CONCAT(IF(`" . $options["table_dett_name"] . "`.value = " . $db->toSql(MOD_SEC_USER_COMPANY) . "
@@ -71,7 +76,7 @@ if (strlen($strKeyDescrizione))
 					`" . $options["table_dett_name"] . "`.ID_users = `" . $options["table_name"] . "`.ID
 					AND `" . $options["table_dett_name"] . "`.field IN (" . $strKeyDescrizione . ")
 			) AS descrizione
-		";
+		";*/
 }
 
 /*if (MOD_SEC_CRYPT)
