@@ -28,6 +28,7 @@ if (!defined("MOD_SEC_LOGIN_REGISTER")) define ("MOD_SEC_LOGIN_REGISTER", false)
 
 if (!defined("MOD_SEC_FORCE_XHR")) define ("MOD_SEC_FORCE_XHR", false);
 
+// SAMUELE VUOLE CHE LA METTO A NULL
 if (!defined("MOD_SEC_LOGIN_FORCE_LAYER")) define ("MOD_SEC_LOGIN_FORCE_LAYER", "empty");
 
 if (!defined("MOD_SECURITY_REGISTER_PRIVACY"))	define("MOD_SECURITY_REGISTER_PRIVACY", false);
