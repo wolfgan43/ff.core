@@ -69,6 +69,11 @@ class CreateOrder
                                                     'currency_code' => 'USD',
                                                     'value' => '10.00',
                                                 ),
+                                            'discount' =>
+                                                array(
+                                                    'currency_code' => 'USD',
+                                                    'value' => '10.00',
+                                                ),
                                         ),
                                 ),
                             'items' =>

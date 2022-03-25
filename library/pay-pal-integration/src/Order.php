@@ -298,9 +298,13 @@ class Order
             $taxtotal['value'] = self::_formatPrice($taxtotal['value']);
             $tmp['amount']['breakdown']['item_total'] = $itemtotal;
             $tmp['amount']['breakdown']['tax_total'] = $taxtotal;
+
+
         }
 
         $body['purchase_units'][] = $tmp;
+        // TEST MIRKO
+        //$body['purchase_units']['discount'] = '10';
         return $body;
     }
 
