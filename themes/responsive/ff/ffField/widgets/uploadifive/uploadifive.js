@@ -415,7 +415,7 @@ ff.ffField.uploadifive = (function () {
 					var ext = fileThumb.split('.').pop();
                     fileThumb = fileThumb.replace("." + ext, "-" + thisData["modelThumb"] + "." + ext);
 				}
-				previewBlock = '<a href="' + showFileDetail + '" class="' + showFileClass + '" target="_blank"' + descBlock + ' rel="' + previewUrl + '" ' + showFileAjaxDetail + '><img id="' + fileValueNormalized + '" class="image" src="' + previewUrl + fileThumb + '" /></a>';
+				previewBlock = '<a href="' + showFileDetail + '" class="' + showFileClass + '" ' + descBlock + ' rel="' + previewUrl + '" ' + showFileAjaxDetail + '><img id="' + fileValueNormalized + '" class="image" src="' + previewUrl + fileThumb + '" /></a>';
 			}
             
 			if(thisData["aviary"])

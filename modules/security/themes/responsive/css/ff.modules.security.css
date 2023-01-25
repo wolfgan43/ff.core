@@ -43,6 +43,10 @@ a.recover {
     padding-bottom:30px;
 }
 
+.logo-login img {
+    width: 100%;
+}
+
 span.no-account{
     padding:15px 0;
     color:#fff;

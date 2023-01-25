@@ -408,7 +408,7 @@ ff.ffField.kcuploadifive = (function () {
 				} else {
 					showFileDetail = thisData["previewPath"] + '/' + fileValue.trim("/");
 				}
-				previewBlock = '<a href="' + showFileDetail + '" class="' + showFileClass + '" target="_blank"' + descBlock + ' rel="' + previewUrl + '" ' + showFileAjaxDetail + '><img id="' + fileValueNormalized + '" class="image" src="' + previewUrl + fileValue + '" /></a>';
+				previewBlock = '<a href="' + showFileDetail + '" class="' + showFileClass + '" ' + descBlock + ' rel="' + previewUrl + '" ' + showFileAjaxDetail + '><img id="' + fileValueNormalized + '" class="image" src="' + previewUrl + fileValue + '" /></a>';
 			}
 			if(thisData["aviary"])
 				editBlock = '<a href="javascript:void(0);" alt="modify" class="' + thisData["icons"]["aviary"] + '" onclick="ff.load(\'ff.ffField.aviary\', function() { ff.ffField.aviary.launch(\'' + fileValueNormalized + '\', \'' + fileValue + '\', \'' + thisData["aviary"]["img_hash"] + '\', \'' + thisData["aviary"]["key"] + '\', \'' + thisData["aviary"]["tools"] + '\', \'' + thisData["aviary"]["theme"] + '\', \'' + thisData["aviary"]["version"] + '\', \'' + thisData["aviary"]["post_url"] + '\'); });"></a>';

@@ -306,11 +306,11 @@ Il javascript � embedded in /themes/comune.info/applets/poi_group/index.html
 	function init($Field)
 	{
 		if (!is_array($Field[0]->multi_fields) || !count($Field[0]->multi_fields))
-			$Field[0]->multi_fields = array(
-					"lat" 		=> array("type" => "Text")
-					, "lng" 	=> array("type" => "Text")
-					, "title" 	=> array("type" => "Text")
-					, "zoom" 	=> array("type" => "Text")
-				);
+            $Field[0]->multi_fields = array(
+                "lat" 		=> array("type" => "Text", "default" => new ffData("0"))
+                , "lng" 	=> array("type" => "Text", "default" => new ffData("0"))
+                , "title" 	=> array("type" => "Text")
+                , "zoom" 	=> array("type" => "Text", "default" => new ffData("0"))
+            );
 	}
 }
